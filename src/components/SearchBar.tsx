@@ -18,7 +18,7 @@ const SearchBar = () => {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
             <Input
               type="text"
-              placeholder="Search businesses by name, industry..."
+              placeholder="Rechercher par nom, secteur d'activité..."
               className="pl-10 h-12 bg-background border-border"
             />
           </div>
@@ -26,13 +26,13 @@ const SearchBar = () => {
         
         <Select>
           <SelectTrigger className="w-full md:w-[200px] h-12 bg-background border-border">
-            <SelectValue placeholder="Industry" />
+            <SelectValue placeholder="Secteur" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="technology">Technology</SelectItem>
-            <SelectItem value="retail">Retail</SelectItem>
-            <SelectItem value="hospitality">Hospitality</SelectItem>
-            <SelectItem value="manufacturing">Manufacturing</SelectItem>
+            <SelectItem value="technology">Technologie</SelectItem>
+            <SelectItem value="retail">Commerce</SelectItem>
+            <SelectItem value="hospitality">Restauration</SelectItem>
+            <SelectItem value="manufacturing">Industrie</SelectItem>
             <SelectItem value="services">Services</SelectItem>
             <SelectItem value="ecommerce">E-commerce</SelectItem>
           </SelectContent>
@@ -40,19 +40,19 @@ const SearchBar = () => {
 
         <Select>
           <SelectTrigger className="w-full md:w-[200px] h-12 bg-background border-border">
-            <SelectValue placeholder="Price Range" />
+            <SelectValue placeholder="Prix" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="0-100k">Under $100K</SelectItem>
-            <SelectItem value="100k-500k">$100K - $500K</SelectItem>
-            <SelectItem value="500k-1m">$500K - $1M</SelectItem>
-            <SelectItem value="1m-5m">$1M - $5M</SelectItem>
-            <SelectItem value="5m+">$5M+</SelectItem>
+            <SelectItem value="0-100k">Moins de 100K€</SelectItem>
+            <SelectItem value="100k-500k">100K€ - 500K€</SelectItem>
+            <SelectItem value="500k-1m">500K€ - 1M€</SelectItem>
+            <SelectItem value="1m-5m">1M€ - 5M€</SelectItem>
+            <SelectItem value="5m+">Plus de 5M€</SelectItem>
           </SelectContent>
         </Select>
 
         <Button className="h-12 px-8 bg-accent hover:bg-accent/90 text-accent-foreground font-semibold">
-          Search
+          Rechercher
         </Button>
       </div>
     </div>

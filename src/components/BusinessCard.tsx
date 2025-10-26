@@ -28,16 +28,16 @@ const BusinessCard = ({
     <Card className="group hover:shadow-[var(--shadow-hover)] transition-all duration-300 bg-gradient-to-b from-card to-background border-border">
       <CardHeader>
         <div className="flex items-start justify-between mb-2">
-          <Badge variant={featured ? "default" : "secondary"} className="mb-2">
+          <Badge variant={featured ? "default" : "secondary"} className={featured ? "bg-accent text-accent-foreground" : ""}>
             {industry}
           </Badge>
           {featured && (
-            <Badge variant="default" className="bg-accent text-accent-foreground">
-              Featured
+            <Badge className="bg-accent text-accent-foreground">
+              En vedette
             </Badge>
           )}
         </div>
-        <CardTitle className="text-xl font-bold text-foreground group-hover:text-primary transition-colors">
+        <CardTitle className="text-xl font-bold text-foreground group-hover:text-accent transition-colors">
           {title}
         </CardTitle>
         <div className="flex items-center gap-1 text-sm text-muted-foreground mt-1">
@@ -52,28 +52,28 @@ const BusinessCard = ({
         
         <div className="grid grid-cols-2 gap-4 mb-4">
           <div>
-            <p className="text-xs text-muted-foreground mb-1">Annual Revenue</p>
+            <p className="text-xs text-muted-foreground mb-1">Chiffre d'affaires annuel</p>
             <p className="font-semibold text-foreground flex items-center gap-1">
-              <TrendingUp className="w-4 h-4 text-secondary" />
+              <TrendingUp className="w-4 h-4 text-accent" />
               {revenue}
             </p>
           </div>
           <div>
-            <p className="text-xs text-muted-foreground mb-1">Annual Profit</p>
-            <p className="font-semibold text-secondary">{profit}</p>
+            <p className="text-xs text-muted-foreground mb-1">Bénéfice annuel</p>
+            <p className="font-semibold text-accent">{profit}</p>
           </div>
         </div>
 
         <div className="flex items-center justify-between pt-4 border-t border-border">
           <div>
-            <p className="text-xs text-muted-foreground mb-1">Asking Price</p>
-            <p className="text-2xl font-bold text-primary flex items-center gap-1">
+            <p className="text-xs text-muted-foreground mb-1">Prix demandé</p>
+            <p className="text-2xl font-bold text-accent flex items-center gap-1">
               <DollarSign className="w-5 h-5" />
-              {price}
+              {price}€
             </p>
           </div>
-          <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
-            View Details
+          <Button className="bg-accent hover:bg-accent/90 text-accent-foreground">
+            Voir détails
           </Button>
         </div>
       </CardContent>
