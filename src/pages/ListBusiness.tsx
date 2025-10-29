@@ -944,15 +944,37 @@ const ListBusiness = () => {
             {/* Sidebar - 1/3 width */}
             <div className="space-y-6">
               {/* Score de visibilité */}
-              <div className="bg-card p-6 rounded-2xl shadow-elegant border border-border/50 sticky top-6">
+              <div className="bg-card p-6 rounded-2xl shadow-elegant border border-border/50 sticky top-6 transition-all duration-300">
                 <div className="mb-4">
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="text-lg font-semibold">Score de visibilité</h3>
-                    <Badge variant={visibilityScore >= 80 ? "default" : "secondary"} className="text-lg">
-                      🔴 {visibilityScore}%
+                    <Badge 
+                      variant={visibilityScore >= 80 ? "default" : "secondary"} 
+                      className={`text-lg transition-all duration-500 ${
+                        visibilityScore === 0 ? "bg-gray-500" :
+                        visibilityScore < 30 ? "bg-red-500 text-white" :
+                        visibilityScore < 60 ? "bg-orange-500 text-white" :
+                        visibilityScore < 80 ? "bg-yellow-500 text-white" :
+                        "bg-green-500 text-white"
+                      }`}
+                    >
+                      {visibilityScore === 0 ? "⚪" :
+                       visibilityScore < 30 ? "🔴" :
+                       visibilityScore < 60 ? "🟠" :
+                       visibilityScore < 80 ? "🟡" :
+                       "🟢"} {visibilityScore}%
                     </Badge>
                   </div>
-                  <Progress value={visibilityScore} className="h-2" />
+                  <Progress 
+                    value={visibilityScore} 
+                    className={`h-2 transition-all duration-500 ${
+                      visibilityScore === 0 ? "[&>div]:bg-gray-500" :
+                      visibilityScore < 30 ? "[&>div]:bg-red-500" :
+                      visibilityScore < 60 ? "[&>div]:bg-orange-500" :
+                      visibilityScore < 80 ? "[&>div]:bg-yellow-500" :
+                      "[&>div]:bg-green-500"
+                    }`}
+                  />
                 </div>
 
                 <div className="space-y-4">
