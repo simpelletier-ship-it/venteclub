@@ -10,9 +10,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
-import { User, MapPin, Globe, Bell, Mail, Save, Upload, Shield } from "lucide-react";
+import { User, CreditCard, Globe, Bell, Mail, Save, Upload, Shield } from "lucide-react";
 import { AlertsManager } from "@/components/AlertsManager";
 import { TwoFactorAuth } from "@/components/TwoFactorAuth";
+import { PaymentHistory } from "@/components/PaymentHistory";
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -25,11 +26,6 @@ const Settings = () => {
     phone: "",
     email: "",
     avatar_url: "",
-    street_address: "",
-    city: "",
-    province: "",
-    postal_code: "",
-    country: "Canada",
     bio: "",
     is_public: false,
     newsletter_enabled: false,
@@ -67,11 +63,6 @@ const Settings = () => {
           phone: profileData.phone || "",
           email: session.user.email || "",
           avatar_url: profileData.avatar_url || "",
-          street_address: profileData.street_address || "",
-          city: profileData.city || "",
-          province: profileData.province || "",
-          postal_code: profileData.postal_code || "",
-          country: profileData.country || "Canada",
           bio: profileData.bio || "",
           is_public: profileData.is_public || false,
           newsletter_enabled: profileData.newsletter_enabled || false,
@@ -99,11 +90,6 @@ const Settings = () => {
           phone: profile.phone,
           email: profile.email,
           avatar_url: profile.avatar_url,
-          street_address: profile.street_address,
-          city: profile.city,
-          province: profile.province,
-          postal_code: profile.postal_code,
-          country: profile.country,
           bio: profile.bio,
           is_public: profile.is_public,
           newsletter_enabled: profile.newsletter_enabled,
@@ -232,9 +218,9 @@ const Settings = () => {
                 <User className="h-4 w-4" />
                 <span className="hidden sm:inline">Personnel</span>
               </TabsTrigger>
-              <TabsTrigger value="address" className="flex items-center gap-2">
-                <MapPin className="h-4 w-4" />
-                <span className="hidden sm:inline">Adresse</span>
+              <TabsTrigger value="payments" className="flex items-center gap-2">
+                <CreditCard className="h-4 w-4" />
+                <span className="hidden sm:inline">Paiements</span>
               </TabsTrigger>
               <TabsTrigger value="security" className="flex items-center gap-2">
                 <Shield className="h-4 w-4" />
@@ -409,81 +395,8 @@ const Settings = () => {
               </Card>
             </TabsContent>
 
-            <TabsContent value="address" className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-primary">
-                    <MapPin className="h-5 w-5" />
-                    Adresse
-                  </CardTitle>
-                  <CardDescription>
-                    Votre adresse complète
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <Label htmlFor="street_address">Adresse</Label>
-                    <Input
-                      id="street_address"
-                      type="text"
-                      value={profile.street_address}
-                      onChange={(e) => setProfile({ ...profile, street_address: e.target.value })}
-                      placeholder="123 Rue Principale"
-                      className="mt-2"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="city">Ville</Label>
-                      <Input
-                        id="city"
-                        type="text"
-                        value={profile.city}
-                        onChange={(e) => setProfile({ ...profile, city: e.target.value })}
-                        placeholder="Montréal"
-                        className="mt-2"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="province">Province</Label>
-                      <Input
-                        id="province"
-                        type="text"
-                        value={profile.province}
-                        onChange={(e) => setProfile({ ...profile, province: e.target.value })}
-                        placeholder="Québec"
-                        className="mt-2"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="postal_code">Code postal</Label>
-                      <Input
-                        id="postal_code"
-                        type="text"
-                        value={profile.postal_code}
-                        onChange={(e) => setProfile({ ...profile, postal_code: e.target.value })}
-                        placeholder="H1A 1A1"
-                        className="mt-2"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="country">Pays</Label>
-                      <Input
-                        id="country"
-                        type="text"
-                        value={profile.country}
-                        onChange={(e) => setProfile({ ...profile, country: e.target.value })}
-                        placeholder="Canada"
-                        className="mt-2"
-                      />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+            <TabsContent value="payments" className="space-y-6">
+              <PaymentHistory userId={user?.id} />
             </TabsContent>
 
             <TabsContent value="security" className="space-y-6">
