@@ -346,10 +346,15 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
       }
     };
 
-    if (map.current.isStyleLoaded()) {
+    // Remove existing event listeners to avoid duplicates
+    if (map.current.loaded()) {
       addBusinessLayers();
     } else {
-      map.current.on('load', addBusinessLayers);
+      const loadHandler = () => {
+        addBusinessLayers();
+        map.current?.off('load', loadHandler);
+      };
+      map.current.on('load', loadHandler);
     }
 
   }, [businesses, navigate]);

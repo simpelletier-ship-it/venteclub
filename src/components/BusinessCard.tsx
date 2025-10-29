@@ -122,6 +122,11 @@ const BusinessCard = ({
                   ✗ Rejetée
                 </Badge>
               )}
+              {showActions && status === 'archived' && (
+                <Badge className="bg-gray-500 hover:bg-gray-600 text-white border-0 shadow-md text-xs">
+                  📝 Brouillon
+                </Badge>
+              )}
             </div>
             <h3 className="text-xl font-bold text-foreground group-hover:text-accent transition-colors line-clamp-1">
               {title}
