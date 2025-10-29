@@ -122,17 +122,17 @@ const Admin = () => {
 
       if (error) throw error;
 
-      // Send email notification
-      if (business?.seller_email) {
-        await supabase.functions.invoke('send-approval-email', {
-          body: {
-            email: business.seller_email,
-            businessTitle: business.title,
-            status: approvalStatus,
-            rejectionReason: rejectionReason,
-          }
-        });
-      }
+      // Send email notification (commented out temporarily due to resend package issue)
+      // if (business?.seller_email) {
+      //   await supabase.functions.invoke('send-approval-email', {
+      //     body: {
+      //       email: business.seller_email,
+      //       businessTitle: business.title,
+      //       status: approvalStatus,
+      //       rejectionReason: rejectionReason,
+      //     }
+      //   });
+      // }
 
       toast({
         title: "Succès",

@@ -20,10 +20,10 @@ const Settings = () => {
   });
 
   useEffect(() => {
-    fetchUserProfile();
+    loadUserData();
   }, []);
 
-  const fetchUserProfile = async () => {
+  const loadUserData = async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
@@ -34,7 +34,7 @@ const Settings = () => {
       setUser(session.user);
       setProfile(prev => ({ ...prev, email: session.user.email || "" }));
 
-      // Fetch profile data
+      // Load profile data
       const { data: profileData } = await supabase
         .from('profiles')
         .select('*')
@@ -49,7 +49,7 @@ const Settings = () => {
         });
       }
     } catch (error: any) {
-      console.error('Error fetching profile:', error);
+      console.error("Error loading profile:", error);
     }
   };
 
@@ -66,7 +66,7 @@ const Settings = () => {
           id: user.id,
           full_name: profile.full_name,
           phone: profile.phone,
-          email: user.email,
+          email: profile.email,
           updated_at: new Date().toISOString(),
         });
 
@@ -84,6 +84,29 @@ const Settings = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleChangePassword = async () => {
+    try {
+      if (!profile.email) return;
+
+      const { error } = await supabase.auth.resetPasswordForEmail(profile.email, {
+        redirectTo: `${window.location.origin}/auth`,
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Email envoyé",
+        description: "Un lien de réinitialisation a été envoyé à votre adresse email.",
+      });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: error.message,
+      });
     }
   };
 
@@ -106,7 +129,7 @@ const Settings = () => {
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-2xl mx-auto">
           <h1 className="text-4xl font-bold text-foreground mb-2">
-            Paramètres
+            Paramètres du compte
           </h1>
           <p className="text-muted-foreground mb-8">
             Gérez vos informations personnelles
@@ -115,9 +138,9 @@ const Settings = () => {
           <div className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Informations du compte</CardTitle>
+                <CardTitle>Informations personnelles</CardTitle>
                 <CardDescription>
-                  Mettez à jour vos informations personnelles
+                  Mettez à jour vos informations de profil
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -129,7 +152,7 @@ const Settings = () => {
                       type="email"
                       value={profile.email}
                       disabled
-                      className="mt-2 bg-muted"
+                      className="bg-muted mt-2"
                     />
                     <p className="text-xs text-muted-foreground mt-1">
                       L'email ne peut pas être modifié
@@ -172,34 +195,43 @@ const Settings = () => {
               <CardHeader>
                 <CardTitle>Sécurité</CardTitle>
                 <CardDescription>
-                  Gérez la sécurité de votre compte
+                  Gérez votre mot de passe
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <Button
                   variant="outline"
-                  onClick={async () => {
-                    try {
-                      const { error } = await supabase.auth.resetPasswordForEmail(
-                        profile.email,
-                        { redirectTo: `${window.location.origin}/auth` }
-                      );
-                      if (error) throw error;
-                      toast({
-                        title: "Email envoyé",
-                        description: "Vérifiez votre boîte de réception pour réinitialiser votre mot de passe.",
-                      });
-                    } catch (error: any) {
-                      toast({
-                        variant: "destructive",
-                        title: "Erreur",
-                        description: error.message,
-                      });
-                    }
-                  }}
+                  onClick={handleChangePassword}
+                  className="w-full"
                 >
-                  Changer le mot de passe
+                  Réinitialiser le mot de passe
                 </Button>
+                <p className="text-xs text-muted-foreground mt-2">
+                  Un email avec un lien de réinitialisation vous sera envoyé
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Informations du compte</CardTitle>
+                <CardDescription>
+                  Détails de votre compte
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <div className="flex justify-between py-2 border-b">
+                  <span className="text-sm font-medium">Identifiant</span>
+                  <span className="text-sm text-muted-foreground font-mono">
+                    {user?.id?.slice(0, 8)}...
+                  </span>
+                </div>
+                <div className="flex justify-between py-2">
+                  <span className="text-sm font-medium">Créé le</span>
+                  <span className="text-sm text-muted-foreground">
+                    {user?.created_at ? new Date(user.created_at).toLocaleDateString('fr-CA') : 'N/A'}
+                  </span>
+                </div>
               </CardContent>
             </Card>
           </div>

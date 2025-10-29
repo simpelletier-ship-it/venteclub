@@ -164,14 +164,14 @@ const ListBusiness = () => {
         }
       }
 
-      // Send email notification
-      await supabase.functions.invoke('send-approval-email', {
-        body: {
-          email: formData.seller_email,
-          businessTitle: validatedData.title,
-          status: 'pending',
-        }
-      });
+      // Send email notification (commented out temporarily due to resend package issue)
+      // await supabase.functions.invoke('send-approval-email', {
+      //   body: {
+      //     email: formData.seller_email,
+      //     businessTitle: validatedData.title,
+      //     status: 'pending',
+      //   }
+      // });
 
       toast({
         title: "Succès !",
