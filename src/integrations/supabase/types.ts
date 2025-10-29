@@ -491,6 +491,39 @@ export type Database = {
           },
         ]
       }
+      premium_subscriptions: {
+        Row: {
+          created_at: string
+          current_period_end: string
+          id: string
+          status: string
+          stripe_customer_id: string
+          stripe_subscription_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_period_end: string
+          id?: string
+          status?: string
+          stripe_customer_id: string
+          stripe_subscription_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_period_end?: string
+          id?: string
+          status?: string
+          stripe_customer_id?: string
+          stripe_subscription_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -755,6 +788,16 @@ export type Database = {
       is_business_featured: {
         Args: { business_uuid: string }
         Returns: boolean
+      }
+      sync_premium_subscription: {
+        Args: {
+          p_current_period_end: string
+          p_status: string
+          p_stripe_customer_id: string
+          p_stripe_subscription_id: string
+          p_user_id: string
+        }
+        Returns: undefined
       }
       use_token_for_access: {
         Args: { business_uuid: string; has_premium?: boolean }

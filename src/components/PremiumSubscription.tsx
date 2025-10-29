@@ -19,6 +19,28 @@ export const PremiumSubscription = ({ userId }: PremiumSubscriptionProps) => {
 
   useEffect(() => {
     checkSubscription();
+    
+    // Écouter les changements en temps réel sur l'abonnement Premium
+    const channel = supabase
+      .channel('premium-subscription-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'premium_subscriptions',
+          filter: `user_id=eq.${userId}`
+        },
+        (payload) => {
+          console.log('Premium subscription changed:', payload);
+          checkSubscription();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [userId]);
 
   const checkSubscription = async () => {
@@ -109,20 +131,24 @@ export const PremiumSubscription = ({ userId }: PremiumSubscriptionProps) => {
             <div className="space-y-3">
               <div className="flex items-center gap-2 text-sm">
                 <Check className="h-4 w-4 text-green-500" />
-                <span>Accès illimité à tous les vendeurs</span>
+                <span>✨ Accès automatique et illimité à TOUS les vendeurs</span>
               </div>
               <div className="flex items-center gap-2 text-sm">
                 <Check className="h-4 w-4 text-green-500" />
-                <span>Aucune limite de temps</span>
+                <span>🚀 Déblocage instantané sans limitation de temps</span>
               </div>
               <div className="flex items-center gap-2 text-sm">
                 <Check className="h-4 w-4 text-green-500" />
-                <span>Messagerie illimitée</span>
+                <span>💬 Messagerie illimitée avec tous les vendeurs</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm">
+                <Check className="h-4 w-4 text-green-500" />
+                <span>⏱️ Valide pendant toute la durée de l'abonnement (1 mois)</span>
               </div>
             </div>
 
             {subscriptionEnd && (
-              <div className="bg-muted p-3 rounded-lg">
+              <div className="bg-muted p-3 rounded-lg space-y-2">
                 <p className="text-sm text-muted-foreground">
                   Renouvellement le{' '}
                   <span className="font-semibold text-foreground">
@@ -133,6 +159,23 @@ export const PremiumSubscription = ({ userId }: PremiumSubscriptionProps) => {
                     })}
                   </span>
                 </p>
+                <div className="text-sm font-semibold text-primary">
+                  ⏱️ Temps restant: {(() => {
+                    const now = new Date();
+                    const end = new Date(subscriptionEnd);
+                    const diffMs = end.getTime() - now.getTime();
+                    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                    const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    
+                    if (diffDays > 0) {
+                      return `${diffDays} jour${diffDays > 1 ? 's' : ''} et ${diffHours} heure${diffHours > 1 ? 's' : ''}`;
+                    } else if (diffHours > 0) {
+                      return `${diffHours} heure${diffHours > 1 ? 's' : ''}`;
+                    } else {
+                      return 'Expire bientôt';
+                    }
+                  })()}
+                </div>
               </div>
             )}
 

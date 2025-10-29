@@ -53,6 +53,29 @@ serve(async (req) => {
     if (hasActiveSub) {
       const subscription = subscriptions.data[0];
       subscriptionEnd = new Date(subscription.current_period_end * 1000).toISOString();
+
+      // Synchroniser l'abonnement dans la base de données Supabase
+      const { error: syncError } = await supabaseClient.rpc('sync_premium_subscription', {
+        p_user_id: user.id,
+        p_stripe_customer_id: customerId,
+        p_stripe_subscription_id: subscription.id,
+        p_status: subscription.status,
+        p_current_period_end: subscriptionEnd
+      });
+
+      if (syncError) {
+        console.error("Error syncing subscription to database:", syncError);
+      }
+    } else {
+      // Mettre à jour le statut dans la base de données si l'abonnement n'est plus actif
+      const { error: syncError } = await supabaseClient
+        .from('premium_subscriptions')
+        .update({ status: 'canceled' })
+        .eq('user_id', user.id);
+
+      if (syncError) {
+        console.error("Error updating subscription status:", syncError);
+      }
     }
 
     return new Response(JSON.stringify({
