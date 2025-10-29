@@ -136,8 +136,7 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
       el.style.cursor = 'pointer';
       el.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
       el.style.transition = 'transform 0.2s, box-shadow 0.2s';
-      el.style.position = 'relative';
-      el.style.zIndex = '1';
+      el.style.transformOrigin = 'center bottom';
 
       // Hover effect
       el.addEventListener('mouseenter', () => {
@@ -206,8 +205,8 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
         maxWidth: '300px'
       }).setHTML(popupContent);
 
-      // Add marker with element
-      const marker = new mapboxgl.Marker({ element: el, anchor: 'center' })
+      // Add marker with element (using bottom anchor to avoid position shift)
+      const marker = new mapboxgl.Marker({ element: el, anchor: 'bottom' })
         .setLngLat([business.longitude, business.latitude])
         .addTo(map.current);
 

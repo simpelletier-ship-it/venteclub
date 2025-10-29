@@ -58,13 +58,6 @@ const BusinessDetails = () => {
     initialize();
   }, [id]);
 
-  // Re-check access when business data loads
-  useEffect(() => {
-    if (user && business && !hasAccess && !isVerifyingPayment) {
-      checkAccess(user.id);
-    }
-  }, [business, user]);
-
   const fetchPhotos = async () => {
     if (!id) return;
     
