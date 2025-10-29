@@ -52,6 +52,13 @@ const BusinessDetails = () => {
     }
   }, [id, searchParams, setSearchParams]);
 
+  // Re-check access when business data loads
+  useEffect(() => {
+    if (user && business && !hasAccess) {
+      checkAccess(user.id);
+    }
+  }, [business, user]);
+
   const fetchPhotos = async () => {
     if (!id) return;
     
@@ -112,14 +119,23 @@ const BusinessDetails = () => {
       setHasAccess(!!accessGranted);
 
       // If has access, fetch seller contact info
-      if (accessGranted && business) {
-        const { data: contact } = await supabase
-          .from('seller_contacts')
-          .select('email, phone')
-          .eq('seller_id', business.seller_id)
-          .maybeSingle();
-        
-        setSellerContact(contact);
+      if (accessGranted) {
+        // First get the business to find seller_id
+        const { data: businessData } = await supabase
+          .from('businesses')
+          .select('seller_id')
+          .eq('id', id)
+          .single();
+
+        if (businessData?.seller_id) {
+          const { data: contact } = await supabase
+            .from('seller_contacts')
+            .select('email, phone')
+            .eq('seller_id', businessData.seller_id)
+            .maybeSingle();
+          
+          setSellerContact(contact);
+        }
       }
     } catch (error: any) {
       console.error(error);

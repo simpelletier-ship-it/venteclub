@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import BusinessCard from "@/components/BusinessCard";
 import { MessagesList } from "@/components/MessagesList";
+import { PurchasedBusinesses } from "@/components/PurchasedBusinesses";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -150,8 +151,9 @@ const Dashboard = () => {
             <p className="text-muted-foreground mb-6">
               Gérez vos annonces et vos conversations
             </p>
-            <TabsList className="grid w-full max-w-md grid-cols-2">
+            <TabsList className="grid w-full max-w-3xl grid-cols-3">
               <TabsTrigger value="businesses">Mes annonces</TabsTrigger>
+              <TabsTrigger value="purchases">Mes achats</TabsTrigger>
               <TabsTrigger value="messages">Messages</TabsTrigger>
             </TabsList>
           </div>
@@ -211,6 +213,10 @@ const Dashboard = () => {
                 ))}
               </div>
             )}
+          </TabsContent>
+
+          <TabsContent value="purchases">
+            {user && <PurchasedBusinesses userId={user.id} />}
           </TabsContent>
 
           <TabsContent value="messages">
