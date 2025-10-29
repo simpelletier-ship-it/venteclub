@@ -27,6 +27,8 @@ const ListBusiness = () => {
     profit_margin: "",
     employees_count: "",
     year_established: "",
+    seller_email: "",
+    seller_phone: "",
   });
   const [photos, setPhotos] = useState<File[]>([]);
   const [photoPreviewUrls, setPhotoPreviewUrls] = useState<string[]>([]);
@@ -128,6 +130,23 @@ const ListBusiness = () => {
             photo_url: publicUrl,
             display_order: i,
           });
+        }
+      }
+
+      // Create or update seller contact info
+      if (formData.seller_email || formData.seller_phone) {
+        const { error: contactError } = await supabase
+          .from('seller_contacts')
+          .upsert({
+            seller_id: user.id,
+            email: formData.seller_email,
+            phone: formData.seller_phone,
+          }, {
+            onConflict: 'seller_id'
+          });
+
+        if (contactError) {
+          console.error('Contact info error:', contactError);
         }
       }
 
@@ -295,6 +314,37 @@ const ListBusiness = () => {
                   onChange={(e) => setFormData({ ...formData, year_established: e.target.value })}
                   placeholder="2010"
                 />
+              </div>
+            </div>
+
+            <div className="border-t pt-6 mt-6">
+              <h3 className="text-lg font-semibold mb-4">Vos coordonnées</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Ces informations seront visibles uniquement aux acheteurs qui paient pour y accéder (5$ CAD).
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <Label htmlFor="seller_email">Votre email *</Label>
+                  <Input
+                    id="seller_email"
+                    type="email"
+                    value={formData.seller_email}
+                    onChange={(e) => setFormData({ ...formData, seller_email: e.target.value })}
+                    required
+                    placeholder="votre@email.com"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="seller_phone">Votre téléphone</Label>
+                  <Input
+                    id="seller_phone"
+                    type="tel"
+                    value={formData.seller_phone}
+                    onChange={(e) => setFormData({ ...formData, seller_phone: e.target.value })}
+                    placeholder="+1 (514) 123-4567"
+                  />
+                </div>
               </div>
             </div>
 

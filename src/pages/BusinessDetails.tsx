@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -13,12 +13,12 @@ const BusinessDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [user, setUser] = useState<any>(null);
   const [business, setBusiness] = useState<any>(null);
   const [hasAccess, setHasAccess] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [showPlansDialog, setShowPlansDialog] = useState(false);
-  const [plans, setPlans] = useState<any[]>([]);
+  const [showPaymentDialog, setShowPaymentDialog] = useState(false);
   const [sellerContact, setSellerContact] = useState<any>(null);
   const [isPurchasing, setIsPurchasing] = useState(false);
   const [photos, setPhotos] = useState<any[]>([]);
@@ -33,9 +33,22 @@ const BusinessDetails = () => {
       }
     });
     fetchBusiness();
-    fetchPlans();
     fetchPhotos();
-  }, [id]);
+
+    // Check for payment success/cancel
+    const sessionId = searchParams.get('session_id');
+    if (searchParams.get('payment_success') === 'true' && sessionId) {
+      verifyPayment(sessionId);
+      setSearchParams({});
+    } else if (searchParams.get('payment_canceled') === 'true') {
+      toast({
+        variant: "destructive",
+        title: "Paiement annulé",
+        description: "Vous avez annulé le paiement.",
+      });
+      setSearchParams({});
+    }
+  }, [id, searchParams, setSearchParams]);
 
   const fetchPhotos = async () => {
     if (!id) return;
@@ -111,27 +124,91 @@ const BusinessDetails = () => {
     }
   };
 
-  const fetchPlans = async () => {
+  const verifyPayment = async (sessionId: string) => {
     try {
-      const { data, error } = await supabase
-        .from("subscription_plans")
-        .select("*")
-        .eq("is_active", true)
-        .order("price");
+      const { data, error } = await supabase.functions.invoke('verify-contact-payment', {
+        body: { sessionId }
+      });
 
       if (error) throw error;
-      setPlans(data || []);
+
+      if (data.error) {
+        toast({
+          variant: "destructive",
+          title: "Erreur",
+          description: data.error,
+        });
+        return;
+      }
+
+      toast({
+        title: "Paiement réussi!",
+        description: "Vous avez maintenant accès aux coordonnées du vendeur.",
+      });
+      
+      setHasAccess(true);
+      setSellerContact(data.sellerContact);
+
+      // Refresh the page to update access
+      if (user) {
+        checkAccess(user.id);
+      }
     } catch (error: any) {
-      console.error(error);
+      console.error('Payment verification error:', error);
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: error.message || "Erreur lors de la vérification du paiement",
+      });
     }
   };
 
   const handleUnlockAccess = () => {
     if (!user) {
+      toast({
+        title: "Connexion requise",
+        description: "Vous devez vous connecter pour accéder aux coordonnées du vendeur.",
+      });
       navigate("/auth");
       return;
     }
-    setShowPlansDialog(true);
+    setShowPaymentDialog(true);
+  };
+
+  const handlePayForAccess = async () => {
+    if (!id) return;
+    
+    setIsPurchasing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('create-contact-checkout', {
+        body: { businessId: id }
+      });
+
+      if (error) throw error;
+
+      if (data?.error) {
+        toast({
+          variant: "destructive",
+          title: "Erreur",
+          description: data.error,
+        });
+        return;
+      }
+
+      if (data?.url) {
+        window.open(data.url, '_blank');
+        setShowPaymentDialog(false);
+      }
+    } catch (error: any) {
+      console.error('Payment error:', error);
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: error.message || "Erreur lors de la création du paiement",
+      });
+    } finally {
+      setIsPurchasing(false);
+    }
   };
 
   const handlePurchasePlan = async (planId: string) => {
@@ -171,7 +248,7 @@ const BusinessDetails = () => {
       });
       setHasAccess(true);
       setSellerContact(data.sellerContact);
-      setShowPlansDialog(false);
+      setShowPaymentDialog(false);
       
       // Refresh access
       if (user) {
@@ -363,14 +440,13 @@ const BusinessDetails = () => {
                     <div className="bg-gradient-to-br from-primary/5 to-accent/5 p-6 rounded-lg text-center">
                       <Lock className="w-12 h-12 mx-auto mb-4 text-accent" />
                       <h3 className="text-lg font-semibold mb-2">
-                        Accès premium requis
+                        Coordonnées du vendeur verrouillées
                       </h3>
                       <p className="text-muted-foreground mb-4">
-                        Débloquez les informations complètes du vendeur pour
-                        entrer en contact
+                        Payez 5$ CAD pour accéder aux informations de contact du vendeur (email et téléphone)
                       </p>
                       <Button size="lg" onClick={handleUnlockAccess}>
-                        Débloquer l'accès
+                        Débloquer pour 5$ CAD
                       </Button>
                     </div>
                   )}
@@ -381,44 +457,46 @@ const BusinessDetails = () => {
         </div>
       </div>
 
-      <Dialog open={showPlansDialog} onOpenChange={setShowPlansDialog}>
-        <DialogContent className="max-w-4xl">
+      <Dialog open={showPaymentDialog} onOpenChange={setShowPaymentDialog}>
+        <DialogContent>
           <DialogHeader>
-            <DialogTitle>Choisissez votre forfait</DialogTitle>
+            <DialogTitle>Accéder aux coordonnées du vendeur</DialogTitle>
             <DialogDescription>
-              Achetez des crédits pour accéder aux informations des vendeurs
+              Payez 5$ CAD pour débloquer les coordonnées complètes du vendeur
             </DialogDescription>
           </DialogHeader>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-            {plans.map((plan) => (
-              <div
-                key={plan.id}
-                className="border border-border rounded-lg p-6 flex flex-col"
-              >
-                <h3 className="text-xl font-bold mb-2">{plan.name}</h3>
-                <div className="text-3xl font-bold text-accent mb-2">
-                  {plan.price}€
-                </div>
-                <p className="text-sm text-muted-foreground mb-4 flex-1">
-                  {plan.description}
-                </p>
-                <ul className="space-y-2 mb-6">
-                  <li className="text-sm">
-                    ✓ {plan.credits} crédits d'accès
-                  </li>
-                  <li className="text-sm">
-                    ✓ Valide {plan.duration_days} jours
-                  </li>
-                </ul>
-                <Button
-                  onClick={() => handlePurchasePlan(plan.id)}
-                  className="w-full"
-                  disabled={isPurchasing}
-                >
-                  {isPurchasing ? "Traitement..." : "Acheter"}
-                </Button>
+          <div className="space-y-4 py-4">
+            <div className="bg-secondary/20 p-4 rounded-lg border border-border">
+              <h3 className="font-semibold mb-2">{business?.title}</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Accédez à l'email et au numéro de téléphone du vendeur pour le contacter directement.
+              </p>
+              <div className="flex items-center gap-2 text-primary">
+                <Lock className="h-5 w-5" />
+                <span className="font-bold">5$ CAD - Paiement unique</span>
               </div>
-            ))}
+            </div>
+            <div className="text-sm text-muted-foreground">
+              <p className="mb-2">✅ Email du vendeur</p>
+              <p className="mb-2">✅ Téléphone du vendeur</p>
+              <p>✅ Accès permanent à ces coordonnées</p>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <Button 
+              onClick={handlePayForAccess} 
+              disabled={isPurchasing}
+              className="flex-1"
+            >
+              {isPurchasing ? "Traitement..." : "Payer 5$ CAD"}
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={() => setShowPaymentDialog(false)}
+              disabled={isPurchasing}
+            >
+              Annuler
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
