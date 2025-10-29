@@ -8,81 +8,63 @@ import { ArrowRight, Grid3x3, List } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { SEO } from "@/components/SEO";
 import heroImage from "@/assets/hero-business-pro.jpg";
-
 const Index = () => {
   const navigate = useNavigate();
   const [featuredBusinesses, setFeaturedBusinesses] = useState<any[]>([]);
   const [allBusinesses, setAllBusinesses] = useState<any[]>([]);
   const [filteredBusinesses, setFilteredBusinesses] = useState<any[]>([]);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-
   useEffect(() => {
     fetchBusinesses();
   }, []);
-
   const fetchBusinesses = async () => {
     // Fetch all approved businesses (active or sold within 3 months)
-    const { data: businesses } = await supabase
-      .from('businesses')
-      .select('*')
-      .in('status', ['active', 'sold'])
-      .eq('approval_status', 'approved')
-      .order('created_at', { ascending: false });
-
+    const {
+      data: businesses
+    } = await supabase.from('businesses').select('*').in('status', ['active', 'sold']).eq('approval_status', 'approved').order('created_at', {
+      ascending: false
+    });
     if (businesses) {
       // Check which ones are featured
-      const businessesWithFeature = await Promise.all(
-        businesses.map(async (business) => {
-          const { data: isFeatured } = await supabase
-            .rpc('is_business_featured', { business_uuid: business.id });
-          return { ...business, featured: !!isFeatured };
-        })
-      );
+      const businessesWithFeature = await Promise.all(businesses.map(async business => {
+        const {
+          data: isFeatured
+        } = await supabase.rpc('is_business_featured', {
+          business_uuid: business.id
+        });
+        return {
+          ...business,
+          featured: !!isFeatured
+        };
+      }));
 
       // Separate featured and regular businesses
-      const featured = businessesWithFeature
-        .filter(b => b.featured && b.status === 'active')
-        .slice(0, 3);
+      const featured = businessesWithFeature.filter(b => b.featured && b.status === 'active').slice(0, 3);
       const regular = businessesWithFeature.filter(b => !b.featured || b.status === 'sold');
-
       setFeaturedBusinesses(featured);
       setAllBusinesses(regular);
       setFilteredBusinesses(regular);
     }
   };
-
-  const handleFilter = (filters: { 
-    city?: string; 
+  const handleFilter = (filters: {
+    city?: string;
     industry?: string;
     minPrice?: number;
     maxPrice?: number;
   }) => {
     let filtered = [...allBusinesses];
-    
     if (filters.city) {
-      filtered = filtered.filter(business => 
-        business.city?.toLowerCase().includes(filters.city!.toLowerCase())
-      );
+      filtered = filtered.filter(business => business.city?.toLowerCase().includes(filters.city!.toLowerCase()));
     }
-    
     if (filters.industry) {
-      filtered = filtered.filter(business => 
-        business.industry === filters.industry
-      );
+      filtered = filtered.filter(business => business.industry === filters.industry);
     }
-
     if (filters.minPrice !== undefined) {
-      filtered = filtered.filter(business => 
-        business.asking_price >= filters.minPrice!
-      );
+      filtered = filtered.filter(business => business.asking_price >= filters.minPrice!);
     }
-
     if (filters.maxPrice !== undefined) {
-      filtered = filtered.filter(business => 
-        business.asking_price <= filters.maxPrice!
-      );
+      filtered = filtered.filter(business => business.asking_price <= filters.maxPrice!);
     }
-    
     setFilteredBusinesses(filtered);
   };
 
@@ -104,33 +86,17 @@ const Index = () => {
       "url": "https://vente.club"
     }
   };
-
-  return (
-    <>
-      <SEO 
-        title="Vente.club - Achat et Vente d'Entreprises au Québec | Opportunités Vérifiées"
-        description="Découvrez plus de 100 entreprises à vendre au Québec : restaurants, commerces, franchises. Plateforme sécurisée avec vérification des annonces. Contactez directement les vendeurs."
-        keywords="vente entreprise Québec, achat commerce Montréal, vendre restaurant, acheter franchise, opportunité affaires, cession entreprise, reprise commerce"
-        canonical="/"
-        structuredData={structuredData}
-      />
+  return <>
+      <SEO title="Vente.club - Achat et Vente d'Entreprises au Québec | Opportunités Vérifiées" description="Découvrez plus de 100 entreprises à vendre au Québec : restaurants, commerces, franchises. Plateforme sécurisée avec vérification des annonces. Contactez directement les vendeurs." keywords="vente entreprise Québec, achat commerce Montréal, vendre restaurant, acheter franchise, opportunité affaires, cession entreprise, reprise commerce" canonical="/" structuredData={structuredData} />
       
       {/* Hero Section */}
-      <section 
-        className="relative overflow-hidden bg-gradient-to-br from-background via-primary/5 to-accent/10"
-        aria-label="Section principale"
-      >
+      <section className="relative overflow-hidden bg-gradient-to-br from-background via-primary/5 to-accent/10" aria-label="Section principale">
         <div className="absolute inset-0">
-          <div 
-            className="absolute inset-0 opacity-20"
-            style={{
-              backgroundImage: `url(${heroImage})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-            }}
-            role="img"
-            aria-label="Image d'arrière-plan montrant des entrepreneurs en action"
-          />
+          <div className="absolute inset-0 opacity-20" style={{
+          backgroundImage: `url(${heroImage})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center'
+        }} role="img" aria-label="Image d'arrière-plan montrant des entrepreneurs en action" />
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/50 to-background" />
         </div>
         
@@ -150,25 +116,16 @@ const Index = () => {
               <span className="text-accent">des Entreprises</span>
             </h1>
             
-            <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              La plateforme d'acquisition et de vente d'entreprise au Québec
-            </p>
+            
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-2">
-              <Button 
-                size="lg" 
-                className="bg-accent hover:bg-accent/90 text-accent-foreground h-14 px-8 text-lg font-semibold shadow-lg hover:shadow-xl transition-all"
-                onClick={() => document.getElementById('featured')?.scrollIntoView({ behavior: 'smooth' })}
-              >
+              <Button size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground h-14 px-8 text-lg font-semibold shadow-lg hover:shadow-xl transition-all" onClick={() => document.getElementById('featured')?.scrollIntoView({
+              behavior: 'smooth'
+            })}>
                 Explorer les opportunités
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
-              <Button 
-                size="lg" 
-                variant="outline"
-                className="h-14 px-8 text-lg font-semibold border-2 hover:bg-accent/5"
-                onClick={() => navigate("/list-business")}
-              >
+              <Button size="lg" variant="outline" className="h-14 px-8 text-lg font-semibold border-2 hover:bg-accent/5" onClick={() => navigate("/list-business")}>
                 Vendre mon entreprise
               </Button>
             </div>
@@ -186,15 +143,9 @@ const Index = () => {
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {featuredBusinesses.length > 0 ? (
-              featuredBusinesses.map((business) => (
-                <BusinessCard key={business.id} {...business} />
-              ))
-            ) : (
-              <div className="col-span-full text-center py-12">
+            {featuredBusinesses.length > 0 ? featuredBusinesses.map(business => <BusinessCard key={business.id} {...business} />) : <div className="col-span-full text-center py-12">
                 <p className="text-lg text-muted-foreground">Aucune annonce en vedette pour le moment</p>
-              </div>
-            )}
+              </div>}
           </div>
         </div>
       </section>
@@ -217,21 +168,11 @@ const Index = () => {
           {/* View Mode Toggle */}
           <div className="flex justify-end mb-6">
             <div className="inline-flex rounded-lg border border-border bg-card p-1">
-              <Button
-                variant={viewMode === 'grid' ? 'secondary' : 'ghost'}
-                size="sm"
-                onClick={() => setViewMode('grid')}
-                className="gap-2"
-              >
+              <Button variant={viewMode === 'grid' ? 'secondary' : 'ghost'} size="sm" onClick={() => setViewMode('grid')} className="gap-2">
                 <Grid3x3 className="h-4 w-4" />
                 Grille
               </Button>
-              <Button
-                variant={viewMode === 'list' ? 'secondary' : 'ghost'}
-                size="sm"
-                onClick={() => setViewMode('list')}
-                className="gap-2"
-              >
+              <Button variant={viewMode === 'list' ? 'secondary' : 'ghost'} size="sm" onClick={() => setViewMode('list')} className="gap-2">
                 <List className="h-4 w-4" />
                 Liste
               </Button>
@@ -239,23 +180,11 @@ const Index = () => {
           </div>
 
           <div className={viewMode === 'grid' ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" : "space-y-4"}>
-            {filteredBusinesses.length > 0 ? (
-              filteredBusinesses.map((business) => (
-                viewMode === 'grid' ? (
-                  <BusinessCard key={business.id} {...business} />
-                ) : (
-                  <BusinessListItem key={business.id} {...business} />
-                )
-              ))
-            ) : allBusinesses.length > 0 ? (
-              <div className={viewMode === 'grid' ? "col-span-full text-center py-12" : "text-center py-12"}>
+            {filteredBusinesses.length > 0 ? filteredBusinesses.map(business => viewMode === 'grid' ? <BusinessCard key={business.id} {...business} /> : <BusinessListItem key={business.id} {...business} />) : allBusinesses.length > 0 ? <div className={viewMode === 'grid' ? "col-span-full text-center py-12" : "text-center py-12"}>
                 <p className="text-lg text-muted-foreground">Aucune annonce ne correspond à vos critères de recherche</p>
-              </div>
-            ) : (
-              <div className={viewMode === 'grid' ? "col-span-full text-center py-12" : "text-center py-12"}>
+              </div> : <div className={viewMode === 'grid' ? "col-span-full text-center py-12" : "text-center py-12"}>
                 <p className="text-lg text-muted-foreground">Aucune annonce disponible pour le moment</p>
-              </div>
-            )}
+              </div>}
           </div>
         </div>
       </section>
@@ -295,8 +224,6 @@ const Index = () => {
           </div>
         </div>
       </footer>
-    </>
-  );
+    </>;
 };
-
 export default Index;
