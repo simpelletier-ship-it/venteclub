@@ -16,12 +16,13 @@ export const PremiumSubscription = ({ userId }: PremiumSubscriptionProps) => {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [subscriptionEnd, setSubscriptionEnd] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
 
   useEffect(() => {
     checkSubscription();
     
     // Écouter les changements en temps réel sur l'abonnement Premium
-    // On utilise un debounce pour éviter le "flash" causé par des appels trop fréquents
+    // Mais ne pas re-render si on a déjà chargé une fois
     let debounceTimeout: NodeJS.Timeout;
     
     const channel = supabase
@@ -36,11 +37,11 @@ export const PremiumSubscription = ({ userId }: PremiumSubscriptionProps) => {
         },
         (payload) => {
           console.log('Premium subscription changed:', payload);
-          // Debounce de 500ms pour éviter les appels multiples
+          // Seulement rafraîchir après un délai et sans montrer de loading
           clearTimeout(debounceTimeout);
           debounceTimeout = setTimeout(() => {
             checkSubscription();
-          }, 500);
+          }, 1000);
         }
       )
       .subscribe();
@@ -52,9 +53,8 @@ export const PremiumSubscription = ({ userId }: PremiumSubscriptionProps) => {
   }, [userId]);
 
   const checkSubscription = async () => {
-    // Ne pas afficher le loading si on a déjà des données (évite le flash)
-    const isInitialLoad = isSubscribed === false && subscriptionEnd === null;
-    if (isInitialLoad) {
+    // Seulement afficher le loading la toute première fois
+    if (!hasLoadedOnce) {
       setLoading(true);
     }
     
@@ -64,14 +64,14 @@ export const PremiumSubscription = ({ userId }: PremiumSubscriptionProps) => {
       
       if (error) {
         console.error('[CHECK SUBSCRIPTION] Error:', error);
-        // Ne pas réinitialiser si on a déjà des données
-        if (isInitialLoad) {
+        // Ne mettre à jour que si c'est le premier chargement
+        if (!hasLoadedOnce) {
           setIsSubscribed(false);
           setSubscriptionEnd(null);
         }
       } else {
         console.log('[CHECK SUBSCRIPTION] Data received:', data);
-        // Seulement mettre à jour si les données ont changé
+        // Seulement mettre à jour si les données ont réellement changé
         const newSubscribed = data?.subscribed || false;
         const newEnd = data?.subscription_end || null;
         
@@ -82,13 +82,14 @@ export const PremiumSubscription = ({ userId }: PremiumSubscriptionProps) => {
       }
     } catch (error: any) {
       console.error('[CHECK SUBSCRIPTION] Exception:', error);
-      if (isInitialLoad) {
+      if (!hasLoadedOnce) {
         setIsSubscribed(false);
         setSubscriptionEnd(null);
       }
     } finally {
-      if (isInitialLoad) {
+      if (!hasLoadedOnce) {
         setLoading(false);
+        setHasLoadedOnce(true);
       }
     }
   };

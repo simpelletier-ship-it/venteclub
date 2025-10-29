@@ -256,10 +256,18 @@ const BusinessDetails = () => {
         setSellerContact(result.seller_contact);
         setShowUnlockDialog(false);
         
-        toast({
-          title: "Accès déverrouillé !",
-          description: "Vous pouvez maintenant voir les coordonnées du vendeur et lui envoyer des messages.",
-        });
+        // Message différent selon si c'est premium ou token gratuit
+        if (result.premium_access) {
+          toast({
+            title: "Accès déverrouillé !",
+            description: "✨ Grâce à votre abonnement Premium, vous avez un accès illimité à tous les vendeurs !",
+          });
+        } else {
+          toast({
+            title: "Accès déverrouillé !",
+            description: "Vous pouvez maintenant voir les coordonnées du vendeur et lui envoyer des messages.",
+          });
+        }
         
         setTimeout(() => {
           const element = document.getElementById('seller-contact');
