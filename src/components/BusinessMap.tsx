@@ -16,6 +16,7 @@ interface Business {
   annual_revenue?: number;
   status?: string;
   photo_url?: string | null;
+  is_franchise?: boolean;
 }
 
 interface BusinessMapProps {
@@ -55,6 +56,7 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
         annual_revenue, 
         status,
         approval_status,
+        is_franchise,
         business_photos(photo_url)
       `)
       .eq('status', 'active')
@@ -206,6 +208,7 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
             description: business.description,
             photo_url: business.photo_url || null,
             status: business.status,
+            is_franchise: business.is_franchise || false,
           },
         })),
       };
@@ -228,6 +231,7 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
       // Get primary color from CSS variables
       const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim();
       const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+      const franchiseColor = '45 76 212'; // Blue color for franchises (HSL format)
       
       // Convert HSL to hex for Mapbox
       const hslToHex = (hsl: string) => {
@@ -256,6 +260,7 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
       
       const primaryHex = hslToHex(primaryColor);
       const accentHex = hslToHex(accentColor);
+      const franchiseHex = hslToHex(franchiseColor);
 
       // Add cluster circles layer with theme colors
       map.current.addLayer({
@@ -303,14 +308,19 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
         },
       });
 
-      // Add unclustered points layer with theme colors
+      // Add unclustered points layer with different colors for franchises
       map.current.addLayer({
         id: 'unclustered-point',
         type: 'circle',
         source: 'businesses',
         filter: ['!', ['has', 'point_count']],
         paint: {
-          'circle-color': primaryHex,
+          'circle-color': [
+            'case',
+            ['get', 'is_franchise'],
+            franchiseHex,
+            primaryHex
+          ],
           'circle-radius': 16,
           'circle-stroke-width': 3,
           'circle-stroke-color': '#fff',

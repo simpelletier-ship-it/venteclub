@@ -250,9 +250,20 @@ const ListFranchise = () => {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="restaurant">Restaurant</SelectItem>
+                        <SelectItem value="bar_bistro_discotheque">Bar / Bistro / Discothèque</SelectItem>
                         <SelectItem value="beaute_esthetique">Beauté et Esthétique</SelectItem>
                         <SelectItem value="boutique_commerce_detail">Commerce de détail</SelectItem>
-                        <SelectItem value="franchise">Franchise</SelectItem>
+                        <SelectItem value="garage_mecanique_concessionnaire">Garage / Mécanique / Concessionnaire</SelectItem>
+                        <SelectItem value="entreprise_service">Entreprise de services</SelectItem>
+                        <SelectItem value="communications_informatique">Communications / Informatique</SelectItem>
+                        <SelectItem value="domaine_alimentaire">Domaine alimentaire</SelectItem>
+                        <SelectItem value="education_garderie">Éducation / Garderie</SelectItem>
+                        <SelectItem value="activite_sport_loisir">Activité sport / Loisir</SelectItem>
+                        <SelectItem value="hebergement">Hébergement</SelectItem>
+                        <SelectItem value="camping">Camping</SelectItem>
+                        <SelectItem value="centre_equestre_erabliere">Centre équestre / Érablière</SelectItem>
+                        <SelectItem value="pourvoirie_centre_plein_air">Pourvoirie / Centre plein air</SelectItem>
+                        <SelectItem value="franchise">Autres franchises</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
