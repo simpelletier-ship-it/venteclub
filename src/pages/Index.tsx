@@ -30,10 +30,10 @@ const Index = () => {
         description: "Vous avez maintenant un accès illimité à tous les vendeurs.",
       });
       setSearchParams({});
-      // Refresh après 2 secondes pour laisser le temps à Stripe de synchroniser
+      // Refresh après 5 secondes pour laisser le temps à Stripe de synchroniser
       setTimeout(() => {
         window.location.reload();
-      }, 2000);
+      }, 5000);
     } else if (searchParams.get('premium_cancel') === 'true') {
       toast({
         variant: "destructive",

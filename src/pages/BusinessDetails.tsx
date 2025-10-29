@@ -41,9 +41,11 @@ const BusinessDetails = () => {
       await fetchPhotos();
 
       if (session?.user) {
-        console.log('[INIT] Checking access for user');
-        await checkAccess(session.user.id);
+        console.log('[INIT] Checking Premium subscription first');
         await checkPremiumSubscription(session.user.id);
+        
+        console.log('[INIT] Then checking access for user');
+        await checkAccess(session.user.id);
       } else {
         console.log('[INIT] No user session');
         setLoading(false);
@@ -52,6 +54,14 @@ const BusinessDetails = () => {
 
     initialize();
   }, [id]);
+
+  // Re-check access when premium status changes
+  useEffect(() => {
+    if (user && hasPremium) {
+      console.log('[PREMIUM] User is premium, re-checking access');
+      checkAccess(user.id);
+    }
+  }, [hasPremium, user?.id]);
 
   const fetchPhotos = async () => {
     if (!id) return;

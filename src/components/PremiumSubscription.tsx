@@ -46,19 +46,20 @@ export const PremiumSubscription = ({ userId }: PremiumSubscriptionProps) => {
   const checkSubscription = async () => {
     setLoading(true);
     try {
+      console.log('[CHECK SUBSCRIPTION] Calling check-premium-subscription edge function');
       const { data, error } = await supabase.functions.invoke('check-premium-subscription');
       
       if (error) {
-        console.error('Error checking subscription:', error);
+        console.error('[CHECK SUBSCRIPTION] Error:', error);
         setIsSubscribed(false);
         setSubscriptionEnd(null);
       } else {
-        console.log('Subscription data:', data);
+        console.log('[CHECK SUBSCRIPTION] Data received:', data);
         setIsSubscribed(data?.subscribed || false);
         setSubscriptionEnd(data?.subscription_end || null);
       }
     } catch (error: any) {
-      console.error('Error checking subscription:', error);
+      console.error('[CHECK SUBSCRIPTION] Exception:', error);
       setIsSubscribed(false);
       setSubscriptionEnd(null);
     } finally {
