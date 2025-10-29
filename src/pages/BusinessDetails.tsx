@@ -21,6 +21,7 @@ const BusinessDetails = () => {
   const [sellerContact, setSellerContact] = useState<any>(null);
   const [isPurchasing, setIsPurchasing] = useState(false);
   const [photos, setPhotos] = useState<any[]>([]);
+  const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -334,25 +335,59 @@ const BusinessDetails = () => {
                 {/* Photo Gallery */}
                 {photos.length > 0 && (
                   <div className="mb-6">
-                    <h2 className="text-xl font-semibold mb-3">Galerie Photos</h2>
-                    <Carousel className="w-full">
-                      <CarouselContent>
-                        {photos.map((photo) => (
-                          <CarouselItem key={photo.id} className="md:basis-1/2 lg:basis-1/3">
-                            <div className="aspect-video rounded-lg overflow-hidden">
-                              <img
-                                src={photo.photo_url}
-                                alt="Business photo"
-                                className="w-full h-full object-cover"
-                              />
-                            </div>
-                          </CarouselItem>
-                        ))}
-                      </CarouselContent>
-                      <CarouselPrevious />
-                      <CarouselNext />
-                    </Carousel>
+                    <h2 className="text-xl font-semibold mb-4">Galerie Photos</h2>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                      {photos.map((photo, index) => (
+                        <div 
+                          key={photo.id} 
+                          className="aspect-video rounded-lg overflow-hidden cursor-pointer hover:opacity-90 transition-opacity shadow-md hover:shadow-lg"
+                          onClick={() => setSelectedPhotoIndex(index)}
+                        >
+                          <img
+                            src={photo.photo_url}
+                            alt={`Photo ${index + 1}`}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      ))}
+                    </div>
                   </div>
+                )}
+
+                {/* Photo Lightbox */}
+                {selectedPhotoIndex !== null && (
+                  <Dialog open={true} onOpenChange={() => setSelectedPhotoIndex(null)}>
+                    <DialogContent className="max-w-4xl w-full p-0">
+                      <div className="relative bg-black">
+                        <img
+                          src={photos[selectedPhotoIndex].photo_url}
+                          alt={`Photo ${selectedPhotoIndex + 1}`}
+                          className="w-full h-auto max-h-[80vh] object-contain"
+                        />
+                        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
+                          {selectedPhotoIndex > 0 && (
+                            <Button
+                              variant="secondary"
+                              onClick={() => setSelectedPhotoIndex(selectedPhotoIndex - 1)}
+                            >
+                              Précédent
+                            </Button>
+                          )}
+                          {selectedPhotoIndex < photos.length - 1 && (
+                            <Button
+                              variant="secondary"
+                              onClick={() => setSelectedPhotoIndex(selectedPhotoIndex + 1)}
+                            >
+                              Suivant
+                            </Button>
+                          )}
+                        </div>
+                        <div className="absolute top-4 right-4 text-white bg-black/50 px-3 py-1 rounded-full">
+                          {selectedPhotoIndex + 1} / {photos.length}
+                        </div>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
                 )}
 
               <div className="space-y-6">

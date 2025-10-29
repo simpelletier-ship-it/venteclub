@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import BusinessCard from "@/components/BusinessCard";
 import FilterBar from "@/components/FilterBar";
-import { ArrowRight, Shield, TrendingUp, Users } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import heroImage from "@/assets/hero-business.jpg";
 
@@ -241,41 +241,6 @@ const Index = () => {
       <section className="py-8 bg-muted/30">
         <div className="container mx-auto px-4">
           <FilterBar />
-        </div>
-      </section>
-
-      {/* Trust Indicators */}
-      <section className="py-16 border-b border-border">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            <div className="text-center space-y-3">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10">
-                <Shield className="w-8 h-8 text-primary" />
-              </div>
-              <h3 className="text-xl font-bold text-foreground">Transactions Sécurisées</h3>
-              <p className="text-muted-foreground">
-                Entreprises vérifiées et services d'entiercement sécurisés pour votre tranquillité d'esprit
-              </p>
-            </div>
-            <div className="text-center space-y-3">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-accent/10">
-                <TrendingUp className="w-8 h-8 text-accent" />
-              </div>
-              <h3 className="text-xl font-bold text-foreground">Historique Prouvé</h3>
-              <p className="text-muted-foreground">
-                Plus de 2,5 milliards d'euros en transactions d'entreprises réussies sur notre plateforme
-              </p>
-            </div>
-            <div className="text-center space-y-3">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-accent/10">
-                <Users className="w-8 h-8 text-accent" />
-              </div>
-              <h3 className="text-xl font-bold text-foreground">Accompagnement Expert</h3>
-              <p className="text-muted-foreground">
-                Conseillers dédiés pour vous guider à chaque étape du processus
-              </p>
-            </div>
-          </div>
         </div>
       </section>
 

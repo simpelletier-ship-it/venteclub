@@ -14,3 +14,6 @@ verify_jwt = true
 
 [functions.verify-contact-payment]
 verify_jwt = true
+
+[functions.send-approval-email]
+verify_jwt = false

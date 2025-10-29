@@ -149,9 +149,18 @@ const ListBusiness = () => {
         }
       }
 
+      // Send email notification
+      await supabase.functions.invoke('send-approval-email', {
+        body: {
+          email: formData.seller_email,
+          businessTitle: validatedData.title,
+          status: 'pending',
+        }
+      });
+
       toast({
         title: "Succès !",
-        description: "Votre entreprise a été listée avec succès.",
+        description: "Votre annonce a été soumise et est en attente d'approbation. Vous recevrez un email de confirmation.",
       });
       navigate("/dashboard");
     } catch (error: any) {

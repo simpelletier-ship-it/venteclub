@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { authSchema } from "@/lib/validations";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -12,7 +13,6 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isSignUp, setIsSignUp] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -22,7 +22,7 @@ const Auth = () => {
     });
   }, [navigate]);
 
-  const handleEmailAuth = async (e: React.FormEvent) => {
+  const handleEmailAuth = async (e: React.FormEvent, isSignUp: boolean) => {
     e.preventDefault();
     setLoading(true);
 
@@ -40,16 +40,19 @@ const Auth = () => {
         });
         if (error) throw error;
         toast({
-          title: "Inscription réussie !",
-          description: "Vous pouvez maintenant vous connecter.",
+          title: "Compte créé avec succès !",
+          description: "Vous pouvez maintenant vous connecter avec vos identifiants.",
         });
-        setIsSignUp(false);
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email: validatedData.email,
           password: validatedData.password,
         });
         if (error) throw error;
+        toast({
+          title: "Connexion réussie !",
+          description: "Bienvenue sur Vente.Club",
+        });
         navigate("/");
       }
     } catch (error: any) {
@@ -74,113 +77,107 @@ const Auth = () => {
     }
   };
 
-  const handleSocialLogin = async (provider: "google" | "linkedin_oidc") => {
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider,
-        options: {
-          redirectTo: `${window.location.origin}/`,
-        },
-      });
-      if (error) throw error;
-    } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Erreur",
-        description: error.message,
-      });
-    }
-  };
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-secondary/10 p-4">
-      <div className="w-full max-w-md">
-        <div className="bg-card rounded-2xl shadow-elegant p-8 border border-border/50">
-          <div className="flex flex-col items-center mb-8">
-            <div className="mb-4">
-              <span className="text-3xl font-bold">
-                Vente<span className="text-accent">.Club</span>
-              </span>
-            </div>
-            <h1 className="text-2xl font-bold text-foreground">
-              {isSignUp ? "Créer un compte" : "Connexion"}
-            </h1>
-            <p className="text-muted-foreground text-center mt-2">
-              {isSignUp
-                ? "Rejoignez Vente.club"
-                : "Accédez à votre compte"}
-            </p>
-          </div>
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/20 flex items-center justify-center p-4">
+      <div className="max-w-md w-full">
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold mb-2 cursor-pointer" onClick={() => navigate("/")}>
+            Vente<span className="text-accent">.Club</span>
+          </h1>
+          <p className="text-muted-foreground">
+            Achetez et vendez des entreprises en toute confiance
+          </p>
+        </div>
 
-          <div className="space-y-4">
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full"
-              onClick={() => handleSocialLogin("google")}
-            >
-              Continuer avec Google
-            </Button>
+        <div className="bg-card p-8 rounded-2xl shadow-elegant border border-border/50">
+          <Tabs defaultValue="login" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 mb-6">
+              <TabsTrigger value="login">Connexion</TabsTrigger>
+              <TabsTrigger value="signup">Créer un compte</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="login">
+              <form onSubmit={(e) => handleEmailAuth(e, false)} className="space-y-4">
+                <div>
+                  <label htmlFor="login-email" className="block text-sm font-medium mb-2">
+                    Email
+                  </label>
+                  <Input
+                    id="login-email"
+                    type="email"
+                    placeholder="votre@email.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="w-full"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="login-password" className="block text-sm font-medium mb-2">
+                    Mot de passe
+                  </label>
+                  <Input
+                    id="login-password"
+                    type="password"
+                    placeholder="Votre mot de passe"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    className="w-full"
+                  />
+                </div>
+                <Button type="submit" disabled={loading} className="w-full">
+                  {loading ? "Connexion en cours..." : "Se connecter"}
+                </Button>
+              </form>
+            </TabsContent>
+            
+            <TabsContent value="signup">
+              <form onSubmit={(e) => handleEmailAuth(e, true)} className="space-y-4">
+                <div>
+                  <label htmlFor="signup-email" className="block text-sm font-medium mb-2">
+                    Email
+                  </label>
+                  <Input
+                    id="signup-email"
+                    type="email"
+                    placeholder="votre@email.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="w-full"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="signup-password" className="block text-sm font-medium mb-2">
+                    Mot de passe
+                  </label>
+                  <Input
+                    id="signup-password"
+                    type="password"
+                    placeholder="Minimum 8 caractères"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    minLength={8}
+                    className="w-full"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Le mot de passe doit contenir au moins 8 caractères
+                  </p>
+                </div>
+                <Button type="submit" disabled={loading} className="w-full">
+                  {loading ? "Création du compte..." : "Créer mon compte"}
+                </Button>
+              </form>
+            </TabsContent>
+          </Tabs>
+        </div>
 
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full"
-              onClick={() => handleSocialLogin("linkedin_oidc")}
-            >
-              Continuer avec LinkedIn
-            </Button>
-
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t border-border" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-card px-2 text-muted-foreground">ou</span>
-              </div>
-            </div>
-
-            <form onSubmit={handleEmailAuth} className="space-y-4">
-              <div>
-                <Input
-                  type="email"
-                  placeholder="Email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </div>
-              <div>
-                <Input
-                  type="password"
-                  placeholder="Mot de passe"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  minLength={6}
-                />
-              </div>
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading
-                  ? "Chargement..."
-                  : isSignUp
-                  ? "S'inscrire"
-                  : "Se connecter"}
-              </Button>
-            </form>
-
-            <div className="text-center text-sm">
-              <button
-                type="button"
-                onClick={() => setIsSignUp(!isSignUp)}
-                className="text-primary hover:underline"
-              >
-                {isSignUp
-                  ? "Déjà un compte ? Connectez-vous"
-                  : "Pas de compte ? Inscrivez-vous"}
-              </button>
-            </div>
-          </div>
+        <div className="mt-6 text-center">
+          <Button variant="ghost" onClick={() => navigate("/")}>
+            Retour à l'accueil
+          </Button>
         </div>
       </div>
     </div>

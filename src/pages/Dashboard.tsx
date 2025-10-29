@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, LogOut, Star } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -166,17 +167,36 @@ const Dashboard = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {businesses.map((business) => (
               <div key={business.id} className="relative">
-                <BusinessCard {...business} />
-                {!business.featured && (
-                  <Button
-                    onClick={() => handleFeatureClick(business)}
-                    className="absolute top-4 right-4 z-10"
-                    size="sm"
-                    variant="secondary"
-                  >
-                    <Star className="mr-2 h-4 w-4" />
-                    Mettre en avant
-                  </Button>
+                <div className="relative">
+                  <BusinessCard {...business} />
+                  <div className="absolute top-4 left-4 z-10">
+                    <Badge variant={
+                      business.approval_status === 'approved' ? 'default' : 
+                      business.approval_status === 'pending' ? 'secondary' : 
+                      'destructive'
+                    }>
+                      {business.approval_status === 'approved' ? 'Approuvée' : 
+                       business.approval_status === 'pending' ? 'En attente' : 
+                       'Rejetée'}
+                    </Badge>
+                  </div>
+                  {!business.featured && business.approval_status === 'approved' && (
+                    <Button
+                      onClick={() => handleFeatureClick(business)}
+                      className="absolute top-4 right-4 z-10"
+                      size="sm"
+                      variant="secondary"
+                    >
+                      <Star className="mr-2 h-4 w-4" />
+                      Mettre en avant
+                    </Button>
+                  )}
+                </div>
+                {business.rejection_reason && business.approval_status === 'rejected' && (
+                  <div className="mt-2 p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
+                    <p className="text-sm font-semibold mb-1">Raison du refus:</p>
+                    <p className="text-sm text-muted-foreground">{business.rejection_reason}</p>
+                  </div>
                 )}
               </div>
             ))}

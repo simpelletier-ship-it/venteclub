@@ -4,8 +4,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { CheckCircle, XCircle, Eye, ArrowLeft } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -13,6 +16,9 @@ const Admin = () => {
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [businesses, setBusinesses] = useState<any[]>([]);
+  const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
+  const [selectedBusiness, setSelectedBusiness] = useState<any>(null);
+  const [rejectionReason, setRejectionReason] = useState("");
 
   useEffect(() => {
     checkAdminAccess();
@@ -59,7 +65,7 @@ const Admin = () => {
     try {
       const { data, error } = await supabase
         .from('businesses')
-        .select('*')
+        .select('*, seller_contacts!left(email)')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -75,14 +81,31 @@ const Admin = () => {
     }
   };
 
-  const updateBusinessStatus = async (businessId: string, approvalStatus: string) => {
+  const updateBusinessStatus = async (businessId: string, approvalStatus: string, rejectionReason?: string) => {
     try {
+      const business = businesses.find(b => b.id === businessId);
+      
       const { error } = await supabase
         .from('businesses')
-        .update({ approval_status: approvalStatus })
+        .update({ 
+          approval_status: approvalStatus,
+          rejection_reason: rejectionReason || null
+        })
         .eq('id', businessId);
 
       if (error) throw error;
+
+      // Send email notification
+      if (business?.seller_contacts?.email) {
+        await supabase.functions.invoke('send-approval-email', {
+          body: {
+            email: business.seller_contacts.email,
+            businessTitle: business.title,
+            status: approvalStatus,
+            rejectionReason: rejectionReason,
+          }
+        });
+      }
 
       toast({
         title: "Succès",
@@ -90,6 +113,9 @@ const Admin = () => {
       });
 
       fetchBusinesses();
+      setRejectDialogOpen(false);
+      setRejectionReason("");
+      setSelectedBusiness(null);
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -97,6 +123,11 @@ const Admin = () => {
         description: error.message,
       });
     }
+  };
+
+  const handleReject = (business: any) => {
+    setSelectedBusiness(business);
+    setRejectDialogOpen(true);
   };
 
   const getStatusBadge = (status: string) => {
@@ -185,6 +216,13 @@ const Admin = () => {
                     </div>
                   )}
                 </div>
+                {business.rejection_reason && business.approval_status === 'rejected' && (
+                  <div className="mb-4 p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
+                    <p className="text-sm">
+                      <span className="font-semibold">Raison du refus:</span> {business.rejection_reason}
+                    </p>
+                  </div>
+                )}
                 <div className="flex gap-2">
                   <Button
                     variant="outline"
@@ -208,7 +246,7 @@ const Admin = () => {
                     <Button
                       variant="destructive"
                       size="sm"
-                      onClick={() => updateBusinessStatus(business.id, 'rejected')}
+                      onClick={() => handleReject(business)}
                     >
                       <XCircle className="mr-2 h-4 w-4" />
                       Rejeter
@@ -220,6 +258,52 @@ const Admin = () => {
           ))}
         </div>
       </div>
+
+      <Dialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Rejeter l'annonce</DialogTitle>
+            <DialogDescription>
+              Veuillez fournir une raison pour le refus de cette annonce. L'utilisateur recevra un email avec cette information.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div>
+              <Label htmlFor="rejection-reason">Raison du refus *</Label>
+              <Textarea
+                id="rejection-reason"
+                value={rejectionReason}
+                onChange={(e) => setRejectionReason(e.target.value)}
+                placeholder="Ex: L'annonce ne respecte pas nos conditions d'utilisation car..."
+                rows={4}
+                className="mt-2"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setRejectDialogOpen(false)}>
+              Annuler
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                if (!rejectionReason.trim()) {
+                  toast({
+                    variant: "destructive",
+                    title: "Erreur",
+                    description: "Veuillez fournir une raison pour le refus.",
+                  });
+                  return;
+                }
+                updateBusinessStatus(selectedBusiness?.id, 'rejected', rejectionReason);
+              }}
+              disabled={!rejectionReason.trim()}
+            >
+              Confirmer le refus
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
