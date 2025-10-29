@@ -58,11 +58,24 @@ const BusinessListItem = ({
 
   return (
     <div 
-      className={`group relative flex items-center gap-4 p-4 bg-card border border-border rounded-xl transition-all duration-300 hover:shadow-[var(--shadow-hover)] cursor-pointer ${
+      className={`group relative flex items-center gap-4 p-4 bg-card border border-border rounded-xl transition-all duration-300 hover:shadow-[var(--shadow-hover)] cursor-pointer overflow-hidden ${
         featured ? 'ring-2 ring-amber-500/30' : ''
       }`}
       onClick={handleClick}
     >
+      {/* Sold Overlay */}
+      {status === 'sold' && (
+        <div className="absolute inset-0 z-10 bg-background/60 backdrop-blur-[2px] pointer-events-none">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rotate-[-35deg] w-[150%]">
+            <div className="bg-gradient-to-r from-blue-600 via-blue-500 to-blue-600 text-white py-4 px-8 shadow-2xl border-y-4 border-white/30">
+              <p className="text-3xl md:text-4xl font-black text-center tracking-widest uppercase shadow-lg">
+                VENDU
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Left section - Badges & Title */}
       <div className="flex-1 min-w-0 space-y-2">
         <div className="flex items-center gap-2 flex-wrap">
@@ -84,20 +97,13 @@ const BusinessListItem = ({
           </div>
         </div>
 
-        <p className={`text-sm text-muted-foreground line-clamp-1 ${status === 'sold' ? 'blur-sm select-none' : ''}`}>
+        <p className="text-sm text-muted-foreground line-clamp-1">
           {description}
         </p>
-
-        {/* Sold Badge */}
-        {status === 'sold' && (
-          <Badge className="bg-blue-500 hover:bg-blue-600 text-white border-0 shadow-md text-xs">
-            ✓ Vendue
-          </Badge>
-        )}
       </div>
 
       {/* Middle section - Stats */}
-      <div className={`hidden md:flex items-center gap-6 ${status === 'sold' ? 'blur-sm select-none' : ''}`}>
+      <div className="hidden md:flex items-center gap-6">
         <div className="text-center">
           <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Chiffre d'affaires</p>
           <p className="text-sm font-semibold text-foreground flex items-center gap-1">
@@ -113,7 +119,7 @@ const BusinessListItem = ({
 
       {/* Right section - Price & Actions */}
       <div className="flex items-center gap-4">
-        <div className={`text-right ${status === 'sold' ? 'blur-sm select-none' : ''}`}>
+        <div className="text-right">
           <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Prix demandé</p>
           <p className="text-xl font-bold text-primary whitespace-nowrap">
             {displayPrice}

@@ -72,6 +72,19 @@ const BusinessCard = ({
       }`}
       onClick={handleClick}
     >
+      {/* Sold Overlay */}
+      {status === 'sold' && (
+        <div className="absolute inset-0 z-10 bg-background/60 backdrop-blur-[2px] pointer-events-none">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rotate-[-35deg] w-[150%]">
+            <div className="bg-gradient-to-r from-blue-600 via-blue-500 to-blue-600 text-white py-6 px-8 shadow-2xl border-y-4 border-white/30">
+              <p className="text-4xl md:text-5xl font-black text-center tracking-widest uppercase shadow-lg">
+                VENDU
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Content Section */}
       <div className="p-4 space-y-3">
         {/* Title & Location with Favorite */}
@@ -116,21 +129,12 @@ const BusinessCard = ({
         </div>
 
         {/* Description */}
-        <p className={`text-sm text-muted-foreground line-clamp-2 leading-relaxed ${status === 'sold' ? 'blur-md select-none' : ''}`}>
+        <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
           {description}
         </p>
 
-        {/* Sold Badge */}
-        {status === 'sold' && (
-          <div className="flex justify-center">
-            <Badge className="bg-blue-500 hover:bg-blue-600 text-white border-0 shadow-md text-xs">
-              ✓ Vendue
-            </Badge>
-          </div>
-        )}
-
         {/* Stats Grid */}
-        <div className={`grid grid-cols-2 gap-4 pt-4 border-t border-border/50 ${status === 'sold' ? 'blur-md select-none' : ''}`}>
+        <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border/50">
           <div className="space-y-1">
             <p className="text-xs text-muted-foreground uppercase tracking-wider">Chiffre d'affaires</p>
             <p className="text-sm font-semibold text-foreground flex items-center gap-1">
@@ -146,7 +150,7 @@ const BusinessCard = ({
 
         {/* Price & CTA */}
         <div className="flex items-end justify-between pt-4 border-t border-border/50">
-          <div className={`space-y-1 ${status === 'sold' ? 'blur-md select-none' : ''}`}>
+          <div className="space-y-1">
             <p className="text-xs text-muted-foreground uppercase tracking-wider">Prix demandé</p>
             <p className="text-2xl font-bold text-primary">
               {displayPrice}
