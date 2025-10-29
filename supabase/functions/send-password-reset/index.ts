@@ -29,12 +29,12 @@ const handler = async (req: Request): Promise<Response> => {
     
     console.log("Sending password reset email to:", email);
 
-    // Generate password reset link using Supabase
+    // Generate password reset link using Supabase - toujours utiliser vente.club
     const { data, error } = await supabaseAdmin.auth.admin.generateLink({
       type: 'recovery',
       email: email,
       options: {
-        redirectTo: redirectUrl || `${Deno.env.get("SUPABASE_URL")?.replace("supabase.co", "vente.club") || "https://vente.club"}/auth`
+        redirectTo: redirectUrl || "https://vente.club/reset-password"
       }
     });
 

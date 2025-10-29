@@ -56,7 +56,7 @@ const handler = async (req: Request): Promise<Response> => {
       currency: business.currency || 'CAD',
     }).format(business.asking_price);
 
-    const businessUrl = `${Deno.env.get("SUPABASE_URL")?.replace("supabase.co", "vente.club") || "https://vente.club"}/business/${businessId}`;
+    const businessUrl = `https://vente.club/business/${businessId}`;
 
     const emailResponse = await resend.emails.send({
       from: "Vente.club <info@vente.club>",
