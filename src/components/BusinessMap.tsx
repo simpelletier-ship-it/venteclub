@@ -30,8 +30,6 @@ interface BusinessMapProps {
 const BusinessMap = ({ filters }: BusinessMapProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
-  const markers = useRef<mapboxgl.Marker[]>([]);
-  const popups = useRef<mapboxgl.Popup[]>([]);
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [zoomLevel, setZoomLevel] = useState(6);
   const navigate = useNavigate();
@@ -118,7 +116,7 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
         'top-right'
       );
 
-      // Listen to zoom events to adjust popup sizes
+      // Listen to zoom events
       map.current.on('zoom', () => {
         if (map.current) {
           setZoomLevel(map.current.getZoom());
@@ -126,223 +124,232 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
       });
     }
 
-    // Clear existing markers and popups
-    markers.current.forEach(marker => marker.remove());
-    markers.current = [];
-    popups.current.forEach(popup => popup.remove());
-    popups.current = [];
+    // Only proceed if map is ready and businesses are loaded
+    if (!map.current || businesses.length === 0) return;
 
-    // Only add markers if map is ready
-    if (!map.current) return;
-
-    // Calculate scale based on zoom level
-    // At zoom 6 (default): scale = 1
-    // At zoom 12: scale = 0.6
-    // At zoom 3: scale = 1.4
-    const scale = Math.max(0.5, Math.min(1.5, 1 + (6 - zoomLevel) * 0.1));
-    const popupWidth = Math.floor(300 * scale);
-    const imageHeight = Math.floor(150 * scale);
-    const markerSize = Math.floor(32 * scale);
-
-    // Add markers for each business
-    businesses.forEach((business) => {
+    // Wait for map to load before adding sources and layers
+    const addBusinessLayers = () => {
       if (!map.current) return;
 
-      // Create custom marker element
-      const el = document.createElement('div');
-      el.className = 'business-marker';
-      el.style.width = `${markerSize}px`;
-      el.style.height = `${markerSize}px`;
-      el.style.borderRadius = '50%';
-      el.style.backgroundColor = 'hsl(270 100% 60%)';
-      el.style.border = '3px solid white';
-      el.style.cursor = 'pointer';
-      el.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
-      el.style.transition = 'box-shadow 0.2s, background-color 0.2s, width 0.3s, height 0.3s';
-      el.style.position = 'relative';
+      // Convert businesses to GeoJSON format
+      const geojsonData = {
+        type: 'FeatureCollection' as const,
+        features: businesses.map((business) => ({
+          type: 'Feature' as const,
+          geometry: {
+            type: 'Point' as const,
+            coordinates: [business.longitude, business.latitude],
+          },
+          properties: {
+            id: business.id,
+            title: business.title,
+            location: business.location,
+            asking_price: business.asking_price,
+            annual_revenue: business.annual_revenue || null,
+            description: business.description,
+            photo_url: business.photo_url || null,
+            status: business.status,
+          },
+        })),
+      };
 
-      // Hover effect - only change visual properties, never transform or position
-      el.addEventListener('mouseenter', () => {
-        el.style.backgroundColor = 'hsl(270 100% 65%)';
-        el.style.boxShadow = '0 6px 20px rgba(139, 92, 246, 0.6)';
+      // Remove existing layers and source if they exist
+      if (map.current.getLayer('clusters')) map.current.removeLayer('clusters');
+      if (map.current.getLayer('cluster-count')) map.current.removeLayer('cluster-count');
+      if (map.current.getLayer('unclustered-point')) map.current.removeLayer('unclustered-point');
+      if (map.current.getSource('businesses')) map.current.removeSource('businesses');
+
+      // Add source with clustering
+      map.current.addSource('businesses', {
+        type: 'geojson',
+        data: geojsonData,
+        cluster: true,
+        clusterMaxZoom: 14, // Max zoom to cluster points on
+        clusterRadius: 50, // Radius of each cluster when clustering points
       });
-      el.addEventListener('mouseleave', () => {
-        el.style.backgroundColor = 'hsl(270 100% 60%)';
-        el.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
+
+      // Add cluster circles layer
+      map.current.addLayer({
+        id: 'clusters',
+        type: 'circle',
+        source: 'businesses',
+        filter: ['has', 'point_count'],
+        paint: {
+          'circle-color': [
+            'step',
+            ['get', 'point_count'],
+            'hsl(270 100% 60%)', // Color for small clusters
+            10,
+            'hsl(270 100% 55%)', // Color for medium clusters
+            30,
+            'hsl(270 100% 50%)', // Color for large clusters
+          ],
+          'circle-radius': [
+            'step',
+            ['get', 'point_count'],
+            20, // Size for small clusters
+            10,
+            30, // Size for medium clusters
+            30,
+            40, // Size for large clusters
+          ],
+          'circle-stroke-width': 3,
+          'circle-stroke-color': '#fff',
+        },
       });
 
-      // Create rich popup with preview and image
-      const popupContent = `
-        <div style="padding: 0; max-width: ${popupWidth}px;">
-          ${business.photo_url ? `
-            <img 
-              src="${business.photo_url}" 
-              alt="${business.title}"
-              style="width: 100%; height: ${imageHeight}px; object-fit: cover; border-radius: 12px 12px 0 0;"
-            />
-          ` : ''}
-          <div style="padding: ${Math.floor(12 * scale)}px;">
-            <h3 style="font-weight: 700; margin-bottom: 8px; font-size: 16px; color: hsl(252 47% 11%); line-height: 1.3;">
-              ${business.title}
-            </h3>
-            <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 8px;">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="hsl(270 100% 60%)" stroke-width="2">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                <circle cx="12" cy="10" r="3"></circle>
-              </svg>
-              <span style="color: hsl(252 15% 50%); font-size: 13px;">${business.location}</span>
-            </div>
-            <p style="color: hsl(252 15% 50%); font-size: 13px; margin-bottom: 10px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
-              ${business.description}
-            </p>
-            <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid hsl(252 20% 90%);">
-              <div>
-                <div style="font-size: 11px; color: hsl(252 15% 50%); text-transform: uppercase; margin-bottom: 2px;">Prix demandé</div>
-                <div style="font-weight: 700; color: hsl(270 100% 60%); font-size: 18px;">
-                  ${business.asking_price.toLocaleString('fr-CA')} $
-                </div>
-              </div>
-              ${business.annual_revenue ? `
-                <div style="text-align: right;">
-                  <div style="font-size: 11px; color: hsl(252 15% 50%); text-transform: uppercase; margin-bottom: 2px;">Chiffre d'affaires</div>
-                  <div style="font-size: 13px; font-weight: 600; color: hsl(252 47% 11%);">
-                    ${business.annual_revenue.toLocaleString('fr-CA')} $
-                  </div>
-                </div>
-              ` : ''}
-            </div>
-            <div style="margin-top: 12px; padding: 8px; background: hsl(270 100% 60% / 0.1); border-radius: 6px; text-align: center; font-size: 12px; color: hsl(270 100% 60%); font-weight: 600;">
-              Cliquez pour voir les détails
-            </div>
-          </div>
-        </div>
-      `;
+      // Add cluster count labels
+      map.current.addLayer({
+        id: 'cluster-count',
+        type: 'symbol',
+        source: 'businesses',
+        filter: ['has', 'point_count'],
+        layout: {
+          'text-field': '{point_count_abbreviated}',
+          'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
+          'text-size': 14,
+        },
+        paint: {
+          'text-color': '#ffffff',
+        },
+      });
 
-      // Create popup (will be configured dynamically)
-      const popup = new mapboxgl.Popup({ 
-        offset: Math.floor(15 * scale),
+      // Add unclustered points layer
+      map.current.addLayer({
+        id: 'unclustered-point',
+        type: 'circle',
+        source: 'businesses',
+        filter: ['!', ['has', 'point_count']],
+        paint: {
+          'circle-color': 'hsl(270 100% 60%)',
+          'circle-radius': 16,
+          'circle-stroke-width': 3,
+          'circle-stroke-color': '#fff',
+        },
+      });
+
+      // Click on cluster to zoom in
+      map.current.on('click', 'clusters', (e) => {
+        if (!map.current) return;
+        const features = map.current.queryRenderedFeatures(e.point, {
+          layers: ['clusters'],
+        });
+        
+        if (!features.length) return;
+        
+        const clusterId = features[0].properties?.cluster_id;
+        const source = map.current.getSource('businesses') as mapboxgl.GeoJSONSource;
+        
+        source.getClusterExpansionZoom(clusterId, (err, zoom) => {
+          if (err || !map.current) return;
+          
+          const coordinates = (features[0].geometry as any).coordinates;
+          map.current.easeTo({
+            center: coordinates,
+            zoom: zoom,
+          });
+        });
+      });
+
+      // Show popup on unclustered point hover
+      const popup = new mapboxgl.Popup({
         closeButton: false,
         closeOnClick: false,
         className: 'business-popup',
-        maxWidth: `${popupWidth}px`,
-      }).setHTML(popupContent);
-      
-      popups.current.push(popup);
-
-      // Create marker with fixed coordinates - never changes
-      const markerLngLat: [number, number] = [business.longitude, business.latitude];
-      const marker = new mapboxgl.Marker({ 
-        element: el, 
-        anchor: 'center' 
-      })
-        .setLngLat(markerLngLat)
-        .addTo(map.current);
-
-      // Handle popup visibility manually
-      let hideTimeout: NodeJS.Timeout;
-      let isPopupHovered = false;
-      let isMarkerHovered = false;
-      
-      const showPopup = () => {
-        clearTimeout(hideTimeout);
-        if (!popup.isOpen() && map.current) {
-          // Calculate intelligent popup position based on marker screen position
-          const markerPoint = map.current.project(markerLngLat);
-          const mapCanvas = map.current.getCanvas();
-          const canvasWidth = mapCanvas.width;
-          const canvasHeight = mapCanvas.height;
-          
-          // Calculate available space in each direction
-          const spaceRight = canvasWidth - markerPoint.x;
-          const spaceLeft = markerPoint.x;
-          const spaceBottom = canvasHeight - markerPoint.y;
-          const spaceTop = markerPoint.y;
-          
-          // Determine best anchor position based on available space
-          let anchor: 'left' | 'right' | 'top' | 'bottom' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' = 'left';
-          
-          // Prefer horizontal placement (left or right)
-          if (spaceRight > popupWidth + 50) {
-            // Enough space on the right
-            anchor = 'left';
-          } else if (spaceLeft > popupWidth + 50) {
-            // Not enough space on right, try left
-            anchor = 'right';
-          } else if (spaceBottom > imageHeight + 200) {
-            // Not enough horizontal space, try bottom
-            anchor = 'top';
-          } else if (spaceTop > imageHeight + 200) {
-            // Try top
-            anchor = 'bottom';
-          } else {
-            // Use corner anchors based on which corner has most space
-            const topLeft = spaceTop + spaceLeft;
-            const topRight = spaceTop + spaceRight;
-            const bottomLeft = spaceBottom + spaceLeft;
-            const bottomRight = spaceBottom + spaceRight;
-            
-            const maxSpace = Math.max(topLeft, topRight, bottomLeft, bottomRight);
-            
-            if (maxSpace === topLeft) anchor = 'bottom-right';
-            else if (maxSpace === topRight) anchor = 'bottom-left';
-            else if (maxSpace === bottomLeft) anchor = 'top-right';
-            else anchor = 'top-left';
-          }
-          
-          // Set the anchor and show popup
-          popup.options.anchor = anchor;
-          popup.setLngLat(markerLngLat).addTo(map.current);
-          
-          // Attach hover listeners to popup after it's added
-          setTimeout(() => {
-            const popupEl = popup.getElement();
-            if (popupEl) {
-              popupEl.addEventListener('mouseenter', () => {
-                isPopupHovered = true;
-                clearTimeout(hideTimeout);
-              });
-              popupEl.addEventListener('mouseleave', () => {
-                isPopupHovered = false;
-                hidePopup();
-              });
-            }
-          }, 0);
-        }
-      };
-      
-      const hidePopup = () => {
-        hideTimeout = setTimeout(() => {
-          if (!isPopupHovered && !isMarkerHovered && popup.isOpen()) {
-            popup.remove();
-          }
-        }, 200);
-      };
-      
-      // Marker hover events
-      el.addEventListener('mouseenter', () => {
-        isMarkerHovered = true;
-        showPopup();
-      });
-      
-      el.addEventListener('mouseleave', () => {
-        isMarkerHovered = false;
-        hidePopup();
+        maxWidth: '300px',
       });
 
-      // Navigate on click
-      el.addEventListener('click', (e) => {
-        e.stopPropagation();
-        navigate(`/business/${business.id}`);
+      map.current.on('mouseenter', 'unclustered-point', (e) => {
+        if (!map.current) return;
+        map.current.getCanvas().style.cursor = 'pointer';
+
+        const coordinates = (e.features![0].geometry as any).coordinates.slice();
+        const props = e.features![0].properties!;
+
+        const popupContent = `
+          <div style="padding: 0; max-width: 300px;">
+            ${props.photo_url ? `
+              <img 
+                src="${props.photo_url}" 
+                alt="${props.title}"
+                style="width: 100%; height: 150px; object-fit: cover; border-radius: 12px 12px 0 0;"
+              />
+            ` : ''}
+            <div style="padding: 12px;">
+              <h3 style="font-weight: 700; margin-bottom: 8px; font-size: 16px; color: hsl(252 47% 11%); line-height: 1.3;">
+                ${props.title}
+              </h3>
+              <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 8px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="hsl(270 100% 60%)" stroke-width="2">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                  <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+                <span style="color: hsl(252 15% 50%); font-size: 13px;">${props.location}</span>
+              </div>
+              <p style="color: hsl(252 15% 50%); font-size: 13px; margin-bottom: 10px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                ${props.description}
+              </p>
+              <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid hsl(252 20% 90%);">
+                <div>
+                  <div style="font-size: 11px; color: hsl(252 15% 50%); text-transform: uppercase; margin-bottom: 2px;">Prix demandé</div>
+                  <div style="font-weight: 700; color: hsl(270 100% 60%); font-size: 18px;">
+                    ${Number(props.asking_price).toLocaleString('fr-CA')} $
+                  </div>
+                </div>
+                ${props.annual_revenue ? `
+                  <div style="text-align: right;">
+                    <div style="font-size: 11px; color: hsl(252 15% 50%); text-transform: uppercase; margin-bottom: 2px;">Chiffre d'affaires</div>
+                    <div style="font-size: 13px; font-weight: 600; color: hsl(252 47% 11%);">
+                      ${Number(props.annual_revenue).toLocaleString('fr-CA')} $
+                    </div>
+                  </div>
+                ` : ''}
+              </div>
+              <div style="margin-top: 12px; padding: 8px; background: hsl(270 100% 60% / 0.1); border-radius: 6px; text-align: center; font-size: 12px; color: hsl(270 100% 60%); font-weight: 600;">
+                Cliquez pour voir les détails
+              </div>
+            </div>
+          </div>
+        `;
+
+        popup.setLngLat(coordinates).setHTML(popupContent).addTo(map.current);
       });
 
-      markers.current.push(marker);
-    });
+      map.current.on('mouseleave', 'unclustered-point', () => {
+        if (!map.current) return;
+        map.current.getCanvas().style.cursor = '';
+        popup.remove();
+      });
 
-    // Fit bounds if there are businesses
-    if (businesses.length > 0 && map.current) {
-      const bounds = new mapboxgl.LngLatBounds();
-      businesses.forEach(b => bounds.extend([b.longitude, b.latitude]));
-      map.current.fitBounds(bounds, { padding: 50 });
+      // Click on unclustered point to navigate
+      map.current.on('click', 'unclustered-point', (e) => {
+        const businessId = e.features![0].properties!.id;
+        navigate(`/business/${businessId}`);
+      });
+
+      // Change cursor on cluster hover
+      map.current.on('mouseenter', 'clusters', () => {
+        if (!map.current) return;
+        map.current.getCanvas().style.cursor = 'pointer';
+      });
+
+      map.current.on('mouseleave', 'clusters', () => {
+        if (!map.current) return;
+        map.current.getCanvas().style.cursor = '';
+      });
+
+      // Fit bounds if there are businesses
+      if (businesses.length > 0) {
+        const bounds = new mapboxgl.LngLatBounds();
+        businesses.forEach(b => bounds.extend([b.longitude, b.latitude]));
+        map.current.fitBounds(bounds, { padding: 50 });
+      }
+    };
+
+    if (map.current.isStyleLoaded()) {
+      addBusinessLayers();
+    } else {
+      map.current.on('load', addBusinessLayers);
     }
 
   }, [businesses, navigate]);
@@ -350,8 +357,6 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      markers.current.forEach(marker => marker.remove());
-      popups.current.forEach(popup => popup.remove());
       map.current?.remove();
     };
   }, []);
