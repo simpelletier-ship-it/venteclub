@@ -150,10 +150,10 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
     if (!map.current) {
       mapboxgl.accessToken = mapboxToken;
 
-      // Initialize map centered on Quebec
+      // Initialize map centered on Quebec with dark theme
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
-        style: 'mapbox://styles/mapbox/streets-v12',
+        style: 'mapbox://styles/mapbox/light-v11',
         center: [-71.2082, 46.8139],
         zoom: 6,
       });
@@ -225,7 +225,39 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
         clusterRadius: 50, // Radius of each cluster when clustering points
       });
 
-      // Add cluster circles layer
+      // Get primary color from CSS variables
+      const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim();
+      const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+      
+      // Convert HSL to hex for Mapbox
+      const hslToHex = (hsl: string) => {
+        const [h, s, l] = hsl.split(' ').map(v => parseFloat(v));
+        const hue = h / 360;
+        const saturation = s / 100;
+        const lightness = l / 100;
+        
+        const hue2rgb = (p: number, q: number, t: number) => {
+          if (t < 0) t += 1;
+          if (t > 1) t -= 1;
+          if (t < 1/6) return p + (q - p) * 6 * t;
+          if (t < 1/2) return q;
+          if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+          return p;
+        };
+        
+        const q = lightness < 0.5 ? lightness * (1 + saturation) : lightness + saturation - lightness * saturation;
+        const p = 2 * lightness - q;
+        const r = Math.round(hue2rgb(p, q, hue + 1/3) * 255);
+        const g = Math.round(hue2rgb(p, q, hue) * 255);
+        const b = Math.round(hue2rgb(p, q, hue - 1/3) * 255);
+        
+        return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+      };
+      
+      const primaryHex = hslToHex(primaryColor);
+      const accentHex = hslToHex(accentColor);
+
+      // Add cluster circles layer with theme colors
       map.current.addLayer({
         id: 'clusters',
         type: 'circle',
@@ -235,20 +267,20 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
           'circle-color': [
             'step',
             ['get', 'point_count'],
-            '#9333ea', // Color for small clusters (purple)
+            primaryHex,
             10,
-            '#7c3aed', // Color for medium clusters
+            accentHex,
             30,
-            '#6d28d9', // Color for large clusters
+            primaryHex,
           ],
           'circle-radius': [
             'step',
             ['get', 'point_count'],
-            20, // Size for small clusters
+            20,
             10,
-            30, // Size for medium clusters
             30,
-            40, // Size for large clusters
+            30,
+            40,
           ],
           'circle-stroke-width': 3,
           'circle-stroke-color': '#fff',
@@ -271,14 +303,14 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
         },
       });
 
-      // Add unclustered points layer
+      // Add unclustered points layer with theme colors
       map.current.addLayer({
         id: 'unclustered-point',
         type: 'circle',
         source: 'businesses',
         filter: ['!', ['has', 'point_count']],
         paint: {
-          'circle-color': '#9333ea',
+          'circle-color': primaryHex,
           'circle-radius': 16,
           'circle-stroke-width': 3,
           'circle-stroke-color': '#fff',
@@ -322,6 +354,11 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
 
         const coordinates = (e.features![0].geometry as any).coordinates.slice();
         const props = e.features![0].properties!;
+        
+        // Get theme colors
+        const foregroundColor = getComputedStyle(document.documentElement).getPropertyValue('--foreground').trim();
+        const mutedForegroundColor = getComputedStyle(document.documentElement).getPropertyValue('--muted-foreground').trim();
+        const borderColor = getComputedStyle(document.documentElement).getPropertyValue('--border').trim();
 
         const popupContent = `
           <div style="padding: 0; max-width: 300px;">
@@ -333,36 +370,36 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
               />
             ` : ''}
             <div style="padding: 12px;">
-              <h3 style="font-weight: 700; margin-bottom: 8px; font-size: 16px; color: hsl(252 47% 11%); line-height: 1.3;">
+              <h3 style="font-weight: 700; margin-bottom: 8px; font-size: 16px; color: hsl(${foregroundColor}); line-height: 1.3;">
                 ${props.title}
               </h3>
               <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 8px;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9333ea" stroke-width="2">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="${primaryHex}" stroke-width="2">
                   <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                   <circle cx="12" cy="10" r="3"></circle>
                 </svg>
-                <span style="color: hsl(252 15% 50%); font-size: 13px;">${props.location}</span>
+                <span style="color: hsl(${mutedForegroundColor}); font-size: 13px;">${props.location}</span>
               </div>
-              <p style="color: hsl(252 15% 50%); font-size: 13px; margin-bottom: 10px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+              <p style="color: hsl(${mutedForegroundColor}); font-size: 13px; margin-bottom: 10px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
                 ${props.description}
               </p>
-              <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid hsl(252 20% 90%);">
+              <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid hsl(${borderColor});">
                 <div>
-                  <div style="font-size: 11px; color: hsl(252 15% 50%); text-transform: uppercase; margin-bottom: 2px;">Prix demandé</div>
-                  <div style="font-weight: 700; color: #9333ea; font-size: 18px;">
+                  <div style="font-size: 11px; color: hsl(${mutedForegroundColor}); text-transform: uppercase; margin-bottom: 2px;">Prix demandé</div>
+                  <div style="font-weight: 700; color: ${primaryHex}; font-size: 18px;">
                     ${Number(props.asking_price).toLocaleString('fr-CA')} $
                   </div>
                 </div>
                 ${props.annual_revenue ? `
                   <div style="text-align: right;">
-                    <div style="font-size: 11px; color: hsl(252 15% 50%); text-transform: uppercase; margin-bottom: 2px;">Chiffre d'affaires</div>
-                    <div style="font-size: 13px; font-weight: 600; color: hsl(252 47% 11%);">
+                    <div style="font-size: 11px; color: hsl(${mutedForegroundColor}); text-transform: uppercase; margin-bottom: 2px;">Chiffre d'affaires</div>
+                    <div style="font-size: 13px; font-weight: 600; color: hsl(${foregroundColor});">
                       ${Number(props.annual_revenue).toLocaleString('fr-CA')} $
                     </div>
                   </div>
                 ` : ''}
               </div>
-              <div style="margin-top: 12px; padding: 8px; background: rgba(147, 51, 234, 0.1); border-radius: 6px; text-align: center; font-size: 12px; color: #9333ea; font-weight: 600;">
+              <div style="margin-top: 12px; padding: 8px; background: ${primaryHex}15; border-radius: 6px; text-align: center; font-size: 12px; color: ${primaryHex}; font-weight: 600;">
                 Cliquez pour voir les détails
               </div>
             </div>
