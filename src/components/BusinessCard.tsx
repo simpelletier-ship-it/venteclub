@@ -142,9 +142,6 @@ const BusinessCard = ({
                 {region && <span className="text-muted-foreground/70">, {region}</span>}
               </span>
             </div>
-            <Badge variant="outline" className="w-fit">
-              {industry}
-            </Badge>
           </div>
           {id && (
             <div className="pt-1">

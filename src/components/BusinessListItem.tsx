@@ -114,9 +114,6 @@ const BusinessListItem = ({
               {region && <span className="text-muted-foreground/70">, {region}</span>}
             </span>
           </div>
-          <Badge variant="outline" className="w-fit text-xs">
-            {industry}
-          </Badge>
         </div>
 
         <p className="text-sm text-muted-foreground line-clamp-1">
