@@ -3,53 +3,18 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import BusinessCard from "@/components/BusinessCard";
 import FilterBar from "@/components/FilterBar";
-import { ArrowRight, Heart } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import heroImage from "@/assets/hero-business.jpg";
-import { NotificationBell } from "@/components/NotificationBell";
 
 const Index = () => {
   const navigate = useNavigate();
-  const [user, setUser] = useState<any>(null);
   const [featuredBusinesses, setFeaturedBusinesses] = useState<any[]>([]);
   const [allBusinesses, setAllBusinesses] = useState<any[]>([]);
   const [filteredBusinesses, setFilteredBusinesses] = useState<any[]>([]);
-  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      
-      // Check if user is admin
-      if (session?.user) {
-        const { data: hasAdminRole } = await supabase
-          .rpc('has_role', { 
-            _user_id: session.user.id, 
-            _role: 'admin' 
-          });
-        setIsAdmin(!!hasAdminRole);
-      }
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      setUser(session?.user ?? null);
-      
-      // Check admin role on auth change
-      if (session?.user) {
-        const { data: hasAdminRole } = await supabase
-          .rpc('has_role', { 
-            _user_id: session.user.id, 
-            _role: 'admin' 
-          });
-        setIsAdmin(!!hasAdminRole);
-      } else {
-        setIsAdmin(false);
-      }
-    });
-
     fetchBusinesses();
-
-    return () => subscription.unsubscribe();
   }, []);
 
   const fetchBusinesses = async () => {
@@ -102,65 +67,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Navigation */}
-      <nav className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center cursor-pointer" onClick={() => navigate("/")}>
-            <span className="text-3xl font-bold">
-              Vente<span className="text-accent">.Club</span>
-            </span>
-          </div>
-          <div className="hidden md:flex items-center gap-8">
-            <button onClick={() => document.getElementById('featured')?.scrollIntoView({ behavior: 'smooth' })} className="text-foreground hover:text-accent transition-colors font-medium">Parcourir</button>
-            <button onClick={() => navigate("/map")} className="text-foreground hover:text-accent transition-colors font-medium">Carte</button>
-            {user && (
-              <button onClick={() => navigate("/favorites")} className="text-foreground hover:text-accent transition-colors font-medium flex items-center gap-2">
-                <Heart className="w-4 h-4" />
-                Mes favoris
-              </button>
-            )}
-            <button onClick={() => navigate(user ? "/list-business" : "/auth")} className="text-foreground hover:text-accent transition-colors font-medium">Vendre</button>
-          </div>
-          <div className="flex items-center gap-3">
-            {user ? (
-              <>
-                <NotificationBell userId={user?.id} />
-                {isAdmin && (
-                  <Button variant="secondary" onClick={() => navigate("/admin")}>
-                    Admin
-                  </Button>
-                )}
-                <Button variant="ghost" onClick={() => navigate("/dashboard")}>
-                  Dashboard
-                </Button>
-                <Button variant="ghost" onClick={() => navigate("/settings")}>
-                  Paramètres
-                </Button>
-                <Button className="bg-accent hover:bg-accent/90 text-accent-foreground" onClick={() => navigate("/list-business")}>
-                  Vendre une entreprise
-                </Button>
-                <Button variant="outline" onClick={async () => {
-                  await supabase.auth.signOut();
-                  navigate("/");
-                }}>
-                  Déconnexion
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button variant="ghost" className="text-foreground hover:text-accent" onClick={() => navigate("/auth")}>
-                  Connexion
-                </Button>
-                <Button className="bg-accent hover:bg-accent/90 text-accent-foreground" onClick={() => navigate("/auth")}>
-                  Vendre une entreprise
-                </Button>
-              </>
-            )}
-          </div>
-        </div>
-      </nav>
-
+    <>
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-background via-primary/5 to-accent/10">
         <div className="absolute inset-0">
@@ -208,7 +115,7 @@ const Index = () => {
                 size="lg" 
                 variant="outline"
                 className="h-14 px-8 text-lg font-semibold border-2 hover:bg-accent/5"
-                onClick={() => navigate(user ? "/list-business" : "/auth")}
+                onClick={() => navigate("/list-business")}
               >
                 Vendre mon entreprise
               </Button>
@@ -284,7 +191,7 @@ const Index = () => {
           <p className="text-lg text-white/90 mb-6 max-w-2xl mx-auto">
             Rejoignez des milliers d'entrepreneurs
           </p>
-          <Button size="lg" className="bg-white hover:bg-white/90 text-primary h-12 px-8 text-lg font-semibold" onClick={() => navigate(user ? "/list-business" : "/auth")}>
+          <Button size="lg" className="bg-white hover:bg-white/90 text-primary h-12 px-8 text-lg font-semibold" onClick={() => navigate("/list-business")}>
             Commencer
             <ArrowRight className="ml-2 w-5 h-5" />
           </Button>
@@ -309,7 +216,7 @@ const Index = () => {
           </div>
         </div>
       </footer>
-    </div>
+    </>
   );
 };
 
