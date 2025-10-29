@@ -201,6 +201,7 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
         </div>
       `;
 
+      // Create popup and attach it to marker
       const popup = new mapboxgl.Popup({ 
         offset: 25,
         closeButton: false,
@@ -209,12 +210,14 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
         maxWidth: '300px'
       }).setHTML(popupContent);
 
-      // Add marker with element (using center anchor to avoid position shift)
+      // Create marker with center anchor at fixed coordinates
+      const markerLngLat: [number, number] = [business.longitude, business.latitude];
       const marker = new mapboxgl.Marker({ element: el, anchor: 'center' })
-        .setLngLat([business.longitude, business.latitude])
+        .setLngLat(markerLngLat)
+        .setPopup(popup) // Attach popup directly to marker
         .addTo(map.current);
 
-      // Handle popup manually
+      // Handle popup visibility manually without moving anything
       let hideTimeout: NodeJS.Timeout;
       let isPopupHovered = false;
       let isMarkerHovered = false;
@@ -222,14 +225,14 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
       const showPopup = () => {
         clearTimeout(hideTimeout);
         if (!popup.isOpen()) {
-          popup.setLngLat([business.longitude, business.latitude]).addTo(map.current!);
+          marker.togglePopup(); // Use marker's popup, no coordinate change
         }
       };
       
       const hidePopup = () => {
         hideTimeout = setTimeout(() => {
-          if (!isPopupHovered && !isMarkerHovered) {
-            popup.remove();
+          if (!isPopupHovered && !isMarkerHovered && popup.isOpen()) {
+            marker.togglePopup(); // Close using marker's method
           }
         }, 200);
       };
