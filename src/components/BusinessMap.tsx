@@ -201,42 +201,62 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
         </div>
       `;
 
-      // Create popup and attach it to marker
+      // Create popup (not attached to marker to avoid position shifts)
       const popup = new mapboxgl.Popup({ 
         offset: 25,
         closeButton: false,
         closeOnClick: false,
         className: 'business-popup',
-        maxWidth: '300px'
+        maxWidth: '300px',
+        anchor: 'bottom' // Fixed anchor position
       }).setHTML(popupContent);
 
-      // Create marker with center anchor at fixed coordinates
+      // Create marker with fixed coordinates - never changes
       const markerLngLat: [number, number] = [business.longitude, business.latitude];
-      const marker = new mapboxgl.Marker({ element: el, anchor: 'center' })
+      const marker = new mapboxgl.Marker({ 
+        element: el, 
+        anchor: 'center' 
+      })
         .setLngLat(markerLngLat)
-        .setPopup(popup) // Attach popup directly to marker
         .addTo(map.current);
 
-      // Handle popup visibility manually without moving anything
+      // Handle popup visibility manually
       let hideTimeout: NodeJS.Timeout;
       let isPopupHovered = false;
       let isMarkerHovered = false;
       
       const showPopup = () => {
         clearTimeout(hideTimeout);
-        if (!popup.isOpen()) {
-          marker.togglePopup(); // Use marker's popup, no coordinate change
+        if (!popup.isOpen() && map.current) {
+          // Always use the same fixed coordinates
+          popup.setLngLat(markerLngLat).addTo(map.current);
+          
+          // Attach hover listeners to popup after it's added
+          setTimeout(() => {
+            const popupEl = popup.getElement();
+            if (popupEl) {
+              popupEl.addEventListener('mouseenter', () => {
+                isPopupHovered = true;
+                clearTimeout(hideTimeout);
+              });
+              popupEl.addEventListener('mouseleave', () => {
+                isPopupHovered = false;
+                hidePopup();
+              });
+            }
+          }, 0);
         }
       };
       
       const hidePopup = () => {
         hideTimeout = setTimeout(() => {
           if (!isPopupHovered && !isMarkerHovered && popup.isOpen()) {
-            marker.togglePopup(); // Close using marker's method
+            popup.remove();
           }
         }, 200);
       };
       
+      // Marker hover events
       el.addEventListener('mouseenter', () => {
         isMarkerHovered = true;
         showPopup();
@@ -245,21 +265,6 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
       el.addEventListener('mouseleave', () => {
         isMarkerHovered = false;
         hidePopup();
-      });
-
-      // Keep popup open when hovering over it
-      popup.on('open', () => {
-        const popupEl = popup.getElement();
-        if (popupEl) {
-          popupEl.addEventListener('mouseenter', () => {
-            isPopupHovered = true;
-            clearTimeout(hideTimeout);
-          });
-          popupEl.addEventListener('mouseleave', () => {
-            isPopupHovered = false;
-            hidePopup();
-          });
-        }
       });
 
       // Navigate on click
