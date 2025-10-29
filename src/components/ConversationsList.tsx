@@ -116,7 +116,7 @@ export const ConversationsList = ({ userId }: ConversationsListProps) => {
   };
 
   const handleConversationClick = (conversation: Conversation) => {
-    navigate(`/business/${conversation.business_id}`);
+    navigate(`/messages?conversation=${conversation.business_id}-${conversation.other_user_id}`);
   };
 
   if (loading) {

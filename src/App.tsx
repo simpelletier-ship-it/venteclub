@@ -14,6 +14,7 @@ import Map from "./pages/Map";
 import Admin from "./pages/Admin";
 import Settings from "./pages/Settings";
 import Favorites from "./pages/Favorites";
+import Messages from "./pages/Messages";
 import NotFound from "./pages/NotFound";
 import LogoutSuccess from "./pages/LogoutSuccess";
 
@@ -37,6 +38,7 @@ const App = () => (
               <Route path="/admin" element={<Admin />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="/favorites" element={<Favorites />} />
+              <Route path="/messages" element={<Messages />} />
               <Route path="/logout-success" element={<LogoutSuccess />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />

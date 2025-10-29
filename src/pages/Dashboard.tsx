@@ -3,17 +3,16 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, LogOut, Star, XCircle, Edit } from "lucide-react";
+import { Plus, LogOut, Star, XCircle, Edit, MessageSquare } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import BusinessCard from "@/components/BusinessCard";
-import { MessagesList } from "@/components/MessagesList";
 import { PurchasedBusinesses } from "@/components/PurchasedBusinesses";
 import { WithdrawBusinessDialog } from "@/components/WithdrawBusinessDialog";
 import { EditBusinessDialog } from "@/components/EditBusinessDialog";
 import { AlertsManager } from "@/components/AlertsManager";
-import { ConversationsList } from "@/components/ConversationsList";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -214,7 +213,19 @@ const Dashboard = () => {
           </TabsContent>
 
           <TabsContent value="messages">
-            {user && <ConversationsList userId={user.id} />}
+            <Card>
+              <CardContent className="p-6 text-center">
+                <MessageSquare className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+                <h3 className="text-lg font-semibold mb-2">Messagerie</h3>
+                <p className="text-muted-foreground mb-4">
+                  Accédez à votre boîte de réception pour gérer toutes vos conversations
+                </p>
+                <Button onClick={() => navigate('/messages')}>
+                  <MessageSquare className="mr-2 h-4 w-4" />
+                  Ouvrir la messagerie
+                </Button>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           <TabsContent value="alerts">

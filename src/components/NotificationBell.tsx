@@ -108,6 +108,9 @@ export const NotificationBell = ({ userId }: NotificationBellProps) => {
     // Pour les notifications de nouvelle annonce créée par le vendeur, aller au dashboard
     if (notification.type === 'new_listing' && notification.message.includes('soumise avec succès')) {
       navigate('/dashboard');
+    } else if (notification.type === 'new_message' || notification.type === 'contact_purchased') {
+      // Pour les notifications de messages, aller à la messagerie
+      navigate('/messages');
     } else if (notification.type === 'approved') {
       // Pour les notifications d'approbation, aller vers l'annonce
       navigate(`/business/${notification.business_id}`);
@@ -139,7 +142,7 @@ export const NotificationBell = ({ userId }: NotificationBellProps) => {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => navigate('/dashboard?tab=messages')}
+                onClick={() => navigate('/messages')}
               >
                 {unreadMessagesCount} message{unreadMessagesCount > 1 ? 's' : ''} non lu{unreadMessagesCount > 1 ? 's' : ''}
               </Button>
