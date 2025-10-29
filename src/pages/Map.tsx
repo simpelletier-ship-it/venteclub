@@ -1,28 +1,6 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 import BusinessMap from "@/components/BusinessMap";
-import FilterBar from "@/components/FilterBar";
-import { ArrowLeft } from "lucide-react";
 
 const Map = () => {
-  const navigate = useNavigate();
-  const [filters, setFilters] = useState<{
-    city?: string;
-    industry?: string;
-    minPrice?: number;
-    maxPrice?: number;
-  }>({});
-
-  const handleFilter = (newFilters: {
-    city?: string;
-    industry?: string;
-    minPrice?: number;
-    maxPrice?: number;
-  }) => {
-    setFilters(newFilters);
-  };
-
   return (
     <div className="min-h-screen bg-background pt-32">
       {/* Map Section */}
@@ -35,13 +13,8 @@ const Map = () => {
             </p>
           </div>
 
-          {/* Filter Bar */}
-          <div className="mb-8">
-            <FilterBar onFilter={handleFilter} />
-          </div>
-
           {/* Map */}
-          <BusinessMap filters={filters} />
+          <BusinessMap />
         </div>
       </section>
     </div>
