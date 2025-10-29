@@ -183,15 +183,19 @@ const Settings = () => {
     try {
       if (!profile.email) return;
 
-      const { error } = await supabase.auth.resetPasswordForEmail(profile.email, {
-        redirectTo: `${window.location.origin}/auth`,
+      // Use custom edge function to send password reset email with custom sender
+      const { error } = await supabase.functions.invoke('send-password-reset', {
+        body: {
+          email: profile.email,
+          redirectUrl: `${window.location.origin}/auth`
+        }
       });
 
       if (error) throw error;
 
       toast({
         title: "Email envoyé",
-        description: "Un lien de réinitialisation a été envoyé à votre adresse email.",
+        description: "Un lien de réinitialisation a été envoyé à votre adresse email. Si vous ne recevez pas l'email, vérifiez vos courriels indésirables.",
       });
     } catch (error: any) {
       toast({

@@ -59,7 +59,7 @@ const handler = async (req: Request): Promise<Response> => {
     const businessUrl = `${Deno.env.get("SUPABASE_URL")?.replace("supabase.co", "vente.club") || "https://vente.club"}/business/${businessId}`;
 
     const emailResponse = await resend.emails.send({
-      from: "Vente.club <noreply@vente.club>",
+      from: "Vente.club <info@vente.club>",
       to: [profile.email],
       subject: `✅ Votre annonce "${business.title}" a été approuvée !`,
       html: `

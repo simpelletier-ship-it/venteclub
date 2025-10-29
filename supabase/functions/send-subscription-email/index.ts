@@ -39,7 +39,7 @@ const handler = async (req: Request): Promise<Response> => {
     });
 
     const emailResponse = await resend.emails.send({
-      from: "Vente.club <noreply@vente.club>",
+      from: "Vente.club <info@vente.club>",
       to: [email],
       subject: "Confirmation de votre abonnement Premium - Vente.club",
       html: `

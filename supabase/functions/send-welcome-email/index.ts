@@ -24,7 +24,7 @@ const handler = async (req: Request): Promise<Response> => {
     console.log("Sending welcome email to:", email);
 
     const emailResponse = await resend.emails.send({
-      from: "Vente.club <noreply@vente.club>",
+      from: "Vente.club <info@vente.club>",
       to: [email],
       subject: "Bienvenue sur Vente.club - Votre plateforme de vente d'entreprises au Québec",
       html: `
