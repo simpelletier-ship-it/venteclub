@@ -14,13 +14,215 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      business_inquiries: {
+        Row: {
+          business_id: string
+          buyer_id: string
+          created_at: string | null
+          id: string
+        }
+        Insert: {
+          business_id: string
+          buyer_id: string
+          created_at?: string | null
+          id?: string
+        }
+        Update: {
+          business_id?: string
+          buyer_id?: string
+          created_at?: string | null
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_inquiries_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_inquiries_buyer_id_fkey"
+            columns: ["buyer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      businesses: {
+        Row: {
+          annual_revenue: number | null
+          asking_price: number
+          created_at: string | null
+          description: string
+          employees_count: number | null
+          id: string
+          industry: string
+          is_premium: boolean | null
+          location: string
+          profit_margin: number | null
+          seller_id: string
+          status: string | null
+          title: string
+          updated_at: string | null
+          year_established: number | null
+        }
+        Insert: {
+          annual_revenue?: number | null
+          asking_price: number
+          created_at?: string | null
+          description: string
+          employees_count?: number | null
+          id?: string
+          industry: string
+          is_premium?: boolean | null
+          location: string
+          profit_margin?: number | null
+          seller_id: string
+          status?: string | null
+          title: string
+          updated_at?: string | null
+          year_established?: number | null
+        }
+        Update: {
+          annual_revenue?: number | null
+          asking_price?: number
+          created_at?: string | null
+          description?: string
+          employees_count?: number | null
+          id?: string
+          industry?: string
+          is_premium?: boolean | null
+          location?: string
+          profit_margin?: number | null
+          seller_id?: string
+          status?: string | null
+          title?: string
+          updated_at?: string | null
+          year_established?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "businesses_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          email: string | null
+          full_name: string | null
+          id: string
+          phone: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email?: string | null
+          full_name?: string | null
+          id: string
+          phone?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          phone?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      subscription_plans: {
+        Row: {
+          created_at: string | null
+          credits: number
+          description: string | null
+          duration_days: number
+          id: string
+          is_active: boolean | null
+          name: string
+          price: number
+        }
+        Insert: {
+          created_at?: string | null
+          credits: number
+          description?: string | null
+          duration_days: number
+          id?: string
+          is_active?: boolean | null
+          name: string
+          price: number
+        }
+        Update: {
+          created_at?: string | null
+          credits?: number
+          description?: string | null
+          duration_days?: number
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          price?: number
+        }
+        Relationships: []
+      }
+      user_subscriptions: {
+        Row: {
+          created_at: string | null
+          credits_remaining: number
+          expires_at: string
+          id: string
+          plan_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          credits_remaining: number
+          expires_at: string
+          id?: string
+          plan_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          credits_remaining?: number
+          expires_at?: string
+          id?: string
+          plan_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_subscriptions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_subscriptions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      can_access_seller_info: {
+        Args: { business_uuid: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
