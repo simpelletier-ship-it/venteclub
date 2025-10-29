@@ -48,12 +48,19 @@ export const PremiumSubscription = ({ userId }: PremiumSubscriptionProps) => {
     try {
       const { data, error } = await supabase.functions.invoke('check-premium-subscription');
       
-      if (error) throw error;
-      
-      setIsSubscribed(data?.subscribed || false);
-      setSubscriptionEnd(data?.subscription_end || null);
+      if (error) {
+        console.error('Error checking subscription:', error);
+        setIsSubscribed(false);
+        setSubscriptionEnd(null);
+      } else {
+        console.log('Subscription data:', data);
+        setIsSubscribed(data?.subscribed || false);
+        setSubscriptionEnd(data?.subscription_end || null);
+      }
     } catch (error: any) {
       console.error('Error checking subscription:', error);
+      setIsSubscribed(false);
+      setSubscriptionEnd(null);
     } finally {
       setLoading(false);
     }
@@ -182,13 +189,13 @@ export const PremiumSubscription = ({ userId }: PremiumSubscriptionProps) => {
             <Button
               onClick={handleManageSubscription}
               disabled={processing}
-              variant="outline"
+              variant="destructive"
               className="w-full"
             >
-              {processing ? 'Chargement...' : 'Gérer mon abonnement'}
+              {processing ? 'Chargement...' : 'Annuler mon abonnement'}
             </Button>
             <p className="text-xs text-muted-foreground text-center">
-              Vous pouvez annuler votre abonnement à tout moment depuis le portail de gestion
+              Annulez votre abonnement à tout moment. L'accès restera actif jusqu'à la fin de la période payée.
             </p>
           </CardContent>
         </Card>
