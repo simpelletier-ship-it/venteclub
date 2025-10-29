@@ -154,7 +154,19 @@ const BlogPost = () => {
 
             {/* Content */}
             <div 
-              className="prose prose-lg max-w-none prose-headings:text-foreground prose-p:text-muted-foreground prose-a:text-accent prose-strong:text-foreground prose-ul:text-muted-foreground prose-h2:text-2xl prose-h2:font-bold prose-h2:mt-8 prose-h2:mb-4 prose-h3:text-xl prose-h3:font-semibold prose-h3:mt-6 prose-h3:mb-3"
+              className="prose prose-lg max-w-none 
+                prose-headings:text-foreground prose-headings:font-bold
+                prose-h2:text-3xl prose-h2:mt-12 prose-h2:mb-6 prose-h2:leading-tight
+                prose-h3:text-2xl prose-h3:mt-8 prose-h3:mb-4 prose-h3:leading-snug
+                prose-h4:text-xl prose-h4:mt-6 prose-h4:mb-3
+                prose-p:text-muted-foreground prose-p:leading-relaxed prose-p:mb-6 prose-p:text-justify
+                prose-ul:my-6 prose-ul:space-y-2 prose-ul:text-muted-foreground
+                prose-li:leading-relaxed prose-li:pl-2
+                prose-ol:my-6 prose-ol:space-y-2 prose-ol:text-muted-foreground
+                prose-strong:text-foreground prose-strong:font-semibold
+                prose-a:text-accent prose-a:font-medium prose-a:no-underline hover:prose-a:underline
+                prose-blockquote:border-l-accent prose-blockquote:bg-accent/5 prose-blockquote:py-4 prose-blockquote:px-6 prose-blockquote:my-6
+                prose-img:rounded-lg prose-img:shadow-md prose-img:my-8"
               dangerouslySetInnerHTML={{ __html: post.content }}
             />
 
