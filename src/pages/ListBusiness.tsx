@@ -402,7 +402,7 @@ const ListBusiness = () => {
 
                     <div>
                       <Label htmlFor="description">
-                        Description (FR) <span className="text-destructive">*</span>
+                        Description <span className="text-destructive">*</span>
                       </Label>
                       <div className="space-y-2">
                         <Textarea
