@@ -61,6 +61,7 @@ const ListBusiness = () => {
     annual_revenue: "",
     asking_price: "",
     profit_margin: "",
+    baiia: "",
     employees_count: "",
     year_established: "",
     seller_email: "",
@@ -259,6 +260,7 @@ const ListBusiness = () => {
         annual_revenue: formData.annual_revenue ? parseFloat(formData.annual_revenue) : null,
         asking_price: parseFloat(formData.asking_price),
         profit_margin: formData.profit_margin && !isNaN(parseFloat(formData.profit_margin)) ? parseFloat(formData.profit_margin) : null,
+        baiia: formData.baiia && !isNaN(parseFloat(formData.baiia)) ? parseFloat(formData.baiia) : null,
         employees_count: formData.employees_count ? parseInt(formData.employees_count) : null,
         year_established: formData.year_established ? parseInt(formData.year_established) : null,
       });
@@ -276,6 +278,7 @@ const ListBusiness = () => {
           annual_revenue: validatedData.annual_revenue,
           asking_price: validatedData.asking_price,
           profit_margin: validatedData.profit_margin,
+          baiia: validatedData.baiia,
           employees_count: validatedData.employees_count,
           year_established: validatedData.year_established,
           is_franchise: formData.is_franchise,
@@ -763,7 +766,7 @@ const ListBusiness = () => {
                   </h2>
 
                   <div className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                       <div>
                         <Label htmlFor="asking_price">
                           Prix de vente <span className="text-destructive">*</span>
@@ -790,12 +793,23 @@ const ListBusiness = () => {
                       </div>
 
                       <div>
-                        <Label htmlFor="profit_margin">Bénéfices / BAIIA</Label>
+                        <Label htmlFor="profit_margin">Bénéfices</Label>
                         <Input
                           id="profit_margin"
                           value={formData.profit_margin}
                           onChange={(e) => setFormData({ ...formData, profit_margin: e.target.value })}
                           placeholder="Montant ou texte (ex: Sur demande)."
+                        />
+                      </div>
+
+                      <div>
+                        <Label htmlFor="baiia">BAIIA</Label>
+                        <Input
+                          id="baiia"
+                          type="number"
+                          value={formData.baiia}
+                          onChange={(e) => setFormData({ ...formData, baiia: e.target.value })}
+                          placeholder="Ex: 50 000"
                         />
                       </div>
                     </div>

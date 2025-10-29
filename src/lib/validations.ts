@@ -56,6 +56,11 @@ export const businessSchema = z.object({
     .max(999999999, 'La marge bénéficiaire ne peut pas dépasser 999 999 999')
     .optional()
     .nullable(),
+  baiia: z.number()
+    .positive('Le BAIIA doit être positif')
+    .max(999999999, 'Le BAIIA ne peut pas dépasser 999 999 999')
+    .optional()
+    .nullable(),
   employees_count: z.number()
     .int('Le nombre d\'employés doit être un nombre entier')
     .positive('Le nombre d\'employés doit être positif')

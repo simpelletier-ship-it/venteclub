@@ -205,6 +205,7 @@ export type Database = {
           annual_revenue: number | null
           approval_status: string | null
           asking_price: number
+          baiia: number | null
           city: string | null
           created_at: string | null
           currency: string | null
@@ -237,6 +238,7 @@ export type Database = {
           annual_revenue?: number | null
           approval_status?: string | null
           asking_price: number
+          baiia?: number | null
           city?: string | null
           created_at?: string | null
           currency?: string | null
@@ -269,6 +271,7 @@ export type Database = {
           annual_revenue?: number | null
           approval_status?: string | null
           asking_price?: number
+          baiia?: number | null
           city?: string | null
           created_at?: string | null
           currency?: string | null

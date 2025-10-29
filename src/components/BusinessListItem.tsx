@@ -17,6 +17,7 @@ interface BusinessListItemProps {
   asking_price?: number;
   profit?: string;
   profit_margin?: number;
+  baiia?: number;
   description: string;
   featured?: boolean;
   status?: string;
@@ -34,6 +35,7 @@ const BusinessListItem = ({
   asking_price,
   profit,
   profit_margin,
+  baiia,
   description,
   featured = false,
   status,
@@ -51,6 +53,7 @@ const BusinessListItem = ({
   const displayRevenue = revenue || (annual_revenue ? `${annual_revenue.toLocaleString('fr-CA', { useGrouping: true }).replace(/\$/g, '')} $` : 'N/A');
   const displayPrice = price || (asking_price ? `${asking_price.toLocaleString('fr-CA', { useGrouping: true }).replace(/\$/g, '')} $` : 'N/A');
   const displayProfit = profit || (profit_margin ? `${profit_margin} %` : 'N/A');
+  const displayBaiia = baiia ? `${baiia.toLocaleString('fr-CA', { useGrouping: true }).replace(/\$/g, '')} $` : 'N/D';
 
   const handleClick = () => {
     if (id && status !== 'sold') {
@@ -121,8 +124,8 @@ const BusinessListItem = ({
           </p>
         </div>
         <div className="text-center">
-          <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Bénéfice</p>
-          <p className="text-sm font-semibold text-accent">{displayProfit}</p>
+          <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">BAIIA</p>
+          <p className="text-sm font-semibold text-accent">{displayBaiia}</p>
         </div>
       </div>
 
