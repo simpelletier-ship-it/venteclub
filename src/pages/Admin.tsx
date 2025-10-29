@@ -15,7 +15,6 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { z } from "zod";
 import { QUEBEC_INDUSTRIES } from "@/lib/constants";
-import { EditProposalsManager } from "@/components/EditProposalsManager";
 import { BlogManager } from "@/components/BlogManager";
 
 const Admin = () => {
@@ -787,10 +786,9 @@ const Admin = () => {
         </div>
 
         <Tabs defaultValue="businesses" className="w-full">
-          <TabsList className="grid w-full max-w-6xl grid-cols-7 mb-6">
+          <TabsList className="grid w-full max-w-6xl grid-cols-6 mb-6">
             <TabsTrigger value="businesses">Annonces</TabsTrigger>
             <TabsTrigger value="pending-changes">Modifications</TabsTrigger>
-            <TabsTrigger value="proposals">Propositions</TabsTrigger>
             <TabsTrigger value="users">Utilisateurs</TabsTrigger>
             <TabsTrigger value="reports">Signalements</TabsTrigger>
             <TabsTrigger value="subscriptions">Abonnements</TabsTrigger>
@@ -993,10 +991,6 @@ const Admin = () => {
                 ))
               )}
             </div>
-          </TabsContent>
-
-          <TabsContent value="proposals">
-            <EditProposalsManager />
           </TabsContent>
 
           <TabsContent value="users">

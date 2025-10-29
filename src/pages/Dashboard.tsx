@@ -10,7 +10,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import BusinessCard from "@/components/BusinessCard";
 import { WithdrawBusinessDialog } from "@/components/WithdrawBusinessDialog";
-import { EditBusinessDialog } from "@/components/EditBusinessDialog";
 import { AlertsManager } from "@/components/AlertsManager";
 import { PremiumSubscription } from "@/components/PremiumSubscription";
 import { MessagesList } from "@/components/MessagesList";
@@ -28,8 +27,6 @@ const Dashboard = () => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [withdrawDialogOpen, setWithdrawDialogOpen] = useState(false);
   const [businessToWithdraw, setBusinessToWithdraw] = useState<any>(null);
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [businessToEdit, setBusinessToEdit] = useState<any>(null);
   const [selectedDuration, setSelectedDuration] = useState<7 | 14 | 30>(7);
   const defaultTab = searchParams.get('tab') || 'businesses';
 
@@ -150,11 +147,6 @@ const Dashboard = () => {
   const handleWithdrawClick = (business: any) => {
     setBusinessToWithdraw(business);
     setWithdrawDialogOpen(true);
-  };
-
-  const handleEditClick = (business: any) => {
-    setBusinessToEdit(business);
-    setEditDialogOpen(true);
   };
 
   const handleSignOut = async () => {
@@ -323,7 +315,7 @@ const Dashboard = () => {
                         )}
                         {business.approval_status === 'approved' && business.status !== 'sold' && business.status !== 'archived' && (
                           <Button
-                            onClick={() => handleEditClick(business)}
+                            onClick={() => navigate(`/list-business?edit=${business.id}`)}
                             size="sm"
                             variant="outline"
                             className="flex-1"
@@ -564,18 +556,6 @@ const Dashboard = () => {
           onSuccess={() => {
             fetchUserBusinesses(user.id);
             setBusinessToWithdraw(null);
-          }}
-        />
-      )}
-
-      {businessToEdit && (
-        <EditBusinessDialog
-          business={businessToEdit}
-          open={editDialogOpen}
-          onOpenChange={setEditDialogOpen}
-          onSuccess={() => {
-            fetchUserBusinesses(user.id);
-            setBusinessToEdit(null);
           }}
         />
       )}
