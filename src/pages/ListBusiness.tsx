@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft } from "lucide-react";
 import venteLogo from "@/assets/vente-logo.png";
+import { businessSchema } from "@/lib/validations";
 
 const ListBusiness = () => {
   const navigate = useNavigate();
@@ -43,8 +44,8 @@ const ListBusiness = () => {
     setLoading(true);
 
     try {
-      const { error } = await supabase.from("businesses").insert({
-        seller_id: user.id,
+      // Validate with Zod
+      const validatedData = businessSchema.parse({
         title: formData.title,
         description: formData.description,
         industry: formData.industry,
@@ -54,6 +55,19 @@ const ListBusiness = () => {
         profit_margin: formData.profit_margin ? parseFloat(formData.profit_margin) : null,
         employees_count: formData.employees_count ? parseInt(formData.employees_count) : null,
         year_established: formData.year_established ? parseInt(formData.year_established) : null,
+      });
+
+      const { error } = await supabase.from("businesses").insert({
+        seller_id: user.id,
+        title: validatedData.title,
+        description: validatedData.description,
+        industry: validatedData.industry,
+        location: validatedData.location,
+        annual_revenue: validatedData.annual_revenue,
+        asking_price: validatedData.asking_price,
+        profit_margin: validatedData.profit_margin,
+        employees_count: validatedData.employees_count,
+        year_established: validatedData.year_established,
         status: "active",
       });
 
@@ -65,11 +79,22 @@ const ListBusiness = () => {
       });
       navigate("/dashboard");
     } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Erreur",
-        description: error.message,
-      });
+      if (error.errors) {
+        // Zod validation errors
+        error.errors.forEach((err: any) => {
+          toast({
+            variant: "destructive",
+            title: "Erreur de validation",
+            description: err.message,
+          });
+        });
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Erreur",
+          description: error.message,
+        });
+      }
     } finally {
       setLoading(false);
     }

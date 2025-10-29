@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import venteLogo from "@/assets/vente-logo.png";
+import { authSchema } from "@/lib/validations";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -27,10 +28,13 @@ const Auth = () => {
     setLoading(true);
 
     try {
+      // Validate with Zod
+      const validatedData = authSchema.parse({ email, password });
+
       if (isSignUp) {
         const { error } = await supabase.auth.signUp({
-          email,
-          password,
+          email: validatedData.email,
+          password: validatedData.password,
           options: {
             emailRedirectTo: `${window.location.origin}/`,
           },
@@ -43,18 +47,29 @@ const Auth = () => {
         setIsSignUp(false);
       } else {
         const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
+          email: validatedData.email,
+          password: validatedData.password,
         });
         if (error) throw error;
         navigate("/");
       }
     } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Erreur",
-        description: error.message,
-      });
+      if (error.errors) {
+        // Zod validation errors
+        error.errors.forEach((err: any) => {
+          toast({
+            variant: "destructive",
+            title: "Erreur de validation",
+            description: err.message,
+          });
+        });
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Erreur",
+          description: error.message,
+        });
+      }
     } finally {
       setLoading(false);
     }

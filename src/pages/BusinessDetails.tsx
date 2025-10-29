@@ -18,6 +18,8 @@ const BusinessDetails = () => {
   const [loading, setLoading] = useState(true);
   const [showPlansDialog, setShowPlansDialog] = useState(false);
   const [plans, setPlans] = useState<any[]>([]);
+  const [sellerContact, setSellerContact] = useState<any>(null);
+  const [isPurchasing, setIsPurchasing] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -54,16 +56,30 @@ const BusinessDetails = () => {
   };
 
   const checkAccess = async (userId: string) => {
+    if (!id) return;
+    
     try {
-      const { data, error } = await supabase
-        .from("business_inquiries")
-        .select("*")
-        .eq("business_id", id)
-        .eq("buyer_id", userId)
-        .maybeSingle();
+      // Use RPC to check access server-side
+      const { data: accessGranted, error } = await supabase
+        .rpc('check_business_access', { business_uuid: id });
 
-      if (error) throw error;
-      setHasAccess(!!data);
+      if (error) {
+        console.error('Error checking access:', error);
+        return;
+      }
+
+      setHasAccess(!!accessGranted);
+
+      // If has access, fetch seller contact info
+      if (accessGranted && business) {
+        const { data: contact } = await supabase
+          .from('seller_contacts')
+          .select('email, phone')
+          .eq('seller_id', business.seller_id)
+          .maybeSingle();
+        
+        setSellerContact(contact);
+      }
     } catch (error: any) {
       console.error(error);
     }
@@ -93,11 +109,58 @@ const BusinessDetails = () => {
   };
 
   const handlePurchasePlan = async (planId: string) => {
-    toast({
-      title: "Fonctionnalité à venir",
-      description: "L'intégration de paiement Stripe sera ajoutée prochainement.",
-    });
-    setShowPlansDialog(false);
+    if (!id) return;
+    
+    setIsPurchasing(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        toast({
+          variant: "destructive",
+          title: "Erreur",
+          description: "Vous devez être connecté",
+        });
+        return;
+      }
+
+      const { data, error } = await supabase.functions.invoke('purchase-access', {
+        body: { businessId: id, planId },
+      });
+
+      if (error) throw error;
+
+      if (data.error) {
+        toast({
+          variant: "destructive",
+          title: "Erreur",
+          description: data.error,
+        });
+        return;
+      }
+
+      toast({
+        title: "Succès !",
+        description: "Accès débloqué avec succès!",
+      });
+      setHasAccess(true);
+      setSellerContact(data.sellerContact);
+      setShowPlansDialog(false);
+      
+      // Refresh access
+      if (user) {
+        checkAccess(user.id);
+      }
+    } catch (error: any) {
+      console.error('Purchase error:', error);
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: error.message || "Erreur lors de l'achat",
+      });
+    } finally {
+      setIsPurchasing(false);
+    }
   };
 
   if (loading) {
@@ -222,13 +285,25 @@ const BusinessDetails = () => {
                     Informations du vendeur
                   </h2>
                   {isSeller || hasAccess ? (
-                    <div className="bg-muted/30 p-6 rounded-lg">
-                      <p className="text-sm text-muted-foreground mb-2">
-                        Contact du vendeur :
-                      </p>
-                      <p className="font-semibold">
-                        [Informations de contact complètes disponibles]
-                      </p>
+                    <div className="bg-muted/30 p-6 rounded-lg space-y-2">
+                      {sellerContact ? (
+                        <>
+                          {sellerContact.email && (
+                            <p className="text-sm">
+                              <span className="font-semibold">Email:</span> {sellerContact.email}
+                            </p>
+                          )}
+                          {sellerContact.phone && (
+                            <p className="text-sm">
+                              <span className="font-semibold">Téléphone:</span> {sellerContact.phone}
+                            </p>
+                          )}
+                        </>
+                      ) : (
+                        <p className="text-sm text-muted-foreground">
+                          Le vendeur n'a pas encore ajouté ses coordonnées.
+                        </p>
+                      )}
                     </div>
                   ) : (
                     <div className="bg-gradient-to-br from-primary/5 to-accent/5 p-6 rounded-lg text-center">
@@ -284,8 +359,9 @@ const BusinessDetails = () => {
                 <Button
                   onClick={() => handlePurchasePlan(plan.id)}
                   className="w-full"
+                  disabled={isPurchasing}
                 >
-                  Acheter
+                  {isPurchasing ? "Traitement..." : "Acheter"}
                 </Button>
               </div>
             ))}

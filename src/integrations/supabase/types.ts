@@ -139,6 +139,38 @@ export type Database = {
         }
         Relationships: []
       }
+      seller_contacts: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: string
+          phone: string | null
+          seller_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id?: string
+          phone?: string | null
+          seller_id: string
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          id?: string
+          phone?: string | null
+          seller_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seller_contacts_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       subscription_plans: {
         Row: {
           created_at: string | null
@@ -219,7 +251,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      can_access_seller_info: {
+      check_business_access: {
         Args: { business_uuid: string }
         Returns: boolean
       }
