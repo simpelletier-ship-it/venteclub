@@ -20,48 +20,34 @@ export const PremiumSubscription = ({ userId }: PremiumSubscriptionProps) => {
 
   useEffect(() => {
     // Charger une seule fois au montage du composant
-    checkSubscription();
-    
-    // NE PAS écouter les changements en temps réel pour éviter le flash
-    // L'utilisateur peut rafraîchir manuellement si nécessaire
+    if (userId && !hasLoadedOnce) {
+      checkSubscription();
+    }
   }, [userId]);
 
   const checkSubscription = async () => {
-    if (!hasLoadedOnce) {
-      setLoading(true);
-    }
+    setLoading(true);
     
     try {
       console.log('[CHECK SUBSCRIPTION] Calling check-premium-subscription edge function');
-      const { data, error } = await invokeWithTimeout('check-premium-subscription', { timeout: 8000 });
+      const { data, error } = await invokeWithTimeout('check-premium-subscription', { timeout: 10000 });
       
       if (error) {
         console.error('[CHECK SUBSCRIPTION] Error:', error);
-        if (!hasLoadedOnce) {
-          setIsSubscribed(false);
-          setSubscriptionEnd(null);
-        }
+        setIsSubscribed(false);
+        setSubscriptionEnd(null);
       } else {
         console.log('[CHECK SUBSCRIPTION] Data received:', data);
-        const newSubscribed = data?.subscribed || false;
-        const newEnd = data?.subscription_end || null;
-        
-        if (newSubscribed !== isSubscribed || newEnd !== subscriptionEnd) {
-          setIsSubscribed(newSubscribed);
-          setSubscriptionEnd(newEnd);
-        }
+        setIsSubscribed(data?.subscribed || false);
+        setSubscriptionEnd(data?.subscription_end || null);
       }
     } catch (error: any) {
       console.error('[CHECK SUBSCRIPTION] Exception:', error);
-      if (!hasLoadedOnce) {
-        setIsSubscribed(false);
-        setSubscriptionEnd(null);
-      }
+      setIsSubscribed(false);
+      setSubscriptionEnd(null);
     } finally {
-      if (!hasLoadedOnce) {
-        setLoading(false);
-        setHasLoadedOnce(true);
-      }
+      setLoading(false);
+      setHasLoadedOnce(true);
     }
   };
 
@@ -209,15 +195,12 @@ export const PremiumSubscription = ({ userId }: PremiumSubscriptionProps) => {
               Vous pouvez annuler le renouvellement à tout moment. Votre accès restera actif jusqu&apos;à la fin de la période déjà payée.
             </p>
             <Button
-              onClick={() => {
-                setHasLoadedOnce(false);
-                checkSubscription();
-              }}
-              disabled={processing}
+              onClick={checkSubscription}
+              disabled={processing || loading}
               variant="outline"
               className="w-full"
             >
-              Actualiser le statut
+              {loading ? "Actualisation..." : "Actualiser le statut"}
             </Button>
           </CardContent>
         </Card>

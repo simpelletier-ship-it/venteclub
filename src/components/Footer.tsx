@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { MapPin, Phone, Mail, Facebook, Linkedin, Twitter } from "lucide-react";
+import { Phone, Mail } from "lucide-react";
 
 export const Footer = () => {
   return (
@@ -13,23 +13,6 @@ export const Footer = () => {
               La plateforme québécoise de référence pour l'achat et la vente d'entreprises. 
               Transactions sécurisées, vérification rigoureuse, accompagnement professionnel.
             </p>
-            <div className="flex gap-3">
-              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" 
-                 className="text-muted-foreground hover:text-accent transition-colors"
-                 aria-label="Facebook">
-                <Facebook className="w-5 h-5" />
-              </a>
-              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer"
-                 className="text-muted-foreground hover:text-accent transition-colors"
-                 aria-label="LinkedIn">
-                <Linkedin className="w-5 h-5" />
-              </a>
-              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer"
-                 className="text-muted-foreground hover:text-accent transition-colors"
-                 aria-label="Twitter">
-                <Twitter className="w-5 h-5" />
-              </a>
-            </div>
           </div>
 
           {/* Navigation */}
@@ -57,18 +40,10 @@ export const Footer = () => {
             </ul>
           </div>
 
-          {/* Contact Info (NAP) */}
+          {/* Contact Info */}
           <div>
             <h3 className="font-bold text-lg mb-4">Coordonnées</h3>
             <div className="space-y-3">
-              <div className="flex items-start gap-2">
-                <MapPin className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" />
-                <div className="text-sm text-muted-foreground">
-                  <p>Vente.Club Inc.</p>
-                  <p>1250 Rue René-Lévesque O</p>
-                  <p>Montréal, QC H3B 4W8</p>
-                </div>
-              </div>
               <div className="flex items-center gap-2">
                 <Phone className="w-5 h-5 text-accent flex-shrink-0" />
                 <a href="tel:+15148501234" className="text-sm text-muted-foreground hover:text-accent transition-colors">
@@ -112,26 +87,13 @@ export const Footer = () => {
           "url": "https://vente.club",
           "logo": "https://vente.club/vente-logo.png",
           "description": "Plateforme québécoise pour l'achat et la vente d'entreprises",
-          "address": {
-            "@type": "PostalAddress",
-            "streetAddress": "1250 Rue René-Lévesque O",
-            "addressLocality": "Montréal",
-            "addressRegion": "QC",
-            "postalCode": "H3B 4W8",
-            "addressCountry": "CA"
-          },
           "contactPoint": {
             "@type": "ContactPoint",
             "telephone": "+1-514-850-1234",
             "contactType": "Customer Service",
             "areaServed": "CA-QC",
             "availableLanguage": ["French", "English"]
-          },
-          "sameAs": [
-            "https://facebook.com/venteclub",
-            "https://linkedin.com/company/venteclub",
-            "https://twitter.com/venteclub"
-          ]
+          }
         })}
       </script>
     </footer>
