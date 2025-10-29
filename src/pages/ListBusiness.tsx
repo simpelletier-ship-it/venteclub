@@ -35,6 +35,7 @@ const ListBusiness = () => {
   });
   const [photos, setPhotos] = useState<File[]>([]);
   const [photoPreviewUrls, setPhotoPreviewUrls] = useState<string[]>([]);
+  const [generatingImage, setGeneratingImage] = useState(false);
 
   useEffect(() => {
     // Check initial session
@@ -83,6 +84,67 @@ const ListBusiness = () => {
     URL.revokeObjectURL(photoPreviewUrls[index]);
     setPhotos(photos.filter((_, i) => i !== index));
     setPhotoPreviewUrls(photoPreviewUrls.filter((_, i) => i !== index));
+  };
+
+  const handleGenerateImage = async () => {
+    // Vérifier que le titre et la description sont remplis
+    if (!formData.title || !formData.description) {
+      toast({
+        variant: "destructive",
+        title: "Informations manquantes",
+        description: "Veuillez remplir le titre et la description avant de générer une image.",
+      });
+      return;
+    }
+
+    if (photos.length >= 10) {
+      toast({
+        variant: "destructive",
+        title: "Limite atteinte",
+        description: "Vous avez déjà atteint la limite de 10 photos.",
+      });
+      return;
+    }
+
+    setGeneratingImage(true);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-business-image', {
+        body: {
+          title: formData.title,
+          description: formData.description,
+          industry: formData.industry,
+        }
+      });
+
+      if (error) throw error;
+
+      if (!data?.imageUrl) {
+        throw new Error("Aucune image générée");
+      }
+
+      // Convertir le base64 en fichier
+      const response = await fetch(data.imageUrl);
+      const blob = await response.blob();
+      const file = new File([blob], `ai-generated-${Date.now()}.png`, { type: 'image/png' });
+
+      setPhotos([...photos, file]);
+      setPhotoPreviewUrls([...photoPreviewUrls, data.imageUrl]);
+
+      toast({
+        title: "Image générée !",
+        description: "L'image a été générée avec succès par l'IA.",
+      });
+    } catch (error: any) {
+      console.error("Erreur génération image:", error);
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: error.message || "Impossible de générer l'image. Veuillez réessayer.",
+      });
+    } finally {
+      setGeneratingImage(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -395,15 +457,7 @@ const ListBusiness = () => {
 
             <div>
               <Label htmlFor="photos">Photos (maximum 10)</Label>
-              <div className="mt-2">
-                <Input
-                  id="photos"
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={handlePhotoChange}
-                  className="hidden"
-                />
+              <div className="mt-2 space-y-3">
                 <label
                   htmlFor="photos"
                   className="flex items-center justify-center gap-2 p-6 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary transition-colors"
@@ -413,6 +467,62 @@ const ListBusiness = () => {
                     Cliquez pour ajouter des photos
                   </span>
                 </label>
+                <Input
+                  id="photos"
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handlePhotoChange}
+                  className="hidden"
+                />
+                
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t border-border" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-card px-2 text-muted-foreground">
+                      ou
+                    </span>
+                  </div>
+                </div>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  onClick={handleGenerateImage}
+                  disabled={generatingImage || !formData.title || !formData.description}
+                >
+                  {generatingImage ? (
+                    <>
+                      <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                      Génération en cours...
+                    </>
+                  ) : (
+                    <>
+                      <svg
+                        className="mr-2 h-4 w-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                        />
+                      </svg>
+                      Générer une image par IA
+                    </>
+                  )}
+                </Button>
+                {(!formData.title || !formData.description) && (
+                  <p className="text-xs text-muted-foreground text-center">
+                    Remplissez le titre et la description pour générer une image
+                  </p>
+                )}
               </div>
               
               {photoPreviewUrls.length > 0 && (
