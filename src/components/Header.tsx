@@ -83,11 +83,7 @@ export const Header = () => {
               </Button>
               <Button variant="outline" onClick={async () => {
                 await supabase.auth.signOut();
-                toast({
-                  title: "Déconnexion réussie",
-                  description: "Vous avez bien été déconnecté.",
-                });
-                navigate("/");
+                navigate("/logout-success");
               }}>
                 Déconnexion
               </Button>

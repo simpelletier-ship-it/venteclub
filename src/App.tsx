@@ -14,6 +14,7 @@ import Admin from "./pages/Admin";
 import Settings from "./pages/Settings";
 import Favorites from "./pages/Favorites";
 import NotFound from "./pages/NotFound";
+import LogoutSuccess from "./pages/LogoutSuccess";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +35,7 @@ const App = () => (
             <Route path="/admin" element={<Admin />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/favorites" element={<Favorites />} />
+            <Route path="/logout-success" element={<LogoutSuccess />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
