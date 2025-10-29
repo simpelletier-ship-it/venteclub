@@ -62,32 +62,30 @@ const BusinessCard = ({
       }`}
       onClick={handleClick}
     >
-      {/* Header with badges and favorite */}
-      <div className="flex items-start justify-between px-4 pt-3 pb-0">
-        <div className="flex items-center gap-2">
-          {featured && (
-            <Badge className="bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 text-white border-0 shadow-md text-xs">
-              <Star className="w-3 h-3 fill-white mr-1" />
-              En Vedette
-            </Badge>
-          )}
-        </div>
-        {id && (
-          <FavoriteButton businessId={id} userId={userId} />
-        )}
-      </div>
-
       {/* Content Section */}
-      <div className="px-4 pb-4 pt-2 space-y-3">
-        {/* Title & Location */}
-        <div className="space-y-2">
-          <h3 className="text-xl font-bold text-foreground group-hover:text-accent transition-colors line-clamp-1">
-            {title}
-          </h3>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <MapPin className="w-4 h-4 flex-shrink-0" />
-            <span className="line-clamp-1">{location}</span>
+      <div className="p-4 space-y-3">
+        {/* Title & Location with Favorite */}
+        <div className="flex items-start justify-between gap-2">
+          <div className="space-y-2 flex-1">
+            {featured && (
+              <Badge className="bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 text-white border-0 shadow-md text-xs">
+                <Star className="w-3 h-3 fill-white mr-1" />
+                En Vedette
+              </Badge>
+            )}
+            <h3 className="text-xl font-bold text-foreground group-hover:text-accent transition-colors line-clamp-1">
+              {title}
+            </h3>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <MapPin className="w-4 h-4 flex-shrink-0" />
+              <span className="line-clamp-1">{location}</span>
+            </div>
           </div>
+          {id && (
+            <div className="pt-1">
+              <FavoriteButton businessId={id} userId={userId} />
+            </div>
+          )}
         </div>
 
         {/* Description */}
@@ -114,8 +112,7 @@ const BusinessCard = ({
         <div className="flex items-end justify-between pt-4 border-t border-border/50">
           <div className="space-y-1">
             <p className="text-xs text-muted-foreground uppercase tracking-wider">Prix demandé</p>
-            <p className="text-2xl font-bold text-primary flex items-center gap-1">
-              <DollarSign className="w-6 h-6" />
+            <p className="text-2xl font-bold text-primary">
               {displayPrice}
             </p>
           </div>
