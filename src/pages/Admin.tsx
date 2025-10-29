@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { CheckCircle, XCircle, Eye, ArrowLeft, Trash2, Star, Edit, Upload } from "lucide-react";
+import { CheckCircle, XCircle, Eye, ArrowLeft, Trash2, Star, Edit, Upload, UserX } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { z } from "zod";
@@ -44,6 +44,9 @@ const Admin = () => {
   });
   const [uploadingImage, setUploadingImage] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [users, setUsers] = useState<any[]>([]);
+  const [userToDelete, setUserToDelete] = useState<any>(null);
+  const [deleteUserDialogOpen, setDeleteUserDialogOpen] = useState(false);
 
   useEffect(() => {
     checkAdminAccess();
@@ -76,6 +79,7 @@ const Admin = () => {
 
       setIsAdmin(true);
       fetchBusinesses();
+      fetchUsers();
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -402,6 +406,52 @@ const Admin = () => {
     }
   };
 
+  const fetchUsers = async () => {
+    try {
+      const { data: usersData, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      setUsers(usersData || []);
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: error.message,
+      });
+    }
+  };
+
+  const handleDeleteUser = async () => {
+    if (!userToDelete) return;
+
+    try {
+      const { error } = await supabase.functions.invoke('delete-user', {
+        body: { userId: userToDelete.id }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Succès",
+        description: "L'utilisateur a été supprimé.",
+      });
+
+      fetchUsers();
+      setDeleteUserDialogOpen(false);
+      setUserToDelete(null);
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: error.message,
+      });
+    }
+  };
+
   const createSampleData = async () => {
     try {
       const { error } = await supabase.rpc('create_sample_businesses');
@@ -465,9 +515,10 @@ const Admin = () => {
         </div>
 
         <Tabs defaultValue="businesses" className="w-full">
-          <TabsList className="grid w-full max-w-md grid-cols-2 mb-6">
+          <TabsList className="grid w-full max-w-2xl grid-cols-3 mb-6">
             <TabsTrigger value="businesses">Annonces</TabsTrigger>
-            <TabsTrigger value="proposals">Propositions de modification</TabsTrigger>
+            <TabsTrigger value="proposals">Propositions</TabsTrigger>
+            <TabsTrigger value="users">Utilisateurs</TabsTrigger>
           </TabsList>
 
           <TabsContent value="businesses">
@@ -568,6 +619,51 @@ const Admin = () => {
 
           <TabsContent value="proposals">
             <EditProposalsManager />
+          </TabsContent>
+
+          <TabsContent value="users">
+            <div className="grid gap-4">
+              {users.map((user) => (
+                <Card key={user.id}>
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <CardTitle className="text-lg">{user.email}</CardTitle>
+                        {user.full_name && (
+                          <CardDescription className="mt-1">
+                            {user.full_name}
+                          </CardDescription>
+                        )}
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex flex-wrap gap-4 mb-4 text-sm">
+                      {user.phone && (
+                        <div>
+                          <span className="font-semibold">Téléphone:</span> {user.phone}
+                        </div>
+                      )}
+                      <div>
+                        <span className="font-semibold">Inscrit le:</span>{" "}
+                        {new Date(user.created_at).toLocaleDateString('fr-CA')}
+                      </div>
+                    </div>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => {
+                        setUserToDelete(user);
+                        setDeleteUserDialogOpen(true);
+                      }}
+                    >
+                      <UserX className="mr-2 h-4 w-4" />
+                      Supprimer le compte
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </TabsContent>
         </Tabs>
       </div>
@@ -811,6 +907,23 @@ const Admin = () => {
             <AlertDialogCancel>Annuler</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">
               Supprimer
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={deleteUserDialogOpen} onOpenChange={setDeleteUserDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmer la suppression</AlertDialogTitle>
+            <AlertDialogDescription>
+              Êtes-vous sûr de vouloir supprimer le compte de "{userToDelete?.email}" ? Cette action supprimera toutes les données associées (annonces, favoris, messages, etc.) et est irréversible.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteUser} className="bg-destructive hover:bg-destructive/90">
+              Supprimer définitivement
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
