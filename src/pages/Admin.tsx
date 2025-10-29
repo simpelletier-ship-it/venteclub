@@ -153,17 +153,20 @@ const Admin = () => {
 
       if (error) throw error;
 
-      // Send email notification (commented out temporarily due to resend package issue)
-      // if (business?.seller_email) {
-      //   await supabase.functions.invoke('send-approval-email', {
-      //     body: {
-      //       email: business.seller_email,
-      //       businessTitle: business.title,
-      //       status: approvalStatus,
-      //       rejectionReason: rejectionReason,
-      //     }
-      //   });
-      // }
+      // Send approval email when business is approved
+      if (approvalStatus === 'approved') {
+        try {
+          await supabase.functions.invoke('send-approval-email', {
+            body: {
+              businessId: businessId
+            }
+          });
+          console.log('Approval email sent successfully');
+        } catch (emailError) {
+          console.error('Error sending approval email:', emailError);
+          // Don't fail the approval if email fails
+        }
+      }
 
       toast({
         title: "Succès",

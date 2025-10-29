@@ -12,6 +12,9 @@ verify_jwt = true
 [functions.send-sale-notification]
 verify_jwt = true
 
+[functions.send-approval-email]
+verify_jwt = false
+
 [functions.purchase-access]
 verify_jwt = true
 
