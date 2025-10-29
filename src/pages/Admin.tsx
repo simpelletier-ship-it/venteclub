@@ -7,11 +7,13 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { CheckCircle, XCircle, Eye, ArrowLeft, Trash2, Star, Edit } from "lucide-react";
+import { CheckCircle, XCircle, Eye, ArrowLeft, Trash2, Star, Edit, Upload } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { z } from "zod";
+import { QUEBEC_INDUSTRIES } from "@/lib/constants";
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -30,9 +32,16 @@ const Admin = () => {
     description: "",
     asking_price: "",
     annual_revenue: "",
+    profit_margin: "",
+    employees_count: "",
+    year_established: "",
     location: "",
     city: "",
+    province: "",
+    industry: "",
   });
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
   useEffect(() => {
     checkAdminAccess();
@@ -256,9 +265,15 @@ const Admin = () => {
       description: business.description,
       asking_price: business.asking_price?.toString() || "",
       annual_revenue: business.annual_revenue?.toString() || "",
+      profit_margin: business.profit_margin?.toString() || "",
+      employees_count: business.employees_count?.toString() || "",
+      year_established: business.year_established?.toString() || "",
       location: business.location || "",
       city: business.city || "",
+      province: business.province || "Québec",
+      industry: business.industry || "",
     });
+    setImageFile(null);
     setEditDialogOpen(true);
   };
 
@@ -267,28 +282,95 @@ const Admin = () => {
     description: z.string().trim().min(20, "La description doit contenir au moins 20 caractères").max(5000, "La description doit contenir maximum 5000 caractères"),
     asking_price: z.string().regex(/^\d+(\.\d{1,2})?$/, "Prix invalide"),
     annual_revenue: z.string().optional(),
+    profit_margin: z.string().optional(),
+    employees_count: z.string().optional(),
+    year_established: z.string().optional(),
     location: z.string().trim().min(2, "Emplacement requis"),
     city: z.string().trim().min(2, "Ville requise"),
+    province: z.string().trim().min(2, "Province requise"),
+    industry: z.string().min(1, "Secteur requis"),
   });
+
+  const handleImageUpload = async (businessId: string): Promise<string | null> => {
+    if (!imageFile) return null;
+
+    try {
+      const fileExt = imageFile.name.split('.').pop();
+      const fileName = `${businessId}-${Date.now()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('business-photos')
+        .upload(filePath, imageFile, {
+          cacheControl: '3600',
+          upsert: true
+        });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('business-photos')
+        .getPublicUrl(filePath);
+
+      return publicUrl;
+    } catch (error: any) {
+      console.error('Error uploading image:', error);
+      throw error;
+    }
+  };
 
   const handleEditSave = async () => {
     try {
+      setUploadingImage(true);
+      
       // Validate form data
       const validated = editBusinessSchema.parse(editFormData);
 
+      // Upload image if provided
+      let photoUrl = null;
+      if (imageFile) {
+        photoUrl = await handleImageUpload(selectedBusiness?.id);
+      }
+
+      // Update business
+      const updateData: any = {
+        title: validated.title,
+        description: validated.description,
+        asking_price: parseFloat(validated.asking_price),
+        annual_revenue: validated.annual_revenue ? parseFloat(validated.annual_revenue) : null,
+        profit_margin: validated.profit_margin ? parseFloat(validated.profit_margin) : null,
+        employees_count: validated.employees_count ? parseInt(validated.employees_count) : null,
+        year_established: validated.year_established ? parseInt(validated.year_established) : null,
+        location: validated.location,
+        city: validated.city,
+        province: validated.province,
+        industry: validated.industry,
+      };
+
       const { error } = await supabase
         .from('businesses')
-        .update({
-          title: validated.title,
-          description: validated.description,
-          asking_price: parseFloat(validated.asking_price),
-          annual_revenue: validated.annual_revenue ? parseFloat(validated.annual_revenue) : null,
-          location: validated.location,
-          city: validated.city,
-        })
+        .update(updateData)
         .eq('id', selectedBusiness?.id);
 
       if (error) throw error;
+
+      // Update or insert photo if uploaded
+      if (photoUrl) {
+        // Delete existing photos first
+        await supabase
+          .from('business_photos')
+          .delete()
+          .eq('business_id', selectedBusiness?.id);
+
+        // Insert new photo
+        await supabase
+          .from('business_photos')
+          .insert({
+            business_id: selectedBusiness?.id,
+            photo_url: photoUrl,
+            display_order: 1
+          });
+      }
 
       toast({
         title: "Succès",
@@ -298,6 +380,7 @@ const Admin = () => {
       fetchBusinesses();
       setEditDialogOpen(false);
       setSelectedBusiness(null);
+      setImageFile(null);
     } catch (error: any) {
       if (error instanceof z.ZodError) {
         toast({
@@ -312,6 +395,8 @@ const Admin = () => {
           description: error.message,
         });
       }
+    } finally {
+      setUploadingImage(false);
     }
   };
 
@@ -547,6 +632,25 @@ const Admin = () => {
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div>
+              <Label htmlFor="edit-image">Photo de l'entreprise</Label>
+              <div className="mt-2">
+                <Input
+                  id="edit-image"
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+                  className="cursor-pointer"
+                />
+                {imageFile && (
+                  <p className="text-xs text-muted-foreground mt-2 flex items-center gap-2">
+                    <Upload className="w-4 h-4" />
+                    {imageFile.name}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div>
               <Label htmlFor="edit-title">Titre *</Label>
               <Input
                 id="edit-title"
@@ -557,6 +661,26 @@ const Admin = () => {
                 className="mt-2"
               />
             </div>
+
+            <div>
+              <Label htmlFor="edit-industry">Secteur d'activité *</Label>
+              <Select 
+                value={editFormData.industry} 
+                onValueChange={(value) => setEditFormData({ ...editFormData, industry: value })}
+              >
+                <SelectTrigger className="mt-2">
+                  <SelectValue placeholder="Sélectionnez un secteur" />
+                </SelectTrigger>
+                <SelectContent>
+                  {QUEBEC_INDUSTRIES.map((industry) => (
+                    <SelectItem key={industry.value} value={industry.value}>
+                      {industry.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
             <div>
               <Label htmlFor="edit-description">Description *</Label>
               <Textarea
@@ -564,7 +688,7 @@ const Admin = () => {
                 value={editFormData.description}
                 onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
                 placeholder="Description détaillée de l'entreprise"
-                rows={8}
+                rows={6}
                 maxLength={5000}
                 className="mt-2"
               />
@@ -572,6 +696,7 @@ const Admin = () => {
                 {editFormData.description.length} / 5000 caractères
               </p>
             </div>
+
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="edit-price">Prix demandé (CAD) *</Label>
@@ -596,7 +721,45 @@ const Admin = () => {
                 />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <Label htmlFor="edit-profit">Marge bénéficiaire (%)</Label>
+                <Input
+                  id="edit-profit"
+                  type="number"
+                  step="0.1"
+                  value={editFormData.profit_margin}
+                  onChange={(e) => setEditFormData({ ...editFormData, profit_margin: e.target.value })}
+                  placeholder="22.5"
+                  className="mt-2"
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit-employees">Employés</Label>
+                <Input
+                  id="edit-employees"
+                  type="number"
+                  value={editFormData.employees_count}
+                  onChange={(e) => setEditFormData({ ...editFormData, employees_count: e.target.value })}
+                  placeholder="8"
+                  className="mt-2"
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit-year">Année de création</Label>
+                <Input
+                  id="edit-year"
+                  type="number"
+                  value={editFormData.year_established}
+                  onChange={(e) => setEditFormData({ ...editFormData, year_established: e.target.value })}
+                  placeholder="2009"
+                  className="mt-2"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-4">
               <div>
                 <Label htmlFor="edit-city">Ville *</Label>
                 <Input
@@ -604,6 +767,16 @@ const Admin = () => {
                   value={editFormData.city}
                   onChange={(e) => setEditFormData({ ...editFormData, city: e.target.value })}
                   placeholder="Montréal"
+                  className="mt-2"
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit-province">Province *</Label>
+                <Input
+                  id="edit-province"
+                  value={editFormData.province}
+                  onChange={(e) => setEditFormData({ ...editFormData, province: e.target.value })}
+                  placeholder="Québec"
                   className="mt-2"
                 />
               </div>
@@ -620,11 +793,11 @@ const Admin = () => {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditDialogOpen(false)}>
+            <Button variant="outline" onClick={() => setEditDialogOpen(false)} disabled={uploadingImage}>
               Annuler
             </Button>
-            <Button onClick={handleEditSave}>
-              Sauvegarder
+            <Button onClick={handleEditSave} disabled={uploadingImage}>
+              {uploadingImage ? "Enregistrement..." : "Sauvegarder"}
             </Button>
           </DialogFooter>
         </DialogContent>

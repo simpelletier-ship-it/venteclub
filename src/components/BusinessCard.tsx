@@ -58,23 +58,25 @@ const BusinessCard = ({
   return (
     <Card 
       className={`group hover:shadow-[var(--shadow-hover)] transition-all duration-300 bg-gradient-to-b from-card to-background border-border cursor-pointer relative overflow-hidden ${
-        featured ? 'ring-2 ring-yellow-400' : ''
+        featured ? 'ring-2 ring-accent/50 shadow-lg' : ''
       }`}
       onClick={handleClick}
     >
-      {featured && (
-        <div className="absolute top-0 right-0 bg-gradient-to-br from-yellow-400 to-yellow-600 text-white px-4 py-2 rounded-bl-2xl shadow-lg flex items-center gap-1 z-10">
-          <Star className="w-4 h-4 fill-current" />
-          <span className="text-sm font-bold">En vedette</span>
-        </div>
-      )}
-      <CardHeader>
-        <div className="flex items-start justify-between mb-2">
-          <Badge variant="secondary" className="text-xs">
+      <CardHeader className="relative">
+        {featured && (
+          <div className="absolute -top-2 -right-2 z-10">
+            <div className="bg-gradient-to-br from-yellow-400 via-yellow-500 to-amber-600 text-white px-5 py-2.5 rounded-2xl shadow-xl flex items-center gap-2 border-2 border-yellow-300/50 backdrop-blur-sm">
+              <Star className="w-5 h-5 fill-white animate-pulse" />
+              <span className="text-sm font-bold tracking-wide">EN VEDETTE</span>
+            </div>
+          </div>
+        )}
+        <div className="flex items-start justify-between mb-4">
+          <Badge variant="secondary" className="text-xs font-medium">
             {industry}
           </Badge>
           {id && (
-            <div className="z-20 relative">
+            <div className="z-20 relative -mt-1">
               <FavoriteButton businessId={id} userId={userId} />
             </div>
           )}
