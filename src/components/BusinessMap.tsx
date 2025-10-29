@@ -199,7 +199,8 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
         closeButton: false,
         closeOnClick: false,
         className: 'business-popup',
-        maxWidth: '300px'
+        maxWidth: '300px',
+        anchor: 'bottom' // Anchor the popup to the bottom so it appears above the marker
       }).setHTML(popupContent);
 
       // Add marker
@@ -208,20 +209,36 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
         .setPopup(popup)
         .addTo(map.current);
 
-      // Show popup on hover with delay to allow moving mouse to popup
+      // Show/hide popup on hover
       let hideTimeout: NodeJS.Timeout;
+      let isPopupHovered = false;
+      let isMarkerHovered = false;
+      
+      const showPopup = () => {
+        clearTimeout(hideTimeout);
+        if (!popup.isOpen()) {
+          marker.togglePopup();
+        }
+      };
+      
+      const hidePopup = () => {
+        hideTimeout = setTimeout(() => {
+          if (!isPopupHovered && !isMarkerHovered) {
+            if (popup.isOpen()) {
+              marker.togglePopup();
+            }
+          }
+        }, 200);
+      };
       
       el.addEventListener('mouseenter', () => {
-        clearTimeout(hideTimeout);
-        if (!marker.getPopup().isOpen()) {
-          marker.getPopup().addTo(map.current!);
-        }
+        isMarkerHovered = true;
+        showPopup();
       });
       
       el.addEventListener('mouseleave', () => {
-        hideTimeout = setTimeout(() => {
-          marker.getPopup().remove();
-        }, 300);
+        isMarkerHovered = false;
+        hidePopup();
       });
 
       // Keep popup open when hovering over it
@@ -229,12 +246,12 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
         const popupEl = popup.getElement();
         if (popupEl) {
           popupEl.addEventListener('mouseenter', () => {
+            isPopupHovered = true;
             clearTimeout(hideTimeout);
           });
           popupEl.addEventListener('mouseleave', () => {
-            hideTimeout = setTimeout(() => {
-              marker.getPopup().remove();
-            }, 200);
+            isPopupHovered = false;
+            hidePopup();
           });
         }
       });
