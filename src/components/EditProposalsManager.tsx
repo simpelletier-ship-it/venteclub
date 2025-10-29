@@ -33,6 +33,16 @@ export const EditProposalsManager = () => {
           businesses (
             id,
             title,
+            description,
+            industry,
+            location,
+            city,
+            province,
+            asking_price,
+            annual_revenue,
+            profit_margin,
+            employees_count,
+            year_established,
             seller_id
           )
         `)
@@ -292,30 +302,59 @@ export const EditProposalsManager = () => {
               />
               <CompareField
                 label="Description"
-                oldValue="[Voir l'annonce actuelle]"
+                oldValue={selectedProposal.businesses?.description}
                 newValue={selectedProposal.proposed_changes?.description}
               />
               <CompareField
                 label="Industrie"
-                oldValue="[Actuel]"
+                oldValue={selectedProposal.businesses?.industry}
                 newValue={selectedProposal.proposed_changes?.industry}
               />
               <CompareField
+                label="Ville"
+                oldValue={selectedProposal.businesses?.city}
+                newValue={selectedProposal.proposed_changes?.city}
+              />
+              <CompareField
+                label="Province"
+                oldValue={selectedProposal.businesses?.province}
+                newValue={selectedProposal.proposed_changes?.province}
+              />
+              <CompareField
                 label="Localisation"
-                oldValue="[Actuelle]"
+                oldValue={selectedProposal.businesses?.location}
                 newValue={selectedProposal.proposed_changes?.location}
               />
               <CompareField
                 label="Prix demandé"
-                oldValue="[Actuel]"
+                oldValue={selectedProposal.businesses?.asking_price ? 
+                  `${selectedProposal.businesses.asking_price.toLocaleString()} $ CAD` : null}
                 newValue={selectedProposal.proposed_changes?.asking_price ? 
                   `${selectedProposal.proposed_changes.asking_price.toLocaleString()} $ CAD` : null}
               />
               <CompareField
                 label="Chiffre d'affaires"
-                oldValue="[Actuel]"
+                oldValue={selectedProposal.businesses?.annual_revenue ? 
+                  `${selectedProposal.businesses.annual_revenue.toLocaleString()} $ CAD` : null}
                 newValue={selectedProposal.proposed_changes?.annual_revenue ? 
                   `${selectedProposal.proposed_changes.annual_revenue.toLocaleString()} $ CAD` : null}
+              />
+              <CompareField
+                label="Marge bénéficiaire"
+                oldValue={selectedProposal.businesses?.profit_margin ? 
+                  `${selectedProposal.businesses.profit_margin}%` : null}
+                newValue={selectedProposal.proposed_changes?.profit_margin ? 
+                  `${selectedProposal.proposed_changes.profit_margin}%` : null}
+              />
+              <CompareField
+                label="Nombre d'employés"
+                oldValue={selectedProposal.businesses?.employees_count}
+                newValue={selectedProposal.proposed_changes?.employees_count}
+              />
+              <CompareField
+                label="Année de création"
+                oldValue={selectedProposal.businesses?.year_established}
+                newValue={selectedProposal.proposed_changes?.year_established}
               />
             </div>
           )}
