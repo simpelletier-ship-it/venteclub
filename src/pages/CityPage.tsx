@@ -58,8 +58,8 @@ const CityPage = () => {
   const [businesses, setBusinesses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Extract city name from URL (e.g., "entreprises-a-vendre-montreal" or just "montreal")
-  const citySlug = cityParam?.replace('entreprises-a-vendre-', '') || '';
+  // Extract city name from URL parameter
+  const citySlug = cityParam || '';
   const cityInfo = cityData[citySlug];
 
   useEffect(() => {
