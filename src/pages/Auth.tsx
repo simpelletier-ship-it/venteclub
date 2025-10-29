@@ -4,7 +4,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import venteLogo from "@/assets/vente-logo.png";
 import { authSchema } from "@/lib/validations";
 
 const Auth = () => {
@@ -98,14 +97,18 @@ const Auth = () => {
       <div className="w-full max-w-md">
         <div className="bg-card rounded-2xl shadow-elegant p-8 border border-border/50">
           <div className="flex flex-col items-center mb-8">
-            <img src={venteLogo} alt="Vente.club" className="h-16 mb-4" />
+            <div className="mb-4">
+              <span className="text-3xl font-bold">
+                Vente<span className="text-accent">.Club</span>
+              </span>
+            </div>
             <h1 className="text-2xl font-bold text-foreground">
               {isSignUp ? "Créer un compte" : "Connexion"}
             </h1>
             <p className="text-muted-foreground text-center mt-2">
               {isSignUp
-                ? "Rejoignez Vente.club pour vendre ou acheter des entreprises"
-                : "Accédez à votre compte Vente.club"}
+                ? "Rejoignez Vente.club"
+                : "Accédez à votre compte"}
             </p>
           </div>
 

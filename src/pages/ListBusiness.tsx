@@ -8,7 +8,6 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Upload, X } from "lucide-react";
-import venteLogo from "@/assets/vente-logo.png";
 import { businessSchema } from "@/lib/validations";
 
 const ListBusiness = () => {
@@ -181,7 +180,11 @@ const ListBusiness = () => {
     <div className="min-h-screen bg-gradient-to-br from-background to-secondary/10">
       <nav className="border-b border-border/50 bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <img src={venteLogo} alt="Vente.club" className="h-10" />
+          <div className="flex items-center cursor-pointer" onClick={() => navigate("/")}>
+            <span className="text-2xl font-bold">
+              Vente<span className="text-accent">.Club</span>
+            </span>
+          </div>
           <Button variant="ghost" onClick={() => navigate("/")}>
             <ArrowLeft className="mr-2 h-4 w-4" />
             Retour

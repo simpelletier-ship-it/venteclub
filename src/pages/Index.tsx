@@ -2,12 +2,10 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import BusinessCard from "@/components/BusinessCard";
-import SearchBar from "@/components/SearchBar";
-import BusinessMap from "@/components/BusinessMap";
+import FilterBar from "@/components/FilterBar";
 import { ArrowRight, Shield, TrendingUp, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import heroImage from "@/assets/hero-business.jpg";
-import venteLogo from "@/assets/vente-logo.png";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -153,14 +151,15 @@ const Index = () => {
       {/* Navigation */}
       <nav className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center">
-            <img src={venteLogo} alt="Vente.club" className="h-12" />
+          <div className="flex items-center cursor-pointer" onClick={() => navigate("/")}>
+            <span className="text-3xl font-bold">
+              Vente<span className="text-accent">.Club</span>
+            </span>
           </div>
           <div className="hidden md:flex items-center gap-8">
-            <a href="#" className="text-foreground hover:text-accent transition-colors font-medium">Parcourir</a>
-            <a href="#" className="text-foreground hover:text-accent transition-colors font-medium">Vendre</a>
-            <a href="#" className="text-foreground hover:text-accent transition-colors font-medium">Ressources</a>
-            <a href="#" className="text-foreground hover:text-accent transition-colors font-medium">À propos</a>
+            <button onClick={() => document.getElementById('featured')?.scrollIntoView({ behavior: 'smooth' })} className="text-foreground hover:text-accent transition-colors font-medium">Parcourir</button>
+            <button onClick={() => navigate("/map")} className="text-foreground hover:text-accent transition-colors font-medium">Carte</button>
+            <button onClick={() => navigate(user ? "/list-business" : "/auth")} className="text-foreground hover:text-accent transition-colors font-medium">Vendre</button>
           </div>
           <div className="flex items-center gap-3">
             {user ? (
@@ -169,7 +168,7 @@ const Index = () => {
                   Mes annonces
                 </Button>
                 <Button className="bg-accent hover:bg-accent/90 text-accent-foreground" onClick={() => navigate("/list-business")}>
-                  Lister votre entreprise
+                  Lister
                 </Button>
               </>
             ) : (
@@ -178,7 +177,7 @@ const Index = () => {
                   Connexion
                 </Button>
                 <Button className="bg-accent hover:bg-accent/90 text-accent-foreground" onClick={() => navigate("/auth")}>
-                  Lister votre entreprise
+                  Lister
                 </Button>
               </>
             )}
@@ -197,32 +196,23 @@ const Index = () => {
             backgroundPosition: 'center',
           }}
         />
-        <div className="relative container mx-auto px-4 py-24 md:py-32">
-          <div className="max-w-4xl mx-auto text-center space-y-8">
-            <h1 className="text-5xl md:text-7xl font-bold text-foreground leading-tight">
+        <div className="relative container mx-auto px-4 py-20 md:py-28">
+          <div className="max-w-4xl mx-auto text-center space-y-6">
+            <h1 className="text-4xl md:text-6xl font-bold text-foreground leading-tight">
               Achetez & Vendez des Entreprises
               <span className="block text-accent mt-2">En Toute Confiance</span>
             </h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Un réseau d'entrepreneurs en action. La plateforme de confiance qui connecte les propriétaires d'entreprises avec des acheteurs qualifiés.
+            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+              Un réseau d'entrepreneurs en action
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
-              <Button size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground h-14 px-8 text-lg" onClick={() => document.getElementById('featured')?.scrollIntoView({ behavior: 'smooth' })}>
-                Parcourir les entreprises
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </Button>
-              <Button size="lg" variant="outline" className="h-14 px-8 text-lg border-2 border-primary hover:bg-primary hover:text-primary-foreground" onClick={() => navigate(user ? "/list-business" : "/auth")}>
-                Vendre votre entreprise
-              </Button>
-            </div>
           </div>
         </div>
       </section>
 
-      {/* Search Section */}
-      <section className="py-12 bg-muted/30">
+      {/* Filter Section */}
+      <section className="py-8 bg-muted/30">
         <div className="container mx-auto px-4">
-          <SearchBar />
+          <FilterBar />
         </div>
       </section>
 
@@ -262,11 +252,11 @@ const Index = () => {
       </section>
 
       {/* Featured Businesses */}
-      <section id="featured" className="py-20">
+      <section id="featured" className="py-16">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-foreground mb-4">Opportunités En Vedette</h2>
-            <p className="text-xl text-muted-foreground">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-3">Opportunités En Vedette</h2>
+            <p className="text-lg text-muted-foreground">
               Entreprises sélectionnées avec un potentiel de croissance exceptionnel
             </p>
           </div>
@@ -284,26 +274,13 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Interactive Map Section */}
-      <section className="py-20 bg-muted/30">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-foreground mb-4">Explorez la Carte Interactive</h2>
-            <p className="text-xl text-muted-foreground">
-              Découvrez les entreprises à vendre partout au Québec
-            </p>
-          </div>
-          <BusinessMap />
-        </div>
-      </section>
-
       {/* All Listings */}
-      <section className="py-20">
+      <section className="py-16 bg-muted/30">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-foreground mb-4">Parcourir Toutes les Annonces</h2>
-            <p className="text-xl text-muted-foreground">
-              Explorez des centaines d'entreprises dans divers secteurs
+          <div className="text-center mb-10">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-3">Toutes les Annonces</h2>
+            <p className="text-lg text-muted-foreground">
+              Explorez toutes les entreprises disponibles
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -317,67 +294,40 @@ const Index = () => {
               ))
             )}
           </div>
-          <div className="text-center mt-12">
-            <Button size="lg" variant="outline" className="h-12 px-8 border-2 border-primary hover:bg-primary hover:text-primary-foreground">
-              Charger plus d'entreprises
-            </Button>
-          </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-24 bg-gradient-to-br from-primary via-primary to-primary/90 relative overflow-hidden">
+      <section className="py-20 bg-gradient-to-br from-primary via-primary to-primary/90 relative overflow-hidden">
         <div className="absolute inset-0 bg-grid-white/5" />
         <div className="relative container mx-auto px-4 text-center">
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
             Prêt à Trouver Votre Prochaine Opportunité ?
           </h2>
-          <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-            Rejoignez des milliers d'entrepreneurs qui ont acheté ou vendu avec succès des entreprises sur notre plateforme.
+          <p className="text-lg text-white/90 mb-6 max-w-2xl mx-auto">
+            Rejoignez des milliers d'entrepreneurs
           </p>
-          <Button size="lg" className="bg-white hover:bg-white/90 text-primary h-14 px-8 text-lg font-semibold" onClick={() => navigate(user ? "/list-business" : "/auth")}>
-            Commencer Maintenant
+          <Button size="lg" className="bg-white hover:bg-white/90 text-primary h-12 px-8 text-lg font-semibold" onClick={() => navigate(user ? "/list-business" : "/auth")}>
+            Commencer
             <ArrowRight className="ml-2 w-5 h-5" />
           </Button>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-card border-t border-border py-12">
+      <footer className="bg-card border-t border-border py-10">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-            <div>
-              <img src={venteLogo} alt="Vente.club" className="h-10 mb-4" />
-              <p className="text-muted-foreground">
-                Un réseau d'entrepreneurs en action. La plateforme de confiance pour acheter et vendre des entreprises.
-              </p>
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <div className="flex items-center">
+              <span className="text-2xl font-bold">
+                Vente<span className="text-accent">.Club</span>
+              </span>
             </div>
-            <div>
-              <h4 className="font-semibold text-foreground mb-4">Acheteurs</h4>
-              <ul className="space-y-2 text-muted-foreground">
-                <li><a href="#" className="hover:text-accent transition-colors">Parcourir les entreprises</a></li>
-                <li><a href="#" className="hover:text-accent transition-colors">Comment ça marche</a></li>
-                <li><a href="#" className="hover:text-accent transition-colors">Options de financement</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold text-foreground mb-4">Vendeurs</h4>
-              <ul className="space-y-2 text-muted-foreground">
-                <li><a href="#" className="hover:text-accent transition-colors">Lister votre entreprise</a></li>
-                <li><a href="#" className="hover:text-accent transition-colors">Outils d'évaluation</a></li>
-                <li><a href="#" className="hover:text-accent transition-colors">Ressources vendeurs</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold text-foreground mb-4">Entreprise</h4>
-              <ul className="space-y-2 text-muted-foreground">
-                <li><a href="#" className="hover:text-accent transition-colors">À propos</a></li>
-                <li><a href="#" className="hover:text-accent transition-colors">Contact</a></li>
-                <li><a href="#" className="hover:text-accent transition-colors">Politique de confidentialité</a></li>
-              </ul>
+            <div className="text-sm text-muted-foreground">
+              Un réseau d'entrepreneurs en action
             </div>
           </div>
-          <div className="border-t border-border pt-8 text-center text-muted-foreground">
+          <div className="border-t border-border mt-6 pt-6 text-center text-sm text-muted-foreground">
             <p>&copy; 2025 Vente.club. Tous droits réservés.</p>
           </div>
         </div>

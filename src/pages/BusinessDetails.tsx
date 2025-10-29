@@ -7,7 +7,6 @@ import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Lock, MapPin, TrendingUp, Users, Calendar, Eye } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import venteLogo from "@/assets/vente-logo.png";
 
 const BusinessDetails = () => {
   const { id } = useParams();
@@ -291,12 +290,11 @@ const BusinessDetails = () => {
     <div className="min-h-screen bg-gradient-to-br from-background to-secondary/10">
       <nav className="border-b border-border/50 bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <img
-            src={venteLogo}
-            alt="Vente.club"
-            className="h-10 cursor-pointer"
-            onClick={() => navigate("/")}
-          />
+          <div className="flex items-center cursor-pointer" onClick={() => navigate("/")}>
+            <span className="text-2xl font-bold">
+              Vente<span className="text-accent">.Club</span>
+            </span>
+          </div>
           <Button variant="ghost" onClick={() => navigate(-1)}>
             <ArrowLeft className="mr-2 h-4 w-4" />
             Retour
