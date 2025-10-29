@@ -50,56 +50,121 @@ export type Database = {
           },
         ]
       }
+      business_photos: {
+        Row: {
+          business_id: string
+          created_at: string | null
+          display_order: number | null
+          id: string
+          photo_url: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string | null
+          display_order?: number | null
+          id?: string
+          photo_url: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string | null
+          display_order?: number | null
+          id?: string
+          photo_url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_photos_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       businesses: {
         Row: {
+          address: string | null
           annual_revenue: number | null
           asking_price: number
+          city: string | null
           created_at: string | null
+          currency: string | null
           description: string
           employees_count: number | null
+          featured: boolean | null
           id: string
-          industry: string
+          industry: Database["public"]["Enums"]["industry_type_new"]
           is_premium: boolean | null
+          latitude: number | null
           location: string
+          longitude: number | null
           profit_margin: number | null
+          province: string | null
           seller_id: string
+          seller_name: string | null
+          seller_phone: string | null
+          sold_at: string | null
           status: string | null
           title: string
           updated_at: string | null
+          views_count: number | null
           year_established: number | null
         }
         Insert: {
+          address?: string | null
           annual_revenue?: number | null
           asking_price: number
+          city?: string | null
           created_at?: string | null
+          currency?: string | null
           description: string
           employees_count?: number | null
+          featured?: boolean | null
           id?: string
-          industry: string
+          industry: Database["public"]["Enums"]["industry_type_new"]
           is_premium?: boolean | null
+          latitude?: number | null
           location: string
+          longitude?: number | null
           profit_margin?: number | null
+          province?: string | null
           seller_id: string
+          seller_name?: string | null
+          seller_phone?: string | null
+          sold_at?: string | null
           status?: string | null
           title: string
           updated_at?: string | null
+          views_count?: number | null
           year_established?: number | null
         }
         Update: {
+          address?: string | null
           annual_revenue?: number | null
           asking_price?: number
+          city?: string | null
           created_at?: string | null
+          currency?: string | null
           description?: string
           employees_count?: number | null
+          featured?: boolean | null
           id?: string
-          industry?: string
+          industry?: Database["public"]["Enums"]["industry_type_new"]
           is_premium?: boolean | null
+          latitude?: number | null
           location?: string
+          longitude?: number | null
           profit_margin?: number | null
+          province?: string | null
           seller_id?: string
+          seller_name?: string | null
+          seller_phone?: string | null
+          sold_at?: string | null
           status?: string | null
           title?: string
           updated_at?: string | null
+          views_count?: number | null
           year_established?: number | null
         }
         Relationships: [
@@ -257,7 +322,35 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      industry_type_new:
+        | "activite_sport_loisir"
+        | "art_spectacle_cinema"
+        | "hebergement"
+        | "bar_bistro_discotheque"
+        | "batiment_immeuble"
+        | "beaute_esthetique"
+        | "boutique_commerce_detail"
+        | "camping"
+        | "centre_equestre_erabliere"
+        | "transport_entreposage"
+        | "construction_excavation_renovation"
+        | "developpement_domaine"
+        | "distribution_commerce_gros"
+        | "domaine_alimentaire"
+        | "communications_informatique"
+        | "education_garderie"
+        | "entreprise_service"
+        | "entreprise_saisonniere"
+        | "epicerie_depanneur"
+        | "franchise"
+        | "garage_mecanique_concessionnaire"
+        | "immeuble_revenus"
+        | "industrie_manufacturier_transformation"
+        | "jardin_pepiniere_verger_vignoble"
+        | "pourvoirie_centre_plein_air"
+        | "residence_sante"
+        | "residentiel"
+        | "restaurant"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -384,6 +477,37 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      industry_type_new: [
+        "activite_sport_loisir",
+        "art_spectacle_cinema",
+        "hebergement",
+        "bar_bistro_discotheque",
+        "batiment_immeuble",
+        "beaute_esthetique",
+        "boutique_commerce_detail",
+        "camping",
+        "centre_equestre_erabliere",
+        "transport_entreposage",
+        "construction_excavation_renovation",
+        "developpement_domaine",
+        "distribution_commerce_gros",
+        "domaine_alimentaire",
+        "communications_informatique",
+        "education_garderie",
+        "entreprise_service",
+        "entreprise_saisonniere",
+        "epicerie_depanneur",
+        "franchise",
+        "garage_mecanique_concessionnaire",
+        "immeuble_revenus",
+        "industrie_manufacturier_transformation",
+        "jardin_pepiniere_verger_vignoble",
+        "pourvoirie_centre_plein_air",
+        "residence_sante",
+        "residentiel",
+        "restaurant",
+      ],
+    },
   },
 } as const
