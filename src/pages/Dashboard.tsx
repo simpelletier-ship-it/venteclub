@@ -285,78 +285,196 @@ const Dashboard = () => {
       </div>
 
       <Dialog open={featuredDialogOpen} onOpenChange={setFeaturedDialogOpen}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Mettre votre annonce en avant</DialogTitle>
-            <DialogDescription>
-              Choisissez la durée de mise en avant pour votre annonce
+        <DialogContent className="max-w-4xl">
+          <DialogHeader className="space-y-3 pb-4 border-b">
+            <DialogTitle className="text-2xl font-bold flex items-center gap-2">
+              <Star className="h-6 w-6 fill-primary text-primary" />
+              Mettre votre annonce en avant
+            </DialogTitle>
+            <DialogDescription className="text-base">
+              Augmentez votre visibilité et attirez plus d'acheteurs potentiels
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="bg-secondary/20 p-4 rounded-lg border border-border">
-              <h3 className="font-semibold mb-2">{selectedBusiness?.title}</h3>
+          
+          <div className="space-y-6 py-6">
+            <div className="bg-gradient-to-br from-primary/5 to-primary/10 p-6 rounded-xl border border-primary/20">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <Star className="h-6 w-6 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-bold text-lg mb-1">{selectedBusiness?.title}</h3>
+                  <p className="text-sm text-muted-foreground">Cette annonce sera mise en avant</p>
+                </div>
+              </div>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Bronze Package */}
               <Card 
-                className={`cursor-pointer transition-all ${selectedDuration === 7 ? 'ring-2 ring-primary' : ''}`}
+                className={`cursor-pointer transition-all hover:shadow-lg relative overflow-hidden ${
+                  selectedDuration === 7 ? 'ring-2 ring-amber-600 shadow-lg scale-105' : 'hover:scale-102'
+                }`}
                 onClick={() => setSelectedDuration(7)}
               >
-                <CardContent className="p-6 text-center">
-                  <Badge className="mb-3 bg-amber-700/20 text-amber-700 border-amber-700/30">Bronze</Badge>
-                  <Star className="h-8 w-8 mx-auto mb-3 fill-amber-700 text-amber-700" />
-                  <h4 className="font-bold text-2xl mb-1">75$</h4>
-                  <p className="text-sm text-muted-foreground mb-3">7 jours</p>
-                  <p className="text-xs text-muted-foreground">~10,71$ / jour</p>
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-amber-600/20 to-transparent rounded-bl-full" />
+                <CardContent className="p-6 relative">
+                  <Badge className="mb-4 bg-amber-600/20 text-amber-700 border-amber-600/30 font-semibold">
+                    BRONZE
+                  </Badge>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-center">
+                      <Star className="h-12 w-12 fill-amber-600 text-amber-600" />
+                    </div>
+                    <div className="text-center space-y-1">
+                      <h4 className="font-bold text-3xl text-foreground">75$</h4>
+                      <p className="text-sm font-medium text-muted-foreground">7 jours de mise en avant</p>
+                      <p className="text-xs text-muted-foreground">10,71$ / jour</p>
+                    </div>
+                    <div className="pt-4 border-t space-y-2">
+                      <div className="flex items-center gap-2 text-sm">
+                        <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                        <span>Visibilité prioritaire</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                        <span>Badge étoile dorée</span>
+                      </div>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
 
+              {/* Platinum Package */}
               <Card 
-                className={`cursor-pointer transition-all ${selectedDuration === 14 ? 'ring-2 ring-primary' : ''}`}
+                className={`cursor-pointer transition-all hover:shadow-xl relative overflow-hidden ${
+                  selectedDuration === 14 ? 'ring-2 ring-slate-500 shadow-xl scale-105' : 'hover:scale-102'
+                }`}
                 onClick={() => setSelectedDuration(14)}
               >
-                <CardContent className="p-6 text-center">
-                  <Badge className="mb-3 bg-slate-400/20 text-slate-700 border-slate-400/30">Platine</Badge>
-                  <Star className="h-8 w-8 mx-auto mb-3 fill-slate-400 text-slate-400" />
-                  <h4 className="font-bold text-2xl mb-1">100$</h4>
-                  <p className="text-sm text-muted-foreground mb-3">14 jours</p>
-                  <Badge variant="secondary" className="mb-1">Populaire</Badge>
-                  <p className="text-xs text-muted-foreground">~7,14$ / jour</p>
+                <div className="absolute top-0 left-0 right-0">
+                  <Badge className="w-full rounded-t-lg rounded-b-none bg-slate-500/90 text-white border-0 py-1">
+                    ⭐ POPULAIRE
+                  </Badge>
+                </div>
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-slate-400/20 to-transparent rounded-bl-full" />
+                <CardContent className="p-6 pt-10 relative">
+                  <Badge className="mb-4 bg-slate-400/20 text-slate-700 border-slate-400/30 font-semibold">
+                    PLATINE
+                  </Badge>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-center">
+                      <Star className="h-12 w-12 fill-slate-400 text-slate-400" />
+                    </div>
+                    <div className="text-center space-y-1">
+                      <h4 className="font-bold text-3xl text-foreground">100$</h4>
+                      <p className="text-sm font-medium text-muted-foreground">14 jours de mise en avant</p>
+                      <p className="text-xs text-muted-foreground">7,14$ / jour</p>
+                    </div>
+                    <div className="pt-4 border-t space-y-2">
+                      <div className="flex items-center gap-2 text-sm">
+                        <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                        <span>Visibilité prioritaire</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                        <span>Badge étoile argentée</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                        <span>Économie de 33%</span>
+                      </div>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
 
+              {/* Gold Package */}
               <Card 
-                className={`cursor-pointer transition-all ${selectedDuration === 30 ? 'ring-2 ring-primary' : ''}`}
+                className={`cursor-pointer transition-all hover:shadow-xl relative overflow-hidden ${
+                  selectedDuration === 30 ? 'ring-2 ring-yellow-500 shadow-xl scale-105' : 'hover:scale-102'
+                }`}
                 onClick={() => setSelectedDuration(30)}
               >
-                <CardContent className="p-6 text-center">
-                  <Badge className="mb-3 bg-yellow-500/20 text-yellow-700 border-yellow-500/30">Or</Badge>
-                  <Star className="h-8 w-8 mx-auto mb-3 fill-yellow-500 text-yellow-500" />
-                  <h4 className="font-bold text-2xl mb-1">110$</h4>
-                  <p className="text-sm text-muted-foreground mb-3">30 jours</p>
-                  <Badge variant="secondary" className="mb-1 bg-green-500/20 text-green-700">Meilleure valeur</Badge>
-                  <p className="text-xs text-muted-foreground">~3,67$ / jour</p>
+                <div className="absolute top-0 left-0 right-0">
+                  <Badge className="w-full rounded-t-lg rounded-b-none bg-green-600/90 text-white border-0 py-1">
+                    💎 MEILLEURE VALEUR
+                  </Badge>
+                </div>
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-yellow-500/20 to-transparent rounded-bl-full" />
+                <CardContent className="p-6 pt-10 relative">
+                  <Badge className="mb-4 bg-yellow-500/20 text-yellow-700 border-yellow-500/30 font-semibold">
+                    OR
+                  </Badge>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-center">
+                      <Star className="h-12 w-12 fill-yellow-500 text-yellow-500" />
+                    </div>
+                    <div className="text-center space-y-1">
+                      <h4 className="font-bold text-3xl text-foreground">110$</h4>
+                      <p className="text-sm font-medium text-muted-foreground">30 jours de mise en avant</p>
+                      <p className="text-xs text-muted-foreground">3,67$ / jour</p>
+                    </div>
+                    <div className="pt-4 border-t space-y-2">
+                      <div className="flex items-center gap-2 text-sm">
+                        <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                        <span>Visibilité prioritaire</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                        <span>Badge étoile dorée</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                        <span>Économie de 66%</span>
+                      </div>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             </div>
 
-            <div className="text-sm text-muted-foreground bg-muted/50 p-4 rounded-lg">
-              <p className="mb-2">✨ Votre annonce apparaîtra en haut de la page principale avec une étoile dorée</p>
-              <p>⏱️ Durée garantie selon votre forfait</p>
+            <div className="bg-gradient-to-r from-muted/50 to-muted/30 p-6 rounded-xl border">
+              <h4 className="font-semibold mb-4 flex items-center gap-2">
+                <span className="text-lg">✨</span>
+                Ce qui est inclus dans tous les forfaits
+              </h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="flex items-start gap-2">
+                  <span className="text-primary mt-0.5">✓</span>
+                  <span className="text-sm">Position en tête de liste sur la page principale</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-primary mt-0.5">✓</span>
+                  <span className="text-sm">Badge étoile visible sur votre annonce</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-primary mt-0.5">✓</span>
+                  <span className="text-sm">Durée garantie selon votre forfait</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-primary mt-0.5">✓</span>
+                  <span className="text-sm">Augmentation moyenne de +300% de visibilité</span>
+                </div>
+              </div>
             </div>
           </div>
-          <div className="flex gap-2">
+          
+          <div className="flex gap-3 pt-4 border-t">
             <Button 
               onClick={handleFeaturePayment} 
               disabled={processingPayment}
-              className="flex-1"
+              className="flex-1 h-12 text-base font-semibold"
+              size="lg"
             >
-              {processingPayment ? "Traitement..." : `Payer ${selectedDuration === 7 ? '75' : selectedDuration === 14 ? '100' : '110'}$ CAD`}
+              {processingPayment ? "Traitement en cours..." : `Confirmer le paiement de ${selectedDuration === 7 ? '75' : selectedDuration === 14 ? '100' : '110'}$ CAD`}
             </Button>
             <Button 
               variant="outline" 
               onClick={() => setFeaturedDialogOpen(false)}
               disabled={processingPayment}
+              className="h-12"
+              size="lg"
             >
               Annuler
             </Button>
