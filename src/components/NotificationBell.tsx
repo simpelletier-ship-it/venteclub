@@ -109,10 +109,10 @@ export const NotificationBell = ({ userId }: NotificationBellProps) => {
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[480px] max-w-[90vw]">
+      <PopoverContent className="w-[640px] max-w-[95vw] z-50">
         <div className="space-y-2">
           <h3 className="font-semibold">Notifications</h3>
-          <ScrollArea className="h-96 w-full">
+          <ScrollArea className="h-96 w-full overflow-x-auto">
             {notifications.length === 0 ? (
               <p className="text-sm text-muted-foreground py-4 text-center">
                 Aucune notification
