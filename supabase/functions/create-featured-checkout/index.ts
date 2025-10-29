@@ -74,7 +74,7 @@ serve(async (req) => {
         },
       ],
       mode: "payment",
-      success_url: `${req.headers.get("origin")}/dashboard?featured_success=true`,
+      success_url: `${req.headers.get("origin")}/dashboard?featured_success=true&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.headers.get("origin")}/dashboard?featured_canceled=true`,
       metadata: {
         business_id: businessId,

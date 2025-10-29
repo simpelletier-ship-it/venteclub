@@ -43,14 +43,32 @@ serve(async (req) => {
 
     // Determine amount based on duration
     const amountMap: Record<number, number> = {
-      7: 75.00,
-      14: 100.00,
-      30: 110.00,
+      7: 7.50,
+      14: 10.00,
+      30: 11.50,
     };
-    const amount = amountMap[duration] || 75.00;
+    const amount = amountMap[duration] || 7.50;
+
+    // Check if there's an existing active featured period
+    const { data: existingPayment } = await supabaseClient
+      .from("featured_payments")
+      .select("featured_until")
+      .eq("business_id", businessId)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
 
     // Calculate featured_until based on duration
-    const featuredUntil = new Date();
+    let featuredUntil = new Date();
+    
+    // If there's an existing featured period that hasn't expired, extend from that date
+    if (existingPayment?.featured_until) {
+      const existingUntil = new Date(existingPayment.featured_until);
+      if (existingUntil > featuredUntil) {
+        featuredUntil = existingUntil;
+      }
+    }
+    
     featuredUntil.setDate(featuredUntil.getDate() + duration);
 
     const { error: insertError } = await supabaseClient
@@ -73,6 +91,8 @@ serve(async (req) => {
       .eq("id", businessId);
 
     if (updateError) throw updateError;
+
+    console.log(`[VERIFY-FEATURED] Business ${businessId} featured until ${featuredUntil.toISOString()}`);
 
     return new Response(JSON.stringify({ success: true }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

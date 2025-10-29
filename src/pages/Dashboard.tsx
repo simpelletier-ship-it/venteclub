@@ -53,17 +53,40 @@ const Dashboard = () => {
   }, [navigate]);
 
   useEffect(() => {
-    // Check for payment success/cancel
-    if (searchParams.get('featured_success') === 'true') {
-      toast({
-        title: "Paiement réussi!",
-        description: "Votre annonce est maintenant en vedette pour 7 jours.",
-      });
-      setSearchParams({});
-      // Recharger les businesses après succès
-      if (user?.id) {
-        fetchUserBusinesses(user.id);
+    const verifyFeaturedPayment = async (sessionId: string) => {
+      try {
+        console.log('[DASHBOARD] Verifying featured payment with session:', sessionId);
+        const { error } = await supabase.functions.invoke('verify-featured-payment', {
+          body: { sessionId }
+        });
+        
+        if (error) throw error;
+        
+        toast({
+          title: "Paiement réussi!",
+          description: "Votre annonce est maintenant mise en avant.",
+        });
+        
+        // Recharger les businesses
+        if (user?.id) {
+          fetchUserBusinesses(user.id);
+        }
+      } catch (error: any) {
+        console.error('[DASHBOARD] Error verifying payment:', error);
+        toast({
+          variant: "destructive",
+          title: "Erreur",
+          description: "Le paiement a réussi mais la mise en avant a échoué. Contactez le support.",
+        });
+      } finally {
+        setSearchParams({});
       }
+    };
+
+    // Check for payment success/cancel
+    const sessionId = searchParams.get('session_id');
+    if (searchParams.get('featured_success') === 'true' && sessionId) {
+      verifyFeaturedPayment(sessionId);
     } else if (searchParams.get('featured_cancel') === 'true') {
       toast({
         variant: "destructive",
@@ -71,10 +94,6 @@ const Dashboard = () => {
         description: "Le paiement a été annulé.",
       });
       setSearchParams({});
-      // Recharger les businesses après annulation
-      if (user?.id) {
-        fetchUserBusinesses(user.id);
-      }
     } else if (searchParams.get('payment_verified') === 'true') {
       toast({
         title: "Accès débloqué!",
@@ -87,15 +106,35 @@ const Dashboard = () => {
   const fetchUserBusinesses = async (userId: string) => {
     console.log('[DASHBOARD] Fetching businesses for user:', userId);
     try {
-      const { data, error } = await supabase
+      // Fetch businesses with featured payment info
+      const { data: businessData, error: businessError } = await supabase
         .from("businesses")
         .select("*")
         .eq("seller_id", userId)
         .order("created_at", { ascending: false });
 
-      if (error) throw error;
-      console.log('[DASHBOARD] Businesses loaded:', data?.length || 0);
-      setBusinesses(data || []);
+      if (businessError) throw businessError;
+
+      // For each business, get the latest featured payment
+      const businessesWithFeatured = await Promise.all(
+        (businessData || []).map(async (business) => {
+          const { data: featuredPayment } = await supabase
+            .from("featured_payments")
+            .select("featured_until")
+            .eq("business_id", business.id)
+            .order("created_at", { ascending: false })
+            .limit(1)
+            .maybeSingle();
+
+          return {
+            ...business,
+            featured_until: featuredPayment?.featured_until
+          };
+        })
+      );
+
+      console.log('[DASHBOARD] Businesses loaded:', businessesWithFeatured.length);
+      setBusinesses(businessesWithFeatured);
     } catch (error: any) {
       console.error('[DASHBOARD] Error fetching businesses:', error);
       toast({
@@ -212,77 +251,97 @@ const Dashboard = () => {
                   </Button>
                 </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {businesses.map((business) => (
-                  <div key={business.id} className="space-y-2">
-                    <div 
-                      onClick={() => {
-                        if (business.status === 'archived') {
-                          navigate(`/list-business?edit=${business.id}`);
-                        } else {
-                          navigate(`/business/${business.id}`);
-                        }
-                      }}
-                      className="cursor-pointer"
-                    >
-                      <BusinessCard 
-                        {...business}
-                        showActions={business.status !== 'archived'}
-                        onWithdraw={() => handleWithdrawClick(business)}
-                        onFeature={() => handleFeatureClick(business)}
-                      />
-                    </div>
-                    <div className="flex gap-2">
-                      {business.status === 'archived' && (
-                        <Button
-                          onClick={async () => {
-                            try {
-                              await supabase
-                                .from('businesses')
-                                .update({ 
-                                  status: 'active',
-                                  approval_status: 'pending'
-                                })
-                                .eq('id', business.id);
-                              
-                              toast({
-                                title: "Annonce publiée!",
-                                description: "Votre annonce a été soumise pour approbation.",
-                              });
-                              fetchUserBusinesses(user.id);
-                            } catch (error: any) {
-                              toast({
-                                variant: "destructive",
-                                title: "Erreur",
-                                description: error.message,
-                              });
-                            }
-                          }}
-                          size="sm"
-                          className="flex-1"
-                        >
-                          Publier l'annonce
-                        </Button>
+                {businesses.map((business) => {
+                  const featuredUntil = business.featured_until ? new Date(business.featured_until) : null;
+                  const now = new Date();
+                  const isActiveFeatured = featuredUntil && featuredUntil > now;
+                  const daysRemaining = isActiveFeatured 
+                    ? Math.ceil((featuredUntil.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+                    : 0;
+
+                  return (
+                    <div key={business.id} className="space-y-2">
+                      {isActiveFeatured && (
+                        <div className="bg-gradient-to-r from-yellow-500/20 to-amber-500/20 border border-yellow-500/30 rounded-lg p-3 flex items-center gap-2">
+                          <Star className="h-4 w-4 fill-yellow-500 text-yellow-500 flex-shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-semibold text-foreground">Mise en avant active</p>
+                            <p className="text-xs text-muted-foreground">
+                              {daysRemaining} jour{daysRemaining > 1 ? 's' : ''} restant{daysRemaining > 1 ? 's' : ''} · Expire le {featuredUntil.toLocaleDateString('fr-CA', { day: 'numeric', month: 'short' })}
+                            </p>
+                          </div>
+                        </div>
                       )}
-                      {business.approval_status === 'approved' && business.status !== 'sold' && business.status !== 'archived' && (
-                        <Button
-                          onClick={() => handleEditClick(business)}
-                          size="sm"
-                          variant="outline"
-                          className="flex-1"
-                        >
-                          <Edit className="mr-1 h-3 w-3" />
-                          Modifier
-                        </Button>
-                      )}
-                    </div>
-                    {business.rejection_reason && business.approval_status === 'rejected' && (
-                      <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
-                        <p className="text-sm font-semibold mb-1">Raison du refus:</p>
-                        <p className="text-sm text-muted-foreground">{business.rejection_reason}</p>
+                      <div 
+                        onClick={() => {
+                          if (business.status === 'archived') {
+                            navigate(`/list-business?edit=${business.id}`);
+                          } else {
+                            navigate(`/business/${business.id}`);
+                          }
+                        }}
+                        className="cursor-pointer"
+                      >
+                        <BusinessCard 
+                          {...business}
+                          showActions={business.status !== 'archived'}
+                          onWithdraw={() => handleWithdrawClick(business)}
+                          onFeature={() => handleFeatureClick(business)}
+                        />
                       </div>
-                    )}
-                  </div>
-                ))}
+                      <div className="flex gap-2">
+                        {business.status === 'archived' && (
+                          <Button
+                            onClick={async () => {
+                              try {
+                                await supabase
+                                  .from('businesses')
+                                  .update({ 
+                                    status: 'active',
+                                    approval_status: 'pending'
+                                  })
+                                  .eq('id', business.id);
+                                
+                                toast({
+                                  title: "Annonce publiée!",
+                                  description: "Votre annonce a été soumise pour approbation.",
+                                });
+                                fetchUserBusinesses(user.id);
+                              } catch (error: any) {
+                                toast({
+                                  variant: "destructive",
+                                  title: "Erreur",
+                                  description: error.message,
+                                });
+                              }
+                            }}
+                            size="sm"
+                            className="flex-1"
+                          >
+                            Publier l'annonce
+                          </Button>
+                        )}
+                        {business.approval_status === 'approved' && business.status !== 'sold' && business.status !== 'archived' && (
+                          <Button
+                            onClick={() => handleEditClick(business)}
+                            size="sm"
+                            variant="outline"
+                            className="flex-1"
+                          >
+                            <Edit className="mr-1 h-3 w-3" />
+                            Modifier
+                          </Button>
+                        )}
+                      </div>
+                      {business.rejection_reason && business.approval_status === 'rejected' && (
+                        <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
+                          <p className="text-sm font-semibold mb-1">Raison du refus:</p>
+                          <p className="text-sm text-muted-foreground">{business.rejection_reason}</p>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
               </>
             )}
