@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { TrendingUp, MapPin, DollarSign, Star } from "lucide-react";
+import { TrendingUp, MapPin, DollarSign, Star, XCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { FavoriteButton } from "./FavoriteButton";
 import { useState, useEffect } from "react";
@@ -21,6 +21,10 @@ interface BusinessCardProps {
   description: string;
   featured?: boolean;
   status?: string;
+  approval_status?: string;
+  onWithdraw?: () => void;
+  onFeature?: () => void;
+  showActions?: boolean;
 }
 
 const BusinessCard = ({
@@ -37,6 +41,10 @@ const BusinessCard = ({
   description,
   featured = false,
   status,
+  approval_status,
+  onWithdraw,
+  onFeature,
+  showActions = false,
 }: BusinessCardProps) => {
   const navigate = useNavigate();
   const [userId, setUserId] = useState<string | undefined>();
@@ -79,6 +87,21 @@ const BusinessCard = ({
               {status === 'sold' && (
                 <Badge className="bg-blue-500 hover:bg-blue-600 text-white border-0 shadow-md text-xs">
                   ✓ Vendue
+                </Badge>
+              )}
+              {showActions && approval_status === 'approved' && (
+                <Badge className="bg-green-500 hover:bg-green-600 text-white border-0 shadow-md text-xs">
+                  ✓ Approuvée
+                </Badge>
+              )}
+              {showActions && approval_status === 'pending' && (
+                <Badge className="bg-orange-500 hover:bg-orange-600 text-white border-0 shadow-md text-xs">
+                  ⏳ En attente
+                </Badge>
+              )}
+              {showActions && approval_status === 'rejected' && (
+                <Badge className="bg-red-500 hover:bg-red-600 text-white border-0 shadow-md text-xs">
+                  ✗ Rejetée
                 </Badge>
               )}
             </div>
@@ -136,6 +159,40 @@ const BusinessCard = ({
             Voir l'annonce
           </Button>
         </div>
+
+        {/* Dashboard Actions */}
+        {showActions && (
+          <div className="flex items-center gap-2 pt-3 border-t border-border/50">
+            {status !== 'sold' && approval_status === 'approved' && onWithdraw && (
+              <Button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onWithdraw();
+                }}
+                size="sm"
+                variant="destructive"
+                className="flex-1"
+              >
+                <XCircle className="mr-1 h-3 w-3" />
+                Retirer
+              </Button>
+            )}
+            {!featured && approval_status === 'approved' && status !== 'sold' && onFeature && (
+              <Button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onFeature();
+                }}
+                size="sm"
+                variant="secondary"
+                className="flex-1"
+              >
+                <Star className="mr-1 h-3 w-3" />
+                Mettre en avant
+              </Button>
+            )}
+          </div>
+        )}
       </div>
     </Card>
   );

@@ -36,6 +36,7 @@ const ListBusiness = () => {
   const [photos, setPhotos] = useState<File[]>([]);
   const [photoPreviewUrls, setPhotoPreviewUrls] = useState<string[]>([]);
   const [generatingImage, setGeneratingImage] = useState(false);
+  const [imagePrompt, setImagePrompt] = useState("");
 
   useEffect(() => {
     // Check initial session
@@ -87,16 +88,6 @@ const ListBusiness = () => {
   };
 
   const handleGenerateImage = async () => {
-    // Vérifier que le titre et la description sont remplis
-    if (!formData.title || !formData.description) {
-      toast({
-        variant: "destructive",
-        title: "Informations manquantes",
-        description: "Veuillez remplir le titre et la description avant de générer une image.",
-      });
-      return;
-    }
-
     if (photos.length >= 10) {
       toast({
         variant: "destructive",
@@ -106,13 +97,23 @@ const ListBusiness = () => {
       return;
     }
 
+    // Utiliser le prompt personnalisé s'il est fourni, sinon utiliser titre/description
+    if (!imagePrompt && (!formData.title || !formData.description)) {
+      toast({
+        variant: "destructive",
+        title: "Informations manquantes",
+        description: "Veuillez remplir le prompt personnalisé ou le titre et la description.",
+      });
+      return;
+    }
+
     setGeneratingImage(true);
 
     try {
       const { data, error } = await supabase.functions.invoke('generate-business-image', {
         body: {
-          title: formData.title,
-          description: formData.description,
+          title: imagePrompt || formData.title,
+          description: imagePrompt || formData.description,
           industry: formData.industry,
         }
       });
@@ -135,6 +136,9 @@ const ListBusiness = () => {
         title: "Image générée !",
         description: "L'image a été générée avec succès par l'IA.",
       });
+      
+      // Réinitialiser le prompt après génération
+      setImagePrompt("");
     } catch (error: any) {
       console.error("Erreur génération image:", error);
       toast({
@@ -487,13 +491,29 @@ const ListBusiness = () => {
                   </div>
                 </div>
 
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full"
-                  onClick={handleGenerateImage}
-                  disabled={generatingImage || !formData.title || !formData.description}
-                >
+                <div className="space-y-3">
+                  <div>
+                    <Label htmlFor="imagePrompt">Prompt personnalisé pour l'IA (optionnel)</Label>
+                    <Textarea
+                      id="imagePrompt"
+                      value={imagePrompt}
+                      onChange={(e) => setImagePrompt(e.target.value)}
+                      placeholder="Ex: Une photo professionnelle d'un restaurant italien moderne avec terrasse..."
+                      rows={3}
+                      className="mt-1"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Si vous laissez vide, l'IA utilisera automatiquement votre titre et description.
+                    </p>
+                  </div>
+
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full"
+                    onClick={handleGenerateImage}
+                    disabled={generatingImage || (!imagePrompt && (!formData.title || !formData.description))}
+                  >
                   {generatingImage ? (
                     <>
                       <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
@@ -514,13 +534,14 @@ const ListBusiness = () => {
                           d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
                         />
                       </svg>
-                      Générer une image par IA
+                       Générer une image par IA
                     </>
                   )}
                 </Button>
-                {(!formData.title || !formData.description) && (
+                </div>
+                {(!imagePrompt && (!formData.title || !formData.description)) && (
                   <p className="text-xs text-muted-foreground text-center">
-                    Remplissez le titre et la description pour générer une image
+                    Remplissez le prompt personnalisé ou le titre et la description pour générer une image
                   </p>
                 )}
               </div>

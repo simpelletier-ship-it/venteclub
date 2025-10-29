@@ -191,59 +191,15 @@ const Dashboard = () => {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {businesses.map((business) => (
-                  <div key={business.id} className="relative group">
-                    <div className="relative">
-                      <BusinessCard {...business} />
-                      {/* Action buttons overlay */}
-                      <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        {business.status !== 'sold' && business.approval_status === 'approved' && (
-                          <Button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleWithdrawClick(business);
-                            }}
-                            size="sm"
-                            variant="destructive"
-                            className="shadow-lg"
-                          >
-                            <XCircle className="mr-1 h-3 w-3" />
-                            Retirer
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                    <div className="mt-3 space-y-2">
-                      <div className="flex items-center justify-between gap-2">
-                        <Badge 
-                          className={
-                            business.status === 'sold'
-                              ? 'bg-blue-500 hover:bg-blue-600 text-white'
-                              : business.approval_status === 'approved' 
-                              ? 'bg-green-500 hover:bg-green-600 text-white' 
-                              : business.approval_status === 'pending' 
-                              ? 'bg-orange-500 hover:bg-orange-600 text-white' 
-                              : 'bg-red-500 hover:bg-red-600 text-white'
-                          }
-                        >
-                          {business.status === 'sold' ? '✓ Vendue' :
-                           business.approval_status === 'approved' ? '✓ Approuvée' : 
-                           business.approval_status === 'pending' ? '⏳ En attente' : 
-                           '✗ Rejetée'}
-                        </Badge>
-                        {!business.featured && business.approval_status === 'approved' && business.status !== 'sold' && (
-                          <Button
-                            onClick={() => handleFeatureClick(business)}
-                            size="sm"
-                            variant="secondary"
-                          >
-                            <Star className="mr-2 h-4 w-4" />
-                            Mettre en avant
-                          </Button>
-                        )}
-                      </div>
-                    </div>
+                  <div key={business.id} className="space-y-2">
+                    <BusinessCard 
+                      {...business}
+                      showActions={true}
+                      onWithdraw={() => handleWithdrawClick(business)}
+                      onFeature={() => handleFeatureClick(business)}
+                    />
                     {business.rejection_reason && business.approval_status === 'rejected' && (
-                      <div className="mt-2 p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
+                      <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
                         <p className="text-sm font-semibold mb-1">Raison du refus:</p>
                         <p className="text-sm text-muted-foreground">{business.rejection_reason}</p>
                       </div>
