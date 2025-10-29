@@ -2,8 +2,9 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MessageSquare } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { MessageSquare, ArrowLeft } from "lucide-react";
+import { ChatBox } from "@/components/ChatBox";
 
 interface Conversation {
   business_id: string;
@@ -21,7 +22,7 @@ interface MessagesListProps {
 export const MessagesList = ({ userId }: MessagesListProps) => {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
+  const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
 
   useEffect(() => {
     fetchConversations();
@@ -126,13 +127,44 @@ export const MessagesList = ({ userId }: MessagesListProps) => {
     );
   }
 
+  // If a conversation is selected, show the chat
+  if (selectedConversation) {
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setSelectedConversation(null)}
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Retour aux conversations
+          </Button>
+        </div>
+        <Card>
+          <CardHeader>
+            <CardTitle>{selectedConversation.business_title}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ChatBox
+              businessId={selectedConversation.business_id}
+              currentUserId={userId}
+              otherUserId={selectedConversation.other_user_id}
+            />
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Show conversation list
   return (
     <div className="space-y-4">
       {conversations.map((conv) => (
         <Card
           key={`${conv.business_id}-${conv.other_user_id}`}
           className="cursor-pointer hover:shadow-lg transition-shadow"
-          onClick={() => navigate(`/business/${conv.business_id}`)}
+          onClick={() => setSelectedConversation(conv)}
         >
           <CardHeader>
             <div className="flex items-start justify-between">
