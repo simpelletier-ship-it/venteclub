@@ -14,6 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Logo } from "@/components/Logo";
 
 export const Header = () => {
   const navigate = useNavigate();
@@ -75,9 +76,7 @@ export const Header = () => {
     <nav className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         <div className="flex items-center cursor-pointer" onClick={() => navigate("/")}>
-          <span className="text-3xl font-bold">
-            Vente<span className="text-accent">.Club</span>
-          </span>
+          <Logo />
         </div>
         <div className="hidden md:flex items-center gap-8">
           <button onClick={() => navigate("/")} className="text-foreground hover:text-accent transition-colors font-medium">Parcourir</button>

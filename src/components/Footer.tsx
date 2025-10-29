@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Mail } from "lucide-react";
+import { Logo } from "@/components/Logo";
 
 export const Footer = () => {
   return (
@@ -8,7 +9,7 @@ export const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* À propos */}
           <div>
-            <h3 className="font-bold text-lg mb-4">Vente.Club</h3>
+            <Logo showTagline className="mb-4" />
             <p className="text-sm text-muted-foreground mb-4">
               La plateforme québécoise de référence pour l'achat et la vente d'entreprises. 
               Transactions sécurisées, vérification rigoureuse, accompagnement professionnel.
