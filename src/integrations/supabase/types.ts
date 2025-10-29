@@ -799,12 +799,7 @@ export type Database = {
         }
         Returns: undefined
       }
-      use_token_for_access:
-        | { Args: { business_uuid: string }; Returns: Json }
-        | {
-            Args: { business_uuid: string; has_premium?: boolean }
-            Returns: Json
-          }
+      use_token_for_access: { Args: { business_uuid: string }; Returns: Json }
     }
     Enums: {
       app_role: "admin" | "user"
