@@ -44,12 +44,18 @@ const BusinessDetails = () => {
       const paymentCanceled = searchParams.get('payment_canceled') === 'true';
       
       if (paymentSuccess && sessionId) {
-        console.log('[INIT] Payment success detected, verifying...');
+        console.log('[INIT] Payment success detected, verifying...', { sessionId, hasUser: !!session?.user });
         if (session?.user) {
           await verifyPayment(sessionId, session.user.id);
         } else {
-          console.log('[INIT] No user session, stopping');
+          console.log('[INIT] No user session, redirecting to auth');
+          toast({
+            variant: "destructive",
+            title: "Session expirée",
+            description: "Veuillez vous reconnecter pour finaliser votre achat.",
+          });
           setLoading(false);
+          navigate('/auth');
         }
       } else if (paymentCanceled) {
         console.log('[INIT] Payment canceled');

@@ -28,14 +28,14 @@ serve(async (req) => {
     if (!businessId) throw new Error("Business ID required");
 
     // Verify user doesn't already have access
-    const { data: existingInquiry } = await supabaseClient
-      .from("business_inquiries")
+    const { data: existingAccess } = await supabaseClient
+      .from("contact_access")
       .select("id")
       .eq("business_id", businessId)
-      .eq("buyer_id", user.id)
+      .eq("user_id", user.id)
       .maybeSingle();
 
-    if (existingInquiry) {
+    if (existingAccess) {
       throw new Error("You already have access to this business contacts");
     }
 
@@ -78,8 +78,9 @@ serve(async (req) => {
       success_url: `${req.headers.get("origin")}/business/${businessId}?payment_success=true&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.headers.get("origin")}/business/${businessId}?payment_canceled=true`,
       metadata: {
-        business_id: businessId,
-        buyer_id: user.id,
+        businessId: businessId,
+        userId: user.id,
+        accessType: 'one_time',
       },
     });
 

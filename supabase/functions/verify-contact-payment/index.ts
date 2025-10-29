@@ -70,13 +70,13 @@ serve(async (req) => {
       throw new Error("Payment not completed");
     }
 
-    const businessId = session.metadata?.businessId;
-    const userId = session.metadata?.userId;
-    const accessType = session.metadata?.accessType;
+    const businessId = session.metadata?.businessId || session.metadata?.business_id;
+    const userId = session.metadata?.userId || session.metadata?.buyer_id;
+    const accessType = session.metadata?.accessType || 'one_time';
     
     console.log("[VERIFY] Session metadata:", { businessId, userId, accessType });
     
-    if (!businessId || !userId || !accessType) {
+    if (!businessId || !userId) {
       throw new Error("Missing metadata in session");
     }
 
