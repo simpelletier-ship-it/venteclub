@@ -177,7 +177,7 @@ const Auth = () => {
 
       toast({
         title: "Email envoyé !",
-        description: "Veuillez vérifier votre boîte de réception pour réinitialiser votre mot de passe.",
+        description: "Veuillez vérifier votre boîte de réception pour réinitialiser votre mot de passe. Si vous ne recevez pas l'email, vérifiez vos courriels indésirables.",
       });
       setShowResetPassword(false);
       setEmail("");
