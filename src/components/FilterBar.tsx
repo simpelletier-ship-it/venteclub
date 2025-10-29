@@ -22,7 +22,7 @@ interface FilterBarProps {
 const FilterBar = ({ onFilter }: FilterBarProps) => {
   const [city, setCity] = useState<string>("");
   const [industry, setIndustry] = useState<string>("");
-  const [priceRange, setPriceRange] = useState<number[]>([0, 1000000]);
+  const [priceRange, setPriceRange] = useState<number[]>([0, 10000000]);
 
   const cities = [
     "Montréal",
@@ -51,7 +51,7 @@ const FilterBar = ({ onFilter }: FilterBarProps) => {
   const handleReset = () => {
     setCity("");
     setIndustry("");
-    setPriceRange([0, 1000000]);
+    setPriceRange([0, 10000000]);
     if (onFilter) {
       onFilter({});
     }
@@ -97,8 +97,8 @@ const FilterBar = ({ onFilter }: FilterBarProps) => {
             value={priceRange}
             onValueChange={setPriceRange}
             min={0}
-            max={1000000}
-            step={10000}
+            max={10000000}
+            step={50000}
             className="w-full"
           />
           <div className="flex justify-between text-sm text-muted-foreground">
@@ -114,7 +114,7 @@ const FilterBar = ({ onFilter }: FilterBarProps) => {
           >
             Filtrer
           </Button>
-          {(city || industry || priceRange[0] > 0 || priceRange[1] < 1000000) && (
+          {(city || industry || priceRange[0] > 0 || priceRange[1] < 10000000) && (
             <Button 
               onClick={handleReset}
               variant="outline"
