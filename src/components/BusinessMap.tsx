@@ -103,7 +103,7 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
       // Initialize map centered on Quebec
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
-        style: 'mapbox://styles/mapbox/light-v11',
+        style: 'mapbox://styles/mapbox/streets-v12',
         center: [-71.2082, 46.8139],
         zoom: 6,
       });
