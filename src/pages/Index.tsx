@@ -302,25 +302,6 @@ const Index = () => {
           </div>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="bg-card border-t border-border py-6">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-            <div className="flex items-center">
-              <span className="text-3xl font-display font-bold">
-                Vente<span className="text-accent">.Club</span>
-              </span>
-            </div>
-            <div className="text-sm text-muted-foreground">
-              Un réseau d'entrepreneurs en action
-            </div>
-          </div>
-          <div className="border-t border-border mt-6 pt-6 text-center text-sm text-muted-foreground">
-            <p>&copy; 2025 Vente.club. Tous droits réservés.</p>
-          </div>
-        </div>
-      </footer>
     </>
   );
 };
