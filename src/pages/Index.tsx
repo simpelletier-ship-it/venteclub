@@ -99,7 +99,7 @@ const Index = () => {
             </h1>
             
             <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              Connectez avec des entrepreneurs sérieux et découvrez des opportunités d'affaires vérifiées
+              La plateforme d'acquisition et de vente d'entreprise au Québec
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
@@ -124,13 +124,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Filter Section */}
-      <section className="py-8 bg-muted/30">
-        <div className="container mx-auto px-4">
-          <FilterBar onFilter={handleFilter} />
-        </div>
-      </section>
-
       {/* Featured Businesses */}
       <section id="featured" className="py-16">
         <div className="container mx-auto px-4">
@@ -140,7 +133,7 @@ const Index = () => {
               Entreprises sélectionnées avec un potentiel de croissance exceptionnel
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {featuredBusinesses.length > 0 ? (
               featuredBusinesses.map((business) => (
                 <BusinessCard key={business.id} {...business} />
@@ -151,6 +144,13 @@ const Index = () => {
               </div>
             )}
           </div>
+        </div>
+      </section>
+
+      {/* Filter Section */}
+      <section className="py-8 bg-muted/30">
+        <div className="container mx-auto px-4">
+          <FilterBar onFilter={handleFilter} />
         </div>
       </section>
 

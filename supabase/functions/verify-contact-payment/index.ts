@@ -37,36 +37,49 @@ serve(async (req) => {
       throw new Error("Payment not completed");
     }
 
-    const businessId = session.metadata?.business_id;
-    const buyerId = session.metadata?.buyer_id;
+    const businessId = session.metadata?.businessId;
+    const userId = session.metadata?.userId;
+    const accessType = session.metadata?.accessType;
     
-    if (!businessId || !buyerId) {
+    if (!businessId || !userId || !accessType) {
       throw new Error("Missing metadata in session");
     }
 
-    if (buyerId !== user.id) {
+    if (userId !== user.id) {
       throw new Error("Unauthorized");
     }
 
-    // Check if inquiry already exists
-    const { data: existingInquiry } = await supabaseClient
-      .from("business_inquiries")
+    // Calculate expiration date for subscriptions
+    let expiresAt = null;
+    if (accessType === 'subscription') {
+      // For subscriptions, set expiry to 30 days from now
+      const expiryDate = new Date();
+      expiryDate.setDate(expiryDate.getDate() + 30);
+      expiresAt = expiryDate.toISOString();
+    }
+
+    // Check if access already exists
+    const { data: existingAccess } = await supabaseClient
+      .from("contact_access")
       .select("id")
       .eq("business_id", businessId)
-      .eq("buyer_id", user.id)
+      .eq("user_id", user.id)
       .maybeSingle();
 
-    if (!existingInquiry) {
-      // Grant access by creating business inquiry
-      const { error: inquiryError } = await supabaseClient
-        .from("business_inquiries")
+    if (!existingAccess) {
+      // Grant access by creating contact_access record
+      const { error: accessError } = await supabaseClient
+        .from("contact_access")
         .insert({
           business_id: businessId,
-          buyer_id: user.id,
+          user_id: user.id,
+          access_type: accessType,
+          stripe_payment_id: sessionId,
+          expires_at: expiresAt,
         });
 
-      if (inquiryError) {
-        console.error("Inquiry creation error:", inquiryError);
+      if (accessError) {
+        console.error("Access creation error:", accessError);
         throw new Error("Failed to grant access");
       }
     }

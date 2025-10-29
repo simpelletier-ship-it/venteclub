@@ -60,8 +60,8 @@ serve(async (req) => {
         },
       ],
       mode: mode,
-      success_url: `${req.headers.get("origin")}/business/${businessId}?access_success=true`,
-      cancel_url: `${req.headers.get("origin")}/business/${businessId}?access_canceled=true`,
+      success_url: `${req.headers.get("origin")}/business/${businessId}?payment_success=true&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${req.headers.get("origin")}/business/${businessId}?payment_canceled=true`,
       metadata: {
         businessId: businessId,
         userId: user.id,

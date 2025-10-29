@@ -4,9 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Heart } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { NotificationBell } from "@/components/NotificationBell";
+import { useToast } from "@/hooks/use-toast";
 
 export const Header = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [user, setUser] = useState<any>(null);
   const [isAdmin, setIsAdmin] = useState(false);
 
@@ -81,6 +83,10 @@ export const Header = () => {
               </Button>
               <Button variant="outline" onClick={async () => {
                 await supabase.auth.signOut();
+                toast({
+                  title: "Déconnexion réussie",
+                  description: "Vous avez bien été déconnecté.",
+                });
                 navigate("/");
               }}>
                 Déconnexion

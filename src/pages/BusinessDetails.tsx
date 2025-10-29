@@ -176,13 +176,16 @@ const BusinessDetails = () => {
     setShowPaymentDialog(true);
   };
 
-  const handlePayForAccess = async () => {
+  const handlePayForAccess = async (isSubscription = false) => {
     if (!id) return;
     
     setIsPurchasing(true);
     try {
-      const { data, error } = await supabase.functions.invoke('create-contact-checkout', {
-        body: { businessId: id }
+      const { data, error } = await supabase.functions.invoke('create-contact-access-checkout', {
+        body: { 
+          businessId: id,
+          accessType: isSubscription ? 'subscription' : 'one_time'
+        }
       });
 
       if (error) throw error;
@@ -502,45 +505,93 @@ const BusinessDetails = () => {
       </div>
 
       <Dialog open={showPaymentDialog} onOpenChange={setShowPaymentDialog}>
-        <DialogContent>
+        <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Accéder aux coordonnées du vendeur</DialogTitle>
             <DialogDescription>
-              Payez 5$ CAD pour débloquer les coordonnées complètes du vendeur
+              Choisissez votre option de paiement
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-4">
+          <div className="space-y-6 py-4">
             <div className="bg-secondary/20 p-4 rounded-lg border border-border">
               <h3 className="font-semibold mb-2">{business?.title}</h3>
-              <p className="text-sm text-muted-foreground mb-4">
+              <p className="text-sm text-muted-foreground">
                 Accédez à l'email et au numéro de téléphone du vendeur pour le contacter directement.
               </p>
-              <div className="flex items-center gap-2 text-primary">
-                <Lock className="h-5 w-5" />
-                <span className="font-bold">5$ CAD - Paiement unique</span>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-4">
+              {/* Option 1: Paiement unique */}
+              <div className="border-2 border-border rounded-lg p-6 hover:border-accent transition-colors">
+                <div className="text-center mb-4">
+                  <h3 className="text-lg font-bold mb-2">Paiement unique</h3>
+                  <div className="text-3xl font-bold text-primary mb-2">5 $</div>
+                  <p className="text-sm text-muted-foreground">Accès à cette annonce seulement</p>
+                </div>
+                <div className="space-y-2 text-sm mb-6">
+                  <p className="flex items-center gap-2">
+                    <span className="text-green-500">✓</span> Email du vendeur
+                  </p>
+                  <p className="flex items-center gap-2">
+                    <span className="text-green-500">✓</span> Téléphone du vendeur
+                  </p>
+                  <p className="flex items-center gap-2">
+                    <span className="text-green-500">✓</span> Accès permanent
+                  </p>
+                </div>
+                <Button 
+                  onClick={() => handlePayForAccess(false)} 
+                  disabled={isPurchasing}
+                  className="w-full"
+                  variant="outline"
+                >
+                  {isPurchasing ? "Traitement..." : "Payer 5 $"}
+                </Button>
+              </div>
+
+              {/* Option 2: Abonnement */}
+              <div className="border-2 border-accent rounded-lg p-6 bg-accent/5 relative">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                  <Badge className="bg-accent text-accent-foreground">Meilleure valeur</Badge>
+                </div>
+                <div className="text-center mb-4">
+                  <h3 className="text-lg font-bold mb-2">Abonnement mensuel</h3>
+                  <div className="text-3xl font-bold text-accent mb-2">9,99 $ / mois</div>
+                  <p className="text-sm text-muted-foreground">Accès illimité à toutes les annonces</p>
+                </div>
+                <div className="space-y-2 text-sm mb-6">
+                  <p className="flex items-center gap-2">
+                    <span className="text-green-500">✓</span> Toutes les coordonnées
+                  </p>
+                  <p className="flex items-center gap-2">
+                    <span className="text-green-500">✓</span> Accès illimité
+                  </p>
+                  <p className="flex items-center gap-2">
+                    <span className="text-green-500">✓</span> Annulation à tout moment
+                  </p>
+                  <p className="flex items-center gap-2">
+                    <span className="text-green-500">✓</span> Nouvelles annonces
+                  </p>
+                </div>
+                <Button 
+                  onClick={() => handlePayForAccess(true)} 
+                  disabled={isPurchasing}
+                  className="w-full bg-accent hover:bg-accent/90"
+                >
+                  {isPurchasing ? "Traitement..." : "S'abonner à 9,99 $"}
+                </Button>
               </div>
             </div>
-            <div className="text-sm text-muted-foreground">
-              <p className="mb-2">✅ Email du vendeur</p>
-              <p className="mb-2">✅ Téléphone du vendeur</p>
-              <p>✅ Accès permanent à ces coordonnées</p>
+
+            <div className="text-center">
+              <Button 
+                variant="ghost" 
+                onClick={() => setShowPaymentDialog(false)}
+                disabled={isPurchasing}
+              >
+                Annuler
+              </Button>
             </div>
-          </div>
-          <div className="flex gap-2">
-            <Button 
-              onClick={handlePayForAccess} 
-              disabled={isPurchasing}
-              className="flex-1"
-            >
-              {isPurchasing ? "Traitement..." : "Payer 5$ CAD"}
-            </Button>
-            <Button 
-              variant="outline" 
-              onClick={() => setShowPaymentDialog(false)}
-              disabled={isPurchasing}
-            >
-              Annuler
-            </Button>
           </div>
         </DialogContent>
       </Dialog>
