@@ -105,10 +105,10 @@ const BusinessCard = ({
                 <Badge className="bg-orange-500 text-white">⏳ En attente</Badge>
               )}
             </div>
-            <h3 className="text-2xl font-display font-bold text-foreground group-hover:text-primary transition-colors line-clamp-1">
+            <h3 className={`text-2xl font-display font-bold text-foreground group-hover:text-primary transition-colors line-clamp-1 ${status === 'sold' ? 'blur-[0.5px]' : ''}`}>
               {title}
             </h3>
-            <div className={`flex items-center gap-2 text-muted-foreground ${status === 'sold' ? 'blur-[2px]' : ''}`}>
+            <div className={`flex items-center gap-2 text-muted-foreground ${status === 'sold' ? 'blur-[8px]' : ''}`}>
               <MapPin className="w-4 h-4" />
               <span className="font-medium">
                 {city}{region && `, ${region}`}
@@ -118,9 +118,9 @@ const BusinessCard = ({
           {id && status !== 'sold' && <FavoriteButton businessId={id} userId={userId} />}
         </div>
 
-        <p className={`text-muted-foreground line-clamp-2 leading-relaxed ${status === 'sold' ? 'blur-[2px]' : ''}`}>{description}</p>
+        <p className={`text-muted-foreground line-clamp-2 leading-relaxed ${status === 'sold' ? 'blur-[8px]' : ''}`}>{description}</p>
 
-        <div className={`grid grid-cols-2 gap-4 pt-4 border-t border-border/50 ${status === 'sold' ? 'blur-[2px]' : ''}`}>
+        <div className={`grid grid-cols-2 gap-4 pt-4 border-t border-border/50 ${status === 'sold' ? 'blur-[8px]' : ''}`}>
           <div className="space-y-1">
             <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Revenus</p>
             <p className="text-lg font-bold text-foreground flex items-center gap-1">
@@ -134,7 +134,7 @@ const BusinessCard = ({
           </div>
         </div>
 
-        <div className={`flex items-end justify-between pt-4 border-t border-border/50 ${status === 'sold' ? 'blur-[2px]' : ''}`}>
+        <div className={`flex items-end justify-between pt-4 border-t border-border/50 ${status === 'sold' ? 'blur-[8px]' : ''}`}>
           <div className="space-y-1">
             <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Prix demandé</p>
             <p className="text-3xl font-display font-bold text-primary">{displayPrice}</p>
