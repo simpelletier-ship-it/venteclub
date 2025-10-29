@@ -112,25 +112,25 @@ const Index = () => {
         structuredData={structuredData} 
       />
       
-      {/* Hero Section - Premium Design */}
-      <section className="relative min-h-[90vh] flex items-center overflow-hidden bg-gradient-to-br from-primary via-primary-light to-secondary" aria-label="Section principale">
+      {/* Hero Section - Corporate Design */}
+      <section className="relative min-h-[90vh] flex items-center overflow-hidden bg-gradient-to-br from-foreground via-primary to-primary-dark" aria-label="Section principale">
         <div className="absolute inset-0">
-          <div className="absolute inset-0 opacity-10" style={{
+          <div className="absolute inset-0 opacity-5" style={{
             backgroundImage: `url(${heroImage})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center'
           }} role="img" aria-label="Image d'arrière-plan montrant des entrepreneurs en action" />
-          <div className="absolute inset-0 bg-gradient-to-b from-primary/90 via-primary-light/80 to-secondary/90" />
+          <div className="absolute inset-0 bg-gradient-to-b from-foreground/95 via-primary/90 to-primary-dark/95" />
           
           {/* Animated gradient orbs */}
-          <div className="absolute top-20 right-20 w-96 h-96 bg-secondary/30 rounded-full blur-3xl animate-float" />
-          <div className="absolute bottom-20 left-20 w-96 h-96 bg-accent/20 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }} />
+          <div className="absolute top-20 right-20 w-96 h-96 bg-accent/20 rounded-full blur-3xl animate-float" />
+          <div className="absolute bottom-20 left-20 w-96 h-96 bg-secondary/15 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }} />
         </div>
         
         <div className="relative container mx-auto px-4 py-20">
           <div className="max-w-4xl mx-auto text-center space-y-8 animate-slide-up">
             <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full glass-effect border-white/20">
-              <Sparkles className="w-5 h-5 text-accent animate-glow" />
+              <Sparkles className="w-5 h-5 text-secondary animate-glow" />
               <span className="text-white text-sm font-semibold tracking-wide">
                 La plateforme d'acquisition et de vente d'entreprise au Québec
               </span>
@@ -139,7 +139,7 @@ const Index = () => {
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-display font-bold leading-tight text-white">
               Achetez & Vendez
               <br />
-              <span className="text-gradient" style={{ backgroundImage: 'linear-gradient(135deg, #FCD34D 0%, #FBBF24 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+              <span className="bg-gradient-to-r from-accent via-primary-light to-accent bg-clip-text text-transparent">
                 des Entreprises
               </span>
             </h1>
@@ -151,7 +151,7 @@ const Index = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
               <Button 
                 size="lg" 
-                className="bg-accent hover:bg-accent/90 text-accent-foreground h-14 px-10 text-lg font-semibold shadow-xl hover:shadow-2xl transition-all hover:scale-105 btn-premium group"
+                className="bg-accent hover:bg-primary-dark text-accent-foreground h-14 px-10 text-lg font-semibold shadow-xl hover:shadow-2xl transition-all hover:scale-105 btn-premium group"
                 onClick={() => document.getElementById('featured')?.scrollIntoView({ behavior: 'smooth' })}
               >
                 Explorer les opportunités
@@ -171,21 +171,21 @@ const Index = () => {
             <div className="grid grid-cols-3 gap-8 pt-12 max-w-3xl mx-auto">
               <div className="text-center">
                 <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-white/10 backdrop-blur-md mb-3">
-                  <Shield className="w-6 h-6 text-accent" />
+                  <Shield className="w-6 h-6 text-secondary" />
                 </div>
                 <div className="text-3xl font-bold text-white mb-1">100+</div>
                 <div className="text-sm text-white/70">Annonces vérifiées</div>
               </div>
               <div className="text-center">
                 <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-white/10 backdrop-blur-md mb-3">
-                  <TrendingUp className="w-6 h-6 text-accent" />
+                  <TrendingUp className="w-6 h-6 text-secondary" />
                 </div>
                 <div className="text-3xl font-bold text-white mb-1">34K+</div>
                 <div className="text-sm text-white/70">Opportunités au QC</div>
               </div>
               <div className="text-center">
                 <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-white/10 backdrop-blur-md mb-3">
-                  <Clock className="w-6 h-6 text-accent" />
+                  <Clock className="w-6 h-6 text-secondary" />
                 </div>
                 <div className="text-3xl font-bold text-white mb-1">24h</div>
                 <div className="text-sm text-white/70">Réponse moyenne</div>
@@ -287,11 +287,11 @@ const Index = () => {
         </div>
       </section>
 
-      {/* CTA Section - Premium Gradient */}
-      <section className="py-32 bg-gradient-to-br from-primary via-primary-light to-secondary relative overflow-hidden">
+      {/* CTA Section - Corporate Gradient */}
+      <section className="py-32 bg-gradient-to-br from-foreground via-primary to-primary-dark relative overflow-hidden">
         <div className="absolute inset-0">
           <div className="absolute top-10 right-10 w-96 h-96 bg-accent/20 rounded-full blur-3xl" />
-          <div className="absolute bottom-10 left-10 w-96 h-96 bg-secondary/30 rounded-full blur-3xl" />
+          <div className="absolute bottom-10 left-10 w-96 h-96 bg-secondary/20 rounded-full blur-3xl" />
         </div>
         <div className="relative container mx-auto px-4 text-center">
           <div className="max-w-3xl mx-auto space-y-8">
