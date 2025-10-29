@@ -50,6 +50,27 @@ const ListBusiness = () => {
     "Notre-Dame-de-l'Île-Perrot", "Saint-Augustin-de-Desmaures", "Saint-Lin-Laurentides", "Lorraine", "Amos", "Delson", "Beauharnois",
     "Saint-Charles-Borromée", "Cantley", "Sainte-Adèle", "Charlemagne", "La Tuque", "Mont-Tremblant", "Saint-Colomban",
   ].sort();
+
+  // Régions administratives du Québec
+  const quebecRegions = [
+    "Bas-Saint-Laurent",
+    "Saguenay–Lac-Saint-Jean",
+    "Capitale-Nationale",
+    "Mauricie",
+    "Estrie",
+    "Montréal",
+    "Outaouais",
+    "Abitibi-Témiscamingue",
+    "Côte-Nord",
+    "Nord-du-Québec",
+    "Gaspésie–Îles-de-la-Madeleine",
+    "Chaudière-Appalaches",
+    "Laval",
+    "Lanaudière",
+    "Laurentides",
+    "Montérégie",
+    "Centre-du-Québec",
+  ].sort();
   
   const [formData, setFormData] = useState({
     title: "",
@@ -57,6 +78,7 @@ const ListBusiness = () => {
     industry: "",
     location: "",
     city: "",
+    region: "",
     province: "Québec",
     annual_revenue: "",
     asking_price: "",
@@ -274,6 +296,7 @@ const ListBusiness = () => {
           industry: validatedData.industry,
           location: validatedData.location,
           city: formData.city,
+          region: formData.region,
           province: formData.province,
           annual_revenue: validatedData.annual_revenue,
           asking_price: validatedData.asking_price,
@@ -690,6 +713,25 @@ const ListBusiness = () => {
                         disabled
                         className="bg-muted"
                       />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="region">Région</Label>
+                      <Select
+                        value={formData.region}
+                        onValueChange={(value) => setFormData({ ...formData, region: value })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Sélectionner une région..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {quebecRegions.map((region) => (
+                            <SelectItem key={region} value={region}>
+                              {region}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
 
                     <div>
