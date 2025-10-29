@@ -43,6 +43,9 @@ export const Footer = () => {
           {/* Contact Info */}
           <div>
             <h3 className="font-bold text-lg mb-4">Coordonnées</h3>
+            <p className="text-sm text-muted-foreground mb-3">
+              Contactez-nous si vous avez des questions:
+            </p>
             <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <Mail className="w-5 h-5 text-accent flex-shrink-0" />
