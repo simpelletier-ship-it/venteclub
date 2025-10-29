@@ -61,7 +61,6 @@ export const Header = () => {
               Mes favoris
             </button>
           )}
-          <button onClick={() => navigate(user ? "/list-business" : "/auth")} className="text-foreground hover:text-accent transition-colors font-medium">Vendre</button>
         </div>
         <div className="flex items-center gap-3">
           {user ? (

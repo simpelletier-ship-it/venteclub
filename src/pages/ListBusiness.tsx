@@ -1003,19 +1003,6 @@ const ListBusiness = () => {
                       </p>
                     </div>
                   </div>
-
-                  {/* Analyse IA */}
-                  <div className="flex items-start gap-3 p-3 rounded-lg bg-secondary/20">
-                    <div className="w-6 h-6 rounded-full bg-background border-2 border-border flex items-center justify-center text-xs font-bold flex-shrink-0">
-                      3
-                    </div>
-                    <div>
-                      <p className="font-medium text-sm">Analyse IA (Bientôt)</p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Maximisez votre visibilité en débloquant l&apos;analyse IA.
-                      </p>
-                    </div>
-                  </div>
                 </div>
 
                 {/* Prochaines étapes */}
