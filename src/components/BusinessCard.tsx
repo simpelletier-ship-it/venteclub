@@ -70,10 +70,14 @@ const BusinessCard = ({
       )}
       <CardHeader>
         <div className="flex items-start justify-between mb-2">
-          <Badge variant="secondary">
+          <Badge variant="secondary" className="text-xs">
             {industry}
           </Badge>
-          {id && <FavoriteButton businessId={id} userId={userId} />}
+          {id && (
+            <div className="z-20 relative">
+              <FavoriteButton businessId={id} userId={userId} />
+            </div>
+          )}
         </div>
         <CardTitle className="text-xl font-bold text-foreground group-hover:text-accent transition-colors">
           {title}

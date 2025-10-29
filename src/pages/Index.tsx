@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import BusinessCard from "@/components/BusinessCard";
 import FilterBar from "@/components/FilterBar";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Heart } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import heroImage from "@/assets/hero-business.jpg";
 import { NotificationBell } from "@/components/NotificationBell";
@@ -114,6 +114,12 @@ const Index = () => {
           <div className="hidden md:flex items-center gap-8">
             <button onClick={() => document.getElementById('featured')?.scrollIntoView({ behavior: 'smooth' })} className="text-foreground hover:text-accent transition-colors font-medium">Parcourir</button>
             <button onClick={() => navigate("/map")} className="text-foreground hover:text-accent transition-colors font-medium">Carte</button>
+            {user && (
+              <button onClick={() => navigate("/favorites")} className="text-foreground hover:text-accent transition-colors font-medium flex items-center gap-2">
+                <Heart className="w-4 h-4" />
+                Mes favoris
+              </button>
+            )}
             <button onClick={() => navigate(user ? "/list-business" : "/auth")} className="text-foreground hover:text-accent transition-colors font-medium">Vendre</button>
           </div>
           <div className="flex items-center gap-3">
@@ -156,25 +162,57 @@ const Index = () => {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/5" />
-        <div 
-          className="absolute inset-0 opacity-10"
-          style={{
-            backgroundImage: `url(${heroImage})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-          }}
-        />
-        <div className="relative container mx-auto px-4 py-20 md:py-28">
-          <div className="max-w-4xl mx-auto text-center space-y-6">
-            <h1 className="text-4xl md:text-6xl font-bold text-foreground leading-tight">
-              Achetez & Vendez des Entreprises
-              <span className="block text-accent mt-2">En Toute Confiance</span>
+      <section className="relative overflow-hidden bg-gradient-to-br from-background via-primary/5 to-accent/10">
+        <div className="absolute inset-0">
+          <div 
+            className="absolute inset-0 opacity-[0.03]"
+            style={{
+              backgroundImage: `url(${heroImage})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+            }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/50 to-background" />
+        </div>
+        
+        <div className="relative container mx-auto px-4 py-24 md:py-32">
+          <div className="max-w-4xl mx-auto text-center space-y-8">
+            <div className="inline-block">
+              <span className="px-4 py-2 rounded-full bg-accent/10 text-accent text-sm font-semibold border border-accent/20">
+                Plateforme #1 d'Acquisition d'Entreprises au Québec
+              </span>
+            </div>
+            
+            <h1 className="text-5xl md:text-7xl font-bold leading-tight">
+              <span className="bg-gradient-to-r from-foreground via-foreground to-accent bg-clip-text text-transparent">
+                Achetez & Vendez
+              </span>
+              <br />
+              <span className="text-accent">des Entreprises</span>
             </h1>
-            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-              Un réseau d'entrepreneurs en action
+            
+            <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+              Connectez avec des entrepreneurs sérieux et découvrez des opportunités d'affaires vérifiées
             </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+              <Button 
+                size="lg" 
+                className="bg-accent hover:bg-accent/90 text-accent-foreground h-14 px-8 text-lg font-semibold shadow-lg hover:shadow-xl transition-all"
+                onClick={() => document.getElementById('featured')?.scrollIntoView({ behavior: 'smooth' })}
+              >
+                Explorer les opportunités
+                <ArrowRight className="ml-2 w-5 h-5" />
+              </Button>
+              <Button 
+                size="lg" 
+                variant="outline"
+                className="h-14 px-8 text-lg font-semibold border-2 hover:bg-accent/5"
+                onClick={() => navigate(user ? "/list-business" : "/auth")}
+              >
+                Vendre mon entreprise
+              </Button>
+            </div>
           </div>
         </div>
       </section>
