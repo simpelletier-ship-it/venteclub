@@ -13,7 +13,6 @@ import { businessSchema } from "@/lib/validations";
 import { TermsDialog } from "@/components/TermsDialog";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 const ListBusiness = () => {
   const navigate = useNavigate();
@@ -46,11 +45,7 @@ const ListBusiness = () => {
     support_offered: "",
     website: "",
     facebook: "",
-    linkedin: "",
     instagram: "",
-    twitter: "",
-    threads: "",
-    status: "active" as "active" | "archived",
   });
   const [photos, setPhotos] = useState<File[]>([]);
   const [photoPreviewUrls, setPhotoPreviewUrls] = useState<string[]>([]);
@@ -99,7 +94,12 @@ const ListBusiness = () => {
     ];
     
     const filledFields = fields.filter(field => field && field !== "").length;
-    return Math.round((filledFields / fields.length) * 100);
+    const totalFields = fields.length;
+    
+    // Return 0 if nothing is filled
+    if (filledFields === 0) return 0;
+    
+    return Math.round((filledFields / totalFields) * 100);
   }, [formData, photos]);
 
   // Next steps suggestions
@@ -195,10 +195,10 @@ const ListBusiness = () => {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent, isDraft: boolean = false) => {
     e.preventDefault();
 
-    if (!termsAccepted) {
+    if (!isDraft && !termsAccepted) {
       toast({
         variant: "destructive",
         title: "Conditions non acceptées",
@@ -238,7 +238,7 @@ const ListBusiness = () => {
           employees_count: validatedData.employees_count,
           year_established: validatedData.year_established,
           is_franchise: formData.is_franchise,
-          status: formData.status,
+          status: isDraft ? "archived" : "active",
         } as any)
         .select()
         .single();
@@ -291,8 +291,10 @@ const ListBusiness = () => {
       }
 
       toast({
-        title: "Succès !",
-        description: "Votre annonce a été soumise et est en attente d'approbation. Vous recevrez un email de confirmation.",
+        title: isDraft ? "Enregistré !" : "Succès !",
+        description: isDraft 
+          ? "Votre annonce a été enregistrée mais n'est pas encore publiée. Elle est visible uniquement dans votre tableau de bord." 
+          : "Votre annonce a été soumise et est en attente d'approbation. Vous recevrez un email de confirmation.",
       });
       navigate("/dashboard");
     } catch (error: any) {
@@ -745,24 +747,18 @@ const ListBusiness = () => {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div>
-                        <Label htmlFor="sale_reason">Raison vente</Label>
-                        <Select
-                          value={formData.sale_reason}
-                          onValueChange={(value) => setFormData({ ...formData, sale_reason: value })}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Sélectionner" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="retirement">Retraite</SelectItem>
-                            <SelectItem value="new_project">Nouveau projet</SelectItem>
-                            <SelectItem value="relocation">Déménagement</SelectItem>
-                            <SelectItem value="other">Autre</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
+                    <div>
+                      <Label htmlFor="sale_reason">Raison de vente</Label>
+                      <Textarea
+                        id="sale_reason"
+                        value={formData.sale_reason}
+                        onChange={(e) => setFormData({ ...formData, sale_reason: e.target.value })}
+                        rows={3}
+                        placeholder="Ex: Départ à la retraite, nouveau projet, déménagement..."
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
                       <div>
                         <Label htmlFor="financing_options">Options financement</Label>
@@ -833,17 +829,6 @@ const ListBusiness = () => {
                     </div>
 
                     <div>
-                      <Label htmlFor="linkedin">Linkedin</Label>
-                      <Input
-                        id="linkedin"
-                        type="url"
-                        value={formData.linkedin}
-                        onChange={(e) => setFormData({ ...formData, linkedin: e.target.value })}
-                        placeholder="https://linkedin.com/company/..."
-                      />
-                    </div>
-
-                    <div>
                       <Label htmlFor="instagram">Instagram</Label>
                       <Input
                         id="instagram"
@@ -853,66 +838,6 @@ const ListBusiness = () => {
                         placeholder="https://instagram.com/..."
                       />
                     </div>
-
-                    <div>
-                      <Label htmlFor="twitter">X (Twitter)</Label>
-                      <Input
-                        id="twitter"
-                        type="url"
-                        value={formData.twitter}
-                        onChange={(e) => setFormData({ ...formData, twitter: e.target.value })}
-                        placeholder="https://x.com/..."
-                      />
-                    </div>
-
-                    <div>
-                      <Label htmlFor="threads">Threads</Label>
-                      <Input
-                        id="threads"
-                        type="url"
-                        value={formData.threads}
-                        onChange={(e) => setFormData({ ...formData, threads: e.target.value })}
-                        placeholder="https://threads.net/..."
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Statut de publication */}
-                <div className="bg-card p-6 rounded-2xl shadow-elegant border border-border/50">
-                  <h2 className="text-xl font-semibold text-primary mb-4">Statut de publication</h2>
-
-                  <div>
-                    <Label>Statut</Label>
-                    <RadioGroup
-                      value={formData.status}
-                      onValueChange={(value: "active" | "archived") => setFormData({ ...formData, status: value })}
-                      className="flex flex-col md:flex-row gap-4 mt-3"
-                    >
-                      <div className="flex items-start space-x-3 p-4 border-2 rounded-lg cursor-pointer hover:bg-accent/5 flex-1">
-                        <RadioGroupItem value="active" id="status-active" />
-                        <div>
-                          <Label htmlFor="status-active" className="cursor-pointer font-medium flex items-center gap-2">
-                            ✏️ Brouillon
-                          </Label>
-                          <p className="text-sm text-muted-foreground mt-1">
-                            La fiche n'est pas visible et ne sera pas affichée sur le site.
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="flex items-start space-x-3 p-4 border-2 rounded-lg cursor-pointer hover:bg-accent/5 flex-1">
-                        <RadioGroupItem value="archived" id="status-archived" />
-                        <div>
-                          <Label htmlFor="status-archived" className="cursor-pointer font-medium flex items-center gap-2">
-                            🗑️ Archivée
-                          </Label>
-                          <p className="text-sm text-muted-foreground mt-1">
-                            La fiche est archivée et ne sera plus visible sur le site.
-                          </p>
-                        </div>
-                      </div>
-                    </RadioGroup>
                   </div>
                 </div>
 
@@ -989,11 +914,27 @@ const ListBusiness = () => {
                   </div>
                 </div>
 
-                <div className="flex gap-4 pt-4">
-                  <Button type="submit" disabled={loading || !termsAccepted} className="flex-1">
-                    {loading ? "Publication..." : "Publier l'annonce"}
-                  </Button>
-                  <Button type="button" variant="outline" onClick={() => navigate("/")} disabled={loading}>
+                <div className="flex flex-col gap-4 pt-4">
+                  <div className="flex gap-4">
+                    <Button 
+                      type="button" 
+                      onClick={(e) => handleSubmit(e, false)} 
+                      disabled={loading || !termsAccepted} 
+                      className="flex-1"
+                    >
+                      {loading ? "Publication..." : "Publier l'annonce"}
+                    </Button>
+                    <Button 
+                      type="button" 
+                      variant="secondary"
+                      onClick={(e) => handleSubmit(e, true)} 
+                      disabled={loading} 
+                      className="flex-1"
+                    >
+                      {loading ? "Enregistrement..." : "Enregistrer (brouillon)"}
+                    </Button>
+                  </div>
+                  <Button type="button" variant="outline" onClick={() => navigate("/")} disabled={loading} className="w-full">
                     Annuler
                   </Button>
                 </div>
