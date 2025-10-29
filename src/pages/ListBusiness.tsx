@@ -98,6 +98,8 @@ const ListBusiness = () => {
     year_established: "",
     seller_email: "",
     seller_phone: "",
+    latitude: null as number | null,
+    longitude: null as number | null,
     is_franchise: false,
     competitive_advantages: "",
     target_clientele: "",
@@ -182,6 +184,8 @@ const ListBusiness = () => {
         seller_email: "",
         seller_phone: "",
         is_franchise: business.is_franchise || false,
+        latitude: business.latitude || null,
+        longitude: business.longitude || null,
         competitive_advantages: "",
         target_clientele: "",
         sale_reason: "",
@@ -408,6 +412,8 @@ const ListBusiness = () => {
             employees_count: validatedData.employees_count,
             year_established: validatedData.year_established,
             is_franchise: formData.is_franchise,
+            latitude: formData.latitude,
+            longitude: formData.longitude,
             status: isDraft ? "archived" : "active",
             approval_status: isDraft ? "pending" : "pending",
           } as any)
@@ -472,6 +478,8 @@ const ListBusiness = () => {
           employees_count: validatedData.employees_count,
           year_established: validatedData.year_established,
           is_franchise: formData.is_franchise,
+          latitude: formData.latitude,
+          longitude: formData.longitude,
           status: isDraft ? "archived" : "active",
         } as any)
         .select()
@@ -949,11 +957,38 @@ const ListBusiness = () => {
                                     <CommandItem
                                       key={city}
                                       value={city}
-                                      onSelect={(currentValue) => {
-                                        setFormData({ ...formData, city: currentValue });
-                                        setCitySearchOpen(false);
-                                        setCitySearchValue("");
-                                      }}
+                                  onSelect={async (currentValue) => {
+                                    // Mettre à jour la ville
+                                    setFormData({ ...formData, city: currentValue });
+                                    setCitySearchOpen(false);
+                                    setCitySearchValue("");
+
+                                    // Géocoder automatiquement la ville
+                                    try {
+                                      const { data, error } = await supabase.functions.invoke('geocode-city', {
+                                        body: { 
+                                          city: currentValue, 
+                                          province: formData.province 
+                                        }
+                                      });
+
+                                      if (error) {
+                                        console.error('[GEOCODE] Error:', error);
+                                        return;
+                                      }
+
+                                      if (data?.success) {
+                                        console.log('[GEOCODE] Coordinates obtained:', data);
+                                        setFormData(prev => ({
+                                          ...prev,
+                                          latitude: data.latitude,
+                                          longitude: data.longitude
+                                        }));
+                                      }
+                                    } catch (err) {
+                                      console.error('[GEOCODE] Failed to geocode city:', err);
+                                    }
+                                  }}
                                     >
                                       <Check
                                         className={cn(
