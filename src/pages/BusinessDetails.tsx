@@ -27,6 +27,9 @@ const BusinessDetails = () => {
   const [isUnlocking, setIsUnlocking] = useState(false);
   const [photos, setPhotos] = useState<any[]>([]);
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(null);
+  const [hasPremium, setHasPremium] = useState(false);
+  const [secondsRemaining, setSecondsRemaining] = useState<number | null>(null);
+  const [showPremiumDialog, setShowPremiumDialog] = useState(false);
 
   useEffect(() => {
     const initialize = async () => {
@@ -40,6 +43,7 @@ const BusinessDetails = () => {
       if (session?.user) {
         console.log('[INIT] Checking access for user');
         await checkAccess(session.user.id);
+        await checkPremiumSubscription(session.user.id);
       } else {
         console.log('[INIT] No user session');
         setLoading(false);
@@ -143,6 +147,38 @@ const BusinessDetails = () => {
     }
   };
 
+  const checkPremiumSubscription = async (userId: string) => {
+    try {
+      const { data, error } = await supabase.functions.invoke('check-premium-subscription');
+      
+      if (error) {
+        console.error('Error checking premium:', error);
+        return;
+      }
+      
+      setHasPremium(data?.subscribed || false);
+    } catch (error) {
+      console.error('Error in checkPremiumSubscription:', error);
+    }
+  };
+
+  const getNextAccessTime = async () => {
+    if (!user) return;
+    
+    try {
+      const { data, error } = await supabase.rpc('get_next_access_time', {
+        user_uuid: user.id
+      });
+      
+      if (error) throw error;
+      
+      return data;
+    } catch (error) {
+      console.error('Error getting next access time:', error);
+      return null;
+    }
+  };
+
 
   const handleUnlockRequest = () => {
     if (!user) {
@@ -162,10 +198,23 @@ const BusinessDetails = () => {
     setIsUnlocking(true);
     try {
       const { data, error } = await supabase.rpc('use_token_for_access', {
-        business_uuid: id
+        business_uuid: id,
+        has_premium: hasPremium
       });
 
-      if (error) throw error;
+      if (error) {
+        // Extraire le nombre de secondes de l'erreur
+        const match = error.message.match(/attendre (\d+) secondes/);
+        if (match) {
+          const seconds = parseInt(match[1]);
+          setSecondsRemaining(seconds);
+          setShowUnlockDialog(false);
+          setShowPremiumDialog(true);
+        } else {
+          throw error;
+        }
+        return;
+      }
 
       const result = data as any;
       
@@ -193,6 +242,42 @@ const BusinessDetails = () => {
       });
     } finally {
       setIsUnlocking(false);
+    }
+  };
+
+  const handlePremiumCheckout = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke('create-premium-checkout');
+      
+      if (error) throw error;
+      
+      if (data?.url) {
+        window.open(data.url, '_blank');
+        setShowPremiumDialog(false);
+      }
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: error.message || "Impossible de créer la session de paiement",
+      });
+    }
+  };
+
+  const formatTimeRemaining = (seconds: number): string => {
+    const days = Math.floor(seconds / 86400);
+    const hours = Math.floor((seconds % 86400) / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    
+    if (days > 0) {
+      return `${days} jour${days > 1 ? 's' : ''}, ${hours}h ${minutes}min`;
+    } else if (hours > 0) {
+      return `${hours}h ${minutes}min ${secs}s`;
+    } else if (minutes > 0) {
+      return `${minutes}min ${secs}s`;
+    } else {
+      return `${secs}s`;
     }
   };
 
@@ -564,6 +649,73 @@ const BusinessDetails = () => {
               disabled={isUnlocking}
             >
               {isUnlocking ? 'Déverrouillage...' : 'Confirmer et déverrouiller'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog Premium pour temps d'attente */}
+      <Dialog open={showPremiumDialog} onOpenChange={setShowPremiumDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Accès limité atteint</DialogTitle>
+            <DialogDescription className="space-y-4 pt-4">
+              <div className="bg-red-50 dark:bg-red-950/30 border-2 border-red-200 dark:border-red-800 rounded-lg p-4">
+                <p className="font-semibold text-red-900 dark:text-red-100 flex items-center gap-2 mb-2">
+                  <span className="text-2xl">⏱️</span>
+                  Temps d'attente requis
+                </p>
+                {secondsRemaining && (
+                  <p className="text-sm text-red-800 dark:text-red-200">
+                    Vous devez attendre <strong>{formatTimeRemaining(secondsRemaining)}</strong> avant de pouvoir déverrouiller un autre vendeur gratuitement.
+                  </p>
+                )}
+              </div>
+
+              <div className="bg-gradient-to-br from-primary/10 to-accent/10 border-2 border-primary/30 rounded-lg p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="font-bold text-lg">Abonnement Premium</h3>
+                  <Badge className="bg-gradient-to-r from-primary to-accent text-white font-bold">
+                    4,99$ CAD/mois
+                  </Badge>
+                </div>
+                <p className="text-sm mb-3">
+                  Obtenez un accès illimité aux coordonnées de tous les vendeurs sans aucune restriction !
+                </p>
+                <ul className="space-y-2 text-sm">
+                  <li className="flex items-center gap-2">
+                    <span className="text-green-500 font-bold">✓</span>
+                    Accès illimité à tous les vendeurs
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-green-500 font-bold">✓</span>
+                    Aucune limite de temps
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-green-500 font-bold">✓</span>
+                    Annulation facile à tout moment
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-green-500 font-bold">✓</span>
+                    Messagerie illimitée
+                  </li>
+                </ul>
+              </div>
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex gap-2 pt-4">
+            <Button 
+              variant="outline" 
+              onClick={() => setShowPremiumDialog(false)}
+              className="flex-1"
+            >
+              Attendre
+            </Button>
+            <Button 
+              onClick={handlePremiumCheckout}
+              className="flex-1 bg-gradient-to-r from-primary to-accent hover:opacity-90"
+            >
+              S'abonner à Premium
             </Button>
           </div>
         </DialogContent>

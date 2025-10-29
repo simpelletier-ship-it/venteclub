@@ -13,6 +13,7 @@ import { PurchasedBusinesses } from "@/components/PurchasedBusinesses";
 import { WithdrawBusinessDialog } from "@/components/WithdrawBusinessDialog";
 import { EditBusinessDialog } from "@/components/EditBusinessDialog";
 import { AlertsManager } from "@/components/AlertsManager";
+import { PremiumSubscription } from "@/components/PremiumSubscription";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -67,6 +68,19 @@ const Dashboard = () => {
       toast({
         title: "Accès débloqué!",
         description: "Vous pouvez maintenant voir vos achats dans l'onglet 'Mes Achats'.",
+      });
+      setSearchParams({});
+    } else if (searchParams.get('premium_success') === 'true') {
+      toast({
+        title: "Bienvenue à Premium!",
+        description: "Vous avez maintenant un accès illimité à tous les vendeurs.",
+      });
+      setSearchParams({});
+    } else if (searchParams.get('premium_cancel') === 'true') {
+      toast({
+        variant: "destructive",
+        title: "Abonnement annulé",
+        description: "L'abonnement Premium a été annulé.",
       });
       setSearchParams({});
     }
@@ -150,11 +164,12 @@ const Dashboard = () => {
             <p className="text-muted-foreground mb-6">
               Gérez vos annonces et vos conversations
             </p>
-            <TabsList className="grid w-full max-w-3xl grid-cols-4">
+            <TabsList className="grid w-full max-w-3xl grid-cols-5">
               <TabsTrigger value="businesses">Mes annonces</TabsTrigger>
               <TabsTrigger value="purchases">Mes achats</TabsTrigger>
               <TabsTrigger value="messages">Messages</TabsTrigger>
               <TabsTrigger value="alerts">Alertes</TabsTrigger>
+              <TabsTrigger value="subscription">Abonnement</TabsTrigger>
             </TabsList>
           </div>
 
@@ -230,6 +245,10 @@ const Dashboard = () => {
 
           <TabsContent value="alerts">
             {user && <AlertsManager userId={user.id} />}
+          </TabsContent>
+
+          <TabsContent value="subscription">
+            {user && <PremiumSubscription userId={user.id} />}
           </TabsContent>
         </Tabs>
       </div>

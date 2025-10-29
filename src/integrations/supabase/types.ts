@@ -743,6 +743,7 @@ export type Database = {
       }
       create_demo_businesses: { Args: never; Returns: undefined }
       create_sample_businesses: { Args: never; Returns: undefined }
+      get_next_access_time: { Args: { user_uuid: string }; Returns: Json }
       has_contact_access: { Args: { business_uuid: string }; Returns: boolean }
       has_role: {
         Args: {
@@ -755,7 +756,10 @@ export type Database = {
         Args: { business_uuid: string }
         Returns: boolean
       }
-      use_token_for_access: { Args: { business_uuid: string }; Returns: Json }
+      use_token_for_access: {
+        Args: { business_uuid: string; has_premium?: boolean }
+        Returns: Json
+      }
     }
     Enums: {
       app_role: "admin" | "user"
