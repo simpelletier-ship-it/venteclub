@@ -387,7 +387,9 @@ const BusinessDetails = () => {
                         <Badge variant="secondary">{business.industry}</Badge>
                         <span className="flex items-center gap-1">
                           <MapPin className="w-4 h-4" />
-                          {business.location}
+                          {business.city && business.region 
+                            ? `${business.city}, ${business.region}` 
+                            : business.location}
                         </span>
                         <span className="flex items-center gap-1">
                           <Eye className="w-4 h-4" />
@@ -473,6 +475,23 @@ const BusinessDetails = () => {
                     {business.description}
                   </p>
                 </div>
+
+                {/* Location Information */}
+                {(business.city || business.region) && (
+                  <div className="bg-gradient-to-r from-primary/5 to-accent/5 p-5 rounded-xl border border-border/50">
+                    <div className="flex items-start gap-3">
+                      <MapPin className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+                      <div>
+                        <h3 className="font-semibold text-foreground mb-1">Localisation</h3>
+                        <p className="text-sm text-muted-foreground">
+                          {business.city && business.region 
+                            ? `${business.city}, ${business.region}, ${business.province || 'Québec'}` 
+                            : business.location}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {business.annual_revenue && (

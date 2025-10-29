@@ -12,6 +12,8 @@ interface BusinessCardProps {
   title: string;
   industry: string;
   location: string;
+  city?: string;
+  region?: string;
   revenue?: string;
   annual_revenue?: number;
   price?: string;
@@ -34,6 +36,8 @@ const BusinessCard = ({
   title,
   industry,
   location,
+  city,
+  region,
   revenue,
   annual_revenue,
   price,
@@ -133,7 +137,9 @@ const BusinessCard = ({
             </h3>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <MapPin className="w-4 h-4 flex-shrink-0" />
-              <span className="line-clamp-1">{location}</span>
+              <span className="line-clamp-1">
+                {city && region ? `${city}, ${region}` : location}
+              </span>
             </div>
           </div>
           {id && (

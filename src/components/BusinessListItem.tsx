@@ -11,6 +11,8 @@ interface BusinessListItemProps {
   title: string;
   industry: string;
   location: string;
+  city?: string;
+  region?: string;
   revenue?: string;
   annual_revenue?: number;
   price?: string;
@@ -29,6 +31,8 @@ const BusinessListItem = ({
   title,
   industry,
   location,
+  city,
+  region,
   revenue,
   annual_revenue,
   price,
@@ -105,7 +109,9 @@ const BusinessListItem = ({
           </h3>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <MapPin className="w-4 h-4 flex-shrink-0" />
-            <span className="truncate">{location}</span>
+            <span className="truncate">
+              {city && region ? `${city}, ${region}` : location}
+            </span>
           </div>
         </div>
 
