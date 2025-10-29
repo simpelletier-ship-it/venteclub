@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import BusinessCard from "@/components/BusinessCard";
 import BusinessListItem from "@/components/BusinessListItem";
@@ -10,13 +11,32 @@ import { SEO } from "@/components/SEO";
 import heroImage from "@/assets/hero-business-pro.jpg";
 const Index = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [featuredBusinesses, setFeaturedBusinesses] = useState<any[]>([]);
   const [allBusinesses, setAllBusinesses] = useState<any[]>([]);
   const [filteredBusinesses, setFilteredBusinesses] = useState<any[]>([]);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  
   useEffect(() => {
     fetchBusinesses();
-  }, []);
+    
+    // Check for premium payment success/cancel
+    if (searchParams.get('premium_success') === 'true') {
+      toast({
+        title: "Bienvenue à Premium!",
+        description: "Vous avez maintenant un accès illimité à tous les vendeurs.",
+      });
+      setSearchParams({});
+    } else if (searchParams.get('premium_cancel') === 'true') {
+      toast({
+        variant: "destructive",
+        title: "Abonnement annulé",
+        description: "L'abonnement Premium a été annulé.",
+      });
+      setSearchParams({});
+    }
+  }, [searchParams, setSearchParams, toast]);
   const fetchBusinesses = async () => {
     // Fetch all approved businesses (active or sold within 3 months)
     const {

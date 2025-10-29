@@ -70,19 +70,6 @@ const Dashboard = () => {
         description: "Vous pouvez maintenant voir vos achats dans l'onglet 'Mes Achats'.",
       });
       setSearchParams({});
-    } else if (searchParams.get('premium_success') === 'true') {
-      toast({
-        title: "Bienvenue à Premium!",
-        description: "Vous avez maintenant un accès illimité à tous les vendeurs.",
-      });
-      setSearchParams({});
-    } else if (searchParams.get('premium_cancel') === 'true') {
-      toast({
-        variant: "destructive",
-        title: "Abonnement annulé",
-        description: "L'abonnement Premium a été annulé.",
-      });
-      setSearchParams({});
     }
   }, [navigate, searchParams, setSearchParams, toast]);
 
