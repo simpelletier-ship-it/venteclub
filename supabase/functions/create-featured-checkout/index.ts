@@ -68,7 +68,7 @@ serve(async (req) => {
               name: `Mise en avant - ${duration} jours`,
               description: `Mettez votre annonce en vedette pendant ${duration} jours`,
             },
-            unit_amount: duration === 7 ? 7500 : duration === 14 ? 10000 : 11000,
+            unit_amount: duration === 7 ? 750 : duration === 14 ? 1000 : 1150,
           },
           quantity: 1,
         },
