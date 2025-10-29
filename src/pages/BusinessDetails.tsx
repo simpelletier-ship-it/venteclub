@@ -38,31 +38,52 @@ const BusinessDetails = () => {
 
       // Check for payment success/cancel
       const sessionId = searchParams.get('session_id');
-      if (searchParams.get('payment_success') === 'true' && sessionId) {
+      const paymentSuccess = searchParams.get('payment_success') === 'true';
+      const paymentCanceled = searchParams.get('payment_canceled') === 'true';
+      
+      if (paymentSuccess && sessionId) {
+        console.log('[INIT] Payment success detected, verifying...');
         if (session?.user) {
           await verifyPayment(sessionId, session.user.id);
-          // Clear URL params after verification
-          setSearchParams({});
         } else {
+          console.log('[INIT] No user session, stopping');
           setLoading(false);
         }
-      } else if (searchParams.get('payment_canceled') === 'true') {
+      } else if (paymentCanceled) {
+        console.log('[INIT] Payment canceled');
         toast({
           variant: "destructive",
           title: "Paiement annulé",
           description: "Vous avez annulé le paiement.",
         });
-        setSearchParams({});
         setLoading(false);
       } else if (session?.user) {
+        console.log('[INIT] Checking access for user');
         await checkAccess(session.user.id);
       } else {
+        console.log('[INIT] No user session');
         setLoading(false);
       }
     };
 
     initialize();
-  }, [id, searchParams]);
+  }, [id]); // REMOVED searchParams dependency to avoid infinite loop
+
+  // Separate useEffect to clean URL params after payment
+  useEffect(() => {
+    const hasPaymentParams = searchParams.has('payment_success') || 
+                            searchParams.has('payment_canceled') || 
+                            searchParams.has('session_id');
+    
+    if (hasPaymentParams && !isVerifyingPayment) {
+      console.log('[CLEANUP] Cleaning URL params');
+      const timer = setTimeout(() => {
+        setSearchParams({});
+      }, 2000); // Wait 2 seconds before cleaning URL
+      
+      return () => clearTimeout(timer);
+    }
+  }, [searchParams, isVerifyingPayment, setSearchParams]);
 
   const fetchPhotos = async () => {
     if (!id) return;
@@ -323,15 +344,35 @@ const BusinessDetails = () => {
 
   if (loading || isVerifyingPayment) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-muted-foreground">
-            {isVerifyingPayment ? "Vérification du paiement..." : "Chargement..."}
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center max-w-md mx-auto p-8">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto mb-4"></div>
+          <h2 className="text-2xl font-bold mb-2">
+            {isVerifyingPayment ? "Vérification du paiement..." : "Chargement de l'annonce..."}
+          </h2>
+          <p className="text-muted-foreground mb-6">
+            {isVerifyingPayment 
+              ? "Nous vérifions votre paiement avec Stripe. Cela peut prendre quelques secondes."
+              : "Veuillez patienter pendant que nous chargeons les détails de l'annonce."}
           </p>
+          {isVerifyingPayment && (
+            <div className="mt-8">
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  console.log('[USER ACTION] Refresh requested');
+                  window.location.reload();
+                }}
+              >
+                Rafraîchir la page
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     );
   }
+
 
   if (!business) {
     return (
