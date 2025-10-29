@@ -309,6 +309,15 @@ const Auth = () => {
                       className="w-full mt-2"
                     />
                   </div>
+                  <div className="bg-muted/50 border border-border rounded-lg p-4 text-xs text-muted-foreground">
+                    <p className="font-medium mb-1">Avertissement important :</p>
+                    <p>
+                      En créant un compte, vous reconnaissez que Vente.Club n'est aucunement responsable 
+                      des annonces publiées sur la plateforme et ne peut être reconnu comme ayant commis 
+                      une faute. Vous devez agir avec prudence lors de l'achat d'une entreprise et effectuer 
+                      vos propres vérifications.
+                    </p>
+                  </div>
                   <Button type="submit" disabled={loading} className="w-full">
                     {loading ? "Création..." : "Créer mon compte"}
                   </Button>
