@@ -83,10 +83,16 @@ export const Header = () => {
           <button onClick={() => navigate("/")} className="text-foreground hover:text-accent transition-colors font-medium">Parcourir</button>
           <button onClick={() => navigate("/map")} className="text-foreground hover:text-accent transition-colors font-medium">Carte</button>
           {user && (
-            <button onClick={() => navigate("/favorites")} className="text-foreground hover:text-accent transition-colors font-medium flex items-center gap-2">
-              <Heart className="w-4 h-4" />
-              Mes favoris
-            </button>
+            <>
+              <button onClick={() => navigate("/dashboard")} className="text-foreground hover:text-accent transition-colors font-medium flex items-center gap-2">
+                <LayoutDashboard className="w-4 h-4" />
+                Dashboard
+              </button>
+              <button onClick={() => navigate("/favorites")} className="text-foreground hover:text-accent transition-colors font-medium flex items-center gap-2">
+                <Heart className="w-4 h-4" />
+                Mes favoris
+              </button>
+            </>
           )}
         </div>
         <div className="flex items-center gap-3">
@@ -124,10 +130,6 @@ export const Header = () => {
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => navigate("/dashboard")} className="cursor-pointer">
-                    <LayoutDashboard className="mr-2 h-4 w-4" />
-                    <span>Dashboard</span>
-                  </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate("/settings")} className="cursor-pointer">
                     <Settings className="mr-2 h-4 w-4" />
                     <span>Paramètres</span>
