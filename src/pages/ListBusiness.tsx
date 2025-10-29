@@ -6,15 +6,19 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Upload, X } from "lucide-react";
 import { businessSchema } from "@/lib/validations";
+import { TermsDialog } from "@/components/TermsDialog";
 
 const ListBusiness = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [termsDialogOpen, setTermsDialogOpen] = useState(false);
   
   const [formData, setFormData] = useState({
     title: "",
@@ -83,6 +87,17 @@ const ListBusiness = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Vérifier l'acceptation des conditions
+    if (!termsAccepted) {
+      toast({
+        variant: "destructive",
+        title: "Conditions non acceptées",
+        description: "Vous devez accepter les conditions d'utilisation pour publier une annonce.",
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -436,8 +451,36 @@ const ListBusiness = () => {
               )}
             </div>
 
+            {/* Acceptation des conditions */}
+            <div className="flex items-start space-x-3 p-4 bg-accent/10 rounded-lg border border-accent/20">
+              <Checkbox 
+                id="terms" 
+                checked={termsAccepted}
+                onCheckedChange={(checked) => setTermsAccepted(checked as boolean)}
+              />
+              <div className="grid gap-1.5 leading-none">
+                <label
+                  htmlFor="terms"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                >
+                  J&apos;accepte les conditions d&apos;utilisation *
+                </label>
+                <p className="text-sm text-muted-foreground">
+                  En publiant mon annonce, je confirme avoir lu et accepté le{" "}
+                  <button
+                    type="button"
+                    onClick={() => setTermsDialogOpen(true)}
+                    className="text-accent hover:underline font-medium"
+                  >
+                    Contrat d&apos;utilisation
+                  </button>
+                  , incluant le partage de mes coordonnées et la décharge de responsabilité.
+                </p>
+              </div>
+            </div>
+
             <div className="flex gap-4 pt-4">
-              <Button type="submit" disabled={loading} className="flex-1">
+              <Button type="submit" disabled={loading || !termsAccepted} className="flex-1">
                 {loading ? "Publication..." : "Publier l'annonce"}
               </Button>
               <Button type="button" variant="outline" onClick={() => navigate("/")} disabled={loading}>
@@ -447,6 +490,8 @@ const ListBusiness = () => {
           </form>
         </div>
       </div>
+      
+      <TermsDialog open={termsDialogOpen} onOpenChange={setTermsDialogOpen} />
     </div>
   );
 };
