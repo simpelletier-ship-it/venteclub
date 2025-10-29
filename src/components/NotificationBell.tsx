@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Bell } from "lucide-react";
+import { Bell, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -70,6 +70,16 @@ export const NotificationBell = ({ userId }: NotificationBellProps) => {
     fetchNotifications();
   };
 
+  const deleteNotification = async (notificationId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    await supabase
+      .from('notifications')
+      .delete()
+      .eq('id', notificationId);
+    
+    fetchNotifications();
+  };
+
   const handleNotificationClick = (notification: Notification) => {
     markAsRead(notification.id);
     
@@ -113,13 +123,21 @@ export const NotificationBell = ({ userId }: NotificationBellProps) => {
                   <div
                     key={notification.id}
                     onClick={() => handleNotificationClick(notification)}
-                    className={`p-3 rounded-lg cursor-pointer transition-colors ${
+                    className={`p-3 rounded-lg cursor-pointer transition-colors relative group ${
                       notification.read 
                         ? "bg-muted/50 hover:bg-muted" 
                         : "bg-accent/10 hover:bg-accent/20"
                     }`}
                   >
-                    <p className="text-sm font-medium">{notification.message}</p>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="absolute top-2 right-2 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={(e) => deleteNotification(notification.id, e)}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                    <p className="text-sm font-medium pr-8">{notification.message}</p>
                     <p className="text-xs text-muted-foreground mt-1">
                       {new Date(notification.created_at).toLocaleDateString('fr-CA', {
                         day: 'numeric',
