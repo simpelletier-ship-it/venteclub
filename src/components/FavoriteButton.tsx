@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Heart } from "lucide-react";
+import { Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -91,9 +91,13 @@ export const FavoriteButton = ({ businessId, userId }: FavoriteButtonProps) => {
       size="icon"
       onClick={toggleFavorite}
       disabled={loading}
-      className={isFavorite ? "text-red-500 hover:text-red-600" : "text-muted-foreground hover:text-foreground"}
+      className="text-muted-foreground hover:text-muted-foreground [&:hover_svg]:fill-primary transition-all"
     >
-      <Heart className={`h-5 w-5 ${isFavorite ? "fill-current" : ""}`} />
+      <Bell 
+        className="h-5 w-5 transition-all" 
+        fill={isFavorite ? "hsl(var(--primary))" : "none"}
+        strokeWidth={2}
+      />
     </Button>
   );
 };
