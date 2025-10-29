@@ -6,10 +6,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { CheckCircle, XCircle, Eye, ArrowLeft, Trash2, Star, Edit } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { z } from "zod";
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -22,6 +24,15 @@ const Admin = () => {
   const [rejectionReason, setRejectionReason] = useState("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [businessToDelete, setBusinessToDelete] = useState<any>(null);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editFormData, setEditFormData] = useState({
+    title: "",
+    description: "",
+    asking_price: "",
+    annual_revenue: "",
+    location: "",
+    city: "",
+  });
 
   useEffect(() => {
     checkAdminAccess();
@@ -238,6 +249,72 @@ const Admin = () => {
     }
   };
 
+  const handleEditClick = (business: any) => {
+    setSelectedBusiness(business);
+    setEditFormData({
+      title: business.title,
+      description: business.description,
+      asking_price: business.asking_price?.toString() || "",
+      annual_revenue: business.annual_revenue?.toString() || "",
+      location: business.location || "",
+      city: business.city || "",
+    });
+    setEditDialogOpen(true);
+  };
+
+  const editBusinessSchema = z.object({
+    title: z.string().trim().min(5, "Le titre doit contenir au moins 5 caractères").max(200, "Le titre doit contenir maximum 200 caractères"),
+    description: z.string().trim().min(20, "La description doit contenir au moins 20 caractères").max(5000, "La description doit contenir maximum 5000 caractères"),
+    asking_price: z.string().regex(/^\d+(\.\d{1,2})?$/, "Prix invalide"),
+    annual_revenue: z.string().optional(),
+    location: z.string().trim().min(2, "Emplacement requis"),
+    city: z.string().trim().min(2, "Ville requise"),
+  });
+
+  const handleEditSave = async () => {
+    try {
+      // Validate form data
+      const validated = editBusinessSchema.parse(editFormData);
+
+      const { error } = await supabase
+        .from('businesses')
+        .update({
+          title: validated.title,
+          description: validated.description,
+          asking_price: parseFloat(validated.asking_price),
+          annual_revenue: validated.annual_revenue ? parseFloat(validated.annual_revenue) : null,
+          location: validated.location,
+          city: validated.city,
+        })
+        .eq('id', selectedBusiness?.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Succès",
+        description: "L'annonce a été mise à jour.",
+      });
+
+      fetchBusinesses();
+      setEditDialogOpen(false);
+      setSelectedBusiness(null);
+    } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        toast({
+          variant: "destructive",
+          title: "Erreur de validation",
+          description: error.errors[0].message,
+        });
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Erreur",
+          description: error.message,
+        });
+      }
+    }
+  };
+
   const createSampleData = async () => {
     try {
       const { error } = await supabase.rpc('create_sample_businesses');
@@ -364,6 +441,14 @@ const Admin = () => {
                     Voir
                   </Button>
                   <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleEditClick(business)}
+                  >
+                    <Edit className="mr-2 h-4 w-4" />
+                    Éditer
+                  </Button>
+                  <Button
                     variant={business.is_featured ? "secondary" : "outline"}
                     size="sm"
                     onClick={() => toggleFeatured(business.id, business.is_featured)}
@@ -447,6 +532,99 @@ const Admin = () => {
               disabled={!rejectionReason.trim()}
             >
               Confirmer le refus
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Éditer l'annonce</DialogTitle>
+            <DialogDescription>
+              Modifiez les détails de l'annonce ci-dessous.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div>
+              <Label htmlFor="edit-title">Titre *</Label>
+              <Input
+                id="edit-title"
+                value={editFormData.title}
+                onChange={(e) => setEditFormData({ ...editFormData, title: e.target.value })}
+                placeholder="Nom de l'entreprise"
+                maxLength={200}
+                className="mt-2"
+              />
+            </div>
+            <div>
+              <Label htmlFor="edit-description">Description *</Label>
+              <Textarea
+                id="edit-description"
+                value={editFormData.description}
+                onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
+                placeholder="Description détaillée de l'entreprise"
+                rows={8}
+                maxLength={5000}
+                className="mt-2"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                {editFormData.description.length} / 5000 caractères
+              </p>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="edit-price">Prix demandé (CAD) *</Label>
+                <Input
+                  id="edit-price"
+                  type="number"
+                  value={editFormData.asking_price}
+                  onChange={(e) => setEditFormData({ ...editFormData, asking_price: e.target.value })}
+                  placeholder="450000"
+                  className="mt-2"
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit-revenue">Revenus annuels (CAD)</Label>
+                <Input
+                  id="edit-revenue"
+                  type="number"
+                  value={editFormData.annual_revenue}
+                  onChange={(e) => setEditFormData({ ...editFormData, annual_revenue: e.target.value })}
+                  placeholder="650000"
+                  className="mt-2"
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="edit-city">Ville *</Label>
+                <Input
+                  id="edit-city"
+                  value={editFormData.city}
+                  onChange={(e) => setEditFormData({ ...editFormData, city: e.target.value })}
+                  placeholder="Montréal"
+                  className="mt-2"
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit-location">Emplacement complet *</Label>
+                <Input
+                  id="edit-location"
+                  value={editFormData.location}
+                  onChange={(e) => setEditFormData({ ...editFormData, location: e.target.value })}
+                  placeholder="Montréal, QC"
+                  className="mt-2"
+                />
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditDialogOpen(false)}>
+              Annuler
+            </Button>
+            <Button onClick={handleEditSave}>
+              Sauvegarder
             </Button>
           </DialogFooter>
         </DialogContent>
