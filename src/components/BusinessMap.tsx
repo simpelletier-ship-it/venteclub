@@ -14,6 +14,7 @@ interface Business {
   location: string;
   description: string;
   annual_revenue?: number;
+  status?: string;
 }
 
 interface BusinessMapProps {
@@ -39,8 +40,8 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
   const fetchBusinesses = async () => {
     let query = supabase
       .from('businesses')
-      .select('id, title, latitude, longitude, asking_price, industry, location, description, annual_revenue')
-      .eq('status', 'active')
+      .select('id, title, latitude, longitude, asking_price, industry, location, description, annual_revenue, status')
+      .in('status', ['active', 'sold'])
       .eq('approval_status', 'approved')
       .not('latitude', 'is', null)
       .not('longitude', 'is', null);

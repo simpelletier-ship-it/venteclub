@@ -140,6 +140,7 @@ export type Database = {
           title: string
           updated_at: string | null
           views_count: number | null
+          withdrawal_reason: string | null
           year_established: number | null
         }
         Insert: {
@@ -170,6 +171,7 @@ export type Database = {
           title: string
           updated_at?: string | null
           views_count?: number | null
+          withdrawal_reason?: string | null
           year_established?: number | null
         }
         Update: {
@@ -200,6 +202,7 @@ export type Database = {
           title?: string
           updated_at?: string | null
           views_count?: number | null
+          withdrawal_reason?: string | null
           year_established?: number | null
         }
         Relationships: []
@@ -541,6 +544,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      archive_old_sold_businesses: { Args: never; Returns: undefined }
       check_business_access: {
         Args: { business_uuid: string }
         Returns: boolean

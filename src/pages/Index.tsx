@@ -18,11 +18,11 @@ const Index = () => {
   }, []);
 
   const fetchBusinesses = async () => {
-    // Fetch all approved and active businesses (visible to everyone)
+    // Fetch all approved businesses (active or sold within 3 months)
     const { data: businesses } = await supabase
       .from('businesses')
       .select('*')
-      .eq('status', 'active')
+      .in('status', ['active', 'sold'])
       .eq('approval_status', 'approved')
       .order('created_at', { ascending: false });
 
@@ -38,9 +38,9 @@ const Index = () => {
 
       // Separate featured and regular businesses
       const featured = businessesWithFeature
-        .filter(b => b.featured)
+        .filter(b => b.featured && b.status === 'active')
         .slice(0, 3);
-      const regular = businessesWithFeature.filter(b => !b.featured);
+      const regular = businessesWithFeature.filter(b => !b.featured || b.status === 'sold');
 
       setFeaturedBusinesses(featured);
       setAllBusinesses(regular);

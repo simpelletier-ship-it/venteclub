@@ -4,12 +4,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, LogOut, Star } from "lucide-react";
+import { Plus, LogOut, Star, XCircle } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import BusinessCard from "@/components/BusinessCard";
 import { MessagesList } from "@/components/MessagesList";
 import { PurchasedBusinesses } from "@/components/PurchasedBusinesses";
+import { WithdrawBusinessDialog } from "@/components/WithdrawBusinessDialog";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -22,6 +23,8 @@ const Dashboard = () => {
   const [selectedBusiness, setSelectedBusiness] = useState<any>(null);
   const [processingPayment, setProcessingPayment] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [withdrawDialogOpen, setWithdrawDialogOpen] = useState(false);
+  const [businessToWithdraw, setBusinessToWithdraw] = useState<any>(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
@@ -64,6 +67,7 @@ const Dashboard = () => {
         .from("businesses")
         .select("*")
         .eq("seller_id", userId)
+        .neq("status", "archived")
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -77,6 +81,11 @@ const Dashboard = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleWithdrawClick = (business: any) => {
+    setBusinessToWithdraw(business);
+    setWithdrawDialogOpen(true);
   };
 
   const handleSignOut = async () => {
@@ -178,28 +187,44 @@ const Dashboard = () => {
                 {businesses.map((business) => (
                   <div key={business.id} className="relative">
                     <BusinessCard {...business} />
-                    <div className="mt-3 flex items-center justify-between gap-2">
-                      <Badge 
-                        className={
-                          business.approval_status === 'approved' 
-                            ? 'bg-green-500 hover:bg-green-600 text-white' 
-                            : business.approval_status === 'pending' 
-                            ? 'bg-orange-500 hover:bg-orange-600 text-white' 
-                            : 'bg-red-500 hover:bg-red-600 text-white'
-                        }
-                      >
-                        {business.approval_status === 'approved' ? '✓ Approuvée' : 
-                         business.approval_status === 'pending' ? '⏳ En attente' : 
-                         '✗ Rejetée'}
-                      </Badge>
-                      {!business.featured && business.approval_status === 'approved' && (
-                        <Button
-                          onClick={() => handleFeatureClick(business)}
-                          size="sm"
-                          variant="secondary"
+                    <div className="mt-3 space-y-2">
+                      <div className="flex items-center justify-between gap-2">
+                        <Badge 
+                          className={
+                            business.status === 'sold'
+                              ? 'bg-blue-500 hover:bg-blue-600 text-white'
+                              : business.approval_status === 'approved' 
+                              ? 'bg-green-500 hover:bg-green-600 text-white' 
+                              : business.approval_status === 'pending' 
+                              ? 'bg-orange-500 hover:bg-orange-600 text-white' 
+                              : 'bg-red-500 hover:bg-red-600 text-white'
+                          }
                         >
-                          <Star className="mr-2 h-4 w-4" />
-                          Mettre en avant
+                          {business.status === 'sold' ? '✓ Vendue' :
+                           business.approval_status === 'approved' ? '✓ Approuvée' : 
+                           business.approval_status === 'pending' ? '⏳ En attente' : 
+                           '✗ Rejetée'}
+                        </Badge>
+                        {!business.featured && business.approval_status === 'approved' && business.status !== 'sold' && (
+                          <Button
+                            onClick={() => handleFeatureClick(business)}
+                            size="sm"
+                            variant="secondary"
+                          >
+                            <Star className="mr-2 h-4 w-4" />
+                            Mettre en avant
+                          </Button>
+                        )}
+                      </div>
+                      {business.status !== 'sold' && business.approval_status === 'approved' && (
+                        <Button
+                          onClick={() => handleWithdrawClick(business)}
+                          size="sm"
+                          variant="outline"
+                          className="w-full"
+                        >
+                          <XCircle className="mr-2 h-4 w-4" />
+                          Retirer l'annonce
                         </Button>
                       )}
                     </div>
@@ -268,6 +293,18 @@ const Dashboard = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {businessToWithdraw && (
+        <WithdrawBusinessDialog
+          business={businessToWithdraw}
+          open={withdrawDialogOpen}
+          onOpenChange={setWithdrawDialogOpen}
+          onSuccess={() => {
+            fetchUserBusinesses(user.id);
+            setBusinessToWithdraw(null);
+          }}
+        />
+      )}
     </div>
   );
 };

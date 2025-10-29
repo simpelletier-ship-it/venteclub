@@ -20,6 +20,7 @@ interface BusinessCardProps {
   profit_margin?: number;
   description: string;
   featured?: boolean;
+  status?: string;
 }
 
 const BusinessCard = ({
@@ -35,6 +36,7 @@ const BusinessCard = ({
   profit_margin,
   description,
   featured = false,
+  status,
 }: BusinessCardProps) => {
   const navigate = useNavigate();
   const [userId, setUserId] = useState<string | undefined>();
@@ -67,12 +69,19 @@ const BusinessCard = ({
         {/* Title & Location with Favorite */}
         <div className="flex items-start justify-between gap-2">
           <div className="space-y-2 flex-1">
-            {featured && (
-              <Badge className="bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 text-white border-0 shadow-md text-xs">
-                <Star className="w-3 h-3 fill-white mr-1" />
-                En Vedette
-              </Badge>
-            )}
+            <div className="flex items-center gap-2 flex-wrap">
+              {featured && (
+                <Badge className="bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 text-white border-0 shadow-md text-xs">
+                  <Star className="w-3 h-3 fill-white mr-1" />
+                  En Vedette
+                </Badge>
+              )}
+              {status === 'sold' && (
+                <Badge className="bg-blue-500 hover:bg-blue-600 text-white border-0 shadow-md text-xs">
+                  ✓ Vendue
+                </Badge>
+              )}
+            </div>
             <h3 className="text-xl font-bold text-foreground group-hover:text-accent transition-colors line-clamp-1">
               {title}
             </h3>
