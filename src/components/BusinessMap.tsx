@@ -235,11 +235,11 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
           'circle-color': [
             'step',
             ['get', 'point_count'],
-            'hsl(270 100% 60%)', // Color for small clusters
+            '#9333ea', // Color for small clusters (purple)
             10,
-            'hsl(270 100% 55%)', // Color for medium clusters
+            '#7c3aed', // Color for medium clusters
             30,
-            'hsl(270 100% 50%)', // Color for large clusters
+            '#6d28d9', // Color for large clusters
           ],
           'circle-radius': [
             'step',
@@ -278,7 +278,7 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
         source: 'businesses',
         filter: ['!', ['has', 'point_count']],
         paint: {
-          'circle-color': 'hsl(270 100% 60%)',
+          'circle-color': '#9333ea',
           'circle-radius': 16,
           'circle-stroke-width': 3,
           'circle-stroke-color': '#fff',
@@ -337,7 +337,7 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
                 ${props.title}
               </h3>
               <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 8px;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="hsl(270 100% 60%)" stroke-width="2">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9333ea" stroke-width="2">
                   <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                   <circle cx="12" cy="10" r="3"></circle>
                 </svg>
@@ -349,7 +349,7 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
               <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid hsl(252 20% 90%);">
                 <div>
                   <div style="font-size: 11px; color: hsl(252 15% 50%); text-transform: uppercase; margin-bottom: 2px;">Prix demandé</div>
-                  <div style="font-weight: 700; color: hsl(270 100% 60%); font-size: 18px;">
+                  <div style="font-weight: 700; color: #9333ea; font-size: 18px;">
                     ${Number(props.asking_price).toLocaleString('fr-CA')} $
                   </div>
                 </div>
@@ -362,7 +362,7 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
                   </div>
                 ` : ''}
               </div>
-              <div style="margin-top: 12px; padding: 8px; background: hsl(270 100% 60% / 0.1); border-radius: 6px; text-align: center; font-size: 12px; color: hsl(270 100% 60%); font-weight: 600;">
+              <div style="margin-top: 12px; padding: 8px; background: rgba(147, 51, 234, 0.1); border-radius: 6px; text-align: center; font-size: 12px; color: #9333ea; font-weight: 600;">
                 Cliquez pour voir les détails
               </div>
             </div>
