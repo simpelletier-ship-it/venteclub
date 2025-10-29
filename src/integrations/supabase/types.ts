@@ -86,6 +86,7 @@ export type Database = {
         Row: {
           address: string | null
           annual_revenue: number | null
+          approval_status: string | null
           asking_price: number
           city: string | null
           created_at: string | null
@@ -114,6 +115,7 @@ export type Database = {
         Insert: {
           address?: string | null
           annual_revenue?: number | null
+          approval_status?: string | null
           asking_price: number
           city?: string | null
           created_at?: string | null
@@ -142,6 +144,7 @@ export type Database = {
         Update: {
           address?: string | null
           annual_revenue?: number | null
+          approval_status?: string | null
           asking_price?: number
           city?: string | null
           created_at?: string | null
@@ -310,6 +313,27 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_subscriptions: {
         Row: {
           created_at: string | null
@@ -361,12 +385,20 @@ export type Database = {
         Args: { business_uuid: string }
         Returns: boolean
       }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
       is_business_featured: {
         Args: { business_uuid: string }
         Returns: boolean
       }
     }
     Enums: {
+      app_role: "admin" | "user"
       industry_type_new:
         | "activite_sport_loisir"
         | "art_spectacle_cinema"
@@ -523,6 +555,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      app_role: ["admin", "user"],
       industry_type_new: [
         "activite_sport_loisir",
         "art_spectacle_cinema",

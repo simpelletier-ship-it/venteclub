@@ -237,16 +237,26 @@ const ListBusiness = () => {
                     <SelectValue placeholder="Sélectionner" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Restaurant">Restaurant</SelectItem>
-                    <SelectItem value="Commerce de détail">Commerce de détail</SelectItem>
-                    <SelectItem value="Services">Services</SelectItem>
-                    <SelectItem value="Technologie">Technologie</SelectItem>
-                    <SelectItem value="Immobilier">Immobilier</SelectItem>
-                    <SelectItem value="Santé">Santé</SelectItem>
-                    <SelectItem value="Éducation">Éducation</SelectItem>
-                    <SelectItem value="Manufacturing">Manufacturing</SelectItem>
-                    <SelectItem value="Transport">Transport</SelectItem>
-                    <SelectItem value="Autre">Autre</SelectItem>
+                    <SelectItem value="restaurant">Restaurant</SelectItem>
+                    <SelectItem value="boutique_commerce_detail">Commerce de détail</SelectItem>
+                    <SelectItem value="entreprise_service">Services</SelectItem>
+                    <SelectItem value="communications_informatique">Technologie</SelectItem>
+                    <SelectItem value="batiment_immeuble">Immobilier</SelectItem>
+                    <SelectItem value="residence_sante">Santé</SelectItem>
+                    <SelectItem value="education_garderie">Éducation</SelectItem>
+                    <SelectItem value="industrie_manufacturier_transformation">Manufacturing</SelectItem>
+                    <SelectItem value="transport_entreposage">Transport</SelectItem>
+                    <SelectItem value="bar_bistro_discotheque">Bar / Bistro</SelectItem>
+                    <SelectItem value="beaute_esthetique">Beauté / Esthétique</SelectItem>
+                    <SelectItem value="camping">Camping</SelectItem>
+                    <SelectItem value="hebergement">Hébergement</SelectItem>
+                    <SelectItem value="domaine_alimentaire">Domaine alimentaire</SelectItem>
+                    <SelectItem value="epicerie_depanneur">Épicerie / Dépanneur</SelectItem>
+                    <SelectItem value="franchise">Franchise</SelectItem>
+                    <SelectItem value="garage_mecanique_concessionnaire">Garage / Mécanique</SelectItem>
+                    <SelectItem value="activite_sport_loisir">Sport / Loisir</SelectItem>
+                    <SelectItem value="art_spectacle_cinema">Art / Spectacle</SelectItem>
+                    <SelectItem value="entreprise_saisonniere">Entreprise saisonnière</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

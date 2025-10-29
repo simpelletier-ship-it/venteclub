@@ -69,8 +69,8 @@ const FilterBar = ({ onFilter }: FilterBarProps) => {
           </SelectTrigger>
           <SelectContent>
             {QUEBEC_INDUSTRIES.map((ind) => (
-              <SelectItem key={ind} value={ind}>
-                {ind}
+              <SelectItem key={ind.value} value={ind.value}>
+                {ind.label}
               </SelectItem>
             ))}
           </SelectContent>
