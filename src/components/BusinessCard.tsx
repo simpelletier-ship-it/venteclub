@@ -75,7 +75,7 @@ const BusinessCard = ({
       {/* Sold Overlay */}
       {status === 'sold' && (
         <div className="absolute inset-0 z-[5] bg-background/30 pointer-events-none">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rotate-[-30deg] w-[200%] md:w-[150%]">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rotate-[-30deg] w-[160%] md:w-[120%]">
             <div className="bg-purple-600 text-white py-6 md:py-8 shadow-2xl">
               <p className="text-3xl md:text-5xl font-bold text-center tracking-[0.4em] uppercase">
                 VENDU
@@ -134,7 +134,7 @@ const BusinessCard = ({
         </p>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border/50">
+        <div className={`grid grid-cols-2 gap-4 pt-4 border-t border-border/50 ${status === 'sold' ? 'blur-sm' : ''}`}>
           <div className="space-y-1">
             <p className="text-xs text-muted-foreground uppercase tracking-wider">Chiffre d'affaires</p>
             <p className="text-sm font-semibold text-foreground flex items-center gap-1">
@@ -150,7 +150,7 @@ const BusinessCard = ({
 
         {/* Price & CTA */}
         <div className="flex items-end justify-between pt-4 border-t border-border/50">
-          <div className="space-y-1">
+          <div className={`space-y-1 ${status === 'sold' ? 'blur-sm' : ''}`}>
             <p className="text-xs text-muted-foreground uppercase tracking-wider">Prix demandé</p>
             <p className="text-2xl font-bold text-primary">
               {displayPrice}

@@ -66,7 +66,7 @@ const BusinessListItem = ({
       {/* Sold Overlay */}
       {status === 'sold' && (
         <div className="absolute inset-0 z-[5] bg-background/30 pointer-events-none">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rotate-[-30deg] w-[200%] md:w-[150%]">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rotate-[-30deg] w-[160%] md:w-[120%]">
             <div className="bg-purple-600 text-white py-4 md:py-6 shadow-2xl">
               <p className="text-2xl md:text-4xl font-bold text-center tracking-[0.4em] uppercase">
                 VENDU
@@ -103,7 +103,7 @@ const BusinessListItem = ({
       </div>
 
       {/* Middle section - Stats */}
-      <div className="hidden md:flex items-center gap-6">
+      <div className={`hidden md:flex items-center gap-6 ${status === 'sold' ? 'blur-sm' : ''}`}>
         <div className="text-center">
           <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Chiffre d'affaires</p>
           <p className="text-sm font-semibold text-foreground flex items-center gap-1">
@@ -119,7 +119,7 @@ const BusinessListItem = ({
 
       {/* Right section - Price & Actions */}
       <div className="flex items-center gap-4">
-        <div className="text-right">
+        <div className={`text-right ${status === 'sold' ? 'blur-sm' : ''}`}>
           <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Prix demandé</p>
           <p className="text-xl font-bold text-primary whitespace-nowrap">
             {displayPrice}
