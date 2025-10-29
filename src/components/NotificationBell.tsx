@@ -109,7 +109,7 @@ export const NotificationBell = ({ userId }: NotificationBellProps) => {
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80">
+      <PopoverContent className="w-96">
         <div className="space-y-2">
           <h3 className="font-semibold">Notifications</h3>
           <ScrollArea className="h-96">
