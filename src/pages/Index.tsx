@@ -174,9 +174,9 @@ const Index = () => {
       </section>
 
       {/* Featured Businesses - Premium Cards */}
-      <section id="featured" className="py-24 bg-gradient-to-b from-muted/30 to-background">
+      <section id="featured" className="py-12 bg-gradient-to-b from-muted/30 to-background">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16 animate-slide-up">
+          <div className="text-center mb-8 animate-slide-up">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 text-accent text-sm font-semibold mb-6">
               <Sparkles className="w-4 h-4" />
               Opportunités en vedette
@@ -205,9 +205,9 @@ const Index = () => {
       </section>
 
       {/* All Listings */}
-      <section className="py-24 bg-background">
+      <section className="py-12 bg-background">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
+          <div className="text-center mb-8">
             <h2 className="text-4xl md:text-5xl font-display font-bold text-foreground mb-4">
               Toutes les Annonces
             </h2>
