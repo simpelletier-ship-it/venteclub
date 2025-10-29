@@ -60,16 +60,16 @@ const BusinessCard = ({
   const displayProfit = profit || (profit_margin ? `${profit_margin} %` : 'N/A');
 
   const handleClick = () => {
-    if (id) {
+    if (id && status !== 'sold') {
       navigate(`/business/${id}`);
     }
   };
 
   return (
     <Card 
-      className={`group relative overflow-hidden bg-card border-border transition-all duration-500 hover:shadow-[var(--shadow-hover)] ${
-        featured ? 'ring-2 ring-amber-500/30' : ''
-      }`}
+      className={`group relative overflow-hidden bg-card border-border transition-all duration-500 ${
+        status !== 'sold' ? 'hover:shadow-[var(--shadow-hover)] cursor-pointer' : 'cursor-default'
+      } ${featured ? 'ring-2 ring-amber-500/30' : ''}`}
       onClick={handleClick}
     >
       {/* Sold Overlay */}

@@ -51,14 +51,16 @@ const BusinessListItem = ({
   const displayProfit = profit || (profit_margin ? `${profit_margin} %` : 'N/A');
 
   const handleClick = () => {
-    if (id) {
+    if (id && status !== 'sold') {
       navigate(`/business/${id}`);
     }
   };
 
   return (
     <div 
-      className={`group relative flex items-center gap-4 p-4 bg-card border border-border rounded-xl transition-all duration-300 hover:shadow-[var(--shadow-hover)] cursor-pointer overflow-hidden ${
+      className={`group relative flex items-center gap-4 p-4 bg-card border border-border rounded-xl transition-all duration-300 ${
+        status !== 'sold' ? 'hover:shadow-[var(--shadow-hover)] cursor-pointer' : 'cursor-default'
+      } overflow-hidden ${
         featured ? 'ring-2 ring-amber-500/30' : ''
       }`}
       onClick={handleClick}
