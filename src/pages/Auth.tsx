@@ -32,7 +32,7 @@ const Auth = () => {
     try {
       const validatedData = authSchema.parse({ email, password });
 
-      // Vérifier les tentatives de connexion avant d'essayer de se connecter
+      // Vérifier si le compte est verrouillé
       const { data: attemptCheck } = await supabase.functions.invoke('check-login-attempt', {
         body: {
           email: validatedData.email,
@@ -52,22 +52,14 @@ const Auth = () => {
         return;
       }
 
-      if (attemptCheck?.remaining_attempts !== undefined && attemptCheck.remaining_attempts < 3) {
-        toast({
-          title: "Attention",
-          description: attemptCheck.message,
-          duration: 5000,
-        });
-      }
-
       const { error } = await supabase.auth.signInWithPassword({
         email: validatedData.email,
         password: validatedData.password,
       });
 
       if (error) {
-        // Enregistrer l'échec
-        await supabase.functions.invoke('check-login-attempt', {
+        // Enregistrer l'échec et récupérer le nombre de tentatives restantes
+        const { data: failureCheck } = await supabase.functions.invoke('check-login-attempt', {
           body: {
             email: validatedData.email,
             success: false,
@@ -77,7 +69,15 @@ const Auth = () => {
           }
         });
 
-        if (error.message.includes('Invalid login credentials')) {
+        // Afficher le nombre de tentatives restantes seulement en cas d'échec
+        if (failureCheck?.remaining_attempts !== undefined && failureCheck.remaining_attempts < 3) {
+          toast({
+            variant: "destructive",
+            title: "Attention",
+            description: failureCheck.message,
+            duration: 5000,
+          });
+        } else if (error.message.includes('Invalid login credentials')) {
           toast({
             variant: "destructive",
             title: "Erreur de connexion",
