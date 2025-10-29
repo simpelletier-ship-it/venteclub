@@ -260,6 +260,7 @@ export type Database = {
           featured: boolean | null
           franchise_fee: number | null
           franchise_term_years: number | null
+          has_pending_changes: boolean | null
           id: string
           industry: Database["public"]["Enums"]["industry_type_new"]
           initial_investment_max: number | null
@@ -272,6 +273,8 @@ export type Database = {
           marketing_fee: number | null
           net_profit: number | null
           net_profit_margin: number | null
+          pending_changes: Json | null
+          pending_changes_submitted_at: string | null
           profit_margin: number | null
           province: string | null
           region: string | null
@@ -306,6 +309,7 @@ export type Database = {
           featured?: boolean | null
           franchise_fee?: number | null
           franchise_term_years?: number | null
+          has_pending_changes?: boolean | null
           id?: string
           industry: Database["public"]["Enums"]["industry_type_new"]
           initial_investment_max?: number | null
@@ -318,6 +322,8 @@ export type Database = {
           marketing_fee?: number | null
           net_profit?: number | null
           net_profit_margin?: number | null
+          pending_changes?: Json | null
+          pending_changes_submitted_at?: string | null
           profit_margin?: number | null
           province?: string | null
           region?: string | null
@@ -352,6 +358,7 @@ export type Database = {
           featured?: boolean | null
           franchise_fee?: number | null
           franchise_term_years?: number | null
+          has_pending_changes?: boolean | null
           id?: string
           industry?: Database["public"]["Enums"]["industry_type_new"]
           initial_investment_max?: number | null
@@ -364,6 +371,8 @@ export type Database = {
           marketing_fee?: number | null
           net_profit?: number | null
           net_profit_margin?: number | null
+          pending_changes?: Json | null
+          pending_changes_submitted_at?: string | null
           profit_margin?: number | null
           province?: string | null
           region?: string | null
@@ -985,6 +994,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      apply_pending_changes: {
+        Args: { business_uuid: string }
+        Returns: undefined
+      }
       archive_old_sold_businesses: { Args: never; Returns: undefined }
       check_business_access: {
         Args: { business_uuid: string }
@@ -1008,6 +1021,10 @@ export type Database = {
       is_business_featured: {
         Args: { business_uuid: string }
         Returns: boolean
+      }
+      reject_pending_changes: {
+        Args: { business_uuid: string; rejection_reason: string }
+        Returns: undefined
       }
       sync_premium_subscription: {
         Args: {

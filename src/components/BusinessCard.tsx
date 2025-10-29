@@ -27,6 +27,7 @@ interface BusinessCardProps {
   status?: string;
   approval_status?: string;
   is_franchise?: boolean;
+  has_pending_changes?: boolean;
   onWithdraw?: () => void;
   onFeature?: () => void;
   showActions?: boolean;
@@ -46,6 +47,7 @@ const BusinessCard = ({
   status,
   approval_status,
   is_franchise = false,
+  has_pending_changes = false,
   onWithdraw,
   onFeature,
   showActions = false,
@@ -99,6 +101,11 @@ const BusinessCard = ({
               {is_franchise && (
                 <Badge className="bg-gradient-to-r from-secondary to-secondary/80 text-secondary-foreground border-0 shadow-md">
                   🏢 Franchise
+                </Badge>
+              )}
+              {has_pending_changes && (
+                <Badge className="bg-orange-500 text-white">
+                  ✏️ Modification en attente
                 </Badge>
               )}
               {showActions && approval_status === 'approved' && (

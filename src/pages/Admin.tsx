@@ -275,6 +275,53 @@ const Admin = () => {
     }
   };
 
+  const approvePendingChanges = async (businessId: string) => {
+    try {
+      const { error } = await supabase.rpc('apply_pending_changes', {
+        business_uuid: businessId
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Succès",
+        description: "Les modifications ont été approuvées et appliquées.",
+      });
+
+      fetchBusinesses();
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: error.message,
+      });
+    }
+  };
+
+  const rejectPendingChanges = async (businessId: string, reason: string) => {
+    try {
+      const { error } = await supabase.rpc('reject_pending_changes', {
+        business_uuid: businessId,
+        rejection_reason: reason
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Succès",
+        description: "Les modifications ont été rejetées.",
+      });
+
+      fetchBusinesses();
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: error.message,
+      });
+    }
+  };
+
   const toggleFeatured = async (businessId: string, currentStatus: boolean) => {
     try {
       if (currentStatus) {
@@ -740,8 +787,9 @@ const Admin = () => {
         </div>
 
         <Tabs defaultValue="businesses" className="w-full">
-          <TabsList className="grid w-full max-w-6xl grid-cols-6 mb-6">
+          <TabsList className="grid w-full max-w-6xl grid-cols-7 mb-6">
             <TabsTrigger value="businesses">Annonces</TabsTrigger>
+            <TabsTrigger value="pending-changes">Modifications</TabsTrigger>
             <TabsTrigger value="proposals">Propositions</TabsTrigger>
             <TabsTrigger value="users">Utilisateurs</TabsTrigger>
             <TabsTrigger value="reports">Signalements</TabsTrigger>
@@ -842,6 +890,108 @@ const Admin = () => {
               </CardContent>
             </Card>
           ))}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="pending-changes">
+            <div className="grid gap-6">
+              {businesses.filter(b => b.has_pending_changes).length === 0 ? (
+                <Card>
+                  <CardContent className="p-8 text-center">
+                    <p className="text-muted-foreground">Aucune modification en attente.</p>
+                  </CardContent>
+                </Card>
+              ) : (
+                businesses.filter(b => b.has_pending_changes).map((business) => (
+                  <Card key={business.id}>
+                    <CardHeader>
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <CardTitle className="text-lg">{business.title}</CardTitle>
+                          <CardDescription className="mt-1">
+                            {business.seller_email || "Email non disponible"}
+                          </CardDescription>
+                        </div>
+                        <Badge variant="default" className="bg-orange-500">
+                          Modifications en attente
+                        </Badge>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div className="bg-muted/30 p-4 rounded-lg">
+                          <p className="text-sm font-semibold mb-3">Modifications proposées :</p>
+                          <div className="space-y-2 text-sm">
+                            {business.pending_changes?.title && (
+                              <div>
+                                <span className="font-semibold">Nouveau titre :</span>
+                                <p className="text-muted-foreground">{business.pending_changes.title}</p>
+                              </div>
+                            )}
+                            {business.pending_changes?.description && (
+                              <div>
+                                <span className="font-semibold">Nouvelle description :</span>
+                                <p className="text-muted-foreground line-clamp-3">{business.pending_changes.description}</p>
+                              </div>
+                            )}
+                            {business.pending_changes?.asking_price && (
+                              <div>
+                                <span className="font-semibold">Nouveau prix :</span>
+                                <p className="text-muted-foreground">
+                                  {new Intl.NumberFormat('fr-CA', {
+                                    style: 'currency',
+                                    currency: business.currency || 'CAD',
+                                  }).format(business.pending_changes.asking_price)}
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="text-xs text-muted-foreground">
+                          Soumis le: {new Date(business.pending_changes_submitted_at).toLocaleDateString('fr-CA', {
+                            day: 'numeric',
+                            month: 'long',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </div>
+
+                        <div className="flex gap-2 flex-wrap">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => navigate(`/business/${business.id}`)}
+                          >
+                            <Eye className="mr-2 h-4 w-4" />
+                            Voir l'annonce actuelle
+                          </Button>
+                          <Button
+                            variant="default"
+                            size="sm"
+                            onClick={() => approvePendingChanges(business.id)}
+                          >
+                            <CheckCircle className="mr-2 h-4 w-4" />
+                            Approuver les modifications
+                          </Button>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => {
+                              setSelectedBusiness(business);
+                              setRejectDialogOpen(true);
+                            }}
+                          >
+                            <XCircle className="mr-2 h-4 w-4" />
+                            Rejeter
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              )}
             </div>
           </TabsContent>
 
@@ -1181,9 +1331,15 @@ const Admin = () => {
       <Dialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Rejeter l'annonce</DialogTitle>
+            <DialogTitle>
+              {selectedBusiness?.has_pending_changes 
+                ? "Rejeter les modifications" 
+                : "Rejeter l'annonce"}
+            </DialogTitle>
             <DialogDescription>
-              Veuillez fournir une raison pour le refus de cette annonce. L'utilisateur recevra un email avec cette information.
+              {selectedBusiness?.has_pending_changes
+                ? "Veuillez fournir une raison pour le refus de ces modifications. L'utilisateur recevra une notification avec cette information."
+                : "Veuillez fournir une raison pour le refus de cette annonce. L'utilisateur recevra un email avec cette information."}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
@@ -1214,7 +1370,15 @@ const Admin = () => {
                   });
                   return;
                 }
-                updateBusinessStatus(selectedBusiness?.id, 'rejected', rejectionReason);
+                
+                if (selectedBusiness?.has_pending_changes) {
+                  rejectPendingChanges(selectedBusiness.id, rejectionReason);
+                  setRejectDialogOpen(false);
+                  setRejectionReason("");
+                  setSelectedBusiness(null);
+                } else {
+                  updateBusinessStatus(selectedBusiness?.id, 'rejected', rejectionReason);
+                }
               }}
               disabled={!rejectionReason.trim()}
             >

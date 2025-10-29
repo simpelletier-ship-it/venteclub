@@ -399,9 +399,18 @@ const ListBusiness = () => {
 
       // Si on édite une annonce existante
       if (editingBusinessId) {
-        const { error: updateError } = await supabase
+        // Vérifier si l'annonce est déjà approuvée
+        const { data: existingBusiness } = await supabase
           .from("businesses")
-          .update({
+          .select("approval_status")
+          .eq('id', editingBusinessId)
+          .single();
+
+        const isAlreadyApproved = existingBusiness?.approval_status === 'approved';
+
+        if (isAlreadyApproved && !isDraft) {
+          // Si l'annonce est déjà approuvée, stocker les modifications en attente
+          const pendingChanges = {
             title: validatedData.title,
             description: validatedData.description,
             industry: validatedData.industry,
@@ -415,17 +424,62 @@ const ListBusiness = () => {
             baiia: validatedData.baiia,
             net_profit: formData.net_profit && !isNaN(parseFloat(formData.net_profit)) ? parseFloat(formData.net_profit) : null,
             net_profit_margin: formData.net_profit_margin && !isNaN(parseFloat(formData.net_profit_margin)) ? parseFloat(formData.net_profit_margin) : null,
-            baiia_margin: formData.baiia_margin && !isNaN(parseFloat(formData.baiia_margin)) ? parseFloat(formData.baiia_margin) : null,
             employees_count: validatedData.employees_count,
             year_established: validatedData.year_established,
-            latitude: formData.latitude,
-            longitude: formData.longitude,
-            status: isDraft ? "archived" : "active",
-            approval_status: isDraft ? "pending" : "pending",
-          } as any)
-          .eq('id', editingBusinessId);
+            seller_phone: formData.seller_phone,
+          };
 
-        if (updateError) throw updateError;
+          const { error: updateError } = await supabase
+            .from("businesses")
+            .update({
+              has_pending_changes: true,
+              pending_changes: pendingChanges,
+              pending_changes_submitted_at: new Date().toISOString(),
+            } as any)
+            .eq('id', editingBusinessId);
+
+          if (updateError) throw updateError;
+
+          toast({
+            title: "Modifications soumises !",
+            description: "Vos modifications sont en attente d'approbation par un administrateur. Votre annonce reste active avec son contenu actuel.",
+          });
+        } else {
+          // Sinon, appliquer les modifications normalement
+          const { error: updateError } = await supabase
+            .from("businesses")
+            .update({
+              title: validatedData.title,
+              description: validatedData.description,
+              industry: validatedData.industry,
+              location: validatedData.location,
+              city: formData.city,
+              region: formData.region,
+              province: formData.province,
+              annual_revenue: validatedData.annual_revenue,
+              asking_price: validatedData.asking_price,
+              profit_margin: validatedData.profit_margin,
+              baiia: validatedData.baiia,
+              net_profit: formData.net_profit && !isNaN(parseFloat(formData.net_profit)) ? parseFloat(formData.net_profit) : null,
+              net_profit_margin: formData.net_profit_margin && !isNaN(parseFloat(formData.net_profit_margin)) ? parseFloat(formData.net_profit_margin) : null,
+              employees_count: validatedData.employees_count,
+              year_established: validatedData.year_established,
+              latitude: formData.latitude,
+              longitude: formData.longitude,
+              status: isDraft ? "archived" : "active",
+              approval_status: isDraft ? "pending" : "pending",
+            } as any)
+            .eq('id', editingBusinessId);
+
+          if (updateError) throw updateError;
+
+          toast({
+            title: isDraft ? "Modifié !" : "Publié !",
+            description: isDraft 
+              ? "Votre annonce a été modifiée et reste en brouillon." 
+              : "Votre annonce a été publiée et est en attente d'approbation.",
+          });
+        }
 
         // Upload new photos if any
         if (photos.length > 0) {
@@ -455,12 +509,6 @@ const ListBusiness = () => {
           }
         }
 
-        toast({
-          title: isDraft ? "Modifié !" : "Publié !",
-          description: isDraft 
-            ? "Votre annonce a été modifiée et reste en brouillon." 
-            : "Votre annonce a été publiée et est en attente d'approbation.",
-        });
         navigate("/dashboard");
         return;
       }
