@@ -60,6 +60,10 @@ const Dashboard = () => {
         description: "Votre annonce est maintenant en vedette pour 7 jours.",
       });
       setSearchParams({});
+      // Recharger les businesses après succès
+      if (user?.id) {
+        fetchUserBusinesses(user.id);
+      }
     } else if (searchParams.get('featured_cancel') === 'true') {
       toast({
         variant: "destructive",
@@ -67,6 +71,10 @@ const Dashboard = () => {
         description: "Le paiement a été annulé.",
       });
       setSearchParams({});
+      // Recharger les businesses après annulation
+      if (user?.id) {
+        fetchUserBusinesses(user.id);
+      }
     } else if (searchParams.get('payment_verified') === 'true') {
       toast({
         title: "Accès débloqué!",
@@ -74,9 +82,10 @@ const Dashboard = () => {
       });
       setSearchParams({});
     }
-  }, [searchParams, setSearchParams, toast]);
+  }, [searchParams, setSearchParams, toast, user]);
 
   const fetchUserBusinesses = async (userId: string) => {
+    console.log('[DASHBOARD] Fetching businesses for user:', userId);
     try {
       const { data, error } = await supabase
         .from("businesses")
@@ -85,8 +94,10 @@ const Dashboard = () => {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
+      console.log('[DASHBOARD] Businesses loaded:', data?.length || 0);
       setBusinesses(data || []);
     } catch (error: any) {
+      console.error('[DASHBOARD] Error fetching businesses:', error);
       toast({
         variant: "destructive",
         title: "Erreur",
@@ -121,6 +132,8 @@ const Dashboard = () => {
     if (!selectedBusiness) return;
 
     setProcessingPayment(true);
+    console.log('[FEATURED] Starting payment for business:', selectedBusiness.id, 'duration:', selectedDuration);
+    
     try {
       const { data, error } = await supabase.functions.invoke('create-featured-checkout', {
         body: { 
@@ -129,24 +142,29 @@ const Dashboard = () => {
         }
       });
 
+      console.log('[FEATURED] Checkout response:', { data, error });
+
       if (error) throw error;
 
       if (data?.url) {
+        console.log('[FEATURED] Opening Stripe checkout in new tab');
         window.open(data.url, '_blank');
         setFeaturedDialogOpen(false);
+        setSelectedBusiness(null);
         toast({
           title: "Redirection vers le paiement",
           description: "Une nouvelle fenêtre s'est ouverte pour finaliser votre paiement.",
         });
       }
     } catch (error: any) {
-      console.error('Erreur lors de la création de la session de paiement featured:', error);
+      console.error('[FEATURED] Error creating checkout session:', error);
       toast({
         variant: "destructive",
         title: "Erreur",
         description: error.message || "Impossible de créer la session de paiement",
       });
     } finally {
+      console.log('[FEATURED] Payment flow completed, resetting state');
       setProcessingPayment(false);
     }
   };
