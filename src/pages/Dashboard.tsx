@@ -277,6 +277,7 @@ const Dashboard = () => {
                         <BusinessCard 
                           {...business}
                           showActions={business.status !== 'archived'}
+                          showPendingBadge={true}
                           onWithdraw={() => handleWithdrawClick(business)}
                           onFeature={() => handleFeatureClick(business)}
                         />

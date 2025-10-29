@@ -112,21 +112,28 @@ export const NotificationBell = ({ userId }: NotificationBellProps) => {
     fetchNotifications();
   };
 
-  const handleNotificationClick = (notification: Notification) => {
+  const handleNotificationClick = async (notification: Notification) => {
     markAsRead(notification.id);
     
     // Pour les notifications de nouvelle annonce créée par le vendeur, aller au dashboard
-    if (notification.type === 'new_listing' && notification.message.includes('soumise avec succès')) {
+    if (notification.type === 'new_listing' || notification.type === 'approved') {
       navigate('/dashboard');
     } else if (notification.type === 'new_message' || notification.type === 'contact_purchased') {
       // Pour les notifications de messages, aller à la messagerie
       navigate('/messages');
-    } else if (notification.type === 'approved') {
-      // Pour les notifications d'approbation, aller vers l'annonce
-      navigate(`/business/${notification.business_id}`);
     } else {
-      // Pour toutes les autres notifications, aller vers l'annonce
-      navigate(`/business/${notification.business_id}`);
+      // Pour toutes les autres notifications, récupérer le slug du business
+      const { data: business } = await supabase
+        .from('businesses')
+        .select('slug')
+        .eq('id', notification.business_id)
+        .maybeSingle();
+      
+      if (business?.slug) {
+        navigate(`/entreprise/${business.slug}`);
+      } else {
+        navigate('/dashboard');
+      }
     }
   };
 

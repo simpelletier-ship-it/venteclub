@@ -31,6 +31,7 @@ interface BusinessCardProps {
   onWithdraw?: () => void;
   onFeature?: () => void;
   showActions?: boolean;
+  showPendingBadge?: boolean;
 }
 
 const BusinessCard = ({
@@ -51,6 +52,7 @@ const BusinessCard = ({
   onWithdraw,
   onFeature,
   showActions = false,
+  showPendingBadge = false,
 }: BusinessCardProps) => {
   const navigate = useNavigate();
   const [userId, setUserId] = useState<string | undefined>();
@@ -103,7 +105,7 @@ const BusinessCard = ({
                   🏢 Franchise
                 </Badge>
               )}
-              {has_pending_changes && (
+              {has_pending_changes && showPendingBadge && (
                 <Badge className="bg-orange-500 text-white">
                   ✏️ Modification en attente d'approbation
                 </Badge>
