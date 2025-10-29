@@ -39,6 +39,7 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
   }, [filters]);
 
   const fetchBusinesses = async () => {
+    console.log('[MAP] Fetching businesses for map...');
     let query = supabase
       .from('businesses')
       .select(`
@@ -52,7 +53,7 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
         description, 
         annual_revenue, 
         status,
-        business_photos!business_photos_business_id_fkey(photo_url)
+        business_photos(photo_url)
       `)
       .in('status', ['active', 'sold'])
       .eq('approval_status', 'approved')
@@ -75,7 +76,14 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
 
     const { data, error } = await query;
 
-    if (data && !error) {
+    console.log('[MAP] Query result:', { count: data?.length, error });
+
+    if (error) {
+      console.error('[MAP] Error fetching businesses:', error);
+      return;
+    }
+
+    if (data) {
       // Transform data to include first photo URL
       const businessesWithPhotos = data.map(b => ({
         ...b,
@@ -83,6 +91,7 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
           ? b.business_photos[0].photo_url 
           : null
       }));
+      console.log('[MAP] Businesses loaded:', businessesWithPhotos.length);
       setBusinesses(businessesWithPhotos);
     }
   };
@@ -92,8 +101,9 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
 
     // Check if we have the Mapbox token
     const mapboxToken = import.meta.env.VITE_MAPBOX_TOKEN;
+    console.log('[MAP] Mapbox token present:', !!mapboxToken);
     if (!mapboxToken) {
-      console.warn('Mapbox token not found');
+      console.error('[MAP] Mapbox token not found in environment variables');
       return;
     }
 
@@ -125,11 +135,18 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
     }
 
     // Only proceed if map is ready and businesses are loaded
-    if (!map.current || businesses.length === 0) return;
+    if (!map.current || businesses.length === 0) {
+      console.log('[MAP] Waiting for map or businesses...', { mapReady: !!map.current, businessCount: businesses.length });
+      return;
+    }
+
+    console.log('[MAP] Adding business layers to map, count:', businesses.length);
 
     // Wait for map to load before adding sources and layers
     const addBusinessLayers = () => {
       if (!map.current) return;
+      
+      console.log('[MAP] Running addBusinessLayers function');
 
       // Convert businesses to GeoJSON format
       const geojsonData = {
