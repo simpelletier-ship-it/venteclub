@@ -134,44 +134,45 @@ const Header = () => {
               </Button>
             )}
 
-            <Button
-              onClick={() => navigate("/list-business")}
-              className="hidden md:flex btn-premium bg-primary hover:bg-primary-dark text-primary-foreground font-semibold shadow-soft hover:shadow-premium transition-all"
-            >
-              Vendre une entreprise
-            </Button>
-
             {user ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                    <Avatar className="h-10 w-10 border-2 border-primary/20 hover:border-primary/40 transition-colors">
-                      <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
-                        {profile?.full_name?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || "U"}
-                      </AvatarFallback>
-                    </Avatar>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56 bg-card/95 backdrop-blur-xl border-border/50 shadow-premium">
-                  <div className="flex items-center justify-start gap-2 p-2">
-                    <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-semibold text-foreground">
-                        {profile?.full_name || "Utilisateur"}
-                      </p>
-                      <p className="text-xs text-muted-foreground">{user.email}</p>
+              <>
+                <Button
+                  onClick={() => navigate("/list-business")}
+                  className="hidden md:flex btn-premium bg-accent hover:bg-primary-dark text-white font-semibold shadow-soft hover:shadow-premium transition-all"
+                >
+                  Vendre une entreprise
+                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                      <Avatar className="h-10 w-10 border-2 border-primary/20 hover:border-primary/40 transition-colors">
+                        <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
+                          {profile?.full_name?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || "U"}
+                        </AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56 bg-card/95 backdrop-blur-xl border-border/50 shadow-premium">
+                    <div className="flex items-center justify-start gap-2 p-2">
+                      <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-semibold text-foreground">
+                          {profile?.full_name || "Utilisateur"}
+                        </p>
+                        <p className="text-xs text-muted-foreground">{user.email}</p>
+                      </div>
                     </div>
-                  </div>
-                  <DropdownMenuSeparator className="bg-border/50" />
-                  <DropdownMenuItem onClick={() => navigate("/settings")} className="cursor-pointer hover:bg-muted/50">
-                    <Settings className="mr-2 h-4 w-4" />
-                    Paramètres
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleLogout} className="cursor-pointer hover:bg-muted/50 text-destructive focus:text-destructive">
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Déconnexion
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                    <DropdownMenuSeparator className="bg-border/50" />
+                    <DropdownMenuItem onClick={() => navigate("/settings")} className="cursor-pointer hover:bg-muted/50">
+                      <Settings className="mr-2 h-4 w-4" />
+                      Paramètres
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleLogout} className="cursor-pointer hover:bg-muted/50 text-destructive focus:text-destructive">
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Déconnexion
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
             ) : (
               <>
                 <Button
@@ -183,7 +184,7 @@ const Header = () => {
                 </Button>
                 <Button
                   onClick={() => navigate("/list-business")}
-                  className="hidden md:inline-flex btn-premium bg-primary hover:bg-primary-dark text-primary-foreground font-semibold"
+                  className="hidden md:inline-flex btn-premium bg-accent hover:bg-primary-dark text-white font-semibold"
                 >
                   Vendre une entreprise
                 </Button>

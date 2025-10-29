@@ -112,19 +112,18 @@ const Index = () => {
         structuredData={structuredData} 
       />
       
-      {/* Hero Section - Corporate Design */}
-      <section className="relative min-h-[90vh] flex items-center overflow-hidden bg-gradient-to-br from-foreground via-primary to-primary-dark" aria-label="Section principale">
+      {/* Hero Section - Corporate Design with Dark Background */}
+      <section className="relative min-h-[90vh] flex items-center overflow-hidden bg-gradient-to-br from-[#1A1A1A] via-[#202124] to-[#1A1A1A]" aria-label="Section principale">
         <div className="absolute inset-0">
-          <div className="absolute inset-0 opacity-5" style={{
+          <div className="absolute inset-0 opacity-[0.03]" style={{
             backgroundImage: `url(${heroImage})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center'
           }} role="img" aria-label="Image d'arrière-plan montrant des entrepreneurs en action" />
-          <div className="absolute inset-0 bg-gradient-to-b from-foreground/95 via-primary/90 to-primary-dark/95" />
           
           {/* Animated gradient orbs */}
-          <div className="absolute top-20 right-20 w-96 h-96 bg-accent/20 rounded-full blur-3xl animate-float" />
-          <div className="absolute bottom-20 left-20 w-96 h-96 bg-secondary/15 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }} />
+          <div className="absolute top-20 right-20 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-float" />
+          <div className="absolute bottom-20 left-20 w-96 h-96 bg-secondary/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }} />
         </div>
         
         <div className="relative container mx-auto px-4 py-20">
@@ -139,7 +138,7 @@ const Index = () => {
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-display font-bold leading-tight text-white">
               Achetez & Vendez
               <br />
-              <span className="bg-gradient-to-r from-accent via-primary-light to-accent bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-accent via-accent to-primary bg-clip-text text-transparent">
                 des Entreprises
               </span>
             </h1>
@@ -151,7 +150,7 @@ const Index = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
               <Button 
                 size="lg" 
-                className="bg-accent hover:bg-primary-dark text-accent-foreground h-14 px-10 text-lg font-semibold shadow-xl hover:shadow-2xl transition-all hover:scale-105 btn-premium group"
+                className="bg-accent hover:bg-accent/90 text-white h-14 px-10 text-lg font-semibold shadow-xl hover:shadow-2xl transition-all hover:scale-105 btn-premium group"
                 onClick={() => document.getElementById('featured')?.scrollIntoView({ behavior: 'smooth' })}
               >
                 Explorer les opportunités
@@ -160,7 +159,7 @@ const Index = () => {
               <Button 
                 size="lg" 
                 variant="outline" 
-                className="h-14 px-10 text-lg font-semibold border-2 border-white/30 text-white hover:bg-white/10 glass-effect backdrop-blur-md"
+                className="h-14 px-10 text-lg font-semibold border-2 border-white/30 text-white hover:bg-white hover:text-foreground glass-effect backdrop-blur-md transition-all"
                 onClick={() => navigate("/list-business")}
               >
                 Vendre mon entreprise
@@ -287,11 +286,11 @@ const Index = () => {
         </div>
       </section>
 
-      {/* CTA Section - Corporate Gradient */}
-      <section className="py-32 bg-gradient-to-br from-foreground via-primary to-primary-dark relative overflow-hidden">
+      {/* CTA Section - Dark Corporate Gradient */}
+      <section className="py-32 bg-gradient-to-br from-[#1A1A1A] via-[#202124] to-[#1A1A1A] relative overflow-hidden">
         <div className="absolute inset-0">
-          <div className="absolute top-10 right-10 w-96 h-96 bg-accent/20 rounded-full blur-3xl" />
-          <div className="absolute bottom-10 left-10 w-96 h-96 bg-secondary/20 rounded-full blur-3xl" />
+          <div className="absolute top-10 right-10 w-96 h-96 bg-accent/15 rounded-full blur-3xl" />
+          <div className="absolute bottom-10 left-10 w-96 h-96 bg-secondary/15 rounded-full blur-3xl" />
         </div>
         <div className="relative container mx-auto px-4 text-center">
           <div className="max-w-3xl mx-auto space-y-8">
@@ -305,7 +304,7 @@ const Index = () => {
             </p>
             <Button 
               size="lg" 
-              className="bg-white hover:bg-white/90 text-primary h-14 px-12 text-lg font-semibold shadow-2xl hover:shadow-xl transition-all hover:scale-105 btn-premium group"
+              className="bg-accent hover:bg-accent/90 text-white h-14 px-12 text-lg font-semibold shadow-2xl hover:shadow-xl transition-all hover:scale-105 btn-premium group"
               onClick={() => navigate("/list-business")}
             >
               Commencer gratuitement
