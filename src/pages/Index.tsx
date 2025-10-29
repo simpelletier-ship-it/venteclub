@@ -6,7 +6,7 @@ import BusinessListItem from "@/components/BusinessListItem";
 import FilterBar from "@/components/FilterBar";
 import { ArrowRight, Grid3x3, List } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import heroImage from "@/assets/hero-business.jpg";
+import heroImage from "@/assets/hero-business-pro.jpg";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -91,7 +91,7 @@ const Index = () => {
       <section className="relative overflow-hidden bg-gradient-to-br from-background via-primary/5 to-accent/10">
         <div className="absolute inset-0">
           <div 
-            className="absolute inset-0 opacity-[0.03]"
+            className="absolute inset-0 opacity-20"
             style={{
               backgroundImage: `url(${heroImage})`,
               backgroundSize: 'cover',
@@ -101,8 +101,8 @@ const Index = () => {
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/50 to-background" />
         </div>
         
-        <div className="relative container mx-auto px-4 py-24 md:py-32">
-          <div className="max-w-4xl mx-auto text-center space-y-8">
+        <div className="relative container mx-auto px-4 py-16 md:py-24">
+          <div className="max-w-4xl mx-auto text-center space-y-6">
             <div className="inline-block">
               <span className="px-4 py-2 rounded-full bg-accent/10 text-accent text-sm font-semibold border border-accent/20">
                 La plateforme d'acquisition et de vente d'entreprise au Québec
@@ -121,7 +121,7 @@ const Index = () => {
               La plateforme d'acquisition et de vente d'entreprise au Québec
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-2">
               <Button 
                 size="lg" 
                 className="bg-accent hover:bg-accent/90 text-accent-foreground h-14 px-8 text-lg font-semibold shadow-lg hover:shadow-xl transition-all"
