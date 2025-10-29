@@ -66,23 +66,37 @@ const Admin = () => {
 
   const fetchBusinesses = async () => {
     try {
-      const { data, error } = await supabase
+      // Fetch businesses first
+      const { data: businessesData, error } = await supabase
         .from('businesses')
-        .select('*, seller_contacts!left(email)')
+        .select('*')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
 
-      // Check featured status for each business
-      const businessesWithFeature = await Promise.all(
-        (data || []).map(async (business) => {
+      // Then fetch seller contacts and featured status for each
+      const businessesWithDetails = await Promise.all(
+        (businessesData || []).map(async (business) => {
+          // Get seller contact
+          const { data: contactData } = await supabase
+            .from('seller_contacts')
+            .select('email')
+            .eq('seller_id', business.seller_id)
+            .single();
+
+          // Get featured status
           const { data: isFeatured } = await supabase
             .rpc('is_business_featured', { business_uuid: business.id });
-          return { ...business, is_featured: !!isFeatured };
+
+          return {
+            ...business,
+            seller_email: contactData?.email || null,
+            is_featured: !!isFeatured
+          };
         })
       );
 
-      setBusinesses(businessesWithFeature);
+      setBusinesses(businessesWithDetails);
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -109,10 +123,10 @@ const Admin = () => {
       if (error) throw error;
 
       // Send email notification
-      if (business?.seller_contacts?.email) {
+      if (business?.seller_email) {
         await supabase.functions.invoke('send-approval-email', {
           body: {
-            email: business.seller_contacts.email,
+            email: business.seller_email,
             businessTitle: business.title,
             status: approvalStatus,
             rejectionReason: rejectionReason,

@@ -202,15 +202,7 @@ export type Database = {
           views_count?: number | null
           year_established?: number | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "businesses_seller_id_fkey"
-            columns: ["seller_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       featured_payments: {
         Row: {
@@ -340,15 +332,7 @@ export type Database = {
           phone?: string | null
           seller_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "seller_contacts_seller_id_fkey"
-            columns: ["seller_id"]
-            isOneToOne: true
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       subscription_plans: {
         Row: {

@@ -198,6 +198,9 @@ const Index = () => {
                 <Button variant="ghost" onClick={() => navigate("/dashboard")}>
                   Dashboard
                 </Button>
+                <Button variant="ghost" onClick={() => navigate("/settings")}>
+                  Paramètres
+                </Button>
                 <Button className="bg-accent hover:bg-accent/90 text-accent-foreground" onClick={() => navigate("/list-business")}>
                   Vendre une entreprise
                 </Button>
