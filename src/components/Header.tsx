@@ -9,7 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Heart, LayoutDashboard, Settings, LogOut, Menu, Sparkles } from "lucide-react";
 import { NotificationBell } from "./NotificationBell";
 
@@ -60,6 +60,31 @@ const Header = () => {
       .maybeSingle();
     setProfile(data);
   };
+
+  useEffect(() => {
+    if (!user) return;
+
+    // Écouter les changements de profil en temps réel
+    const channel = supabase
+      .channel('profile-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'profiles',
+          filter: `id=eq.${user.id}`
+        },
+        (payload) => {
+          setProfile(payload.new);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user?.id]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -146,6 +171,9 @@ const Header = () => {
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                       <Avatar className="h-10 w-10 border-2 border-primary/20 hover:border-primary/40 transition-colors">
+                        {profile?.avatar_url && (
+                          <AvatarImage src={profile.avatar_url} alt={profile?.full_name || "Avatar"} />
+                        )}
                         <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
                           {profile?.full_name?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || "U"}
                         </AvatarFallback>
