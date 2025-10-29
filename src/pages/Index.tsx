@@ -13,6 +13,7 @@ const Index = () => {
   const [user, setUser] = useState<any>(null);
   const [featuredBusinesses, setFeaturedBusinesses] = useState<any[]>([]);
   const [allBusinesses, setAllBusinesses] = useState<any[]>([]);
+  const [filteredBusinesses, setFilteredBusinesses] = useState<any[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
@@ -78,7 +79,26 @@ const Index = () => {
 
       setFeaturedBusinesses(featured);
       setAllBusinesses(regular);
+      setFilteredBusinesses(regular);
     }
+  };
+
+  const handleFilter = (filters: { city?: string; industry?: string }) => {
+    let filtered = [...allBusinesses];
+    
+    if (filters.city) {
+      filtered = filtered.filter(business => 
+        business.city?.toLowerCase().includes(filters.city!.toLowerCase())
+      );
+    }
+    
+    if (filters.industry) {
+      filtered = filtered.filter(business => 
+        business.industry === filters.industry
+      );
+    }
+    
+    setFilteredBusinesses(filtered);
   };
 
   const mockFeaturedBusinesses = [
@@ -252,7 +272,7 @@ const Index = () => {
       {/* Filter Section */}
       <section className="py-8 bg-muted/30">
         <div className="container mx-auto px-4">
-          <FilterBar />
+          <FilterBar onFilter={handleFilter} />
         </div>
       </section>
 
@@ -289,10 +309,14 @@ const Index = () => {
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {allBusinesses.length > 0 ? (
-              allBusinesses.map((business) => (
+            {filteredBusinesses.length > 0 ? (
+              filteredBusinesses.map((business) => (
                 <BusinessCard key={business.id} {...business} />
               ))
+            ) : allBusinesses.length > 0 ? (
+              <div className="col-span-full text-center py-12">
+                <p className="text-lg text-muted-foreground">Aucune annonce ne correspond à vos critères de recherche</p>
+              </div>
             ) : (
               mockAllBusinesses.map((business, index) => (
                 <BusinessCard key={index} {...business} />
