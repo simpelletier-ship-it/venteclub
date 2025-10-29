@@ -35,6 +35,16 @@ const ListBusiness = () => {
   const [user, setUser] = useState<any>(null);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [termsDialogOpen, setTermsDialogOpen] = useState(false);
+  const [editingBusinessId, setEditingBusinessId] = useState<string | null>(null);
+
+  // Récupérer l'ID de l'annonce à éditer depuis l'URL
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const editId = params.get('edit');
+    if (editId) {
+      setEditingBusinessId(editId);
+    }
+  }, []);
 
   // Liste des villes du Québec
   const quebecCities = [
@@ -112,6 +122,11 @@ const ListBusiness = () => {
         navigate("/auth");
       } else {
         setUser(session.user);
+        
+        // Charger l'annonce existante si on est en mode édition
+        if (editingBusinessId) {
+          await loadBusinessForEdit(editingBusinessId, session.user.id);
+        }
       }
     };
 
@@ -126,7 +141,94 @@ const ListBusiness = () => {
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  }, [navigate, editingBusinessId]);
+
+  const loadBusinessForEdit = async (businessId: string, userId: string) => {
+    try {
+      const { data: business, error } = await supabase
+        .from('businesses')
+        .select('*, business_photos(*)')
+        .eq('id', businessId)
+        .eq('seller_id', userId)
+        .single();
+
+      if (error) throw error;
+
+      if (!business) {
+        toast({
+          variant: "destructive",
+          title: "Erreur",
+          description: "Annonce introuvable",
+        });
+        navigate('/dashboard');
+        return;
+      }
+
+      // Remplir le formulaire avec les données existantes
+      setFormData({
+        title: business.title || "",
+        description: business.description || "",
+        industry: business.industry || "",
+        location: business.location || "",
+        city: business.city || "",
+        region: business.region || "",
+        province: business.province || "Québec",
+        annual_revenue: business.annual_revenue?.toString() || "",
+        asking_price: business.asking_price?.toString() || "",
+        profit_margin: business.profit_margin?.toString() || "",
+        baiia: business.baiia?.toString() || "",
+        employees_count: business.employees_count?.toString() || "",
+        year_established: business.year_established?.toString() || "",
+        seller_email: "",
+        seller_phone: "",
+        is_franchise: business.is_franchise || false,
+        competitive_advantages: "",
+        target_clientele: "",
+        sale_reason: "",
+        financing_options: "",
+        support_offered: "",
+        website: "",
+        facebook: "",
+        instagram: "",
+      });
+
+      // Charger les photos existantes
+      if (business.business_photos && business.business_photos.length > 0) {
+        const urls = business.business_photos
+          .sort((a: any, b: any) => a.display_order - b.display_order)
+          .map((photo: any) => photo.photo_url);
+        setPhotoPreviewUrls(urls);
+      }
+
+      // Charger les informations de contact
+      const { data: contact } = await supabase
+        .from('seller_contacts')
+        .select('*')
+        .eq('seller_id', userId)
+        .single();
+
+      if (contact) {
+        setFormData(prev => ({
+          ...prev,
+          seller_email: contact.email || "",
+          seller_phone: contact.phone || "",
+        }));
+      }
+
+      toast({
+        title: "Annonce chargée",
+        description: "Vous pouvez maintenant modifier votre annonce",
+      });
+    } catch (error: any) {
+      console.error('Error loading business:', error);
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: error.message,
+      });
+      navigate('/dashboard');
+    }
+  };
 
   // Calculate visibility score
   const visibilityScore = useMemo(() => {
@@ -287,6 +389,71 @@ const ListBusiness = () => {
         year_established: formData.year_established ? parseInt(formData.year_established) : null,
       });
 
+      // Si on édite une annonce existante
+      if (editingBusinessId) {
+        const { error: updateError } = await supabase
+          .from("businesses")
+          .update({
+            title: validatedData.title,
+            description: validatedData.description,
+            industry: validatedData.industry,
+            location: validatedData.location,
+            city: formData.city,
+            region: formData.region,
+            province: formData.province,
+            annual_revenue: validatedData.annual_revenue,
+            asking_price: validatedData.asking_price,
+            profit_margin: validatedData.profit_margin,
+            baiia: validatedData.baiia,
+            employees_count: validatedData.employees_count,
+            year_established: validatedData.year_established,
+            is_franchise: formData.is_franchise,
+            status: isDraft ? "archived" : "active",
+            approval_status: isDraft ? "pending" : "pending",
+          } as any)
+          .eq('id', editingBusinessId);
+
+        if (updateError) throw updateError;
+
+        // Upload new photos if any
+        if (photos.length > 0) {
+          for (let i = 0; i < photos.length; i++) {
+            const file = photos[i];
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${editingBusinessId}/${Date.now()}-${i}.${fileExt}`;
+
+            const { error: uploadError } = await supabase.storage
+              .from('business-photos')
+              .upload(fileName, file);
+
+            if (uploadError) {
+              console.error('Photo upload error:', uploadError);
+              continue;
+            }
+
+            const { data: { publicUrl } } = supabase.storage
+              .from('business-photos')
+              .getPublicUrl(fileName);
+
+            await supabase.from('business_photos').insert({
+              business_id: editingBusinessId,
+              photo_url: publicUrl,
+              display_order: photoPreviewUrls.length + i,
+            });
+          }
+        }
+
+        toast({
+          title: isDraft ? "Modifié !" : "Publié !",
+          description: isDraft 
+            ? "Votre annonce a été modifiée et reste en brouillon." 
+            : "Votre annonce a été publiée et est en attente d'approbation.",
+        });
+        navigate("/dashboard");
+        return;
+      }
+
+      // Sinon, créer une nouvelle annonce
       const { data: businessData, error: businessError } = await supabase
         .from("businesses")
         .insert({
@@ -405,10 +572,12 @@ const ListBusiness = () => {
         <div className="max-w-7xl mx-auto">
           <div className="mb-8">
             <h1 className="text-4xl font-bold text-foreground mb-2">
-              Nouvelle Fiche Entreprise
+              {editingBusinessId ? "Modifier l'annonce" : "Nouvelle Fiche Entreprise"}
             </h1>
             <p className="text-muted-foreground">
-              Remplissez les informations pour créer une nouvelle annonce.
+              {editingBusinessId 
+                ? "Modifiez les informations de votre annonce et publiez-la." 
+                : "Remplissez les informations pour créer une nouvelle annonce."}
             </p>
           </div>
 

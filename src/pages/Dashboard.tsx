@@ -192,14 +192,56 @@ const Dashboard = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {businesses.map((business) => (
                   <div key={business.id} className="space-y-2">
-                    <BusinessCard 
-                      {...business}
-                      showActions={true}
-                      onWithdraw={() => handleWithdrawClick(business)}
-                      onFeature={() => handleFeatureClick(business)}
-                    />
+                    <div 
+                      onClick={() => {
+                        if (business.status === 'archived') {
+                          navigate(`/list-business?edit=${business.id}`);
+                        } else {
+                          navigate(`/business/${business.id}`);
+                        }
+                      }}
+                      className="cursor-pointer"
+                    >
+                      <BusinessCard 
+                        {...business}
+                        showActions={business.status !== 'archived'}
+                        onWithdraw={() => handleWithdrawClick(business)}
+                        onFeature={() => handleFeatureClick(business)}
+                      />
+                    </div>
                     <div className="flex gap-2">
-                      {business.approval_status === 'approved' && business.status !== 'sold' && (
+                      {business.status === 'archived' && (
+                        <Button
+                          onClick={async () => {
+                            try {
+                              await supabase
+                                .from('businesses')
+                                .update({ 
+                                  status: 'active',
+                                  approval_status: 'pending'
+                                })
+                                .eq('id', business.id);
+                              
+                              toast({
+                                title: "Annonce publiée!",
+                                description: "Votre annonce a été soumise pour approbation.",
+                              });
+                              fetchUserBusinesses(user.id);
+                            } catch (error: any) {
+                              toast({
+                                variant: "destructive",
+                                title: "Erreur",
+                                description: error.message,
+                              });
+                            }
+                          }}
+                          size="sm"
+                          className="flex-1"
+                        >
+                          Publier l'annonce
+                        </Button>
+                      )}
+                      {business.approval_status === 'approved' && business.status !== 'sold' && business.status !== 'archived' && (
                         <Button
                           onClick={() => handleEditClick(business)}
                           size="sm"

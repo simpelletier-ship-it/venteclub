@@ -112,7 +112,7 @@ const BusinessCard = ({
                   ✓ Approuvée
                 </Badge>
               )}
-              {showActions && approval_status === 'pending' && (
+              {showActions && approval_status === 'pending' && status !== 'archived' && (
                 <Badge className="bg-orange-500 hover:bg-orange-600 text-white border-0 shadow-md text-xs">
                   ⏳ En attente
                 </Badge>
