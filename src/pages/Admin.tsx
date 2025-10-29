@@ -1000,10 +1000,46 @@ const Admin = () => {
                                     </p>
                                   </div>
 
-                                  <div className="flex gap-2 pt-2 text-xs text-muted-foreground">
+                                   <div className="flex gap-2 pt-2 text-xs text-muted-foreground">
                                     <div>
                                       <span className="font-semibold">ID Stripe:</span> {subscription.stripe_subscription_id}
                                     </div>
+                                  </div>
+
+                                  <div className="pt-4 border-t mt-4">
+                                    <Button
+                                      variant="destructive"
+                                      size="sm"
+                                      onClick={async () => {
+                                        if (!confirm(`Voulez-vous vraiment annuler l'abonnement de ${subscription.user_email} ?`)) {
+                                          return;
+                                        }
+                                        
+                                        try {
+                                          const { error } = await supabase.functions.invoke('admin-cancel-subscription', {
+                                            body: { subscriptionId: subscription.stripe_subscription_id }
+                                          });
+
+                                          if (error) throw error;
+
+                                          toast({
+                                            title: "Succès",
+                                            description: "L'abonnement a été annulé avec succès.",
+                                          });
+
+                                          fetchSubscriptions();
+                                        } catch (error: any) {
+                                          toast({
+                                            variant: "destructive",
+                                            title: "Erreur",
+                                            description: error.message || "Impossible d'annuler l'abonnement",
+                                          });
+                                        }
+                                      }}
+                                    >
+                                      <XCircle className="mr-2 h-4 w-4" />
+                                      Annuler l'abonnement
+                                    </Button>
                                   </div>
                                 </div>
                               </CardContent>

@@ -21,6 +21,9 @@ export const PremiumSubscription = ({ userId }: PremiumSubscriptionProps) => {
     checkSubscription();
     
     // Écouter les changements en temps réel sur l'abonnement Premium
+    // On utilise un debounce pour éviter le "flash" causé par des appels trop fréquents
+    let debounceTimeout: NodeJS.Timeout;
+    
     const channel = supabase
       .channel('premium-subscription-changes')
       .on(
@@ -33,37 +36,60 @@ export const PremiumSubscription = ({ userId }: PremiumSubscriptionProps) => {
         },
         (payload) => {
           console.log('Premium subscription changed:', payload);
-          checkSubscription();
+          // Debounce de 500ms pour éviter les appels multiples
+          clearTimeout(debounceTimeout);
+          debounceTimeout = setTimeout(() => {
+            checkSubscription();
+          }, 500);
         }
       )
       .subscribe();
 
     return () => {
+      clearTimeout(debounceTimeout);
       supabase.removeChannel(channel);
     };
   }, [userId]);
 
   const checkSubscription = async () => {
-    setLoading(true);
+    // Ne pas afficher le loading si on a déjà des données (évite le flash)
+    const isInitialLoad = isSubscribed === false && subscriptionEnd === null;
+    if (isInitialLoad) {
+      setLoading(true);
+    }
+    
     try {
       console.log('[CHECK SUBSCRIPTION] Calling check-premium-subscription edge function');
       const { data, error } = await supabase.functions.invoke('check-premium-subscription');
       
       if (error) {
         console.error('[CHECK SUBSCRIPTION] Error:', error);
-        setIsSubscribed(false);
-        setSubscriptionEnd(null);
+        // Ne pas réinitialiser si on a déjà des données
+        if (isInitialLoad) {
+          setIsSubscribed(false);
+          setSubscriptionEnd(null);
+        }
       } else {
         console.log('[CHECK SUBSCRIPTION] Data received:', data);
-        setIsSubscribed(data?.subscribed || false);
-        setSubscriptionEnd(data?.subscription_end || null);
+        // Seulement mettre à jour si les données ont changé
+        const newSubscribed = data?.subscribed || false;
+        const newEnd = data?.subscription_end || null;
+        
+        if (newSubscribed !== isSubscribed || newEnd !== subscriptionEnd) {
+          setIsSubscribed(newSubscribed);
+          setSubscriptionEnd(newEnd);
+        }
       }
     } catch (error: any) {
       console.error('[CHECK SUBSCRIPTION] Exception:', error);
-      setIsSubscribed(false);
-      setSubscriptionEnd(null);
+      if (isInitialLoad) {
+        setIsSubscribed(false);
+        setSubscriptionEnd(null);
+      }
     } finally {
-      setLoading(false);
+      if (isInitialLoad) {
+        setLoading(false);
+      }
     }
   };
 
