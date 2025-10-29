@@ -20,6 +20,7 @@ import LogoutSuccess from "./pages/LogoutSuccess";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
 import CityPage from "./pages/CityPage";
 
 const queryClient = new QueryClient();
@@ -49,7 +50,7 @@ const App = () => (
               <Route path="/a-propos" element={<About />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/blog" element={<Blog />} />
-              <Route path="/blog/:slug" element={<Blog />} />
+              <Route path="/blog/:slug" element={<BlogPost />} />
               
               {/* City Pages */}
               <Route path="/entreprises-a-vendre-:city" element={<CityPage />} />
