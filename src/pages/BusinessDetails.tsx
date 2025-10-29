@@ -566,50 +566,69 @@ const BusinessDetails = () => {
 
                 {/* Portrait Financier */}
                 {(business.annual_revenue || business.baiia || business.net_profit) && (
-                  <div className="border border-border/50 rounded-xl p-6 bg-gradient-to-br from-background to-muted/10">
-                    <h2 className="text-2xl font-bold text-foreground mb-6">Portrait financier</h2>
+                  <div className="border border-border/50 rounded-xl p-8 bg-gradient-to-br from-background to-muted/20 shadow-sm">
+                    <h2 className="text-2xl font-bold text-foreground mb-2">Portrait financier</h2>
+                    <p className="text-sm text-muted-foreground mb-6">Aperçu des performances financières de l'entreprise</p>
                     
                     {/* Résultats */}
                     {(business.annual_revenue || business.baiia || business.net_profit) && (
                       <div className="mb-6">
-                        <div className="flex justify-between items-center mb-4">
-                          <h3 className="text-lg font-semibold text-foreground">Résultats</h3>
-                          <span className="text-sm text-muted-foreground">Plus récente déclaration fiscale</span>
-                        </div>
+                        <h3 className="text-lg font-semibold text-foreground mb-4">Résultats</h3>
                         
-                        <div className="space-y-3">
+                        <div className="space-y-2">
                           {business.annual_revenue && (
-                            <div className="flex justify-between items-center py-2">
-                              <span className="text-foreground">Revenu</span>
-                              <span className="font-semibold text-lg">{business.annual_revenue.toLocaleString()}</span>
+                            <div className="flex justify-between items-center py-3 px-4 rounded-lg hover:bg-muted/30 transition-colors">
+                              <span className="text-foreground font-medium">Revenu annuel</span>
+                              <span className="font-bold text-lg text-primary">
+                                {new Intl.NumberFormat('fr-CA', {
+                                  style: 'currency',
+                                  currency: business.currency || 'CAD',
+                                  minimumFractionDigits: 0,
+                                  maximumFractionDigits: 0,
+                                }).format(business.annual_revenue)}
+                              </span>
                             </div>
                           )}
                           
                           {business.baiia && (
-                            <div className="flex justify-between items-center py-2">
-                              <span className="text-foreground">BAIIA</span>
-                              <span className="font-semibold text-lg">{business.baiia.toLocaleString()}</span>
-                            </div>
-                          )}
-                          
-                          {business.baiia_margin && (
-                            <div className="flex justify-between items-center py-2 bg-muted/30 px-4 -mx-4 rounded">
-                              <span className="text-foreground">Marge BAIIA</span>
-                              <span className="font-semibold text-lg">{business.baiia_margin} %</span>
+                            <div className="flex justify-between items-center py-3 px-4 rounded-lg hover:bg-muted/30 transition-colors">
+                              <span className="text-foreground font-medium">BAIIA</span>
+                              <span className="font-bold text-lg text-primary">
+                                {new Intl.NumberFormat('fr-CA', {
+                                  style: 'currency',
+                                  currency: business.currency || 'CAD',
+                                  minimumFractionDigits: 0,
+                                  maximumFractionDigits: 0,
+                                }).format(business.baiia)}
+                              </span>
                             </div>
                           )}
                           
                           {business.net_profit && (
-                            <div className="flex justify-between items-center py-2">
-                              <span className="text-foreground">Bénéfice net</span>
-                              <span className="font-semibold text-lg">{business.net_profit.toLocaleString()}</span>
+                            <div className="flex justify-between items-center py-3 px-4 rounded-lg hover:bg-muted/30 transition-colors">
+                              <span className="text-foreground font-medium">Bénéfice net</span>
+                              <span className="font-bold text-lg text-primary">
+                                {new Intl.NumberFormat('fr-CA', {
+                                  style: 'currency',
+                                  currency: business.currency || 'CAD',
+                                  minimumFractionDigits: 0,
+                                  maximumFractionDigits: 0,
+                                }).format(business.net_profit)}
+                              </span>
                             </div>
                           )}
                           
                           {business.net_profit_margin && (
-                            <div className="flex justify-between items-center py-2 bg-muted/30 px-4 -mx-4 rounded">
-                              <span className="text-foreground">Marge bénéficiaire nette</span>
-                              <span className="font-semibold text-lg">{business.net_profit_margin} %</span>
+                            <div className="flex justify-between items-center py-3 px-4 rounded-lg bg-muted/40">
+                              <span className="text-foreground font-medium">Marge bénéficiaire nette</span>
+                              <span className="font-bold text-lg text-accent">{business.net_profit_margin}%</span>
+                            </div>
+                          )}
+
+                          {business.profit_margin && (
+                            <div className="flex justify-between items-center py-3 px-4 rounded-lg bg-muted/40">
+                              <span className="text-foreground font-medium">Marge de profit</span>
+                              <span className="font-bold text-lg text-accent">{business.profit_margin}%</span>
                             </div>
                           )}
                         </div>
