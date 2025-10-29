@@ -45,8 +45,8 @@ const BusinessCard = ({
     });
   }, []);
   
-  const displayRevenue = revenue || (annual_revenue ? `${annual_revenue.toLocaleString('fr-CA')} $` : 'N/A');
-  const displayPrice = price || (asking_price ? `${asking_price.toLocaleString('fr-CA')} $` : 'N/A');
+  const displayRevenue = revenue || (annual_revenue ? `${annual_revenue.toLocaleString('fr-CA', { useGrouping: true }).replace(/\$/g, '')} $` : 'N/A');
+  const displayPrice = price || (asking_price ? `${asking_price.toLocaleString('fr-CA', { useGrouping: true }).replace(/\$/g, '')} $` : 'N/A');
   const displayProfit = profit || (profit_margin ? `${profit_margin} %` : 'N/A');
 
   const handleClick = () => {
@@ -63,7 +63,7 @@ const BusinessCard = ({
       onClick={handleClick}
     >
       {/* Header with badges and favorite */}
-      <div className="flex items-start justify-between p-4 pb-0">
+      <div className="flex items-start justify-between px-4 pt-3 pb-0">
         <div className="flex items-center gap-2">
           {featured && (
             <Badge className="bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 text-white border-0 shadow-md text-xs">
@@ -78,7 +78,7 @@ const BusinessCard = ({
       </div>
 
       {/* Content Section */}
-      <div className="px-4 pb-4 pt-2 space-y-4">
+      <div className="px-4 pb-4 pt-2 space-y-3">
         {/* Title & Location */}
         <div className="space-y-2">
           <h3 className="text-xl font-bold text-foreground group-hover:text-accent transition-colors line-clamp-1">
