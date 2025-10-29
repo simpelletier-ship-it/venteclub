@@ -611,7 +611,7 @@ const ListBusiness = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Main Form - 2/3 width */}
             <div className="lg:col-span-2">
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form className="space-y-6">
                 {/* Informations générales */}
                 <div className="bg-card p-6 rounded-2xl shadow-elegant border border-border/50">
                   <h2 className="text-xl font-semibold text-primary mb-4 flex items-center gap-2">
@@ -646,7 +646,7 @@ const ListBusiness = () => {
                           rows={6}
                           placeholder="Décrivez votre entreprise en détail..."
                         />
-                        {formData.description && formData.title && formData.industry && (
+                        {formData.description && formData.industry && (
                           <Button
                             type="button"
                             variant="outline"
@@ -1079,18 +1079,6 @@ const ListBusiness = () => {
                           value={formData.baiia}
                           onChange={(e) => setFormData({ ...formData, baiia: e.target.value })}
                           placeholder="Ex: 50 000"
-                        />
-                      </div>
-
-                      <div>
-                        <Label htmlFor="baiia_margin">Marge BAIIA (%)</Label>
-                        <Input
-                          id="baiia_margin"
-                          type="number"
-                          step="0.1"
-                          value={formData.baiia_margin}
-                          onChange={(e) => setFormData({ ...formData, baiia_margin: e.target.value })}
-                          placeholder="Ex: 33"
                         />
                       </div>
 
