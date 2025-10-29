@@ -139,14 +139,10 @@ const Index = () => {
             </div>
             
             {/* Main Heading */}
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-display font-bold leading-[1.1] tracking-tight">
-              <span className="bg-gradient-to-r from-foreground via-foreground to-foreground bg-clip-text text-transparent">
-                Achetez & Vendez
-              </span>
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-display font-bold leading-[1.1] tracking-tight text-foreground">
+              Achetez ou Vendez
               <br />
-              <span className="bg-gradient-to-r from-accent via-primary to-secondary bg-clip-text text-transparent">
-                des Entreprises
-              </span>
+              votre entreprise librement
             </h1>
             
             {/* Subtitle */}
@@ -172,31 +168,6 @@ const Index = () => {
               >
                 Vendre mon entreprise
               </Button>
-            </div>
-
-            {/* Trust Indicators */}
-            <div className="grid grid-cols-3 gap-8 pt-16 max-w-4xl mx-auto">
-              <div className="text-center group">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-secondary/20 to-secondary/10 border border-secondary/20 mb-4 group-hover:scale-110 transition-transform">
-                  <Shield className="w-8 h-8 text-secondary" />
-                </div>
-                <div className="text-4xl font-display font-bold text-foreground mb-2">100+</div>
-                <div className="text-sm text-muted-foreground font-medium">Annonces vérifiées</div>
-              </div>
-              <div className="text-center group">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-accent/20 to-accent/10 border border-accent/20 mb-4 group-hover:scale-110 transition-transform">
-                  <TrendingUp className="w-8 h-8 text-accent" />
-                </div>
-                <div className="text-4xl font-display font-bold text-foreground mb-2">34K+</div>
-                <div className="text-sm text-muted-foreground font-medium">Opportunités au QC</div>
-              </div>
-              <div className="text-center group">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 border border-primary/20 mb-4 group-hover:scale-110 transition-transform">
-                  <Clock className="w-8 h-8 text-primary" />
-                </div>
-                <div className="text-4xl font-display font-bold text-foreground mb-2">24h</div>
-                <div className="text-sm text-muted-foreground font-medium">Réponse moyenne</div>
-              </div>
             </div>
           </div>
         </div>
