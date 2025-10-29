@@ -150,6 +150,7 @@ export const MessagesList = ({ userId }: MessagesListProps) => {
               businessId={selectedConversation.business_id}
               currentUserId={userId}
               otherUserId={selectedConversation.other_user_id}
+              businessTitle={selectedConversation.business_title}
             />
           </CardContent>
         </Card>

@@ -38,51 +38,27 @@ serve(async (req) => {
     }
 
     const businessId = session.metadata?.business_id;
+    const duration = parseInt(session.metadata?.duration || '7');
     if (!businessId) throw new Error("Business ID not found in session");
 
-    // Check how many featured businesses there are
-    const { data: featuredCount } = await supabaseClient
-      .from("featured_payments")
-      .select("id", { count: "exact" })
-      .eq("payment_status", "completed")
-      .gte("featured_until", new Date().toISOString());
+    // Determine amount based on duration
+    const amountMap: Record<number, number> = {
+      7: 75.00,
+      14: 100.00,
+      30: 110.00,
+    };
+    const amount = amountMap[duration] || 75.00;
 
-    // If there are 3 or more, remove the oldest one
-    if (featuredCount && featuredCount.length >= 3) {
-      const { data: oldestFeatured } = await supabaseClient
-        .from("featured_payments")
-        .select("id, business_id")
-        .eq("payment_status", "completed")
-        .gte("featured_until", new Date().toISOString())
-        .order("created_at", { ascending: true })
-        .limit(1)
-        .single();
-
-      if (oldestFeatured) {
-        // Update the featured_until to now (expire it)
-        await supabaseClient
-          .from("featured_payments")
-          .update({ featured_until: new Date().toISOString() })
-          .eq("id", oldestFeatured.id);
-
-        // Update business featured status
-        await supabaseClient
-          .from("businesses")
-          .update({ featured: false })
-          .eq("id", oldestFeatured.business_id);
-      }
-    }
-
-    // Add new featured payment with 30 days duration
+    // Calculate featured_until based on duration
     const featuredUntil = new Date();
-    featuredUntil.setDate(featuredUntil.getDate() + 30);
+    featuredUntil.setDate(featuredUntil.getDate() + duration);
 
     const { error: insertError } = await supabaseClient
       .from("featured_payments")
       .insert({
         user_id: user.id,
         business_id: businessId,
-        amount: 20.00,
+        amount: amount,
         currency: "CAD",
         payment_status: "completed",
         featured_until: featuredUntil.toISOString(),

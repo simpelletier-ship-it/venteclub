@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, LogOut, Star, XCircle, Edit, MessageSquare } from "lucide-react";
+import { Plus, LogOut, Star, XCircle, Edit } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import BusinessCard from "@/components/BusinessCard";
@@ -13,6 +13,7 @@ import { WithdrawBusinessDialog } from "@/components/WithdrawBusinessDialog";
 import { EditBusinessDialog } from "@/components/EditBusinessDialog";
 import { AlertsManager } from "@/components/AlertsManager";
 import { PremiumSubscription } from "@/components/PremiumSubscription";
+import { MessagesList } from "@/components/MessagesList";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -29,6 +30,7 @@ const Dashboard = () => {
   const [businessToWithdraw, setBusinessToWithdraw] = useState<any>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [businessToEdit, setBusinessToEdit] = useState<any>(null);
+  const [selectedDuration, setSelectedDuration] = useState<7 | 14 | 30>(7);
   const defaultTab = searchParams.get('tab') || 'businesses';
 
   useEffect(() => {
@@ -121,18 +123,20 @@ const Dashboard = () => {
     setProcessingPayment(true);
     try {
       const { data, error } = await supabase.functions.invoke('create-featured-checkout', {
-        body: { businessId: selectedBusiness.id }
+        body: { 
+          businessId: selectedBusiness.id,
+          duration: selectedDuration
+        }
       });
 
       if (error) throw error;
 
       if (data?.url) {
-        // Ouvrir Stripe dans un nouvel onglet pour éviter de recharger la page
         window.open(data.url, '_blank');
         setFeaturedDialogOpen(false);
         toast({
           title: "Redirection vers le paiement",
-          description: "Une nouvelle fenêtre s'est ouverte pour finaliser votre paiement. La page se mettra à jour automatiquement après le paiement.",
+          description: "Une nouvelle fenêtre s'est ouverte pour finaliser votre paiement.",
         });
       }
     } catch (error: any) {
@@ -182,6 +186,13 @@ const Dashboard = () => {
                 </Button>
               </div>
             ) : (
+              <>
+                <div className="flex justify-end mb-4">
+                  <Button onClick={() => navigate("/list-business")}>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Créer une nouvelle annonce
+                  </Button>
+                </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {businesses.map((business) => (
                   <div key={business.id} className="space-y-2">
@@ -255,23 +266,12 @@ const Dashboard = () => {
                   </div>
                 ))}
               </div>
+              </>
             )}
           </TabsContent>
 
           <TabsContent value="messages">
-            <Card>
-              <CardContent className="p-6 text-center">
-                <MessageSquare className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-                <h3 className="text-lg font-semibold mb-2">Messagerie</h3>
-                <p className="text-muted-foreground mb-4">
-                  Accédez à votre boîte de réception pour gérer toutes vos conversations
-                </p>
-                <Button onClick={() => navigate('/messages')}>
-                  <MessageSquare className="mr-2 h-4 w-4" />
-                  Ouvrir la messagerie
-                </Button>
-              </CardContent>
-            </Card>
+            {user && <MessagesList userId={user.id} />}
           </TabsContent>
 
           <TabsContent value="alerts">
@@ -285,28 +285,62 @@ const Dashboard = () => {
       </div>
 
       <Dialog open={featuredDialogOpen} onOpenChange={setFeaturedDialogOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Mettre votre annonce en avant</DialogTitle>
             <DialogDescription>
-              Mettez votre annonce en vedette avec une étoile dorée pour 20$ CAD.
+              Choisissez la durée de mise en avant pour votre annonce
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="bg-secondary/20 p-4 rounded-lg border border-border">
               <h3 className="font-semibold mb-2">{selectedBusiness?.title}</h3>
-              <p className="text-sm text-muted-foreground mb-4">
-                Votre annonce sera mise en avant pendant 30 jours ou jusqu'à ce que 3 nouvelles annonces soient promues après la vôtre.
-              </p>
-              <div className="flex items-center gap-2 text-primary">
-                <Star className="h-5 w-5 fill-current" />
-                <span className="font-bold">20$ CAD</span>
-              </div>
             </div>
-            <div className="text-sm text-muted-foreground">
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Card 
+                className={`cursor-pointer transition-all ${selectedDuration === 7 ? 'ring-2 ring-primary' : ''}`}
+                onClick={() => setSelectedDuration(7)}
+              >
+                <CardContent className="p-6 text-center">
+                  <Star className="h-8 w-8 mx-auto mb-3 fill-primary text-primary" />
+                  <h4 className="font-bold text-2xl mb-1">75$</h4>
+                  <p className="text-sm text-muted-foreground mb-3">7 jours</p>
+                  <p className="text-xs text-muted-foreground">~10,71$ / jour</p>
+                </CardContent>
+              </Card>
+
+              <Card 
+                className={`cursor-pointer transition-all ${selectedDuration === 14 ? 'ring-2 ring-primary' : ''}`}
+                onClick={() => setSelectedDuration(14)}
+              >
+                <CardContent className="p-6 text-center">
+                  <Star className="h-8 w-8 mx-auto mb-3 fill-primary text-primary" />
+                  <h4 className="font-bold text-2xl mb-1">100$</h4>
+                  <p className="text-sm text-muted-foreground mb-3">14 jours</p>
+                  <Badge variant="secondary" className="mb-1">Populaire</Badge>
+                  <p className="text-xs text-muted-foreground">~7,14$ / jour</p>
+                </CardContent>
+              </Card>
+
+              <Card 
+                className={`cursor-pointer transition-all ${selectedDuration === 30 ? 'ring-2 ring-primary' : ''}`}
+                onClick={() => setSelectedDuration(30)}
+              >
+                <CardContent className="p-6 text-center">
+                  <Star className="h-8 w-8 mx-auto mb-3 fill-primary text-primary" />
+                  <h4 className="font-bold text-2xl mb-1">110$</h4>
+                  <p className="text-sm text-muted-foreground mb-3">30 jours</p>
+                  <Badge variant="secondary" className="mb-1 bg-green-500/20 text-green-700">Meilleure valeur</Badge>
+                  <p className="text-xs text-muted-foreground">~3,67$ / jour</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="text-sm text-muted-foreground bg-muted/50 p-4 rounded-lg">
               <p className="mb-2">✨ Votre annonce apparaîtra en haut avec une étoile dorée</p>
-              <p className="mb-2">🎯 Maximum 3 annonces en avant en même temps</p>
-              <p>⏱️ Valide 30 jours ou jusqu'à être déplacée par de nouvelles annonces</p>
+              <p className="mb-2">🚀 Pas de limite du nombre d'annonces en vedette</p>
+              <p>⏱️ Durée garantie selon votre forfait</p>
             </div>
           </div>
           <div className="flex gap-2">
@@ -315,7 +349,7 @@ const Dashboard = () => {
               disabled={processingPayment}
               className="flex-1"
             >
-              {processingPayment ? "Traitement..." : "Payer 20$ CAD"}
+              {processingPayment ? "Traitement..." : `Payer ${selectedDuration === 7 ? '75' : selectedDuration === 14 ? '100' : '110'}$ CAD`}
             </Button>
             <Button 
               variant="outline" 

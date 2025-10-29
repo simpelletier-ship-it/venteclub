@@ -3,7 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, Paperclip, X, Download, FileText, Image as ImageIcon } from "lucide-react";
+import { Send, Paperclip, X, Download, FileText, Image as ImageIcon, ExternalLink } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 
 interface Message {
@@ -28,9 +29,10 @@ interface ChatBoxProps {
   currentUserId: string;
   otherUserId: string;
   otherUserName?: string;
+  businessTitle?: string;
 }
 
-export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName }: ChatBoxProps) => {
+export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName, businessTitle }: ChatBoxProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [messageAttachments, setMessageAttachments] = useState<Record<string, MessageAttachment[]>>({});
   const [newMessage, setNewMessage] = useState("");
@@ -40,6 +42,7 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName 
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchMessages();
@@ -273,9 +276,24 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName 
   return (
     <div className="border border-border rounded-lg overflow-hidden bg-card">
       <div className="bg-muted/50 p-4 border-b border-border">
-        <h3 className="font-semibold text-foreground">
-          Conversation avec {otherUserName || "l'acheteur/vendeur"}
-        </h3>
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="font-semibold text-foreground">
+              Conversation avec {otherUserName || "l'acheteur/vendeur"}
+            </h3>
+            {businessTitle && (
+              <Button
+                variant="link"
+                size="sm"
+                className="h-auto p-0 text-xs text-muted-foreground hover:text-primary"
+                onClick={() => navigate(`/business/${businessId}`)}
+              >
+                {businessTitle}
+                <ExternalLink className="ml-1 h-3 w-3" />
+              </Button>
+            )}
+          </div>
+        </div>
       </div>
 
       <ScrollArea className="h-[400px] p-4" ref={scrollRef}>
