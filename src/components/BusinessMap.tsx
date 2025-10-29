@@ -121,6 +121,9 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
     markers.current.forEach(marker => marker.remove());
     markers.current = [];
 
+    // Only add markers if map is ready
+    if (!map.current) return;
+
     // Add markers for each business
     businesses.forEach((business) => {
       if (!map.current) return;

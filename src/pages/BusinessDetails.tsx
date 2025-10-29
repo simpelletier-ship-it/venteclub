@@ -114,6 +114,7 @@ const BusinessDetails = () => {
 
       if (error) {
         console.error('Error checking access:', error);
+        setLoading(false);
         return;
       }
 
@@ -138,8 +139,11 @@ const BusinessDetails = () => {
           setSellerContact(contact);
         }
       }
+      
+      setLoading(false);
     } catch (error: any) {
       console.error(error);
+      setLoading(false);
     }
   };
 
