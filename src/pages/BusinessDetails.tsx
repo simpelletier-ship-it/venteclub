@@ -693,13 +693,6 @@ const BusinessDetails = () => {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-6 py-4">
-            <div className="bg-secondary/20 p-4 rounded-lg border border-border">
-              <h3 className="font-semibold mb-2">{business?.title}</h3>
-              <p className="text-sm text-muted-foreground">
-                Accédez à l'email et au numéro de téléphone du vendeur pour le contacter directement.
-              </p>
-            </div>
-
             <div className="grid md:grid-cols-2 gap-4">
               {/* Option 1: Paiement unique */}
               <div className="border-2 border-border rounded-lg p-6 hover:border-accent transition-colors">
