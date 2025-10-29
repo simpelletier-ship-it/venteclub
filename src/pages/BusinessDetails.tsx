@@ -242,8 +242,8 @@ const BusinessDetails = () => {
       }
 
       if (data?.url) {
-        window.open(data.url, '_blank');
-        setShowPaymentDialog(false);
+        // Redirect in the same window instead of opening new tab
+        window.location.href = data.url;
       }
     } catch (error: any) {
       console.error('Payment error:', error);
@@ -252,7 +252,6 @@ const BusinessDetails = () => {
         title: "Erreur",
         description: error.message || "Erreur lors de la création du paiement",
       });
-    } finally {
       setIsPurchasing(false);
     }
   };

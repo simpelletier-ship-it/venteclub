@@ -9,7 +9,7 @@ verify_jwt = true
 [functions.verify-featured-payment]
 verify_jwt = true
 
-[functions.create-contact-checkout]
+[functions.create-contact-access-checkout]
 verify_jwt = true
 
 [functions.verify-contact-payment]

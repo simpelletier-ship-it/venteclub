@@ -18,20 +18,24 @@ export const PurchasedBusinesses = ({ userId }: PurchasedBusinessesProps) => {
 
   const fetchPurchasedBusinesses = async () => {
     try {
+      console.log('Fetching purchased businesses for user:', userId);
+      
       // Get all businesses the user has access to
       const { data: accessRecords, error: accessError } = await supabase
         .from('contact_access')
         .select(`
-          business_id,
-          access_type,
-          expires_at,
-          created_at,
-          businesses (*)
+          *,
+          businesses!inner (*)
         `)
         .eq('user_id', userId)
         .order('created_at', { ascending: false });
 
-      if (accessError) throw accessError;
+      console.log('Access records fetched:', accessRecords);
+
+      if (accessError) {
+        console.error('Access error:', accessError);
+        throw accessError;
+      }
 
       // Filter out expired subscriptions
       const activeAccess = accessRecords?.filter(record => {
@@ -42,6 +46,8 @@ export const PurchasedBusinesses = ({ userId }: PurchasedBusinessesProps) => {
         return false;
       });
 
+      console.log('Active access:', activeAccess);
+
       // Extract businesses from the records
       const businesses = activeAccess?.map(record => ({
         ...record.businesses,
@@ -50,6 +56,7 @@ export const PurchasedBusinesses = ({ userId }: PurchasedBusinessesProps) => {
         expires_at: record.expires_at,
       })) || [];
 
+      console.log('Businesses to display:', businesses);
       setPurchasedBusinesses(businesses);
     } catch (error: any) {
       console.error('Error fetching purchased businesses:', error);
