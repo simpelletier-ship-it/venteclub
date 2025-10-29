@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { authSchema } from "@/lib/validations";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -16,6 +17,7 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showResetPassword, setShowResetPassword] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -136,6 +138,16 @@ const Auth = () => {
     setLoading(true);
 
     try {
+      if (!acceptedTerms) {
+        toast({
+          variant: "destructive",
+          title: "Conditions non acceptées",
+          description: "Vous devez accepter les conditions d'utilisation pour créer un compte.",
+        });
+        setLoading(false);
+        return;
+      }
+
       if (password !== confirmPassword) {
         toast({
           variant: "destructive",
@@ -376,16 +388,38 @@ const Auth = () => {
                       className="w-full mt-2"
                     />
                   </div>
-                  <div className="bg-muted/50 border border-border rounded-lg p-4 text-xs text-muted-foreground">
-                    <p className="font-medium mb-1">Avertissement important :</p>
-                    <p>
-                      En créant un compte, vous reconnaissez que Vente.Club n'est aucunement responsable 
-                      des annonces publiées sur la plateforme et ne peut être reconnu comme ayant commis 
-                      une faute. Vous devez agir avec prudence lors de l'achat d'une entreprise et effectuer 
-                      vos propres vérifications.
-                    </p>
+                  
+                  <div className="space-y-3">
+                    <div className="flex items-start space-x-3 p-4 bg-muted/50 border border-border rounded-lg">
+                      <Checkbox
+                        id="terms"
+                        checked={acceptedTerms}
+                        onCheckedChange={(checked) => setAcceptedTerms(checked as boolean)}
+                        className="mt-1"
+                      />
+                      <div className="flex-1">
+                        <Label
+                          htmlFor="terms"
+                          className="text-sm leading-relaxed cursor-pointer"
+                        >
+                          J'ai lu et j'accepte les{" "}
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              window.open('/terms', '_blank');
+                            }}
+                            className="text-primary font-medium underline hover:text-primary/80"
+                          >
+                            conditions d'utilisation
+                          </button>
+                          {" "}et je reconnais que Vente.Club n'est aucunement responsable des annonces publiées sur la plateforme.
+                        </Label>
+                      </div>
+                    </div>
                   </div>
-                  <Button type="submit" disabled={loading} className="w-full">
+
+                  <Button type="submit" disabled={loading || !acceptedTerms} className="w-full">
                     {loading ? "Création..." : "Créer mon compte"}
                   </Button>
                 </form>

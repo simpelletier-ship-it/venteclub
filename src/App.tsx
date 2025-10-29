@@ -24,6 +24,7 @@ import Contact from "./pages/Contact";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import CityPage from "./pages/CityPage";
+import Terms from "./pages/Terms";
 
 const queryClient = new QueryClient();
 
@@ -55,6 +56,7 @@ const App = () => (
               <Route path="/contact" element={<Contact />} />
               <Route path="/blog" element={<Blog />} />
               <Route path="/blog/:slug" element={<BlogPost />} />
+              <Route path="/terms" element={<Terms />} />
               
               {/* City Pages - Static routes for SEO */}
               <Route path="/entreprises-a-vendre-montreal" element={<CityPage />} />
