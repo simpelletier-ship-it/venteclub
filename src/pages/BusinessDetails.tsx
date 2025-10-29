@@ -184,12 +184,20 @@ const BusinessDetails = () => {
   const verifyPayment = async (sessionId: string, userId: string) => {
     setIsVerifyingPayment(true);
     setLoading(true);
+    
+    // Add timeout of 30 seconds
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('La vérification du paiement a pris trop de temps. Veuillez rafraîchir la page.')), 30000);
+    });
+    
     try {
       console.log("[VERIFY PAYMENT] Starting verification with session:", sessionId);
       
-      const { data, error } = await supabase.functions.invoke('verify-contact-payment', {
+      const verifyPromise = supabase.functions.invoke('verify-contact-payment', {
         body: { sessionId }
       });
+      
+      const { data, error } = await Promise.race([verifyPromise, timeoutPromise]) as any;
 
       console.log("[VERIFY PAYMENT] Response:", { data, error });
 
@@ -214,8 +222,8 @@ const BusinessDetails = () => {
       setSellerContact(data.sellerContact);
 
       toast({
-        title: "🎉 Accès débloqué avec succès!",
-        description: "Vous pouvez maintenant voir toutes les informations du vendeur et démarrer une conversation.",
+        title: "Accès débloqué avec succès!",
+        description: "Vous pouvez maintenant voir toutes les informations du vendeur.",
       });
       
       // Scroll to seller contact section
@@ -230,7 +238,7 @@ const BusinessDetails = () => {
       toast({
         variant: "destructive",
         title: "Erreur de vérification",
-        description: error.message || "Impossible de vérifier le paiement. Veuillez rafraîchir la page.",
+        description: error.message || "Impossible de vérifier le paiement. Veuillez rafraîchir la page ou contacter le support.",
       });
     } finally {
       console.log("[VERIFY PAYMENT] Cleanup - setting loading to false");

@@ -12,6 +12,11 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Set a timeout for the entire function
+  const timeoutId = setTimeout(() => {
+    console.error("[VERIFY] Function timeout after 25 seconds");
+  }, 25000);
+
   const supabaseClient = createClient(
     Deno.env.get("SUPABASE_URL") ?? "",
     Deno.env.get("SUPABASE_ANON_KEY") ?? "",
@@ -30,16 +35,26 @@ serve(async (req) => {
   try {
     console.log("[VERIFY] Starting payment verification");
     
-    const authHeader = req.headers.get("Authorization")!;
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) {
+      throw new Error("No authorization header");
+    }
+    
     const token = authHeader.replace("Bearer ", "");
     const { data } = await supabaseClient.auth.getUser(token);
     const user = data.user;
-    if (!user) throw new Error("User not authenticated");
+    if (!user) {
+      throw new Error("User not authenticated");
+    }
 
     console.log("[VERIFY] User authenticated:", user.id);
 
-    const { sessionId } = await req.json();
-    if (!sessionId) throw new Error("Session ID required");
+    const body = await req.json();
+    const { sessionId } = body;
+    
+    if (!sessionId) {
+      throw new Error("Session ID required");
+    }
 
     console.log("[VERIFY] Verifying Stripe session:", sessionId);
 
@@ -136,6 +151,8 @@ serve(async (req) => {
     console.log("[VERIFY] Seller contact found:", sellerContact ? "Yes" : "No");
     console.log("[VERIFY] Verification complete, returning success");
 
+    clearTimeout(timeoutId);
+
     return new Response(
       JSON.stringify({ 
         success: true,
@@ -147,7 +164,8 @@ serve(async (req) => {
       }
     );
   } catch (error) {
-    console.error("Error in verify-contact-payment:", error);
+    clearTimeout(timeoutId);
+    console.error("[VERIFY] Error in verify-contact-payment:", error);
     const errorMessage = error instanceof Error ? error.message : "An error occurred";
     return new Response(JSON.stringify({ error: errorMessage }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
