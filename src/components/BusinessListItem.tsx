@@ -104,7 +104,7 @@ const BusinessListItem = ({
         </div>
         
         <div className="space-y-1">
-          <h3 className="text-lg font-bold text-foreground group-hover:text-accent transition-colors truncate">
+          <h3 className="text-lg font-bold text-foreground group-hover:text-accent transition-colors line-clamp-2">
             {title}
           </h3>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">

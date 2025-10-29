@@ -106,7 +106,7 @@ const BusinessCard = ({
                 <Badge className="bg-orange-500 text-white">⏳ En attente</Badge>
               )}
             </div>
-            <h3 className={`text-2xl font-display font-bold text-foreground group-hover:text-primary transition-colors line-clamp-1 ${status === 'sold' ? 'blur-[0.5px]' : ''}`}>
+            <h3 className={`text-2xl font-display font-bold text-foreground group-hover:text-primary transition-colors line-clamp-2 ${status === 'sold' ? 'blur-[0.5px]' : ''}`}>
               {title}
             </h3>
             <div className="flex items-center gap-2 text-muted-foreground">
