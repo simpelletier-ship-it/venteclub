@@ -138,20 +138,17 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
       el.style.border = '3px solid white';
       el.style.cursor = 'pointer';
       el.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
-      el.style.transition = 'transform 0.2s, box-shadow 0.2s';
-      el.style.transformOrigin = 'center center';
+      el.style.transition = 'box-shadow 0.2s, background-color 0.2s';
       el.style.position = 'relative';
 
-      // Hover effect
+      // Hover effect - only change visual properties, never transform or position
       el.addEventListener('mouseenter', () => {
-        el.style.transform = 'scale(1.2)';
-        el.style.boxShadow = '0 6px 16px rgba(0,0,0,0.4)';
-        el.style.zIndex = '999';
+        el.style.backgroundColor = 'hsl(270 100% 65%)';
+        el.style.boxShadow = '0 6px 20px rgba(139, 92, 246, 0.6)';
       });
       el.addEventListener('mouseleave', () => {
-        el.style.transform = 'scale(1)';
+        el.style.backgroundColor = 'hsl(270 100% 60%)';
         el.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
-        el.style.zIndex = '1';
       });
 
       // Create rich popup with preview and image
