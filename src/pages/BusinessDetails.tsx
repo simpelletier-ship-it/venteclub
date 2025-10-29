@@ -29,6 +29,7 @@ const BusinessDetails = () => {
 
   useEffect(() => {
     const initialize = async () => {
+      setLoading(true);
       const { data: { session } } = await supabase.auth.getSession();
       setUser(session?.user ?? null);
       
@@ -40,10 +41,11 @@ const BusinessDetails = () => {
       if (searchParams.get('payment_success') === 'true' && sessionId) {
         if (session?.user) {
           await verifyPayment(sessionId, session.user.id);
-          // Clear URL params after verification to stay on the page
+          // Clear URL params after verification
           setSearchParams({});
+        } else {
+          setLoading(false);
         }
-        return;
       } else if (searchParams.get('payment_canceled') === 'true') {
         toast({
           variant: "destructive",
@@ -51,6 +53,7 @@ const BusinessDetails = () => {
           description: "Vous avez annulé le paiement.",
         });
         setSearchParams({});
+        setLoading(false);
       } else if (session?.user) {
         await checkAccess(session.user.id);
       } else {
@@ -59,7 +62,7 @@ const BusinessDetails = () => {
     };
 
     initialize();
-  }, [id]);
+  }, [id, searchParams]);
 
   const fetchPhotos = async () => {
     if (!id) return;
@@ -77,11 +80,14 @@ const BusinessDetails = () => {
 
   const fetchBusiness = async () => {
     try {
+      console.log('[BUSINESS DETAILS] Fetching business with id:', id);
       const { data, error } = await supabase
         .from("businesses")
         .select("*")
         .eq("id", id)
         .maybeSingle();
+
+      console.log('[BUSINESS DETAILS] Fetch result:', { data, error });
 
       if (error) throw error;
       
@@ -93,11 +99,13 @@ const BusinessDetails = () => {
           .eq("id", id);
         
         setBusiness({ ...data, views_count: (data.views_count || 0) + 1 });
+        console.log('[BUSINESS DETAILS] Business set:', data.title);
       } else {
+        console.log('[BUSINESS DETAILS] No business found');
         setBusiness(null);
       }
     } catch (error: any) {
-      console.error("Fetch business error:", error);
+      console.error("[BUSINESS DETAILS] Fetch business error:", error);
       toast({
         variant: "destructive",
         title: "Erreur",
@@ -154,32 +162,31 @@ const BusinessDetails = () => {
     setIsVerifyingPayment(true);
     setLoading(true);
     try {
-      console.log("Verifying payment with session:", sessionId);
+      console.log("[VERIFY PAYMENT] Starting verification with session:", sessionId);
       
       const { data, error } = await supabase.functions.invoke('verify-contact-payment', {
         body: { sessionId }
       });
 
-      console.log("Verification response:", data);
+      console.log("[VERIFY PAYMENT] Response:", { data, error });
 
       if (error) {
-        console.error("Verification error:", error);
+        console.error("[VERIFY PAYMENT] Error:", error);
         throw error;
       }
 
       if (data?.error) {
-        console.error("Data error:", data.error);
+        console.error("[VERIFY PAYMENT] Data error:", data.error);
         toast({
           variant: "destructive",
           title: "Erreur de vérification",
           description: data.error,
         });
-        setLoading(false);
-        setIsVerifyingPayment(false);
         return;
       }
 
       // Payment successful - update state immediately
+      console.log("[VERIFY PAYMENT] Success! Setting access and contact");
       setHasAccess(true);
       setSellerContact(data.sellerContact);
 
@@ -190,17 +197,20 @@ const BusinessDetails = () => {
       
       // Scroll to seller contact section
       setTimeout(() => {
-        document.getElementById('seller-contact')?.scrollIntoView({ behavior: 'smooth' });
+        const element = document.getElementById('seller-contact');
+        console.log("[VERIFY PAYMENT] Scrolling to seller contact:", element);
+        element?.scrollIntoView({ behavior: 'smooth' });
       }, 500);
       
     } catch (error: any) {
-      console.error('Payment verification error:', error);
+      console.error('[VERIFY PAYMENT] Exception:', error);
       toast({
         variant: "destructive",
         title: "Erreur de vérification",
         description: error.message || "Impossible de vérifier le paiement. Veuillez rafraîchir la page.",
       });
     } finally {
+      console.log("[VERIFY PAYMENT] Cleanup - setting loading to false");
       setIsVerifyingPayment(false);
       setLoading(false);
     }
