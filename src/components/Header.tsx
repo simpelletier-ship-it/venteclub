@@ -81,7 +81,7 @@ export const Header = () => {
         </div>
         <div className="hidden md:flex items-center gap-8">
           <button onClick={() => navigate("/")} className="text-foreground hover:text-accent transition-colors font-medium">Parcourir</button>
-          <button onClick={() => navigate("/map")} className="text-foreground hover:text-accent transition-colors font-medium">Carte</button>
+          <button onClick={() => navigate("/map")} className="text-foreground hover:text-accent transition-colors font-medium">Carte Interactive</button>
           {user && (
             <>
               <button onClick={() => navigate("/dashboard")} className="text-foreground hover:text-accent transition-colors font-medium flex items-center gap-2">
