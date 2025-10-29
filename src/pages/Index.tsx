@@ -196,7 +196,7 @@ const Index = () => {
                   Mes annonces
                 </Button>
                 <Button className="bg-accent hover:bg-accent/90 text-accent-foreground" onClick={() => navigate("/list-business")}>
-                  Lister
+                  Vendre une entreprise
                 </Button>
               </>
             ) : (
@@ -205,7 +205,7 @@ const Index = () => {
                   Connexion
                 </Button>
                 <Button className="bg-accent hover:bg-accent/90 text-accent-foreground" onClick={() => navigate("/auth")}>
-                  Lister
+                  Vendre une entreprise
                 </Button>
               </>
             )}
