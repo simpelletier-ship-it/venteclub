@@ -6,6 +6,7 @@ import BusinessListItem from "@/components/BusinessListItem";
 import FilterBar from "@/components/FilterBar";
 import { ArrowRight, Grid3x3, List } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { SEO } from "@/components/SEO";
 import heroImage from "@/assets/hero-business-pro.jpg";
 
 const Index = () => {
@@ -85,10 +86,40 @@ const Index = () => {
     setFilteredBusinesses(filtered);
   };
 
+  // Structured data for SEO
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Vente.club",
+    "url": "https://vente.club",
+    "description": "Plateforme québécoise pour acheter et vendre des entreprises",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://vente.club/?search={search_term_string}",
+      "query-input": "required name=search_term_string"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Vente.club",
+      "url": "https://vente.club"
+    }
+  };
+
   return (
     <>
+      <SEO 
+        title="Vente.club - Achat et Vente d'Entreprises au Québec | Opportunités Vérifiées"
+        description="Découvrez plus de 100 entreprises à vendre au Québec : restaurants, commerces, franchises. Plateforme sécurisée avec vérification des annonces. Contactez directement les vendeurs."
+        keywords="vente entreprise Québec, achat commerce Montréal, vendre restaurant, acheter franchise, opportunité affaires, cession entreprise, reprise commerce"
+        canonical="/"
+        structuredData={structuredData}
+      />
+      
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-background via-primary/5 to-accent/10">
+      <section 
+        className="relative overflow-hidden bg-gradient-to-br from-background via-primary/5 to-accent/10"
+        aria-label="Section principale"
+      >
         <div className="absolute inset-0">
           <div 
             className="absolute inset-0 opacity-20"
@@ -97,6 +128,8 @@ const Index = () => {
               backgroundSize: 'cover',
               backgroundPosition: 'center',
             }}
+            role="img"
+            aria-label="Image d'arrière-plan montrant des entrepreneurs en action"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/50 to-background" />
         </div>

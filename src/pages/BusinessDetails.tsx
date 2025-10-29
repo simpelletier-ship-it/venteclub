@@ -11,6 +11,7 @@ import { FavoriteButton } from "@/components/FavoriteButton";
 import { ChatBox } from "@/components/ChatBox";
 import { SellerChatSection } from "@/components/SellerChatSection";
 import { ReportBusinessDialog } from "@/components/ReportBusinessDialog";
+import { SEO } from "@/components/SEO";
 
 const BusinessDetails = () => {
   const { id } = useParams();
@@ -388,8 +389,40 @@ const BusinessDetails = () => {
 
   const isSeller = user?.id === business.seller_id;
 
+  // Structured data for business listing
+  const businessStructuredData = business ? {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": business.title,
+    "description": business.description,
+    "category": business.industry,
+    "offers": {
+      "@type": "Offer",
+      "price": business.asking_price,
+      "priceCurrency": "CAD",
+      "availability": business.status === 'active' ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"
+    },
+    "location": {
+      "@type": "Place",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": business.city,
+        "addressRegion": business.province,
+        "addressCountry": "CA"
+      }
+    }
+  } : undefined;
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-secondary/10">
+      <SEO
+        title={`${business.title} - ${business.asking_price.toLocaleString()} CAD | Vente.club`}
+        description={`${business.description.substring(0, 155)}... Entreprise ${business.industry} à ${business.city}. ${business.annual_revenue ? `Revenus: ${business.annual_revenue.toLocaleString()} CAD` : ''}`}
+        keywords={`vente ${business.industry} ${business.city}, acheter entreprise ${business.city}, ${business.title}, opportunité affaires Québec`}
+        canonical={`/business/${id}`}
+        type="product"
+        structuredData={businessStructuredData}
+      />
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
           <div className="bg-card rounded-2xl shadow-elegant border border-border/50 overflow-hidden">
@@ -439,7 +472,7 @@ const BusinessDetails = () => {
                   <div className="mb-6">
                     <h2 className="text-xl font-semibold mb-4">Galerie Photos</h2>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                      {photos.map((photo, index) => (
+                       {photos.map((photo, index) => (
                         <div 
                           key={photo.id} 
                           className="aspect-video rounded-lg overflow-hidden cursor-pointer hover:opacity-90 transition-opacity shadow-md hover:shadow-lg"
@@ -447,8 +480,9 @@ const BusinessDetails = () => {
                         >
                           <img
                             src={photo.photo_url}
-                            alt={`Photo ${index + 1}`}
+                            alt={`Photo ${index + 1} de ${business.title} - ${business.industry} à ${business.city}`}
                             className="w-full h-full object-cover"
+                            loading="lazy"
                           />
                         </div>
                       ))}
