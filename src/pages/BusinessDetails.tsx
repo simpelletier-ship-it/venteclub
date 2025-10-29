@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Lock, MapPin, TrendingUp, Users, Calendar, Eye } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { FavoriteButton } from "@/components/FavoriteButton";
 
 const BusinessDetails = () => {
   const { id } = useParams();
@@ -309,9 +310,19 @@ const BusinessDetails = () => {
               <div className="p-8">
                 <div className="flex items-start justify-between mb-6">
                   <div className="flex-1">
-                    <h1 className="text-3xl font-bold text-foreground mb-2">
-                      {business.title}
-                    </h1>
+                    <div className="flex items-center gap-3 mb-2">
+                      <h1 className="text-3xl font-bold text-foreground">
+                        {business.title}
+                      </h1>
+                      {id && (
+                        <div className="flex items-center gap-2">
+                          <FavoriteButton businessId={id} userId={user?.id} />
+                          <span className="text-xs text-muted-foreground">
+                            Activer les notifications
+                          </span>
+                        </div>
+                      )}
+                    </div>
                     <div className="flex flex-wrap gap-2 items-center text-muted-foreground">
                       <Badge variant="secondary">{business.industry}</Badge>
                       <span className="flex items-center gap-1">
