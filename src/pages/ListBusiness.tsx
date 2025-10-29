@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -8,9 +8,12 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Upload, X } from "lucide-react";
+import { Upload, X, FileText, TrendingUp, DollarSign, Info, Sparkles } from "lucide-react";
 import { businessSchema } from "@/lib/validations";
 import { TermsDialog } from "@/components/TermsDialog";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 const ListBusiness = () => {
   const navigate = useNavigate();
@@ -25,6 +28,9 @@ const ListBusiness = () => {
     description: "",
     industry: "",
     location: "",
+    city: "",
+    province: "Québec",
+    region: "",
     annual_revenue: "",
     asking_price: "",
     profit_margin: "",
@@ -33,6 +39,18 @@ const ListBusiness = () => {
     seller_email: "",
     seller_phone: "",
     is_franchise: false,
+    competitive_advantages: "",
+    target_clientele: "",
+    sale_reason: "",
+    financing_options: "",
+    support_offered: "",
+    website: "",
+    facebook: "",
+    linkedin: "",
+    instagram: "",
+    twitter: "",
+    threads: "",
+    status: "active" as "active" | "archived",
   });
   const [photos, setPhotos] = useState<File[]>([]);
   const [photoPreviewUrls, setPhotoPreviewUrls] = useState<string[]>([]);
@@ -40,7 +58,6 @@ const ListBusiness = () => {
   const [imagePrompt, setImagePrompt] = useState("");
 
   useEffect(() => {
-    // Check initial session
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
@@ -52,7 +69,6 @@ const ListBusiness = () => {
 
     checkSession();
 
-    // Listen to auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (!session) {
         navigate("/auth");
@@ -63,6 +79,38 @@ const ListBusiness = () => {
 
     return () => subscription.unsubscribe();
   }, [navigate]);
+
+  // Calculate visibility score
+  const visibilityScore = useMemo(() => {
+    const fields = [
+      formData.title,
+      formData.description,
+      formData.industry,
+      formData.location,
+      formData.city,
+      formData.province,
+      formData.region,
+      formData.asking_price,
+      formData.year_established,
+      formData.competitive_advantages,
+      formData.target_clientele,
+      photos.length > 0,
+      formData.website,
+    ];
+    
+    const filledFields = fields.filter(field => field && field !== "").length;
+    return Math.round((filledFields / fields.length) * 100);
+  }, [formData, photos]);
+
+  // Next steps suggestions
+  const nextSteps = useMemo(() => {
+    const steps = [];
+    if (!formData.title) steps.push({ icon: FileText, text: "Ajouter un titre percutant", action: "title" });
+    if (!formData.description || formData.description.length < 100) 
+      steps.push({ icon: FileText, text: "Rédiger une description détaillée", action: "description" });
+    if (!formData.asking_price) steps.push({ icon: DollarSign, text: "Indiquer le prix de vente", action: "price" });
+    return steps;
+  }, [formData]);
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -76,8 +124,6 @@ const ListBusiness = () => {
     }
 
     setPhotos([...photos, ...files]);
-    
-    // Create preview URLs
     const newPreviewUrls = files.map(file => URL.createObjectURL(file));
     setPhotoPreviewUrls([...photoPreviewUrls, ...newPreviewUrls]);
   };
@@ -98,7 +144,6 @@ const ListBusiness = () => {
       return;
     }
 
-    // Utiliser le prompt personnalisé s'il est fourni, sinon utiliser titre/description
     if (!imagePrompt && (!formData.title || !formData.description)) {
       toast({
         variant: "destructive",
@@ -125,7 +170,6 @@ const ListBusiness = () => {
         throw new Error("Aucune image générée");
       }
 
-      // Convertir le base64 en fichier
       const response = await fetch(data.imageUrl);
       const blob = await response.blob();
       const file = new File([blob], `ai-generated-${Date.now()}.png`, { type: 'image/png' });
@@ -138,7 +182,6 @@ const ListBusiness = () => {
         description: "L'image a été générée avec succès par l'IA.",
       });
       
-      // Réinitialiser le prompt après génération
       setImagePrompt("");
     } catch (error: any) {
       console.error("Erreur génération image:", error);
@@ -155,7 +198,6 @@ const ListBusiness = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Vérifier l'acceptation des conditions
     if (!termsAccepted) {
       toast({
         variant: "destructive",
@@ -168,7 +210,6 @@ const ListBusiness = () => {
     setLoading(true);
 
     try {
-      // Validate with Zod
       const validatedData = businessSchema.parse({
         title: formData.title,
         description: formData.description,
@@ -189,20 +230,22 @@ const ListBusiness = () => {
           description: validatedData.description,
           industry: validatedData.industry,
           location: validatedData.location,
+          city: formData.city,
+          province: formData.province,
           annual_revenue: validatedData.annual_revenue,
           asking_price: validatedData.asking_price,
           profit_margin: validatedData.profit_margin,
           employees_count: validatedData.employees_count,
           year_established: validatedData.year_established,
           is_franchise: formData.is_franchise,
-          status: "active",
+          status: formData.status,
         } as any)
         .select()
         .single();
 
       if (businessError) throw businessError;
 
-      // Upload photos if any
+      // Upload photos
       if (photos.length > 0 && businessData) {
         for (let i = 0; i < photos.length; i++) {
           const file = photos[i];
@@ -247,15 +290,6 @@ const ListBusiness = () => {
         }
       }
 
-      // Send email notification (commented out temporarily due to resend package issue)
-      // await supabase.functions.invoke('send-approval-email', {
-      //   body: {
-      //     email: formData.seller_email,
-      //     businessTitle: validatedData.title,
-      //     status: 'pending',
-      //   }
-      // });
-
       toast({
         title: "Succès !",
         description: "Votre annonce a été soumise et est en attente d'approbation. Vous recevrez un email de confirmation.",
@@ -263,7 +297,6 @@ const ListBusiness = () => {
       navigate("/dashboard");
     } catch (error: any) {
       if (error.errors) {
-        // Zod validation errors
         error.errors.forEach((err: any) => {
           toast({
             variant: "destructive",
@@ -286,379 +319,774 @@ const ListBusiness = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-secondary/10">
       <div className="container mx-auto px-4 py-12">
-        <div className="max-w-3xl mx-auto">
-          <h1 className="text-4xl font-bold text-foreground mb-2">
-            Listez votre entreprise
-          </h1>
-          <p className="text-muted-foreground mb-8">
-            Remplissez les détails pour mettre votre entreprise en vente
-          </p>
+        <div className="max-w-7xl mx-auto">
+          <div className="mb-8">
+            <h1 className="text-4xl font-bold text-foreground mb-2">
+              Nouvelle Fiche Entreprise
+            </h1>
+            <p className="text-muted-foreground">
+              Remplissez les informations pour créer une nouvelle annonce.
+            </p>
+          </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6 bg-card p-8 rounded-2xl shadow-elegant border border-border/50">
-            <div>
-              <Label htmlFor="title">Titre de l'annonce *</Label>
-              <Input
-                id="title"
-                value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                required
-                placeholder="Ex: Restaurant italien bien établi à Montréal"
-              />
-            </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Main Form - 2/3 width */}
+            <div className="lg:col-span-2">
+              <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Informations générales */}
+                <div className="bg-card p-6 rounded-2xl shadow-elegant border border-border/50">
+                  <h2 className="text-xl font-semibold text-primary mb-4 flex items-center gap-2">
+                    <Info className="w-5 h-5" />
+                    Informations générales
+                  </h2>
 
-            <div>
-              <Label htmlFor="description">Description *</Label>
-              <div className="space-y-2">
-                <Textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  required
-                  rows={6}
-                  placeholder="Décrivez votre entreprise en détail..."
-                />
-                {formData.description && formData.title && formData.industry && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={async () => {
-                      setLoading(true);
-                      try {
-                        const { data, error } = await supabase.functions.invoke('improve-description', {
-                          body: {
-                            description: formData.description,
-                            title: formData.title,
-                            industry: formData.industry
-                          }
-                        });
-
-                        if (error) throw error;
-
-                        if (data?.improvedDescription) {
-                          setFormData({ ...formData, description: data.improvedDescription });
-                          toast({
-                            title: "Description améliorée !",
-                            description: "Votre description a été reformulée avec succès.",
-                          });
-                        }
-                      } catch (error: any) {
-                        toast({
-                          variant: "destructive",
-                          title: "Erreur",
-                          description: error.message || "Impossible d'améliorer la description",
-                        });
-                      } finally {
-                        setLoading(false);
-                      }
-                    }}
-                    disabled={loading}
-                  >
-                    ✨ Améliorer avec l'IA
-                  </Button>
-                )}
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <Label htmlFor="industry">Industrie *</Label>
-                <Select
-                  value={formData.industry}
-                  onValueChange={(value) => setFormData({ ...formData, industry: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sélectionner une industrie" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="restaurant">Restaurant</SelectItem>
-                    <SelectItem value="bar_bistro_discotheque">Bar / Bistro / Discothèque</SelectItem>
-                    <SelectItem value="boutique_commerce_detail">Commerce de détail</SelectItem>
-                    <SelectItem value="epicerie_depanneur">Épicerie / Dépanneur</SelectItem>
-                    <SelectItem value="entreprise_service">Services professionnels</SelectItem>
-                    <SelectItem value="communications_informatique">Technologie / Informatique</SelectItem>
-                    <SelectItem value="batiment_immeuble">Immobilier / Bâtiment</SelectItem>
-                    <SelectItem value="construction_excavation_renovation">Construction / Rénovation</SelectItem>
-                    <SelectItem value="residence_sante">Santé / Résidence</SelectItem>
-                    <SelectItem value="education_garderie">Éducation / Garderie</SelectItem>
-                    <SelectItem value="beaute_esthetique">Beauté / Esthétique</SelectItem>
-                    <SelectItem value="industrie_manufacturier_transformation">Manufacturing / Transformation</SelectItem>
-                    <SelectItem value="transport_entreposage">Transport / Entreposage</SelectItem>
-                    <SelectItem value="camping">Camping</SelectItem>
-                    <SelectItem value="hebergement">Hébergement</SelectItem>
-                    <SelectItem value="domaine_alimentaire">Domaine alimentaire</SelectItem>
-                    <SelectItem value="garage_mecanique_concessionnaire">Garage / Mécanique</SelectItem>
-                    <SelectItem value="activite_sport_loisir">Activités sportives / Loisirs</SelectItem>
-                    <SelectItem value="art_spectacle_cinema">Arts / Spectacles / Cinéma</SelectItem>
-                    <SelectItem value="centre_equestre_erabliere">Centre équestre / Érablière</SelectItem>
-                    <SelectItem value="developpement_domaine">Développement de domaine</SelectItem>
-                    <SelectItem value="distribution_commerce_gros">Distribution / Commerce de gros</SelectItem>
-                    <SelectItem value="entreprise_saisonniere">Entreprise saisonnière</SelectItem>
-                    <SelectItem value="immeuble_revenus">Immeuble à revenus</SelectItem>
-                    <SelectItem value="jardin_pepiniere_verger_vignoble">Jardin / Pépinière / Verger</SelectItem>
-                    <SelectItem value="pourvoirie_centre_plein_air">Pourvoirie / Plein air</SelectItem>
-                    <SelectItem value="residentiel">Résidentiel</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label htmlFor="location">Localisation *</Label>
-                <Input
-                  id="location"
-                  value={formData.location}
-                  onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                  required
-                  placeholder="Ex: Montréal, QC"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="asking_price">Prix demandé (CAD) *</Label>
-                <Input
-                  id="asking_price"
-                  type="number"
-                  value={formData.asking_price}
-                  onChange={(e) => setFormData({ ...formData, asking_price: e.target.value })}
-                  required
-                  placeholder="250000"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="annual_revenue">Chiffre d'affaires annuel (CAD)</Label>
-                <Input
-                  id="annual_revenue"
-                  type="number"
-                  value={formData.annual_revenue}
-                  onChange={(e) => setFormData({ ...formData, annual_revenue: e.target.value })}
-                  placeholder="500000"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="profit_margin">Marge de profit (%)</Label>
-                <Input
-                  id="profit_margin"
-                  type="number"
-                  step="0.01"
-                  value={formData.profit_margin}
-                  onChange={(e) => setFormData({ ...formData, profit_margin: e.target.value })}
-                  placeholder="25"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="employees_count">Nombre d'employés</Label>
-                <Input
-                  id="employees_count"
-                  type="number"
-                  value={formData.employees_count}
-                  onChange={(e) => setFormData({ ...formData, employees_count: e.target.value })}
-                  placeholder="10"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="year_established">Année de fondation</Label>
-                <Input
-                  id="year_established"
-                  type="number"
-                  value={formData.year_established}
-                  onChange={(e) => setFormData({ ...formData, year_established: e.target.value })}
-                  placeholder="2010"
-                />
-              </div>
-            </div>
-
-            <div className="border-t pt-6 mt-6">
-              <h3 className="text-lg font-semibold mb-4">Vos coordonnées</h3>
-              <p className="text-sm text-muted-foreground mb-4">
-                Ces informations seront visibles uniquement aux acheteurs qui paient pour y accéder (5$ CAD).
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <Label htmlFor="seller_email">Votre email *</Label>
-                  <Input
-                    id="seller_email"
-                    type="email"
-                    value={formData.seller_email}
-                    onChange={(e) => setFormData({ ...formData, seller_email: e.target.value })}
-                    required
-                    placeholder="votre@email.com"
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="seller_phone">Votre téléphone</Label>
-                  <Input
-                    id="seller_phone"
-                    type="tel"
-                    value={formData.seller_phone}
-                    onChange={(e) => setFormData({ ...formData, seller_phone: e.target.value })}
-                    placeholder="+1 (514) 123-4567"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <Checkbox 
-                id="is_franchise" 
-                checked={formData.is_franchise}
-                onCheckedChange={(checked) => setFormData({ ...formData, is_franchise: checked as boolean })}
-              />
-              <Label htmlFor="is_franchise" className="text-sm font-normal cursor-pointer">
-                Cette entreprise est une franchise
-              </Label>
-            </div>
-
-              <div>
-              <Label htmlFor="photos">Photos (maximum 10)</Label>
-              <div className="mt-2 space-y-3">
-                <label
-                  htmlFor="photos"
-                  className="flex items-center justify-center gap-2 p-6 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary transition-colors"
-                >
-                  <Upload className="h-5 w-5 text-muted-foreground" />
-                  <span className="text-muted-foreground">
-                    Cliquez pour ajouter des photos
-                  </span>
-                </label>
-                <Input
-                  id="photos"
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={handlePhotoChange}
-                  className="hidden"
-                />
-                
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t border-border" />
-                  </div>
-                  <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-card px-2 text-muted-foreground">
-                      ou
-                    </span>
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  <div>
-                    <Label htmlFor="imagePrompt">Prompt personnalisé pour l'IA (optionnel)</Label>
-                    <Textarea
-                      id="imagePrompt"
-                      value={imagePrompt}
-                      onChange={(e) => setImagePrompt(e.target.value)}
-                      placeholder="Ex: Une photo professionnelle d'un restaurant italien moderne avec terrasse..."
-                      rows={3}
-                      className="mt-1"
-                    />
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Si vous laissez vide, l'IA utilisera automatiquement votre titre et description.
-                    </p>
-                  </div>
-
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="w-full"
-                    onClick={handleGenerateImage}
-                    disabled={generatingImage || (!imagePrompt && (!formData.title || !formData.description))}
-                  >
-                  {generatingImage ? (
-                    <>
-                      <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-                      Génération en cours...
-                    </>
-                  ) : (
-                    <>
-                      <svg
-                        className="mr-2 h-4 w-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-                        />
-                      </svg>
-                       Générer une image par IA
-                    </>
-                  )}
-                </Button>
-                </div>
-                {(!imagePrompt && (!formData.title || !formData.description)) && (
-                  <p className="text-xs text-muted-foreground text-center">
-                    Remplissez le prompt personnalisé ou le titre et la description pour générer une image
-                  </p>
-                )}
-              </div>
-              
-              {photoPreviewUrls.length > 0 && (
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-                  {photoPreviewUrls.map((url, index) => (
-                    <div key={index} className="relative group">
-                      <img
-                        src={url}
-                        alt={`Photo ${index + 1}`}
-                        className="w-full h-32 object-cover rounded-lg"
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="title">
+                        Titre de l'annonce <span className="text-destructive">*</span>
+                      </Label>
+                      <Input
+                        id="title"
+                        value={formData.title}
+                        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                        required
+                        placeholder="Ex: Restaurant italien bien établi à Montréal"
                       />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="description">
+                        Description (FR) <span className="text-destructive">*</span>
+                      </Label>
+                      <div className="space-y-2">
+                        <Textarea
+                          id="description"
+                          value={formData.description}
+                          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                          required
+                          rows={6}
+                          placeholder="Décrivez votre entreprise en détail..."
+                        />
+                        {formData.description && formData.title && formData.industry && (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={async () => {
+                              setLoading(true);
+                              try {
+                                const { data, error } = await supabase.functions.invoke('improve-description', {
+                                  body: {
+                                    description: formData.description,
+                                    title: formData.title,
+                                    industry: formData.industry
+                                  }
+                                });
+
+                                if (error) throw error;
+
+                                if (data?.improvedDescription) {
+                                  setFormData({ ...formData, description: data.improvedDescription });
+                                  toast({
+                                    title: "Description améliorée !",
+                                    description: "Votre description a été reformulée avec succès.",
+                                  });
+                                }
+                              } catch (error: any) {
+                                toast({
+                                  variant: "destructive",
+                                  title: "Erreur",
+                                  description: error.message || "Impossible d'améliorer la description",
+                                });
+                              } finally {
+                                setLoading(false);
+                              }
+                            }}
+                            disabled={loading}
+                          >
+                            <Sparkles className="w-4 h-4 mr-2" />
+                            Améliorer avec l'IA
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="year_established">
+                          Année de fondation
+                        </Label>
+                        <Input
+                          id="year_established"
+                          type="number"
+                          value={formData.year_established}
+                          onChange={(e) => setFormData({ ...formData, year_established: e.target.value })}
+                          placeholder="2010"
+                        />
+                      </div>
+
+                      <div>
+                        <Label htmlFor="industry">
+                          Catégories
+                        </Label>
+                        <Select
+                          value={formData.industry}
+                          onValueChange={(value) => setFormData({ ...formData, industry: value })}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Sélectionner des catégories" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="restaurant">Restaurant</SelectItem>
+                            <SelectItem value="bar_bistro_discotheque">Bar / Bistro / Discothèque</SelectItem>
+                            <SelectItem value="boutique_commerce_detail">Commerce de détail</SelectItem>
+                            <SelectItem value="epicerie_depanneur">Épicerie / Dépanneur</SelectItem>
+                            <SelectItem value="entreprise_service">Services professionnels</SelectItem>
+                            <SelectItem value="communications_informatique">Technologie / Informatique</SelectItem>
+                            <SelectItem value="batiment_immeuble">Immobilier / Bâtiment</SelectItem>
+                            <SelectItem value="construction_excavation_renovation">Construction / Rénovation</SelectItem>
+                            <SelectItem value="residence_sante">Santé / Résidence</SelectItem>
+                            <SelectItem value="education_garderie">Éducation / Garderie</SelectItem>
+                            <SelectItem value="beaute_esthetique">Beauté / Esthétique</SelectItem>
+                            <SelectItem value="industrie_manufacturier_transformation">Manufacturing / Transformation</SelectItem>
+                            <SelectItem value="transport_entreposage">Transport / Entreposage</SelectItem>
+                            <SelectItem value="camping">Camping</SelectItem>
+                            <SelectItem value="hebergement">Hébergement</SelectItem>
+                            <SelectItem value="domaine_alimentaire">Domaine alimentaire</SelectItem>
+                            <SelectItem value="garage_mecanique_concessionnaire">Garage / Mécanique</SelectItem>
+                            <SelectItem value="activite_sport_loisir">Activités sportives / Loisirs</SelectItem>
+                            <SelectItem value="art_spectacle_cinema">Arts / Spectacles / Cinéma</SelectItem>
+                            <SelectItem value="centre_equestre_erabliere">Centre équestre / Érablière</SelectItem>
+                            <SelectItem value="developpement_domaine">Développement de domaine</SelectItem>
+                            <SelectItem value="distribution_commerce_gros">Distribution / Commerce de gros</SelectItem>
+                            <SelectItem value="entreprise_saisonniere">Entreprise saisonnière</SelectItem>
+                            <SelectItem value="immeuble_revenus">Immeuble à revenus</SelectItem>
+                            <SelectItem value="jardin_pepiniere_verger_vignoble">Jardin / Pépinière / Verger</SelectItem>
+                            <SelectItem value="pourvoirie_centre_plein_air">Pourvoirie / Plein air</SelectItem>
+                            <SelectItem value="residentiel">Résidentiel</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="competitive_advantages">
+                        Avantages compétitifs
+                      </Label>
+                      <Textarea
+                        id="competitive_advantages"
+                        value={formData.competitive_advantages}
+                        onChange={(e) => setFormData({ ...formData, competitive_advantages: e.target.value })}
+                        rows={4}
+                        placeholder="Décrivez les avantages uniques de votre entreprise..."
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="target_clientele">
+                        Clientèle
+                      </Label>
+                      <Textarea
+                        id="target_clientele"
+                        value={formData.target_clientele}
+                        onChange={(e) => setFormData({ ...formData, target_clientele: e.target.value })}
+                        rows={4}
+                        placeholder="Décrivez votre clientèle cible..."
+                      />
+                    </div>
+
+                    {/* Image principale */}
+                    <div>
+                      <Label>Image principale</Label>
+                      <div className="mt-2 space-y-3">
+                        <label
+                          htmlFor="main-photo"
+                          className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary transition-colors bg-secondary/20"
+                        >
+                          {photoPreviewUrls.length > 0 ? (
+                            <img
+                              src={photoPreviewUrls[0]}
+                              alt="Aperçu principal"
+                              className="max-h-48 rounded-lg"
+                            />
+                          ) : (
+                            <>
+                              <div className="text-muted-foreground text-center">
+                                <div className="text-4xl mb-2">📷</div>
+                                <p className="font-medium">Aucune image</p>
+                                <p className="text-sm mt-1">Choisir un fichier</p>
+                              </div>
+                            </>
+                          )}
+                        </label>
+                        <Input
+                          id="main-photo"
+                          type="file"
+                          accept="image/*"
+                          onChange={handlePhotoChange}
+                          className="hidden"
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          Formats acceptés : JPEG, PNG, WEBP, GIF. Max 16 Mo.
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Images supplémentaires */}
+                    <div>
+                      <Label htmlFor="photos">Images supplémentaires</Label>
+                      <div className="mt-2 space-y-3">
+                        <label
+                          htmlFor="photos"
+                          className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary transition-colors bg-secondary/20"
+                        >
+                          {photoPreviewUrls.length > 1 ? (
+                            <p className="text-muted-foreground text-center">
+                              {photoPreviewUrls.length - 1} image(s) supplémentaire(s).
+                            </p>
+                          ) : (
+                            <p className="text-muted-foreground text-center">Aucune image supplémentaire.</p>
+                          )}
+                          <Button type="button" variant="ghost" size="sm" className="mt-2">
+                            Sélect. fichiers
+                          </Button>
+                        </label>
+                        <Input
+                          id="photos"
+                          type="file"
+                          accept="image/*"
+                          multiple
+                          onChange={handlePhotoChange}
+                          className="hidden"
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          Sélectionnez jusqu'à 6 fichiers (JPEG, PNG, WEBP, GIF). Max 5Mo par fichier.
+                        </p>
+
+                        <div className="relative">
+                          <div className="absolute inset-0 flex items-center">
+                            <span className="w-full border-t border-border" />
+                          </div>
+                          <div className="relative flex justify-center text-xs uppercase">
+                            <span className="bg-card px-2 text-muted-foreground">ou</span>
+                          </div>
+                        </div>
+
+                        <div className="space-y-3">
+                          <div>
+                            <Label htmlFor="imagePrompt">Prompt personnalisé pour l'IA (optionnel)</Label>
+                            <Textarea
+                              id="imagePrompt"
+                              value={imagePrompt}
+                              onChange={(e) => setImagePrompt(e.target.value)}
+                              placeholder="Ex: Une photo professionnelle d'un restaurant italien moderne avec terrasse..."
+                              rows={3}
+                              className="mt-1"
+                            />
+                          </div>
+
+                          <Button
+                            type="button"
+                            variant="outline"
+                            className="w-full"
+                            onClick={handleGenerateImage}
+                            disabled={generatingImage || (!imagePrompt && (!formData.title || !formData.description))}
+                          >
+                            {generatingImage ? (
+                              <>
+                                <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                                Génération en cours...
+                              </>
+                            ) : (
+                              <>
+                                <Sparkles className="mr-2 h-4 w-4" />
+                                Générer une image par IA
+                              </>
+                            )}
+                          </Button>
+                        </div>
+
+                        {photoPreviewUrls.length > 0 && (
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+                            {photoPreviewUrls.map((url, index) => (
+                              <div key={index} className="relative group">
+                                <img
+                                  src={url}
+                                  alt={`Photo ${index + 1}`}
+                                  className="w-full h-32 object-cover rounded-lg"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => removePhoto(index)}
+                                  className="absolute top-2 right-2 p-1 bg-destructive text-destructive-foreground rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                >
+                                  <X className="h-4 w-4" />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Emplacement */}
+                <div className="bg-card p-6 rounded-2xl shadow-elegant border border-border/50">
+                  <h2 className="text-xl font-semibold text-primary mb-4">Emplacement</h2>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <Label htmlFor="province">Province</Label>
+                      <Select
+                        value={formData.province}
+                        onValueChange={(value) => setFormData({ ...formData, province: value })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Québec">Québec</SelectItem>
+                          <SelectItem value="Ontario">Ontario</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="region">Région (QC)</Label>
+                      <Select
+                        value={formData.region}
+                        onValueChange={(value) => setFormData({ ...formData, region: value })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Sélectionner" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="montreal">Montréal</SelectItem>
+                          <SelectItem value="quebec">Québec</SelectItem>
+                          <SelectItem value="laval">Laval</SelectItem>
+                          <SelectItem value="gatineau">Gatineau</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="city">Ville (QC)</Label>
+                      <Select
+                        value={formData.city}
+                        onValueChange={(value) => setFormData({ ...formData, city: value })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Sélectionner" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="montreal">Montréal</SelectItem>
+                          <SelectItem value="quebec">Québec</SelectItem>
+                          <SelectItem value="laval">Laval</SelectItem>
+                          <SelectItem value="gatineau">Gatineau</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div className="mt-4">
+                    <Label htmlFor="location">Adresse complète</Label>
+                    <Input
+                      id="location"
+                      value={formData.location}
+                      onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                      placeholder="Ex: 123 Rue Principale, Montréal, QC"
+                    />
+                  </div>
+                </div>
+
+                {/* Volet financier */}
+                <div className="bg-card p-6 rounded-2xl shadow-elegant border border-border/50">
+                  <h2 className="text-xl font-semibold text-primary mb-4 flex items-center gap-2">
+                    <DollarSign className="w-5 h-5" />
+                    Volet financier
+                  </h2>
+
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <Label htmlFor="asking_price">
+                          Prix de vente <span className="text-destructive">*</span>
+                        </Label>
+                        <Input
+                          id="asking_price"
+                          type="number"
+                          value={formData.asking_price}
+                          onChange={(e) => setFormData({ ...formData, asking_price: e.target.value })}
+                          required
+                          placeholder="Ex: 100 000"
+                        />
+                      </div>
+
+                      <div>
+                        <Label htmlFor="annual_revenue">Revenus annuels</Label>
+                        <Input
+                          id="annual_revenue"
+                          type="number"
+                          value={formData.annual_revenue}
+                          onChange={(e) => setFormData({ ...formData, annual_revenue: e.target.value })}
+                          placeholder="Ex: 250 000"
+                        />
+                      </div>
+
+                      <div>
+                        <Label htmlFor="profit_margin">Bénéfices / BAIIA</Label>
+                        <Input
+                          id="profit_margin"
+                          value={formData.profit_margin}
+                          onChange={(e) => setFormData({ ...formData, profit_margin: e.target.value })}
+                          placeholder="Montant ou texte (ex: Sur demande)."
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <Label htmlFor="sale_reason">Raison vente</Label>
+                        <Select
+                          value={formData.sale_reason}
+                          onValueChange={(value) => setFormData({ ...formData, sale_reason: value })}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Sélectionner" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="retirement">Retraite</SelectItem>
+                            <SelectItem value="new_project">Nouveau projet</SelectItem>
+                            <SelectItem value="relocation">Déménagement</SelectItem>
+                            <SelectItem value="other">Autre</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div>
+                        <Label htmlFor="financing_options">Options financement</Label>
+                        <Input
+                          id="financing_options"
+                          value={formData.financing_options}
+                          onChange={(e) => setFormData({ ...formData, financing_options: e.target.value })}
+                          placeholder="Ex: Financement disponible"
+                        />
+                      </div>
+
+                      <div>
+                        <Label htmlFor="support_offered">Accompagnement</Label>
+                        <Select
+                          value={formData.support_offered}
+                          onValueChange={(value) => setFormData({ ...formData, support_offered: value })}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Sélectionner" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="none">Aucun</SelectItem>
+                            <SelectItem value="training">Formation incluse</SelectItem>
+                            <SelectItem value="transition">Transition assistée</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="employees_count">Nombre d'employés</Label>
+                      <Input
+                        id="employees_count"
+                        type="number"
+                        value={formData.employees_count}
+                        onChange={(e) => setFormData({ ...formData, employees_count: e.target.value })}
+                        placeholder="10"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Présence web */}
+                <div className="bg-card p-6 rounded-2xl shadow-elegant border border-border/50">
+                  <h2 className="text-xl font-semibold text-primary mb-4">Présence web</h2>
+
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="website">Site web 🌐</Label>
+                      <Input
+                        id="website"
+                        type="url"
+                        value={formData.website}
+                        onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+                        placeholder="https://..."
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="facebook">Facebook</Label>
+                      <Input
+                        id="facebook"
+                        type="url"
+                        value={formData.facebook}
+                        onChange={(e) => setFormData({ ...formData, facebook: e.target.value })}
+                        placeholder="https://facebook.com/..."
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="linkedin">Linkedin</Label>
+                      <Input
+                        id="linkedin"
+                        type="url"
+                        value={formData.linkedin}
+                        onChange={(e) => setFormData({ ...formData, linkedin: e.target.value })}
+                        placeholder="https://linkedin.com/company/..."
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="instagram">Instagram</Label>
+                      <Input
+                        id="instagram"
+                        type="url"
+                        value={formData.instagram}
+                        onChange={(e) => setFormData({ ...formData, instagram: e.target.value })}
+                        placeholder="https://instagram.com/..."
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="twitter">X (Twitter)</Label>
+                      <Input
+                        id="twitter"
+                        type="url"
+                        value={formData.twitter}
+                        onChange={(e) => setFormData({ ...formData, twitter: e.target.value })}
+                        placeholder="https://x.com/..."
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="threads">Threads</Label>
+                      <Input
+                        id="threads"
+                        type="url"
+                        value={formData.threads}
+                        onChange={(e) => setFormData({ ...formData, threads: e.target.value })}
+                        placeholder="https://threads.net/..."
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Statut de publication */}
+                <div className="bg-card p-6 rounded-2xl shadow-elegant border border-border/50">
+                  <h2 className="text-xl font-semibold text-primary mb-4">Statut de publication</h2>
+
+                  <div>
+                    <Label>Statut</Label>
+                    <RadioGroup
+                      value={formData.status}
+                      onValueChange={(value: "active" | "archived") => setFormData({ ...formData, status: value })}
+                      className="flex flex-col md:flex-row gap-4 mt-3"
+                    >
+                      <div className="flex items-start space-x-3 p-4 border-2 rounded-lg cursor-pointer hover:bg-accent/5 flex-1">
+                        <RadioGroupItem value="active" id="status-active" />
+                        <div>
+                          <Label htmlFor="status-active" className="cursor-pointer font-medium flex items-center gap-2">
+                            ✏️ Brouillon
+                          </Label>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            La fiche n'est pas visible et ne sera pas affichée sur le site.
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start space-x-3 p-4 border-2 rounded-lg cursor-pointer hover:bg-accent/5 flex-1">
+                        <RadioGroupItem value="archived" id="status-archived" />
+                        <div>
+                          <Label htmlFor="status-archived" className="cursor-pointer font-medium flex items-center gap-2">
+                            🗑️ Archivée
+                          </Label>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            La fiche est archivée et ne sera plus visible sur le site.
+                          </p>
+                        </div>
+                      </div>
+                    </RadioGroup>
+                  </div>
+                </div>
+
+                {/* Vos coordonnées */}
+                <div className="bg-card p-6 rounded-2xl shadow-elegant border border-border/50">
+                  <h3 className="text-lg font-semibold mb-4">Vos coordonnées</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Ces informations seront visibles uniquement aux acheteurs qui paient pour y accéder (5$ CAD).
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <Label htmlFor="seller_email">
+                        Votre email <span className="text-destructive">*</span>
+                      </Label>
+                      <Input
+                        id="seller_email"
+                        type="email"
+                        value={formData.seller_email}
+                        onChange={(e) => setFormData({ ...formData, seller_email: e.target.value })}
+                        required
+                        placeholder="votre@email.com"
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="seller_phone">Votre téléphone</Label>
+                      <Input
+                        id="seller_phone"
+                        type="tel"
+                        value={formData.seller_phone}
+                        onChange={(e) => setFormData({ ...formData, seller_phone: e.target.value })}
+                        placeholder="+1 (514) 123-4567"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <Checkbox 
+                    id="is_franchise" 
+                    checked={formData.is_franchise}
+                    onCheckedChange={(checked) => setFormData({ ...formData, is_franchise: checked as boolean })}
+                  />
+                  <Label htmlFor="is_franchise" className="text-sm font-normal cursor-pointer">
+                    Cette entreprise est une franchise
+                  </Label>
+                </div>
+
+                {/* Acceptation des conditions */}
+                <div className="flex items-start space-x-3 p-4 bg-accent/10 rounded-lg border border-accent/20">
+                  <Checkbox 
+                    id="terms" 
+                    checked={termsAccepted}
+                    onCheckedChange={(checked) => setTermsAccepted(checked as boolean)}
+                  />
+                  <div className="grid gap-1.5 leading-none">
+                    <label
+                      htmlFor="terms"
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                    >
+                      J&apos;accepte les conditions d&apos;utilisation <span className="text-destructive">*</span>
+                    </label>
+                    <p className="text-sm text-muted-foreground">
+                      En publiant mon annonce, je confirme avoir lu et accepté le{" "}
                       <button
                         type="button"
-                        onClick={() => removePhoto(index)}
-                        className="absolute top-2 right-2 p-1 bg-destructive text-destructive-foreground rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={() => setTermsDialogOpen(true)}
+                        className="text-accent hover:underline font-medium"
                       >
-                        <X className="h-4 w-4" />
+                        Contrat d&apos;utilisation
                       </button>
-                    </div>
-                  ))}
+                      , incluant le partage de mes coordonnées et la décharge de responsabilité.
+                    </p>
+                  </div>
                 </div>
-              )}
+
+                <div className="flex gap-4 pt-4">
+                  <Button type="submit" disabled={loading || !termsAccepted} className="flex-1">
+                    {loading ? "Publication..." : "Publier l'annonce"}
+                  </Button>
+                  <Button type="button" variant="outline" onClick={() => navigate("/")} disabled={loading}>
+                    Annuler
+                  </Button>
+                </div>
+              </form>
             </div>
 
-            {/* Acceptation des conditions */}
-            <div className="flex items-start space-x-3 p-4 bg-accent/10 rounded-lg border border-accent/20">
-              <Checkbox 
-                id="terms" 
-                checked={termsAccepted}
-                onCheckedChange={(checked) => setTermsAccepted(checked as boolean)}
-              />
-              <div className="grid gap-1.5 leading-none">
-                <label
-                  htmlFor="terms"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                >
-                  J&apos;accepte les conditions d&apos;utilisation *
-                </label>
-                <p className="text-sm text-muted-foreground">
-                  En publiant mon annonce, je confirme avoir lu et accepté le{" "}
-                  <button
-                    type="button"
-                    onClick={() => setTermsDialogOpen(true)}
-                    className="text-accent hover:underline font-medium"
-                  >
-                    Contrat d&apos;utilisation
-                  </button>
-                  , incluant le partage de mes coordonnées et la décharge de responsabilité.
-                </p>
+            {/* Sidebar - 1/3 width */}
+            <div className="space-y-6">
+              {/* Score de visibilité */}
+              <div className="bg-card p-6 rounded-2xl shadow-elegant border border-border/50 sticky top-6">
+                <div className="mb-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-lg font-semibold">Score de visibilité</h3>
+                    <Badge variant={visibilityScore >= 80 ? "default" : "secondary"} className="text-lg">
+                      🔴 {visibilityScore}%
+                    </Badge>
+                  </div>
+                  <Progress value={visibilityScore} className="h-2" />
+                </div>
+
+                <div className="space-y-4">
+                  {/* Fiche publiable */}
+                  <div className="flex items-start gap-3 p-3 rounded-lg bg-secondary/20">
+                    <div className="w-6 h-6 rounded-full bg-background border-2 border-border flex items-center justify-center text-xs font-bold flex-shrink-0">
+                      1
+                    </div>
+                    <div>
+                      <p className="font-medium text-sm">Fiche publiable</p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Votre annonce respecte les critères minimums et peut être publiée.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Mise en avant */}
+                  <div className="flex items-start gap-3 p-3 rounded-lg bg-secondary/20">
+                    <div className="w-6 h-6 rounded-full bg-background border-2 border-border flex items-center justify-center text-xs font-bold flex-shrink-0">
+                      2
+                    </div>
+                    <div>
+                      <p className="font-medium text-sm">Mise en avant</p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Votre fiche est éligible à une mise en avant et à un positionnement premium.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Analyse IA */}
+                  <div className="flex items-start gap-3 p-3 rounded-lg bg-secondary/20">
+                    <div className="w-6 h-6 rounded-full bg-background border-2 border-border flex items-center justify-center text-xs font-bold flex-shrink-0">
+                      3
+                    </div>
+                    <div>
+                      <p className="font-medium text-sm">Analyse IA (Bientôt)</p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Maximisez votre visibilité en débloquant l&apos;analyse IA.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Prochaines étapes */}
+                {nextSteps.length > 0 && (
+                  <div className="mt-6 pt-6 border-t">
+                    <h4 className="font-semibold text-sm mb-3">Prochaines étapes</h4>
+                    <p className="text-xs text-muted-foreground mb-3">
+                      {nextSteps.length} étape(s) restante(s)
+                    </p>
+                    <div className="space-y-2">
+                      {nextSteps.map((step, index) => (
+                        <Button
+                          key={index}
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="w-full justify-start text-left h-auto py-3"
+                          onClick={() => {
+                            const element = document.getElementById(step.action);
+                            element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            element?.focus();
+                          }}
+                        >
+                          <step.icon className="w-4 h-4 mr-2 flex-shrink-0" />
+                          <span className="text-xs">{step.text}</span>
+                          <span className="ml-auto text-primary">→</span>
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
-
-            <div className="flex gap-4 pt-4">
-              <Button type="submit" disabled={loading || !termsAccepted} className="flex-1">
-                {loading ? "Publication..." : "Publier l'annonce"}
-              </Button>
-              <Button type="button" variant="outline" onClick={() => navigate("/")} disabled={loading}>
-                Annuler
-              </Button>
-            </div>
-          </form>
+          </div>
         </div>
       </div>
       
