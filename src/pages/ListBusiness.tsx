@@ -1043,61 +1043,62 @@ const ListBusiness = () => {
             {/* Sidebar - 1/3 width */}
             <div className="space-y-6">
               {/* Score de visibilité */}
-              <div className="bg-card p-6 rounded-2xl shadow-elegant border border-border/50 sticky top-24 transition-all duration-300">
-                <div className="mb-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-lg font-semibold">Score de visibilité</h3>
-                    <Badge 
-                      variant={visibilityScore >= 80 ? "default" : "secondary"} 
-                      className={`text-lg transition-all duration-500 ${
-                        visibilityScore === 0 ? "bg-gray-500" :
-                        visibilityScore < 30 ? "bg-red-500 text-white" :
-                        visibilityScore < 60 ? "bg-orange-500 text-white" :
-                        visibilityScore < 80 ? "bg-yellow-500 text-white" :
-                        "bg-green-500 text-white"
-                      }`}
-                    >
-                      {visibilityScore === 0 ? "⚪" :
-                       visibilityScore < 30 ? "🔴" :
-                       visibilityScore < 60 ? "🟠" :
-                       visibilityScore < 80 ? "🟡" :
-                       "🟢"} {visibilityScore}%
-                    </Badge>
+              <div className="bg-card p-6 rounded-lg shadow-sm border border-border sticky top-24">
+                <div className="mb-6">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-base font-semibold text-foreground">Score de visibilité</h3>
+                    <div className="flex items-center gap-2">
+                      <div className={`w-2 h-2 rounded-full ${
+                        visibilityScore === 0 ? "bg-gray-400" :
+                        visibilityScore < 30 ? "bg-red-500" :
+                        visibilityScore < 60 ? "bg-orange-500" :
+                        visibilityScore < 80 ? "bg-yellow-500" :
+                        "bg-green-500"
+                      }`} />
+                      <span className="text-2xl font-bold text-foreground">{visibilityScore}%</span>
+                    </div>
                   </div>
                   <Progress 
                     value={visibilityScore} 
-                    className={`h-2 transition-all duration-500 ${
-                      visibilityScore === 0 ? "[&>div]:bg-gray-500" :
+                    className={`h-1.5 ${
+                      visibilityScore === 0 ? "[&>div]:bg-gray-400" :
                       visibilityScore < 30 ? "[&>div]:bg-red-500" :
                       visibilityScore < 60 ? "[&>div]:bg-orange-500" :
                       visibilityScore < 80 ? "[&>div]:bg-yellow-500" :
                       "[&>div]:bg-green-500"
                     }`}
                   />
+                  <p className="text-xs text-muted-foreground mt-2">
+                    {visibilityScore === 0 ? "Aucune donnée" :
+                     visibilityScore < 30 ? "Visibilité faible" :
+                     visibilityScore < 60 ? "Visibilité moyenne" :
+                     visibilityScore < 80 ? "Bonne visibilité" :
+                     "Excellente visibilité"}
+                  </p>
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {/* Fiche publiable */}
-                  <div className="flex items-start gap-3 p-3 rounded-lg bg-secondary/20">
-                    <div className="w-6 h-6 rounded-full bg-background border-2 border-border flex items-center justify-center text-xs font-bold flex-shrink-0">
+                  <div className="flex items-start gap-3 p-3 rounded-md bg-muted/50 border border-border/50">
+                    <div className="w-5 h-5 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-semibold flex-shrink-0 mt-0.5">
                       1
                     </div>
-                    <div>
-                      <p className="font-medium text-sm">Fiche publiable</p>
-                      <p className="text-xs text-muted-foreground mt-1">
+                    <div className="flex-1">
+                      <p className="font-medium text-sm text-foreground">Fiche publiable</p>
+                      <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
                         Votre annonce respecte les critères minimums et peut être publiée.
                       </p>
                     </div>
                   </div>
 
                   {/* Mise en avant */}
-                  <div className="flex items-start gap-3 p-3 rounded-lg bg-secondary/20">
-                    <div className="w-6 h-6 rounded-full bg-background border-2 border-border flex items-center justify-center text-xs font-bold flex-shrink-0">
+                  <div className="flex items-start gap-3 p-3 rounded-md bg-muted/50 border border-border/50">
+                    <div className="w-5 h-5 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-semibold flex-shrink-0 mt-0.5">
                       2
                     </div>
-                    <div>
-                      <p className="font-medium text-sm">Mise en avant</p>
-                      <p className="text-xs text-muted-foreground mt-1">
+                    <div className="flex-1">
+                      <p className="font-medium text-sm text-foreground">Mise en avant</p>
+                      <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
                         Votre fiche est éligible à une mise en avant et à un positionnement premium.
                       </p>
                     </div>
@@ -1106,8 +1107,8 @@ const ListBusiness = () => {
 
                 {/* Prochaines étapes */}
                 {nextSteps.length > 0 && (
-                  <div className="mt-6 pt-6 border-t">
-                    <h4 className="font-semibold text-sm mb-3">Prochaines étapes</h4>
+                  <div className="mt-6 pt-6 border-t border-border">
+                    <h4 className="font-semibold text-sm mb-2 text-foreground">Prochaines étapes</h4>
                     <p className="text-xs text-muted-foreground mb-3">
                       {nextSteps.length} étape(s) restante(s)
                     </p>
@@ -1118,16 +1119,16 @@ const ListBusiness = () => {
                           type="button"
                           variant="outline"
                           size="sm"
-                          className="w-full justify-start text-left h-auto py-3"
+                          className="w-full justify-start text-left h-auto py-2.5 hover:bg-muted"
                           onClick={() => {
                             const element = document.getElementById(step.action);
                             element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
                             element?.focus();
                           }}
                         >
-                          <step.icon className="w-4 h-4 mr-2 flex-shrink-0" />
-                          <span className="text-xs">{step.text}</span>
-                          <span className="ml-auto text-primary">→</span>
+                          <step.icon className="w-4 h-4 mr-2 flex-shrink-0 text-muted-foreground" />
+                          <span className="text-xs flex-1">{step.text}</span>
+                          <span className="ml-2 text-muted-foreground">→</span>
                         </Button>
                       ))}
                     </div>
