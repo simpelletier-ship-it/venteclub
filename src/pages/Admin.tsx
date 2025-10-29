@@ -8,12 +8,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { CheckCircle, XCircle, Eye, ArrowLeft, Trash2, Star, Edit, Upload } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { z } from "zod";
 import { QUEBEC_INDUSTRIES } from "@/lib/constants";
+import { EditProposalsManager } from "@/components/EditProposalsManager";
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -458,11 +460,18 @@ const Admin = () => {
             Tableau de bord Admin
           </h1>
           <p className="text-muted-foreground">
-            Gérez les annonces d'entreprises
+            Gérez les annonces et les propositions de modification
           </p>
         </div>
 
-        <div className="grid gap-6">
+        <Tabs defaultValue="businesses" className="w-full">
+          <TabsList className="grid w-full max-w-md grid-cols-2 mb-6">
+            <TabsTrigger value="businesses">Annonces</TabsTrigger>
+            <TabsTrigger value="proposals">Propositions de modification</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="businesses">
+            <div className="grid gap-6">
           {businesses.map((business) => (
             <Card key={business.id}>
               <CardHeader>
@@ -554,7 +563,13 @@ const Admin = () => {
               </CardContent>
             </Card>
           ))}
-        </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="proposals">
+            <EditProposalsManager />
+          </TabsContent>
+        </Tabs>
       </div>
 
       <Dialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>

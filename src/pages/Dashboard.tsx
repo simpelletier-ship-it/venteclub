@@ -4,13 +4,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, LogOut, Star, XCircle } from "lucide-react";
+import { Plus, LogOut, Star, XCircle, Edit } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import BusinessCard from "@/components/BusinessCard";
 import { MessagesList } from "@/components/MessagesList";
 import { PurchasedBusinesses } from "@/components/PurchasedBusinesses";
 import { WithdrawBusinessDialog } from "@/components/WithdrawBusinessDialog";
+import { EditBusinessDialog } from "@/components/EditBusinessDialog";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -25,6 +26,8 @@ const Dashboard = () => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [withdrawDialogOpen, setWithdrawDialogOpen] = useState(false);
   const [businessToWithdraw, setBusinessToWithdraw] = useState<any>(null);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [businessToEdit, setBusinessToEdit] = useState<any>(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
@@ -92,6 +95,11 @@ const Dashboard = () => {
   const handleWithdrawClick = (business: any) => {
     setBusinessToWithdraw(business);
     setWithdrawDialogOpen(true);
+  };
+
+  const handleEditClick = (business: any) => {
+    setBusinessToEdit(business);
+    setEditDialogOpen(true);
   };
 
   const handleSignOut = async () => {
@@ -173,6 +181,19 @@ const Dashboard = () => {
                       onWithdraw={() => handleWithdrawClick(business)}
                       onFeature={() => handleFeatureClick(business)}
                     />
+                    <div className="flex gap-2">
+                      {business.approval_status === 'approved' && business.status !== 'sold' && (
+                        <Button
+                          onClick={() => handleEditClick(business)}
+                          size="sm"
+                          variant="outline"
+                          className="flex-1"
+                        >
+                          <Edit className="mr-1 h-3 w-3" />
+                          Modifier
+                        </Button>
+                      )}
+                    </div>
                     {business.rejection_reason && business.approval_status === 'rejected' && (
                       <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
                         <p className="text-sm font-semibold mb-1">Raison du refus:</p>
@@ -247,6 +268,18 @@ const Dashboard = () => {
           onSuccess={() => {
             fetchUserBusinesses(user.id);
             setBusinessToWithdraw(null);
+          }}
+        />
+      )}
+
+      {businessToEdit && (
+        <EditBusinessDialog
+          business={businessToEdit}
+          open={editDialogOpen}
+          onOpenChange={setEditDialogOpen}
+          onSuccess={() => {
+            fetchUserBusinesses(user.id);
+            setBusinessToEdit(null);
           }}
         />
       )}
