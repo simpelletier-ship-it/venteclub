@@ -19,37 +19,11 @@ export const PremiumSubscription = ({ userId }: PremiumSubscriptionProps) => {
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
 
   useEffect(() => {
+    // Charger une seule fois au montage du composant
     checkSubscription();
     
-    // Écouter les changements en temps réel sur l'abonnement Premium
-    // Mais ne pas re-render si on a déjà chargé une fois
-    let debounceTimeout: NodeJS.Timeout;
-    
-    const channel = supabase
-      .channel('premium-subscription-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'premium_subscriptions',
-          filter: `user_id=eq.${userId}`
-        },
-        (payload) => {
-          console.log('Premium subscription changed:', payload);
-          // Seulement rafraîchir après un délai et sans montrer de loading
-          clearTimeout(debounceTimeout);
-          debounceTimeout = setTimeout(() => {
-            checkSubscription();
-          }, 1000);
-        }
-      )
-      .subscribe();
-
-    return () => {
-      clearTimeout(debounceTimeout);
-      supabase.removeChannel(channel);
-    };
+    // NE PAS écouter les changements en temps réel pour éviter le flash
+    // L'utilisateur peut rafraîchir manuellement si nécessaire
   }, [userId]);
 
   const checkSubscription = async () => {
@@ -230,12 +204,23 @@ export const PremiumSubscription = ({ userId }: PremiumSubscriptionProps) => {
               onClick={handleManageSubscription}
               disabled={processing}
               variant="destructive"
+              className="w-full mb-2"
+            >
+              {processing ? "Chargement..." : "Annuler mon abonnement"}
+            </Button>
+            <Button
+              onClick={() => {
+                setHasLoadedOnce(false);
+                checkSubscription();
+              }}
+              disabled={processing}
+              variant="outline"
               className="w-full"
             >
-              {processing ? 'Chargement...' : 'Annuler mon abonnement'}
+              Actualiser le statut
             </Button>
-            <p className="text-xs text-muted-foreground text-center">
-              Annulez votre abonnement à tout moment. L'accès restera actif jusqu'à la fin de la période payée.
+            <p className="text-xs text-muted-foreground text-center mt-2">
+              Annulez votre abonnement à tout moment. L&apos;accès restera actif jusqu&apos;à la fin de la période payée.
             </p>
           </CardContent>
         </Card>
@@ -298,7 +283,7 @@ export const PremiumSubscription = ({ userId }: PremiumSubscriptionProps) => {
               className="w-full bg-gradient-to-r from-primary to-accent hover:opacity-90"
               size="lg"
             >
-              {processing ? 'Chargement...' : 'S\'abonner à Premium'}
+              {processing ? "Chargement..." : "S'abonner à Premium"}
             </Button>
 
             <p className="text-xs text-muted-foreground text-center">
