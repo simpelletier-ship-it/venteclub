@@ -101,96 +101,6 @@ const Index = () => {
     setFilteredBusinesses(filtered);
   };
 
-  const mockFeaturedBusinesses = [
-    {
-      title: "Plateforme SaaS TechStart",
-      industry: "Technologie",
-      location: "Montréal, QC",
-      revenue: "850K $",
-      price: "2.5M $",
-      profit: "320K $",
-      description: "Plateforme SaaS B2B établie avec plus de 500 clients actifs et un modèle de revenus récurrents. Forte trajectoire de croissance.",
-      featured: true,
-    },
-    {
-      title: "Chaîne de Cafés Bio",
-      industry: "Restauration",
-      location: "Québec, QC",
-      revenue: "1.2M $",
-      price: "950K $",
-      profit: "280K $",
-      description: "Chaîne de cafés populaire avec 3 emplacements, clientèle fidèle et immobilier de premier choix. Exploitation clé en main.",
-      featured: true,
-    },
-    {
-      title: "Marque de Mode E-Commerce",
-      industry: "E-commerce",
-      location: "Laval, QC",
-      revenue: "2.1M $",
-      price: "1.8M $",
-      profit: "580K $",
-      description: "Marque de mode direct-consommateur avec forte présence sur les réseaux sociaux et systèmes d'exécution automatisés.",
-      featured: true,
-    },
-  ];
-
-  const mockAllBusinesses = [
-    {
-      title: "Agence Marketing Digital",
-      industry: "Services",
-      location: "Gatineau, QC",
-      revenue: "450K $",
-      price: "380K $",
-      profit: "160K $",
-      description: "Agence de marketing digital full-service avec plus de 15 clients long terme et équipe expérimentée en place.",
-    },
-    {
-      title: "Entreprise de Fournitures Industrielles",
-      industry: "Industrie",
-      location: "Gatineau, QC",
-      revenue: "3.5M $",
-      price: "2.8M $",
-      profit: "820K $",
-      description: "Fournisseur B2B manufacturier avec contrats établis et installations de production efficaces.",
-    },
-    {
-      title: "Studio de Fitness Boutique",
-      industry: "Sport & Bien-être",
-      location: "Sherbrooke, QC",
-      revenue: "380K $",
-      price: "290K $",
-      profit: "125K $",
-      description: "Studio de fitness moderne avec base d'adhérents solide et excellent emplacement dans un quartier en croissance.",
-    },
-    {
-      title: "Développement d'Applications Mobiles",
-      industry: "Technologie",
-      location: "Trois-Rivières, QC",
-      revenue: "680K $",
-      price: "520K $",
-      profit: "240K $",
-      description: "Studio de développement mobile-first spécialisé dans les applications iOS et Android pour clients d'entreprise.",
-    },
-    {
-      title: "Animalerie de Détail",
-      industry: "Commerce",
-      location: "Longueuil, QC",
-      revenue: "920K $",
-      price: "650K $",
-      profit: "310K $",
-      description: "Animalerie bien établie avec services de toilettage et fidèle communauté locale.",
-    },
-    {
-      title: "Plateforme d'Éducation en Ligne",
-      industry: "E-learning",
-      location: "Montréal, QC",
-      revenue: "1.5M $",
-      price: "1.2M $",
-      profit: "480K $",
-      description: "Marketplace d'éducation en ligne en croissance avec plus de 50 instructeurs et milliers d'étudiants actifs.",
-    },
-  ];
-
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
@@ -291,9 +201,9 @@ const Index = () => {
                 <BusinessCard key={business.id} {...business} />
               ))
             ) : (
-              mockFeaturedBusinesses.map((business, index) => (
-                <BusinessCard key={index} {...business} />
-              ))
+              <div className="col-span-full text-center py-12">
+                <p className="text-lg text-muted-foreground">Aucune annonce en vedette pour le moment</p>
+              </div>
             )}
           </div>
         </div>
@@ -318,9 +228,9 @@ const Index = () => {
                 <p className="text-lg text-muted-foreground">Aucune annonce ne correspond à vos critères de recherche</p>
               </div>
             ) : (
-              mockAllBusinesses.map((business, index) => (
-                <BusinessCard key={index} {...business} />
-              ))
+              <div className="col-span-full text-center py-12">
+                <p className="text-lg text-muted-foreground">Aucune annonce disponible pour le moment</p>
+              </div>
             )}
           </div>
         </div>
