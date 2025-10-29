@@ -1,11 +1,28 @@
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import BusinessCard from "@/components/BusinessCard";
 import SearchBar from "@/components/SearchBar";
 import { ArrowRight, Shield, TrendingUp, Users } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import heroImage from "@/assets/hero-business.jpg";
 import venteLogo from "@/assets/vente-logo.png";
 
 const Index = () => {
+  const navigate = useNavigate();
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
   const featuredBusinesses = [
     {
       title: "Plateforme SaaS TechStart",
@@ -111,12 +128,25 @@ const Index = () => {
             <a href="#" className="text-foreground hover:text-accent transition-colors font-medium">À propos</a>
           </div>
           <div className="flex items-center gap-3">
-            <Button variant="ghost" className="text-foreground hover:text-accent">
-              Connexion
-            </Button>
-            <Button className="bg-accent hover:bg-accent/90 text-accent-foreground">
-              Lister votre entreprise
-            </Button>
+            {user ? (
+              <>
+                <Button variant="ghost" onClick={() => navigate("/dashboard")}>
+                  Mes annonces
+                </Button>
+                <Button className="bg-accent hover:bg-accent/90 text-accent-foreground" onClick={() => navigate("/list-business")}>
+                  Lister votre entreprise
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button variant="ghost" className="text-foreground hover:text-accent" onClick={() => navigate("/auth")}>
+                  Connexion
+                </Button>
+                <Button className="bg-accent hover:bg-accent/90 text-accent-foreground" onClick={() => navigate("/auth")}>
+                  Lister votre entreprise
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </nav>
@@ -142,11 +172,11 @@ const Index = () => {
               Un réseau d'entrepreneurs en action. La plateforme de confiance qui connecte les propriétaires d'entreprises avec des acheteurs qualifiés.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
-              <Button size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground h-14 px-8 text-lg">
+              <Button size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground h-14 px-8 text-lg" onClick={() => document.getElementById('featured')?.scrollIntoView({ behavior: 'smooth' })}>
                 Parcourir les entreprises
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
-              <Button size="lg" variant="outline" className="h-14 px-8 text-lg border-2 border-primary hover:bg-primary hover:text-primary-foreground">
+              <Button size="lg" variant="outline" className="h-14 px-8 text-lg border-2 border-primary hover:bg-primary hover:text-primary-foreground" onClick={() => navigate(user ? "/list-business" : "/auth")}>
                 Vendre votre entreprise
               </Button>
             </div>
@@ -197,7 +227,7 @@ const Index = () => {
       </section>
 
       {/* Featured Businesses */}
-      <section className="py-20">
+      <section id="featured" className="py-20">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold text-foreground mb-4">Opportunités En Vedette</h2>
@@ -245,7 +275,7 @@ const Index = () => {
           <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
             Rejoignez des milliers d'entrepreneurs qui ont acheté ou vendu avec succès des entreprises sur notre plateforme.
           </p>
-          <Button size="lg" className="bg-white hover:bg-white/90 text-primary h-14 px-8 text-lg font-semibold">
+          <Button size="lg" className="bg-white hover:bg-white/90 text-primary h-14 px-8 text-lg font-semibold" onClick={() => navigate(user ? "/list-business" : "/auth")}>
             Commencer Maintenant
             <ArrowRight className="ml-2 w-5 h-5" />
           </Button>
