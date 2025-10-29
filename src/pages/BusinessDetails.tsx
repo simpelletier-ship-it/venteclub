@@ -10,6 +10,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { FavoriteButton } from "@/components/FavoriteButton";
 import { ChatBox } from "@/components/ChatBox";
 import { SellerChatSection } from "@/components/SellerChatSection";
+import { ReportBusinessDialog } from "@/components/ReportBusinessDialog";
 
 const BusinessDetails = () => {
   const { id } = useParams();
@@ -408,16 +409,21 @@ const BusinessDetails = () => {
                         </div>
                       )}
                     </div>
-                    <div className="flex flex-wrap gap-2 items-center text-muted-foreground">
-                      <Badge variant="secondary">{business.industry}</Badge>
-                      <span className="flex items-center gap-1">
-                        <MapPin className="w-4 h-4" />
-                        {business.location}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Eye className="w-4 h-4" />
-                        {business.views_count || 0} vues
-                      </span>
+                    <div className="flex items-center justify-between">
+                      <div className="flex flex-wrap gap-2 items-center text-muted-foreground">
+                        <Badge variant="secondary">{business.industry}</Badge>
+                        <span className="flex items-center gap-1">
+                          <MapPin className="w-4 h-4" />
+                          {business.location}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Eye className="w-4 h-4" />
+                          {business.views_count || 0} vues
+                        </span>
+                      </div>
+                      {!isSeller && id && (
+                        <ReportBusinessDialog businessId={id} businessTitle={business.title} />
+                      )}
                     </div>
                   </div>
                   <div className="text-right">

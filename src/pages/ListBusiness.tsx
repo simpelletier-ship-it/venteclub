@@ -308,14 +308,56 @@ const ListBusiness = () => {
 
             <div>
               <Label htmlFor="description">Description *</Label>
-              <Textarea
-                id="description"
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                required
-                rows={6}
-                placeholder="Décrivez votre entreprise en détail..."
-              />
+              <div className="space-y-2">
+                <Textarea
+                  id="description"
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  required
+                  rows={6}
+                  placeholder="Décrivez votre entreprise en détail..."
+                />
+                {formData.description && formData.title && formData.industry && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={async () => {
+                      setLoading(true);
+                      try {
+                        const { data, error } = await supabase.functions.invoke('improve-description', {
+                          body: {
+                            description: formData.description,
+                            title: formData.title,
+                            industry: formData.industry
+                          }
+                        });
+
+                        if (error) throw error;
+
+                        if (data?.improvedDescription) {
+                          setFormData({ ...formData, description: data.improvedDescription });
+                          toast({
+                            title: "Description améliorée !",
+                            description: "Votre description a été reformulée avec succès.",
+                          });
+                        }
+                      } catch (error: any) {
+                        toast({
+                          variant: "destructive",
+                          title: "Erreur",
+                          description: error.message || "Impossible d'améliorer la description",
+                        });
+                      } finally {
+                        setLoading(false);
+                      }
+                    }}
+                    disabled={loading}
+                  >
+                    ✨ Améliorer avec l'IA
+                  </Button>
+                )}
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

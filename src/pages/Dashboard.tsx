@@ -12,6 +12,7 @@ import { MessagesList } from "@/components/MessagesList";
 import { PurchasedBusinesses } from "@/components/PurchasedBusinesses";
 import { WithdrawBusinessDialog } from "@/components/WithdrawBusinessDialog";
 import { EditBusinessDialog } from "@/components/EditBusinessDialog";
+import { AlertsManager } from "@/components/AlertsManager";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -153,6 +154,7 @@ const Dashboard = () => {
               <TabsTrigger value="businesses">Mes annonces</TabsTrigger>
               <TabsTrigger value="purchases">Mes achats</TabsTrigger>
               <TabsTrigger value="messages">Messages</TabsTrigger>
+              <TabsTrigger value="alerts">Alertes</TabsTrigger>
             </TabsList>
           </div>
 
@@ -212,6 +214,10 @@ const Dashboard = () => {
 
           <TabsContent value="messages">
             {user && <MessagesList userId={user.id} />}
+          </TabsContent>
+
+          <TabsContent value="alerts">
+            {user && <AlertsManager userId={user.id} />}
           </TabsContent>
         </Tabs>
       </div>
