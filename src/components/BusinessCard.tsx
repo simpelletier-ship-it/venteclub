@@ -63,10 +63,10 @@ const BusinessCard = ({
       onClick={handleClick}
     >
       {/* Header with badges and favorite */}
-      <div className="flex items-start justify-between p-6 pb-0">
+      <div className="flex items-start justify-between p-4 pb-0">
         <div className="flex items-center gap-2">
           {featured && (
-            <Badge className="bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 text-white border-0 shadow-md">
+            <Badge className="bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 text-white border-0 shadow-md text-xs">
               <Star className="w-3 h-3 fill-white mr-1" />
               En Vedette
             </Badge>
@@ -78,7 +78,7 @@ const BusinessCard = ({
       </div>
 
       {/* Content Section */}
-      <div className="p-6 pt-4 space-y-4">
+      <div className="px-4 pb-4 pt-2 space-y-4">
         {/* Title & Location */}
         <div className="space-y-2">
           <h3 className="text-xl font-bold text-foreground group-hover:text-accent transition-colors line-clamp-1">

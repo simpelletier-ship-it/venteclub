@@ -94,8 +94,8 @@ export const FavoriteButton = ({ businessId, userId }: FavoriteButtonProps) => {
       className="hover:bg-transparent group"
     >
       <Heart 
-        className="h-5 w-5 transition-all stroke-muted-foreground group-hover:fill-red-500" 
-        fill={isFavorite ? "#ef4444" : "transparent"}
+        className="h-5 w-5 transition-all stroke-muted-foreground group-hover:fill-accent" 
+        fill={isFavorite ? "hsl(270 100% 60%)" : "transparent"}
         strokeWidth={2}
       />
     </Button>
