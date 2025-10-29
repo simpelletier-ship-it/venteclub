@@ -50,6 +50,7 @@ const BusinessCard = ({
 }: BusinessCardProps) => {
   const navigate = useNavigate();
   const [userId, setUserId] = useState<string | undefined>();
+  const [showFullDescription, setShowFullDescription] = useState(false);
   
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -118,7 +119,22 @@ const BusinessCard = ({
           {id && status !== 'sold' && <FavoriteButton businessId={id} userId={userId} />}
         </div>
 
-        <p className={`text-muted-foreground line-clamp-2 leading-relaxed ${status === 'sold' ? 'blur-[1px]' : ''}`}>{description}</p>
+        <div>
+          <p className={`text-muted-foreground leading-relaxed ${status === 'sold' ? 'blur-[1px]' : ''} ${showFullDescription ? '' : 'line-clamp-3'}`}>
+            {description}
+          </p>
+          {description.length > 150 && status !== 'sold' && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowFullDescription(!showFullDescription);
+              }}
+              className="text-sm text-primary hover:text-primary/80 font-medium mt-2 transition-colors"
+            >
+              {showFullDescription ? 'Voir moins' : 'Voir plus'}
+            </button>
+          )}
+        </div>
 
         <div className={`grid grid-cols-2 gap-4 pt-4 border-t border-border/50 ${status === 'sold' ? 'blur-[8px]' : ''}`}>
           <div className="space-y-1">
