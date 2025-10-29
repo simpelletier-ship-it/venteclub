@@ -208,13 +208,35 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
         .setPopup(popup)
         .addTo(map.current);
 
-      // Show/hide popup on hover
+      // Show popup on hover with delay to allow moving mouse to popup
+      let hideTimeout: NodeJS.Timeout;
+      
       el.addEventListener('mouseenter', () => {
-        marker.togglePopup();
+        clearTimeout(hideTimeout);
+        if (!marker.getPopup().isOpen()) {
+          marker.getPopup().addTo(map.current!);
+        }
       });
       
       el.addEventListener('mouseleave', () => {
-        marker.togglePopup();
+        hideTimeout = setTimeout(() => {
+          marker.getPopup().remove();
+        }, 300);
+      });
+
+      // Keep popup open when hovering over it
+      popup.on('open', () => {
+        const popupEl = popup.getElement();
+        if (popupEl) {
+          popupEl.addEventListener('mouseenter', () => {
+            clearTimeout(hideTimeout);
+          });
+          popupEl.addEventListener('mouseleave', () => {
+            hideTimeout = setTimeout(() => {
+              marker.getPopup().remove();
+            }, 200);
+          });
+        }
       });
 
       // Navigate on click
