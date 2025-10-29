@@ -3,11 +3,11 @@ import { supabase } from "@/integrations/supabase/client";
 import BusinessCard from "@/components/BusinessCard";
 import { useToast } from "@/hooks/use-toast";
 
-interface PurchasedBusinessesProps {
+interface UnlockedBusinessesProps {
   userId: string;
 }
 
-export const PurchasedBusinesses = ({ userId }: PurchasedBusinessesProps) => {
+export const UnlockedBusinesses = ({ userId }: UnlockedBusinessesProps) => {
   const [purchasedBusinesses, setPurchasedBusinesses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
@@ -85,9 +85,9 @@ export const PurchasedBusinesses = ({ userId }: PurchasedBusinessesProps) => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold">Mes Accès Débloqués</h2>
+          <h2 className="text-2xl font-bold">Données Déverrouillées</h2>
           <p className="text-muted-foreground mt-1">
-            Vendeurs dont vous avez débloqué les coordonnées ({purchasedBusinesses.length})
+            Vendeurs dont vous avez déverrouillé les coordonnées gratuitement ({purchasedBusinesses.length})
           </p>
         </div>
       </div>

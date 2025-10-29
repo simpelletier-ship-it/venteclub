@@ -9,7 +9,7 @@ import { Plus, LogOut, Star, XCircle, Edit, MessageSquare } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import BusinessCard from "@/components/BusinessCard";
-import { PurchasedBusinesses } from "@/components/PurchasedBusinesses";
+import { UnlockedBusinesses } from "@/components/UnlockedBusinesses";
 import { WithdrawBusinessDialog } from "@/components/WithdrawBusinessDialog";
 import { EditBusinessDialog } from "@/components/EditBusinessDialog";
 import { AlertsManager } from "@/components/AlertsManager";
@@ -266,7 +266,7 @@ const Dashboard = () => {
           </TabsContent>
 
           <TabsContent value="purchases">
-            {user && <PurchasedBusinesses userId={user.id} />}
+            {user && <UnlockedBusinesses userId={user.id} />}
           </TabsContent>
 
           <TabsContent value="messages">
