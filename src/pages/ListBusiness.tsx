@@ -231,32 +231,39 @@ const ListBusiness = () => {
                 <Select
                   value={formData.industry}
                   onValueChange={(value) => setFormData({ ...formData, industry: value })}
-                  required
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Sélectionner" />
+                    <SelectValue placeholder="Sélectionner une industrie" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="restaurant">Restaurant</SelectItem>
+                    <SelectItem value="bar_bistro_discotheque">Bar / Bistro / Discothèque</SelectItem>
                     <SelectItem value="boutique_commerce_detail">Commerce de détail</SelectItem>
-                    <SelectItem value="entreprise_service">Services</SelectItem>
-                    <SelectItem value="communications_informatique">Technologie</SelectItem>
-                    <SelectItem value="batiment_immeuble">Immobilier</SelectItem>
-                    <SelectItem value="residence_sante">Santé</SelectItem>
-                    <SelectItem value="education_garderie">Éducation</SelectItem>
-                    <SelectItem value="industrie_manufacturier_transformation">Manufacturing</SelectItem>
-                    <SelectItem value="transport_entreposage">Transport</SelectItem>
-                    <SelectItem value="bar_bistro_discotheque">Bar / Bistro</SelectItem>
+                    <SelectItem value="epicerie_depanneur">Épicerie / Dépanneur</SelectItem>
+                    <SelectItem value="entreprise_service">Services professionnels</SelectItem>
+                    <SelectItem value="communications_informatique">Technologie / Informatique</SelectItem>
+                    <SelectItem value="batiment_immeuble">Immobilier / Bâtiment</SelectItem>
+                    <SelectItem value="construction_excavation_renovation">Construction / Rénovation</SelectItem>
+                    <SelectItem value="residence_sante">Santé / Résidence</SelectItem>
+                    <SelectItem value="education_garderie">Éducation / Garderie</SelectItem>
                     <SelectItem value="beaute_esthetique">Beauté / Esthétique</SelectItem>
+                    <SelectItem value="industrie_manufacturier_transformation">Manufacturing / Transformation</SelectItem>
+                    <SelectItem value="transport_entreposage">Transport / Entreposage</SelectItem>
                     <SelectItem value="camping">Camping</SelectItem>
                     <SelectItem value="hebergement">Hébergement</SelectItem>
                     <SelectItem value="domaine_alimentaire">Domaine alimentaire</SelectItem>
-                    <SelectItem value="epicerie_depanneur">Épicerie / Dépanneur</SelectItem>
                     <SelectItem value="franchise">Franchise</SelectItem>
                     <SelectItem value="garage_mecanique_concessionnaire">Garage / Mécanique</SelectItem>
-                    <SelectItem value="activite_sport_loisir">Sport / Loisir</SelectItem>
-                    <SelectItem value="art_spectacle_cinema">Art / Spectacle</SelectItem>
+                    <SelectItem value="activite_sport_loisir">Activités sportives / Loisirs</SelectItem>
+                    <SelectItem value="art_spectacle_cinema">Arts / Spectacles / Cinéma</SelectItem>
+                    <SelectItem value="centre_equestre_erabliere">Centre équestre / Érablière</SelectItem>
+                    <SelectItem value="developpement_domaine">Développement de domaine</SelectItem>
+                    <SelectItem value="distribution_commerce_gros">Distribution / Commerce de gros</SelectItem>
                     <SelectItem value="entreprise_saisonniere">Entreprise saisonnière</SelectItem>
+                    <SelectItem value="immeuble_revenus">Immeuble à revenus</SelectItem>
+                    <SelectItem value="jardin_pepiniere_verger_vignoble">Jardin / Pépinière / Verger</SelectItem>
+                    <SelectItem value="pourvoirie_centre_plein_air">Pourvoirie / Plein air</SelectItem>
+                    <SelectItem value="residentiel">Résidentiel</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
