@@ -69,7 +69,7 @@ const ListBusiness = () => {
         employees_count: validatedData.employees_count,
         year_established: validatedData.year_established,
         status: "active",
-      });
+      } as any);
 
       if (error) throw error;
 
