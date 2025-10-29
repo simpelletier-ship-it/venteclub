@@ -303,7 +303,8 @@ const Dashboard = () => {
                 onClick={() => setSelectedDuration(7)}
               >
                 <CardContent className="p-6 text-center">
-                  <Star className="h-8 w-8 mx-auto mb-3 fill-primary text-primary" />
+                  <Badge className="mb-3 bg-amber-700/20 text-amber-700 border-amber-700/30">Bronze</Badge>
+                  <Star className="h-8 w-8 mx-auto mb-3 fill-amber-700 text-amber-700" />
                   <h4 className="font-bold text-2xl mb-1">75$</h4>
                   <p className="text-sm text-muted-foreground mb-3">7 jours</p>
                   <p className="text-xs text-muted-foreground">~10,71$ / jour</p>
@@ -315,7 +316,8 @@ const Dashboard = () => {
                 onClick={() => setSelectedDuration(14)}
               >
                 <CardContent className="p-6 text-center">
-                  <Star className="h-8 w-8 mx-auto mb-3 fill-primary text-primary" />
+                  <Badge className="mb-3 bg-slate-400/20 text-slate-700 border-slate-400/30">Platine</Badge>
+                  <Star className="h-8 w-8 mx-auto mb-3 fill-slate-400 text-slate-400" />
                   <h4 className="font-bold text-2xl mb-1">100$</h4>
                   <p className="text-sm text-muted-foreground mb-3">14 jours</p>
                   <Badge variant="secondary" className="mb-1">Populaire</Badge>
@@ -328,7 +330,8 @@ const Dashboard = () => {
                 onClick={() => setSelectedDuration(30)}
               >
                 <CardContent className="p-6 text-center">
-                  <Star className="h-8 w-8 mx-auto mb-3 fill-primary text-primary" />
+                  <Badge className="mb-3 bg-yellow-500/20 text-yellow-700 border-yellow-500/30">Or</Badge>
+                  <Star className="h-8 w-8 mx-auto mb-3 fill-yellow-500 text-yellow-500" />
                   <h4 className="font-bold text-2xl mb-1">110$</h4>
                   <p className="text-sm text-muted-foreground mb-3">30 jours</p>
                   <Badge variant="secondary" className="mb-1 bg-green-500/20 text-green-700">Meilleure valeur</Badge>
@@ -338,8 +341,7 @@ const Dashboard = () => {
             </div>
 
             <div className="text-sm text-muted-foreground bg-muted/50 p-4 rounded-lg">
-              <p className="mb-2">✨ Votre annonce apparaîtra en haut avec une étoile dorée</p>
-              <p className="mb-2">🚀 Pas de limite du nombre d'annonces en vedette</p>
+              <p className="mb-2">✨ Votre annonce apparaîtra en haut de la page principale avec une étoile dorée</p>
               <p>⏱️ Durée garantie selon votre forfait</p>
             </div>
           </div>
