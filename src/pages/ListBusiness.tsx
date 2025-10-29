@@ -1161,9 +1161,6 @@ const ListBusiness = () => {
                 {/* Vos coordonnées */}
                 <div className="bg-card p-6 rounded-2xl shadow-elegant border border-border/50">
                   <h3 className="text-lg font-semibold mb-4">Vos coordonnées</h3>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Ces informations seront visibles uniquement aux acheteurs qui paient pour y accéder (5$ CAD).
-                  </p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <Label htmlFor="seller_email">
