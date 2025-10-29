@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { FavoriteButton } from "@/components/FavoriteButton";
 import { ChatBox } from "@/components/ChatBox";
+import { SellerChatSection } from "@/components/SellerChatSection";
 
 const BusinessDetails = () => {
   const { id } = useParams();
@@ -556,19 +557,32 @@ const BusinessDetails = () => {
                   )}
                 </div>
 
-                {/* Chat Section - Only show if user has access */}
-                {hasAccess && !isSeller && user && business && (
-                  <div className="border-t pt-6 mt-6">
-                    <h2 className="text-xl font-semibold mb-4">
-                      Messagerie avec le vendeur
-                    </h2>
-                    <ChatBox
-                      businessId={business.id}
-                      currentUserId={user.id}
-                      otherUserId={business.seller_id}
-                      otherUserName="Vendeur"
-                    />
-                  </div>
+                {/* Chat Section - Show if buyer has access OR if seller and someone bought access */}
+                {user && business && (
+                  <>
+                    {/* Buyer view - chat with seller */}
+                    {hasAccess && !isSeller && (
+                      <div className="border-t pt-6 mt-6">
+                        <h2 className="text-xl font-semibold mb-4">
+                          Messagerie avec le vendeur
+                        </h2>
+                        <ChatBox
+                          businessId={business.id}
+                          currentUserId={user.id}
+                          otherUserId={business.seller_id}
+                          otherUserName="Vendeur"
+                        />
+                      </div>
+                    )}
+                    
+                    {/* Seller view - show all buyers who have access */}
+                    {isSeller && (
+                      <SellerChatSection 
+                        businessId={business.id}
+                        sellerId={user.id}
+                      />
+                    )}
+                  </>
                 )}
               </div>
             </div>
