@@ -56,15 +56,18 @@ serve(async (req) => {
       apiVersion: "2025-08-27.basil",
     });
 
-    // Cancel the subscription in Stripe
-    const canceledSubscription = await stripe.subscriptions.cancel(subscriptionId);
-    console.log("[ADMIN-CANCEL] Subscription cancelled in Stripe:", canceledSubscription.id);
+    // Au lieu d'annuler immédiatement, on configure l'annulation à la fin de la période
+    // L'abonnement reste actif jusqu'à la fin de la période payée
+    const updatedSubscription = await stripe.subscriptions.update(subscriptionId, {
+      cancel_at_period_end: true
+    });
+    console.log("[ADMIN-CANCEL] Subscription will cancel at period end:", updatedSubscription.current_period_end);
 
-    // Update in Supabase database
+    // Update in Supabase database - on garde le status 'active' car l'abonnement est toujours actif
+    // On ajoute juste une note qu'il sera annulé
     const { error: updateError } = await supabaseClient
       .from('premium_subscriptions')
       .update({ 
-        status: 'canceled',
         updated_at: new Date().toISOString()
       })
       .eq('stripe_subscription_id', subscriptionId);
@@ -77,7 +80,8 @@ serve(async (req) => {
 
     return new Response(JSON.stringify({
       success: true,
-      message: "Subscription cancelled successfully"
+      message: "L'abonnement restera actif jusqu'à la fin de la période payée, puis ne sera pas renouvelé.",
+      cancel_at: updatedSubscription.current_period_end
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,

@@ -1011,24 +1011,25 @@ const Admin = () => {
                                       variant="destructive"
                                       size="sm"
                                       onClick={async () => {
-                                        if (!confirm(`Voulez-vous vraiment annuler l'abonnement de ${subscription.user_email} ?`)) {
+                                        if (!confirm(`Voulez-vous vraiment annuler l'abonnement de ${subscription.user_email} ?\n\nL'abonnement restera actif jusqu'à la fin de la période payée, puis ne sera pas renouvelé.`)) {
                                           return;
                                         }
                                         
                                         try {
-                                          const { error } = await supabase.functions.invoke('admin-cancel-subscription', {
+                                          const { data, error } = await supabase.functions.invoke('admin-cancel-subscription', {
                                             body: { subscriptionId: subscription.stripe_subscription_id }
                                           });
 
                                           if (error) throw error;
 
                                           toast({
-                                            title: "Succès",
-                                            description: "L'abonnement a été annulé avec succès.",
+                                            title: "Abonnement annulé",
+                                            description: data?.message || "L'abonnement restera actif jusqu'à la fin de la période payée.",
                                           });
 
                                           fetchSubscriptions();
                                         } catch (error: any) {
+                                          console.error('Error cancelling subscription:', error);
                                           toast({
                                             variant: "destructive",
                                             title: "Erreur",
@@ -1038,8 +1039,11 @@ const Admin = () => {
                                       }}
                                     >
                                       <XCircle className="mr-2 h-4 w-4" />
-                                      Annuler l'abonnement
+                                      Annuler le renouvellement
                                     </Button>
+                                    <p className="text-xs text-muted-foreground mt-2">
+                                      L&apos;abonnement restera actif jusqu&apos;à la fin de la période payée
+                                    </p>
                                   </div>
                                 </div>
                               </CardContent>

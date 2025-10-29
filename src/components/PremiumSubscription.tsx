@@ -206,8 +206,11 @@ export const PremiumSubscription = ({ userId }: PremiumSubscriptionProps) => {
               variant="destructive"
               className="w-full mb-2"
             >
-              {processing ? "Chargement..." : "Annuler mon abonnement"}
+              {processing ? "Chargement..." : "Gérer mon abonnement"}
             </Button>
+            <p className="text-xs text-muted-foreground text-center mb-2">
+              Vous pouvez annuler le renouvellement à tout moment. Votre accès restera actif jusqu&apos;à la fin de la période déjà payée.
+            </p>
             <Button
               onClick={() => {
                 setHasLoadedOnce(false);
@@ -219,9 +222,6 @@ export const PremiumSubscription = ({ userId }: PremiumSubscriptionProps) => {
             >
               Actualiser le statut
             </Button>
-            <p className="text-xs text-muted-foreground text-center mt-2">
-              Annulez votre abonnement à tout moment. L&apos;accès restera actif jusqu&apos;à la fin de la période payée.
-            </p>
           </CardContent>
         </Card>
       ) : (
