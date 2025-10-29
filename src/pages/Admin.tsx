@@ -429,18 +429,40 @@ const Admin = () => {
 
   const fetchReports = async () => {
     try {
+      // Fetch reports first
       const { data: reportsData, error } = await supabase
         .from('business_reports')
-        .select(`
-          *,
-          businesses:business_id (title, industry, location),
-          profiles:reporter_id (email)
-        `)
+        .select('*')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
 
-      setReports(reportsData || []);
+      // Then fetch related data for each report
+      const reportsWithDetails = await Promise.all(
+        (reportsData || []).map(async (report) => {
+          // Get business details
+          const { data: businessData } = await supabase
+            .from('businesses')
+            .select('title, industry, location')
+            .eq('id', report.business_id)
+            .maybeSingle();
+
+          // Get reporter email
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('email')
+            .eq('id', report.reporter_id)
+            .maybeSingle();
+
+          return {
+            ...report,
+            businesses: businessData,
+            profiles: profileData
+          };
+        })
+      );
+
+      setReports(reportsWithDetails);
     } catch (error: any) {
       toast({
         variant: "destructive",

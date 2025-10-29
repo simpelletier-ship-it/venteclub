@@ -142,19 +142,19 @@ export const NotificationBell = ({ userId }: NotificationBellProps) => {
                   const getIcon = (type: string) => {
                     switch (type) {
                       case 'approved':
-                        return '✓';
+                        return <span className="text-2xl">✅</span>;
                       case 'new_listing':
-                        return '🆕';
+                        return <span className="text-2xl">🆕</span>;
                       case 'price_drop':
-                        return '💰';
+                        return <span className="text-2xl">💰</span>;
                       case 'sold':
-                        return '🎉';
+                        return <span className="text-2xl">🎉</span>;
                       case 'contact_purchased':
-                        return '📧';
+                        return <span className="text-2xl">📧</span>;
                       case 'high_views':
-                        return '👀';
+                        return <span className="text-2xl">👀</span>;
                       default:
-                        return '📬';
+                        return <span className="text-2xl">📬</span>;
                     }
                   };
 
@@ -190,7 +190,7 @@ export const NotificationBell = ({ userId }: NotificationBellProps) => {
                       </Button>
                       
                       <div className="flex items-start gap-3">
-                        <div className="text-2xl flex-shrink-0 mt-0.5">
+                        <div className="flex-shrink-0 mt-0.5">
                           {getIcon(notification.type)}
                         </div>
                         <div className="flex-1 pr-8">
@@ -211,7 +211,7 @@ export const NotificationBell = ({ userId }: NotificationBellProps) => {
                             )}
                           </p>
                           <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
-                            <span>📅</span>
+                            <span className="text-base">📅</span>
                             {new Date(notification.created_at).toLocaleDateString('fr-CA', {
                               day: 'numeric',
                               month: 'short',
