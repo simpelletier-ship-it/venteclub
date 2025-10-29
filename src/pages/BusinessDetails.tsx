@@ -24,33 +24,39 @@ const BusinessDetails = () => {
   const [isPurchasing, setIsPurchasing] = useState(false);
   const [photos, setPhotos] = useState<any[]>([]);
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(null);
+  const [isVerifyingPayment, setIsVerifyingPayment] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    const initialize = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
       setUser(session?.user ?? null);
-      if (session?.user) {
-        checkAccess(session.user.id);
+      
+      await fetchBusiness();
+      await fetchPhotos();
+
+      // Check for payment success/cancel
+      const sessionId = searchParams.get('session_id');
+      if (searchParams.get('payment_success') === 'true' && sessionId) {
+        if (session?.user) {
+          await verifyPayment(sessionId, session.user.id);
+        }
+        setSearchParams({});
+      } else if (searchParams.get('payment_canceled') === 'true') {
+        toast({
+          variant: "destructive",
+          title: "Paiement annulé",
+          description: "Vous avez annulé le paiement.",
+        });
+        setSearchParams({});
+      } else if (session?.user) {
+        await checkAccess(session.user.id);
       } else {
         setLoading(false);
       }
-    });
-    fetchBusiness();
-    fetchPhotos();
+    };
 
-    // Check for payment success/cancel
-    const sessionId = searchParams.get('session_id');
-    if (searchParams.get('payment_success') === 'true' && sessionId) {
-      verifyPayment(sessionId);
-      setSearchParams({});
-    } else if (searchParams.get('payment_canceled') === 'true') {
-      toast({
-        variant: "destructive",
-        title: "Paiement annulé",
-        description: "Vous avez annulé le paiement.",
-      });
-      setSearchParams({});
-    }
-  }, [id, searchParams, setSearchParams]);
+    initialize();
+  }, [id]);
 
   // Re-check access when business data loads
   useEffect(() => {
@@ -142,42 +148,54 @@ const BusinessDetails = () => {
     }
   };
 
-  const verifyPayment = async (sessionId: string) => {
+  const verifyPayment = async (sessionId: string, userId: string) => {
+    setIsVerifyingPayment(true);
     try {
+      console.log("Verifying payment with session:", sessionId);
+      
       const { data, error } = await supabase.functions.invoke('verify-contact-payment', {
         body: { sessionId }
       });
 
-      if (error) throw error;
+      console.log("Verification response:", data);
 
-      if (data.error) {
+      if (error) {
+        console.error("Verification error:", error);
+        throw error;
+      }
+
+      if (data?.error) {
+        console.error("Data error:", data.error);
         toast({
           variant: "destructive",
-          title: "Erreur",
+          title: "Erreur de vérification",
           description: data.error,
         });
+        setIsVerifyingPayment(false);
         return;
       }
 
-      toast({
-        title: "Paiement réussi!",
-        description: "Vous avez maintenant accès aux coordonnées du vendeur.",
-      });
-      
+      // Payment successful - update state
       setHasAccess(true);
       setSellerContact(data.sellerContact);
 
-      // Refresh the page to update access
-      if (user) {
-        checkAccess(user.id);
-      }
+      toast({
+        title: "Paiement effectué avec succès!",
+        description: "Vous avez maintenant accès aux coordonnées du vendeur ci-dessous.",
+      });
+
+      // Refresh access to ensure everything is up to date
+      await checkAccess(userId);
     } catch (error: any) {
       console.error('Payment verification error:', error);
       toast({
         variant: "destructive",
-        title: "Erreur",
-        description: error.message || "Erreur lors de la vérification du paiement",
+        title: "Erreur de vérification",
+        description: error.message || "Impossible de vérifier le paiement. Veuillez rafraîchir la page.",
       });
+    } finally {
+      setIsVerifyingPayment(false);
+      setLoading(false);
     }
   };
 
@@ -287,10 +305,14 @@ const BusinessDetails = () => {
     }
   };
 
-  if (loading) {
+  if (loading || isVerifyingPayment) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-muted-foreground">Chargement...</p>
+        <div className="text-center">
+          <p className="text-muted-foreground">
+            {isVerifyingPayment ? "Vérification du paiement..." : "Chargement..."}
+          </p>
+        </div>
       </div>
     );
   }
