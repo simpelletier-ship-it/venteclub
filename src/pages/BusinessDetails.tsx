@@ -108,20 +108,27 @@ const BusinessDetails = () => {
     if (!id) return;
     
     try {
+      console.log('[ACCESS CHECK] Checking access for business:', id);
+      
       // Use RPC to check access server-side
       const { data: accessGranted, error } = await supabase
         .rpc('check_business_access', { business_uuid: id });
 
+      console.log('[ACCESS CHECK] RPC result:', { accessGranted, error });
+
       if (error) {
-        console.error('Error checking access:', error);
+        console.error('[ACCESS CHECK] Error checking access:', error);
         setLoading(false);
         return;
       }
 
       setHasAccess(!!accessGranted);
+      console.log('[ACCESS CHECK] Has access:', !!accessGranted);
 
       // If has access, fetch seller contact info
       if (accessGranted) {
+        console.log('[ACCESS CHECK] User has access, fetching seller contact...');
+        
         // First get the business to find seller_id
         const { data: businessData } = await supabase
           .from('businesses')
@@ -129,20 +136,31 @@ const BusinessDetails = () => {
           .eq('id', id)
           .single();
 
+        console.log('[ACCESS CHECK] Business seller_id:', businessData?.seller_id);
+
         if (businessData?.seller_id) {
-          const { data: contact } = await supabase
+          const { data: contact, error: contactError } = await supabase
             .from('seller_contacts')
             .select('email, phone')
             .eq('seller_id', businessData.seller_id)
             .maybeSingle();
           
-          setSellerContact(contact);
+          console.log('[ACCESS CHECK] Seller contact:', { contact, contactError });
+          
+          if (contact) {
+            setSellerContact(contact);
+            console.log('[ACCESS CHECK] Seller contact set successfully');
+          } else {
+            console.log('[ACCESS CHECK] No seller contact found');
+          }
         }
+      } else {
+        console.log('[ACCESS CHECK] User does not have access');
       }
       
       setLoading(false);
     } catch (error: any) {
-      console.error(error);
+      console.error('[ACCESS CHECK] Unexpected error:', error);
       setLoading(false);
     }
   };
