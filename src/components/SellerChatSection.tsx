@@ -118,22 +118,7 @@ export const SellerChatSection = ({ businessId, sellerId }: SellerChatSectionPro
   }
 
   if (buyers.length === 0) {
-    return (
-      <div className="border-t pt-6 mt-6">
-        <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-          <Users className="w-5 h-5" />
-          Conversations avec les acheteurs
-        </h2>
-        <Card>
-          <CardContent className="py-12 text-center">
-            <Users className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-            <p className="text-muted-foreground">
-              Aucun acheteur n'a encore acheté l'accès à vos coordonnées pour cette annonce.
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-    );
+    return null;
   }
 
   const selectedBuyer = buyers.find(b => b.user_id === selectedBuyerId);
