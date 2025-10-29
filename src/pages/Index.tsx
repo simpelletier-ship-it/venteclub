@@ -131,9 +131,9 @@ const Index = () => {
         <div className="relative container mx-auto px-4 py-20">
           <div className="max-w-5xl mx-auto text-center space-y-8 animate-slide-up">
             {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-accent/10 via-primary/10 to-secondary/10 border border-accent/20">
-              <Sparkles className="w-5 h-5 text-accent animate-glow" />
-              <span className="text-foreground text-sm font-semibold tracking-wide">
+            <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-accent/10 via-primary/10 to-secondary/10 border border-accent/20 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-primary/20 hover:border-primary/40 hover:from-accent/20 hover:via-primary/20 hover:to-secondary/20 cursor-pointer group">
+              <Sparkles className="w-5 h-5 text-accent animate-glow group-hover:rotate-12 transition-transform duration-300" />
+              <span className="text-foreground text-sm font-semibold tracking-wide group-hover:text-primary transition-colors duration-300">
                 La plateforme d'acquisition et de vente d'entreprise au Québec
               </span>
             </div>
