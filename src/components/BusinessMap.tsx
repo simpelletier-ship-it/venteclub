@@ -218,14 +218,13 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
         </div>
       `;
 
-      // Create popup (not attached to marker to avoid position shifts)
+      // Create popup (will be configured dynamically)
       const popup = new mapboxgl.Popup({ 
         offset: Math.floor(15 * scale),
         closeButton: false,
         closeOnClick: false,
         className: 'business-popup',
         maxWidth: `${popupWidth}px`,
-        anchor: 'left' // Show popup on the right side of marker
       }).setHTML(popupContent);
       
       popups.current.push(popup);
@@ -247,7 +246,51 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
       const showPopup = () => {
         clearTimeout(hideTimeout);
         if (!popup.isOpen() && map.current) {
-          // Always use the same fixed coordinates
+          // Calculate intelligent popup position based on marker screen position
+          const markerPoint = map.current.project(markerLngLat);
+          const mapCanvas = map.current.getCanvas();
+          const canvasWidth = mapCanvas.width;
+          const canvasHeight = mapCanvas.height;
+          
+          // Calculate available space in each direction
+          const spaceRight = canvasWidth - markerPoint.x;
+          const spaceLeft = markerPoint.x;
+          const spaceBottom = canvasHeight - markerPoint.y;
+          const spaceTop = markerPoint.y;
+          
+          // Determine best anchor position based on available space
+          let anchor: 'left' | 'right' | 'top' | 'bottom' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' = 'left';
+          
+          // Prefer horizontal placement (left or right)
+          if (spaceRight > popupWidth + 50) {
+            // Enough space on the right
+            anchor = 'left';
+          } else if (spaceLeft > popupWidth + 50) {
+            // Not enough space on right, try left
+            anchor = 'right';
+          } else if (spaceBottom > imageHeight + 200) {
+            // Not enough horizontal space, try bottom
+            anchor = 'top';
+          } else if (spaceTop > imageHeight + 200) {
+            // Try top
+            anchor = 'bottom';
+          } else {
+            // Use corner anchors based on which corner has most space
+            const topLeft = spaceTop + spaceLeft;
+            const topRight = spaceTop + spaceRight;
+            const bottomLeft = spaceBottom + spaceLeft;
+            const bottomRight = spaceBottom + spaceRight;
+            
+            const maxSpace = Math.max(topLeft, topRight, bottomLeft, bottomRight);
+            
+            if (maxSpace === topLeft) anchor = 'bottom-right';
+            else if (maxSpace === topRight) anchor = 'bottom-left';
+            else if (maxSpace === bottomLeft) anchor = 'top-right';
+            else anchor = 'top-left';
+          }
+          
+          // Set the anchor and show popup
+          popup.options.anchor = anchor;
           popup.setLngLat(markerLngLat).addTo(map.current);
           
           // Attach hover listeners to popup after it's added
