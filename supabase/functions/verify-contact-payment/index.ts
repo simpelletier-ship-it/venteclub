@@ -151,6 +151,32 @@ serve(async (req) => {
     console.log("[VERIFY] Seller contact found:", sellerContact ? "Yes" : "No");
     console.log("[VERIFY] Verification complete, returning success");
 
+    // Send purchase invoice email
+    try {
+      const { data: businessData } = await supabaseAdmin
+        .from('businesses')
+        .select('title')
+        .eq('id', businessId)
+        .single();
+
+      await supabaseAdmin.functions.invoke('send-purchase-invoice', {
+        body: {
+          email: user.email,
+          name: user.email?.split('@')[0],
+          businessTitle: businessData?.title || 'Entreprise',
+          accessType: accessType,
+          amount: 2000, // 20$
+          currency: 'cad',
+          invoiceId: sessionId.substring(0, 8).toUpperCase(),
+          purchaseDate: new Date().toISOString()
+        }
+      });
+      console.log("[VERIFY] Invoice email sent");
+    } catch (emailError) {
+      console.error("[VERIFY] Error sending invoice email:", emailError);
+      // Don't fail the request if email fails
+    }
+
     clearTimeout(timeoutId);
 
     return new Response(

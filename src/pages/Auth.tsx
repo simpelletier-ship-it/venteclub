@@ -99,7 +99,7 @@ const Auth = () => {
 
       const validatedData = authSchema.parse({ email, password });
 
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email: validatedData.email,
         password: validatedData.password,
         options: {
@@ -118,6 +118,20 @@ const Auth = () => {
           throw error;
         }
         return;
+      }
+
+      // Send welcome email
+      if (data.user?.email) {
+        try {
+          await supabase.functions.invoke('send-welcome-email', {
+            body: {
+              email: data.user.email,
+              name: data.user.email.split('@')[0]
+            }
+          });
+        } catch (emailError) {
+          console.error("Error sending welcome email:", emailError);
+        }
       }
 
       toast({
