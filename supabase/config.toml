@@ -80,3 +80,6 @@ verify_jwt = true
 
 [functions.check-login-attempt]
 verify_jwt = false
+
+[functions.send-alert-email]
+verify_jwt = false

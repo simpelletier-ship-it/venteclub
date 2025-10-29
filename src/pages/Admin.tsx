@@ -166,6 +166,57 @@ const Admin = () => {
           console.error('Error sending approval email:', emailError);
           // Don't fail the approval if email fails
         }
+
+        // Envoyer les emails d'alerte aux utilisateurs avec email_enabled = true
+        if (business) {
+          try {
+            // Récupérer les alertes avec email activé qui correspondent à cette annonce
+            const { data: emailAlerts } = await supabase
+              .from('user_alerts')
+              .select('*')
+              .eq('email_enabled', true)
+              .or(`alert_type.eq.all,and(alert_type.eq.category,category.eq.${business.industry}),and(alert_type.eq.city,city.eq.${business.city})`);
+
+            // Envoyer un email pour chaque alerte
+            if (emailAlerts && emailAlerts.length > 0) {
+              console.log(`Sending ${emailAlerts.length} alert emails for business ${businessId}`);
+              
+              for (const alert of emailAlerts) {
+                if (alert.user_id !== business.seller_id) {
+                  // Récupérer l'email de l'utilisateur
+                  const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('email')
+                    .eq('id', alert.user_id)
+                    .single();
+
+                  if (profile?.email) {
+                    try {
+                      await supabase.functions.invoke('send-alert-email', {
+                        body: {
+                          userEmail: profile.email,
+                          businessTitle: business.title,
+                          businessId: business.id,
+                          businessCity: business.city || '',
+                          businessIndustry: business.industry,
+                          businessPrice: business.asking_price,
+                          alertType: alert.alert_type,
+                        }
+                      });
+                      console.log(`Alert email sent to ${profile.email}`);
+                    } catch (alertEmailError) {
+                      console.error('Error sending alert email:', alertEmailError);
+                      // Continue avec les autres emails même si un échoue
+                    }
+                  }
+                }
+              }
+            }
+          } catch (alertError) {
+            console.error('Error processing alerts:', alertError);
+            // Don't fail the approval if alerts fail
+          }
+        }
       }
 
       toast({
