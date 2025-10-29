@@ -84,11 +84,6 @@ const BusinessCard = ({
                   En Vedette
                 </Badge>
               )}
-              {status === 'sold' && (
-                <Badge className="bg-blue-500 hover:bg-blue-600 text-white border-0 shadow-md text-xs">
-                  ✓ Vendue
-                </Badge>
-              )}
               {showActions && approval_status === 'approved' && (
                 <Badge className="bg-green-500 hover:bg-green-600 text-white border-0 shadow-md text-xs">
                   ✓ Approuvée
@@ -124,6 +119,15 @@ const BusinessCard = ({
         <p className={`text-sm text-muted-foreground line-clamp-2 leading-relaxed ${status === 'sold' ? 'blur-md select-none' : ''}`}>
           {description}
         </p>
+
+        {/* Sold Badge */}
+        {status === 'sold' && (
+          <div className="flex justify-center">
+            <Badge className="bg-blue-500 hover:bg-blue-600 text-white border-0 shadow-md text-xs">
+              ✓ Vendue
+            </Badge>
+          </div>
+        )}
 
         {/* Stats Grid */}
         <div className={`grid grid-cols-2 gap-4 pt-4 border-t border-border/50 ${status === 'sold' ? 'blur-md select-none' : ''}`}>

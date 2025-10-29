@@ -72,11 +72,6 @@ const BusinessListItem = ({
               En Vedette
             </Badge>
           )}
-          {status === 'sold' && (
-            <Badge className="bg-blue-500 hover:bg-blue-600 text-white border-0 shadow-md text-xs">
-              ✓ Vendue
-            </Badge>
-          )}
         </div>
         
         <div className="space-y-1">
@@ -92,6 +87,13 @@ const BusinessListItem = ({
         <p className={`text-sm text-muted-foreground line-clamp-1 ${status === 'sold' ? 'blur-sm select-none' : ''}`}>
           {description}
         </p>
+
+        {/* Sold Badge */}
+        {status === 'sold' && (
+          <Badge className="bg-blue-500 hover:bg-blue-600 text-white border-0 shadow-md text-xs">
+            ✓ Vendue
+          </Badge>
+        )}
       </div>
 
       {/* Middle section - Stats */}
