@@ -98,12 +98,12 @@ const BusinessCard = ({
         </div>
 
         {/* Description */}
-        <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
+        <p className={`text-sm text-muted-foreground line-clamp-2 leading-relaxed ${status === 'sold' ? 'blur-md select-none' : ''}`}>
           {description}
         </p>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border/50">
+        <div className={`grid grid-cols-2 gap-4 pt-4 border-t border-border/50 ${status === 'sold' ? 'blur-md select-none' : ''}`}>
           <div className="space-y-1">
             <p className="text-xs text-muted-foreground uppercase tracking-wider">Chiffre d'affaires</p>
             <p className="text-sm font-semibold text-foreground flex items-center gap-1">
@@ -119,7 +119,7 @@ const BusinessCard = ({
 
         {/* Price & CTA */}
         <div className="flex items-end justify-between pt-4 border-t border-border/50">
-          <div className="space-y-1">
+          <div className={`space-y-1 ${status === 'sold' ? 'blur-md select-none' : ''}`}>
             <p className="text-xs text-muted-foreground uppercase tracking-wider">Prix demandé</p>
             <p className="text-2xl font-bold text-primary">
               {displayPrice}
