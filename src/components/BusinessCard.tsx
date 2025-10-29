@@ -139,17 +139,33 @@ const BusinessCard = ({
         </div>
 
         <div className={`grid grid-cols-2 gap-4 pt-4 border-t border-border/50 ${status === 'sold' ? 'blur-[8px]' : ''}`}>
-          <div className="space-y-1">
-            <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Revenus</p>
-            <p className="text-lg font-bold text-foreground flex items-center gap-1">
-              <TrendingUp className="w-4 h-4 text-accent" />
-              {displayRevenue}
-            </p>
-          </div>
-          <div className="space-y-1">
-            <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">BAIIA</p>
-            <p className="text-lg font-bold text-secondary">{displayBaiia}</p>
-          </div>
+          {!is_franchise && (
+            <>
+              <div className="space-y-1">
+                <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Revenus</p>
+                <p className="text-lg font-bold text-foreground flex items-center gap-1">
+                  <TrendingUp className="w-4 h-4 text-accent" />
+                  {displayRevenue}
+                </p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">BAIIA</p>
+                <p className="text-lg font-bold text-secondary">{displayBaiia}</p>
+              </div>
+            </>
+          )}
+          {is_franchise && (
+            <>
+              <div className="space-y-1">
+                <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Type</p>
+                <p className="text-lg font-bold text-foreground">Opportunité Franchise</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Droit d'entrée</p>
+                <p className="text-lg font-bold text-secondary">{displayPrice}</p>
+              </div>
+            </>
+          )}
         </div>
 
         <div className={`flex items-end justify-between pt-4 border-t border-border/50 ${status === 'sold' ? 'blur-[8px]' : ''}`}>

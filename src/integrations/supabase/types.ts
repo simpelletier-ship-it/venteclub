@@ -258,26 +258,34 @@ export type Database = {
           description: string
           employees_count: number | null
           featured: boolean | null
+          franchise_fee: number | null
+          franchise_term_years: number | null
           id: string
           industry: Database["public"]["Enums"]["industry_type_new"]
+          initial_investment_max: number | null
+          initial_investment_min: number | null
           is_franchise: boolean | null
           is_premium: boolean | null
           latitude: number | null
           location: string
           longitude: number | null
+          marketing_fee: number | null
           net_profit: number | null
           net_profit_margin: number | null
           profit_margin: number | null
           province: string | null
           region: string | null
           rejection_reason: string | null
+          royalty_percentage: number | null
           seller_id: string
           seller_name: string | null
           seller_phone: string | null
           slug: string
           sold_at: string | null
           status: string | null
+          territory_available: string | null
           title: string
+          training_provided: boolean | null
           updated_at: string | null
           views_count: number | null
           withdrawal_reason: string | null
@@ -296,26 +304,34 @@ export type Database = {
           description: string
           employees_count?: number | null
           featured?: boolean | null
+          franchise_fee?: number | null
+          franchise_term_years?: number | null
           id?: string
           industry: Database["public"]["Enums"]["industry_type_new"]
+          initial_investment_max?: number | null
+          initial_investment_min?: number | null
           is_franchise?: boolean | null
           is_premium?: boolean | null
           latitude?: number | null
           location: string
           longitude?: number | null
+          marketing_fee?: number | null
           net_profit?: number | null
           net_profit_margin?: number | null
           profit_margin?: number | null
           province?: string | null
           region?: string | null
           rejection_reason?: string | null
+          royalty_percentage?: number | null
           seller_id: string
           seller_name?: string | null
           seller_phone?: string | null
           slug: string
           sold_at?: string | null
           status?: string | null
+          territory_available?: string | null
           title: string
+          training_provided?: boolean | null
           updated_at?: string | null
           views_count?: number | null
           withdrawal_reason?: string | null
@@ -334,26 +350,34 @@ export type Database = {
           description?: string
           employees_count?: number | null
           featured?: boolean | null
+          franchise_fee?: number | null
+          franchise_term_years?: number | null
           id?: string
           industry?: Database["public"]["Enums"]["industry_type_new"]
+          initial_investment_max?: number | null
+          initial_investment_min?: number | null
           is_franchise?: boolean | null
           is_premium?: boolean | null
           latitude?: number | null
           location?: string
           longitude?: number | null
+          marketing_fee?: number | null
           net_profit?: number | null
           net_profit_margin?: number | null
           profit_margin?: number | null
           province?: string | null
           region?: string | null
           rejection_reason?: string | null
+          royalty_percentage?: number | null
           seller_id?: string
           seller_name?: string | null
           seller_phone?: string | null
           slug?: string
           sold_at?: string | null
           status?: string | null
+          territory_available?: string | null
           title?: string
+          training_provided?: boolean | null
           updated_at?: string | null
           views_count?: number | null
           withdrawal_reason?: string | null

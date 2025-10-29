@@ -103,7 +103,6 @@ const ListBusiness = () => {
     seller_phone: "",
     latitude: null as number | null,
     longitude: null as number | null,
-    is_franchise: false,
     competitive_advantages: "",
     target_clientele: "",
     sale_reason: "",
@@ -189,7 +188,6 @@ const ListBusiness = () => {
         year_established: business.year_established?.toString() || "",
         seller_email: "",
         seller_phone: "",
-        is_franchise: business.is_franchise || false,
         latitude: business.latitude || null,
         longitude: business.longitude || null,
         competitive_advantages: "",
@@ -420,7 +418,6 @@ const ListBusiness = () => {
             baiia_margin: formData.baiia_margin && !isNaN(parseFloat(formData.baiia_margin)) ? parseFloat(formData.baiia_margin) : null,
             employees_count: validatedData.employees_count,
             year_established: validatedData.year_established,
-            is_franchise: formData.is_franchise,
             latitude: formData.latitude,
             longitude: formData.longitude,
             status: isDraft ? "archived" : "active",
@@ -489,7 +486,6 @@ const ListBusiness = () => {
           baiia_margin: formData.baiia_margin && !isNaN(parseFloat(formData.baiia_margin)) ? parseFloat(formData.baiia_margin) : null,
           employees_count: validatedData.employees_count,
           year_established: validatedData.year_established,
-          is_franchise: formData.is_franchise,
           latitude: formData.latitude,
           longitude: formData.longitude,
           status: isDraft ? "archived" : "active",
@@ -591,13 +587,24 @@ const ListBusiness = () => {
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-7xl mx-auto">
           <div className="mb-8">
-            <h1 className="text-4xl font-bold text-foreground mb-2">
-              {editingBusinessId ? "Modifier l'annonce" : "Nouvelle Fiche Entreprise"}
-            </h1>
+            <div className="flex items-center justify-between mb-4">
+              <h1 className="text-4xl font-bold text-foreground">
+                {editingBusinessId ? "Modifier l'annonce" : "Nouvelle Fiche Entreprise"}
+              </h1>
+              {!editingBusinessId && (
+                <Button
+                  variant="outline"
+                  onClick={() => navigate("/list-franchise")}
+                  className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700 border-0 shadow-md"
+                >
+                  🏢 Vendre une franchise
+                </Button>
+              )}
+            </div>
             <p className="text-muted-foreground">
               {editingBusinessId 
                 ? "Modifiez les informations de votre annonce et publiez-la." 
-                : "Remplissez les informations pour créer une nouvelle annonce."}
+                : "Remplissez les informations pour créer une nouvelle annonce. Si vous vendez une franchise, cliquez sur le bouton ci-dessus pour accéder au formulaire spécialisé."}
             </p>
           </div>
 
@@ -1234,17 +1241,6 @@ const ListBusiness = () => {
                       />
                     </div>
                   </div>
-                </div>
-
-                <div className="flex items-center space-x-2">
-                  <Checkbox 
-                    id="is_franchise" 
-                    checked={formData.is_franchise}
-                    onCheckedChange={(checked) => setFormData({ ...formData, is_franchise: checked as boolean })}
-                  />
-                  <Label htmlFor="is_franchise" className="text-sm font-normal cursor-pointer">
-                    Cette entreprise est une franchise
-                  </Label>
                 </div>
 
                 {/* Acceptation des conditions */}

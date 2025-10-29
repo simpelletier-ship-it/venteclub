@@ -125,17 +125,27 @@ const BusinessListItem = ({
 
       {/* Middle section - Stats */}
       <div className={`hidden md:flex items-center gap-6 ${status === 'sold' ? 'blur-sm' : ''}`}>
-        <div className="text-center">
-          <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Chiffre d'affaires</p>
-          <p className="text-sm font-semibold text-foreground flex items-center gap-1">
-            <TrendingUp className="w-3.5 h-3.5 text-accent" />
-            {displayRevenue}
-          </p>
-        </div>
-        <div className="text-center">
-          <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">BAIIA</p>
-          <p className="text-sm font-semibold text-accent">{displayBaiia}</p>
-        </div>
+        {!is_franchise && (
+          <>
+            <div className="text-center">
+              <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Chiffre d'affaires</p>
+              <p className="text-sm font-semibold text-foreground flex items-center gap-1">
+                <TrendingUp className="w-3.5 h-3.5 text-accent" />
+                {displayRevenue}
+              </p>
+            </div>
+            <div className="text-center">
+              <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">BAIIA</p>
+              <p className="text-sm font-semibold text-accent">{displayBaiia}</p>
+            </div>
+          </>
+        )}
+        {is_franchise && (
+          <div className="text-center">
+            <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Type</p>
+            <p className="text-sm font-semibold text-foreground">Opportunité Franchise</p>
+          </div>
+        )}
       </div>
 
       {/* Right section - Price & Actions */}

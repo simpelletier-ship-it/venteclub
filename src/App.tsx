@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
 import ListBusiness from "./pages/ListBusiness";
+import ListFranchise from "./pages/ListFranchise";
 import Dashboard from "./pages/Dashboard";
 import BusinessDetails from "./pages/BusinessDetails";
 import Map from "./pages/Map";
@@ -39,6 +40,7 @@ const App = () => (
               <Route path="/auth" element={<Auth />} />
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/list-business" element={<ListBusiness />} />
+              <Route path="/list-franchise" element={<ListFranchise />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/entreprise/:slug" element={<BusinessDetails />} />
               <Route path="/map" element={<Map />} />
