@@ -102,6 +102,7 @@ export type Database = {
           longitude: number | null
           profit_margin: number | null
           province: string | null
+          rejection_reason: string | null
           seller_id: string
           seller_name: string | null
           seller_phone: string | null
@@ -131,6 +132,7 @@ export type Database = {
           longitude?: number | null
           profit_margin?: number | null
           province?: string | null
+          rejection_reason?: string | null
           seller_id: string
           seller_name?: string | null
           seller_phone?: string | null
@@ -160,6 +162,7 @@ export type Database = {
           longitude?: number | null
           profit_margin?: number | null
           province?: string | null
+          rejection_reason?: string | null
           seller_id?: string
           seller_name?: string | null
           seller_phone?: string | null
