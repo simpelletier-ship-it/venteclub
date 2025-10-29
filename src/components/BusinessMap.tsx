@@ -220,12 +220,12 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
 
       // Create popup (not attached to marker to avoid position shifts)
       const popup = new mapboxgl.Popup({ 
-        offset: Math.floor(25 * scale),
+        offset: Math.floor(15 * scale),
         closeButton: false,
         closeOnClick: false,
         className: 'business-popup',
         maxWidth: `${popupWidth}px`,
-        anchor: 'bottom' // Fixed anchor position
+        anchor: 'left' // Show popup on the right side of marker
       }).setHTML(popupContent);
       
       popups.current.push(popup);
