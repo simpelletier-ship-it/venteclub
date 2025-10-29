@@ -130,16 +130,18 @@ const BusinessListItem = ({
           {id && (
             <FavoriteButton businessId={id} userId={userId} />
           )}
-          <Button 
-            size="sm"
-            className="bg-accent hover:bg-accent/90 text-accent-foreground font-semibold shadow-md"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleClick();
-            }}
-          >
-            Voir
-          </Button>
+          {status !== 'sold' && (
+            <Button 
+              size="sm"
+              className="bg-accent hover:bg-accent/90 text-accent-foreground font-semibold shadow-md"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleClick();
+              }}
+            >
+              Voir
+            </Button>
+          )}
         </div>
       </div>
     </div>

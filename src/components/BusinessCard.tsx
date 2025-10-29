@@ -156,16 +156,18 @@ const BusinessCard = ({
               {displayPrice}
             </p>
           </div>
-          <Button 
-            size="sm"
-            className="bg-accent hover:bg-accent/90 text-accent-foreground font-semibold px-6 shadow-md"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleClick();
-            }}
-          >
-            Voir l'annonce
-          </Button>
+          {status !== 'sold' && (
+            <Button 
+              size="sm"
+              className="bg-accent hover:bg-accent/90 text-accent-foreground font-semibold px-6 shadow-md"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleClick();
+              }}
+            >
+              Voir l'annonce
+            </Button>
+          )}
         </div>
 
         {/* Dashboard Actions */}
