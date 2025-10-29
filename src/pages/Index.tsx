@@ -2,8 +2,9 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import BusinessCard from "@/components/BusinessCard";
+import BusinessListItem from "@/components/BusinessListItem";
 import FilterBar from "@/components/FilterBar";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Grid3x3, List } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import heroImage from "@/assets/hero-business.jpg";
 
@@ -12,6 +13,7 @@ const Index = () => {
   const [featuredBusinesses, setFeaturedBusinesses] = useState<any[]>([]);
   const [allBusinesses, setAllBusinesses] = useState<any[]>([]);
   const [filteredBusinesses, setFilteredBusinesses] = useState<any[]>([]);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   useEffect(() => {
     fetchBusinesses();
@@ -175,21 +177,49 @@ const Index = () => {
           </div>
 
           {/* Filter Section */}
-          <div className="mb-10">
+          <div className="mb-8">
             <FilterBar onFilter={handleFilter} />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* View Mode Toggle */}
+          <div className="flex justify-end mb-6">
+            <div className="inline-flex rounded-lg border border-border bg-card p-1">
+              <Button
+                variant={viewMode === 'grid' ? 'secondary' : 'ghost'}
+                size="sm"
+                onClick={() => setViewMode('grid')}
+                className="gap-2"
+              >
+                <Grid3x3 className="h-4 w-4" />
+                Grille
+              </Button>
+              <Button
+                variant={viewMode === 'list' ? 'secondary' : 'ghost'}
+                size="sm"
+                onClick={() => setViewMode('list')}
+                className="gap-2"
+              >
+                <List className="h-4 w-4" />
+                Liste
+              </Button>
+            </div>
+          </div>
+
+          <div className={viewMode === 'grid' ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" : "space-y-4"}>
             {filteredBusinesses.length > 0 ? (
               filteredBusinesses.map((business) => (
-                <BusinessCard key={business.id} {...business} />
+                viewMode === 'grid' ? (
+                  <BusinessCard key={business.id} {...business} />
+                ) : (
+                  <BusinessListItem key={business.id} {...business} />
+                )
               ))
             ) : allBusinesses.length > 0 ? (
-              <div className="col-span-full text-center py-12">
+              <div className={viewMode === 'grid' ? "col-span-full text-center py-12" : "text-center py-12"}>
                 <p className="text-lg text-muted-foreground">Aucune annonce ne correspond à vos critères de recherche</p>
               </div>
             ) : (
-              <div className="col-span-full text-center py-12">
+              <div className={viewMode === 'grid' ? "col-span-full text-center py-12" : "text-center py-12"}>
                 <p className="text-lg text-muted-foreground">Aucune annonce disponible pour le moment</p>
               </div>
             )}
