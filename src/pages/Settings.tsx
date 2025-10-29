@@ -10,8 +10,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
-import { User, MapPin, Globe, Bell, Mail, Save, Upload } from "lucide-react";
+import { User, MapPin, Globe, Bell, Mail, Save, Upload, Shield } from "lucide-react";
 import { AlertsManager } from "@/components/AlertsManager";
+import { TwoFactorAuth } from "@/components/TwoFactorAuth";
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -187,7 +188,7 @@ const Settings = () => {
       const { error } = await supabase.functions.invoke('send-password-reset', {
         body: {
           email: profile.email,
-          redirectUrl: `${window.location.origin}/auth`
+          redirectUrl: `${window.location.origin}/reset-password`
         }
       });
 
@@ -226,18 +227,22 @@ const Settings = () => {
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-5 lg:w-auto">
+            <TabsList className="grid w-full grid-cols-6 lg:w-auto">
               <TabsTrigger value="personal" className="flex items-center gap-2">
                 <User className="h-4 w-4" />
-                <span className="hidden sm:inline">Informations personnelles</span>
+                <span className="hidden sm:inline">Personnel</span>
               </TabsTrigger>
               <TabsTrigger value="address" className="flex items-center gap-2">
                 <MapPin className="h-4 w-4" />
                 <span className="hidden sm:inline">Adresse</span>
               </TabsTrigger>
+              <TabsTrigger value="security" className="flex items-center gap-2">
+                <Shield className="h-4 w-4" />
+                <span className="hidden sm:inline">Sécurité</span>
+              </TabsTrigger>
               <TabsTrigger value="public" className="flex items-center gap-2">
                 <Globe className="h-4 w-4" />
-                <span className="hidden sm:inline">Profil public</span>
+                <span className="hidden sm:inline">Public</span>
               </TabsTrigger>
               <TabsTrigger value="alerts" className="flex items-center gap-2">
                 <Bell className="h-4 w-4" />
@@ -476,6 +481,31 @@ const Settings = () => {
                         className="mt-2"
                       />
                     </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="security" className="space-y-6">
+              <TwoFactorAuth />
+              
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-primary">
+                    <Shield className="h-5 w-5" />
+                    Tentatives de connexion récentes
+                  </CardTitle>
+                  <CardDescription>
+                    Surveillez l'activité de votre compte
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-sm text-muted-foreground">
+                    <p>✅ Authentification à deux facteurs disponible</p>
+                    <p>🔒 Limite de 3 tentatives de connexion avant verrouillage temporaire</p>
+                    <p>⏱️ Verrouillage de 30 minutes après tentatives échouées</p>
+                    <p>🔐 Mots de passe sécurisés avec critères stricts (12+ caractères)</p>
+                    <p>🚫 Protection contre la réutilisation de mots de passe</p>
                   </div>
                 </CardContent>
               </Card>

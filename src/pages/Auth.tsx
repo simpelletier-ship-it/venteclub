@@ -32,12 +32,51 @@ const Auth = () => {
     try {
       const validatedData = authSchema.parse({ email, password });
 
+      // Vérifier les tentatives de connexion avant d'essayer de se connecter
+      const { data: attemptCheck } = await supabase.functions.invoke('check-login-attempt', {
+        body: {
+          email: validatedData.email,
+          success: false,
+          ip_address: 'web',
+          user_agent: navigator.userAgent
+        }
+      });
+
+      if (attemptCheck?.locked) {
+        toast({
+          variant: "destructive",
+          title: "Compte temporairement verrouillé",
+          description: attemptCheck.message,
+          duration: 10000,
+        });
+        return;
+      }
+
+      if (attemptCheck?.remaining_attempts !== undefined && attemptCheck.remaining_attempts < 3) {
+        toast({
+          title: "Attention",
+          description: attemptCheck.message,
+          duration: 5000,
+        });
+      }
+
       const { error } = await supabase.auth.signInWithPassword({
         email: validatedData.email,
         password: validatedData.password,
       });
 
       if (error) {
+        // Enregistrer l'échec
+        await supabase.functions.invoke('check-login-attempt', {
+          body: {
+            email: validatedData.email,
+            success: false,
+            failure_reason: error.message,
+            ip_address: 'web',
+            user_agent: navigator.userAgent
+          }
+        });
+
         if (error.message.includes('Invalid login credentials')) {
           toast({
             variant: "destructive",
@@ -55,6 +94,16 @@ const Auth = () => {
         }
         return;
       }
+
+      // Enregistrer le succès
+      await supabase.functions.invoke('check-login-attempt', {
+        body: {
+          email: validatedData.email,
+          success: true,
+          ip_address: 'web',
+          user_agent: navigator.userAgent
+        }
+      });
 
       toast({
         title: "Connexion réussie !",
@@ -169,7 +218,7 @@ const Auth = () => {
       const { error } = await supabase.functions.invoke('send-password-reset', {
         body: {
           email: email,
-          redirectUrl: `${window.location.origin}/auth`
+          redirectUrl: `${window.location.origin}/reset-password`
         }
       });
 
