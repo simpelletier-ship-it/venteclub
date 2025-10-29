@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import { Header } from "./Header";
+import { Footer } from "./Footer";
 import { AlertCircle } from "lucide-react";
 
 interface LayoutProps {
@@ -8,7 +9,7 @@ interface LayoutProps {
 
 export const Layout = ({ children }: LayoutProps) => {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       <div className="bg-accent text-accent-foreground py-2 px-4 text-center text-sm font-medium flex items-center justify-center gap-2">
         <AlertCircle className="h-4 w-4" />
         <span>
@@ -16,7 +17,8 @@ export const Layout = ({ children }: LayoutProps) => {
         </span>
       </div>
       <Header />
-      <main>{children}</main>
+      <main className="flex-1">{children}</main>
+      <Footer />
     </div>
   );
 };
