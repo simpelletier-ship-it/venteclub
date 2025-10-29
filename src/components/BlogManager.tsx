@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { Pencil, Trash2, Plus, X } from "lucide-react";
+import { Pencil, Trash2, Plus, X, Sparkles } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -35,6 +35,7 @@ export const BlogManager = () => {
   const [loading, setLoading] = useState(true);
   const [editingPost, setEditingPost] = useState<BlogPost | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [generatingContent, setGeneratingContent] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     slug: "",
@@ -174,6 +175,34 @@ export const BlogManager = () => {
     setEditingPost(null);
     resetForm();
     setIsDialogOpen(true);
+  };
+
+  const handleGenerateContent = async (postId: string) => {
+    setGeneratingContent(postId);
+    
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-blog-content', {
+        body: { blogPostId: postId }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Contenu généré!",
+        description: `Contenu de ${data.contentLength} caractères généré avec succès.`,
+      });
+
+      fetchPosts();
+    } catch (error: any) {
+      console.error('Error generating content:', error);
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: error.message || "Impossible de générer le contenu",
+      });
+    } finally {
+      setGeneratingContent(null);
+    }
   };
 
   if (loading) {
@@ -317,6 +346,19 @@ export const BlogManager = () => {
                   <Button
                     variant="outline"
                     size="sm"
+                    onClick={() => handleGenerateContent(post.id)}
+                    disabled={generatingContent === post.id}
+                    title="Générer le contenu complet avec l'IA"
+                  >
+                    {generatingContent === post.id ? (
+                      <>Génération...</>
+                    ) : (
+                      <Sparkles className="w-4 h-4" />
+                    )}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={() => handleEdit(post)}
                   >
                     <Pencil className="w-4 h-4" />
@@ -332,7 +374,13 @@ export const BlogManager = () => {
               </div>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">{post.excerpt}</p>
+              <p className="text-sm text-muted-foreground mb-2">{post.excerpt}</p>
+              <div className="text-xs text-muted-foreground">
+                Contenu: {post.content.length} caractères
+                {post.content.length < 500 && (
+                  <span className="ml-2 text-yellow-600">⚠️ Contenu court, cliquez sur l'icône ✨ pour générer</span>
+                )}
+              </div>
             </CardContent>
           </Card>
         ))}
