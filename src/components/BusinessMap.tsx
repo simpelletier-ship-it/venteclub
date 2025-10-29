@@ -91,7 +91,15 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
           ? b.business_photos[0].photo_url 
           : null
       }));
-      console.log('[MAP] Businesses loaded:', businessesWithPhotos.length);
+      console.log('[MAP] Businesses loaded for map:', {
+        total: businessesWithPhotos.length,
+        withCoords: businessesWithPhotos.filter(b => b.latitude && b.longitude).length,
+        sample: businessesWithPhotos[0] ? {
+          title: businessesWithPhotos[0].title,
+          lat: businessesWithPhotos[0].latitude,
+          lng: businessesWithPhotos[0].longitude
+        } : 'none'
+      });
       setBusinesses(businessesWithPhotos);
     }
   };
@@ -386,6 +394,21 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
   return (
     <div className="relative w-full h-[600px] rounded-2xl overflow-hidden shadow-elegant border border-border">
       <div ref={mapContainer} className="absolute inset-0" />
+      
+      {/* Message si aucune annonce */}
+      {businesses.length === 0 && (
+        <div className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm z-10">
+          <div className="text-center p-8">
+            <p className="text-lg font-semibold text-foreground mb-2">
+              Aucune annonce trouvée
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Essayez de modifier vos filtres pour voir plus d'annonces
+            </p>
+          </div>
+        </div>
+      )}
+      
       <style>{`
         .business-popup .mapboxgl-popup-content {
           padding: 0;

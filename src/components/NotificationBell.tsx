@@ -189,7 +189,7 @@ export const NotificationBell = ({ userId }: NotificationBellProps) => {
                     <div
                       key={notification.id}
                       onClick={() => handleNotificationClick(notification)}
-                      className={`max-w-[520px] p-4 rounded-xl cursor-pointer transition-all duration-300 relative group border-2 ${
+                      className={`w-full p-4 rounded-xl cursor-pointer transition-all duration-300 relative group border-2 ${
                         getNotificationStyle(notification.type)
                       } ${
                         notification.read 

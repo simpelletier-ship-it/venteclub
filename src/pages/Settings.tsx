@@ -156,9 +156,17 @@ const Settings = () => {
 
       setProfile({ ...profile, avatar_url: publicUrl });
 
+      // Sauvegarder l'avatar dans la base de données immédiatement
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: publicUrl })
+        .eq('id', user.id);
+
+      if (updateError) throw updateError;
+
       toast({
-        title: "Avatar téléchargé",
-        description: "Votre avatar a été mis à jour avec succès.",
+        title: "Avatar mis à jour",
+        description: "Votre avatar a été enregistré avec succès.",
       });
     } catch (error: any) {
       toast({
