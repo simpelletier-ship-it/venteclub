@@ -156,17 +156,18 @@ const BlogPost = () => {
             <div 
               className="prose prose-lg max-w-none 
                 prose-headings:text-foreground prose-headings:font-bold
-                prose-h2:text-3xl prose-h2:mt-12 prose-h2:mb-6 prose-h2:leading-tight
-                prose-h3:text-2xl prose-h3:mt-8 prose-h3:mb-4 prose-h3:leading-snug
-                prose-h4:text-xl prose-h4:mt-6 prose-h4:mb-3
-                prose-p:text-muted-foreground prose-p:leading-relaxed prose-p:mb-6 prose-p:text-justify
-                prose-ul:my-6 prose-ul:space-y-2 prose-ul:text-muted-foreground
-                prose-li:leading-relaxed prose-li:pl-2
-                prose-ol:my-6 prose-ol:space-y-2 prose-ol:text-muted-foreground
-                prose-strong:text-foreground prose-strong:font-semibold
+                prose-h2:text-3xl prose-h2:mt-16 prose-h2:mb-8 prose-h2:leading-tight prose-h2:font-display
+                prose-h3:text-2xl prose-h3:mt-12 prose-h3:mb-6 prose-h3:leading-snug prose-h3:font-display
+                prose-h4:text-xl prose-h4:mt-8 prose-h4:mb-4 prose-h4:font-semibold
+                prose-p:text-muted-foreground prose-p:leading-relaxed prose-p:mb-8 prose-p:text-lg
+                prose-ul:my-8 prose-ul:space-y-3 prose-ul:text-muted-foreground prose-ul:text-lg
+                prose-li:leading-relaxed prose-li:pl-2 prose-li:mb-2
+                prose-ol:my-8 prose-ol:space-y-3 prose-ol:text-muted-foreground prose-ol:text-lg
+                prose-strong:text-foreground prose-strong:font-bold
                 prose-a:text-accent prose-a:font-medium prose-a:no-underline hover:prose-a:underline
-                prose-blockquote:border-l-accent prose-blockquote:bg-accent/5 prose-blockquote:py-4 prose-blockquote:px-6 prose-blockquote:my-6
-                prose-img:rounded-lg prose-img:shadow-md prose-img:my-8"
+                prose-blockquote:border-l-4 prose-blockquote:border-l-accent prose-blockquote:bg-accent/5 prose-blockquote:py-6 prose-blockquote:px-8 prose-blockquote:my-8 prose-blockquote:italic
+                prose-img:rounded-lg prose-img:shadow-md prose-img:my-12
+                [&>*:first-child]:mt-0"
               dangerouslySetInnerHTML={{ __html: post.content }}
             />
 
