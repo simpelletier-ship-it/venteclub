@@ -14,6 +14,16 @@ serve(async (req) => {
 
   const supabaseClient = createClient(
     Deno.env.get("SUPABASE_URL") ?? "",
+    Deno.env.get("SUPABASE_ANON_KEY") ?? "",
+    {
+      global: {
+        headers: { Authorization: req.headers.get('Authorization')! },
+      },
+    }
+  );
+
+  const supabaseAdmin = createClient(
+    Deno.env.get("SUPABASE_URL") ?? "",
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
   );
 
@@ -27,11 +37,15 @@ serve(async (req) => {
     const { sessionId } = await req.json();
     if (!sessionId) throw new Error("Session ID required");
 
+    console.log("Verifying session:", sessionId, "for user:", user.id);
+
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2025-08-27.basil",
     });
 
     const session = await stripe.checkout.sessions.retrieve(sessionId);
+    
+    console.log("Stripe session status:", session.payment_status);
     
     if (session.payment_status !== "paid") {
       throw new Error("Payment not completed");
@@ -52,23 +66,24 @@ serve(async (req) => {
     // Calculate expiration date for subscriptions
     let expiresAt = null;
     if (accessType === 'subscription') {
-      // For subscriptions, set expiry to 30 days from now
       const expiryDate = new Date();
       expiryDate.setDate(expiryDate.getDate() + 30);
       expiresAt = expiryDate.toISOString();
     }
 
     // Check if access already exists
-    const { data: existingAccess } = await supabaseClient
+    const { data: existingAccess } = await supabaseAdmin
       .from("contact_access")
       .select("id")
       .eq("business_id", businessId)
       .eq("user_id", user.id)
       .maybeSingle();
 
+    console.log("Existing access:", existingAccess);
+
     if (!existingAccess) {
       // Grant access by creating contact_access record
-      const { error: accessError } = await supabaseClient
+      const { error: accessError } = await supabaseAdmin
         .from("contact_access")
         .insert({
           business_id: businessId,
@@ -82,10 +97,14 @@ serve(async (req) => {
         console.error("Access creation error:", accessError);
         throw new Error("Failed to grant access");
       }
+      
+      console.log("Access granted successfully");
+    } else {
+      console.log("Access already exists");
     }
 
     // Fetch seller contact info
-    const { data: business } = await supabaseClient
+    const { data: business } = await supabaseAdmin
       .from("businesses")
       .select("seller_id")
       .eq("id", businessId)
@@ -95,11 +114,13 @@ serve(async (req) => {
       throw new Error("Business not found");
     }
 
-    const { data: sellerContact } = await supabaseClient
+    const { data: sellerContact } = await supabaseAdmin
       .from("seller_contacts")
       .select("email, phone")
       .eq("seller_id", business.seller_id)
       .maybeSingle();
+
+    console.log("Returning seller contact");
 
     return new Response(
       JSON.stringify({ 

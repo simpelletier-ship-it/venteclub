@@ -149,6 +149,7 @@ const BusinessDetails = () => {
 
   const verifyPayment = async (sessionId: string, userId: string) => {
     setIsVerifyingPayment(true);
+    setLoading(true);
     try {
       console.log("Verifying payment with session:", sessionId);
       
@@ -170,7 +171,6 @@ const BusinessDetails = () => {
           title: "Erreur de vérification",
           description: data.error,
         });
-        setIsVerifyingPayment(false);
         return;
       }
 
@@ -182,9 +182,6 @@ const BusinessDetails = () => {
         title: "Paiement effectué avec succès!",
         description: "Vous avez maintenant accès aux coordonnées du vendeur ci-dessous.",
       });
-
-      // Refresh access to ensure everything is up to date
-      await checkAccess(userId);
     } catch (error: any) {
       console.error('Payment verification error:', error);
       toast({
