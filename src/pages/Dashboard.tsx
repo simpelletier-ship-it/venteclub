@@ -9,7 +9,6 @@ import { Plus, LogOut, Star, XCircle, Edit, MessageSquare } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import BusinessCard from "@/components/BusinessCard";
-import { UnlockedBusinesses } from "@/components/UnlockedBusinesses";
 import { WithdrawBusinessDialog } from "@/components/WithdrawBusinessDialog";
 import { EditBusinessDialog } from "@/components/EditBusinessDialog";
 import { AlertsManager } from "@/components/AlertsManager";
@@ -69,7 +68,7 @@ const Dashboard = () => {
     } else if (searchParams.get('payment_verified') === 'true') {
       toast({
         title: "Accès débloqué!",
-        description: "Vous pouvez maintenant voir vos achats dans l'onglet 'Mes Achats'.",
+        description: "Vous pouvez maintenant contacter le vendeur.",
       });
       setSearchParams({});
     }
@@ -159,9 +158,8 @@ const Dashboard = () => {
             <p className="text-muted-foreground mb-6">
               Gérez vos annonces et vos conversations
             </p>
-            <TabsList className="grid w-full max-w-3xl grid-cols-5">
+            <TabsList className="grid w-full max-w-3xl grid-cols-4">
               <TabsTrigger value="businesses">Mes annonces</TabsTrigger>
-              <TabsTrigger value="purchases">Mes achats</TabsTrigger>
               <TabsTrigger value="messages">Messages</TabsTrigger>
               <TabsTrigger value="alerts">Alertes</TabsTrigger>
               <TabsTrigger value="subscription">Abonnement</TabsTrigger>
@@ -258,10 +256,6 @@ const Dashboard = () => {
                 ))}
               </div>
             )}
-          </TabsContent>
-
-          <TabsContent value="purchases">
-            {user && <UnlockedBusinesses userId={user.id} />}
           </TabsContent>
 
           <TabsContent value="messages">
