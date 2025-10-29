@@ -15,7 +15,6 @@ export const QUEBEC_INDUSTRIES = [
   { value: 'hebergement', label: 'Hébergement' },
   { value: 'domaine_alimentaire', label: 'Domaine alimentaire' },
   { value: 'epicerie_depanneur', label: 'Épicerie / Dépanneur' },
-  { value: 'franchise', label: 'Franchise' },
   { value: 'garage_mecanique_concessionnaire', label: 'Garage / Mécanique' },
   { value: 'activite_sport_loisir', label: 'Sport / Loisir' },
   { value: 'art_spectacle_cinema', label: 'Art / Spectacle' },

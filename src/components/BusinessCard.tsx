@@ -22,6 +22,7 @@ interface BusinessCardProps {
   featured?: boolean;
   status?: string;
   approval_status?: string;
+  is_franchise?: boolean;
   onWithdraw?: () => void;
   onFeature?: () => void;
   showActions?: boolean;
@@ -42,6 +43,7 @@ const BusinessCard = ({
   featured = false,
   status,
   approval_status,
+  is_franchise = false,
   onWithdraw,
   onFeature,
   showActions = false,
@@ -95,6 +97,11 @@ const BusinessCard = ({
                 <Badge className="bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 text-white border-0 shadow-md text-xs">
                   <Star className="w-3 h-3 fill-white mr-1" />
                   En Vedette
+                </Badge>
+              )}
+              {is_franchise && (
+                <Badge className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-0 shadow-md text-xs">
+                  🏢 Franchise
                 </Badge>
               )}
               {showActions && approval_status === 'approved' && (

@@ -169,6 +169,7 @@ export type Database = {
           featured: boolean | null
           id: string
           industry: Database["public"]["Enums"]["industry_type_new"]
+          is_franchise: boolean | null
           is_premium: boolean | null
           latitude: number | null
           location: string
@@ -200,6 +201,7 @@ export type Database = {
           featured?: boolean | null
           id?: string
           industry: Database["public"]["Enums"]["industry_type_new"]
+          is_franchise?: boolean | null
           is_premium?: boolean | null
           latitude?: number | null
           location: string
@@ -231,6 +233,7 @@ export type Database = {
           featured?: boolean | null
           id?: string
           industry?: Database["public"]["Enums"]["industry_type_new"]
+          is_franchise?: boolean | null
           is_premium?: boolean | null
           latitude?: number | null
           location?: string

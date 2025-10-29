@@ -20,6 +20,7 @@ interface BusinessListItemProps {
   description: string;
   featured?: boolean;
   status?: string;
+  is_franchise?: boolean;
 }
 
 const BusinessListItem = ({
@@ -36,6 +37,7 @@ const BusinessListItem = ({
   description,
   featured = false,
   status,
+  is_franchise = false,
 }: BusinessListItemProps) => {
   const navigate = useNavigate();
   const [userId, setUserId] = useState<string | undefined>();
@@ -85,6 +87,11 @@ const BusinessListItem = ({
             <Badge className="bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 text-white border-0 shadow-md text-xs">
               <Star className="w-3 h-3 fill-white mr-1" />
               En Vedette
+            </Badge>
+          )}
+          {is_franchise && (
+            <Badge className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-0 shadow-md text-xs">
+              🏢 Franchise
             </Badge>
           )}
         </div>

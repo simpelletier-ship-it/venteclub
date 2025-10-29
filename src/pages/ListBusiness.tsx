@@ -32,6 +32,7 @@ const ListBusiness = () => {
     year_established: "",
     seller_email: "",
     seller_phone: "",
+    is_franchise: false,
   });
   const [photos, setPhotos] = useState<File[]>([]);
   const [photoPreviewUrls, setPhotoPreviewUrls] = useState<string[]>([]);
@@ -193,6 +194,7 @@ const ListBusiness = () => {
           profit_margin: validatedData.profit_margin,
           employees_count: validatedData.employees_count,
           year_established: validatedData.year_established,
+          is_franchise: formData.is_franchise,
           status: "active",
         } as any)
         .select()
@@ -343,7 +345,6 @@ const ListBusiness = () => {
                     <SelectItem value="camping">Camping</SelectItem>
                     <SelectItem value="hebergement">Hébergement</SelectItem>
                     <SelectItem value="domaine_alimentaire">Domaine alimentaire</SelectItem>
-                    <SelectItem value="franchise">Franchise</SelectItem>
                     <SelectItem value="garage_mecanique_concessionnaire">Garage / Mécanique</SelectItem>
                     <SelectItem value="activite_sport_loisir">Activités sportives / Loisirs</SelectItem>
                     <SelectItem value="art_spectacle_cinema">Arts / Spectacles / Cinéma</SelectItem>
@@ -459,7 +460,18 @@ const ListBusiness = () => {
               </div>
             </div>
 
-            <div>
+            <div className="flex items-center space-x-2">
+              <Checkbox 
+                id="is_franchise" 
+                checked={formData.is_franchise}
+                onCheckedChange={(checked) => setFormData({ ...formData, is_franchise: checked as boolean })}
+              />
+              <Label htmlFor="is_franchise" className="text-sm font-normal cursor-pointer">
+                Cette entreprise est une franchise
+              </Label>
+            </div>
+
+              <div>
               <Label htmlFor="photos">Photos (maximum 10)</Label>
               <div className="mt-2 space-y-3">
                 <label
