@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Upload, X } from "lucide-react";
 import venteLogo from "@/assets/vente-logo.png";
 import { businessSchema } from "@/lib/validations";
 
@@ -28,6 +28,8 @@ const ListBusiness = () => {
     employees_count: "",
     year_established: "",
   });
+  const [photos, setPhotos] = useState<File[]>([]);
+  const [photoPreviewUrls, setPhotoPreviewUrls] = useState<string[]>([]);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -38,6 +40,30 @@ const ListBusiness = () => {
       }
     });
   }, [navigate]);
+
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length + photos.length > 10) {
+      toast({
+        variant: "destructive",
+        title: "Limite dépassée",
+        description: "Vous pouvez télécharger un maximum de 10 photos.",
+      });
+      return;
+    }
+
+    setPhotos([...photos, ...files]);
+    
+    // Create preview URLs
+    const newPreviewUrls = files.map(file => URL.createObjectURL(file));
+    setPhotoPreviewUrls([...photoPreviewUrls, ...newPreviewUrls]);
+  };
+
+  const removePhoto = (index: number) => {
+    URL.revokeObjectURL(photoPreviewUrls[index]);
+    setPhotos(photos.filter((_, i) => i !== index));
+    setPhotoPreviewUrls(photoPreviewUrls.filter((_, i) => i !== index));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,21 +83,53 @@ const ListBusiness = () => {
         year_established: formData.year_established ? parseInt(formData.year_established) : null,
       });
 
-      const { error } = await supabase.from("businesses").insert({
-        seller_id: user.id,
-        title: validatedData.title,
-        description: validatedData.description,
-        industry: validatedData.industry,
-        location: validatedData.location,
-        annual_revenue: validatedData.annual_revenue,
-        asking_price: validatedData.asking_price,
-        profit_margin: validatedData.profit_margin,
-        employees_count: validatedData.employees_count,
-        year_established: validatedData.year_established,
-        status: "active",
-      } as any);
+      const { data: businessData, error: businessError } = await supabase
+        .from("businesses")
+        .insert({
+          seller_id: user.id,
+          title: validatedData.title,
+          description: validatedData.description,
+          industry: validatedData.industry,
+          location: validatedData.location,
+          annual_revenue: validatedData.annual_revenue,
+          asking_price: validatedData.asking_price,
+          profit_margin: validatedData.profit_margin,
+          employees_count: validatedData.employees_count,
+          year_established: validatedData.year_established,
+          status: "active",
+        } as any)
+        .select()
+        .single();
 
-      if (error) throw error;
+      if (businessError) throw businessError;
+
+      // Upload photos if any
+      if (photos.length > 0 && businessData) {
+        for (let i = 0; i < photos.length; i++) {
+          const file = photos[i];
+          const fileExt = file.name.split('.').pop();
+          const fileName = `${businessData.id}/${Date.now()}-${i}.${fileExt}`;
+
+          const { error: uploadError } = await supabase.storage
+            .from('business-photos')
+            .upload(fileName, file);
+
+          if (uploadError) {
+            console.error('Photo upload error:', uploadError);
+            continue;
+          }
+
+          const { data: { publicUrl } } = supabase.storage
+            .from('business-photos')
+            .getPublicUrl(fileName);
+
+          await supabase.from('business_photos').insert({
+            business_id: businessData.id,
+            photo_url: publicUrl,
+            display_order: i,
+          });
+        }
+      }
 
       toast({
         title: "Succès !",
@@ -161,8 +219,11 @@ const ListBusiness = () => {
                     <SelectItem value="Commerce de détail">Commerce de détail</SelectItem>
                     <SelectItem value="Services">Services</SelectItem>
                     <SelectItem value="Technologie">Technologie</SelectItem>
-                    <SelectItem value="Fabrication">Fabrication</SelectItem>
                     <SelectItem value="Immobilier">Immobilier</SelectItem>
+                    <SelectItem value="Santé">Santé</SelectItem>
+                    <SelectItem value="Éducation">Éducation</SelectItem>
+                    <SelectItem value="Manufacturing">Manufacturing</SelectItem>
+                    <SelectItem value="Transport">Transport</SelectItem>
                     <SelectItem value="Autre">Autre</SelectItem>
                   </SelectContent>
                 </Select>
@@ -180,7 +241,7 @@ const ListBusiness = () => {
               </div>
 
               <div>
-                <Label htmlFor="asking_price">Prix demandé (€) *</Label>
+                <Label htmlFor="asking_price">Prix demandé (CAD) *</Label>
                 <Input
                   id="asking_price"
                   type="number"
@@ -192,7 +253,7 @@ const ListBusiness = () => {
               </div>
 
               <div>
-                <Label htmlFor="annual_revenue">Revenu annuel (€)</Label>
+                <Label htmlFor="annual_revenue">Revenu annuel (CAD)</Label>
                 <Input
                   id="annual_revenue"
                   type="number"
@@ -235,6 +296,50 @@ const ListBusiness = () => {
                   placeholder="2010"
                 />
               </div>
+            </div>
+
+            <div>
+              <Label htmlFor="photos">Photos (maximum 10)</Label>
+              <div className="mt-2">
+                <Input
+                  id="photos"
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handlePhotoChange}
+                  className="hidden"
+                />
+                <label
+                  htmlFor="photos"
+                  className="flex items-center justify-center gap-2 p-6 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary transition-colors"
+                >
+                  <Upload className="h-5 w-5 text-muted-foreground" />
+                  <span className="text-muted-foreground">
+                    Cliquez pour ajouter des photos
+                  </span>
+                </label>
+              </div>
+              
+              {photoPreviewUrls.length > 0 && (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+                  {photoPreviewUrls.map((url, index) => (
+                    <div key={index} className="relative group">
+                      <img
+                        src={url}
+                        alt={`Photo ${index + 1}`}
+                        className="w-full h-32 object-cover rounded-lg"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removePhoto(index)}
+                        className="absolute top-2 right-2 p-1 bg-destructive text-destructive-foreground rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className="flex gap-4 pt-4">
