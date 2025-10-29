@@ -28,16 +28,20 @@ serve(async (req) => {
   );
 
   try {
+    console.log("[VERIFY] Starting payment verification");
+    
     const authHeader = req.headers.get("Authorization")!;
     const token = authHeader.replace("Bearer ", "");
     const { data } = await supabaseClient.auth.getUser(token);
     const user = data.user;
     if (!user) throw new Error("User not authenticated");
 
+    console.log("[VERIFY] User authenticated:", user.id);
+
     const { sessionId } = await req.json();
     if (!sessionId) throw new Error("Session ID required");
 
-    console.log("Verifying session:", sessionId, "for user:", user.id);
+    console.log("[VERIFY] Verifying Stripe session:", sessionId);
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2025-08-27.basil",
@@ -45,7 +49,7 @@ serve(async (req) => {
 
     const session = await stripe.checkout.sessions.retrieve(sessionId);
     
-    console.log("Stripe session status:", session.payment_status);
+    console.log("[VERIFY] Stripe session payment status:", session.payment_status);
     
     if (session.payment_status !== "paid") {
       throw new Error("Payment not completed");
@@ -54,6 +58,8 @@ serve(async (req) => {
     const businessId = session.metadata?.businessId;
     const userId = session.metadata?.userId;
     const accessType = session.metadata?.accessType;
+    
+    console.log("[VERIFY] Session metadata:", { businessId, userId, accessType });
     
     if (!businessId || !userId || !accessType) {
       throw new Error("Missing metadata in session");
@@ -79,11 +85,13 @@ serve(async (req) => {
       .eq("user_id", user.id)
       .maybeSingle();
 
-    console.log("Existing access:", existingAccess);
+    console.log("[VERIFY] Existing access check:", existingAccess ? "Found" : "Not found");
 
     if (!existingAccess) {
+      console.log("[VERIFY] Creating new access record");
+      
       // Grant access by creating contact_access record
-      const { error: accessError } = await supabaseAdmin
+      const { data: newAccess, error: accessError } = await supabaseAdmin
         .from("contact_access")
         .insert({
           business_id: businessId,
@@ -91,28 +99,33 @@ serve(async (req) => {
           access_type: accessType,
           stripe_payment_id: sessionId,
           expires_at: expiresAt,
-        });
+        })
+        .select()
+        .single();
 
       if (accessError) {
-        console.error("Access creation error:", accessError);
-        throw new Error("Failed to grant access");
+        console.error("[VERIFY] Access creation error:", accessError);
+        throw new Error(`Failed to grant access: ${accessError.message}`);
       }
       
-      console.log("Access granted successfully");
+      console.log("[VERIFY] Access granted successfully:", newAccess.id);
     } else {
-      console.log("Access already exists");
+      console.log("[VERIFY] Access already exists, skipping creation");
     }
 
     // Fetch seller contact info
-    const { data: business } = await supabaseAdmin
+    const { data: business, error: businessError } = await supabaseAdmin
       .from("businesses")
       .select("seller_id")
       .eq("id", businessId)
       .single();
 
-    if (!business) {
+    if (businessError || !business) {
+      console.error("[VERIFY] Business fetch error:", businessError);
       throw new Error("Business not found");
     }
+
+    console.log("[VERIFY] Fetching seller contact for seller:", business.seller_id);
 
     const { data: sellerContact } = await supabaseAdmin
       .from("seller_contacts")
@@ -120,7 +133,8 @@ serve(async (req) => {
       .eq("seller_id", business.seller_id)
       .maybeSingle();
 
-    console.log("Returning seller contact");
+    console.log("[VERIFY] Seller contact found:", sellerContact ? "Yes" : "No");
+    console.log("[VERIFY] Verification complete, returning success");
 
     return new Response(
       JSON.stringify({ 

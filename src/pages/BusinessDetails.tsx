@@ -39,10 +39,8 @@ const BusinessDetails = () => {
       if (searchParams.get('payment_success') === 'true' && sessionId) {
         if (session?.user) {
           await verifyPayment(sessionId, session.user.id);
-          // Clear URL params and redirect to dashboard after verification
-          setTimeout(() => {
-            navigate('/dashboard?payment_verified=true');
-          }, 2000);
+          // Clear URL params after verification to stay on the page
+          setSearchParams({});
         }
         return;
       } else if (searchParams.get('payment_canceled') === 'true') {
@@ -175,17 +173,25 @@ const BusinessDetails = () => {
           title: "Erreur de vérification",
           description: data.error,
         });
+        setLoading(false);
+        setIsVerifyingPayment(false);
         return;
       }
 
-      // Payment successful - update state
+      // Payment successful - update state immediately
       setHasAccess(true);
       setSellerContact(data.sellerContact);
 
       toast({
-        title: "Paiement effectué avec succès!",
-        description: "Vous avez maintenant accès aux coordonnées du vendeur ci-dessous.",
+        title: "🎉 Accès débloqué avec succès!",
+        description: "Vous pouvez maintenant voir toutes les informations du vendeur et démarrer une conversation.",
       });
+      
+      // Scroll to seller contact section
+      setTimeout(() => {
+        document.getElementById('seller-contact')?.scrollIntoView({ behavior: 'smooth' });
+      }, 500);
+      
     } catch (error: any) {
       console.error('Payment verification error:', error);
       toast({
@@ -497,22 +503,34 @@ const BusinessDetails = () => {
                   )}
                 </div>
 
-                <div className="border-t pt-6">
+                <div className="border-t pt-6" id="seller-contact">
                   <h2 className="text-xl font-semibold mb-4">
                     Informations du vendeur
                   </h2>
                   {isSeller || hasAccess ? (
-                    <div className="bg-muted/30 p-6 rounded-lg space-y-2">
+                    <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 p-6 rounded-lg space-y-3 border-2 border-green-200 dark:border-green-800">
+                      <div className="flex items-center gap-2 text-green-600 dark:text-green-400 mb-2">
+                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                        <span className="font-semibold">Accès débloqué</span>
+                      </div>
                       {sellerContact ? (
                         <>
                           {sellerContact.email && (
                             <p className="text-sm">
-                              <span className="font-semibold">Email:</span> {sellerContact.email}
+                              <span className="font-semibold">Email:</span>{' '}
+                              <a href={`mailto:${sellerContact.email}`} className="text-primary hover:underline">
+                                {sellerContact.email}
+                              </a>
                             </p>
                           )}
                           {sellerContact.phone && (
                             <p className="text-sm">
-                              <span className="font-semibold">Téléphone:</span> {sellerContact.phone}
+                              <span className="font-semibold">Téléphone:</span>{' '}
+                              <a href={`tel:${sellerContact.phone}`} className="text-primary hover:underline">
+                                {sellerContact.phone}
+                              </a>
                             </p>
                           )}
                         </>
