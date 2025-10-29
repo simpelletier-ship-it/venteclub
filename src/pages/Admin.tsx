@@ -227,34 +227,57 @@ const Admin = () => {
   const toggleFeatured = async (businessId: string, currentStatus: boolean) => {
     try {
       if (currentStatus) {
-        // Remove from featured (delete payment record)
-        const { error } = await supabase
+        // Remove from featured (delete payment record and update business)
+        const { error: deleteError } = await supabase
           .from('featured_payments')
           .delete()
           .eq('business_id', businessId);
 
-        if (error) throw error;
+        if (deleteError) throw deleteError;
+
+        const { error: updateError } = await supabase
+          .from('businesses')
+          .update({ featured: false })
+          .eq('id', businessId);
+
+        if (updateError) throw updateError;
 
         toast({
           title: "Succès",
           description: "L'annonce n'est plus en vedette.",
         });
       } else {
-        // Add to featured (create payment record)
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) return;
+        // Get business seller_id
+        const { data: business, error: fetchError } = await supabase
+          .from('businesses')
+          .select('seller_id')
+          .eq('id', businessId)
+          .single();
 
-        const { error } = await supabase
+        if (fetchError) throw fetchError;
+        if (!business) throw new Error("Entreprise introuvable");
+
+        // Add to featured (create payment record)
+        const { error: insertError } = await supabase
           .from('featured_payments')
           .insert({
-            user_id: session.user.id,
+            user_id: business.seller_id,
             business_id: businessId,
-            amount: 20,
+            amount: 0, // Admin feature = free
+            currency: 'CAD',
             featured_until: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days
             payment_status: 'completed'
           });
 
-        if (error) throw error;
+        if (insertError) throw insertError;
+
+        // Update business featured status
+        const { error: updateError } = await supabase
+          .from('businesses')
+          .update({ featured: true })
+          .eq('id', businessId);
+
+        if (updateError) throw updateError;
 
         toast({
           title: "Succès",
