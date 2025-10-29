@@ -257,8 +257,6 @@ export type Database = {
           currency: string | null
           description: string
           employees_count: number | null
-          equipment_lease: string | null
-          equipment_lease_cost: number | null
           featured: boolean | null
           id: string
           industry: Database["public"]["Enums"]["industry_type_new"]
@@ -297,8 +295,6 @@ export type Database = {
           currency?: string | null
           description: string
           employees_count?: number | null
-          equipment_lease?: string | null
-          equipment_lease_cost?: number | null
           featured?: boolean | null
           id?: string
           industry: Database["public"]["Enums"]["industry_type_new"]
@@ -337,8 +333,6 @@ export type Database = {
           currency?: string | null
           description?: string
           employees_count?: number | null
-          equipment_lease?: string | null
-          equipment_lease_cost?: number | null
           featured?: boolean | null
           id?: string
           industry?: Database["public"]["Enums"]["industry_type_new"]

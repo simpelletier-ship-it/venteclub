@@ -565,7 +565,7 @@ const BusinessDetails = () => {
                 </div>
 
                 {/* Portrait Financier */}
-                {(business.annual_revenue || business.baiia || business.net_profit || business.equipment_lease) && (
+                {(business.annual_revenue || business.baiia || business.net_profit) && (
                   <div className="border border-border/50 rounded-xl p-6 bg-gradient-to-br from-background to-muted/10">
                     <h2 className="text-2xl font-bold text-foreground mb-6">Portrait financier</h2>
                     
@@ -611,19 +611,6 @@ const BusinessDetails = () => {
                               <span className="text-foreground">Marge bénéficiaire nette</span>
                               <span className="font-semibold text-lg">{business.net_profit_margin} %</span>
                             </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                    
-                    {/* Location d'équipement */}
-                    {business.equipment_lease && (
-                      <div className="pt-6 border-t border-border/50">
-                        <h3 className="text-lg font-semibold text-foreground mb-4">Location d'équipement ou de biens immobiliers</h3>
-                        <div className="flex justify-between items-center">
-                          <span className="text-foreground">{business.equipment_lease}</span>
-                          {business.equipment_lease_cost && (
-                            <span className="font-semibold">location {business.equipment_lease_cost.toLocaleString()}$/mois</span>
                           )}
                         </div>
                       </div>

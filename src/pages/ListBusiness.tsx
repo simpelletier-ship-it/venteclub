@@ -97,8 +97,6 @@ const ListBusiness = () => {
     net_profit: "",
     net_profit_margin: "",
     baiia_margin: "",
-    equipment_lease: "",
-    equipment_lease_cost: "",
     employees_count: "",
     year_established: "",
     seller_email: "",
@@ -187,8 +185,6 @@ const ListBusiness = () => {
         net_profit: business.net_profit?.toString() || "",
         net_profit_margin: business.net_profit_margin?.toString() || "",
         baiia_margin: business.baiia_margin?.toString() || "",
-        equipment_lease: business.equipment_lease || "",
-        equipment_lease_cost: business.equipment_lease_cost?.toString() || "",
         employees_count: business.employees_count?.toString() || "",
         year_established: business.year_established?.toString() || "",
         seller_email: "",
@@ -422,8 +418,6 @@ const ListBusiness = () => {
             net_profit: formData.net_profit && !isNaN(parseFloat(formData.net_profit)) ? parseFloat(formData.net_profit) : null,
             net_profit_margin: formData.net_profit_margin && !isNaN(parseFloat(formData.net_profit_margin)) ? parseFloat(formData.net_profit_margin) : null,
             baiia_margin: formData.baiia_margin && !isNaN(parseFloat(formData.baiia_margin)) ? parseFloat(formData.baiia_margin) : null,
-            equipment_lease: formData.equipment_lease || null,
-            equipment_lease_cost: formData.equipment_lease_cost && !isNaN(parseFloat(formData.equipment_lease_cost)) ? parseFloat(formData.equipment_lease_cost) : null,
             employees_count: validatedData.employees_count,
             year_established: validatedData.year_established,
             is_franchise: formData.is_franchise,
@@ -493,8 +487,6 @@ const ListBusiness = () => {
           net_profit: formData.net_profit && !isNaN(parseFloat(formData.net_profit)) ? parseFloat(formData.net_profit) : null,
           net_profit_margin: formData.net_profit_margin && !isNaN(parseFloat(formData.net_profit_margin)) ? parseFloat(formData.net_profit_margin) : null,
           baiia_margin: formData.baiia_margin && !isNaN(parseFloat(formData.baiia_margin)) ? parseFloat(formData.baiia_margin) : null,
-          equipment_lease: formData.equipment_lease || null,
-          equipment_lease_cost: formData.equipment_lease_cost && !isNaN(parseFloat(formData.equipment_lease_cost)) ? parseFloat(formData.equipment_lease_cost) : null,
           employees_count: validatedData.employees_count,
           year_established: validatedData.year_established,
           is_franchise: formData.is_franchise,
@@ -1115,29 +1107,6 @@ const ListBusiness = () => {
                           value={formData.net_profit_margin}
                           onChange={(e) => setFormData({ ...formData, net_profit_margin: e.target.value })}
                           placeholder="Ex: 28"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="equipment_lease">Location d'équipement ou de biens immobiliers</Label>
-                        <Input
-                          id="equipment_lease"
-                          value={formData.equipment_lease}
-                          onChange={(e) => setFormData({ ...formData, equipment_lease: e.target.value })}
-                          placeholder="Ex: Atelier et salle de montre"
-                        />
-                      </div>
-
-                      <div>
-                        <Label htmlFor="equipment_lease_cost">Coût de location mensuel ($)</Label>
-                        <Input
-                          id="equipment_lease_cost"
-                          type="number"
-                          value={formData.equipment_lease_cost}
-                          onChange={(e) => setFormData({ ...formData, equipment_lease_cost: e.target.value })}
-                          placeholder="Ex: 5154"
                         />
                       </div>
                     </div>
