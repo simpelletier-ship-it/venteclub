@@ -443,6 +443,36 @@ export type Database = {
         }
         Relationships: []
       }
+      user_alerts: {
+        Row: {
+          alert_type: string
+          category: string | null
+          city: string | null
+          created_at: string
+          email_enabled: boolean
+          id: string
+          user_id: string
+        }
+        Insert: {
+          alert_type: string
+          category?: string | null
+          city?: string | null
+          created_at?: string
+          email_enabled?: boolean
+          id?: string
+          user_id: string
+        }
+        Update: {
+          alert_type?: string
+          category?: string | null
+          city?: string | null
+          created_at?: string
+          email_enabled?: boolean
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string | null

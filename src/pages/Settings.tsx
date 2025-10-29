@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Save } from "lucide-react";
+import { AlertsManager } from "@/components/AlertsManager";
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -211,6 +212,8 @@ const Settings = () => {
                 </p>
               </CardContent>
             </Card>
+
+            <AlertsManager userId={user?.id} />
 
             <Card>
               <CardHeader>
