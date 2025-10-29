@@ -15,6 +15,9 @@ verify_jwt = true
 [functions.send-approval-email]
 verify_jwt = false
 
+[functions.send-password-reset]
+verify_jwt = false
+
 [functions.purchase-access]
 verify_jwt = true
 
