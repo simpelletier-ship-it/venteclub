@@ -25,15 +25,62 @@ const Index = () => {
   useEffect(() => {
     // Check for premium payment success/cancel
     if (searchParams.get('premium_success') === 'true') {
+      console.log('[PREMIUM-SUCCESS] Payment successful, starting polling...');
       toast({
-        title: "Bienvenue à Premium!",
-        description: "Vous avez maintenant un accès illimité à tous les vendeurs.",
+        title: "Paiement réussi!",
+        description: "Vérification de votre abonnement en cours...",
       });
       setSearchParams({});
-      // Refresh après 5 secondes pour laisser le temps à Stripe de synchroniser
-      setTimeout(() => {
-        window.location.reload();
-      }, 5000);
+      
+      // Polling pour vérifier l'activation de l'abonnement
+      let attempts = 0;
+      const maxAttempts = 10;
+      const pollInterval = 3000; // 3 secondes entre chaque tentative
+      
+      const checkSubscription = async () => {
+        attempts++;
+        console.log(`[PREMIUM-SUCCESS] Polling attempt ${attempts}/${maxAttempts}`);
+        
+        try {
+          const { data } = await supabase.functions.invoke('check-premium-subscription');
+          console.log('[PREMIUM-SUCCESS] Polling result:', data);
+          
+          if (data?.subscribed) {
+            console.log('[PREMIUM-SUCCESS] Subscription active! Reloading...');
+            toast({
+              title: "Bienvenue à Premium!",
+              description: "Vous avez maintenant un accès illimité à tous les vendeurs.",
+            });
+            setTimeout(() => window.location.reload(), 1000);
+            return true;
+          } else if (attempts >= maxAttempts) {
+            console.log('[PREMIUM-SUCCESS] Max attempts reached, reloading anyway...');
+            toast({
+              title: "Synchronisation...",
+              description: "Votre abonnement est en cours d'activation. Rechargement de la page...",
+            });
+            setTimeout(() => window.location.reload(), 1000);
+            return true;
+          } else {
+            console.log('[PREMIUM-SUCCESS] Not active yet, will retry...');
+            setTimeout(checkSubscription, pollInterval);
+          }
+        } catch (error) {
+          console.error('[PREMIUM-SUCCESS] Error during polling:', error);
+          if (attempts >= maxAttempts) {
+            toast({
+              variant: "destructive",
+              title: "Erreur",
+              description: "Problème lors de l'activation. Veuillez recharger la page.",
+            });
+          } else {
+            setTimeout(checkSubscription, pollInterval);
+          }
+        }
+      };
+      
+      // Démarrer le polling après un délai initial de 2 secondes
+      setTimeout(checkSubscription, 2000);
     } else if (searchParams.get('premium_cancel') === 'true') {
       toast({
         variant: "destructive",

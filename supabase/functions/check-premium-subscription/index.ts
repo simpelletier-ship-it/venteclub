@@ -19,6 +19,7 @@ serve(async (req) => {
   );
 
   try {
+    console.log("[CHECK-PREMIUM] Starting subscription check");
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) throw new Error("No authorization header");
 
@@ -27,14 +28,17 @@ serve(async (req) => {
     if (userError) throw userError;
     const user = userData.user;
     if (!user?.email) throw new Error("User not authenticated");
+    console.log("[CHECK-PREMIUM] User authenticated:", user.email);
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2025-08-27.basil",
     });
 
+    console.log("[CHECK-PREMIUM] Looking for Stripe customer with email:", user.email);
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
     
     if (customers.data.length === 0) {
+      console.log("[CHECK-PREMIUM] No Stripe customer found");
       return new Response(JSON.stringify({ subscribed: false }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
@@ -42,20 +46,49 @@ serve(async (req) => {
     }
 
     const customerId = customers.data[0].id;
-    const subscriptions = await stripe.subscriptions.list({
+    console.log("[CHECK-PREMIUM] Found customer ID:", customerId);
+    
+    // Chercher d'abord les abonnements actifs, puis incomplete si aucun actif trouvé
+    let subscriptions = await stripe.subscriptions.list({
       customer: customerId,
       status: "active",
       limit: 1,
     });
+    console.log("[CHECK-PREMIUM] Active subscriptions count:", subscriptions.data.length);
+    
+    // Si aucun abonnement actif, vérifier s'il y a des abonnements incomplete (en cours de création)
+    if (subscriptions.data.length === 0) {
+      console.log("[CHECK-PREMIUM] No active subscription, checking incomplete...");
+      subscriptions = await stripe.subscriptions.list({
+        customer: customerId,
+        status: "incomplete",
+        limit: 1,
+      });
+      console.log("[CHECK-PREMIUM] Incomplete subscriptions count:", subscriptions.data.length);
+    }
 
     const hasActiveSub = subscriptions.data.length > 0;
     let subscriptionEnd = null;
 
     if (hasActiveSub) {
       const subscription = subscriptions.data[0];
+      console.log("[CHECK-PREMIUM] Subscription details:", {
+        id: subscription.id,
+        status: subscription.status,
+        current_period_end: subscription.current_period_end
+      });
+
+      // Vérifier que current_period_end est valide avant de l'utiliser
+      if (!subscription.current_period_end || typeof subscription.current_period_end !== 'number') {
+        console.error("[CHECK-PREMIUM] Invalid current_period_end:", subscription.current_period_end);
+        throw new Error("Invalid subscription period end date");
+      }
+
       subscriptionEnd = new Date(subscription.current_period_end * 1000).toISOString();
+      console.log("[CHECK-PREMIUM] Subscription end date:", subscriptionEnd);
 
       // Synchroniser l'abonnement dans la base de données Supabase
+      console.log("[CHECK-PREMIUM] Syncing to database...");
       const { error: syncError } = await supabaseClient.rpc('sync_premium_subscription', {
         p_user_id: user.id,
         p_stripe_customer_id: customerId,
@@ -65,9 +98,12 @@ serve(async (req) => {
       });
 
       if (syncError) {
-        console.error("Error syncing subscription to database:", syncError);
+        console.error("[CHECK-PREMIUM] Error syncing subscription to database:", syncError);
+        throw syncError;
       }
+      console.log("[CHECK-PREMIUM] Successfully synced to database");
     } else {
+      console.log("[CHECK-PREMIUM] No active subscription, updating status to canceled");
       // Mettre à jour le statut dans la base de données si l'abonnement n'est plus actif
       const { error: syncError } = await supabaseClient
         .from('premium_subscriptions')
@@ -75,10 +111,11 @@ serve(async (req) => {
         .eq('user_id', user.id);
 
       if (syncError) {
-        console.error("Error updating subscription status:", syncError);
+        console.error("[CHECK-PREMIUM] Error updating subscription status:", syncError);
       }
     }
 
+    console.log("[CHECK-PREMIUM] Returning result:", { subscribed: hasActiveSub, subscription_end: subscriptionEnd });
     return new Response(JSON.stringify({
       subscribed: hasActiveSub,
       subscription_end: subscriptionEnd
@@ -87,10 +124,13 @@ serve(async (req) => {
       status: 200,
     });
   } catch (error: any) {
-    console.error("Error checking subscription:", error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    console.error("[CHECK-PREMIUM] FATAL ERROR:", error);
+    return new Response(JSON.stringify({ 
+      error: error.message,
+      subscribed: false 
+    }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: 500,
+      status: 200, // Retourner 200 même en cas d'erreur pour ne pas bloquer le frontend
     });
   }
 });
