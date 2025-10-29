@@ -45,6 +45,7 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
       .select(`
         id, 
         title, 
+        city,
         latitude, 
         longitude, 
         asking_price, 
@@ -57,9 +58,7 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
         business_photos(photo_url)
       `)
       .eq('status', 'active')
-      .eq('approval_status', 'approved')
-      .not('latitude', 'is', null)
-      .not('longitude', 'is', null);
+      .eq('approval_status', 'approved');
 
     // Apply filters
     if (filters?.city) {
@@ -92,16 +91,48 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
           ? b.business_photos[0].photo_url 
           : null
       }));
+      
+      // Géocoder les annonces sans coordonnées
+      const businessesWithCoords = await Promise.all(
+        businessesWithPhotos.map(async (business) => {
+          // Si pas de coordonnées mais a une ville, géocoder
+          if ((!business.latitude || !business.longitude) && business.city) {
+            console.log('[MAP] Geocoding business:', business.title, 'in', business.city);
+            try {
+              const { data: geocodeData } = await supabase.functions.invoke('geocode-city', {
+                body: { city: business.city, province: 'Québec' }
+              });
+              
+              if (geocodeData?.success && geocodeData.latitude && geocodeData.longitude) {
+                console.log('[MAP] Geocoded:', business.city, '→', geocodeData.latitude, geocodeData.longitude);
+                return {
+                  ...business,
+                  latitude: geocodeData.latitude,
+                  longitude: geocodeData.longitude
+                };
+              }
+            } catch (err) {
+              console.error('[MAP] Geocoding error for', business.city, ':', err);
+            }
+          }
+          return business;
+        })
+      );
+      
+      // Filtrer pour garder seulement ceux avec coordonnées
+      const validBusinesses = businessesWithCoords.filter(b => b.latitude && b.longitude);
+      
       console.log('[MAP] Businesses loaded for map:', {
         total: businessesWithPhotos.length,
-        withCoords: businessesWithPhotos.filter(b => b.latitude && b.longitude).length,
-        sample: businessesWithPhotos[0] ? {
-          title: businessesWithPhotos[0].title,
-          lat: businessesWithPhotos[0].latitude,
-          lng: businessesWithPhotos[0].longitude
+        withCoords: validBusinesses.length,
+        geocoded: businessesWithCoords.length - businessesWithPhotos.filter(b => b.latitude && b.longitude).length,
+        sample: validBusinesses[0] ? {
+          title: validBusinesses[0].title,
+          lat: validBusinesses[0].latitude,
+          lng: validBusinesses[0].longitude
         } : 'none'
       });
-      setBusinesses(businessesWithPhotos);
+      setBusinesses(validBusinesses);
     }
   };
 
