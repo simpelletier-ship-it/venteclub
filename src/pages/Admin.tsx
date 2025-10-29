@@ -47,6 +47,7 @@ const Admin = () => {
   const [users, setUsers] = useState<any[]>([]);
   const [userToDelete, setUserToDelete] = useState<any>(null);
   const [deleteUserDialogOpen, setDeleteUserDialogOpen] = useState(false);
+  const [reports, setReports] = useState<any[]>([]);
 
   useEffect(() => {
     checkAdminAccess();
@@ -80,6 +81,7 @@ const Admin = () => {
       setIsAdmin(true);
       fetchBusinesses();
       fetchUsers();
+      fetchReports();
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -425,6 +427,91 @@ const Admin = () => {
     }
   };
 
+  const fetchReports = async () => {
+    try {
+      const { data: reportsData, error } = await supabase
+        .from('business_reports')
+        .select(`
+          *,
+          businesses:business_id (title, industry, location),
+          profiles:reporter_id (email)
+        `)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      setReports(reportsData || []);
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: error.message,
+      });
+    }
+  };
+
+  const handleReportStatusUpdate = async (reportId: string, status: string) => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      const { error } = await supabase
+        .from('business_reports')
+        .update({ 
+          status,
+          reviewed_by: session?.user.id,
+          reviewed_at: new Date().toISOString()
+        })
+        .eq('id', reportId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Succès",
+        description: `Signalement marqué comme ${status === 'resolved' ? 'résolu' : 'rejeté'}.`,
+      });
+
+      fetchReports();
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: error.message,
+      });
+    }
+  };
+
+  const getReportStatusBadge = (status: string) => {
+    const variants: Record<string, "default" | "secondary" | "destructive"> = {
+      pending: "secondary",
+      resolved: "default",
+      rejected: "destructive",
+    };
+    
+    const labels: Record<string, string> = {
+      pending: "En attente",
+      resolved: "Résolu",
+      rejected: "Rejeté",
+    };
+
+    return (
+      <Badge variant={variants[status] || "default"}>
+        {labels[status] || status}
+      </Badge>
+    );
+  };
+
+  const getReportReasonLabel = (reason: string) => {
+    const reasons: Record<string, string> = {
+      fraud: "Fraude / Arnaque",
+      misleading: "Informations trompeuses",
+      spam: "Spam / Contenu indésirable",
+      inappropriate: "Contenu inapproprié",
+      duplicate: "Doublon",
+      other: "Autre"
+    };
+    return reasons[reason] || reason;
+  };
+
   const handleDeleteUser = async () => {
     if (!userToDelete) return;
 
@@ -515,10 +602,11 @@ const Admin = () => {
         </div>
 
         <Tabs defaultValue="businesses" className="w-full">
-          <TabsList className="grid w-full max-w-2xl grid-cols-3 mb-6">
+          <TabsList className="grid w-full max-w-3xl grid-cols-4 mb-6">
             <TabsTrigger value="businesses">Annonces</TabsTrigger>
             <TabsTrigger value="proposals">Propositions</TabsTrigger>
             <TabsTrigger value="users">Utilisateurs</TabsTrigger>
+            <TabsTrigger value="reports">Signalements</TabsTrigger>
           </TabsList>
 
           <TabsContent value="businesses">
@@ -663,6 +751,114 @@ const Admin = () => {
                   </CardContent>
                 </Card>
               ))}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="reports">
+            <div className="grid gap-4">
+              {reports.length === 0 ? (
+                <Card>
+                  <CardContent className="p-8 text-center">
+                    <p className="text-muted-foreground">Aucun signalement pour le moment.</p>
+                  </CardContent>
+                </Card>
+              ) : (
+                reports.map((report) => (
+                  <Card key={report.id}>
+                    <CardHeader>
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <CardTitle className="text-lg">
+                            {report.businesses?.title || "Annonce supprimée"}
+                          </CardTitle>
+                          <CardDescription className="mt-1">
+                            Signalé par: {report.profiles?.email || "Utilisateur inconnu"}
+                          </CardDescription>
+                        </div>
+                        {getReportStatusBadge(report.status)}
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div className="bg-muted/30 p-4 rounded-lg">
+                          <p className="text-sm font-semibold mb-2">Raison du signalement:</p>
+                          <Badge variant="outline" className="mb-2">
+                            {getReportReasonLabel(report.reason)}
+                          </Badge>
+                          {report.details && (
+                            <p className="text-sm text-muted-foreground mt-2">
+                              {report.details}
+                            </p>
+                          )}
+                        </div>
+
+                        {report.businesses && (
+                          <div className="text-sm">
+                            <p><span className="font-semibold">Secteur:</span> {report.businesses.industry}</p>
+                            <p><span className="font-semibold">Localisation:</span> {report.businesses.location}</p>
+                          </div>
+                        )}
+
+                        <div className="text-xs text-muted-foreground">
+                          Signalé le: {new Date(report.created_at).toLocaleDateString('fr-CA', {
+                            day: 'numeric',
+                            month: 'long',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </div>
+
+                        {report.reviewed_at && (
+                          <div className="text-xs text-muted-foreground">
+                            Traité le: {new Date(report.reviewed_at).toLocaleDateString('fr-CA', {
+                              day: 'numeric',
+                              month: 'long',
+                              year: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </div>
+                        )}
+
+                        <div className="flex gap-2 flex-wrap">
+                          {report.business_id && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => navigate(`/business/${report.business_id}`)}
+                            >
+                              <Eye className="mr-2 h-4 w-4" />
+                              Voir l'annonce
+                            </Button>
+                          )}
+                          
+                          {report.status === 'pending' && (
+                            <>
+                              <Button
+                                variant="default"
+                                size="sm"
+                                onClick={() => handleReportStatusUpdate(report.id, 'resolved')}
+                              >
+                                <CheckCircle className="mr-2 h-4 w-4" />
+                                Marquer résolu
+                              </Button>
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => handleReportStatusUpdate(report.id, 'rejected')}
+                              >
+                                <XCircle className="mr-2 h-4 w-4" />
+                                Rejeter
+                              </Button>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              )}
             </div>
           </TabsContent>
         </Tabs>
