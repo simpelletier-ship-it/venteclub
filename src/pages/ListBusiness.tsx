@@ -8,11 +8,25 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, X, FileText, TrendingUp, DollarSign, Info, Sparkles } from "lucide-react";
+import { Upload, X, FileText, TrendingUp, DollarSign, Info, Sparkles, Check, ChevronsUpDown } from "lucide-react";
 import { businessSchema } from "@/lib/validations";
 import { TermsDialog } from "@/components/TermsDialog";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 const ListBusiness = () => {
   const navigate = useNavigate();
@@ -21,6 +35,21 @@ const ListBusiness = () => {
   const [user, setUser] = useState<any>(null);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [termsDialogOpen, setTermsDialogOpen] = useState(false);
+
+  // Liste des villes du Québec
+  const quebecCities = [
+    "Montréal", "Québec", "Laval", "Gatineau", "Longueuil", "Sherbrooke", "Saguenay", "Lévis", "Trois-Rivières", "Terrebonne",
+    "Saint-Jean-sur-Richelieu", "Repentigny", "Boucherville", "Drummondville", "Saint-Jérôme", "Granby", "Blainville", "Saint-Hyacinthe",
+    "Shawinigan", "Dollard-des-Ormeaux", "Châteauguay", "Rimouski", "Victoriaville", "Sorel-Tracy", "Salaberry-de-Valleyfield",
+    "Saint-Eustache", "Mascouche", "Rouyn-Noranda", "Mirabel", "Val-d'Or", "Alma", "Vaudreuil-Dorion", "Sept-Îles", "Sainte-Julie",
+    "Thetford Mines", "Côte-Saint-Luc", "Brossard", "Beaconsfield", "La Prairie", "Saint-Lambert", "Candiac", "Varennes", "Chambly",
+    "Mont-Royal", "Sainte-Thérèse", "Joliette", "Saint-Bruno-de-Montarville", "Matane", "Westmount", "Pointe-Claire", "Magog",
+    "Mont-Saint-Hilaire", "Saint-Constant", "Rosemère", "Boisbriand", "L'Assomption", "Baie-Comeau", "Saint-Basile-le-Grand",
+    "Sainte-Marthe-sur-le-Lac", "Pincourt", "Rivière-du-Loup", "Sainte-Catherine", "Lavaltrie", "Prévost", "Dorval", "Kirkland",
+    "Saint-Lazare", "Deux-Montagnes", "Sainte-Anne-des-Plaines", "Cowansville", "Mercier", "Sainte-Sophie", "L'Île-Perrot",
+    "Notre-Dame-de-l'Île-Perrot", "Saint-Augustin-de-Desmaures", "Saint-Lin-Laurentides", "Lorraine", "Amos", "Delson", "Beauharnois",
+    "Saint-Charles-Borromée", "Cantley", "Sainte-Adèle", "Charlemagne", "La Tuque", "Mont-Tremblant", "Saint-Colomban",
+  ].sort();
   
   const [formData, setFormData] = useState({
     title: "",
@@ -29,7 +58,6 @@ const ListBusiness = () => {
     location: "",
     city: "",
     province: "Québec",
-    region: "",
     annual_revenue: "",
     asking_price: "",
     profit_margin: "",
@@ -51,6 +79,8 @@ const ListBusiness = () => {
   const [photoPreviewUrls, setPhotoPreviewUrls] = useState<string[]>([]);
   const [generatingImage, setGeneratingImage] = useState(false);
   const [imagePrompt, setImagePrompt] = useState("");
+  const [citySearchOpen, setCitySearchOpen] = useState(false);
+  const [citySearchValue, setCitySearchValue] = useState("");
 
   useEffect(() => {
     const checkSession = async () => {
@@ -84,7 +114,6 @@ const ListBusiness = () => {
       formData.location,
       formData.city,
       formData.province,
-      formData.region,
       formData.asking_price,
       formData.year_established,
       formData.competitive_advantages,
@@ -637,57 +666,69 @@ const ListBusiness = () => {
                 <div className="bg-card p-6 rounded-2xl shadow-elegant border border-border/50">
                   <h2 className="text-xl font-semibold text-primary mb-4">Emplacement</h2>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="province">Province</Label>
-                      <Select
+                      <Input
+                        id="province"
                         value={formData.province}
-                        onValueChange={(value) => setFormData({ ...formData, province: value })}
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Québec">Québec</SelectItem>
-                          <SelectItem value="Ontario">Ontario</SelectItem>
-                        </SelectContent>
-                      </Select>
+                        disabled
+                        className="bg-muted"
+                      />
                     </div>
 
                     <div>
-                      <Label htmlFor="region">Région (QC)</Label>
-                      <Select
-                        value={formData.region}
-                        onValueChange={(value) => setFormData({ ...formData, region: value })}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Sélectionner" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="montreal">Montréal</SelectItem>
-                          <SelectItem value="quebec">Québec</SelectItem>
-                          <SelectItem value="laval">Laval</SelectItem>
-                          <SelectItem value="gatineau">Gatineau</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div>
-                      <Label htmlFor="city">Ville (QC)</Label>
-                      <Select
-                        value={formData.city}
-                        onValueChange={(value) => setFormData({ ...formData, city: value })}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Sélectionner" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="montreal">Montréal</SelectItem>
-                          <SelectItem value="quebec">Québec</SelectItem>
-                          <SelectItem value="laval">Laval</SelectItem>
-                          <SelectItem value="gatineau">Gatineau</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <Label htmlFor="city">Ville</Label>
+                      <Popover open={citySearchOpen} onOpenChange={setCitySearchOpen}>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            aria-expanded={citySearchOpen}
+                            className="w-full justify-between"
+                          >
+                            {formData.city || "Sélectionner une ville..."}
+                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-full p-0" align="start">
+                          <Command>
+                            <CommandInput 
+                              placeholder="Rechercher une ville..." 
+                              value={citySearchValue}
+                              onValueChange={setCitySearchValue}
+                            />
+                            <CommandList>
+                              <CommandEmpty>Aucune ville trouvée.</CommandEmpty>
+                              <CommandGroup>
+                                {quebecCities
+                                  .filter(city => 
+                                    city.toLowerCase().includes(citySearchValue.toLowerCase())
+                                  )
+                                  .map((city) => (
+                                    <CommandItem
+                                      key={city}
+                                      value={city}
+                                      onSelect={(currentValue) => {
+                                        setFormData({ ...formData, city: currentValue });
+                                        setCitySearchOpen(false);
+                                        setCitySearchValue("");
+                                      }}
+                                    >
+                                      <Check
+                                        className={cn(
+                                          "mr-2 h-4 w-4",
+                                          formData.city === city ? "opacity-100" : "opacity-0"
+                                        )}
+                                      />
+                                      {city}
+                                    </CommandItem>
+                                  ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
                     </div>
                   </div>
 
