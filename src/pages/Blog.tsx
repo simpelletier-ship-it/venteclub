@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { Calendar, Clock, ArrowRight } from "lucide-react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import blogEvaluation from "@/assets/blog-evaluation-entreprise.jpg";
 import blogAcheter from "@/assets/blog-acheter-entreprise.jpg";
 import blogFinancement from "@/assets/blog-financement.jpg";
@@ -11,74 +13,58 @@ import blogTendances from "@/assets/blog-tendances-2025.jpg";
 import blogPreparer from "@/assets/blog-preparer-vente.jpg";
 
 interface BlogPost {
+  id: string;
   slug: string;
   title: string;
   excerpt: string;
   date: string;
   readTime: string;
   category: string;
-  image?: string;
+  image: string;
+  published: boolean;
 }
 
-const blogPosts: BlogPost[] = [
-  {
-    slug: "guide-complet-vendre-entreprise-quebec",
-    title: "Guide Complet pour Vendre Votre Entreprise au Québec en 2025",
-    excerpt: "Découvrez les 10 étapes essentielles pour vendre votre entreprise avec succès au Québec. De l'évaluation à la transaction finale, tout ce que vous devez savoir.",
-    date: "2025-01-15",
-    readTime: "8 min",
-    category: "Guide Vendeur",
-    image: blogPreparer
-  },
-  {
-    slug: "acheter-premiere-entreprise-conseils",
-    title: "Acheter sa Première Entreprise : 7 Conseils d'Experts",
-    excerpt: "Vous envisagez d'acheter votre première entreprise ? Nos experts partagent leurs meilleurs conseils pour réussir votre acquisition et éviter les pièges courants.",
-    date: "2025-01-10",
-    readTime: "6 min",
-    category: "Guide Acheteur",
-    image: blogAcheter
-  },
-  {
-    slug: "evaluation-entreprise-methodes",
-    title: "Comment Évaluer la Valeur d'une Entreprise : Les 3 Méthodes Clés",
-    excerpt: "Apprenez à évaluer correctement une entreprise avec les méthodes reconnues : actifs nets, capitalisation des bénéfices et flux de trésorerie actualisés.",
-    date: "2025-01-05",
-    readTime: "10 min",
-    category: "Évaluation",
-    image: blogEvaluation
-  },
-  {
-    slug: "financer-achat-entreprise-options",
-    title: "Financer l'Achat d'une Entreprise : Toutes les Options au Québec",
-    excerpt: "Découvrez toutes les solutions de financement disponibles au Québec pour l'acquisition d'une entreprise : prêts bancaires, investisseurs, subventions et plus.",
-    date: "2025-01-01",
-    readTime: "7 min",
-    category: "Financement",
-    image: blogFinancement
-  },
-  {
-    slug: "due-diligence-checklist-complete",
-    title: "Due Diligence : La Checklist Complète pour Acheteurs",
-    excerpt: "Assurez-vous de ne rien manquer lors de votre vérification diligente. Notre checklist détaillée couvre tous les aspects financiers, légaux et opérationnels.",
-    date: "2025-01-28",
-    readTime: "12 min",
-    category: "Acquisition",
-    image: blogDueDiligence
-  },
-  {
-    slug: "secteurs-porteurs-quebec-2025",
-    title: "Les Secteurs les Plus Porteurs pour Investir au Québec en 2025",
-    excerpt: "Analyse des industries les plus prometteuses pour l'acquisition d'entreprises au Québec : technologie, santé, alimentation et services aux entreprises.",
-    date: "2025-01-20",
-    readTime: "9 min",
-    category: "Tendances",
-    image: blogTendances
-  }
-];
+const imageMap: Record<string, string> = {
+  "/src/assets/blog-preparer-vente.jpg": blogPreparer,
+  "/src/assets/blog-acheter-entreprise.jpg": blogAcheter,
+  "/src/assets/blog-evaluation-entreprise.jpg": blogEvaluation,
+  "/src/assets/blog-financement.jpg": blogFinancement,
+  "/src/assets/blog-due-diligence.jpg": blogDueDiligence,
+  "/src/assets/blog-tendances-2025.jpg": blogTendances,
+};
 
 const Blog = () => {
   const navigate = useNavigate();
+  const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchBlogPosts();
+  }, []);
+
+  const fetchBlogPosts = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('blog_posts')
+        .select('id, slug, title, excerpt, date, read_time, category, image, published')
+        .eq('published', true)
+        .order('date', { ascending: false });
+
+      if (error) throw error;
+
+      const postsWithImages = (data || []).map(post => ({
+        ...post,
+        readTime: post.read_time,
+        image: imageMap[post.image] || post.image
+      }));
+
+      setBlogPosts(postsWithImages);
+    } catch (error) {
+      console.error('Error fetching blog posts:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const structuredData = {
     "@context": "https://schema.org",
@@ -137,107 +123,119 @@ const Blog = () => {
         </div>
       </section>
 
-      {/* Featured Post */}
-      {blogPosts[0] && (
-        <section className="py-12">
-          <div className="container mx-auto px-4">
-            <div className="max-w-5xl mx-auto">
-              <Card className="overflow-hidden hover:shadow-lg transition-shadow">
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div className="relative aspect-video md:aspect-auto overflow-hidden">
-                    <img 
-                      src={blogPosts[0].image} 
-                      alt={blogPosts[0].title}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <CardContent className="p-8 flex flex-col justify-center">
-                    <div className="flex items-center gap-4 mb-4">
-                      <span className="text-sm font-semibold text-accent">
-                        {blogPosts[0].category}
-                      </span>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Calendar className="w-4 h-4" />
-                        {new Date(blogPosts[0].date).toLocaleDateString('fr-CA', { 
-                          year: 'numeric', 
-                          month: 'long', 
-                          day: 'numeric' 
-                        })}
-                      </div>
-                    </div>
-                    <h2 className="text-2xl font-bold mb-3 hover:text-accent transition-colors cursor-pointer"
-                        onClick={() => navigate(`/blog/${blogPosts[0].slug}`)}>
-                      {blogPosts[0].title}
-                    </h2>
-                    <p className="text-muted-foreground mb-4">
-                      {blogPosts[0].excerpt}
-                    </p>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Clock className="w-4 h-4" />
-                        {blogPosts[0].readTime} de lecture
-                      </div>
-                      <Button variant="ghost" onClick={() => navigate(`/blog/${blogPosts[0].slug}`)}>
-                        Lire l'article <ArrowRight className="w-4 h-4 ml-2" />
-                      </Button>
-                    </div>
-                  </CardContent>
-                </div>
-              </Card>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Blog Posts Grid */}
-      <section className="py-12 bg-muted/30">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold mb-8">Articles Récents</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
-            {blogPosts.slice(1).map((post) => (
-              <Card key={post.slug} className="hover:shadow-lg transition-shadow overflow-hidden">
-                <div className="relative aspect-video overflow-hidden">
-                  <img 
-                    src={post.image} 
-                    alt={post.title}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-4 mb-3">
-                    <span className="text-xs font-semibold text-accent">
-                      {post.category}
-                    </span>
-                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                      <Clock className="w-3 h-3" />
-                      {post.readTime}
-                    </div>
-                  </div>
-                  <h3 className="text-xl font-bold mb-2 hover:text-accent transition-colors cursor-pointer line-clamp-2"
-                      onClick={() => navigate(`/blog/${post.slug}`)}>
-                    {post.title}
-                  </h3>
-                  <p className="text-sm text-muted-foreground mb-4 line-clamp-3">
-                    {post.excerpt}
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-muted-foreground">
-                      {new Date(post.date).toLocaleDateString('fr-CA', { 
-                        year: 'numeric', 
-                        month: 'short', 
-                        day: 'numeric' 
-                      })}
-                    </span>
-                    <Button variant="ghost" size="sm" onClick={() => navigate(`/blog/${post.slug}`)}>
-                      Lire <ArrowRight className="w-3 h-3 ml-1" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+      {loading ? (
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">Chargement des articles...</p>
         </div>
-      </section>
+      ) : blogPosts.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">Aucun article disponible</p>
+        </div>
+      ) : (
+        <>
+          {/* Featured Post */}
+          {blogPosts[0] && (
+            <section className="py-12">
+              <div className="container mx-auto px-4">
+                <div className="max-w-5xl mx-auto">
+                  <Card className="overflow-hidden hover:shadow-lg transition-shadow">
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div className="relative aspect-video md:aspect-auto overflow-hidden">
+                        <img 
+                          src={blogPosts[0].image} 
+                          alt={blogPosts[0].title}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <CardContent className="p-8 flex flex-col justify-center">
+                        <div className="flex items-center gap-4 mb-4">
+                          <span className="text-sm font-semibold text-accent">
+                            {blogPosts[0].category}
+                          </span>
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <Calendar className="w-4 h-4" />
+                            {new Date(blogPosts[0].date).toLocaleDateString('fr-CA', { 
+                              year: 'numeric', 
+                              month: 'long', 
+                              day: 'numeric' 
+                            })}
+                          </div>
+                        </div>
+                        <h2 className="text-2xl font-bold mb-3 hover:text-accent transition-colors cursor-pointer"
+                            onClick={() => navigate(`/blog/${blogPosts[0].slug}`)}>
+                          {blogPosts[0].title}
+                        </h2>
+                        <p className="text-muted-foreground mb-4">
+                          {blogPosts[0].excerpt}
+                        </p>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <Clock className="w-4 h-4" />
+                            {blogPosts[0].readTime} de lecture
+                          </div>
+                          <Button variant="ghost" onClick={() => navigate(`/blog/${blogPosts[0].slug}`)}>
+                            Lire l'article <ArrowRight className="w-4 h-4 ml-2" />
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </div>
+                  </Card>
+                </div>
+              </div>
+            </section>
+          )}
+
+          {/* Blog Posts Grid */}
+          <section className="py-12 bg-muted/30">
+            <div className="container mx-auto px-4">
+              <h2 className="text-3xl font-bold mb-8">Articles Récents</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
+                {blogPosts.slice(1).map((post) => (
+                  <Card key={post.slug} className="hover:shadow-lg transition-shadow overflow-hidden">
+                    <div className="relative aspect-video overflow-hidden">
+                      <img 
+                        src={post.image} 
+                        alt={post.title}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <CardContent className="p-6">
+                      <div className="flex items-center gap-4 mb-3">
+                        <span className="text-xs font-semibold text-accent">
+                          {post.category}
+                        </span>
+                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                          <Clock className="w-3 h-3" />
+                          {post.readTime}
+                        </div>
+                      </div>
+                      <h3 className="text-xl font-bold mb-2 hover:text-accent transition-colors cursor-pointer line-clamp-2"
+                          onClick={() => navigate(`/blog/${post.slug}`)}>
+                        {post.title}
+                      </h3>
+                      <p className="text-sm text-muted-foreground mb-4 line-clamp-3">
+                        {post.excerpt}
+                      </p>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-muted-foreground">
+                          {new Date(post.date).toLocaleDateString('fr-CA', { 
+                            year: 'numeric', 
+                            month: 'short', 
+                            day: 'numeric' 
+                          })}
+                        </span>
+                        <Button variant="ghost" size="sm" onClick={() => navigate(`/blog/${post.slug}`)}>
+                          Lire <ArrowRight className="w-3 h-3 ml-1" />
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          </section>
+        </>
+      )}
 
       {/* CTA Section */}
       <section className="py-16">

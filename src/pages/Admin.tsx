@@ -16,6 +16,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { z } from "zod";
 import { QUEBEC_INDUSTRIES } from "@/lib/constants";
 import { EditProposalsManager } from "@/components/EditProposalsManager";
+import { BlogManager } from "@/components/BlogManager";
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -662,12 +663,13 @@ const Admin = () => {
         </div>
 
         <Tabs defaultValue="businesses" className="w-full">
-          <TabsList className="grid w-full max-w-4xl grid-cols-5 mb-6">
+          <TabsList className="grid w-full max-w-6xl grid-cols-6 mb-6">
             <TabsTrigger value="businesses">Annonces</TabsTrigger>
             <TabsTrigger value="proposals">Propositions</TabsTrigger>
             <TabsTrigger value="users">Utilisateurs</TabsTrigger>
             <TabsTrigger value="reports">Signalements</TabsTrigger>
             <TabsTrigger value="subscriptions">Abonnements</TabsTrigger>
+            <TabsTrigger value="blog">Articles</TabsTrigger>
           </TabsList>
 
           <TabsContent value="businesses">
@@ -1091,6 +1093,10 @@ const Admin = () => {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          <TabsContent value="blog">
+            <BlogManager />
           </TabsContent>
         </Tabs>
       </div>

@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Phone, Mail } from "lucide-react";
+import { Mail } from "lucide-react";
 
 export const Footer = () => {
   return (
@@ -45,12 +45,6 @@ export const Footer = () => {
             <h3 className="font-bold text-lg mb-4">Coordonnées</h3>
             <div className="space-y-3">
               <div className="flex items-center gap-2">
-                <Phone className="w-5 h-5 text-accent flex-shrink-0" />
-                <a href="tel:+15148501234" className="text-sm text-muted-foreground hover:text-accent transition-colors">
-                  (514) 850-1234
-                </a>
-              </div>
-              <div className="flex items-center gap-2">
                 <Mail className="w-5 h-5 text-accent flex-shrink-0" />
                 <a href="mailto:info@vente.club" className="text-sm text-muted-foreground hover:text-accent transition-colors">
                   info@vente.club
@@ -89,7 +83,7 @@ export const Footer = () => {
           "description": "Plateforme québécoise pour l'achat et la vente d'entreprises",
           "contactPoint": {
             "@type": "ContactPoint",
-            "telephone": "+1-514-850-1234",
+            "email": "info@vente.club",
             "contactType": "Customer Service",
             "areaServed": "CA-QC",
             "availableLanguage": ["French", "English"]
