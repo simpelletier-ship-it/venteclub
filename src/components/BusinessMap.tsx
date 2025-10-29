@@ -31,7 +31,9 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const markers = useRef<mapboxgl.Marker[]>([]);
+  const popups = useRef<mapboxgl.Popup[]>([]);
   const [businesses, setBusinesses] = useState<Business[]>([]);
+  const [zoomLevel, setZoomLevel] = useState(6);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -115,14 +117,32 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
         }),
         'top-right'
       );
+
+      // Listen to zoom events to adjust popup sizes
+      map.current.on('zoom', () => {
+        if (map.current) {
+          setZoomLevel(map.current.getZoom());
+        }
+      });
     }
 
-    // Clear existing markers
+    // Clear existing markers and popups
     markers.current.forEach(marker => marker.remove());
     markers.current = [];
+    popups.current.forEach(popup => popup.remove());
+    popups.current = [];
 
     // Only add markers if map is ready
     if (!map.current) return;
+
+    // Calculate scale based on zoom level
+    // At zoom 6 (default): scale = 1
+    // At zoom 12: scale = 0.6
+    // At zoom 3: scale = 1.4
+    const scale = Math.max(0.5, Math.min(1.5, 1 + (6 - zoomLevel) * 0.1));
+    const popupWidth = Math.floor(300 * scale);
+    const imageHeight = Math.floor(150 * scale);
+    const markerSize = Math.floor(32 * scale);
 
     // Add markers for each business
     businesses.forEach((business) => {
@@ -131,14 +151,14 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
       // Create custom marker element
       const el = document.createElement('div');
       el.className = 'business-marker';
-      el.style.width = '32px';
-      el.style.height = '32px';
+      el.style.width = `${markerSize}px`;
+      el.style.height = `${markerSize}px`;
       el.style.borderRadius = '50%';
       el.style.backgroundColor = 'hsl(270 100% 60%)';
       el.style.border = '3px solid white';
       el.style.cursor = 'pointer';
       el.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
-      el.style.transition = 'box-shadow 0.2s, background-color 0.2s';
+      el.style.transition = 'box-shadow 0.2s, background-color 0.2s, width 0.3s, height 0.3s';
       el.style.position = 'relative';
 
       // Hover effect - only change visual properties, never transform or position
@@ -153,15 +173,15 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
 
       // Create rich popup with preview and image
       const popupContent = `
-        <div style="padding: 0; max-width: 300px;">
+        <div style="padding: 0; max-width: ${popupWidth}px;">
           ${business.photo_url ? `
             <img 
               src="${business.photo_url}" 
               alt="${business.title}"
-              style="width: 100%; height: 150px; object-fit: cover; border-radius: 12px 12px 0 0;"
+              style="width: 100%; height: ${imageHeight}px; object-fit: cover; border-radius: 12px 12px 0 0;"
             />
           ` : ''}
-          <div style="padding: 12px;">
+          <div style="padding: ${Math.floor(12 * scale)}px;">
             <h3 style="font-weight: 700; margin-bottom: 8px; font-size: 16px; color: hsl(252 47% 11%); line-height: 1.3;">
               ${business.title}
             </h3>
@@ -200,13 +220,15 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
 
       // Create popup (not attached to marker to avoid position shifts)
       const popup = new mapboxgl.Popup({ 
-        offset: 25,
+        offset: Math.floor(25 * scale),
         closeButton: false,
         closeOnClick: false,
         className: 'business-popup',
-        maxWidth: '300px',
+        maxWidth: `${popupWidth}px`,
         anchor: 'bottom' // Fixed anchor position
       }).setHTML(popupContent);
+      
+      popups.current.push(popup);
 
       // Create marker with fixed coordinates - never changes
       const markerLngLat: [number, number] = [business.longitude, business.latitude];
@@ -286,6 +308,7 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
   useEffect(() => {
     return () => {
       markers.current.forEach(marker => marker.remove());
+      popups.current.forEach(popup => popup.remove());
       map.current?.remove();
     };
   }, []);
