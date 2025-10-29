@@ -113,7 +113,6 @@ const ListBusiness = () => {
       formData.industry,
       formData.location,
       formData.city,
-      formData.province,
       formData.asking_price,
       formData.year_established,
       formData.competitive_advantages,
