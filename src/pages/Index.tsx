@@ -265,25 +265,35 @@ const Index = () => {
         </div>
       </section>
 
-      {/* CTA Section - Dark Corporate Gradient */}
-      <section className="py-32 bg-gradient-to-br from-[#1A1A1A] via-[#202124] to-[#1A1A1A] relative overflow-hidden">
-        <div className="absolute inset-0">
-          <div className="absolute top-10 right-10 w-96 h-96 bg-accent/15 rounded-full blur-3xl" />
-          <div className="absolute bottom-10 left-10 w-96 h-96 bg-secondary/15 rounded-full blur-3xl" />
+      {/* CTA Section - Modern Gradient Design like Hero */}
+      <section className="relative py-20 overflow-hidden bg-gradient-to-br from-white via-muted to-white">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          {/* Large gradient orbs */}
+          <div className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-gradient-to-br from-accent/30 via-primary/20 to-transparent rounded-full blur-3xl animate-float" />
+          <div className="absolute -bottom-40 -left-40 w-[600px] h-[600px] bg-gradient-to-tr from-secondary/30 via-primary/20 to-transparent rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-r from-accent/10 via-transparent to-secondary/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '4s' }} />
+          
+          {/* Grid pattern overlay */}
+          <div className="absolute inset-0 opacity-[0.02]" style={{
+            backgroundImage: 'radial-gradient(circle at 1px 1px, rgb(0 0 0) 1px, transparent 0)',
+            backgroundSize: '40px 40px'
+          }} />
         </div>
+        
         <div className="relative container mx-auto px-4 text-center">
-          <div className="max-w-3xl mx-auto space-y-8">
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-white leading-tight">
+          <div className="max-w-3xl mx-auto space-y-8 animate-slide-up">
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-foreground leading-tight">
               Prêt à Trouver Votre
               <br />
-              Prochaine Opportunité ?
+              <span className="text-primary">Prochaine Opportunité ?</span>
             </h2>
-            <p className="text-xl md:text-2xl text-white/90 font-light">
+            <p className="text-xl md:text-2xl text-muted-foreground">
               Rejoignez des milliers d'entrepreneurs qui font confiance à Vente.club
             </p>
             <Button 
               size="lg" 
-              className="bg-accent hover:bg-accent/90 text-white h-14 px-12 text-lg font-semibold shadow-2xl hover:shadow-xl transition-all hover:scale-105 btn-premium group"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground h-14 px-12 text-lg font-semibold shadow-lg hover:shadow-xl transition-all hover:scale-105 group"
               onClick={() => navigate("/list-business")}
             >
               Commencer gratuitement
@@ -294,7 +304,7 @@ const Index = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-card border-t border-border py-12">
+      <footer className="bg-card border-t border-border py-6">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="flex items-center">
@@ -306,7 +316,7 @@ const Index = () => {
               Un réseau d'entrepreneurs en action
             </div>
           </div>
-          <div className="border-t border-border mt-8 pt-8 text-center text-sm text-muted-foreground">
+          <div className="border-t border-border mt-6 pt-6 text-center text-sm text-muted-foreground">
             <p>&copy; 2025 Vente.club. Tous droits réservés.</p>
           </div>
         </div>
