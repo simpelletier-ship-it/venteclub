@@ -103,7 +103,7 @@ const Index = () => {
           <div className="max-w-4xl mx-auto text-center space-y-8">
             <div className="inline-block">
               <span className="px-4 py-2 rounded-full bg-accent/10 text-accent text-sm font-semibold border border-accent/20">
-                Plateforme #1 d'Acquisition d'Entreprises au Québec
+                La plateforme d'acquisition et de vente d'entreprise au Québec
               </span>
             </div>
             
