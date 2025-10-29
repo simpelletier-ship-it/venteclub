@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -238,6 +238,24 @@ const Admin = () => {
     }
   };
 
+  const createSampleData = async () => {
+    try {
+      const { error } = await supabase.rpc('create_sample_businesses');
+      if (error) throw error;
+      toast({
+        title: "Succès",
+        description: "Les données factices ont été créées avec succès!",
+      });
+      fetchBusinesses();
+    } catch (error: any) {
+      toast({
+        title: "Erreur",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
   const getStatusBadge = (status: string) => {
     const variants: Record<string, "default" | "secondary" | "destructive"> = {
       pending: "secondary",
@@ -274,15 +292,20 @@ const Admin = () => {
     <div className="min-h-screen bg-gradient-to-br from-background to-secondary/10">
       <nav className="border-b border-border/50 bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center cursor-pointer" onClick={() => navigate("/")}>
+          <Link to="/" className="flex items-center">
             <span className="text-2xl font-bold">
               Vente<span className="text-accent">.Club</span>
             </span>
+          </Link>
+          <div className="flex gap-2">
+            <Button variant="secondary" onClick={createSampleData}>
+              Créer Données Factices
+            </Button>
+            <Button variant="ghost" onClick={() => navigate("/")}>
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Retour
+            </Button>
           </div>
-          <Button variant="ghost" onClick={() => navigate("/")}>
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Retour
-          </Button>
         </div>
       </nav>
 
