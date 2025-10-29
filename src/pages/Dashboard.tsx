@@ -313,7 +313,7 @@ const Dashboard = () => {
                             Publier l'annonce
                           </Button>
                         )}
-                        {business.approval_status === 'approved' && business.status !== 'sold' && business.status !== 'archived' && (
+                        {business.approval_status === 'approved' && business.status !== 'sold' && business.status !== 'archived' && !business.has_pending_changes && (
                           <Button
                             onClick={() => navigate(`/list-business?edit=${business.id}`)}
                             size="sm"
@@ -323,6 +323,13 @@ const Dashboard = () => {
                             <Edit className="mr-1 h-3 w-3" />
                             Modifier
                           </Button>
+                        )}
+                        {business.has_pending_changes && (
+                          <div className="p-3 bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-800 rounded-lg">
+                            <p className="text-sm text-orange-700 dark:text-orange-300">
+                              ⏳ Vos modifications sont en attente d'approbation. Vous pourrez modifier l'annonce une fois qu'elles auront été approuvées ou rejetées.
+                            </p>
+                          </div>
                         )}
                       </div>
                       {business.rejection_reason && business.approval_status === 'rejected' && (

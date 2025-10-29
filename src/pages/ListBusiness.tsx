@@ -169,6 +169,18 @@ const ListBusiness = () => {
         return;
       }
 
+      // Vérifier si l'annonce a des modifications en attente
+      if (business.has_pending_changes) {
+        toast({
+          variant: "destructive",
+          title: "Modification impossible",
+          description: "Cette annonce a déjà des modifications en attente d'approbation. Vous devez attendre que l'administrateur approuve ou rejette vos modifications avant d'en soumettre de nouvelles.",
+          duration: 6000,
+        });
+        navigate('/dashboard');
+        return;
+      }
+
       // Remplir le formulaire avec les données existantes
       setFormData({
         title: business.title || "",
