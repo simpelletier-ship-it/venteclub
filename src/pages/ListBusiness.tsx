@@ -217,15 +217,6 @@ const ListBusiness = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-secondary/10">
-      <nav className="border-b border-border/50 bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 h-16 flex items-center">
-          <Button variant="ghost" onClick={() => navigate("/")}>
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Retour
-          </Button>
-        </div>
-      </nav>
-
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-3xl mx-auto">
           <h1 className="text-4xl font-bold text-foreground mb-2">
