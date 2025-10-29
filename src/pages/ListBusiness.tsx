@@ -587,7 +587,7 @@ const ListBusiness = () => {
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-7xl mx-auto">
           <div className="mb-8">
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-4 mb-2">
               <h1 className="text-4xl font-bold text-foreground">
                 {editingBusinessId ? "Modifier l'annonce" : "Nouvelle Fiche Entreprise"}
               </h1>
