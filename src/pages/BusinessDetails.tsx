@@ -517,6 +517,7 @@ const BusinessDetails = () => {
                   </div>
                 )}
 
+                {/* Financial Information Grid */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {business.annual_revenue && (
                     <div className="bg-muted/30 p-4 rounded-lg">
@@ -562,6 +563,73 @@ const BusinessDetails = () => {
                     </div>
                   )}
                 </div>
+
+                {/* Portrait Financier */}
+                {(business.annual_revenue || business.baiia || business.net_profit || business.equipment_lease) && (
+                  <div className="border border-border/50 rounded-xl p-6 bg-gradient-to-br from-background to-muted/10">
+                    <h2 className="text-2xl font-bold text-foreground mb-6">Portrait financier</h2>
+                    
+                    {/* Résultats */}
+                    {(business.annual_revenue || business.baiia || business.net_profit) && (
+                      <div className="mb-6">
+                        <div className="flex justify-between items-center mb-4">
+                          <h3 className="text-lg font-semibold text-foreground">Résultats</h3>
+                          <span className="text-sm text-muted-foreground">Plus récente déclaration fiscale</span>
+                        </div>
+                        
+                        <div className="space-y-3">
+                          {business.annual_revenue && (
+                            <div className="flex justify-between items-center py-2">
+                              <span className="text-foreground">Revenu</span>
+                              <span className="font-semibold text-lg">{business.annual_revenue.toLocaleString()}</span>
+                            </div>
+                          )}
+                          
+                          {business.baiia && (
+                            <div className="flex justify-between items-center py-2">
+                              <span className="text-foreground">BAIIA</span>
+                              <span className="font-semibold text-lg">{business.baiia.toLocaleString()}</span>
+                            </div>
+                          )}
+                          
+                          {business.baiia_margin && (
+                            <div className="flex justify-between items-center py-2 bg-muted/30 px-4 -mx-4 rounded">
+                              <span className="text-foreground">Marge BAIIA</span>
+                              <span className="font-semibold text-lg">{business.baiia_margin} %</span>
+                            </div>
+                          )}
+                          
+                          {business.net_profit && (
+                            <div className="flex justify-between items-center py-2">
+                              <span className="text-foreground">Bénéfice net</span>
+                              <span className="font-semibold text-lg">{business.net_profit.toLocaleString()}</span>
+                            </div>
+                          )}
+                          
+                          {business.net_profit_margin && (
+                            <div className="flex justify-between items-center py-2 bg-muted/30 px-4 -mx-4 rounded">
+                              <span className="text-foreground">Marge bénéficiaire nette</span>
+                              <span className="font-semibold text-lg">{business.net_profit_margin} %</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Location d'équipement */}
+                    {business.equipment_lease && (
+                      <div className="pt-6 border-t border-border/50">
+                        <h3 className="text-lg font-semibold text-foreground mb-4">Location d'équipement ou de biens immobiliers</h3>
+                        <div className="flex justify-between items-center">
+                          <span className="text-foreground">{business.equipment_lease}</span>
+                          {business.equipment_lease_cost && (
+                            <span className="font-semibold">location {business.equipment_lease_cost.toLocaleString()}$/mois</span>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 {business.is_franchise && (
                   <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 p-4 rounded-lg border-2 border-blue-200 dark:border-blue-800 flex items-center gap-3">

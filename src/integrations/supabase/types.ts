@@ -251,11 +251,14 @@ export type Database = {
           approval_status: string | null
           asking_price: number
           baiia: number | null
+          baiia_margin: number | null
           city: string | null
           created_at: string | null
           currency: string | null
           description: string
           employees_count: number | null
+          equipment_lease: string | null
+          equipment_lease_cost: number | null
           featured: boolean | null
           id: string
           industry: Database["public"]["Enums"]["industry_type_new"]
@@ -264,6 +267,8 @@ export type Database = {
           latitude: number | null
           location: string
           longitude: number | null
+          net_profit: number | null
+          net_profit_margin: number | null
           profit_margin: number | null
           province: string | null
           region: string | null
@@ -286,11 +291,14 @@ export type Database = {
           approval_status?: string | null
           asking_price: number
           baiia?: number | null
+          baiia_margin?: number | null
           city?: string | null
           created_at?: string | null
           currency?: string | null
           description: string
           employees_count?: number | null
+          equipment_lease?: string | null
+          equipment_lease_cost?: number | null
           featured?: boolean | null
           id?: string
           industry: Database["public"]["Enums"]["industry_type_new"]
@@ -299,6 +307,8 @@ export type Database = {
           latitude?: number | null
           location: string
           longitude?: number | null
+          net_profit?: number | null
+          net_profit_margin?: number | null
           profit_margin?: number | null
           province?: string | null
           region?: string | null
@@ -321,11 +331,14 @@ export type Database = {
           approval_status?: string | null
           asking_price?: number
           baiia?: number | null
+          baiia_margin?: number | null
           city?: string | null
           created_at?: string | null
           currency?: string | null
           description?: string
           employees_count?: number | null
+          equipment_lease?: string | null
+          equipment_lease_cost?: number | null
           featured?: boolean | null
           id?: string
           industry?: Database["public"]["Enums"]["industry_type_new"]
@@ -334,6 +347,8 @@ export type Database = {
           latitude?: number | null
           location?: string
           longitude?: number | null
+          net_profit?: number | null
+          net_profit_margin?: number | null
           profit_margin?: number | null
           province?: string | null
           region?: string | null
