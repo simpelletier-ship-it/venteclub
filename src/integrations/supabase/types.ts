@@ -177,6 +177,47 @@ export type Database = {
           },
         ]
       }
+      featured_payments: {
+        Row: {
+          amount: number
+          business_id: string
+          created_at: string
+          currency: string
+          featured_until: string
+          id: string
+          payment_status: string
+          user_id: string
+        }
+        Insert: {
+          amount?: number
+          business_id: string
+          created_at?: string
+          currency?: string
+          featured_until: string
+          id?: string
+          payment_status?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          business_id?: string
+          created_at?: string
+          currency?: string
+          featured_until?: string
+          id?: string
+          payment_status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "featured_payments_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string | null
@@ -317,6 +358,10 @@ export type Database = {
     }
     Functions: {
       check_business_access: {
+        Args: { business_uuid: string }
+        Returns: boolean
+      }
+      is_business_featured: {
         Args: { business_uuid: string }
         Returns: boolean
       }

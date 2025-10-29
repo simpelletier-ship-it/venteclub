@@ -4,8 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Lock, MapPin, TrendingUp, Users, Calendar } from "lucide-react";
+import { ArrowLeft, Lock, MapPin, TrendingUp, Users, Calendar, Eye } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import venteLogo from "@/assets/vente-logo.png";
 
 const BusinessDetails = () => {
@@ -20,6 +21,7 @@ const BusinessDetails = () => {
   const [plans, setPlans] = useState<any[]>([]);
   const [sellerContact, setSellerContact] = useState<any>(null);
   const [isPurchasing, setIsPurchasing] = useState(false);
+  const [photos, setPhotos] = useState<any[]>([]);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -32,7 +34,22 @@ const BusinessDetails = () => {
     });
     fetchBusiness();
     fetchPlans();
+    fetchPhotos();
   }, [id]);
+
+  const fetchPhotos = async () => {
+    if (!id) return;
+    
+    const { data } = await supabase
+      .from('business_photos')
+      .select('*')
+      .eq('business_id', id)
+      .order('display_order');
+    
+    if (data) {
+      setPhotos(data);
+    }
+  };
 
   const fetchBusiness = async () => {
     try {
@@ -43,7 +60,16 @@ const BusinessDetails = () => {
         .single();
 
       if (error) throw error;
-      setBusiness(data);
+      
+      // Increment view count
+      if (data) {
+        await supabase
+          .from("businesses")
+          .update({ views_count: (data.views_count || 0) + 1 })
+          .eq("id", id);
+        
+        setBusiness({ ...data, views_count: (data.views_count || 0) + 1 });
+      }
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -204,27 +230,55 @@ const BusinessDetails = () => {
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
           <div className="bg-card rounded-2xl shadow-elegant border border-border/50 overflow-hidden">
-            <div className="p-8">
-              <div className="flex items-start justify-between mb-6">
-                <div className="flex-1">
-                  <h1 className="text-3xl font-bold text-foreground mb-2">
-                    {business.title}
-                  </h1>
-                  <div className="flex flex-wrap gap-2 items-center text-muted-foreground">
-                    <Badge variant="secondary">{business.industry}</Badge>
-                    <span className="flex items-center gap-1">
-                      <MapPin className="w-4 h-4" />
-                      {business.location}
-                    </span>
+              <div className="p-8">
+                <div className="flex items-start justify-between mb-6">
+                  <div className="flex-1">
+                    <h1 className="text-3xl font-bold text-foreground mb-2">
+                      {business.title}
+                    </h1>
+                    <div className="flex flex-wrap gap-2 items-center text-muted-foreground">
+                      <Badge variant="secondary">{business.industry}</Badge>
+                      <span className="flex items-center gap-1">
+                        <MapPin className="w-4 h-4" />
+                        {business.location}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Eye className="w-4 h-4" />
+                        {business.views_count || 0} vues
+                      </span>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-3xl font-bold text-accent">
+                      {business.asking_price.toLocaleString()} CAD
+                    </div>
+                    <div className="text-sm text-muted-foreground">Prix demandé</div>
                   </div>
                 </div>
-                <div className="text-right">
-                  <div className="text-3xl font-bold text-accent">
-                    {business.asking_price.toLocaleString()}€
+
+                {/* Photo Gallery */}
+                {photos.length > 0 && (
+                  <div className="mb-6">
+                    <h2 className="text-xl font-semibold mb-3">Galerie Photos</h2>
+                    <Carousel className="w-full">
+                      <CarouselContent>
+                        {photos.map((photo) => (
+                          <CarouselItem key={photo.id} className="md:basis-1/2 lg:basis-1/3">
+                            <div className="aspect-video rounded-lg overflow-hidden">
+                              <img
+                                src={photo.photo_url}
+                                alt="Business photo"
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                          </CarouselItem>
+                        ))}
+                      </CarouselContent>
+                      <CarouselPrevious />
+                      <CarouselNext />
+                    </Carousel>
                   </div>
-                  <div className="text-sm text-muted-foreground">Prix demandé</div>
-                </div>
-              </div>
+                )}
 
               <div className="space-y-6">
                 <div>
@@ -242,7 +296,7 @@ const BusinessDetails = () => {
                         <span className="text-sm">Revenu annuel</span>
                       </div>
                       <div className="text-xl font-semibold">
-                        {business.annual_revenue.toLocaleString()}€
+                        {business.annual_revenue.toLocaleString()} CAD
                       </div>
                     </div>
                   )}

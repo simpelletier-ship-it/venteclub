@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { TrendingUp, MapPin, DollarSign } from "lucide-react";
+import { TrendingUp, MapPin, DollarSign, Star } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface BusinessCardProps {
@@ -35,7 +35,7 @@ const BusinessCard = ({
 }: BusinessCardProps) => {
   const navigate = useNavigate();
   
-  const displayRevenue = revenue || (annual_revenue ? `${annual_revenue.toLocaleString()}€` : 'N/A');
+  const displayRevenue = revenue || (annual_revenue ? `${annual_revenue.toLocaleString()} CAD` : 'N/A');
   const displayPrice = price || (asking_price ? asking_price.toLocaleString() : 'N/A');
   const displayProfit = profit || (profit_margin ? `${profit_margin}%` : 'N/A');
 
@@ -47,19 +47,22 @@ const BusinessCard = ({
 
   return (
     <Card 
-      className="group hover:shadow-[var(--shadow-hover)] transition-all duration-300 bg-gradient-to-b from-card to-background border-border cursor-pointer"
+      className={`group hover:shadow-[var(--shadow-hover)] transition-all duration-300 bg-gradient-to-b from-card to-background border-border cursor-pointer relative overflow-hidden ${
+        featured ? 'ring-2 ring-yellow-400' : ''
+      }`}
       onClick={handleClick}
     >
+      {featured && (
+        <div className="absolute top-0 right-0 bg-gradient-to-br from-yellow-400 to-yellow-600 text-white px-4 py-2 rounded-bl-2xl shadow-lg flex items-center gap-1 z-10">
+          <Star className="w-4 h-4 fill-current" />
+          <span className="text-sm font-bold">En vedette</span>
+        </div>
+      )}
       <CardHeader>
         <div className="flex items-start justify-between mb-2">
-          <Badge variant={featured ? "default" : "secondary"} className={featured ? "bg-accent text-accent-foreground" : ""}>
+          <Badge variant="secondary">
             {industry}
           </Badge>
-          {featured && (
-            <Badge className="bg-accent text-accent-foreground">
-              En vedette
-            </Badge>
-          )}
         </div>
         <CardTitle className="text-xl font-bold text-foreground group-hover:text-accent transition-colors">
           {title}
@@ -93,7 +96,7 @@ const BusinessCard = ({
             <p className="text-xs text-muted-foreground mb-1">Prix demandé</p>
             <p className="text-2xl font-bold text-accent flex items-center gap-1">
               <DollarSign className="w-5 h-5" />
-              {displayPrice}€
+              {displayPrice} CAD
             </p>
           </div>
           <Button 

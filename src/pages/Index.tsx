@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import BusinessCard from "@/components/BusinessCard";
 import SearchBar from "@/components/SearchBar";
+import BusinessMap from "@/components/BusinessMap";
 import { ArrowRight, Shield, TrendingUp, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import heroImage from "@/assets/hero-business.jpg";
@@ -11,6 +12,8 @@ import venteLogo from "@/assets/vente-logo.png";
 const Index = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<any>(null);
+  const [featuredBusinesses, setFeaturedBusinesses] = useState<any[]>([]);
+  const [allBusinesses, setAllBusinesses] = useState<any[]>([]);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -21,9 +24,41 @@ const Index = () => {
       setUser(session?.user ?? null);
     });
 
+    fetchBusinesses();
+
     return () => subscription.unsubscribe();
   }, []);
-  const featuredBusinesses = [
+
+  const fetchBusinesses = async () => {
+    // Fetch all active businesses
+    const { data: businesses } = await supabase
+      .from('businesses')
+      .select('*')
+      .eq('status', 'active')
+      .order('created_at', { ascending: false });
+
+    if (businesses) {
+      // Check which ones are featured
+      const businessesWithFeature = await Promise.all(
+        businesses.map(async (business) => {
+          const { data: isFeatured } = await supabase
+            .rpc('is_business_featured', { business_uuid: business.id });
+          return { ...business, featured: !!isFeatured };
+        })
+      );
+
+      // Separate featured and regular businesses
+      const featured = businessesWithFeature
+        .filter(b => b.featured)
+        .slice(0, 3);
+      const regular = businessesWithFeature.filter(b => !b.featured);
+
+      setFeaturedBusinesses(featured);
+      setAllBusinesses(regular);
+    }
+  };
+
+  const mockFeaturedBusinesses = [
     {
       title: "Plateforme SaaS TechStart",
       industry: "Technologie",
@@ -56,7 +91,7 @@ const Index = () => {
     },
   ];
 
-  const allBusinesses = [
+  const mockAllBusinesses = [
     {
       title: "Agence Marketing Digital",
       industry: "Services",
@@ -236,15 +271,34 @@ const Index = () => {
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            {featuredBusinesses.map((business, index) => (
-              <BusinessCard key={index} {...business} />
-            ))}
+            {featuredBusinesses.length > 0 ? (
+              featuredBusinesses.map((business) => (
+                <BusinessCard key={business.id} {...business} />
+              ))
+            ) : (
+              mockFeaturedBusinesses.map((business, index) => (
+                <BusinessCard key={index} {...business} />
+              ))
+            )}
           </div>
         </div>
       </section>
 
-      {/* All Listings */}
+      {/* Interactive Map Section */}
       <section className="py-20 bg-muted/30">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold text-foreground mb-4">Explorez la Carte Interactive</h2>
+            <p className="text-xl text-muted-foreground">
+              Découvrez les entreprises à vendre partout au Québec
+            </p>
+          </div>
+          <BusinessMap />
+        </div>
+      </section>
+
+      {/* All Listings */}
+      <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold text-foreground mb-4">Parcourir Toutes les Annonces</h2>
@@ -253,9 +307,15 @@ const Index = () => {
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {allBusinesses.map((business, index) => (
-              <BusinessCard key={index} {...business} />
-            ))}
+            {allBusinesses.length > 0 ? (
+              allBusinesses.map((business) => (
+                <BusinessCard key={business.id} {...business} />
+              ))
+            ) : (
+              mockAllBusinesses.map((business, index) => (
+                <BusinessCard key={index} {...business} />
+              ))
+            )}
           </div>
           <div className="text-center mt-12">
             <Button size="lg" variant="outline" className="h-12 px-8 border-2 border-primary hover:bg-primary hover:text-primary-foreground">
