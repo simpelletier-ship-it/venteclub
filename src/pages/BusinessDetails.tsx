@@ -31,6 +31,7 @@ const BusinessDetails = () => {
   const [hasPremium, setHasPremium] = useState(false);
   const [secondsRemaining, setSecondsRemaining] = useState<number | null>(null);
   const [showPremiumDialog, setShowPremiumDialog] = useState(false);
+  const [isPremiumAccess, setIsPremiumAccess] = useState(false);
 
   useEffect(() => {
     const initialize = async () => {
@@ -140,6 +141,19 @@ const BusinessDetails = () => {
       // If has access, fetch seller contact info
       if (accessGranted) {
         console.log('[ACCESS CHECK] User has access, fetching seller contact...');
+        
+        // Check if access is via premium (used_token = false)
+        const { data: accessData } = await supabase
+          .from('contact_access')
+          .select('used_token')
+          .eq('user_id', userId)
+          .eq('business_id', businessId)
+          .maybeSingle();
+        
+        if (accessData) {
+          setIsPremiumAccess(!accessData.used_token);
+          console.log('[ACCESS CHECK] Access via premium:', !accessData.used_token);
+        }
         
         // First get the business to find seller_id
         const { data: businessData } = await supabase
@@ -256,6 +270,7 @@ const BusinessDetails = () => {
       if (result?.success) {
         setHasAccess(true);
         setSellerContact(result.seller_contact);
+        setIsPremiumAccess(!!result.premium_access);
         setShowUnlockDialog(false);
         
         // Message différent selon si c'est premium ou token gratuit
@@ -674,7 +689,9 @@ const BusinessDetails = () => {
                         <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                         </svg>
-                        <span className="font-semibold">Accès débloqué</span>
+                        <span className="font-semibold">
+                          {isPremiumAccess ? "✨ Accès débloqué grâce à votre abonnement Premium" : "Accès débloqué"}
+                        </span>
                       </div>
                       {sellerContact ? (
                         <>
