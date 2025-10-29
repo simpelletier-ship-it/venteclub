@@ -3,7 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, Paperclip, X, Download, FileText, Image as ImageIcon, ExternalLink } from "lucide-react";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Send, Paperclip, X, Download, FileText, Image as ImageIcon, ExternalLink, Mail, Phone, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 
@@ -39,6 +40,8 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
   const [loading, setLoading] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [otherUserProfile, setOtherUserProfile] = useState<any>(null);
+  const [sellerContact, setSellerContact] = useState<any>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
@@ -46,6 +49,8 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
 
   useEffect(() => {
     fetchMessages();
+    fetchOtherUserProfile();
+    fetchSellerContact();
     
     // Subscribe to realtime messages
     const channel = supabase
@@ -75,7 +80,51 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [businessId, currentUserId]);
+  }, [businessId, currentUserId, otherUserId]);
+
+  const fetchOtherUserProfile = async () => {
+    const { data } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', otherUserId)
+      .single();
+    
+    if (data) {
+      setOtherUserProfile(data);
+    }
+  };
+
+  const fetchSellerContact = async () => {
+    // Check if current user has access to seller contact
+    const { data: business } = await supabase
+      .from('businesses')
+      .select('seller_id')
+      .eq('id', businessId)
+      .single();
+
+    if (!business) return;
+
+    // Check if user has access (is seller or has purchased access)
+    const hasAccess = business.seller_id === currentUserId || 
+      (await supabase
+        .from('contact_access')
+        .select('id')
+        .eq('user_id', currentUserId)
+        .eq('business_id', businessId)
+        .single()).data;
+
+    if (hasAccess) {
+      const { data } = await supabase
+        .from('seller_contacts')
+        .select('*')
+        .eq('seller_id', otherUserId)
+        .single();
+      
+      if (data) {
+        setSellerContact(data);
+      }
+    }
+  };
 
   useEffect(() => {
     // Scroll to bottom when messages change
@@ -273,24 +322,60 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
     }
   };
 
+  const getInitials = (name?: string) => {
+    if (!name) return <User className="h-5 w-5" />;
+    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+  };
+
   return (
     <div className="border border-border rounded-lg overflow-hidden bg-card">
       <div className="bg-muted/50 p-4 border-b border-border">
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="font-semibold text-foreground">
-              Conversation avec {otherUserName || "l'acheteur/vendeur"}
-            </h3>
+        <div className="flex items-start gap-4">
+          <Avatar className="h-12 w-12">
+            <AvatarImage src={otherUserProfile?.avatar_url} />
+            <AvatarFallback className="bg-primary/10 text-primary">
+              {getInitials(otherUserProfile?.full_name || otherUserName)}
+            </AvatarFallback>
+          </Avatar>
+          
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1">
+              <h3 className="font-semibold text-foreground">
+                {otherUserProfile?.full_name || otherUserName || "Utilisateur"}
+              </h3>
+            </div>
+            
             {businessTitle && (
               <Button
                 variant="link"
                 size="sm"
-                className="h-auto p-0 text-xs text-muted-foreground hover:text-primary"
+                className="h-auto p-0 text-sm font-medium hover:text-primary mb-2"
                 onClick={() => navigate(`/business/${businessId}`)}
               >
+                <ExternalLink className="mr-1 h-4 w-4" />
                 {businessTitle}
-                <ExternalLink className="ml-1 h-3 w-3" />
               </Button>
+            )}
+
+            {sellerContact && (
+              <div className="space-y-1 text-sm">
+                {sellerContact.email && (
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Mail className="h-4 w-4" />
+                    <a href={`mailto:${sellerContact.email}`} className="hover:text-primary">
+                      {sellerContact.email}
+                    </a>
+                  </div>
+                )}
+                {sellerContact.phone && (
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Phone className="h-4 w-4" />
+                    <a href={`tel:${sellerContact.phone}`} className="hover:text-primary">
+                      {sellerContact.phone}
+                    </a>
+                  </div>
+                )}
+              </div>
             )}
           </div>
         </div>
