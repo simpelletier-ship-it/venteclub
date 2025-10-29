@@ -204,6 +204,44 @@ export type Database = {
         }
         Relationships: []
       }
+      contact_access: {
+        Row: {
+          access_type: string
+          business_id: string
+          created_at: string
+          expires_at: string | null
+          id: string
+          stripe_payment_id: string | null
+          user_id: string
+        }
+        Insert: {
+          access_type: string
+          business_id: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          stripe_payment_id?: string | null
+          user_id: string
+        }
+        Update: {
+          access_type?: string
+          business_id?: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          stripe_payment_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contact_access_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       featured_payments: {
         Row: {
           amount: number
@@ -441,6 +479,7 @@ export type Database = {
       }
       create_demo_businesses: { Args: never; Returns: undefined }
       create_sample_businesses: { Args: never; Returns: undefined }
+      has_contact_access: { Args: { business_uuid: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
