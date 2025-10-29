@@ -74,10 +74,11 @@ const BusinessCard = ({
       } ${featured ? 'ring-2 ring-accent/30' : ''}`}
       onClick={handleClick}
     >
+      {/* Sold Overlay - Modern Design */}
       {status === 'sold' && (
-        <div className="absolute inset-0 z-[5] bg-background/80 backdrop-blur-sm pointer-events-none flex items-center justify-center">
-          <div className="rotate-[-30deg] bg-primary text-primary-foreground py-8 px-16 shadow-2xl">
-            <p className="text-5xl font-display font-bold tracking-widest uppercase">VENDU</p>
+        <div className="absolute inset-0 z-10 bg-gradient-to-br from-background/95 via-background/98 to-background/95 backdrop-blur-sm">
+          <div className="absolute top-8 right-8 px-6 py-3 bg-gradient-to-r from-primary to-primary-dark rounded-xl shadow-premium">
+            <p className="text-xl font-display font-bold text-white uppercase tracking-wider">VENDU</p>
           </div>
         </div>
       )}
@@ -107,19 +108,19 @@ const BusinessCard = ({
             <h3 className="text-2xl font-display font-bold text-foreground group-hover:text-primary transition-colors line-clamp-1">
               {title}
             </h3>
-            <div className="flex items-center gap-2 text-muted-foreground">
+            <div className={`flex items-center gap-2 text-muted-foreground ${status === 'sold' ? 'blur-sm' : ''}`}>
               <MapPin className="w-4 h-4" />
               <span className="font-medium">
                 {city}{region && `, ${region}`}
               </span>
             </div>
           </div>
-          {id && <FavoriteButton businessId={id} userId={userId} />}
+          {id && status !== 'sold' && <FavoriteButton businessId={id} userId={userId} />}
         </div>
 
-        <p className="text-muted-foreground line-clamp-2 leading-relaxed">{description}</p>
+        <p className={`text-muted-foreground line-clamp-2 leading-relaxed ${status === 'sold' ? 'blur-sm' : ''}`}>{description}</p>
 
-        <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border/50">
+        <div className={`grid grid-cols-2 gap-4 pt-4 border-t border-border/50 ${status === 'sold' ? 'blur-sm' : ''}`}>
           <div className="space-y-1">
             <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Revenus</p>
             <p className="text-lg font-bold text-foreground flex items-center gap-1">
@@ -133,7 +134,7 @@ const BusinessCard = ({
           </div>
         </div>
 
-        <div className="flex items-end justify-between pt-4 border-t border-border/50">
+        <div className={`flex items-end justify-between pt-4 border-t border-border/50 ${status === 'sold' ? 'blur-sm' : ''}`}>
           <div className="space-y-1">
             <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Prix demandé</p>
             <p className="text-3xl font-display font-bold text-primary">{displayPrice}</p>

@@ -142,7 +142,7 @@ const Index = () => {
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-display font-bold leading-[1.1] tracking-tight text-foreground">
               Achetez ou Vendez
               <br />
-              votre entreprise librement
+              <span className="text-primary">votre entreprise librement</span>
             </h1>
             
             {/* Subtitle */}
