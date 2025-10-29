@@ -11,25 +11,55 @@ interface Business {
   longitude: number;
   asking_price: number;
   industry: string;
+  location: string;
+  description: string;
+  annual_revenue?: number;
 }
 
-const BusinessMap = () => {
+interface BusinessMapProps {
+  filters?: {
+    city?: string;
+    industry?: string;
+    minPrice?: number;
+    maxPrice?: number;
+  };
+}
+
+const BusinessMap = ({ filters }: BusinessMapProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
+  const markers = useRef<mapboxgl.Marker[]>([]);
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchBusinesses();
-  }, []);
+  }, [filters]);
 
   const fetchBusinesses = async () => {
-    const { data, error } = await supabase
+    let query = supabase
       .from('businesses')
-      .select('id, title, latitude, longitude, asking_price, industry')
+      .select('id, title, latitude, longitude, asking_price, industry, location, description, annual_revenue')
       .eq('status', 'active')
+      .eq('approval_status', 'approved')
       .not('latitude', 'is', null)
       .not('longitude', 'is', null);
+
+    // Apply filters
+    if (filters?.city) {
+      query = query.ilike('city', `%${filters.city}%`);
+    }
+    if (filters?.industry) {
+      query = query.eq('industry', filters.industry as any);
+    }
+    if (filters?.minPrice !== undefined) {
+      query = query.gte('asking_price', filters.minPrice);
+    }
+    if (filters?.maxPrice !== undefined) {
+      query = query.lte('asking_price', filters.maxPrice);
+    }
+
+    const { data, error } = await query;
 
     if (data && !error) {
       setBusinesses(data);
@@ -37,7 +67,7 @@ const BusinessMap = () => {
   };
 
   useEffect(() => {
-    if (!mapContainer.current || businesses.length === 0) return;
+    if (!mapContainer.current) return;
 
     // Check if we have the Mapbox token
     const mapboxToken = import.meta.env.VITE_MAPBOX_TOKEN;
@@ -46,23 +76,29 @@ const BusinessMap = () => {
       return;
     }
 
-    mapboxgl.accessToken = mapboxToken;
+    if (!map.current) {
+      mapboxgl.accessToken = mapboxToken;
 
-    // Initialize map centered on Quebec
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/light-v11',
-      center: [-71.2082, 46.8139], // Quebec City coordinates
-      zoom: 6,
-    });
+      // Initialize map centered on Quebec
+      map.current = new mapboxgl.Map({
+        container: mapContainer.current,
+        style: 'mapbox://styles/mapbox/light-v11',
+        center: [-71.2082, 46.8139],
+        zoom: 6,
+      });
 
-    // Add navigation controls
-    map.current.addControl(
-      new mapboxgl.NavigationControl({
-        visualizePitch: true,
-      }),
-      'top-right'
-    );
+      // Add navigation controls
+      map.current.addControl(
+        new mapboxgl.NavigationControl({
+          visualizePitch: true,
+        }),
+        'top-right'
+      );
+    }
+
+    // Clear existing markers
+    markers.current.forEach(marker => marker.remove());
+    markers.current = [];
 
     // Add markers for each business
     businesses.forEach((business) => {
@@ -71,43 +107,116 @@ const BusinessMap = () => {
       // Create custom marker element
       const el = document.createElement('div');
       el.className = 'business-marker';
-      el.style.width = '30px';
-      el.style.height = '30px';
+      el.style.width = '32px';
+      el.style.height = '32px';
       el.style.borderRadius = '50%';
       el.style.backgroundColor = 'hsl(270 100% 60%)';
       el.style.border = '3px solid white';
       el.style.cursor = 'pointer';
-      el.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
+      el.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
+      el.style.transition = 'transform 0.2s, box-shadow 0.2s';
 
-      // Create popup
-      const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(`
-        <div style="padding: 8px;">
-          <h3 style="font-weight: bold; margin-bottom: 4px;">${business.title}</h3>
-          <p style="color: hsl(252 15% 50%); font-size: 12px; margin-bottom: 4px;">${business.industry}</p>
-          <p style="font-weight: bold; color: hsl(270 100% 60%);">${business.asking_price.toLocaleString()} CAD</p>
+      // Hover effect
+      el.addEventListener('mouseenter', () => {
+        el.style.transform = 'scale(1.2)';
+        el.style.boxShadow = '0 6px 16px rgba(0,0,0,0.4)';
+      });
+      el.addEventListener('mouseleave', () => {
+        el.style.transform = 'scale(1)';
+        el.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
+      });
+
+      // Create rich popup with preview
+      const popup = new mapboxgl.Popup({ 
+        offset: 25,
+        closeButton: false,
+        className: 'business-popup'
+      }).setHTML(`
+        <div style="padding: 12px; max-width: 280px;">
+          <h3 style="font-weight: 700; margin-bottom: 8px; font-size: 16px; color: hsl(252 47% 11%); line-height: 1.3;">
+            ${business.title}
+          </h3>
+          <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 8px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="hsl(270 100% 60%)" stroke-width="2">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+              <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+            <span style="color: hsl(252 15% 50%); font-size: 13px;">${business.location}</span>
+          </div>
+          <p style="color: hsl(252 15% 50%); font-size: 13px; margin-bottom: 10px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+            ${business.description}
+          </p>
+          <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid hsl(252 20% 90%);">
+            <div>
+              <div style="font-size: 11px; color: hsl(252 15% 50%); text-transform: uppercase; margin-bottom: 2px;">Prix demandé</div>
+              <div style="font-weight: 700; color: hsl(270 100% 60%); font-size: 18px;">
+                ${business.asking_price.toLocaleString('fr-CA')} $
+              </div>
+            </div>
+            ${business.annual_revenue ? `
+              <div style="text-align: right;">
+                <div style="font-size: 11px; color: hsl(252 15% 50%); text-transform: uppercase; margin-bottom: 2px;">Revenus</div>
+                <div style="font-size: 13px; font-weight: 600; color: hsl(252 47% 11%);">
+                  ${business.annual_revenue.toLocaleString('fr-CA')} $
+                </div>
+              </div>
+            ` : ''}
+          </div>
+          <div style="margin-top: 12px; padding: 8px; background: hsl(270 100% 60% / 0.1); border-radius: 6px; text-align: center; font-size: 12px; color: hsl(270 100% 60%); font-weight: 600;">
+            Cliquez pour voir les détails
+          </div>
         </div>
       `);
 
-      // Add marker with click handler
+      // Add marker
       const marker = new mapboxgl.Marker(el)
         .setLngLat([business.longitude, business.latitude])
         .setPopup(popup)
         .addTo(map.current);
 
+      // Show popup on hover
+      el.addEventListener('mouseenter', () => {
+        popup.addTo(map.current!);
+      });
+
+      // Navigate on click
       el.addEventListener('click', () => {
         navigate(`/business/${business.id}`);
       });
+
+      markers.current.push(marker);
     });
 
-    // Cleanup
+    // Fit bounds if there are businesses
+    if (businesses.length > 0 && map.current) {
+      const bounds = new mapboxgl.LngLatBounds();
+      businesses.forEach(b => bounds.extend([b.longitude, b.latitude]));
+      map.current.fitBounds(bounds, { padding: 50 });
+    }
+
+  }, [businesses, navigate]);
+
+  // Cleanup on unmount
+  useEffect(() => {
     return () => {
+      markers.current.forEach(marker => marker.remove());
       map.current?.remove();
     };
-  }, [businesses, navigate]);
+  }, []);
 
   return (
     <div className="relative w-full h-[600px] rounded-2xl overflow-hidden shadow-elegant border border-border">
       <div ref={mapContainer} className="absolute inset-0" />
+      <style>{`
+        .business-popup .mapboxgl-popup-content {
+          padding: 0;
+          border-radius: 12px;
+          box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        }
+        .business-popup .mapboxgl-popup-tip {
+          border-top-color: white;
+        }
+      `}</style>
     </div>
   );
 };

@@ -48,7 +48,12 @@ const Index = () => {
     }
   };
 
-  const handleFilter = (filters: { city?: string; industry?: string }) => {
+  const handleFilter = (filters: { 
+    city?: string; 
+    industry?: string;
+    minPrice?: number;
+    maxPrice?: number;
+  }) => {
     let filtered = [...allBusinesses];
     
     if (filters.city) {
@@ -60,6 +65,18 @@ const Index = () => {
     if (filters.industry) {
       filtered = filtered.filter(business => 
         business.industry === filters.industry
+      );
+    }
+
+    if (filters.minPrice !== undefined) {
+      filtered = filtered.filter(business => 
+        business.asking_price >= filters.minPrice!
+      );
+    }
+
+    if (filters.maxPrice !== undefined) {
+      filtered = filtered.filter(business => 
+        business.asking_price <= filters.maxPrice!
       );
     }
     

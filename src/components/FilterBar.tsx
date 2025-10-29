@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Slider } from "@/components/ui/slider";
 import {
   Select,
   SelectContent,
@@ -10,12 +11,18 @@ import {
 import { QUEBEC_INDUSTRIES } from "@/lib/constants";
 
 interface FilterBarProps {
-  onFilter?: (filters: { city?: string; industry?: string }) => void;
+  onFilter?: (filters: { 
+    city?: string; 
+    industry?: string;
+    minPrice?: number;
+    maxPrice?: number;
+  }) => void;
 }
 
 const FilterBar = ({ onFilter }: FilterBarProps) => {
   const [city, setCity] = useState<string>("");
   const [industry, setIndustry] = useState<string>("");
+  const [priceRange, setPriceRange] = useState<number[]>([0, 1000000]);
 
   const cities = [
     "Montréal",
@@ -35,6 +42,8 @@ const FilterBar = ({ onFilter }: FilterBarProps) => {
       onFilter({
         city: city || undefined,
         industry: industry || undefined,
+        minPrice: priceRange[0],
+        maxPrice: priceRange[1],
       });
     }
   };
@@ -42,48 +51,70 @@ const FilterBar = ({ onFilter }: FilterBarProps) => {
   const handleReset = () => {
     setCity("");
     setIndustry("");
+    setPriceRange([0, 1000000]);
     if (onFilter) {
       onFilter({});
     }
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto bg-card rounded-2xl shadow-elegant p-6 border border-border">
-      <div className="flex flex-col md:flex-row gap-4">
-        <Select value={city} onValueChange={setCity}>
-          <SelectTrigger className="flex-1 h-12 bg-background border-border">
-            <SelectValue placeholder="Ville (optionnel)" />
-          </SelectTrigger>
-          <SelectContent>
-            {cities.map((c) => (
-              <SelectItem key={c} value={c}>
-                {c}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+    <div className="w-full max-w-5xl mx-auto bg-card rounded-2xl shadow-elegant p-6 border border-border">
+      <div className="flex flex-col gap-6">
+        <div className="flex flex-col md:flex-row gap-4">
+          <Select value={city} onValueChange={setCity}>
+            <SelectTrigger className="flex-1 h-12 bg-background border-border">
+              <SelectValue placeholder="Ville (optionnel)" />
+            </SelectTrigger>
+            <SelectContent>
+              {cities.map((c) => (
+                <SelectItem key={c} value={c}>
+                  {c}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
-        <Select value={industry} onValueChange={setIndustry}>
-          <SelectTrigger className="flex-1 h-12 bg-background border-border">
-            <SelectValue placeholder="Secteur (optionnel)" />
-          </SelectTrigger>
-          <SelectContent>
-            {QUEBEC_INDUSTRIES.map((ind) => (
-              <SelectItem key={ind.value} value={ind.value}>
-                {ind.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+          <Select value={industry} onValueChange={setIndustry}>
+            <SelectTrigger className="flex-1 h-12 bg-background border-border">
+              <SelectValue placeholder="Secteur (optionnel)" />
+            </SelectTrigger>
+            <SelectContent>
+              {QUEBEC_INDUSTRIES.map((ind) => (
+                <SelectItem key={ind.value} value={ind.value}>
+                  {ind.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Price Range Slider */}
+        <div className="space-y-3">
+          <label className="text-sm font-medium text-foreground">
+            Fourchette de prix
+          </label>
+          <Slider
+            value={priceRange}
+            onValueChange={setPriceRange}
+            min={0}
+            max={1000000}
+            step={10000}
+            className="w-full"
+          />
+          <div className="flex justify-between text-sm text-muted-foreground">
+            <span>{priceRange[0].toLocaleString('fr-CA')} $</span>
+            <span>{priceRange[1].toLocaleString('fr-CA')} $</span>
+          </div>
+        </div>
 
         <div className="flex gap-2">
           <Button 
             onClick={handleFilter}
-            className="h-12 px-8 bg-accent hover:bg-accent/90 text-accent-foreground font-semibold"
+            className="flex-1 h-12 bg-accent hover:bg-accent/90 text-accent-foreground font-semibold"
           >
             Filtrer
           </Button>
-          {(city || industry) && (
+          {(city || industry || priceRange[0] > 0 || priceRange[1] < 1000000) && (
             <Button 
               onClick={handleReset}
               variant="outline"
@@ -95,7 +126,7 @@ const FilterBar = ({ onFilter }: FilterBarProps) => {
         </div>
       </div>
       <p className="text-sm text-muted-foreground mt-3 text-center">
-        Choisissez une ville, un secteur, ou les deux pour affiner votre recherche
+        Affinez votre recherche par ville, secteur ou fourchette de prix
       </p>
     </div>
   );
