@@ -164,22 +164,21 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Filter Section */}
-      <section className="py-8 bg-muted/30">
-        <div className="container mx-auto px-4">
-          <FilterBar onFilter={handleFilter} />
-        </div>
-      </section>
-
       {/* All Listings */}
       <section className="py-16 bg-muted/30">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-10">
+          <div className="text-center mb-8">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-3">Toutes les Annonces</h2>
-            <p className="text-lg text-muted-foreground">
-              Explorez toutes les entreprises disponibles
+            <p className="text-lg text-muted-foreground mb-8">
+              Explorez toutes les entreprises à vendre
             </p>
           </div>
+
+          {/* Filter Section */}
+          <div className="mb-10">
+            <FilterBar onFilter={handleFilter} />
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredBusinesses.length > 0 ? (
               filteredBusinesses.map((business) => (

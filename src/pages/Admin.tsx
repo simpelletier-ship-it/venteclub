@@ -505,7 +505,7 @@ const Admin = () => {
                   </div>
                   {business.annual_revenue && (
                     <div>
-                      <span className="font-semibold">Revenus:</span> {business.annual_revenue?.toLocaleString()} $ CAD
+                      <span className="font-semibold">Chiffre d'affaires:</span> {business.annual_revenue?.toLocaleString()} $ CAD
                     </div>
                   )}
                 </div>
@@ -710,7 +710,7 @@ const Admin = () => {
                 />
               </div>
               <div>
-                <Label htmlFor="edit-revenue">Revenus annuels (CAD)</Label>
+                <Label htmlFor="edit-revenue">Chiffre d'affaires annuel (CAD)</Label>
                 <Input
                   id="edit-revenue"
                   type="number"

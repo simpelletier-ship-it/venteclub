@@ -6,7 +6,9 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, LogOut, Star } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import BusinessCard from "@/components/BusinessCard";
+import { MessagesList } from "@/components/MessagesList";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -140,69 +142,81 @@ const Dashboard = () => {
       </nav>
 
       <div className="container mx-auto px-4 py-12">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-foreground mb-2">
-            Mes annonces
-          </h1>
-          <p className="text-muted-foreground">
-            Gérez vos entreprises à vendre
-          </p>
-        </div>
-
-        {loading ? (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">Chargement...</p>
-          </div>
-        ) : businesses.length === 0 ? (
-          <div className="text-center py-12 bg-card rounded-2xl border border-border/50">
-            <p className="text-muted-foreground mb-4">
-              Vous n'avez pas encore d'annonces
+        <Tabs defaultValue="businesses" className="w-full">
+          <div className="mb-8">
+            <h1 className="text-4xl font-bold text-foreground mb-2">
+              Tableau de bord
+            </h1>
+            <p className="text-muted-foreground mb-6">
+              Gérez vos annonces et vos conversations
             </p>
-            <Button onClick={() => navigate("/list-business")}>
-              <Plus className="mr-2 h-4 w-4" />
-              Créer ma première annonce
-            </Button>
+            <TabsList className="grid w-full max-w-md grid-cols-2">
+              <TabsTrigger value="businesses">Mes annonces</TabsTrigger>
+              <TabsTrigger value="messages">Messages</TabsTrigger>
+            </TabsList>
           </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {businesses.map((business) => (
-              <div key={business.id} className="relative">
-                <BusinessCard {...business} />
-                <div className="mt-3 flex items-center justify-between gap-2">
-                  <Badge 
-                    className={
-                      business.approval_status === 'approved' 
-                        ? 'bg-green-500 hover:bg-green-600 text-white' 
-                        : business.approval_status === 'pending' 
-                        ? 'bg-orange-500 hover:bg-orange-600 text-white' 
-                        : 'bg-red-500 hover:bg-red-600 text-white'
-                    }
-                  >
-                    {business.approval_status === 'approved' ? '✓ Approuvée' : 
-                     business.approval_status === 'pending' ? '⏳ En attente' : 
-                     '✗ Rejetée'}
-                  </Badge>
-                  {!business.featured && business.approval_status === 'approved' && (
-                    <Button
-                      onClick={() => handleFeatureClick(business)}
-                      size="sm"
-                      variant="secondary"
-                    >
-                      <Star className="mr-2 h-4 w-4" />
-                      Mettre en avant
-                    </Button>
-                  )}
-                </div>
-                {business.rejection_reason && business.approval_status === 'rejected' && (
-                  <div className="mt-2 p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
-                    <p className="text-sm font-semibold mb-1">Raison du refus:</p>
-                    <p className="text-sm text-muted-foreground">{business.rejection_reason}</p>
-                  </div>
-                )}
+
+          <TabsContent value="businesses" className="space-y-6">
+            {loading ? (
+              <div className="text-center py-12">
+                <p className="text-muted-foreground">Chargement...</p>
               </div>
-            ))}
-          </div>
-        )}
+            ) : businesses.length === 0 ? (
+              <div className="text-center py-12 bg-card rounded-2xl border border-border/50">
+                <p className="text-muted-foreground mb-4">
+                  Vous n'avez pas encore d'annonces
+                </p>
+                <Button onClick={() => navigate("/list-business")}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Créer ma première annonce
+                </Button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {businesses.map((business) => (
+                  <div key={business.id} className="relative">
+                    <BusinessCard {...business} />
+                    <div className="mt-3 flex items-center justify-between gap-2">
+                      <Badge 
+                        className={
+                          business.approval_status === 'approved' 
+                            ? 'bg-green-500 hover:bg-green-600 text-white' 
+                            : business.approval_status === 'pending' 
+                            ? 'bg-orange-500 hover:bg-orange-600 text-white' 
+                            : 'bg-red-500 hover:bg-red-600 text-white'
+                        }
+                      >
+                        {business.approval_status === 'approved' ? '✓ Approuvée' : 
+                         business.approval_status === 'pending' ? '⏳ En attente' : 
+                         '✗ Rejetée'}
+                      </Badge>
+                      {!business.featured && business.approval_status === 'approved' && (
+                        <Button
+                          onClick={() => handleFeatureClick(business)}
+                          size="sm"
+                          variant="secondary"
+                        >
+                          <Star className="mr-2 h-4 w-4" />
+                          Mettre en avant
+                        </Button>
+                      )}
+                    </div>
+                    {business.rejection_reason && business.approval_status === 'rejected' && (
+                      <div className="mt-2 p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
+                        <p className="text-sm font-semibold mb-1">Raison du refus:</p>
+                        <p className="text-sm text-muted-foreground">{business.rejection_reason}</p>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="messages">
+            {user && <MessagesList userId={user.id} />}
+          </TabsContent>
+        </Tabs>
       </div>
 
       <Dialog open={featuredDialogOpen} onOpenChange={setFeaturedDialogOpen}>

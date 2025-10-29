@@ -331,7 +331,7 @@ const ListBusiness = () => {
               </div>
 
               <div>
-                <Label htmlFor="annual_revenue">Revenu annuel (CAD)</Label>
+                <Label htmlFor="annual_revenue">Chiffre d'affaires annuel (CAD)</Label>
                 <Input
                   id="annual_revenue"
                   type="number"

@@ -8,6 +8,7 @@ import { ArrowLeft, Lock, MapPin, TrendingUp, Users, Calendar, Eye } from "lucid
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { FavoriteButton } from "@/components/FavoriteButton";
+import { ChatBox } from "@/components/ChatBox";
 
 const BusinessDetails = () => {
   const { id } = useParams();
@@ -417,7 +418,7 @@ const BusinessDetails = () => {
                     <div className="bg-muted/30 p-4 rounded-lg">
                       <div className="flex items-center gap-2 text-muted-foreground mb-1">
                         <TrendingUp className="w-4 h-4" />
-                        <span className="text-sm">Revenu annuel</span>
+                        <span className="text-sm">Chiffre d'affaires annuel</span>
                       </div>
                       <div className="text-xl font-semibold">
                         {business.annual_revenue.toLocaleString()} CAD
@@ -498,6 +499,21 @@ const BusinessDetails = () => {
                     </div>
                   )}
                 </div>
+
+                {/* Chat Section - Only show if user has access */}
+                {hasAccess && !isSeller && user && business && (
+                  <div className="border-t pt-6 mt-6">
+                    <h2 className="text-xl font-semibold mb-4">
+                      Messagerie avec le vendeur
+                    </h2>
+                    <ChatBox
+                      businessId={business.id}
+                      currentUserId={user.id}
+                      otherUserId={business.seller_id}
+                      otherUserName="Vendeur"
+                    />
+                  </div>
+                )}
               </div>
             </div>
           </div>

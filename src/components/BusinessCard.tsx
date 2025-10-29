@@ -96,7 +96,7 @@ const BusinessCard = ({
         {/* Stats Grid */}
         <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border/50">
           <div className="space-y-1">
-            <p className="text-xs text-muted-foreground uppercase tracking-wider">Revenus</p>
+            <p className="text-xs text-muted-foreground uppercase tracking-wider">Chiffre d'affaires</p>
             <p className="text-sm font-semibold text-foreground flex items-center gap-1">
               <TrendingUp className="w-3.5 h-3.5 text-accent" />
               {displayRevenue}

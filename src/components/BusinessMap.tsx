@@ -155,7 +155,7 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
             </div>
             ${business.annual_revenue ? `
               <div style="text-align: right;">
-                <div style="font-size: 11px; color: hsl(252 15% 50%); text-transform: uppercase; margin-bottom: 2px;">Revenus</div>
+                <div style="font-size: 11px; color: hsl(252 15% 50%); text-transform: uppercase; margin-bottom: 2px;">Chiffre d'affaires</div>
                 <div style="font-size: 13px; font-weight: 600; color: hsl(252 47% 11%);">
                   ${business.annual_revenue.toLocaleString('fr-CA')} $
                 </div>
