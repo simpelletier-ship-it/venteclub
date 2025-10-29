@@ -766,7 +766,7 @@ const ListBusiness = () => {
                   </h2>
 
                   <div className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div>
                         <Label htmlFor="asking_price">
                           Prix de vente <span className="text-destructive">*</span>
@@ -789,16 +789,6 @@ const ListBusiness = () => {
                           value={formData.annual_revenue}
                           onChange={(e) => setFormData({ ...formData, annual_revenue: e.target.value })}
                           placeholder="Ex: 250 000"
-                        />
-                      </div>
-
-                      <div>
-                        <Label htmlFor="profit_margin">Bénéfices</Label>
-                        <Input
-                          id="profit_margin"
-                          value={formData.profit_margin}
-                          onChange={(e) => setFormData({ ...formData, profit_margin: e.target.value })}
-                          placeholder="Montant ou texte (ex: Sur demande)."
                         />
                       </div>
 
