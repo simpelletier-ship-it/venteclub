@@ -60,7 +60,7 @@ const BusinessDetails = () => {
 
   // Re-check access when business data loads
   useEffect(() => {
-    if (user && business && !hasAccess) {
+    if (user && business && !hasAccess && !isVerifyingPayment) {
       checkAccess(user.id);
     }
   }, [business, user]);
@@ -85,7 +85,7 @@ const BusinessDetails = () => {
         .from("businesses")
         .select("*")
         .eq("id", id)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       
@@ -97,15 +97,17 @@ const BusinessDetails = () => {
           .eq("id", id);
         
         setBusiness({ ...data, views_count: (data.views_count || 0) + 1 });
+      } else {
+        setBusiness(null);
       }
     } catch (error: any) {
+      console.error("Fetch business error:", error);
       toast({
         variant: "destructive",
         title: "Erreur",
         description: error.message,
       });
-    } finally {
-      setLoading(false);
+      setBusiness(null);
     }
   };
 

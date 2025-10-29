@@ -185,8 +185,27 @@ const Dashboard = () => {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {businesses.map((business) => (
-                  <div key={business.id} className="relative">
-                    <BusinessCard {...business} />
+                  <div key={business.id} className="relative group">
+                    <div className="relative">
+                      <BusinessCard {...business} />
+                      {/* Action buttons overlay */}
+                      <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        {business.status !== 'sold' && business.approval_status === 'approved' && (
+                          <Button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleWithdrawClick(business);
+                            }}
+                            size="sm"
+                            variant="destructive"
+                            className="shadow-lg"
+                          >
+                            <XCircle className="mr-1 h-3 w-3" />
+                            Retirer
+                          </Button>
+                        )}
+                      </div>
+                    </div>
                     <div className="mt-3 space-y-2">
                       <div className="flex items-center justify-between gap-2">
                         <Badge 
@@ -216,17 +235,6 @@ const Dashboard = () => {
                           </Button>
                         )}
                       </div>
-                      {business.status !== 'sold' && business.approval_status === 'approved' && (
-                        <Button
-                          onClick={() => handleWithdrawClick(business)}
-                          size="sm"
-                          variant="outline"
-                          className="w-full"
-                        >
-                          <XCircle className="mr-2 h-4 w-4" />
-                          Retirer l'annonce
-                        </Button>
-                      )}
                     </div>
                     {business.rejection_reason && business.approval_status === 'rejected' && (
                       <div className="mt-2 p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
