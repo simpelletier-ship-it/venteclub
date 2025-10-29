@@ -150,10 +150,10 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
     if (!map.current) {
       mapboxgl.accessToken = mapboxToken;
 
-      // Initialize map centered on Quebec with dark theme
+      // Initialize map centered on Quebec with realistic map style
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
-        style: 'mapbox://styles/mapbox/light-v11',
+        style: 'mapbox://styles/mapbox/outdoors-v12',
         center: [-71.2082, 46.8139],
         zoom: 6,
       });
@@ -461,7 +461,7 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
   }, []);
 
   return (
-    <div className="relative w-full h-[600px] rounded-2xl overflow-hidden shadow-elegant border border-border">
+    <div className="relative w-full max-w-6xl mx-auto h-[600px] rounded-2xl overflow-hidden shadow-elegant border border-border">
       <div ref={mapContainer} className="absolute inset-0" />
       
       {/* Message si aucune annonce */}
