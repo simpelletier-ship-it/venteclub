@@ -112,45 +112,53 @@ const Index = () => {
         structuredData={structuredData} 
       />
       
-      {/* Hero Section - Corporate Design with Dark Background */}
-      <section className="relative min-h-[90vh] flex items-center overflow-hidden bg-gradient-to-br from-[#1A1A1A] via-[#202124] to-[#1A1A1A]" aria-label="Section principale">
-        <div className="absolute inset-0">
-          <div className="absolute inset-0 opacity-[0.03]" style={{
-            backgroundImage: `url(${heroImage})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center'
-          }} role="img" aria-label="Image d'arrière-plan montrant des entrepreneurs en action" />
+      {/* Hero Section - Modern Gradient Design */}
+      <section className="relative min-h-[90vh] flex items-center overflow-hidden bg-gradient-to-br from-white via-muted to-white" aria-label="Section principale">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          {/* Large gradient orbs */}
+          <div className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-gradient-to-br from-accent/30 via-primary/20 to-transparent rounded-full blur-3xl animate-float" />
+          <div className="absolute -bottom-40 -left-40 w-[600px] h-[600px] bg-gradient-to-tr from-secondary/30 via-primary/20 to-transparent rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-r from-accent/10 via-transparent to-secondary/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '4s' }} />
           
-          {/* Animated gradient orbs */}
-          <div className="absolute top-20 right-20 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-float" />
-          <div className="absolute bottom-20 left-20 w-96 h-96 bg-secondary/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }} />
+          {/* Grid pattern overlay */}
+          <div className="absolute inset-0 opacity-[0.02]" style={{
+            backgroundImage: 'radial-gradient(circle at 1px 1px, rgb(0 0 0) 1px, transparent 0)',
+            backgroundSize: '40px 40px'
+          }} />
         </div>
         
         <div className="relative container mx-auto px-4 py-20">
-          <div className="max-w-4xl mx-auto text-center space-y-8 animate-slide-up">
-            <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full glass-effect border-white/20">
-              <Sparkles className="w-5 h-5 text-secondary animate-glow" />
-              <span className="text-white text-sm font-semibold tracking-wide">
-                La plateforme d'acquisition et de vente d'entreprise au Québec
+          <div className="max-w-5xl mx-auto text-center space-y-8 animate-slide-up">
+            {/* Badge */}
+            <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-accent/10 via-primary/10 to-secondary/10 border border-accent/20">
+              <Sparkles className="w-5 h-5 text-accent animate-glow" />
+              <span className="text-foreground text-sm font-semibold tracking-wide">
+                La plateforme #1 d'acquisition et de vente d'entreprise au Québec
               </span>
             </div>
             
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-display font-bold leading-tight text-white">
-              Achetez & Vendez
+            {/* Main Heading */}
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-display font-bold leading-[1.1] tracking-tight">
+              <span className="bg-gradient-to-r from-foreground via-foreground to-foreground bg-clip-text text-transparent">
+                Achetez & Vendez
+              </span>
               <br />
-              <span className="bg-gradient-to-r from-accent via-accent to-primary bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-accent via-primary to-secondary bg-clip-text text-transparent">
                 des Entreprises
               </span>
             </h1>
             
-            <p className="text-xl md:text-2xl text-white/90 max-w-2xl mx-auto font-light">
+            {/* Subtitle */}
+            <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
               Découvrez des opportunités d'affaires vérifiées et connectez-vous directement avec les propriétaires
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-6">
               <Button 
                 size="lg" 
-                className="bg-accent hover:bg-accent/90 text-white h-14 px-10 text-lg font-semibold shadow-xl hover:shadow-2xl transition-all hover:scale-105 btn-premium group"
+                className="bg-gradient-to-r from-accent to-primary hover:from-accent/90 hover:to-primary/90 text-white h-16 px-12 text-lg font-semibold shadow-xl hover:shadow-2xl transition-all hover:scale-105 btn-premium group"
                 onClick={() => document.getElementById('featured')?.scrollIntoView({ behavior: 'smooth' })}
               >
                 Explorer les opportunités
@@ -159,35 +167,35 @@ const Index = () => {
               <Button 
                 size="lg" 
                 variant="outline" 
-                className="h-14 px-10 text-lg font-semibold border-2 border-white/30 text-white hover:bg-white hover:text-foreground glass-effect backdrop-blur-md transition-all"
+                className="h-16 px-12 text-lg font-semibold border-2 border-foreground/20 hover:bg-foreground hover:text-white transition-all"
                 onClick={() => navigate("/list-business")}
               >
                 Vendre mon entreprise
               </Button>
             </div>
 
-            {/* Trust indicators */}
-            <div className="grid grid-cols-3 gap-8 pt-12 max-w-3xl mx-auto">
-              <div className="text-center">
-                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-white/10 backdrop-blur-md mb-3">
-                  <Shield className="w-6 h-6 text-secondary" />
+            {/* Trust Indicators */}
+            <div className="grid grid-cols-3 gap-8 pt-16 max-w-4xl mx-auto">
+              <div className="text-center group">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-secondary/20 to-secondary/10 border border-secondary/20 mb-4 group-hover:scale-110 transition-transform">
+                  <Shield className="w-8 h-8 text-secondary" />
                 </div>
-                <div className="text-3xl font-bold text-white mb-1">100+</div>
-                <div className="text-sm text-white/70">Annonces vérifiées</div>
+                <div className="text-4xl font-display font-bold text-foreground mb-2">100+</div>
+                <div className="text-sm text-muted-foreground font-medium">Annonces vérifiées</div>
               </div>
-              <div className="text-center">
-                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-white/10 backdrop-blur-md mb-3">
-                  <TrendingUp className="w-6 h-6 text-secondary" />
+              <div className="text-center group">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-accent/20 to-accent/10 border border-accent/20 mb-4 group-hover:scale-110 transition-transform">
+                  <TrendingUp className="w-8 h-8 text-accent" />
                 </div>
-                <div className="text-3xl font-bold text-white mb-1">34K+</div>
-                <div className="text-sm text-white/70">Opportunités au QC</div>
+                <div className="text-4xl font-display font-bold text-foreground mb-2">34K+</div>
+                <div className="text-sm text-muted-foreground font-medium">Opportunités au QC</div>
               </div>
-              <div className="text-center">
-                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-white/10 backdrop-blur-md mb-3">
-                  <Clock className="w-6 h-6 text-secondary" />
+              <div className="text-center group">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 border border-primary/20 mb-4 group-hover:scale-110 transition-transform">
+                  <Clock className="w-8 h-8 text-primary" />
                 </div>
-                <div className="text-3xl font-bold text-white mb-1">24h</div>
-                <div className="text-sm text-white/70">Réponse moyenne</div>
+                <div className="text-4xl font-display font-bold text-foreground mb-2">24h</div>
+                <div className="text-sm text-muted-foreground font-medium">Réponse moyenne</div>
               </div>
             </div>
           </div>
