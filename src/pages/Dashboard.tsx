@@ -132,31 +132,6 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-secondary/10">
-      <nav className="border-b border-border/50 bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center cursor-pointer" onClick={() => navigate("/")}>
-            <span className="text-2xl font-bold">
-              Vente<span className="text-accent">.Club</span>
-            </span>
-          </div>
-          <div className="flex gap-4">
-            {isAdmin && (
-              <Button variant="secondary" onClick={() => navigate("/admin")}>
-                Admin
-              </Button>
-            )}
-            <Button onClick={() => navigate("/list-business")}>
-              <Plus className="mr-2 h-4 w-4" />
-              Nouvelle annonce
-            </Button>
-            <Button variant="outline" onClick={handleSignOut}>
-              <LogOut className="mr-2 h-4 w-4" />
-              Déconnexion
-            </Button>
-          </div>
-        </div>
-      </nav>
-
       <div className="container mx-auto px-4 py-12">
         <Tabs defaultValue="businesses" className="w-full">
           <div className="mb-8">
