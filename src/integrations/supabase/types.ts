@@ -455,28 +455,67 @@ export type Database = {
       }
       profiles: {
         Row: {
+          avatar_url: string | null
+          bio: string | null
+          city: string | null
+          country: string | null
           created_at: string | null
           email: string | null
+          first_name: string | null
           full_name: string | null
           id: string
+          is_public: boolean | null
+          last_name: string | null
+          marketing_emails: boolean | null
+          newsletter_enabled: boolean | null
           phone: string | null
+          postal_code: string | null
+          province: string | null
+          street_address: string | null
           updated_at: string | null
+          website: string | null
         }
         Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          city?: string | null
+          country?: string | null
           created_at?: string | null
           email?: string | null
+          first_name?: string | null
           full_name?: string | null
           id: string
+          is_public?: boolean | null
+          last_name?: string | null
+          marketing_emails?: boolean | null
+          newsletter_enabled?: boolean | null
           phone?: string | null
+          postal_code?: string | null
+          province?: string | null
+          street_address?: string | null
           updated_at?: string | null
+          website?: string | null
         }
         Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          city?: string | null
+          country?: string | null
           created_at?: string | null
           email?: string | null
+          first_name?: string | null
           full_name?: string | null
           id?: string
+          is_public?: boolean | null
+          last_name?: string | null
+          marketing_emails?: boolean | null
+          newsletter_enabled?: boolean | null
           phone?: string | null
+          postal_code?: string | null
+          province?: string | null
+          street_address?: string | null
           updated_at?: string | null
+          website?: string | null
         }
         Relationships: []
       }
