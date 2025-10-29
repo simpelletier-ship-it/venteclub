@@ -49,7 +49,9 @@ const Dashboard = () => {
         setIsAdmin(!!hasAdminRole);
       }
     });
+  }, [navigate]);
 
+  useEffect(() => {
     // Check for payment success/cancel
     if (searchParams.get('featured_success') === 'true') {
       toast({
@@ -71,7 +73,7 @@ const Dashboard = () => {
       });
       setSearchParams({});
     }
-  }, [navigate, searchParams, setSearchParams, toast]);
+  }, [searchParams, setSearchParams, toast]);
 
   const fetchUserBusinesses = async (userId: string) => {
     try {

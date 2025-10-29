@@ -20,7 +20,9 @@ const Index = () => {
   
   useEffect(() => {
     fetchBusinesses();
-    
+  }, []);
+
+  useEffect(() => {
     // Check for premium payment success/cancel
     if (searchParams.get('premium_success') === 'true') {
       toast({
