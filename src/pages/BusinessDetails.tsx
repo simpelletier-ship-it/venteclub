@@ -39,8 +39,12 @@ const BusinessDetails = () => {
       if (searchParams.get('payment_success') === 'true' && sessionId) {
         if (session?.user) {
           await verifyPayment(sessionId, session.user.id);
+          // Clear URL params and redirect to dashboard after verification
+          setTimeout(() => {
+            navigate('/dashboard?payment_verified=true');
+          }, 2000);
         }
-        setSearchParams({});
+        return;
       } else if (searchParams.get('payment_canceled') === 'true') {
         toast({
           variant: "destructive",

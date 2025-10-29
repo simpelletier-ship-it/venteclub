@@ -48,14 +48,20 @@ const Dashboard = () => {
     if (searchParams.get('featured_success') === 'true') {
       toast({
         title: "Paiement réussi!",
-        description: "Votre annonce sera mise en avant sous peu.",
+        description: "Votre annonce est maintenant en vedette pour 7 jours.",
       });
       setSearchParams({});
-    } else if (searchParams.get('featured_canceled') === 'true') {
+    } else if (searchParams.get('featured_cancel') === 'true') {
       toast({
         variant: "destructive",
         title: "Paiement annulé",
-        description: "Vous avez annulé le paiement.",
+        description: "Le paiement a été annulé.",
+      });
+      setSearchParams({});
+    } else if (searchParams.get('payment_verified') === 'true') {
+      toast({
+        title: "Accès débloqué!",
+        description: "Vous pouvez maintenant voir vos achats dans l'onglet 'Mes Achats'.",
       });
       setSearchParams({});
     }
