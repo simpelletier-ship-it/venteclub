@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 interface BusinessCardProps {
   id?: string;
+  slug?: string;
   title: string;
   industry: string;
   location: string;
@@ -33,6 +34,7 @@ interface BusinessCardProps {
 
 const BusinessCard = ({
   id,
+  slug,
   title,
   city,
   region,
@@ -63,8 +65,8 @@ const BusinessCard = ({
   const displayBaiia = baiia ? `${baiia.toLocaleString('fr-CA')} $` : 'N/D';
 
   const handleClick = () => {
-    if (id && status !== 'sold') {
-      navigate(`/business/${id}`);
+    if (slug && status !== 'sold') {
+      navigate(`/entreprise/${slug}`);
     }
   };
 

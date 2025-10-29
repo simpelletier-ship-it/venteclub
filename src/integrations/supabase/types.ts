@@ -271,6 +271,7 @@ export type Database = {
           seller_id: string
           seller_name: string | null
           seller_phone: string | null
+          slug: string
           sold_at: string | null
           status: string | null
           title: string
@@ -305,6 +306,7 @@ export type Database = {
           seller_id: string
           seller_name?: string | null
           seller_phone?: string | null
+          slug: string
           sold_at?: string | null
           status?: string | null
           title: string
@@ -339,6 +341,7 @@ export type Database = {
           seller_id?: string
           seller_name?: string | null
           seller_phone?: string | null
+          slug?: string
           sold_at?: string | null
           status?: string | null
           title?: string
@@ -958,6 +961,7 @@ export type Database = {
       cleanup_old_login_attempts: { Args: never; Returns: undefined }
       create_demo_businesses: { Args: never; Returns: undefined }
       create_sample_businesses: { Args: never; Returns: undefined }
+      generate_slug: { Args: { title: string }; Returns: string }
       get_next_access_time: { Args: { user_uuid: string }; Returns: Json }
       has_contact_access: { Args: { business_uuid: string }; Returns: boolean }
       has_role: {

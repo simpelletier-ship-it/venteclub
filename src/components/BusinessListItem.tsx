@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 interface BusinessListItemProps {
   id?: string;
+  slug?: string;
   title: string;
   industry: string;
   location: string;
@@ -28,6 +29,7 @@ interface BusinessListItemProps {
 
 const BusinessListItem = ({
   id,
+  slug,
   title,
   industry,
   location,
@@ -60,8 +62,8 @@ const BusinessListItem = ({
   const displayBaiia = baiia ? `${baiia.toLocaleString('fr-CA', { useGrouping: true }).replace(/\$/g, '')} $` : 'N/D';
 
   const handleClick = () => {
-    if (id && status !== 'sold') {
-      navigate(`/business/${id}`);
+    if (slug && status !== 'sold') {
+      navigate(`/entreprise/${slug}`);
     }
   };
 

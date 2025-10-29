@@ -40,7 +40,7 @@ const App = () => (
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/list-business" element={<ListBusiness />} />
               <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/business/:id" element={<BusinessDetails />} />
+              <Route path="/entreprise/:slug" element={<BusinessDetails />} />
               <Route path="/map" element={<Map />} />
               <Route path="/admin" element={<Admin />} />
               <Route path="/settings" element={<Settings />} />

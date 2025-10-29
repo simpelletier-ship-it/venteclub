@@ -14,12 +14,13 @@ import { ReportBusinessDialog } from "@/components/ReportBusinessDialog";
 import { SEO } from "@/components/SEO";
 
 const BusinessDetails = () => {
-  const { id } = useParams();
+  const { slug } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
   const [user, setUser] = useState<any>(null);
   const [business, setBusiness] = useState<any>(null);
+  const [businessId, setBusinessId] = useState<string | null>(null);
   const [hasAccess, setHasAccess] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showUnlockDialog, setShowUnlockDialog] = useState(false);
@@ -53,7 +54,7 @@ const BusinessDetails = () => {
     };
 
     initialize();
-  }, [id]);
+  }, [slug]);
 
   // Re-check access when premium status changes
   useEffect(() => {
@@ -64,12 +65,12 @@ const BusinessDetails = () => {
   }, [hasPremium, user?.id]);
 
   const fetchPhotos = async () => {
-    if (!id) return;
+    if (!businessId) return;
     
     const { data } = await supabase
       .from('business_photos')
       .select('*')
-      .eq('business_id', id)
+      .eq('business_id', businessId)
       .order('display_order');
     
     if (data) {
@@ -79,11 +80,11 @@ const BusinessDetails = () => {
 
   const fetchBusiness = async () => {
     try {
-      console.log('[BUSINESS DETAILS] Fetching business with id:', id);
+      console.log('[BUSINESS DETAILS] Fetching business with slug:', slug);
       const { data, error } = await supabase
         .from("businesses")
         .select("*")
-        .eq("id", id)
+        .eq("slug", slug)
         .maybeSingle();
 
       console.log('[BUSINESS DETAILS] Fetch result:', { data, error });
@@ -92,10 +93,11 @@ const BusinessDetails = () => {
       
       // Increment view count
       if (data) {
+        setBusinessId(data.id);
         await supabase
           .from("businesses")
           .update({ views_count: (data.views_count || 0) + 1 })
-          .eq("id", id);
+          .eq("id", data.id);
         
         setBusiness({ ...data, views_count: (data.views_count || 0) + 1 });
         console.log('[BUSINESS DETAILS] Business set:', data.title);
@@ -115,14 +117,14 @@ const BusinessDetails = () => {
   };
 
   const checkAccess = async (userId: string) => {
-    if (!id) return;
+    if (!businessId) return;
     
     try {
-      console.log('[ACCESS CHECK] Checking access for business:', id);
+      console.log('[ACCESS CHECK] Checking access for business:', businessId);
       
       // Use RPC to check access server-side
       const { data: accessGranted, error } = await supabase
-        .rpc('check_business_access', { business_uuid: id });
+        .rpc('check_business_access', { business_uuid: businessId });
 
       console.log('[ACCESS CHECK] RPC result:', { accessGranted, error });
 
@@ -143,7 +145,7 @@ const BusinessDetails = () => {
         const { data: businessData } = await supabase
           .from('businesses')
           .select('seller_id')
-          .eq('id', id)
+          .eq('id', businessId)
           .single();
 
         console.log('[ACCESS CHECK] Business seller_id:', businessData?.seller_id);
@@ -221,7 +223,7 @@ const BusinessDetails = () => {
   };
 
   const handleConfirmUnlock = async () => {
-    if (!id || !user) return;
+    if (!businessId || !user) return;
     
     setIsUnlocking(true);
     try {
@@ -229,7 +231,7 @@ const BusinessDetails = () => {
       
       // La vérification premium est maintenant faite côté serveur pour la sécurité
       const { data, error } = await supabase.rpc('use_token_for_access', {
-        business_uuid: id
+        business_uuid: businessId
       });
 
       if (error) {
@@ -382,7 +384,7 @@ const BusinessDetails = () => {
         title={`${business.title} - ${business.asking_price.toLocaleString()} CAD | Vente.club`}
         description={`${business.description.substring(0, 155)}... Entreprise ${business.industry} à ${business.city}. ${business.annual_revenue ? `Revenus: ${business.annual_revenue.toLocaleString()} CAD` : ''}`}
         keywords={`vente ${business.industry} ${business.city}, acheter entreprise ${business.city}, ${business.title}, opportunité affaires Québec`}
-        canonical={`/business/${id}`}
+        canonical={`/entreprise/${business.slug}`}
         type="product"
         structuredData={businessStructuredData}
       />
@@ -396,9 +398,9 @@ const BusinessDetails = () => {
                       <h1 className="text-3xl font-bold text-foreground">
                         {business.title}
                       </h1>
-                      {id && (
+                      {businessId && (
                         <div className="flex items-center gap-2">
-                          <FavoriteButton businessId={id} userId={user?.id} />
+                          <FavoriteButton businessId={businessId} userId={user?.id} />
                           <span className="text-xs text-muted-foreground">
                             Activer les notifications
                           </span>
@@ -418,8 +420,8 @@ const BusinessDetails = () => {
                         {business.views_count || 0} vues
                       </span>
                     </div>
-                      {!isSeller && id && (
-                        <ReportBusinessDialog businessId={id} businessTitle={business.title} />
+                      {!isSeller && businessId && (
+                        <ReportBusinessDialog businessId={businessId} businessTitle={business.title} />
                       )}
                     </div>
                   </div>
@@ -642,7 +644,7 @@ const BusinessDetails = () => {
                           Messagerie avec le vendeur
                         </h2>
                         <ChatBox
-                          businessId={business.id}
+                          businessId={businessId}
                           currentUserId={user.id}
                           otherUserId={business.seller_id}
                           otherUserName="Vendeur"
@@ -651,9 +653,9 @@ const BusinessDetails = () => {
                     )}
                     
                     {/* Seller view - show all buyers who have access */}
-                    {isSeller && (
+                    {isSeller && businessId && (
                       <SellerChatSection 
-                        businessId={business.id}
+                        businessId={businessId}
                         sellerId={user.id}
                       />
                     )}
