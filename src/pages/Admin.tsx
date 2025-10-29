@@ -7,8 +7,9 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { CheckCircle, XCircle, Eye, ArrowLeft } from "lucide-react";
+import { CheckCircle, XCircle, Eye, ArrowLeft, Trash2, Star, Edit } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -19,6 +20,8 @@ const Admin = () => {
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
   const [selectedBusiness, setSelectedBusiness] = useState<any>(null);
   const [rejectionReason, setRejectionReason] = useState("");
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [businessToDelete, setBusinessToDelete] = useState<any>(null);
 
   useEffect(() => {
     checkAdminAccess();
@@ -69,7 +72,17 @@ const Admin = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setBusinesses(data || []);
+
+      // Check featured status for each business
+      const businessesWithFeature = await Promise.all(
+        (data || []).map(async (business) => {
+          const { data: isFeatured } = await supabase
+            .rpc('is_business_featured', { business_uuid: business.id });
+          return { ...business, is_featured: !!isFeatured };
+        })
+      );
+
+      setBusinesses(businessesWithFeature);
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -128,6 +141,87 @@ const Admin = () => {
   const handleReject = (business: any) => {
     setSelectedBusiness(business);
     setRejectDialogOpen(true);
+  };
+
+  const handleDeleteClick = (business: any) => {
+    setBusinessToDelete(business);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDelete = async () => {
+    if (!businessToDelete) return;
+
+    try {
+      const { error } = await supabase
+        .from('businesses')
+        .delete()
+        .eq('id', businessToDelete.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Succès",
+        description: "L'annonce a été supprimée.",
+      });
+
+      fetchBusinesses();
+      setDeleteDialogOpen(false);
+      setBusinessToDelete(null);
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: error.message,
+      });
+    }
+  };
+
+  const toggleFeatured = async (businessId: string, currentStatus: boolean) => {
+    try {
+      if (currentStatus) {
+        // Remove from featured (delete payment record)
+        const { error } = await supabase
+          .from('featured_payments')
+          .delete()
+          .eq('business_id', businessId);
+
+        if (error) throw error;
+
+        toast({
+          title: "Succès",
+          description: "L'annonce n'est plus en vedette.",
+        });
+      } else {
+        // Add to featured (create payment record)
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) return;
+
+        const { error } = await supabase
+          .from('featured_payments')
+          .insert({
+            user_id: session.user.id,
+            business_id: businessId,
+            amount: 20,
+            featured_until: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days
+            payment_status: 'completed'
+          });
+
+        if (error) throw error;
+
+        toast({
+          title: "Succès",
+          description: "L'annonce est maintenant en vedette pour 30 jours.",
+        });
+      }
+
+      fetchBusinesses();
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: error.message,
+      });
+    }
   };
 
   const getStatusBadge = (status: string) => {
@@ -223,7 +317,7 @@ const Admin = () => {
                     </p>
                   </div>
                 )}
-                <div className="flex gap-2">
+                 <div className="flex gap-2 flex-wrap">
                   <Button
                     variant="outline"
                     size="sm"
@@ -231,6 +325,14 @@ const Admin = () => {
                   >
                     <Eye className="mr-2 h-4 w-4" />
                     Voir
+                  </Button>
+                  <Button
+                    variant={business.is_featured ? "secondary" : "outline"}
+                    size="sm"
+                    onClick={() => toggleFeatured(business.id, business.is_featured)}
+                  >
+                    <Star className={`mr-2 h-4 w-4 ${business.is_featured ? 'fill-current' : ''}`} />
+                    {business.is_featured ? 'Retirer vedette' : 'Mettre en vedette'}
                   </Button>
                   {business.approval_status !== 'approved' && (
                     <Button
@@ -252,6 +354,14 @@ const Admin = () => {
                       Rejeter
                     </Button>
                   )}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleDeleteClick(business)}
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Supprimer
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -304,6 +414,23 @@ const Admin = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmer la suppression</AlertDialogTitle>
+            <AlertDialogDescription>
+              Êtes-vous sûr de vouloir supprimer l'annonce "{businessToDelete?.title}" ? Cette action est irréversible.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">
+              Supprimer
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

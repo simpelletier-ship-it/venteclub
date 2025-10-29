@@ -52,11 +52,12 @@ const Index = () => {
   }, []);
 
   const fetchBusinesses = async () => {
-    // Fetch all active businesses
+    // Fetch all approved and active businesses (visible to everyone)
     const { data: businesses } = await supabase
       .from('businesses')
       .select('*')
       .eq('status', 'active')
+      .eq('approval_status', 'approved')
       .order('created_at', { ascending: false });
 
     if (businesses) {
