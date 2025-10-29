@@ -17,14 +17,23 @@ const Dashboard = () => {
   const [featuredDialogOpen, setFeaturedDialogOpen] = useState(false);
   const [selectedBusiness, setSelectedBusiness] = useState<any>(null);
   const [processingPayment, setProcessingPayment] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (!session) {
         navigate("/auth");
       } else {
         setUser(session.user);
         fetchUserBusinesses(session.user.id);
+        
+        // Check if user is admin
+        const { data: hasAdminRole } = await supabase
+          .rpc('has_role', { 
+            _user_id: session.user.id, 
+            _role: 'admin' 
+          });
+        setIsAdmin(!!hasAdminRole);
       }
     });
 
@@ -112,6 +121,11 @@ const Dashboard = () => {
             </span>
           </div>
           <div className="flex gap-4">
+            {isAdmin && (
+              <Button variant="secondary" onClick={() => navigate("/admin")}>
+                Admin
+              </Button>
+            )}
             <Button onClick={() => navigate("/list-business")}>
               <Plus className="mr-2 h-4 w-4" />
               Nouvelle annonce

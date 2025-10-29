@@ -12,14 +12,37 @@ const Index = () => {
   const [user, setUser] = useState<any>(null);
   const [featuredBusinesses, setFeaturedBusinesses] = useState<any[]>([]);
   const [allBusinesses, setAllBusinesses] = useState<any[]>([]);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       setUser(session?.user ?? null);
+      
+      // Check if user is admin
+      if (session?.user) {
+        const { data: hasAdminRole } = await supabase
+          .rpc('has_role', { 
+            _user_id: session.user.id, 
+            _role: 'admin' 
+          });
+        setIsAdmin(!!hasAdminRole);
+      }
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setUser(session?.user ?? null);
+      
+      // Check admin role on auth change
+      if (session?.user) {
+        const { data: hasAdminRole } = await supabase
+          .rpc('has_role', { 
+            _user_id: session.user.id, 
+            _role: 'admin' 
+          });
+        setIsAdmin(!!hasAdminRole);
+      } else {
+        setIsAdmin(false);
+      }
     });
 
     fetchBusinesses();
@@ -164,6 +187,11 @@ const Index = () => {
           <div className="flex items-center gap-3">
             {user ? (
               <>
+                {isAdmin && (
+                  <Button variant="secondary" onClick={() => navigate("/admin")}>
+                    Admin
+                  </Button>
+                )}
                 <Button variant="ghost" onClick={() => navigate("/dashboard")}>
                   Mes annonces
                 </Button>
