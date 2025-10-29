@@ -1,0 +1,6 @@
+-- Ajouter une politique RLS pour permettre aux admins de voir tous les profils
+CREATE POLICY "Admins can view all profiles"
+ON public.profiles
+FOR SELECT
+TO authenticated
+USING (has_role(auth.uid(), 'admin'::app_role));
