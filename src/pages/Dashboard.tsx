@@ -327,9 +327,8 @@ const Dashboard = () => {
                       <Star className="h-10 w-10 fill-amber-600 text-amber-600" />
                     </div>
                     <div className="text-center space-y-1">
-                      <h4 className="font-bold text-2xl text-foreground">75 $</h4>
+                      <h4 className="font-bold text-2xl text-foreground">7,5 $</h4>
                       <p className="text-sm font-medium text-muted-foreground"><span className="font-bold">7 jours</span> de mise en avant</p>
-                      <p className="text-xs text-muted-foreground">10,71 $ / jour</p>
                     </div>
                     <div className="pt-3 border-t space-y-1.5">
                       <div className="flex items-center gap-2 text-xs">
@@ -367,9 +366,8 @@ const Dashboard = () => {
                       <Star className="h-10 w-10 fill-slate-400 text-slate-400" />
                     </div>
                     <div className="text-center space-y-1">
-                      <h4 className="font-bold text-2xl text-foreground">100 $</h4>
+                      <h4 className="font-bold text-2xl text-foreground">10 $</h4>
                       <p className="text-sm font-medium text-muted-foreground"><span className="font-bold">14 jours</span> de mise en avant</p>
-                      <p className="text-xs text-muted-foreground">7,14 $ / jour</p>
                     </div>
                     <div className="pt-3 border-t space-y-1.5">
                       <div className="flex items-center gap-2 text-xs">
@@ -411,9 +409,8 @@ const Dashboard = () => {
                       <Star className="h-10 w-10 fill-yellow-500 text-yellow-500" />
                     </div>
                     <div className="text-center space-y-1">
-                      <h4 className="font-bold text-2xl text-foreground">110 $</h4>
+                      <h4 className="font-bold text-2xl text-foreground">11,50 $</h4>
                       <p className="text-sm font-medium text-muted-foreground"><span className="font-bold">30 jours</span> de mise en avant</p>
-                      <p className="text-xs text-muted-foreground">3,67 $ / jour</p>
                     </div>
                     <div className="pt-3 border-t space-y-1.5">
                       <div className="flex items-center gap-2 text-xs">
@@ -467,7 +464,7 @@ const Dashboard = () => {
               className="flex-1 h-11 text-sm font-semibold"
               size="lg"
             >
-              {processingPayment ? "Traitement en cours..." : `Confirmer le paiement de ${selectedDuration === 7 ? '75' : selectedDuration === 14 ? '100' : '110'} $ CAD`}
+              {processingPayment ? "Traitement en cours..." : `Confirmer le paiement de ${selectedDuration === 7 ? '7,50' : selectedDuration === 14 ? '10' : '11,50'} $ CAD`}
             </Button>
             <Button 
               variant="outline" 
