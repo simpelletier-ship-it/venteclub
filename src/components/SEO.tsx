@@ -12,7 +12,7 @@ interface SEOProps {
 
 export const SEO = ({
   title = "Vente.club - Plateforme d'Achat et Vente d'Entreprises au Québec",
-  description = "Achetez et vendez des entreprises au Québec en toute confiance. Plus de 100 opportunités vérifiées : restaurants, commerces, franchises. Contactez directement les vendeurs.",
+  description = "Plateforme québécoise #1 pour acheter et vendre des entreprises. Plus de 100 opportunités vérifiées : restaurants, commerces, franchises. Transactions sécurisées et contactez directement les vendeurs.",
   keywords = "vente entreprise Québec, achat commerce Montréal, vendre restaurant, acheter franchise, opportunité affaires, cession entreprise, reprise commerce",
   ogImage = "/og-image.jpg",
   canonical,
@@ -22,6 +22,27 @@ export const SEO = ({
   const siteUrl = window.location.origin;
   const currentUrl = canonical ? `${siteUrl}${canonical}` : window.location.href;
   
+  // Default Organization structured data
+  const defaultOrganizationData = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Vente.club",
+    "description": "Plateforme québécoise pour l'achat et la vente d'entreprises au Québec",
+    "url": siteUrl,
+    "logo": `${siteUrl}/logo.png`,
+    "image": `${siteUrl}/og-image.jpg`,
+    "address": {
+      "@type": "PostalAddress",
+      "addressCountry": "CA",
+      "addressRegion": "QC"
+    },
+    "areaServed": {
+      "@type": "Place",
+      "name": "Québec"
+    },
+    "sameAs": []
+  };
+
   return (
     <Helmet>
       {/* Primary Meta Tags */}
@@ -30,6 +51,10 @@ export const SEO = ({
       <meta name="description" content={description} />
       <meta name="keywords" content={keywords} />
       <link rel="canonical" href={currentUrl} />
+      
+      {/* Favicon and Logo */}
+      <link rel="icon" type="image/png" href="/logo.png" />
+      <link rel="apple-touch-icon" href="/logo.png" />
 
       {/* Open Graph / Facebook */}
       <meta property="og:type" content={type} />
@@ -37,6 +62,9 @@ export const SEO = ({
       <meta property="og:title" content={title} />
       <meta property="og:description" content={description} />
       <meta property="og:image" content={`${siteUrl}${ogImage}`} />
+      <meta property="og:image:width" content="1200" />
+      <meta property="og:image:height" content="630" />
+      <meta property="og:image:alt" content="Vente.club - Achat et vente d'entreprises au Québec" />
       <meta property="og:site_name" content="Vente.club" />
       <meta property="og:locale" content="fr_CA" />
 
@@ -46,6 +74,7 @@ export const SEO = ({
       <meta name="twitter:title" content={title} />
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={`${siteUrl}${ogImage}`} />
+      <meta name="twitter:image:alt" content="Vente.club - Achat et vente d'entreprises au Québec" />
 
       {/* Additional SEO */}
       <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
@@ -58,7 +87,12 @@ export const SEO = ({
       <meta name="geo.region" content="CA-QC" />
       <meta name="geo.placename" content="Québec" />
 
-      {/* Structured Data */}
+      {/* Organization Structured Data - Always include */}
+      <script type="application/ld+json">
+        {JSON.stringify(defaultOrganizationData)}
+      </script>
+
+      {/* Additional Structured Data */}
       {structuredData && (
         <script type="application/ld+json">
           {JSON.stringify(structuredData)}
