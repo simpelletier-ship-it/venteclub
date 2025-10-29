@@ -170,13 +170,13 @@ export const NotificationBell = ({ userId }: NotificationBellProps) => {
             </div>
           </div>
           <ScrollArea className="h-96 w-full overflow-x-auto">
-            {notifications.length === 0 ? (
+            {notifications.filter(n => !n.read).length === 0 ? (
               <p className="text-sm text-muted-foreground py-4 text-center">
                 Aucune notification
               </p>
             ) : (
               <div className="space-y-3 pr-2">
-                {notifications.map((notification) => {
+                {notifications.filter(n => !n.read).map((notification) => {
                   const getNotificationStyle = (type: string) => {
                     switch (type) {
                       case 'approved':
