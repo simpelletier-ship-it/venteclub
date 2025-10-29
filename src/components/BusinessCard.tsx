@@ -71,9 +71,6 @@ const BusinessCard = ({
               En Vedette
             </Badge>
           )}
-          <Badge variant="secondary" className="text-xs font-semibold">
-            {industry}
-          </Badge>
         </div>
         {id && (
           <FavoriteButton businessId={id} userId={userId} />
