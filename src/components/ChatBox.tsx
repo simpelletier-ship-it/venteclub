@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send } from "lucide-react";
+import { Send, Paperclip, X, Download, FileText, Image as ImageIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface Message {
@@ -15,6 +15,14 @@ interface Message {
   read: boolean;
 }
 
+interface MessageAttachment {
+  id: string;
+  file_name: string;
+  file_url: string;
+  file_type: string;
+  file_size: number;
+}
+
 interface ChatBoxProps {
   businessId: string;
   currentUserId: string;
@@ -24,9 +32,13 @@ interface ChatBoxProps {
 
 export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName }: ChatBoxProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
+  const [messageAttachments, setMessageAttachments] = useState<Record<string, MessageAttachment[]>>({});
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [uploading, setUploading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -84,6 +96,26 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName 
 
     setMessages(data || []);
 
+    // Fetch attachments for all messages
+    if (data && data.length > 0) {
+      const messageIds = data.map(m => m.id);
+      const { data: attachmentsData } = await supabase
+        .from('message_attachments')
+        .select('*')
+        .in('message_id', messageIds);
+
+      if (attachmentsData) {
+        const attachmentsByMessage: Record<string, MessageAttachment[]> = {};
+        attachmentsData.forEach((att: any) => {
+          if (!attachmentsByMessage[att.message_id]) {
+            attachmentsByMessage[att.message_id] = [];
+          }
+          attachmentsByMessage[att.message_id].push(att);
+        });
+        setMessageAttachments(attachmentsByMessage);
+      }
+    }
+
     // Mark unread messages as read
     const unreadMessages = data?.filter(
       msg => msg.receiver_id === currentUserId && !msg.read
@@ -101,21 +133,96 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName 
       .eq('id', messageId);
   };
 
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length + selectedFiles.length > 5) {
+      toast({
+        variant: "destructive",
+        title: "Limite dépassée",
+        description: "Vous pouvez envoyer un maximum de 5 fichiers à la fois.",
+      });
+      return;
+    }
+
+    // Check file sizes (max 10MB per file)
+    const invalidFiles = files.filter(f => f.size > 10 * 1024 * 1024);
+    if (invalidFiles.length > 0) {
+      toast({
+        variant: "destructive",
+        title: "Fichier trop volumineux",
+        description: "Les fichiers ne doivent pas dépasser 10 Mo.",
+      });
+      return;
+    }
+
+    setSelectedFiles([...selectedFiles, ...files]);
+  };
+
+  const removeFile = (index: number) => {
+    setSelectedFiles(selectedFiles.filter((_, i) => i !== index));
+  };
+
+  const uploadFiles = async (messageId: string) => {
+    if (selectedFiles.length === 0) return;
+
+    setUploading(true);
+    try {
+      for (const file of selectedFiles) {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${currentUserId}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('message-attachments')
+          .upload(fileName, file);
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('message-attachments')
+          .getPublicUrl(fileName);
+
+        await supabase.from('message_attachments').insert({
+          message_id: messageId,
+          file_name: file.name,
+          file_url: publicUrl,
+          file_type: file.type,
+          file_size: file.size,
+        });
+      }
+
+      setSelectedFiles([]);
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: "Impossible d'envoyer les fichiers",
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const sendMessage = async () => {
-    if (!newMessage.trim()) return;
+    if (!newMessage.trim() && selectedFiles.length === 0) return;
 
     setLoading(true);
     try {
-      const { error } = await supabase
+      const { data: messageData, error } = await supabase
         .from('messages')
         .insert({
           business_id: businessId,
           sender_id: currentUserId,
           receiver_id: otherUserId,
-          content: newMessage.trim(),
-        });
+          content: newMessage.trim() || "[Fichier joint]",
+        })
+        .select()
+        .single();
 
       if (error) throw error;
+
+      if (selectedFiles.length > 0) {
+        await uploadFiles(messageData.id);
+      }
 
       setNewMessage("");
     } catch (error: any) {
@@ -127,6 +234,33 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName 
     } finally {
       setLoading(false);
     }
+  };
+
+  const downloadFile = async (fileUrl: string, fileName: string) => {
+    try {
+      const response = await fetch(fileUrl);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: "Impossible de télécharger le fichier",
+      });
+    }
+  };
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -153,6 +287,7 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName 
           ) : (
             messages.map((message) => {
               const isCurrentUser = message.sender_id === currentUserId;
+              const attachments = messageAttachments[message.id] || [];
               return (
                 <div
                   key={message.id}
@@ -165,7 +300,42 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName 
                         : 'bg-muted text-foreground'
                     }`}
                   >
-                    <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
+                    {message.content !== "[Fichier joint]" && (
+                      <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
+                    )}
+                    
+                    {attachments.length > 0 && (
+                      <div className="mt-2 space-y-2">
+                        {attachments.map((att) => {
+                          const isImage = att.file_type.startsWith('image/');
+                          return (
+                            <div
+                              key={att.id}
+                              className="bg-background/50 rounded p-2 flex items-center gap-2"
+                            >
+                              {isImage ? (
+                                <ImageIcon className="w-4 h-4 shrink-0" />
+                              ) : (
+                                <FileText className="w-4 h-4 shrink-0" />
+                              )}
+                              <div className="flex-1 min-w-0">
+                                <p className="text-xs font-medium truncate">{att.file_name}</p>
+                                <p className="text-xs opacity-70">{formatFileSize(att.file_size)}</p>
+                              </div>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => downloadFile(att.file_url, att.file_name)}
+                                className="h-7 w-7 p-0"
+                              >
+                                <Download className="h-3 w-3" />
+                              </Button>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                    
                     <p className="text-xs opacity-70 mt-1">
                       {new Date(message.created_at).toLocaleTimeString('fr-CA', {
                         hour: '2-digit',
@@ -181,18 +351,63 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName 
       </ScrollArea>
 
       <div className="p-4 border-t border-border bg-muted/20">
+        {selectedFiles.length > 0 && (
+          <div className="mb-3 space-y-2">
+            {selectedFiles.map((file, index) => (
+              <div
+                key={index}
+                className="flex items-center gap-2 bg-background rounded p-2 text-sm"
+              >
+                {file.type.startsWith('image/') ? (
+                  <ImageIcon className="w-4 h-4 shrink-0 text-muted-foreground" />
+                ) : (
+                  <FileText className="w-4 h-4 shrink-0 text-muted-foreground" />
+                )}
+                <span className="flex-1 truncate">{file.name}</span>
+                <span className="text-xs text-muted-foreground">{formatFileSize(file.size)}</span>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => removeFile(index)}
+                  className="h-6 w-6 p-0"
+                >
+                  <X className="h-3 w-3" />
+                </Button>
+              </div>
+            ))}
+          </div>
+        )}
+        
         <div className="flex gap-2">
+          <input
+            ref={fileInputRef}
+            type="file"
+            multiple
+            className="hidden"
+            onChange={handleFileSelect}
+            accept="image/*,.pdf,.doc,.docx,.txt"
+          />
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={loading || uploading}
+            className="h-[60px] w-[60px] shrink-0"
+          >
+            <Paperclip className="h-5 w-5" />
+          </Button>
           <Textarea
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder="Écrivez votre message..."
             className="min-h-[60px] resize-none"
-            disabled={loading}
+            disabled={loading || uploading}
           />
           <Button
             onClick={sendMessage}
-            disabled={loading || !newMessage.trim()}
+            disabled={loading || uploading || (!newMessage.trim() && selectedFiles.length === 0)}
             size="icon"
             className="h-[60px] w-[60px] shrink-0"
           >
@@ -200,7 +415,7 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName 
           </Button>
         </div>
         <p className="text-xs text-muted-foreground mt-2">
-          Appuyez sur Entrée pour envoyer
+          Appuyez sur Entrée pour envoyer • Max 5 fichiers (10 Mo chacun)
         </p>
       </div>
     </div>

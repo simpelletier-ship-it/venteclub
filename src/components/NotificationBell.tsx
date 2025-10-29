@@ -27,13 +27,15 @@ export const NotificationBell = ({ userId }: NotificationBellProps) => {
   const navigate = useNavigate();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
 
   useEffect(() => {
     if (userId) {
       fetchNotifications();
+      fetchUnreadMessages();
       
-      // Subscribe to realtime changes
-      const channel = supabase
+      // Subscribe to realtime changes for notifications
+      const notifChannel = supabase
         .channel('notifications')
         .on('postgres_changes', 
           { event: '*', schema: 'public', table: 'notifications', filter: `user_id=eq.${userId}` },
@@ -41,11 +43,31 @@ export const NotificationBell = ({ userId }: NotificationBellProps) => {
         )
         .subscribe();
 
+      // Subscribe to realtime changes for messages
+      const messagesChannel = supabase
+        .channel('unread-messages')
+        .on('postgres_changes', 
+          { event: '*', schema: 'public', table: 'messages', filter: `receiver_id=eq.${userId}` },
+          () => fetchUnreadMessages()
+        )
+        .subscribe();
+
       return () => {
-        supabase.removeChannel(channel);
+        supabase.removeChannel(notifChannel);
+        supabase.removeChannel(messagesChannel);
       };
     }
   }, [userId]);
+
+  const fetchUnreadMessages = async () => {
+    const { count } = await supabase
+      .from('messages')
+      .select('*', { count: 'exact', head: true })
+      .eq('receiver_id', userId)
+      .eq('read', false);
+
+    setUnreadMessagesCount(count || 0);
+  };
 
   const fetchNotifications = async () => {
     const { data } = await supabase
@@ -102,16 +124,27 @@ export const NotificationBell = ({ userId }: NotificationBellProps) => {
       <PopoverTrigger asChild>
         <Button variant="ghost" size="icon" className="relative">
           <Bell className="h-5 w-5" />
-          {unreadCount > 0 && (
+          {(unreadCount + unreadMessagesCount) > 0 && (
             <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center">
-              {unreadCount}
+              {unreadCount + unreadMessagesCount}
             </span>
           )}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[640px] max-w-[95vw] z-50">
         <div className="space-y-2">
-          <h3 className="font-semibold text-lg">Notifications</h3>
+          <div className="flex items-center justify-between">
+            <h3 className="font-semibold text-lg">Notifications</h3>
+            {unreadMessagesCount > 0 && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate('/dashboard?tab=messages')}
+              >
+                {unreadMessagesCount} message{unreadMessagesCount > 1 ? 's' : ''} non lu{unreadMessagesCount > 1 ? 's' : ''}
+              </Button>
+            )}
+          </div>
           <ScrollArea className="h-96 w-full overflow-x-auto">
             {notifications.length === 0 ? (
               <p className="text-sm text-muted-foreground py-4 text-center">

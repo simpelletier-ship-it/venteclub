@@ -13,6 +13,7 @@ import { PurchasedBusinesses } from "@/components/PurchasedBusinesses";
 import { WithdrawBusinessDialog } from "@/components/WithdrawBusinessDialog";
 import { EditBusinessDialog } from "@/components/EditBusinessDialog";
 import { AlertsManager } from "@/components/AlertsManager";
+import { ConversationsList } from "@/components/ConversationsList";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -29,6 +30,7 @@ const Dashboard = () => {
   const [businessToWithdraw, setBusinessToWithdraw] = useState<any>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [businessToEdit, setBusinessToEdit] = useState<any>(null);
+  const defaultTab = searchParams.get('tab') || 'businesses';
 
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
@@ -142,7 +144,7 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-secondary/10">
       <div className="container mx-auto px-4 py-12">
-        <Tabs defaultValue="businesses" className="w-full">
+        <Tabs defaultValue={defaultTab} className="w-full">
           <div className="mb-8">
             <h1 className="text-4xl font-bold text-foreground mb-2">
               Tableau de bord
@@ -150,7 +152,7 @@ const Dashboard = () => {
             <p className="text-muted-foreground mb-6">
               Gérez vos annonces et vos conversations
             </p>
-            <TabsList className="grid w-full max-w-3xl grid-cols-3">
+            <TabsList className="grid w-full max-w-3xl grid-cols-4">
               <TabsTrigger value="businesses">Mes annonces</TabsTrigger>
               <TabsTrigger value="purchases">Mes achats</TabsTrigger>
               <TabsTrigger value="messages">Messages</TabsTrigger>
@@ -213,7 +215,7 @@ const Dashboard = () => {
           </TabsContent>
 
           <TabsContent value="messages">
-            {user && <MessagesList userId={user.id} />}
+            {user && <ConversationsList userId={user.id} />}
           </TabsContent>
 
           <TabsContent value="alerts">
