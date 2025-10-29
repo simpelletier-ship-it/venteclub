@@ -136,15 +136,19 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
       el.style.cursor = 'pointer';
       el.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
       el.style.transition = 'transform 0.2s, box-shadow 0.2s';
+      el.style.position = 'relative';
+      el.style.zIndex = '1';
 
       // Hover effect
       el.addEventListener('mouseenter', () => {
         el.style.transform = 'scale(1.2)';
         el.style.boxShadow = '0 6px 16px rgba(0,0,0,0.4)';
+        el.style.zIndex = '999';
       });
       el.addEventListener('mouseleave', () => {
         el.style.transform = 'scale(1)';
         el.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
+        el.style.zIndex = '1';
       });
 
       // Create rich popup with preview and image
@@ -199,17 +203,15 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
         closeButton: false,
         closeOnClick: false,
         className: 'business-popup',
-        maxWidth: '300px',
-        anchor: 'bottom' // Anchor the popup to the bottom so it appears above the marker
+        maxWidth: '300px'
       }).setHTML(popupContent);
 
-      // Add marker
-      const marker = new mapboxgl.Marker(el)
+      // Add marker with element
+      const marker = new mapboxgl.Marker({ element: el, anchor: 'center' })
         .setLngLat([business.longitude, business.latitude])
-        .setPopup(popup)
         .addTo(map.current);
 
-      // Show/hide popup on hover
+      // Handle popup manually
       let hideTimeout: NodeJS.Timeout;
       let isPopupHovered = false;
       let isMarkerHovered = false;
@@ -217,16 +219,14 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
       const showPopup = () => {
         clearTimeout(hideTimeout);
         if (!popup.isOpen()) {
-          marker.togglePopup();
+          popup.setLngLat([business.longitude, business.latitude]).addTo(map.current!);
         }
       };
       
       const hidePopup = () => {
         hideTimeout = setTimeout(() => {
           if (!isPopupHovered && !isMarkerHovered) {
-            if (popup.isOpen()) {
-              marker.togglePopup();
-            }
+            popup.remove();
           }
         }, 200);
       };
