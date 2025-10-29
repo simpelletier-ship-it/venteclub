@@ -306,30 +306,24 @@ export type Database = {
       }
       contact_access: {
         Row: {
-          access_type: string
           business_id: string
           created_at: string
-          expires_at: string | null
           id: string
-          stripe_payment_id: string | null
+          used_token: boolean
           user_id: string
         }
         Insert: {
-          access_type: string
           business_id: string
           created_at?: string
-          expires_at?: string | null
           id?: string
-          stripe_payment_id?: string | null
+          used_token?: boolean
           user_id: string
         }
         Update: {
-          access_type?: string
           business_id?: string
           created_at?: string
-          expires_at?: string | null
           id?: string
-          stripe_payment_id?: string | null
+          used_token?: boolean
           user_id?: string
         }
         Relationships: [
@@ -713,6 +707,30 @@ export type Database = {
           },
         ]
       }
+      user_tokens: {
+        Row: {
+          created_at: string
+          id: string
+          last_token_refresh: string
+          tokens_available: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          last_token_refresh?: string
+          tokens_available?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          last_token_refresh?: string
+          tokens_available?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -737,6 +755,8 @@ export type Database = {
         Args: { business_uuid: string }
         Returns: boolean
       }
+      refresh_daily_tokens: { Args: never; Returns: undefined }
+      use_token_for_access: { Args: { business_uuid: string }; Returns: Json }
     }
     Enums: {
       app_role: "admin" | "user"

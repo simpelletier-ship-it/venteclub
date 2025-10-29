@@ -37,23 +37,10 @@ export const PurchasedBusinesses = ({ userId }: PurchasedBusinessesProps) => {
         throw accessError;
       }
 
-      // Filter out expired subscriptions
-      const activeAccess = accessRecords?.filter(record => {
-        if (record.access_type === 'one_time') return true;
-        if (record.access_type === 'subscription' && record.expires_at) {
-          return new Date(record.expires_at) > new Date();
-        }
-        return false;
-      });
-
-      console.log('Active access:', activeAccess);
-
       // Extract businesses from the records
-      const businesses = activeAccess?.map(record => ({
+      const businesses = accessRecords?.map(record => ({
         ...record.businesses,
         purchase_date: record.created_at,
-        access_type: record.access_type,
-        expires_at: record.expires_at,
       })) || [];
 
       console.log('Businesses to display:', businesses);
@@ -82,7 +69,7 @@ export const PurchasedBusinesses = ({ userId }: PurchasedBusinessesProps) => {
     return (
       <div className="text-center py-12">
         <p className="text-muted-foreground">
-          Vous n'avez pas encore acheté d'accès à des annonces.
+          Vous n'avez pas encore débloqué de vendeurs.
         </p>
       </div>
     );
@@ -92,9 +79,9 @@ export const PurchasedBusinesses = ({ userId }: PurchasedBusinessesProps) => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold">Mes Achats</h2>
+          <h2 className="text-2xl font-bold">Mes Accès</h2>
           <p className="text-muted-foreground mt-1">
-            Annonces pour lesquelles vous avez acheté l'accès aux coordonnées du vendeur
+            Vendeurs dont vous avez débloqué les coordonnées
           </p>
         </div>
       </div>
@@ -110,16 +97,7 @@ export const PurchasedBusinesses = ({ userId }: PurchasedBusinessesProps) => {
           <div key={business.id} className="relative">
             <BusinessCard {...business} />
             <div className="mt-2 text-xs text-muted-foreground bg-muted/30 px-3 py-2 rounded-md">
-              <div className="flex justify-between items-center">
-                <span>
-                  {business.access_type === 'one_time' ? '✓ Accès permanent' : '✓ Abonnement mensuel'}
-                </span>
-                {business.access_type === 'subscription' && business.expires_at && (
-                  <span>
-                    Expire le {new Date(business.expires_at).toLocaleDateString('fr-CA')}
-                  </span>
-                )}
-              </div>
+              <span>✓ Accès débloqué le {new Date(business.purchase_date).toLocaleDateString('fr-CA')}</span>
             </div>
           </div>
         ))}

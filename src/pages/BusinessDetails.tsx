@@ -22,12 +22,12 @@ const BusinessDetails = () => {
   const [business, setBusiness] = useState<any>(null);
   const [hasAccess, setHasAccess] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [showPaymentDialog, setShowPaymentDialog] = useState(false);
+  const [showTokenDialog, setShowTokenDialog] = useState(false);
   const [sellerContact, setSellerContact] = useState<any>(null);
-  const [isPurchasing, setIsPurchasing] = useState(false);
+  const [isUnlocking, setIsUnlocking] = useState(false);
   const [photos, setPhotos] = useState<any[]>([]);
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(null);
-  const [isVerifyingPayment, setIsVerifyingPayment] = useState(false);
+  const [tokensAvailable, setTokensAvailable] = useState<number>(0);
 
   useEffect(() => {
     const initialize = async () => {
@@ -38,36 +38,10 @@ const BusinessDetails = () => {
       await fetchBusiness();
       await fetchPhotos();
 
-      // Check for payment success/cancel
-      const sessionId = searchParams.get('session_id');
-      const paymentSuccess = searchParams.get('payment_success') === 'true';
-      const paymentCanceled = searchParams.get('payment_canceled') === 'true';
-      
-      if (paymentSuccess && sessionId) {
-        console.log('[INIT] Payment success detected, verifying...', { sessionId, hasUser: !!session?.user });
-        if (session?.user) {
-          await verifyPayment(sessionId, session.user.id);
-        } else {
-          console.log('[INIT] No user session, redirecting to auth');
-          toast({
-            variant: "destructive",
-            title: "Session expirée",
-            description: "Veuillez vous reconnecter pour finaliser votre achat.",
-          });
-          setLoading(false);
-          navigate('/auth');
-        }
-      } else if (paymentCanceled) {
-        console.log('[INIT] Payment canceled');
-        toast({
-          variant: "destructive",
-          title: "Paiement annulé",
-          description: "Vous avez annulé le paiement.",
-        });
-        setLoading(false);
-      } else if (session?.user) {
+      if (session?.user) {
         console.log('[INIT] Checking access for user');
         await checkAccess(session.user.id);
+        await fetchTokens(session.user.id);
       } else {
         console.log('[INIT] No user session');
         setLoading(false);
@@ -75,23 +49,7 @@ const BusinessDetails = () => {
     };
 
     initialize();
-  }, [id]); // REMOVED searchParams dependency to avoid infinite loop
-
-  // Separate useEffect to clean URL params after payment
-  useEffect(() => {
-    const hasPaymentParams = searchParams.has('payment_success') || 
-                            searchParams.has('payment_canceled') || 
-                            searchParams.has('session_id');
-    
-    if (hasPaymentParams && !isVerifyingPayment) {
-      console.log('[CLEANUP] Cleaning URL params');
-      const timer = setTimeout(() => {
-        setSearchParams({});
-      }, 2000); // Wait 2 seconds before cleaning URL
-      
-      return () => clearTimeout(timer);
-    }
-  }, [searchParams, isVerifyingPayment, setSearchParams]);
+  }, [id]);
 
   const fetchPhotos = async () => {
     if (!id) return;
@@ -187,69 +145,25 @@ const BusinessDetails = () => {
     }
   };
 
-  const verifyPayment = async (sessionId: string, userId: string) => {
-    setIsVerifyingPayment(true);
-    setLoading(true);
-    
-    // Add timeout of 30 seconds
-    const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(() => reject(new Error('La vérification du paiement a pris trop de temps. Veuillez rafraîchir la page.')), 30000);
-    });
-    
+  const fetchTokens = async (userId: string) => {
     try {
-      console.log("[VERIFY PAYMENT] Starting verification with session:", sessionId);
+      // Refresh tokens first
+      await supabase.rpc('refresh_daily_tokens');
       
-      const verifyPromise = supabase.functions.invoke('verify-contact-payment', {
-        body: { sessionId }
-      });
+      const { data, error } = await supabase
+        .from('user_tokens')
+        .select('tokens_available')
+        .eq('user_id', userId)
+        .maybeSingle();
       
-      const { data, error } = await Promise.race([verifyPromise, timeoutPromise]) as any;
-
-      console.log("[VERIFY PAYMENT] Response:", { data, error });
-
       if (error) {
-        console.error("[VERIFY PAYMENT] Error:", error);
-        throw error;
-      }
-
-      if (data?.error) {
-        console.error("[VERIFY PAYMENT] Data error:", data.error);
-        toast({
-          variant: "destructive",
-          title: "Erreur de vérification",
-          description: data.error,
-        });
+        console.error('Error fetching tokens:', error);
         return;
       }
-
-      // Payment successful - update state immediately
-      console.log("[VERIFY PAYMENT] Success! Setting access and contact");
-      setHasAccess(true);
-      setSellerContact(data.sellerContact);
-
-      toast({
-        title: "Accès débloqué avec succès!",
-        description: "Vous pouvez maintenant voir toutes les informations du vendeur.",
-      });
       
-      // Scroll to seller contact section
-      setTimeout(() => {
-        const element = document.getElementById('seller-contact');
-        console.log("[VERIFY PAYMENT] Scrolling to seller contact:", element);
-        element?.scrollIntoView({ behavior: 'smooth' });
-      }, 500);
-      
-    } catch (error: any) {
-      console.error('[VERIFY PAYMENT] Exception:', error);
-      toast({
-        variant: "destructive",
-        title: "Erreur de vérification",
-        description: error.message || "Impossible de vérifier le paiement. Veuillez rafraîchir la page ou contacter le support.",
-      });
-    } finally {
-      console.log("[VERIFY PAYMENT] Cleanup - setting loading to false");
-      setIsVerifyingPayment(false);
-      setLoading(false);
+      setTokensAvailable(data?.tokens_available || 1);
+    } catch (error) {
+      console.error('Error in fetchTokens:', error);
     }
   };
 
@@ -257,133 +171,66 @@ const BusinessDetails = () => {
     if (!user) {
       toast({
         title: "Connexion requise",
-        description: "Vous devez vous connecter pour accéder aux coordonnées du vendeur.",
+        description: "Vous devez vous connecter pour voir les coordonnées du vendeur.",
       });
       navigate("/auth");
       return;
     }
-    setShowPaymentDialog(true);
+    setShowTokenDialog(true);
   };
 
-  const handlePayForAccess = async (isSubscription = false) => {
-    if (!id) return;
+  const handleUseToken = async () => {
+    if (!id || !user) return;
     
-    setIsPurchasing(true);
+    setIsUnlocking(true);
     try {
-      const { data, error } = await supabase.functions.invoke('create-contact-access-checkout', {
-        body: { 
-          businessId: id,
-          accessType: isSubscription ? 'subscription' : 'one_time'
-        }
+      const { data, error } = await supabase.rpc('use_token_for_access', {
+        business_uuid: id
       });
 
       if (error) throw error;
 
-      if (data?.error) {
+      const result = data as any;
+      
+      if (result?.success) {
+        setHasAccess(true);
+        setSellerContact(result.seller_contact);
+        setTokensAvailable(prev => prev - 1);
+        setShowTokenDialog(false);
+        
         toast({
-          variant: "destructive",
-          title: "Erreur",
-          description: data.error,
+          title: "Accès débloqué !",
+          description: "Vous pouvez maintenant voir les coordonnées du vendeur.",
         });
-        return;
-      }
-
-      if (data?.url) {
-        // Redirect in the same window instead of opening new tab
-        window.location.href = data.url;
+        
+        setTimeout(() => {
+          const element = document.getElementById('seller-contact');
+          element?.scrollIntoView({ behavior: 'smooth' });
+        }, 500);
       }
     } catch (error: any) {
-      console.error('Payment error:', error);
+      console.error('Token error:', error);
       toast({
         variant: "destructive",
         title: "Erreur",
-        description: error.message || "Erreur lors de la création du paiement",
-      });
-      setIsPurchasing(false);
-    }
-  };
-
-  const handlePurchasePlan = async (planId: string) => {
-    if (!id) return;
-    
-    setIsPurchasing(true);
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        toast({
-          variant: "destructive",
-          title: "Erreur",
-          description: "Vous devez être connecté",
-        });
-        return;
-      }
-
-      const { data, error } = await supabase.functions.invoke('purchase-access', {
-        body: { businessId: id, planId },
-      });
-
-      if (error) throw error;
-
-      if (data.error) {
-        toast({
-          variant: "destructive",
-          title: "Erreur",
-          description: data.error,
-        });
-        return;
-      }
-
-      toast({
-        title: "Succès !",
-        description: "Accès débloqué avec succès!",
-      });
-      setHasAccess(true);
-      setSellerContact(data.sellerContact);
-      setShowPaymentDialog(false);
-      
-      // Refresh access
-      if (user) {
-        checkAccess(user.id);
-      }
-    } catch (error: any) {
-      console.error('Purchase error:', error);
-      toast({
-        variant: "destructive",
-        title: "Erreur",
-        description: error.message || "Erreur lors de l'achat",
+        description: error.message || "Impossible d'utiliser le token.",
       });
     } finally {
-      setIsPurchasing(false);
+      setIsUnlocking(false);
     }
   };
 
-  if (loading || isVerifyingPayment) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center max-w-md mx-auto p-8">
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto mb-4"></div>
           <h2 className="text-2xl font-bold mb-2">
-            {isVerifyingPayment ? "Vérification du paiement..." : "Chargement de l'annonce..."}
+            Chargement de l'annonce...
           </h2>
-          <p className="text-muted-foreground mb-6">
-            {isVerifyingPayment 
-              ? "Nous vérifions votre paiement avec Stripe. Cela peut prendre quelques secondes."
-              : "Veuillez patienter pendant que nous chargeons les détails de l'annonce."}
+          <p className="text-muted-foreground">
+            Veuillez patienter pendant que nous chargeons les détails de l'annonce.
           </p>
-          {isVerifyingPayment && (
-            <div className="mt-8">
-              <Button 
-                variant="outline" 
-                onClick={() => {
-                  console.log('[USER ACTION] Refresh requested');
-                  window.location.reload();
-                }}
-              >
-                Rafraîchir la page
-              </Button>
-            </div>
-          )}
         </div>
       </div>
     );
@@ -698,83 +545,60 @@ const BusinessDetails = () => {
         </div>
       </div>
 
-      <Dialog open={showPaymentDialog} onOpenChange={setShowPaymentDialog}>
-        <DialogContent className="max-w-2xl">
+      <Dialog open={showTokenDialog} onOpenChange={setShowTokenDialog}>
+        <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Accéder aux coordonnées du vendeur</DialogTitle>
+            <DialogTitle>Débloquer les coordonnées du vendeur</DialogTitle>
             <DialogDescription>
-              Choisissez votre option de paiement
+              Utilisez votre token quotidien gratuit pour accéder aux coordonnées
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-6 py-4">
-            <div className="grid md:grid-cols-2 gap-4">
-              {/* Option 1: Paiement unique */}
-              <div className="border-2 border-border rounded-lg p-6 hover:border-accent transition-colors">
-                <div className="text-center mb-4">
-                  <h3 className="text-lg font-bold mb-2">Paiement unique</h3>
-                  <div className="text-3xl font-bold text-primary mb-2">5 $</div>
-                  <p className="text-sm text-muted-foreground">Accès à cette annonce seulement</p>
-                </div>
-                <div className="space-y-2 text-sm mb-6">
-                  <p className="flex items-center gap-2">
-                    <span className="text-green-500">✓</span> Email du vendeur
-                  </p>
-                  <p className="flex items-center gap-2">
-                    <span className="text-green-500">✓</span> Téléphone du vendeur
-                  </p>
-                  <p className="flex items-center gap-2">
-                    <span className="text-green-500">✓</span> Accès permanent
-                  </p>
-                </div>
-                <Button 
-                  onClick={() => handlePayForAccess(false)} 
-                  disabled={isPurchasing}
-                  className="w-full"
-                  variant="outline"
-                >
-                  {isPurchasing ? "Traitement..." : "Payer 5 $"}
-                </Button>
-              </div>
-
-              {/* Option 2: Abonnement */}
-              <div className="border-2 border-accent rounded-lg p-6 bg-accent/5 relative">
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <Badge className="bg-accent text-accent-foreground">Meilleure valeur</Badge>
-                </div>
-                <div className="text-center mb-4">
-                  <h3 className="text-lg font-bold mb-2">Abonnement mensuel</h3>
-                  <div className="text-3xl font-bold text-accent mb-2">9,99 $ / mois</div>
-                  <p className="text-sm text-muted-foreground">Accès aux coordonnées de tous les vendeurs en tout temps</p>
-                </div>
-                <div className="space-y-2 text-sm mb-6">
-                  <p className="flex items-center gap-2">
-                    <span className="text-green-500">✓</span> Toutes les coordonnées
-                  </p>
-                  <p className="flex items-center gap-2">
-                    <span className="text-green-500">✓</span> Accès illimité
-                  </p>
-                  <p className="flex items-center gap-2">
-                    <span className="text-green-500">✓</span> Annulation à tout moment
-                  </p>
-                  <p className="flex items-center gap-2">
-                    <span className="text-green-500">✓</span> Nouvelles annonces
-                  </p>
-                </div>
-                <Button 
-                  onClick={() => handlePayForAccess(true)} 
-                  disabled={isPurchasing}
-                  className="w-full bg-accent hover:bg-accent/90"
-                >
-                  {isPurchasing ? "Traitement..." : "S'abonner à 9,99 $"}
-                </Button>
-              </div>
+            <div className="bg-accent/10 border border-accent/20 rounded-lg p-6 text-center">
+              <div className="text-5xl font-bold text-primary mb-2">{tokensAvailable}</div>
+              <p className="text-sm text-muted-foreground">
+                Token{tokensAvailable > 1 ? 's' : ''} disponible{tokensAvailable > 1 ? 's' : ''}
+              </p>
+              <p className="text-xs text-muted-foreground mt-2">
+                {tokensAvailable > 0 
+                  ? "Vous recevez 1 token gratuit par jour"
+                  : "Votre prochain token sera disponible demain"}
+              </p>
             </div>
 
-            <div className="text-center">
+            <div className="space-y-4">
+              <div className="space-y-2 text-sm">
+                <p className="flex items-center gap-2">
+                  <span className="text-green-500">✓</span> Email du vendeur
+                </p>
+                <p className="flex items-center gap-2">
+                  <span className="text-green-500">✓</span> Téléphone du vendeur
+                </p>
+                <p className="flex items-center gap-2">
+                  <span className="text-green-500">✓</span> Accès permanent
+                </p>
+                <p className="flex items-center gap-2">
+                  <span className="text-green-500">✓</span> Messagerie intégrée
+                </p>
+              </div>
+
+              <Button 
+                onClick={handleUseToken} 
+                disabled={isUnlocking || tokensAvailable < 1}
+                className="w-full"
+              >
+                {isUnlocking 
+                  ? "Déblocage..." 
+                  : tokensAvailable < 1
+                    ? "Aucun token disponible"
+                    : "Utiliser mon token gratuit"}
+              </Button>
+
               <Button 
                 variant="ghost" 
-                onClick={() => setShowPaymentDialog(false)}
-                disabled={isPurchasing}
+                onClick={() => setShowTokenDialog(false)}
+                disabled={isUnlocking}
+                className="w-full"
               >
                 Annuler
               </Button>

@@ -56,8 +56,7 @@ export const SellerChatSection = ({ businessId, sellerId }: SellerChatSectionPro
         .from('contact_access')
         .select(`
           user_id,
-          created_at,
-          access_type
+          created_at
         `)
         .eq('business_id', businessId);
 
@@ -89,7 +88,7 @@ export const SellerChatSection = ({ businessId, sellerId }: SellerChatSectionPro
             user_email: profile?.email || 'Email non disponible',
             user_name: profile?.full_name,
             purchased_at: record.created_at,
-            access_type: record.access_type,
+            access_type: 'token',
             unread_count: count || 0
           };
         })
@@ -169,7 +168,7 @@ export const SellerChatSection = ({ businessId, sellerId }: SellerChatSectionPro
                       {buyer.user_name || buyer.user_email}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      {buyer.access_type === 'one_time' ? 'Accès unique' : 'Abonnement'}
+                      Accès débloqué
                     </p>
                     <p className="text-xs text-muted-foreground">
                       {new Date(buyer.purchased_at).toLocaleDateString('fr-CA')}
