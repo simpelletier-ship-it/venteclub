@@ -75,9 +75,15 @@ export const PremiumSubscription = ({ userId }: PremiumSubscriptionProps) => {
       if (error) throw error;
       
       if (data?.url) {
-        window.location.href = data.url;
+        // Ouvrir Stripe dans un nouvel onglet pour éviter de recharger la page
+        window.open(data.url, '_blank');
+        toast({
+          title: "Redirection vers le paiement",
+          description: "Une nouvelle fenêtre s'est ouverte pour finaliser votre paiement.",
+        });
       }
     } catch (error: any) {
+      console.error('Erreur lors de la création de la session de paiement:', error);
       toast({
         variant: "destructive",
         title: "Erreur",
@@ -96,9 +102,15 @@ export const PremiumSubscription = ({ userId }: PremiumSubscriptionProps) => {
       if (error) throw error;
       
       if (data?.url) {
-        window.location.href = data.url;
+        // Ouvrir le portail Stripe dans un nouvel onglet
+        window.open(data.url, '_blank');
+        toast({
+          title: "Portail de gestion ouvert",
+          description: "Une nouvelle fenêtre s'est ouverte pour gérer votre abonnement.",
+        });
       }
     } catch (error: any) {
+      console.error('Erreur lors de l\'ouverture du portail:', error);
       toast({
         variant: "destructive",
         title: "Erreur",

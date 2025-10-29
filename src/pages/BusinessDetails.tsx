@@ -225,12 +225,16 @@ const BusinessDetails = () => {
     
     setIsUnlocking(true);
     try {
+      console.log('[UNLOCK] Attempting to unlock business access');
+      
       // La vérification premium est maintenant faite côté serveur pour la sécurité
       const { data, error } = await supabase.rpc('use_token_for_access', {
         business_uuid: id
       });
 
       if (error) {
+        console.error('[UNLOCK] Error from RPC:', error);
+        
         // Extraire le nombre de secondes de l'erreur
         const match = error.message.match(/attendre (\d+) secondes/);
         if (match) {
@@ -244,6 +248,7 @@ const BusinessDetails = () => {
         return;
       }
 
+      console.log('[UNLOCK] RPC result:', data);
       const result = data as any;
       
       if (result?.success) {
@@ -262,7 +267,7 @@ const BusinessDetails = () => {
         }, 500);
       }
     } catch (error: any) {
-      console.error('Unlock error:', error);
+      console.error('[UNLOCK] Unexpected error:', error);
       toast({
         variant: "destructive",
         title: "Erreur",

@@ -49,10 +49,12 @@ serve(async (req) => {
     console.log("[CHECK-PREMIUM] Found customer ID:", customerId);
     
     // Chercher d'abord les abonnements actifs, puis incomplete si aucun actif trouvé
+    // IMPORTANT: Utiliser expand pour forcer Stripe à inclure tous les champs nécessaires
     let subscriptions = await stripe.subscriptions.list({
       customer: customerId,
       status: "active",
       limit: 1,
+      expand: ['data.items.data.price']
     });
     console.log("[CHECK-PREMIUM] Active subscriptions count:", subscriptions.data.length);
     
@@ -63,6 +65,7 @@ serve(async (req) => {
         customer: customerId,
         status: "incomplete",
         limit: 1,
+        expand: ['data.items.data.price']
       });
       console.log("[CHECK-PREMIUM] Incomplete subscriptions count:", subscriptions.data.length);
     }
@@ -71,21 +74,38 @@ serve(async (req) => {
     let subscriptionEnd = null;
 
     if (hasActiveSub) {
-      const subscription = subscriptions.data[0];
-      console.log("[CHECK-PREMIUM] Subscription details:", {
+      let subscription = subscriptions.data[0];
+      console.log("[CHECK-PREMIUM] Initial subscription details:", {
         id: subscription.id,
         status: subscription.status,
         current_period_end: subscription.current_period_end
       });
 
-      // Vérifier que current_period_end est valide avant de l'utiliser
+      // Si current_period_end est manquant, récupérer l'abonnement complet
       if (!subscription.current_period_end || typeof subscription.current_period_end !== 'number') {
-        console.error("[CHECK-PREMIUM] Invalid current_period_end:", subscription.current_period_end);
-        throw new Error("Invalid subscription period end date");
+        console.log("[CHECK-PREMIUM] current_period_end missing, retrieving full subscription...");
+        subscription = await stripe.subscriptions.retrieve(subscription.id, {
+          expand: ['items.data.price']
+        });
+        console.log("[CHECK-PREMIUM] Retrieved subscription details:", {
+          id: subscription.id,
+          status: subscription.status,
+          current_period_end: subscription.current_period_end
+        });
       }
 
-      subscriptionEnd = new Date(subscription.current_period_end * 1000).toISOString();
-      console.log("[CHECK-PREMIUM] Subscription end date:", subscriptionEnd);
+      // Vérifier à nouveau après le retrieve
+      if (!subscription.current_period_end || typeof subscription.current_period_end !== 'number') {
+        console.error("[CHECK-PREMIUM] current_period_end still invalid:", subscription.current_period_end);
+        // Utiliser une valeur par défaut de 30 jours pour ne pas bloquer
+        const defaultEnd = new Date();
+        defaultEnd.setDate(defaultEnd.getDate() + 30);
+        subscriptionEnd = defaultEnd.toISOString();
+        console.warn("[CHECK-PREMIUM] Using default 30-day period as fallback:", subscriptionEnd);
+      } else {
+        subscriptionEnd = new Date(subscription.current_period_end * 1000).toISOString();
+        console.log("[CHECK-PREMIUM] Subscription end date:", subscriptionEnd);
+      }
 
       // Synchroniser l'abonnement dans la base de données Supabase
       console.log("[CHECK-PREMIUM] Syncing to database...");

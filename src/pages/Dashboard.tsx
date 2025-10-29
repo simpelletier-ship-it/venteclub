@@ -128,10 +128,16 @@ const Dashboard = () => {
       if (error) throw error;
 
       if (data?.url) {
-        window.location.href = data.url;
+        // Ouvrir Stripe dans un nouvel onglet pour éviter de recharger la page
+        window.open(data.url, '_blank');
         setFeaturedDialogOpen(false);
+        toast({
+          title: "Redirection vers le paiement",
+          description: "Une nouvelle fenêtre s'est ouverte pour finaliser votre paiement. La page se mettra à jour automatiquement après le paiement.",
+        });
       }
     } catch (error: any) {
+      console.error('Erreur lors de la création de la session de paiement featured:', error);
       toast({
         variant: "destructive",
         title: "Erreur",
