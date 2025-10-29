@@ -92,6 +92,16 @@ export const NotificationBell = ({ userId }: NotificationBellProps) => {
     fetchNotifications();
   };
 
+  const markAllAsRead = async () => {
+    await supabase
+      .from('notifications')
+      .update({ read: true })
+      .eq('user_id', userId)
+      .eq('read', false);
+    
+    fetchNotifications();
+  };
+
   const deleteNotification = async (notificationId: string, e: React.MouseEvent) => {
     e.stopPropagation();
     await supabase
@@ -138,15 +148,26 @@ export const NotificationBell = ({ userId }: NotificationBellProps) => {
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <h3 className="font-semibold text-lg">Notifications</h3>
-            {unreadMessagesCount > 0 && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => navigate('/messages')}
-              >
-                {unreadMessagesCount} message{unreadMessagesCount > 1 ? 's' : ''} non lu{unreadMessagesCount > 1 ? 's' : ''}
-              </Button>
-            )}
+            <div className="flex gap-2">
+              {unreadCount > 0 && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={markAllAsRead}
+                >
+                  Tout marquer comme lu
+                </Button>
+              )}
+              {unreadMessagesCount > 0 && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigate('/messages')}
+                >
+                  {unreadMessagesCount} message{unreadMessagesCount > 1 ? 's' : ''} non lu{unreadMessagesCount > 1 ? 's' : ''}
+                </Button>
+              )}
+            </div>
           </div>
           <ScrollArea className="h-96 w-full overflow-x-auto">
             {notifications.length === 0 ? (
