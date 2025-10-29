@@ -22,12 +22,11 @@ const BusinessDetails = () => {
   const [business, setBusiness] = useState<any>(null);
   const [hasAccess, setHasAccess] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [showTokenDialog, setShowTokenDialog] = useState(false);
+  const [showUnlockDialog, setShowUnlockDialog] = useState(false);
   const [sellerContact, setSellerContact] = useState<any>(null);
   const [isUnlocking, setIsUnlocking] = useState(false);
   const [photos, setPhotos] = useState<any[]>([]);
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(null);
-  const [tokensAvailable, setTokensAvailable] = useState<number>(0);
 
   useEffect(() => {
     const initialize = async () => {
@@ -41,7 +40,6 @@ const BusinessDetails = () => {
       if (session?.user) {
         console.log('[INIT] Checking access for user');
         await checkAccess(session.user.id);
-        await fetchTokens(session.user.id);
       } else {
         console.log('[INIT] No user session');
         setLoading(false);
@@ -145,29 +143,8 @@ const BusinessDetails = () => {
     }
   };
 
-  const fetchTokens = async (userId: string) => {
-    try {
-      // Refresh tokens first
-      await supabase.rpc('refresh_daily_tokens');
-      
-      const { data, error } = await supabase
-        .from('user_tokens')
-        .select('tokens_available')
-        .eq('user_id', userId)
-        .maybeSingle();
-      
-      if (error) {
-        console.error('Error fetching tokens:', error);
-        return;
-      }
-      
-      setTokensAvailable(data?.tokens_available || 1);
-    } catch (error) {
-      console.error('Error in fetchTokens:', error);
-    }
-  };
 
-  const handleUnlockAccess = () => {
+  const handleUnlockRequest = () => {
     if (!user) {
       toast({
         title: "Connexion requise",
@@ -176,10 +153,10 @@ const BusinessDetails = () => {
       navigate("/auth");
       return;
     }
-    setShowTokenDialog(true);
+    setShowUnlockDialog(true);
   };
 
-  const handleUseToken = async () => {
+  const handleConfirmUnlock = async () => {
     if (!id || !user) return;
     
     setIsUnlocking(true);
@@ -195,12 +172,11 @@ const BusinessDetails = () => {
       if (result?.success) {
         setHasAccess(true);
         setSellerContact(result.seller_contact);
-        setTokensAvailable(prev => prev - 1);
-        setShowTokenDialog(false);
+        setShowUnlockDialog(false);
         
         toast({
-          title: "Accès débloqué !",
-          description: "Vous pouvez maintenant voir les coordonnées du vendeur.",
+          title: "Accès déverrouillé !",
+          description: "Vous pouvez maintenant voir les coordonnées du vendeur et lui envoyer des messages.",
         });
         
         setTimeout(() => {
@@ -209,11 +185,11 @@ const BusinessDetails = () => {
         }, 500);
       }
     } catch (error: any) {
-      console.error('Token error:', error);
+      console.error('Unlock error:', error);
       toast({
         variant: "destructive",
         title: "Erreur",
-        description: error.message || "Impossible d'utiliser le token.",
+        description: error.message || "Impossible de déverrouiller l'accès.",
       });
     } finally {
       setIsUnlocking(false);
@@ -503,10 +479,10 @@ const BusinessDetails = () => {
                         Coordonnées du vendeur verrouillées
                       </h3>
                       <p className="text-muted-foreground mb-4">
-                        Payez 5$ CAD pour accéder aux informations de contact du vendeur (email et téléphone)
+                        Déverrouillez gratuitement les informations de contact du vendeur (email et téléphone)
                       </p>
-                      <Button size="lg" onClick={handleUnlockAccess}>
-                        Débloquer pour 5$ CAD
+                      <Button size="lg" onClick={handleUnlockRequest}>
+                        Déverrouiller les informations gratuitement
                       </Button>
                     </div>
                   )}
@@ -545,64 +521,50 @@ const BusinessDetails = () => {
         </div>
       </div>
 
-      <Dialog open={showTokenDialog} onOpenChange={setShowTokenDialog}>
+      <Dialog open={showUnlockDialog} onOpenChange={setShowUnlockDialog}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Débloquer les coordonnées du vendeur</DialogTitle>
-            <DialogDescription>
-              Utilisez votre token quotidien gratuit pour accéder aux coordonnées
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-6 py-4">
-            <div className="bg-accent/10 border border-accent/20 rounded-lg p-6 text-center">
-              <div className="text-5xl font-bold text-primary mb-2">{tokensAvailable}</div>
-              <p className="text-sm text-muted-foreground">
-                Token{tokensAvailable > 1 ? 's' : ''} disponible{tokensAvailable > 1 ? 's' : ''}
-              </p>
-              <p className="text-xs text-muted-foreground mt-2">
-                {tokensAvailable > 0 
-                  ? "Vous recevez 1 token gratuit par jour"
-                  : "Votre prochain token sera disponible demain"}
-              </p>
-            </div>
-
-            <div className="space-y-4">
-              <div className="space-y-2 text-sm">
-                <p className="flex items-center gap-2">
-                  <span className="text-green-500">✓</span> Email du vendeur
+            <DialogTitle>Déverrouiller les informations du vendeur</DialogTitle>
+            <DialogDescription className="space-y-3 pt-4">
+              <div className="bg-amber-50 dark:bg-amber-950/30 border-2 border-amber-200 dark:border-amber-800 rounded-lg p-4">
+                <p className="font-semibold text-amber-900 dark:text-amber-100 flex items-center gap-2">
+                  <span className="text-2xl">⚠️</span>
+                  Attention : Limite de 1 vendeur par semaine
                 </p>
-                <p className="flex items-center gap-2">
-                  <span className="text-green-500">✓</span> Téléphone du vendeur
-                </p>
-                <p className="flex items-center gap-2">
-                  <span className="text-green-500">✓</span> Accès permanent
-                </p>
-                <p className="flex items-center gap-2">
-                  <span className="text-green-500">✓</span> Messagerie intégrée
+                <p className="text-sm text-amber-800 dark:text-amber-200 mt-2">
+                  Vous avez droit aux informations de <strong>1 vendeur par période de 7 jours</strong>.
                 </p>
               </div>
-
-              <Button 
-                onClick={handleUseToken} 
-                disabled={isUnlocking || tokensAvailable < 1}
-                className="w-full"
-              >
-                {isUnlocking 
-                  ? "Déblocage..." 
-                  : tokensAvailable < 1
-                    ? "Aucun token disponible"
-                    : "Utiliser mon token gratuit"}
-              </Button>
-
-              <Button 
-                variant="ghost" 
-                onClick={() => setShowTokenDialog(false)}
-                disabled={isUnlocking}
-                className="w-full"
-              >
-                Annuler
-              </Button>
-            </div>
+              
+              <div className="space-y-2 text-sm text-foreground">
+                <p>
+                  Si vous déverrouillez cet accès maintenant, <strong>vous ne pourrez pas accéder aux informations d'autres vendeurs pendant une semaine</strong>.
+                </p>
+                <p>
+                  Une fois déverrouillé, vous pourrez :
+                </p>
+                <ul className="list-disc list-inside space-y-1 ml-2">
+                  <li>Voir les coordonnées complètes du vendeur</li>
+                  <li>Communiquer avec lui par messagerie intégrée</li>
+                  <li>Garder cet accès de façon permanente</li>
+                </ul>
+              </div>
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex gap-2 justify-end pt-4">
+            <Button 
+              variant="outline" 
+              onClick={() => setShowUnlockDialog(false)}
+              disabled={isUnlocking}
+            >
+              Annuler
+            </Button>
+            <Button 
+              onClick={handleConfirmUnlock}
+              disabled={isUnlocking}
+            >
+              {isUnlocking ? 'Déverrouillage...' : 'Confirmer et déverrouiller'}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

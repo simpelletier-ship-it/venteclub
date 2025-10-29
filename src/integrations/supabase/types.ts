@@ -755,7 +755,6 @@ export type Database = {
         Args: { business_uuid: string }
         Returns: boolean
       }
-      refresh_daily_tokens: { Args: never; Returns: undefined }
       use_token_for_access: { Args: { business_uuid: string }; Returns: Json }
     }
     Enums: {
