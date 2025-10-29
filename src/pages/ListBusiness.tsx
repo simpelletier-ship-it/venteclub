@@ -108,6 +108,7 @@ const ListBusiness = () => {
     sale_reason: "",
     financing_options: "",
     support_offered: "",
+    sale_type: "" as "assets" | "shares" | "both" | "",
     website: "",
     facebook: "",
     instagram: "",
@@ -195,6 +196,7 @@ const ListBusiness = () => {
         sale_reason: "",
         financing_options: "",
         support_offered: "",
+        sale_type: business.sale_type || "",
         website: "",
         facebook: "",
         instagram: "",
@@ -466,6 +468,7 @@ const ListBusiness = () => {
               year_established: validatedData.year_established,
               latitude: formData.latitude,
               longitude: formData.longitude,
+              sale_type: formData.sale_type || null,
               status: isDraft ? "archived" : "active",
               approval_status: isDraft ? "pending" : "pending",
             } as any)
@@ -536,6 +539,7 @@ const ListBusiness = () => {
           year_established: validatedData.year_established,
           latitude: formData.latitude,
           longitude: formData.longitude,
+          sale_type: formData.sale_type || null,
           status: isDraft ? "archived" : "active",
         } as any)
         .select()
@@ -1109,6 +1113,26 @@ const ListBusiness = () => {
                       </div>
 
                       <div>
+                        <Label htmlFor="sale_type">Type de vente</Label>
+                        <Select
+                          value={formData.sale_type}
+                          onValueChange={(value) => setFormData({ ...formData, sale_type: value as "assets" | "shares" | "both" })}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Sélectionner le type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="assets">Vente d'actifs</SelectItem>
+                            <SelectItem value="shares">Vente d'actions</SelectItem>
+                            <SelectItem value="both">Ouvert aux deux</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Précisez si vous vendez les actifs, les actions ou les deux
+                        </p>
+                      </div>
+
+                      <div>
                         <Label htmlFor="annual_revenue">Revenus annuels</Label>
                         <Input
                           id="annual_revenue"
@@ -1118,7 +1142,9 @@ const ListBusiness = () => {
                           placeholder="Ex: 250 000"
                         />
                       </div>
+                    </div>
 
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div>
                         <Label htmlFor="baiia">BAIIA</Label>
                         <Input

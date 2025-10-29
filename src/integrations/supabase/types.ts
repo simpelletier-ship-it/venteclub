@@ -280,6 +280,7 @@ export type Database = {
           region: string | null
           rejection_reason: string | null
           royalty_percentage: number | null
+          sale_type: Database["public"]["Enums"]["sale_type"] | null
           seller_id: string
           seller_name: string | null
           seller_phone: string | null
@@ -329,6 +330,7 @@ export type Database = {
           region?: string | null
           rejection_reason?: string | null
           royalty_percentage?: number | null
+          sale_type?: Database["public"]["Enums"]["sale_type"] | null
           seller_id: string
           seller_name?: string | null
           seller_phone?: string | null
@@ -378,6 +380,7 @@ export type Database = {
           region?: string | null
           rejection_reason?: string | null
           royalty_percentage?: number | null
+          sale_type?: Database["public"]["Enums"]["sale_type"] | null
           seller_id?: string
           seller_name?: string | null
           seller_phone?: string | null
@@ -1069,6 +1072,7 @@ export type Database = {
         | "residence_sante"
         | "residentiel"
         | "restaurant"
+      sale_type: "assets" | "shares" | "both"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1227,6 +1231,7 @@ export const Constants = {
         "residentiel",
         "restaurant",
       ],
+      sale_type: ["assets", "shares", "both"],
     },
   },
 } as const

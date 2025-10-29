@@ -430,6 +430,15 @@ const BusinessDetails = () => {
                       {business.asking_price.toLocaleString()} CAD
                     </div>
                     <div className="text-sm text-muted-foreground">Prix demandé</div>
+                    {business.sale_type && (
+                      <div className="mt-2">
+                        <Badge variant="outline" className="text-xs">
+                          {business.sale_type === 'assets' && '💼 Vente d\'actifs'}
+                          {business.sale_type === 'shares' && '📊 Vente d\'actions'}
+                          {business.sale_type === 'both' && '💼📊 Ouvert aux deux'}
+                        </Badge>
+                      </div>
+                    )}
                   </div>
                 </div>
 
