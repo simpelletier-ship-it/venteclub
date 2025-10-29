@@ -258,7 +258,7 @@ const ListBusiness = () => {
         location: formData.location,
         annual_revenue: formData.annual_revenue ? parseFloat(formData.annual_revenue) : null,
         asking_price: parseFloat(formData.asking_price),
-        profit_margin: formData.profit_margin ? parseFloat(formData.profit_margin) : null,
+        profit_margin: formData.profit_margin && !isNaN(parseFloat(formData.profit_margin)) ? parseFloat(formData.profit_margin) : null,
         employees_count: formData.employees_count ? parseInt(formData.employees_count) : null,
         year_established: formData.year_established ? parseInt(formData.year_established) : null,
       });
@@ -997,7 +997,7 @@ const ListBusiness = () => {
             {/* Sidebar - 1/3 width */}
             <div className="space-y-6">
               {/* Score de visibilité */}
-              <div className="bg-card p-6 rounded-2xl shadow-elegant border border-border/50 sticky top-6 transition-all duration-300">
+              <div className="bg-card p-6 rounded-2xl shadow-elegant border border-border/50 sticky top-24 transition-all duration-300">
                 <div className="mb-4">
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="text-lg font-semibold">Score de visibilité</h3>

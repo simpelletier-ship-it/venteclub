@@ -52,8 +52,8 @@ export const businessSchema = z.object({
     .optional()
     .nullable(),
   profit_margin: z.number()
-    .min(0, 'La marge bénéficiaire ne peut pas être négative')
-    .max(100, 'La marge bénéficiaire ne peut pas dépasser 100%')
+    .positive('La marge bénéficiaire doit être positive')
+    .max(999999999, 'La marge bénéficiaire ne peut pas dépasser 999 999 999')
     .optional()
     .nullable(),
   employees_count: z.number()
