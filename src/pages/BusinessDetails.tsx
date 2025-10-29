@@ -737,7 +737,7 @@ const BusinessDetails = () => {
                 <div className="text-center mb-4">
                   <h3 className="text-lg font-bold mb-2">Abonnement mensuel</h3>
                   <div className="text-3xl font-bold text-accent mb-2">9,99 $ / mois</div>
-                  <p className="text-sm text-muted-foreground">Accès illimité à toutes les annonces</p>
+                  <p className="text-sm text-muted-foreground">Accès aux coordonnées de tous les vendeurs en tout temps</p>
                 </div>
                 <div className="space-y-2 text-sm mb-6">
                   <p className="flex items-center gap-2">
