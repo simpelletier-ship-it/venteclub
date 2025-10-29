@@ -310,7 +310,19 @@ const ListBusiness = () => {
         .select()
         .single();
 
-      if (businessError) throw businessError;
+      console.log("[CREATE BUSINESS] Insert result:", { businessData, businessError });
+
+      if (businessError) {
+        console.error("[CREATE BUSINESS] Insert error:", businessError);
+        throw businessError;
+      }
+      
+      if (!businessData) {
+        console.error("[CREATE BUSINESS] No data returned from insert");
+        throw new Error("L'annonce n'a pas pu être créée. Veuillez réessayer.");
+      }
+
+      console.log("[CREATE BUSINESS] Business created successfully:", businessData.id);
 
       // Upload photos
       if (photos.length > 0 && businessData) {
@@ -365,6 +377,8 @@ const ListBusiness = () => {
       });
       navigate("/dashboard");
     } catch (error: any) {
+      console.error("[CREATE BUSINESS] Error:", error);
+      
       if (error.errors) {
         error.errors.forEach((err: any) => {
           toast({
@@ -377,7 +391,7 @@ const ListBusiness = () => {
         toast({
           variant: "destructive",
           title: "Erreur",
-          description: error.message,
+          description: error.message || "Une erreur est survenue lors de la création de l'annonce.",
         });
       }
     } finally {
