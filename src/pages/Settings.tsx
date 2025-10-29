@@ -30,7 +30,6 @@ const Settings = () => {
     postal_code: "",
     country: "Canada",
     bio: "",
-    website: "",
     is_public: false,
     newsletter_enabled: false,
     marketing_emails: false,
@@ -73,7 +72,6 @@ const Settings = () => {
           postal_code: profileData.postal_code || "",
           country: profileData.country || "Canada",
           bio: profileData.bio || "",
-          website: profileData.website || "",
           is_public: profileData.is_public || false,
           newsletter_enabled: profileData.newsletter_enabled || false,
           marketing_emails: profileData.marketing_emails || false,
@@ -106,7 +104,6 @@ const Settings = () => {
           postal_code: profile.postal_code,
           country: profile.country,
           bio: profile.bio,
-          website: profile.website,
           is_public: profile.is_public,
           newsletter_enabled: profile.newsletter_enabled,
           marketing_emails: profile.marketing_emails,
@@ -305,18 +302,6 @@ const Settings = () => {
                         className="bg-muted mt-2"
                       />
                     </div>
-                  </div>
-
-                  <div>
-                    <Label htmlFor="website">Site web</Label>
-                    <Input
-                      id="website"
-                      type="url"
-                      value={profile.website}
-                      onChange={(e) => setProfile({ ...profile, website: e.target.value })}
-                      placeholder="https://www.example.com"
-                      className="mt-2"
-                    />
                   </div>
                 </CardContent>
               </Card>
