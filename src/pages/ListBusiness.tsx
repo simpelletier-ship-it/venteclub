@@ -118,28 +118,41 @@ const ListBusiness = () => {
       formData.year_established,
       formData.competitive_advantages,
       formData.target_clientele,
-      photos.length > 0,
       formData.website,
     ];
     
-    const filledFields = fields.filter(field => field && field !== "").length;
-    const totalFields = fields.length;
+    // Count filled fields (excluding empty strings)
+    const filledFields = fields.filter(field => field && String(field).trim() !== "").length;
+    // Add photos count (1 if at least one photo)
+    const totalFilledFields = filledFields + (photos.length > 0 ? 1 : 0);
+    const totalFields = fields.length + 1; // +1 for photos
     
     // Return 0 if nothing is filled
-    if (filledFields === 0) return 0;
+    if (totalFilledFields === 0) return 0;
     
-    return Math.round((filledFields / totalFields) * 100);
+    return Math.round((totalFilledFields / totalFields) * 100);
   }, [formData, photos]);
 
   // Next steps suggestions
   const nextSteps = useMemo(() => {
     const steps = [];
-    if (!formData.title) steps.push({ icon: FileText, text: "Ajouter un titre percutant", action: "title" });
-    if (!formData.description || formData.description.length < 100) 
+    if (!formData.title || formData.title.trim() === "") {
+      steps.push({ icon: FileText, text: "Ajouter un titre percutant", action: "title" });
+    }
+    if (!formData.description || formData.description.trim() === "" || formData.description.length < 100) {
       steps.push({ icon: FileText, text: "Rédiger une description détaillée", action: "description" });
-    if (!formData.asking_price) steps.push({ icon: DollarSign, text: "Indiquer le prix de vente", action: "price" });
+    }
+    if (!formData.asking_price || formData.asking_price.trim() === "") {
+      steps.push({ icon: DollarSign, text: "Indiquer le prix de vente", action: "asking_price" });
+    }
+    if (!formData.industry || formData.industry.trim() === "") {
+      steps.push({ icon: TrendingUp, text: "Sélectionner une catégorie", action: "industry" });
+    }
+    if (photos.length === 0) {
+      steps.push({ icon: Upload, text: "Ajouter au moins une photo", action: "main-photo" });
+    }
     return steps;
-  }, [formData]);
+  }, [formData, photos]);
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
