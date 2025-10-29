@@ -139,25 +139,6 @@ export const NotificationBell = ({ userId }: NotificationBellProps) => {
                     }
                   };
 
-                  const getIcon = (type: string) => {
-                    switch (type) {
-                      case 'approved':
-                        return <span className="text-2xl">✅</span>;
-                      case 'new_listing':
-                        return <span className="text-2xl">🆕</span>;
-                      case 'price_drop':
-                        return <span className="text-2xl">💰</span>;
-                      case 'sold':
-                        return <span className="text-2xl">🎉</span>;
-                      case 'contact_purchased':
-                        return <span className="text-2xl">📧</span>;
-                      case 'high_views':
-                        return <span className="text-2xl">👀</span>;
-                      default:
-                        return <span className="text-2xl">📬</span>;
-                    }
-                  };
-
                   // Extract business name from message (text between quotes)
                   const businessNameMatch = notification.message.match(/"([^"]+)"/);
                   const businessName = businessNameMatch ? businessNameMatch[1] : null;
@@ -179,21 +160,17 @@ export const NotificationBell = ({ userId }: NotificationBellProps) => {
                           ? "opacity-70 hover:opacity-100" 
                           : "shadow-md hover:shadow-lg"
                       }`}
-                    >
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-destructive/10"
-                        onClick={(e) => deleteNotification(notification.id, e)}
                       >
-                        <X className="h-4 w-4 text-destructive" />
-                      </Button>
-                      
-                      <div className="flex items-start gap-3">
-                        <div className="flex-shrink-0 mt-0.5">
-                          {getIcon(notification.type)}
-                        </div>
-                        <div className="flex-1 pr-8">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-destructive/10"
+                          onClick={(e) => deleteNotification(notification.id, e)}
+                        >
+                          <X className="h-4 w-4 text-destructive" />
+                        </Button>
+                        
+                        <div className="pr-8">
                           <p className="text-sm leading-relaxed text-foreground">
                             {businessName ? (
                               messageParts.split('|||BUSINESS|||').map((part, index) => (
@@ -210,8 +187,7 @@ export const NotificationBell = ({ userId }: NotificationBellProps) => {
                               notification.message
                             )}
                           </p>
-                          <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
-                            <span className="text-base">📅</span>
+                          <p className="text-xs text-muted-foreground mt-2">
                             {new Date(notification.created_at).toLocaleDateString('fr-CA', {
                               day: 'numeric',
                               month: 'short',
@@ -221,9 +197,8 @@ export const NotificationBell = ({ userId }: NotificationBellProps) => {
                           </p>
                         </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
               </div>
             )}
           </ScrollArea>
