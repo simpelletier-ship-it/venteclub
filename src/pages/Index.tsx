@@ -6,6 +6,7 @@ import FilterBar from "@/components/FilterBar";
 import { ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import heroImage from "@/assets/hero-business.jpg";
+import { NotificationBell } from "@/components/NotificationBell";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -187,16 +188,23 @@ const Index = () => {
           <div className="flex items-center gap-3">
             {user ? (
               <>
+                <NotificationBell userId={user?.id} />
                 {isAdmin && (
                   <Button variant="secondary" onClick={() => navigate("/admin")}>
                     Admin
                   </Button>
                 )}
                 <Button variant="ghost" onClick={() => navigate("/dashboard")}>
-                  Mes annonces
+                  Dashboard
                 </Button>
                 <Button className="bg-accent hover:bg-accent/90 text-accent-foreground" onClick={() => navigate("/list-business")}>
                   Vendre une entreprise
+                </Button>
+                <Button variant="outline" onClick={async () => {
+                  await supabase.auth.signOut();
+                  navigate("/");
+                }}>
+                  Déconnexion
                 </Button>
               </>
             ) : (

@@ -3,6 +3,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { TrendingUp, MapPin, DollarSign, Star } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { FavoriteButton } from "./FavoriteButton";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface BusinessCardProps {
   id?: string;
@@ -34,6 +37,13 @@ const BusinessCard = ({
   featured = false,
 }: BusinessCardProps) => {
   const navigate = useNavigate();
+  const [userId, setUserId] = useState<string | undefined>();
+  
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUserId(session?.user?.id);
+    });
+  }, []);
   
   const displayRevenue = revenue || (annual_revenue ? `${annual_revenue.toLocaleString()} CAD` : 'N/A');
   const displayPrice = price || (asking_price ? asking_price.toLocaleString() : 'N/A');
@@ -63,6 +73,7 @@ const BusinessCard = ({
           <Badge variant="secondary">
             {industry}
           </Badge>
+          {id && <FavoriteButton businessId={id} userId={userId} />}
         </div>
         <CardTitle className="text-xl font-bold text-foreground group-hover:text-accent transition-colors">
           {title}
