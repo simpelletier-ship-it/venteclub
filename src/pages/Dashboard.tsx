@@ -285,8 +285,8 @@ const Dashboard = () => {
       </div>
 
       <Dialog open={featuredDialogOpen} onOpenChange={setFeaturedDialogOpen}>
-        <DialogContent className="max-w-4xl">
-          <DialogHeader className="space-y-3 pb-4 border-b">
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader className="space-y-2 pb-3 border-b">
             <DialogTitle className="text-2xl font-bold flex items-center gap-2">
               <Star className="h-6 w-6 fill-primary text-primary" />
               Mettre votre annonce en avant
@@ -296,20 +296,20 @@ const Dashboard = () => {
             </DialogDescription>
           </DialogHeader>
           
-          <div className="space-y-6 py-6">
-            <div className="bg-gradient-to-br from-primary/5 to-primary/10 p-6 rounded-xl border border-primary/20">
+          <div className="space-y-4 py-4">
+            <div className="bg-gradient-to-br from-primary/5 to-primary/10 p-4 rounded-xl border border-primary/20">
               <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                  <Star className="h-6 w-6 text-primary" />
+                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <Star className="h-5 w-5 text-primary" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-bold text-lg mb-1">{selectedBusiness?.title}</h3>
+                  <h3 className="font-bold text-base mb-1">{selectedBusiness?.title}</h3>
                   <p className="text-sm text-muted-foreground">Cette annonce sera mise en avant</p>
                 </div>
               </div>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {/* Bronze Package */}
               <Card 
                 className={`cursor-pointer transition-all hover:shadow-lg relative overflow-hidden ${
@@ -318,25 +318,25 @@ const Dashboard = () => {
                 onClick={() => setSelectedDuration(7)}
               >
                 <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-amber-600/20 to-transparent rounded-bl-full" />
-                <CardContent className="p-6 relative">
-                  <Badge className="mb-4 bg-amber-600/20 text-amber-700 border-amber-600/30 font-semibold">
+                <CardContent className="p-5 relative">
+                  <Badge className="mb-3 bg-amber-600/20 text-amber-700 border-amber-600/30 font-semibold text-xs">
                     BRONZE
                   </Badge>
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     <div className="flex items-center justify-center">
-                      <Star className="h-12 w-12 fill-amber-600 text-amber-600" />
+                      <Star className="h-10 w-10 fill-amber-600 text-amber-600" />
                     </div>
                     <div className="text-center space-y-1">
-                      <h4 className="font-bold text-3xl text-foreground">75$</h4>
-                      <p className="text-sm font-medium text-muted-foreground">7 jours de mise en avant</p>
-                      <p className="text-xs text-muted-foreground">10,71$ / jour</p>
+                      <h4 className="font-bold text-2xl text-foreground">75 $</h4>
+                      <p className="text-sm font-medium text-muted-foreground"><span className="font-bold">7 jours</span> de mise en avant</p>
+                      <p className="text-xs text-muted-foreground">10,71 $ / jour</p>
                     </div>
-                    <div className="pt-4 border-t space-y-2">
-                      <div className="flex items-center gap-2 text-sm">
+                    <div className="pt-3 border-t space-y-1.5">
+                      <div className="flex items-center gap-2 text-xs">
                         <div className="w-1.5 h-1.5 rounded-full bg-primary" />
                         <span>Visibilité prioritaire</span>
                       </div>
-                      <div className="flex items-center gap-2 text-sm">
+                      <div className="flex items-center gap-2 text-xs">
                         <div className="w-1.5 h-1.5 rounded-full bg-primary" />
                         <span>Badge étoile dorée</span>
                       </div>
@@ -358,29 +358,29 @@ const Dashboard = () => {
                   </Badge>
                 </div>
                 <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-slate-400/20 to-transparent rounded-bl-full" />
-                <CardContent className="p-6 pt-10 relative">
-                  <Badge className="mb-4 bg-slate-400/20 text-slate-700 border-slate-400/30 font-semibold">
+                <CardContent className="p-5 pt-10 relative">
+                  <Badge className="mb-3 bg-slate-400/20 text-slate-700 border-slate-400/30 font-semibold text-xs">
                     PLATINE
                   </Badge>
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     <div className="flex items-center justify-center">
-                      <Star className="h-12 w-12 fill-slate-400 text-slate-400" />
+                      <Star className="h-10 w-10 fill-slate-400 text-slate-400" />
                     </div>
                     <div className="text-center space-y-1">
-                      <h4 className="font-bold text-3xl text-foreground">100$</h4>
-                      <p className="text-sm font-medium text-muted-foreground">14 jours de mise en avant</p>
-                      <p className="text-xs text-muted-foreground">7,14$ / jour</p>
+                      <h4 className="font-bold text-2xl text-foreground">100 $</h4>
+                      <p className="text-sm font-medium text-muted-foreground"><span className="font-bold">14 jours</span> de mise en avant</p>
+                      <p className="text-xs text-muted-foreground">7,14 $ / jour</p>
                     </div>
-                    <div className="pt-4 border-t space-y-2">
-                      <div className="flex items-center gap-2 text-sm">
+                    <div className="pt-3 border-t space-y-1.5">
+                      <div className="flex items-center gap-2 text-xs">
                         <div className="w-1.5 h-1.5 rounded-full bg-primary" />
                         <span>Visibilité prioritaire</span>
                       </div>
-                      <div className="flex items-center gap-2 text-sm">
+                      <div className="flex items-center gap-2 text-xs">
                         <div className="w-1.5 h-1.5 rounded-full bg-primary" />
                         <span>Badge étoile argentée</span>
                       </div>
-                      <div className="flex items-center gap-2 text-sm">
+                      <div className="flex items-center gap-2 text-xs">
                         <div className="w-1.5 h-1.5 rounded-full bg-primary" />
                         <span>Économie de 33%</span>
                       </div>
@@ -402,29 +402,29 @@ const Dashboard = () => {
                   </Badge>
                 </div>
                 <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-yellow-500/20 to-transparent rounded-bl-full" />
-                <CardContent className="p-6 pt-10 relative">
-                  <Badge className="mb-4 bg-yellow-500/20 text-yellow-700 border-yellow-500/30 font-semibold">
+                <CardContent className="p-5 pt-10 relative">
+                  <Badge className="mb-3 bg-yellow-500/20 text-yellow-700 border-yellow-500/30 font-semibold text-xs">
                     OR
                   </Badge>
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     <div className="flex items-center justify-center">
-                      <Star className="h-12 w-12 fill-yellow-500 text-yellow-500" />
+                      <Star className="h-10 w-10 fill-yellow-500 text-yellow-500" />
                     </div>
                     <div className="text-center space-y-1">
-                      <h4 className="font-bold text-3xl text-foreground">110$</h4>
-                      <p className="text-sm font-medium text-muted-foreground">30 jours de mise en avant</p>
-                      <p className="text-xs text-muted-foreground">3,67$ / jour</p>
+                      <h4 className="font-bold text-2xl text-foreground">110 $</h4>
+                      <p className="text-sm font-medium text-muted-foreground"><span className="font-bold">30 jours</span> de mise en avant</p>
+                      <p className="text-xs text-muted-foreground">3,67 $ / jour</p>
                     </div>
-                    <div className="pt-4 border-t space-y-2">
-                      <div className="flex items-center gap-2 text-sm">
+                    <div className="pt-3 border-t space-y-1.5">
+                      <div className="flex items-center gap-2 text-xs">
                         <div className="w-1.5 h-1.5 rounded-full bg-primary" />
                         <span>Visibilité prioritaire</span>
                       </div>
-                      <div className="flex items-center gap-2 text-sm">
+                      <div className="flex items-center gap-2 text-xs">
                         <div className="w-1.5 h-1.5 rounded-full bg-primary" />
                         <span>Badge étoile dorée</span>
                       </div>
-                      <div className="flex items-center gap-2 text-sm">
+                      <div className="flex items-center gap-2 text-xs">
                         <div className="w-1.5 h-1.5 rounded-full bg-primary" />
                         <span>Économie de 66%</span>
                       </div>
@@ -434,46 +434,46 @@ const Dashboard = () => {
               </Card>
             </div>
 
-            <div className="bg-gradient-to-r from-muted/50 to-muted/30 p-6 rounded-xl border">
-              <h4 className="font-semibold mb-4 flex items-center gap-2">
-                <span className="text-lg">✨</span>
+            <div className="bg-gradient-to-r from-muted/50 to-muted/30 p-4 rounded-xl border">
+              <h4 className="font-semibold mb-3 flex items-center gap-2 text-sm">
+                <span>✨</span>
                 Ce qui est inclus dans tous les forfaits
               </h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 <div className="flex items-start gap-2">
-                  <span className="text-primary mt-0.5">✓</span>
-                  <span className="text-sm">Position en tête de liste sur la page principale</span>
+                  <span className="text-primary mt-0.5 text-xs">✓</span>
+                  <span className="text-xs">Position en tête de liste sur la page principale</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <span className="text-primary mt-0.5">✓</span>
-                  <span className="text-sm">Badge étoile visible sur votre annonce</span>
+                  <span className="text-primary mt-0.5 text-xs">✓</span>
+                  <span className="text-xs">Badge étoile visible sur votre annonce</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <span className="text-primary mt-0.5">✓</span>
-                  <span className="text-sm">Durée garantie selon votre forfait</span>
+                  <span className="text-primary mt-0.5 text-xs">✓</span>
+                  <span className="text-xs">Durée garantie selon votre forfait</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <span className="text-primary mt-0.5">✓</span>
-                  <span className="text-sm">Augmentation moyenne de +300% de visibilité</span>
+                  <span className="text-primary mt-0.5 text-xs">✓</span>
+                  <span className="text-xs">Augmentation moyenne de visibilité</span>
                 </div>
               </div>
             </div>
           </div>
           
-          <div className="flex gap-3 pt-4 border-t">
+          <div className="flex gap-3 pt-3 border-t">
             <Button 
               onClick={handleFeaturePayment} 
               disabled={processingPayment}
-              className="flex-1 h-12 text-base font-semibold"
+              className="flex-1 h-11 text-sm font-semibold"
               size="lg"
             >
-              {processingPayment ? "Traitement en cours..." : `Confirmer le paiement de ${selectedDuration === 7 ? '75' : selectedDuration === 14 ? '100' : '110'}$ CAD`}
+              {processingPayment ? "Traitement en cours..." : `Confirmer le paiement de ${selectedDuration === 7 ? '75' : selectedDuration === 14 ? '100' : '110'} $ CAD`}
             </Button>
             <Button 
               variant="outline" 
               onClick={() => setFeaturedDialogOpen(false)}
               disabled={processingPayment}
-              className="h-12"
+              className="h-11"
               size="lg"
             >
               Annuler
