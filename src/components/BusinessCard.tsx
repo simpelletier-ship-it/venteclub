@@ -45,9 +45,9 @@ const BusinessCard = ({
     });
   }, []);
   
-  const displayRevenue = revenue || (annual_revenue ? `${annual_revenue.toLocaleString()} CAD` : 'N/A');
-  const displayPrice = price || (asking_price ? `${asking_price.toLocaleString()} CAD` : 'N/A');
-  const displayProfit = profit || (profit_margin ? `${profit_margin}%` : 'N/A');
+  const displayRevenue = revenue || (annual_revenue ? `${annual_revenue.toLocaleString('fr-CA')} $` : 'N/A');
+  const displayPrice = price || (asking_price ? `${asking_price.toLocaleString('fr-CA')} $` : 'N/A');
+  const displayProfit = profit || (profit_margin ? `${profit_margin} %` : 'N/A');
 
   const handleClick = () => {
     if (id) {
@@ -62,41 +62,26 @@ const BusinessCard = ({
       }`}
       onClick={handleClick}
     >
-      {/* Featured Badge */}
-      {featured && (
-        <div className="absolute top-0 left-0 right-0 z-10 flex justify-center -mt-3">
-          <div className="bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 text-white px-6 py-2 rounded-full shadow-lg flex items-center gap-2 border-2 border-amber-300">
-            <Star className="w-4 h-4 fill-white" />
-            <span className="text-xs font-bold tracking-wider uppercase">En Vedette</span>
-          </div>
-        </div>
-      )}
-
-      {/* Image Section */}
-      <div className="relative h-48 bg-gradient-to-br from-muted to-muted/50 overflow-hidden">
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-muted-foreground/20 text-6xl font-bold">
-            {title.charAt(0).toUpperCase()}
-          </div>
-        </div>
-        
-        {/* Favorite Button */}
-        {id && (
-          <div className="absolute top-3 right-3 z-20">
-            <FavoriteButton businessId={id} userId={userId} />
-          </div>
-        )}
-
-        {/* Industry Badge */}
-        <div className="absolute bottom-3 left-3">
-          <Badge variant="secondary" className="text-xs font-semibold px-3 py-1 backdrop-blur-sm bg-background/90 border border-border/50">
+      {/* Header with badges and favorite */}
+      <div className="flex items-start justify-between p-6 pb-0">
+        <div className="flex items-center gap-2">
+          {featured && (
+            <Badge className="bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 text-white border-0 shadow-md">
+              <Star className="w-3 h-3 fill-white mr-1" />
+              En Vedette
+            </Badge>
+          )}
+          <Badge variant="secondary" className="text-xs font-semibold">
             {industry}
           </Badge>
         </div>
+        {id && (
+          <FavoriteButton businessId={id} userId={userId} />
+        )}
       </div>
 
       {/* Content Section */}
-      <div className="p-6 space-y-4">
+      <div className="p-6 pt-4 space-y-4">
         {/* Title & Location */}
         <div className="space-y-2">
           <h3 className="text-xl font-bold text-foreground group-hover:text-accent transition-colors line-clamp-1">
