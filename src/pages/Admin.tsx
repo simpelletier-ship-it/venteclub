@@ -48,6 +48,7 @@ const Admin = () => {
   const [userToDelete, setUserToDelete] = useState<any>(null);
   const [deleteUserDialogOpen, setDeleteUserDialogOpen] = useState(false);
   const [reports, setReports] = useState<any[]>([]);
+  const [subscriptions, setSubscriptions] = useState<any[]>([]);
 
   useEffect(() => {
     checkAdminAccess();
@@ -82,6 +83,7 @@ const Admin = () => {
       fetchBusinesses();
       fetchUsers();
       fetchReports();
+      fetchSubscriptions();
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -472,6 +474,42 @@ const Admin = () => {
     }
   };
 
+  const fetchSubscriptions = async () => {
+    try {
+      const { data: subscriptionsData, error } = await supabase
+        .from('premium_subscriptions')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      // Fetch user email for each subscription
+      const subscriptionsWithDetails = await Promise.all(
+        (subscriptionsData || []).map(async (sub) => {
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('email, full_name')
+            .eq('id', sub.user_id)
+            .maybeSingle();
+
+          return {
+            ...sub,
+            user_email: profileData?.email,
+            user_name: profileData?.full_name
+          };
+        })
+      );
+
+      setSubscriptions(subscriptionsWithDetails);
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: error.message,
+      });
+    }
+  };
+
   const handleReportStatusUpdate = async (reportId: string, status: string) => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -624,11 +662,12 @@ const Admin = () => {
         </div>
 
         <Tabs defaultValue="businesses" className="w-full">
-          <TabsList className="grid w-full max-w-3xl grid-cols-4 mb-6">
+          <TabsList className="grid w-full max-w-4xl grid-cols-5 mb-6">
             <TabsTrigger value="businesses">Annonces</TabsTrigger>
             <TabsTrigger value="proposals">Propositions</TabsTrigger>
             <TabsTrigger value="users">Utilisateurs</TabsTrigger>
             <TabsTrigger value="reports">Signalements</TabsTrigger>
+            <TabsTrigger value="subscriptions">Abonnements</TabsTrigger>
           </TabsList>
 
           <TabsContent value="businesses">
@@ -881,6 +920,136 @@ const Admin = () => {
                   </Card>
                 ))
               )}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="subscriptions">
+            <div className="grid gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Abonnements Premium Actifs</CardTitle>
+                  <CardDescription>
+                    Gestion des abonnements Premium en cours
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {subscriptions.filter(sub => sub.status === 'active' && new Date(sub.current_period_end) > new Date()).length === 0 ? (
+                    <p className="text-center text-muted-foreground py-8">
+                      Aucun abonnement Premium actif
+                    </p>
+                  ) : (
+                    <div className="space-y-4">
+                      {subscriptions
+                        .filter(sub => sub.status === 'active' && new Date(sub.current_period_end) > new Date())
+                        .map((subscription) => {
+                          const now = new Date();
+                          const end = new Date(subscription.current_period_end);
+                          const diffMs = end.getTime() - now.getTime();
+                          const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                          const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+
+                          return (
+                            <Card key={subscription.id} className="border-2 border-primary/20">
+                              <CardContent className="pt-6">
+                                <div className="space-y-3">
+                                  <div className="flex items-center justify-between">
+                                    <div>
+                                      <p className="font-semibold text-lg">
+                                        {subscription.user_name || subscription.user_email}
+                                      </p>
+                                      <p className="text-sm text-muted-foreground">
+                                        {subscription.user_email}
+                                      </p>
+                                    </div>
+                                    <Badge className="bg-gradient-to-r from-primary to-accent text-white">
+                                      PREMIUM
+                                    </Badge>
+                                  </div>
+
+                                  <div className="grid grid-cols-2 gap-4 text-sm">
+                                    <div>
+                                      <p className="text-muted-foreground">Date de souscription</p>
+                                      <p className="font-semibold">
+                                        {new Date(subscription.created_at).toLocaleDateString('fr-CA', {
+                                          day: 'numeric',
+                                          month: 'long',
+                                          year: 'numeric'
+                                        })}
+                                      </p>
+                                    </div>
+                                    <div>
+                                      <p className="text-muted-foreground">Fin de la période</p>
+                                      <p className="font-semibold">
+                                        {end.toLocaleDateString('fr-CA', {
+                                          day: 'numeric',
+                                          month: 'long',
+                                          year: 'numeric'
+                                        })}
+                                      </p>
+                                    </div>
+                                  </div>
+
+                                  <div className="bg-accent/10 p-3 rounded-lg">
+                                    <p className="text-sm font-semibold text-primary">
+                                      ⏱️ Temps restant: {diffDays > 0 
+                                        ? `${diffDays} jour${diffDays > 1 ? 's' : ''} et ${diffHours} heure${diffHours > 1 ? 's' : ''}`
+                                        : diffHours > 0 
+                                        ? `${diffHours} heure${diffHours > 1 ? 's' : ''}`
+                                        : 'Expire bientôt'
+                                      }
+                                    </p>
+                                  </div>
+
+                                  <div className="flex gap-2 pt-2 text-xs text-muted-foreground">
+                                    <div>
+                                      <span className="font-semibold">ID Stripe:</span> {subscription.stripe_subscription_id}
+                                    </div>
+                                  </div>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          );
+                        })}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Historique des Abonnements</CardTitle>
+                  <CardDescription>
+                    Tous les abonnements (actifs, expirés et annulés)
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {subscriptions.length === 0 ? (
+                    <p className="text-center text-muted-foreground py-8">
+                      Aucun abonnement enregistré
+                    </p>
+                  ) : (
+                    <div className="space-y-3">
+                      {subscriptions.map((subscription) => {
+                        const isActive = subscription.status === 'active' && new Date(subscription.current_period_end) > new Date();
+                        
+                        return (
+                          <div key={subscription.id} className="flex items-center justify-between p-4 border rounded-lg">
+                            <div className="flex-1">
+                              <p className="font-semibold">{subscription.user_email}</p>
+                              <p className="text-sm text-muted-foreground">
+                                {new Date(subscription.created_at).toLocaleDateString('fr-CA')} → {new Date(subscription.current_period_end).toLocaleDateString('fr-CA')}
+                              </p>
+                            </div>
+                            <Badge variant={isActive ? "default" : "secondary"}>
+                              {isActive ? 'Actif' : subscription.status === 'canceled' ? 'Annulé' : 'Expiré'}
+                            </Badge>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
             </div>
           </TabsContent>
         </Tabs>
