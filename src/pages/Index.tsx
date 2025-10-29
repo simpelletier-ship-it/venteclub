@@ -134,7 +134,7 @@ const Index = () => {
             <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-accent/10 via-primary/10 to-secondary/10 border border-accent/20">
               <Sparkles className="w-5 h-5 text-accent animate-glow" />
               <span className="text-foreground text-sm font-semibold tracking-wide">
-                La plateforme #1 d'acquisition et de vente d'entreprise au Québec
+                La plateforme d'acquisition et de vente d'entreprise au Québec
               </span>
             </div>
             
