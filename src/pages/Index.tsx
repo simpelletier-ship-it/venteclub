@@ -25,62 +25,12 @@ const Index = () => {
   useEffect(() => {
     // Check for premium payment success/cancel
     if (searchParams.get('premium_success') === 'true') {
-      console.log('[PREMIUM-SUCCESS] Payment successful, starting polling...');
+      console.log('[PREMIUM-SUCCESS] Payment successful');
       toast({
         title: "Paiement réussi!",
-        description: "Vérification de votre abonnement en cours...",
+        description: "Votre abonnement Premium est activé. Rechargez la page pour voir les changements.",
       });
       setSearchParams({});
-      
-      // Polling pour vérifier l'activation de l'abonnement
-      let attempts = 0;
-      const maxAttempts = 10;
-      const pollInterval = 3000; // 3 secondes entre chaque tentative
-      
-      const checkSubscription = async () => {
-        attempts++;
-        console.log(`[PREMIUM-SUCCESS] Polling attempt ${attempts}/${maxAttempts}`);
-        
-        try {
-          const { data } = await supabase.functions.invoke('check-premium-subscription');
-          console.log('[PREMIUM-SUCCESS] Polling result:', data);
-          
-          if (data?.subscribed) {
-            console.log('[PREMIUM-SUCCESS] Subscription active! Reloading...');
-            toast({
-              title: "Bienvenue à Premium!",
-              description: "Vous avez maintenant un accès illimité à tous les vendeurs.",
-            });
-            setTimeout(() => window.location.reload(), 1000);
-            return true;
-          } else if (attempts >= maxAttempts) {
-            console.log('[PREMIUM-SUCCESS] Max attempts reached, reloading anyway...');
-            toast({
-              title: "Synchronisation...",
-              description: "Votre abonnement est en cours d'activation. Rechargement de la page...",
-            });
-            setTimeout(() => window.location.reload(), 1000);
-            return true;
-          } else {
-            console.log('[PREMIUM-SUCCESS] Not active yet, will retry...');
-            setTimeout(checkSubscription, pollInterval);
-          }
-        } catch (error) {
-          console.error('[PREMIUM-SUCCESS] Error during polling:', error);
-          if (attempts >= maxAttempts) {
-            toast({
-              variant: "destructive",
-              title: "Erreur",
-              description: "Problème lors de l'activation. Veuillez recharger la page.",
-            });
-          } else {
-            setTimeout(checkSubscription, pollInterval);
-          }
-        }
-      };
-      
-      // Démarrer le polling après un délai initial de 2 secondes
-      setTimeout(checkSubscription, 2000);
     } else if (searchParams.get('premium_cancel') === 'true') {
       toast({
         variant: "destructive",
@@ -91,32 +41,25 @@ const Index = () => {
     }
   }, [searchParams, setSearchParams, toast]);
   const fetchBusinesses = async () => {
-    // Fetch all approved businesses (active or sold within 3 months)
-    const {
-      data: businesses
-    } = await supabase.from('businesses').select('*').in('status', ['active', 'sold']).eq('approval_status', 'approved').order('created_at', {
-      ascending: false
-    });
-    if (businesses) {
-      // Check which ones are featured
-      const businessesWithFeature = await Promise.all(businesses.map(async business => {
-        const {
-          data: isFeatured
-        } = await supabase.rpc('is_business_featured', {
-          business_uuid: business.id
-        });
-        return {
-          ...business,
-          featured: !!isFeatured
-        };
-      }));
+    try {
+      // Fetch all approved businesses
+      const { data: businesses } = await supabase
+        .from('businesses')
+        .select('*')
+        .in('status', ['active', 'sold'])
+        .eq('approval_status', 'approved')
+        .order('created_at', { ascending: false });
 
-      // Separate featured and regular businesses
-      const featured = businessesWithFeature.filter(b => b.featured && b.status === 'active').slice(0, 3);
-      const regular = businessesWithFeature.filter(b => !b.featured || b.status === 'sold');
-      setFeaturedBusinesses(featured);
-      setAllBusinesses(regular);
-      setFilteredBusinesses(regular);
+      if (businesses) {
+        // Use the featured flag directly from the database
+        const featured = businesses.filter(b => b.featured && b.status === 'active').slice(0, 3);
+        const regular = businesses.filter(b => !b.featured || b.status === 'sold');
+        setFeaturedBusinesses(featured);
+        setAllBusinesses(regular);
+        setFilteredBusinesses(regular);
+      }
+    } catch (error) {
+      console.error('[FETCH-BUSINESSES] Error:', error);
     }
   };
   const handleFilter = (filters: {

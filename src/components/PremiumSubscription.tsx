@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, invokeWithTimeout } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -27,25 +27,22 @@ export const PremiumSubscription = ({ userId }: PremiumSubscriptionProps) => {
   }, [userId]);
 
   const checkSubscription = async () => {
-    // Seulement afficher le loading la toute première fois
     if (!hasLoadedOnce) {
       setLoading(true);
     }
     
     try {
       console.log('[CHECK SUBSCRIPTION] Calling check-premium-subscription edge function');
-      const { data, error } = await supabase.functions.invoke('check-premium-subscription');
+      const { data, error } = await invokeWithTimeout('check-premium-subscription', { timeout: 8000 });
       
       if (error) {
         console.error('[CHECK SUBSCRIPTION] Error:', error);
-        // Ne mettre à jour que si c'est le premier chargement
         if (!hasLoadedOnce) {
           setIsSubscribed(false);
           setSubscriptionEnd(null);
         }
       } else {
         console.log('[CHECK SUBSCRIPTION] Data received:', data);
-        // Seulement mettre à jour si les données ont réellement changé
         const newSubscribed = data?.subscribed || false;
         const newEnd = data?.subscription_end || null;
         

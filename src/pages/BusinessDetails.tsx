@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, invokeWithTimeout } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
@@ -177,7 +177,7 @@ const BusinessDetails = () => {
 
   const checkPremiumSubscription = async (userId: string) => {
     try {
-      const { data, error } = await supabase.functions.invoke('check-premium-subscription');
+      const { data, error } = await invokeWithTimeout('check-premium-subscription', { timeout: 8000 });
       
       if (error) {
         console.error('Error checking premium:', error);

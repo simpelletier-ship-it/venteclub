@@ -15,3 +15,28 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
     autoRefreshToken: true,
   }
 });
+
+// Helper pour les appels d'edge function avec timeout
+export const invokeWithTimeout = async (
+  functionName: string,
+  options?: { body?: any; timeout?: number }
+) => {
+  const timeout = options?.timeout || 10000; // 10s par défaut
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+  try {
+    const response = await supabase.functions.invoke(functionName, {
+      body: options?.body,
+      signal: controller.signal as any,
+    });
+    clearTimeout(timeoutId);
+    return response;
+  } catch (error: any) {
+    clearTimeout(timeoutId);
+    if (error.name === 'AbortError') {
+      throw new Error('Request timeout');
+    }
+    throw error;
+  }
+};

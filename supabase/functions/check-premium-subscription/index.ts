@@ -48,63 +48,35 @@ serve(async (req) => {
     const customerId = customers.data[0].id;
     console.log("[CHECK-PREMIUM] Found customer ID:", customerId);
     
-    // Chercher d'abord les abonnements actifs, puis incomplete si aucun actif trouvé
-    // IMPORTANT: Utiliser expand pour forcer Stripe à inclure tous les champs nécessaires
-    let subscriptions = await stripe.subscriptions.list({
+    // Chercher les abonnements actifs et trialing
+    const subscriptions = await stripe.subscriptions.list({
       customer: customerId,
       status: "active",
       limit: 1,
-      expand: ['data.items.data.price']
     });
     console.log("[CHECK-PREMIUM] Active subscriptions count:", subscriptions.data.length);
-    
-    // Si aucun abonnement actif, vérifier s'il y a des abonnements incomplete (en cours de création)
-    if (subscriptions.data.length === 0) {
-      console.log("[CHECK-PREMIUM] No active subscription, checking incomplete...");
-      subscriptions = await stripe.subscriptions.list({
-        customer: customerId,
-        status: "incomplete",
-        limit: 1,
-        expand: ['data.items.data.price']
-      });
-      console.log("[CHECK-PREMIUM] Incomplete subscriptions count:", subscriptions.data.length);
-    }
 
     const hasActiveSub = subscriptions.data.length > 0;
     let subscriptionEnd = null;
 
     if (hasActiveSub) {
-      let subscription = subscriptions.data[0];
-      console.log("[CHECK-PREMIUM] Initial subscription details:", {
+      const subscription = subscriptions.data[0];
+      console.log("[CHECK-PREMIUM] Subscription found:", {
         id: subscription.id,
         status: subscription.status,
         current_period_end: subscription.current_period_end
       });
 
-      // Si current_period_end est manquant, récupérer l'abonnement complet
-      if (!subscription.current_period_end || typeof subscription.current_period_end !== 'number') {
-        console.log("[CHECK-PREMIUM] current_period_end missing, retrieving full subscription...");
-        subscription = await stripe.subscriptions.retrieve(subscription.id, {
-          expand: ['items.data.price']
-        });
-        console.log("[CHECK-PREMIUM] Retrieved subscription details:", {
-          id: subscription.id,
-          status: subscription.status,
-          current_period_end: subscription.current_period_end
-        });
-      }
-
-      // Vérifier à nouveau après le retrieve
-      if (!subscription.current_period_end || typeof subscription.current_period_end !== 'number') {
-        console.error("[CHECK-PREMIUM] current_period_end still invalid:", subscription.current_period_end);
-        // Utiliser une valeur par défaut de 30 jours pour ne pas bloquer
-        const defaultEnd = new Date();
-        defaultEnd.setDate(defaultEnd.getDate() + 30);
-        subscriptionEnd = defaultEnd.toISOString();
-        console.warn("[CHECK-PREMIUM] Using default 30-day period as fallback:", subscriptionEnd);
-      } else {
+      // Calculer la date de fin : utiliser current_period_end s'il existe, sinon 30 jours
+      if (subscription.current_period_end && typeof subscription.current_period_end === 'number') {
         subscriptionEnd = new Date(subscription.current_period_end * 1000).toISOString();
-        console.log("[CHECK-PREMIUM] Subscription end date:", subscriptionEnd);
+        console.log("[CHECK-PREMIUM] Using current_period_end:", subscriptionEnd);
+      } else {
+        // Si current_period_end manque, utiliser created + 30 jours
+        const createdDate = subscription.created ? new Date(subscription.created * 1000) : new Date();
+        createdDate.setDate(createdDate.getDate() + 30);
+        subscriptionEnd = createdDate.toISOString();
+        console.warn("[CHECK-PREMIUM] current_period_end missing, using created + 30 days:", subscriptionEnd);
       }
 
       // Synchroniser l'abonnement dans la base de données Supabase
