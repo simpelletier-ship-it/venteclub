@@ -138,7 +138,9 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-10">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-3">Opportunités En Vedette</h2>
-            
+            <p className="text-muted-foreground text-sm md:text-base">
+              Selon le CTEQ, plus de 34 000 propriétaires au Québec envisagent de vendre ou de transférer leur entreprise dans les prochaines années.
+            </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {featuredBusinesses.length > 0 ? featuredBusinesses.map(business => <BusinessCard key={business.id} {...business} />) : <div className="col-span-full text-center py-12">
