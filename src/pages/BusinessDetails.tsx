@@ -406,19 +406,18 @@ const BusinessDetails = () => {
                       )}
                     </div>
                     <div className="flex items-center justify-between">
-                      <div className="flex flex-wrap gap-2 items-center text-muted-foreground">
-                        <Badge variant="secondary">{business.industry}</Badge>
-                        <span className="flex items-center gap-1">
-                          <MapPin className="w-4 h-4" />
-                          {business.city && business.region 
-                            ? `${business.city}, ${business.region}` 
-                            : business.location}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Eye className="w-4 h-4" />
-                          {business.views_count || 0} vues
-                        </span>
-                      </div>
+                    <div className="flex flex-wrap gap-2 items-center text-muted-foreground">
+                      <Badge variant="secondary">{business.industry}</Badge>
+                      <span className="flex items-center gap-1 font-medium">
+                        <MapPin className="w-4 h-4" />
+                        {business.city || business.location}
+                        {business.region && <span className="text-muted-foreground/70">, {business.region}</span>}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Eye className="w-4 h-4" />
+                        {business.views_count || 0} vues
+                      </span>
+                    </div>
                       {!isSeller && id && (
                         <ReportBusinessDialog businessId={id} businessTitle={business.title} />
                       )}

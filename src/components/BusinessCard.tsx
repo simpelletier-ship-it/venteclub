@@ -137,10 +137,14 @@ const BusinessCard = ({
             </h3>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <MapPin className="w-4 h-4 flex-shrink-0" />
-              <span className="line-clamp-1">
-                {city && region ? `${city}, ${region}` : location}
+              <span className="line-clamp-1 font-medium">
+                {city || location}
+                {region && <span className="text-muted-foreground/70">, {region}</span>}
               </span>
             </div>
+            <Badge variant="outline" className="w-fit">
+              {industry}
+            </Badge>
           </div>
           {id && (
             <div className="pt-1">
