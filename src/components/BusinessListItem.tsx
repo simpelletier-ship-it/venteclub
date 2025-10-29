@@ -65,15 +65,12 @@ const BusinessListItem = ({
     >
       {/* Sold Overlay */}
       {status === 'sold' && (
-        <div className="absolute inset-0 z-[5] bg-background/40 backdrop-blur-[1px] pointer-events-none">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rotate-[-25deg] w-[140%]">
-            <div className="relative bg-gradient-to-br from-emerald-600 via-emerald-500 to-teal-600 text-white py-4 px-8 shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
-              <div className="absolute inset-0 bg-white/10 backdrop-blur-sm"></div>
-              <p className="relative text-2xl md:text-3xl font-bold text-center tracking-[0.3em] uppercase">
+        <div className="absolute inset-0 z-[5] bg-background/30 pointer-events-none">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rotate-[-30deg] w-[200%] md:w-[150%]">
+            <div className="bg-purple-600 text-white py-4 md:py-6 shadow-2xl">
+              <p className="text-2xl md:text-4xl font-bold text-center tracking-[0.4em] uppercase">
                 VENDU
               </p>
-              <div className="absolute top-0 left-0 right-0 h-[2px] bg-white/40"></div>
-              <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-white/40"></div>
             </div>
           </div>
         </div>
