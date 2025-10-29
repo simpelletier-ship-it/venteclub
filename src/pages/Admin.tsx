@@ -344,7 +344,7 @@ const Admin = () => {
         location: validated.location,
         city: validated.city,
         province: validated.province,
-        industry: validated.industry,
+        industry: validated.industry as any, // Cast to any to handle ENUM type
       };
 
       const { error } = await supabase
