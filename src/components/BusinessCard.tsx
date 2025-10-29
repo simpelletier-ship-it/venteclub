@@ -105,7 +105,7 @@ const BusinessCard = ({
               )}
               {has_pending_changes && (
                 <Badge className="bg-orange-500 text-white">
-                  ✏️ Modification en attente
+                  ✏️ Modification en attente d'approbation
                 </Badge>
               )}
               {showActions && approval_status === 'approved' && (
