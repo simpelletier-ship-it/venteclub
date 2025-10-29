@@ -167,23 +167,24 @@ const Dashboard = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {businesses.map((business) => (
               <div key={business.id} className="relative">
-                <div className="relative">
-                  <BusinessCard {...business} />
-                  <div className="absolute top-4 left-4 z-10">
-                    <Badge variant={
-                      business.approval_status === 'approved' ? 'default' : 
-                      business.approval_status === 'pending' ? 'secondary' : 
-                      'destructive'
-                    }>
-                      {business.approval_status === 'approved' ? 'Approuvée' : 
-                       business.approval_status === 'pending' ? 'En attente' : 
-                       'Rejetée'}
-                    </Badge>
-                  </div>
+                <BusinessCard {...business} />
+                <div className="mt-3 flex items-center justify-between gap-2">
+                  <Badge 
+                    className={
+                      business.approval_status === 'approved' 
+                        ? 'bg-green-500 hover:bg-green-600 text-white' 
+                        : business.approval_status === 'pending' 
+                        ? 'bg-orange-500 hover:bg-orange-600 text-white' 
+                        : 'bg-red-500 hover:bg-red-600 text-white'
+                    }
+                  >
+                    {business.approval_status === 'approved' ? '✓ Approuvée' : 
+                     business.approval_status === 'pending' ? '⏳ En attente' : 
+                     '✗ Rejetée'}
+                  </Badge>
                   {!business.featured && business.approval_status === 'approved' && (
                     <Button
                       onClick={() => handleFeatureClick(business)}
-                      className="absolute top-4 right-4 z-10"
                       size="sm"
                       variant="secondary"
                     >
