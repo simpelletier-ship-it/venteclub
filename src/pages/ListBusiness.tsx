@@ -33,13 +33,28 @@ const ListBusiness = () => {
   const [photoPreviewUrls, setPhotoPreviewUrls] = useState<string[]>([]);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    // Check initial session
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        navigate("/auth");
+      } else {
+        setUser(session.user);
+      }
+    };
+
+    checkSession();
+
+    // Listen to auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (!session) {
         navigate("/auth");
       } else {
         setUser(session.user);
       }
     });
+
+    return () => subscription.unsubscribe();
   }, [navigate]);
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {

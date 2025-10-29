@@ -30,7 +30,7 @@ const Auth = () => {
       const validatedData = authSchema.parse({ email, password });
 
       // Try to sign in first
-      const { error: signInError } = await supabase.auth.signInWithPassword({
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email: validatedData.email,
         password: validatedData.password,
       });
@@ -38,7 +38,7 @@ const Auth = () => {
       if (signInError) {
         // If user not found, create account
         if (signInError.message.includes('Invalid login credentials')) {
-          const { error: signUpError } = await supabase.auth.signUp({
+          const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
             email: validatedData.email,
             password: validatedData.password,
             options: {
@@ -48,20 +48,31 @@ const Auth = () => {
           
           if (signUpError) throw signUpError;
           
-          toast({
-            title: "Compte créé avec succès !",
-            description: "Vous êtes maintenant connecté.",
-          });
-          navigate("/");
+          // Check if email confirmation is required
+          if (signUpData.session) {
+            toast({
+              title: "Compte créé avec succès !",
+              description: "Vous êtes maintenant connecté.",
+            });
+            navigate("/");
+          } else {
+            toast({
+              title: "Compte créé !",
+              description: "Veuillez vérifier votre email pour confirmer votre compte.",
+            });
+          }
         } else {
           throw signInError;
         }
       } else {
-        toast({
-          title: "Connexion réussie !",
-          description: "Bienvenue sur Vente.Club",
-        });
-        navigate("/");
+        // Successful sign in
+        if (signInData.session) {
+          toast({
+            title: "Connexion réussie !",
+            description: "Bienvenue sur Vente.Club",
+          });
+          navigate("/");
+        }
       }
     } catch (error: any) {
       if (error.errors) {
