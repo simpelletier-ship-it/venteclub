@@ -51,7 +51,7 @@ const blogPosts: BlogPost[] = [
     slug: "due-diligence-checklist-complete",
     title: "Due Diligence : La Checklist Complète pour Acheteurs",
     excerpt: "Assurez-vous de ne rien manquer lors de votre vérification diligente. Notre checklist détaillée couvre tous les aspects financiers, légaux et opérationnels.",
-    date: "2024-12-28",
+    date: "2025-01-28",
     readTime: "12 min",
     category: "Acquisition"
   },
@@ -59,7 +59,7 @@ const blogPosts: BlogPost[] = [
     slug: "secteurs-porteurs-quebec-2025",
     title: "Les Secteurs les Plus Porteurs pour Investir au Québec en 2025",
     excerpt: "Analyse des industries les plus prometteuses pour l'acquisition d'entreprises au Québec : technologie, santé, alimentation et services aux entreprises.",
-    date: "2024-12-20",
+    date: "2025-01-20",
     readTime: "9 min",
     category: "Tendances"
   }
@@ -107,6 +107,19 @@ const Blog = () => {
             </h1>
             <p className="text-xl text-muted-foreground">
               Conseils, guides et actualités sur l'achat et la vente d'entreprises au Québec
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Disclaimer */}
+      <section className="py-8 bg-muted/30">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto bg-card border border-border rounded-lg p-6">
+            <p className="text-sm text-muted-foreground text-center">
+              <strong className="text-foreground">Avertissement :</strong> Les articles de ce blog sont fournis à titre informatif uniquement. 
+              Vente.Club ne garantit pas l'exactitude, l'exhaustivité ou la pertinence des informations présentées et n'est pas responsable du contenu publié. 
+              Les lecteurs sont encouragés à consulter des professionnels qualifiés (comptables, avocats, conseillers financiers) pour des conseils spécifiques à leur situation.
             </p>
           </div>
         </div>
