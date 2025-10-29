@@ -152,8 +152,8 @@ const Settings = () => {
       if (updateError) throw updateError;
 
       toast({
-        title: "Avatar mis à jour",
-        description: "Votre avatar a été enregistré avec succès.",
+        title: "Photo de profil mise à jour",
+        description: "Votre photo de profil a été enregistrée avec succès.",
       });
     } catch (error: any) {
       toast({
@@ -203,7 +203,7 @@ const Settings = () => {
                 Mon Profil
               </h1>
               <p className="text-muted-foreground">
-                Gérez vos informations personnelles et votre avatar.
+                Gérez vos informations personnelles et votre photo de profil.
               </p>
             </div>
             <Button onClick={handleUpdateProfile} disabled={loading}>
@@ -313,10 +313,10 @@ const Settings = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-primary">
                     <User className="h-5 w-5" />
-                    Avatar
+                    Photo de profil
                   </CardTitle>
                   <CardDescription>
-                    Avatar
+                    Photo de profil
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -331,7 +331,7 @@ const Settings = () => {
                       <Label htmlFor="avatar" className="cursor-pointer">
                         <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
                           <Upload className="h-4 w-4" />
-                          <span>{profile.avatar_url ? "Modifier l'avatar" : "Choisir un fichier"}</span>
+                          <span>{profile.avatar_url ? "Modifier la photo de profil" : "Choisir un fichier"}</span>
                         </div>
                         <Input
                           id="avatar"

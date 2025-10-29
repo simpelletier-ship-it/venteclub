@@ -172,7 +172,7 @@ const Header = () => {
                     <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                       <Avatar className="h-10 w-10 border-2 border-primary/20 hover:border-primary/40 transition-colors">
                         {profile?.avatar_url && (
-                          <AvatarImage src={profile.avatar_url} alt={profile?.full_name || "Avatar"} />
+                          <AvatarImage src={profile.avatar_url} alt={profile?.full_name || "Photo de profil"} />
                         )}
                         <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
                           {profile?.full_name?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || "U"}
