@@ -91,14 +91,21 @@ export const FavoriteButton = ({ businessId, userId }: FavoriteButtonProps) => {
       size="icon"
       onClick={toggleFavorite}
       disabled={loading}
-      className="text-muted-foreground hover:text-red-500 transition-colors"
+      className="group/heart hover:bg-transparent"
     >
       <Heart 
-        className="h-5 w-5 transition-all" 
-        fill={isFavorite ? "currentColor" : "none"}
+        className="h-5 w-5 transition-all stroke-muted-foreground" 
+        fill={isFavorite ? "#ef4444" : "transparent"}
         strokeWidth={2}
-        color={isFavorite ? "#ef4444" : "currentColor"}
+        style={{
+          fill: isFavorite ? "#ef4444" : "transparent",
+        }}
       />
+      <style>{`
+        .group\\/heart:hover svg {
+          fill: #ef4444 !important;
+        }
+      `}</style>
     </Button>
   );
 };
