@@ -72,7 +72,17 @@ export const NotificationBell = ({ userId }: NotificationBellProps) => {
 
   const handleNotificationClick = (notification: Notification) => {
     markAsRead(notification.id);
-    navigate(`/business/${notification.business_id}`);
+    
+    // Pour les notifications de nouvelle annonce créée par le vendeur, aller au dashboard
+    if (notification.type === 'new_listing' && notification.message.includes('soumise avec succès')) {
+      navigate('/dashboard');
+    } else if (notification.type === 'approved') {
+      // Pour les notifications d'approbation, aller vers l'annonce
+      navigate(`/business/${notification.business_id}`);
+    } else {
+      // Pour toutes les autres notifications, aller vers l'annonce
+      navigate(`/business/${notification.business_id}`);
+    }
   };
 
   if (!userId) return null;
