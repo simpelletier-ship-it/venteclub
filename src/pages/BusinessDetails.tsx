@@ -225,9 +225,9 @@ const BusinessDetails = () => {
     
     setIsUnlocking(true);
     try {
+      // La vérification premium est maintenant faite côté serveur pour la sécurité
       const { data, error } = await supabase.rpc('use_token_for_access', {
-        business_uuid: id,
-        has_premium: hasPremium
+        business_uuid: id
       });
 
       if (error) {
