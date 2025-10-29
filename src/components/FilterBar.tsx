@@ -1,28 +1,31 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { QUEBEC_INDUSTRIES } from "@/lib/constants";
+import { ChevronDown, X } from "lucide-react";
 
 interface FilterBarProps {
   onFilter?: (filters: { 
-    city?: string; 
-    industry?: string;
+    cities?: string[]; 
+    industries?: string[];
     minPrice?: number;
     maxPrice?: number;
   }) => void;
 }
 
 const FilterBar = ({ onFilter }: FilterBarProps) => {
-  const [city, setCity] = useState<string>("");
-  const [industry, setIndustry] = useState<string>("");
+  const [selectedCities, setSelectedCities] = useState<string[]>([]);
+  const [selectedIndustries, setSelectedIndustries] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState<number[]>([0, 10000000]);
+  const [citiesOpen, setCitiesOpen] = useState(false);
+  const [industriesOpen, setIndustriesOpen] = useState(false);
 
   const cities = [
     "Montréal",
@@ -37,11 +40,35 @@ const FilterBar = ({ onFilter }: FilterBarProps) => {
     "Saint-Jean-sur-Richelieu",
   ];
 
+  const toggleCity = (city: string) => {
+    setSelectedCities(prev => 
+      prev.includes(city) 
+        ? prev.filter(c => c !== city)
+        : [...prev, city]
+    );
+  };
+
+  const toggleIndustry = (industry: string) => {
+    setSelectedIndustries(prev => 
+      prev.includes(industry) 
+        ? prev.filter(i => i !== industry)
+        : [...prev, industry]
+    );
+  };
+
+  const removeCity = (city: string) => {
+    setSelectedCities(prev => prev.filter(c => c !== city));
+  };
+
+  const removeIndustry = (industry: string) => {
+    setSelectedIndustries(prev => prev.filter(i => i !== industry));
+  };
+
   const handleFilter = () => {
     if (onFilter) {
       onFilter({
-        city: city || undefined,
-        industry: industry || undefined,
+        cities: selectedCities.length > 0 ? selectedCities : undefined,
+        industries: selectedIndustries.length > 0 ? selectedIndustries : undefined,
         minPrice: priceRange[0],
         maxPrice: priceRange[1],
       });
@@ -49,8 +76,8 @@ const FilterBar = ({ onFilter }: FilterBarProps) => {
   };
 
   const handleReset = () => {
-    setCity("");
-    setIndustry("");
+    setSelectedCities([]);
+    setSelectedIndustries([]);
     setPriceRange([0, 10000000]);
     if (onFilter) {
       onFilter({});
@@ -61,32 +88,108 @@ const FilterBar = ({ onFilter }: FilterBarProps) => {
     <div className="w-full max-w-5xl mx-auto bg-card rounded-2xl shadow-elegant p-6 border border-border">
       <div className="flex flex-col gap-6">
         <div className="flex flex-col md:flex-row gap-4">
-          <Select value={city} onValueChange={setCity}>
-            <SelectTrigger className="flex-1 h-12 bg-background border-border">
-              <SelectValue placeholder="Ville (optionnel)" />
-            </SelectTrigger>
-            <SelectContent>
-              {cities.map((c) => (
-                <SelectItem key={c} value={c}>
-                  {c}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          {/* Villes */}
+          <Popover open={citiesOpen} onOpenChange={setCitiesOpen}>
+            <PopoverTrigger asChild>
+              <Button 
+                variant="outline" 
+                className="flex-1 h-12 bg-background border-border justify-between"
+              >
+                <span className="truncate">
+                  {selectedCities.length > 0 
+                    ? `${selectedCities.length} ville${selectedCities.length > 1 ? 's' : ''}`
+                    : "Villes (optionnel)"
+                  }
+                </span>
+                <ChevronDown className="h-4 w-4 opacity-50 ml-2 flex-shrink-0" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-80 p-4 bg-card border-border z-50">
+              <div className="space-y-2 max-h-[300px] overflow-y-auto">
+                {cities.map((city) => (
+                  <div key={city} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`city-${city}`}
+                      checked={selectedCities.includes(city)}
+                      onCheckedChange={() => toggleCity(city)}
+                    />
+                    <label
+                      htmlFor={`city-${city}`}
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer flex-1"
+                    >
+                      {city}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </PopoverContent>
+          </Popover>
 
-          <Select value={industry} onValueChange={setIndustry}>
-            <SelectTrigger className="flex-1 h-12 bg-background border-border">
-              <SelectValue placeholder="Secteur (optionnel)" />
-            </SelectTrigger>
-            <SelectContent>
-              {QUEBEC_INDUSTRIES.map((ind) => (
-                <SelectItem key={ind.value} value={ind.value}>
-                  {ind.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          {/* Secteurs */}
+          <Popover open={industriesOpen} onOpenChange={setIndustriesOpen}>
+            <PopoverTrigger asChild>
+              <Button 
+                variant="outline" 
+                className="flex-1 h-12 bg-background border-border justify-between"
+              >
+                <span className="truncate">
+                  {selectedIndustries.length > 0 
+                    ? `${selectedIndustries.length} secteur${selectedIndustries.length > 1 ? 's' : ''}`
+                    : "Secteurs (optionnel)"
+                  }
+                </span>
+                <ChevronDown className="h-4 w-4 opacity-50 ml-2 flex-shrink-0" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-80 p-4 bg-card border-border z-50">
+              <div className="space-y-2 max-h-[300px] overflow-y-auto">
+                {QUEBEC_INDUSTRIES.map((ind) => (
+                  <div key={ind.value} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`industry-${ind.value}`}
+                      checked={selectedIndustries.includes(ind.value)}
+                      onCheckedChange={() => toggleIndustry(ind.value)}
+                    />
+                    <label
+                      htmlFor={`industry-${ind.value}`}
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer flex-1"
+                    >
+                      {ind.label}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
+
+        {/* Selected filters badges */}
+        {(selectedCities.length > 0 || selectedIndustries.length > 0) && (
+          <div className="flex flex-wrap gap-2">
+            {selectedCities.map((city) => (
+              <Badge key={city} variant="secondary" className="pl-2 pr-1">
+                {city}
+                <button
+                  onClick={() => removeCity(city)}
+                  className="ml-1 hover:bg-destructive/20 rounded-full p-0.5"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
+            ))}
+            {selectedIndustries.map((industry) => (
+              <Badge key={industry} variant="secondary" className="pl-2 pr-1">
+                {QUEBEC_INDUSTRIES.find(i => i.value === industry)?.label || industry}
+                <button
+                  onClick={() => removeIndustry(industry)}
+                  className="ml-1 hover:bg-destructive/20 rounded-full p-0.5"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
+            ))}
+          </div>
+        )}
 
         {/* Price Range Slider */}
         <div className="space-y-3">
@@ -114,7 +217,7 @@ const FilterBar = ({ onFilter }: FilterBarProps) => {
           >
             Filtrer
           </Button>
-          {(city || industry || priceRange[0] > 0 || priceRange[1] < 10000000) && (
+          {(selectedCities.length > 0 || selectedIndustries.length > 0 || priceRange[0] > 0 || priceRange[1] < 10000000) && (
             <Button 
               onClick={handleReset}
               variant="outline"
@@ -126,7 +229,7 @@ const FilterBar = ({ onFilter }: FilterBarProps) => {
         </div>
       </div>
       <p className="text-sm text-muted-foreground mt-3 text-center">
-        Affinez votre recherche par ville, secteur ou fourchette de prix
+        Affinez votre recherche par villes, secteurs ou fourchette de prix
       </p>
     </div>
   );

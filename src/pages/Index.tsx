@@ -63,17 +63,23 @@ const Index = () => {
   };
 
   const handleFilter = (filters: {
-    city?: string;
-    industry?: string;
+    cities?: string[];
+    industries?: string[];
     minPrice?: number;
     maxPrice?: number;
   }) => {
     let filtered = [...allBusinesses];
-    if (filters.city) {
-      filtered = filtered.filter(business => business.city?.toLowerCase().includes(filters.city!.toLowerCase()));
+    if (filters.cities && filters.cities.length > 0) {
+      filtered = filtered.filter(business => 
+        filters.cities!.some(city => 
+          business.city?.toLowerCase().includes(city.toLowerCase())
+        )
+      );
     }
-    if (filters.industry) {
-      filtered = filtered.filter(business => business.industry === filters.industry);
+    if (filters.industries && filters.industries.length > 0) {
+      filtered = filtered.filter(business => 
+        filters.industries!.includes(business.industry)
+      );
     }
     if (filters.minPrice !== undefined) {
       filtered = filtered.filter(business => business.asking_price >= filters.minPrice!);
