@@ -1,6 +1,6 @@
 import { SEO } from "@/components/SEO";
 import { Button } from "@/components/ui/button";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import BusinessCard from "@/components/BusinessCard";
@@ -53,13 +53,13 @@ const cityData: Record<string, CityInfo> = {
 };
 
 const CityPage = () => {
-  const { city: cityParam } = useParams<{ city: string }>();
   const navigate = useNavigate();
+  const location = window.location.pathname;
   const [businesses, setBusinesses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Extract city name from URL parameter
-  const citySlug = cityParam || '';
+  // Extract city from pathname
+  const citySlug = location.replace('/entreprises-a-vendre-', '').replace('/', '');
   const cityInfo = cityData[citySlug];
 
   useEffect(() => {

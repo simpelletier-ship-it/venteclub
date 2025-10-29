@@ -52,8 +52,12 @@ const App = () => (
               <Route path="/blog" element={<Blog />} />
               <Route path="/blog/:slug" element={<BlogPost />} />
               
-              {/* City Pages */}
-              <Route path="/entreprises-a-vendre-:city" element={<CityPage />} />
+              {/* City Pages - Static routes for SEO */}
+              <Route path="/entreprises-a-vendre-montreal" element={<CityPage />} />
+              <Route path="/entreprises-a-vendre-quebec" element={<CityPage />} />
+              <Route path="/entreprises-a-vendre-laval" element={<CityPage />} />
+              <Route path="/entreprises-a-vendre-gatineau" element={<CityPage />} />
+              <Route path="/entreprises-a-vendre-sherbrooke" element={<CityPage />} />
               
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
