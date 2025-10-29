@@ -103,7 +103,7 @@ const Header = () => {
                   className="text-foreground/80 hover:text-foreground transition-colors font-medium flex items-center gap-2 relative group"
                 >
                   <LayoutDashboard className="w-4 h-4" />
-                  Dashboard
+                  Tableau de bord
                   <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full" />
                 </button>
                 <button 
@@ -234,7 +234,7 @@ const Header = () => {
                   className="w-full text-left px-4 py-2 rounded-lg hover:bg-muted/50 transition-colors flex items-center gap-2"
                 >
                   <LayoutDashboard className="w-4 h-4" />
-                  Dashboard
+                  Tableau de bord
                 </button>
                 <button
                   onClick={() => {
