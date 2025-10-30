@@ -10,7 +10,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import BusinessCard from "@/components/BusinessCard";
 import { WithdrawBusinessDialog } from "@/components/WithdrawBusinessDialog";
-import { AlertsManager } from "@/components/AlertsManager";
 import { PremiumSubscription } from "@/components/PremiumSubscription";
 import { MessagesList } from "@/components/MessagesList";
 
@@ -211,10 +210,9 @@ const Dashboard = () => {
             <p className="text-muted-foreground mb-6">
               Gérez vos annonces et vos conversations
             </p>
-            <TabsList className="grid w-full max-w-3xl grid-cols-4">
+            <TabsList className="grid w-full max-w-3xl grid-cols-3">
               <TabsTrigger value="businesses">Mes annonces</TabsTrigger>
               <TabsTrigger value="messages">Messages</TabsTrigger>
-              <TabsTrigger value="alerts">Alertes</TabsTrigger>
               <TabsTrigger value="subscription">Abonnement</TabsTrigger>
             </TabsList>
           </div>
@@ -349,10 +347,6 @@ const Dashboard = () => {
 
           <TabsContent value="messages">
             {user && <MessagesList userId={user.id} />}
-          </TabsContent>
-
-          <TabsContent value="alerts">
-            {user && <AlertsManager userId={user.id} />}
           </TabsContent>
 
           <TabsContent value="subscription">
