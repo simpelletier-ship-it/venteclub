@@ -47,12 +47,12 @@ const handler = async (req: Request): Promise<Response> => {
           <body>
             <div class="container">
               <div class="header">
-                <h1 style="margin: 0; font-size: 28px;">🎉 Bienvenue sur Vente.club</h1>
+                <h1 style="margin: 0; font-size: 28px;">Bienvenue sur Vente.club</h1>
               </div>
               <div class="content">
                 <p style="font-size: 18px; color: #667eea; font-weight: 600;">Bonjour ${name || 'cher membre'},</p>
                 
-                <p>Nous sommes ravis de vous accueillir sur <strong>Vente.club</strong>, votre plateforme pour acheter et vendre des entreprises au Québec.</p>
+                <p>Nous sommes heureux de vous accueillir sur <strong>Vente.club</strong>, votre plateforme pour acheter et vendre des entreprises au Québec.</p>
                 
                 <div class="features">
                   <h3 style="color: #667eea; margin-top: 0;">Ce que vous pouvez faire dès maintenant :</h3>

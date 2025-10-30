@@ -86,20 +86,20 @@ const handler = async (req: Request): Promise<Response> => {
           <body>
             <div class="container">
               <div class="header">
-                <h1 style="margin: 0; font-size: 32px;">✅ Annonce Approuvée !</h1>
+                <h1 style="margin: 0; font-size: 32px;">Annonce Approuvée</h1>
               </div>
               <div class="content">
                 <p style="font-size: 18px; color: #28a745; font-weight: 600;">Bonjour ${sellerName},</p>
                 
                 <div class="success-box">
-                  <h2 style="margin: 0 0 10px 0; font-size: 24px;">Félicitations ! 🎉</h2>
-                  <p style="margin: 10px 0; font-size: 18px;">Votre annonce "<strong>${business.title}</strong>" est maintenant en ligne !</p>
+                  <h2 style="margin: 0 0 10px 0; font-size: 24px;">Bonne nouvelle</h2>
+                  <p style="margin: 10px 0; font-size: 18px;">Votre annonce "<strong>${business.title}</strong>" est maintenant en ligne.</p>
                 </div>
 
-                <p>Excellente nouvelle ! Notre équipe a validé votre annonce et elle est désormais visible par les acheteurs potentiels sur Vente.club.</p>
+                <p>Notre équipe a validé votre annonce et elle est désormais visible par les acheteurs potentiels sur Vente.club.</p>
 
                 <div class="business-details">
-                  <h3 style="color: #667eea; margin-top: 0;">📊 Détails de votre annonce</h3>
+                  <h3 style="color: #667eea; margin-top: 0;">Détails de votre annonce</h3>
                   <div class="detail-row">
                     <span>Titre</span>
                     <span><strong>${business.title}</strong></span>
@@ -114,7 +114,7 @@ const handler = async (req: Request): Promise<Response> => {
                   </div>
                   <div class="detail-row">
                     <span>Statut</span>
-                    <span><strong style="color: #28a745;">✅ En ligne</strong></span>
+                    <span><strong style="color: #28a745;">En ligne</strong></span>
                   </div>
                 </div>
 
@@ -125,7 +125,7 @@ const handler = async (req: Request): Promise<Response> => {
                 </div>
 
                 <div class="tips-box">
-                  <h3 style="margin-top: 0; color: #856404;">💼 Conseils pour maximiser vos chances de vente</h3>
+                  <h3 style="margin-top: 0; color: #856404;">Conseils pour maximiser vos chances de vente</h3>
                   <div class="tip-item">Répondez rapidement aux demandes des acheteurs</div>
                   <div class="tip-item">Mettez à jour votre annonce si nécessaire</div>
                   <div class="tip-item">Ajoutez des photos de qualité pour attirer plus d'acheteurs</div>
@@ -134,7 +134,7 @@ const handler = async (req: Request): Promise<Response> => {
                 </div>
 
                 <p style="background: #e7f3ff; border-left: 4px solid #007bff; padding: 15px; border-radius: 4px; margin: 20px 0;">
-                  🚀 <strong>Boostez votre visibilité !</strong><br>
+                  <strong>Option disponible :</strong><br>
                   Mettez votre annonce en vedette pour apparaître en haut des résultats et augmenter sa visibilité.
                 </p>
 

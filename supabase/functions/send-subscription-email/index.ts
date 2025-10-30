@@ -64,15 +64,15 @@ const handler = async (req: Request): Promise<Response> => {
           <body>
             <div class="container">
               <div class="header">
-                <h1 style="margin: 0; font-size: 28px;">✨ Abonnement Premium Activé</h1>
+                <h1 style="margin: 0; font-size: 28px;">Abonnement Premium Activé</h1>
               </div>
               <div class="content">
                 <p style="font-size: 18px; color: #667eea; font-weight: 600;">Bonjour ${name || 'cher membre'},</p>
                 
-                <p>Félicitations ! Votre abonnement <strong>${subscriptionType}</strong> est maintenant actif.</p>
+                <p>Votre abonnement <strong>${subscriptionType}</strong> est maintenant actif.</p>
                 
                 <div class="invoice-box">
-                  <h3 style="margin-top: 0; color: #667eea;">📋 Détails de votre facture</h3>
+                  <h3 style="margin-top: 0; color: #667eea;">Détails de votre facture</h3>
                   <div class="invoice-row">
                     <span>Abonnement</span>
                     <span><strong>${subscriptionType}</strong></span>
@@ -92,7 +92,7 @@ const handler = async (req: Request): Promise<Response> => {
                 </div>
 
                 <div class="benefits">
-                  <h3 style="color: #667eea; margin-top: 0;">🎁 Vos avantages Premium :</h3>
+                  <h3 style="color: #667eea; margin-top: 0;">Vos avantages Premium</h3>
                   <div class="benefit-item">Accès illimité aux contacts des vendeurs</div>
                   <div class="benefit-item">Messagerie directe sans restrictions</div>
                   <div class="benefit-item">Alertes en temps réel sur les nouvelles annonces</div>
