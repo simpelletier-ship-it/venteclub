@@ -34,9 +34,14 @@ export const Footer = () => {
           <div>
             <h3 className="font-bold text-lg mb-4">Régions populaires</h3>
             <ul className="space-y-2">
-              <li><Link to="/entreprises-a-vendre-montreal" className="text-sm text-muted-foreground hover:text-accent transition-colors">Montréal</Link></li>
-              <li><Link to="/entreprises-a-vendre-quebec" className="text-sm text-muted-foreground hover:text-accent transition-colors">Capitale-Nationale</Link></li>
+              <li><Link to="/?region=06" className="text-sm text-muted-foreground hover:text-accent transition-colors">Montréal</Link></li>
+              <li><Link to="/?region=03" className="text-sm text-muted-foreground hover:text-accent transition-colors">Capitale-Nationale</Link></li>
               <li><Link to="/?region=16" className="text-sm text-muted-foreground hover:text-accent transition-colors">Montérégie</Link></li>
+              <li><Link to="/?region=13" className="text-sm text-muted-foreground hover:text-accent transition-colors">Laval</Link></li>
+              <li><Link to="/?region=14" className="text-sm text-muted-foreground hover:text-accent transition-colors">Lanaudière</Link></li>
+              <li><Link to="/?region=15" className="text-sm text-muted-foreground hover:text-accent transition-colors">Laurentides</Link></li>
+              <li><Link to="/?region=05" className="text-sm text-muted-foreground hover:text-accent transition-colors">Estrie</Link></li>
+              <li><Link to="/?region=07" className="text-sm text-muted-foreground hover:text-accent transition-colors">Outaouais</Link></li>
             </ul>
           </div>
 
