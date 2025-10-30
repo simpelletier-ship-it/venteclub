@@ -262,7 +262,7 @@ export type Database = {
           franchise_term_years: number | null
           has_pending_changes: boolean | null
           id: string
-          industry: Database["public"]["Enums"]["industry_type_new"]
+          industry: Database["public"]["Enums"]["industry_type"]
           initial_investment_max: number | null
           initial_investment_min: number | null
           is_franchise: boolean | null
@@ -312,7 +312,7 @@ export type Database = {
           franchise_term_years?: number | null
           has_pending_changes?: boolean | null
           id?: string
-          industry: Database["public"]["Enums"]["industry_type_new"]
+          industry: Database["public"]["Enums"]["industry_type"]
           initial_investment_max?: number | null
           initial_investment_min?: number | null
           is_franchise?: boolean | null
@@ -362,7 +362,7 @@ export type Database = {
           franchise_term_years?: number | null
           has_pending_changes?: boolean | null
           id?: string
-          industry?: Database["public"]["Enums"]["industry_type_new"]
+          industry?: Database["public"]["Enums"]["industry_type"]
           initial_investment_max?: number | null
           initial_investment_min?: number | null
           is_franchise?: boolean | null
@@ -1043,7 +1043,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user"
-      industry_type_new:
+      industry_type:
         | "activite_sport_loisir"
         | "art_spectacle_cinema"
         | "hebergement"
@@ -1201,7 +1201,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user"],
-      industry_type_new: [
+      industry_type: [
         "activite_sport_loisir",
         "art_spectacle_cinema",
         "hebergement",
