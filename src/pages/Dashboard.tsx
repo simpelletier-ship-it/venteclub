@@ -210,10 +210,9 @@ const Dashboard = () => {
             <p className="text-muted-foreground mb-6">
               Gérez vos annonces et vos conversations
             </p>
-            <TabsList className="grid w-full max-w-3xl grid-cols-3">
+            <TabsList className="grid w-full max-w-3xl grid-cols-2">
               <TabsTrigger value="businesses">Mes annonces</TabsTrigger>
               <TabsTrigger value="messages">Messages</TabsTrigger>
-              <TabsTrigger value="subscription">Abonnement</TabsTrigger>
             </TabsList>
           </div>
 
@@ -347,10 +346,6 @@ const Dashboard = () => {
 
           <TabsContent value="messages">
             {user && <MessagesList userId={user.id} />}
-          </TabsContent>
-
-          <TabsContent value="subscription">
-            {user && <PremiumSubscription userId={user.id} />}
           </TabsContent>
         </Tabs>
       </div>

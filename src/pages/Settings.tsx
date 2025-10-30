@@ -10,10 +10,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
-import { User, CreditCard, Globe, Bell, Mail, Save, Upload, Shield } from "lucide-react";
+import { User, CreditCard, Bell, Mail, Save, Upload, Shield } from "lucide-react";
 import { AlertsManager } from "@/components/AlertsManager";
 import { TwoFactorAuth } from "@/components/TwoFactorAuth";
 import { PaymentHistory } from "@/components/PaymentHistory";
+import { PremiumSubscription } from "@/components/PremiumSubscription";
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -213,22 +214,18 @@ const Settings = () => {
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-6 lg:w-auto">
+            <TabsList className="grid w-full grid-cols-5 lg:w-auto">
               <TabsTrigger value="personal" className="flex items-center gap-2">
                 <User className="h-4 w-4" />
                 <span className="hidden sm:inline">Personnel</span>
               </TabsTrigger>
               <TabsTrigger value="payments" className="flex items-center gap-2">
                 <CreditCard className="h-4 w-4" />
-                <span className="hidden sm:inline">Paiements</span>
+                <span className="hidden sm:inline">Abonnement</span>
               </TabsTrigger>
               <TabsTrigger value="security" className="flex items-center gap-2">
                 <Shield className="h-4 w-4" />
                 <span className="hidden sm:inline">Sécurité</span>
-              </TabsTrigger>
-              <TabsTrigger value="public" className="flex items-center gap-2">
-                <Globe className="h-4 w-4" />
-                <span className="hidden sm:inline">Public</span>
               </TabsTrigger>
               <TabsTrigger value="alerts" className="flex items-center gap-2">
                 <Bell className="h-4 w-4" />
@@ -396,6 +393,7 @@ const Settings = () => {
             </TabsContent>
 
             <TabsContent value="payments" className="space-y-6">
+              <PremiumSubscription userId={user?.id} />
               <PaymentHistory userId={user?.id} />
             </TabsContent>
 
@@ -419,49 +417,6 @@ const Settings = () => {
                     <p>⏱️ Verrouillage de 30 minutes après tentatives échouées</p>
                     <p>🔐 Mots de passe sécurisés avec critères stricts (12+ caractères)</p>
                     <p>🚫 Protection contre la réutilisation de mots de passe</p>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="public" className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-primary">
-                    <Globe className="h-5 w-5" />
-                    Profil public
-                  </CardTitle>
-                  <CardDescription>
-                    Contrôlez la visibilité de votre profil
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label htmlFor="is_public">Profil public</Label>
-                      <p className="text-sm text-muted-foreground">
-                        Rendre votre profil visible aux autres utilisateurs
-                      </p>
-                    </div>
-                    <Switch
-                      id="is_public"
-                      checked={profile.is_public}
-                      onCheckedChange={(checked) => setProfile({ ...profile, is_public: checked })}
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="bio">Biographie</Label>
-                    <Textarea
-                      id="bio"
-                      value={profile.bio}
-                      onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
-                      placeholder="Parlez-nous de vous..."
-                      className="mt-2 min-h-[120px]"
-                    />
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Visible uniquement si votre profil est public
-                    </p>
                   </div>
                 </CardContent>
               </Card>
