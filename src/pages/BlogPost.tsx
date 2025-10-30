@@ -5,7 +5,6 @@ import { ArrowLeft, Calendar, Clock, AlertCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Layout } from "@/components/Layout";
 import blogEvaluation from "@/assets/blog-evaluation-entreprise.jpg";
 import blogAcheter from "@/assets/blog-acheter-entreprise.jpg";
 import blogFinancement from "@/assets/blog-financement.jpg";
@@ -105,8 +104,8 @@ const BlogPost = () => {
   }
 
   return (
-    <Layout>
-      <SEO 
+    <>
+      <SEO
         title={`${post.title} | Vente.club`}
         description={post.excerpt}
         ogImage={post.image}
@@ -278,7 +277,7 @@ const BlogPost = () => {
           </div>
         </div>
       </article>
-    </Layout>
+    </>
   );
 };
 
