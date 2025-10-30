@@ -1067,6 +1067,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      trigger_auto_blog_generation: { Args: never; Returns: undefined }
       use_token_for_access: { Args: { business_uuid: string }; Returns: Json }
     }
     Enums: {
