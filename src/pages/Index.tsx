@@ -163,9 +163,7 @@ const Index = () => {
             
             {/* Main Heading */}
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-display font-bold leading-[1.1] tracking-tight text-foreground">
-              Achetez ou Vendez
-              <br />
-              <span className="text-primary">votre entreprise librement</span>
+              <span className="text-primary">Entreprises et Franchises à Vendre au Québec</span>
             </h1>
             
             {/* Subtitle */}
