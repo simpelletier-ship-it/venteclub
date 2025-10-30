@@ -154,11 +154,16 @@ const ListProperty = () => {
       // Créer ou mettre à jour le contact vendeur
       const { error: contactError } = await supabase
         .from('seller_contacts')
-        .upsert({
-          seller_id: user.id,
-          email: formData.seller_email,
-          phone: formData.seller_phone,
-        });
+        .upsert(
+          {
+            seller_id: user.id,
+            email: formData.seller_email,
+            phone: formData.seller_phone,
+          },
+          {
+            onConflict: 'seller_id'
+          }
+        );
 
       if (contactError) throw contactError;
 
