@@ -174,7 +174,7 @@ const ListProperty = () => {
           seller_id: user.id,
           title: formData.title,
           description: formData.description,
-          industry: 'immobilier_commercial' as any,
+          industry: 'autre' as any,
           location: `${formData.city}, ${formData.province}`,
           city: formData.city,
           province: formData.province,
