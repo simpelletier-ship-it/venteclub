@@ -27,6 +27,7 @@ import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import CityPage from "./pages/CityPage";
 import Terms from "./pages/Terms";
+import PropertyListings from "./pages/PropertyListings";
 
 const queryClient = new QueryClient();
 
@@ -46,6 +47,7 @@ const App = () => (
               <Route path="/list-business" element={<ListBusiness />} />
               <Route path="/list-franchise" element={<ListFranchise />} />
               <Route path="/list-property" element={<ListProperty />} />
+              <Route path="/immeubles-commerciaux" element={<PropertyListings />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/entreprise/:slug" element={<BusinessDetails />} />
               <Route path="/map" element={<Map />} />
