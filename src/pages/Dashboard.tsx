@@ -227,7 +227,7 @@ const Dashboard = () => {
                 <p className="text-muted-foreground mb-4">
                   Vous n'avez pas encore d'annonces
                 </p>
-                <Button onClick={() => navigate("/list-business")}>
+                <Button onClick={() => navigate("/sell")}>
                   <Plus className="mr-2 h-4 w-4" />
                   Créer ma première annonce
                 </Button>
@@ -235,7 +235,7 @@ const Dashboard = () => {
             ) : (
               <>
                 <div className="flex justify-end mb-4">
-                  <Button onClick={() => navigate("/list-business")}>
+                  <Button onClick={() => navigate("/sell")}>
                     <Plus className="mr-2 h-4 w-4" />
                     Créer une nouvelle annonce
                   </Button>
