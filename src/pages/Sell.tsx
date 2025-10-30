@@ -35,7 +35,7 @@ const Sell = () => {
                 </div>
                 <CardTitle className="text-2xl">Entreprise</CardTitle>
                 <CardDescription className="text-base min-h-[48px]">
-                  Vendez votre entreprise établie, commerciale ou industrielle
+                  Vendez votre entreprise établie ou commerciale
                 </CardDescription>
               </CardHeader>
               <CardContent className="flex-1 flex flex-col justify-between text-sm text-muted-foreground">
@@ -80,7 +80,7 @@ const Sell = () => {
                 </div>
                 <CardTitle className="text-2xl">Franchise</CardTitle>
                 <CardDescription className="text-base min-h-[48px]">
-                  Vendez votre franchise d'une marque reconnue
+                  Vendez votre franchise d'une marque établie
                 </CardDescription>
               </CardHeader>
               <CardContent className="flex-1 flex flex-col justify-between text-sm text-muted-foreground">
@@ -123,9 +123,9 @@ const Sell = () => {
                 <div className="mx-auto w-20 h-20 rounded-full bg-secondary/10 flex items-center justify-center group-hover:bg-secondary/20 transition-colors">
                   <Home className="w-10 h-10 text-secondary" />
                 </div>
-                <CardTitle className="text-2xl">Immeuble Commercial</CardTitle>
+                <CardTitle className="text-2xl">Immeuble</CardTitle>
                 <CardDescription className="text-base min-h-[48px]">
-                  Vendez votre propriété commerciale, industrielle ou terrain
+                  Vendez votre propriété commerciale ou industrielle
                 </CardDescription>
               </CardHeader>
               <CardContent className="flex-1 flex flex-col justify-between text-sm text-muted-foreground">
