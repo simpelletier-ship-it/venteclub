@@ -139,10 +139,97 @@ const ListProperty = () => {
       return;
     }
 
-    toast({
-      title: "Fonctionnalité à venir",
-      description: "La vente d'immobilier sera bientôt disponible.",
-    });
+    if (!user) {
+      toast({
+        variant: "destructive",
+        title: "Non connecté",
+        description: "Vous devez être connecté pour publier une annonce.",
+      });
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      // Créer ou mettre à jour le contact vendeur
+      const { error: contactError } = await supabase
+        .from('seller_contacts')
+        .upsert({
+          seller_id: user.id,
+          email: formData.seller_email,
+          phone: formData.seller_phone,
+        });
+
+      if (contactError) throw contactError;
+
+      // Créer l'annonce immobilière
+      const { data: business, error: businessError } = await supabase
+        .from('businesses')
+        .insert([{
+          seller_id: user.id,
+          title: formData.title,
+          description: formData.description,
+          industry: 'immobilier_commercial' as any,
+          location: `${formData.city}, ${formData.province}`,
+          city: formData.city,
+          province: formData.province,
+          asking_price: priceNegotiable ? 0 : parseFloat(formData.asking_price),
+          year_established: formData.year_built ? parseInt(formData.year_built) : null,
+          status: 'active',
+          approval_status: 'pending',
+          sale_type: 'immobilier' as any,
+          seller_phone: formData.seller_phone,
+          slug: '',
+        }])
+        .select()
+        .single();
+
+      if (businessError) throw businessError;
+
+      // Uploader les photos si présentes
+      if (photos.length > 0 && business) {
+        const photoUploadPromises = photos.map(async (photo, index) => {
+          const fileExt = photo.name.split('.').pop();
+          const fileName = `${business.id}/${Date.now()}-${index}.${fileExt}`;
+          
+          const { error: uploadError } = await supabase.storage
+            .from('business-photos')
+            .upload(fileName, photo);
+
+          if (uploadError) throw uploadError;
+
+          const { data: { publicUrl } } = supabase.storage
+            .from('business-photos')
+            .getPublicUrl(fileName);
+
+          return supabase
+            .from('business_photos')
+            .insert({
+              business_id: business.id,
+              photo_url: publicUrl,
+              display_order: index,
+            });
+        });
+
+        await Promise.all(photoUploadPromises);
+      }
+
+      toast({
+        title: "Annonce publiée avec succès !",
+        description: "Votre annonce immobilière est en cours de vérification. Vous serez notifié une fois approuvée.",
+      });
+
+      navigate('/dashboard');
+    } catch (error: any) {
+      console.error('Error creating property listing:', error);
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: error.message || "Une erreur est survenue lors de la publication de l'annonce.",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
