@@ -76,7 +76,7 @@ const handler = async (req: Request): Promise<Response> => {
                         © 2025 Vente.Club - Plateforme d'achat et vente d'entreprises au Québec
                       </p>
                       <p style="margin: 0; color: #999999; font-size: 12px;">
-                        Des questions ? Contactez-nous à <a href="mailto:support@vente.club" style="color: #667eea; text-decoration: none;">support@vente.club</a>
+                        Des questions ? Contactez-nous à <a href="mailto:info@vente.club" style="color: #667eea; text-decoration: none;">info@vente.club</a>
                       </p>
                     </td>
                   </tr>

@@ -74,7 +74,7 @@ export const TermsDialog = ({ open, onOpenChange }: TermsDialogProps) => {
               </p>
               <p className="text-muted-foreground mt-2">
                 L&apos;Utilisateur peut à tout moment demander l&apos;accès, la rectification ou la suppression de ses données 
-                en écrivant à : <strong>support@vente.club</strong>
+                en écrivant à : <strong>info@vente.club</strong>
               </p>
             </section>
 
