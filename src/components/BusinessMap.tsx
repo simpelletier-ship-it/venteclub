@@ -17,6 +17,7 @@ interface Business {
   status?: string;
   photo_url?: string | null;
   is_franchise?: boolean;
+  slug: string;
 }
 
 interface BusinessMapProps {
@@ -37,6 +38,28 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
 
   useEffect(() => {
     fetchBusinesses();
+
+    // S'abonner aux changements en temps réel
+    const channel = supabase
+      .channel('businesses-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'businesses'
+        },
+        (payload) => {
+          console.log('[MAP] Database change detected:', payload);
+          // Recharger les annonces quand il y a un changement
+          fetchBusinesses();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [filters]);
 
   const fetchBusinesses = async () => {
@@ -47,6 +70,7 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
         id, 
         title, 
         city,
+        slug,
         latitude, 
         longitude, 
         asking_price, 
@@ -201,6 +225,7 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
           },
           properties: {
             id: business.id,
+            slug: business.slug,
             title: business.title,
             location: business.location,
             asking_price: business.asking_price,
@@ -371,7 +396,10 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
         const borderColor = getComputedStyle(document.documentElement).getPropertyValue('--border').trim();
 
         const popupContent = `
-          <div style="padding: 0; max-width: 300px;">
+          <div 
+            style="padding: 0; max-width: 300px; cursor: pointer;" 
+            onclick="window.dispatchEvent(new CustomEvent('navigate-to-business', { detail: '${props.slug}' }))"
+          >
             ${props.photo_url ? `
               <img 
                 src="${props.photo_url}" 
@@ -427,9 +455,16 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
 
       // Click on unclustered point to navigate
       map.current.on('click', 'unclustered-point', (e) => {
-        const businessId = e.features![0].properties!.id;
-        navigate(`/business/${businessId}`);
+        const businessSlug = e.features![0].properties!.slug;
+        navigate(`/entreprise/${businessSlug}`);
       });
+
+      // Listen for navigation events from popup
+      const handlePopupNavigation = (event: CustomEvent) => {
+        navigate(`/entreprise/${event.detail}`);
+      };
+      
+      window.addEventListener('navigate-to-business', handlePopupNavigation as EventListener);
 
       // Change cursor on cluster hover
       map.current.on('mouseenter', 'clusters', () => {
@@ -466,9 +501,15 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
   // Cleanup on unmount
   useEffect(() => {
     return () => {
+      // Cleanup navigation event listener
+      const handlePopupNavigation = (event: CustomEvent) => {
+        navigate(`/entreprise/${event.detail}`);
+      };
+      window.removeEventListener('navigate-to-business', handlePopupNavigation as EventListener);
+      
       map.current?.remove();
     };
-  }, []);
+  }, [navigate]);
 
   return (
     <div className="relative w-full max-w-6xl mx-auto h-[600px] rounded-2xl overflow-hidden shadow-elegant border border-border">
