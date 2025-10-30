@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, X, ArrowLeft } from "lucide-react";
+import { Upload, X, ArrowLeft, Sparkles } from "lucide-react";
 import { TermsDialog } from "@/components/TermsDialog";
 
 const ListFranchise = () => {
@@ -52,6 +52,7 @@ const ListFranchise = () => {
 
   const [photos, setPhotos] = useState<File[]>([]);
   const [photoPreviewUrls, setPhotoPreviewUrls] = useState<string[]>([]);
+  const [improvingDescription, setImprovingDescription] = useState(false);
 
   useEffect(() => {
     const checkSession = async () => {
@@ -85,6 +86,49 @@ const ListFranchise = () => {
     URL.revokeObjectURL(photoPreviewUrls[index]);
     setPhotos(photos.filter((_, i) => i !== index));
     setPhotoPreviewUrls(photoPreviewUrls.filter((_, i) => i !== index));
+  };
+
+  const handleImproveDescription = async () => {
+    if (!formData.description || !formData.title) {
+      toast({
+        variant: "destructive",
+        title: "Informations manquantes",
+        description: "Veuillez d'abord remplir le titre et la description.",
+      });
+      return;
+    }
+
+    setImprovingDescription(true);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('improve-description', {
+        body: {
+          description: formData.description,
+          title: formData.title,
+          industry: formData.industry,
+          type: 'franchise'
+        }
+      });
+
+      if (error) throw error;
+
+      if (data?.improvedDescription) {
+        setFormData({ ...formData, description: data.improvedDescription });
+        toast({
+          title: "Description améliorée !",
+          description: "L'IA a amélioré votre description.",
+        });
+      }
+    } catch (error: any) {
+      console.error('Error improving description:', error);
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: error.message || "Impossible d'améliorer la description.",
+      });
+    } finally {
+      setImprovingDescription(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -239,6 +283,17 @@ const ListFranchise = () => {
                     placeholder="Décrivez votre opportunité de franchise..."
                     required
                   />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleImproveDescription}
+                    disabled={improvingDescription}
+                    className="w-full sm:w-auto mt-2"
+                  >
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    {improvingDescription ? "Amélioration en cours..." : "Améliorer avec l'IA"}
+                  </Button>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
