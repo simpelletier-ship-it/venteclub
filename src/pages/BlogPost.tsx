@@ -12,6 +12,10 @@ import blogFinancement from "@/assets/blog-financement.jpg";
 import blogDueDiligence from "@/assets/blog-due-diligence.jpg";
 import blogTendances from "@/assets/blog-tendances-2025.jpg";
 import blogPreparer from "@/assets/blog-preparer-vente.jpg";
+import blog10Choses from "@/assets/blog-10-choses-vente.jpg";
+import blogEvaluationRealiste from "@/assets/blog-evaluation-realiste.jpg";
+import blogConseillerJuridique from "@/assets/blog-conseiller-juridique.jpg";
+import blogPlanificationFiscale from "@/assets/blog-planification-fiscale.jpg";
 
 interface BlogPostData {
   id: string;
@@ -32,6 +36,10 @@ const imageMap: Record<string, string> = {
   "/src/assets/blog-financement.jpg": blogFinancement,
   "/src/assets/blog-due-diligence.jpg": blogDueDiligence,
   "/src/assets/blog-tendances-2025.jpg": blogTendances,
+  "/src/assets/blog-10-choses-vente.jpg": blog10Choses,
+  "/src/assets/blog-evaluation-realiste.jpg": blogEvaluationRealiste,
+  "/src/assets/blog-conseiller-juridique.jpg": blogConseillerJuridique,
+  "/src/assets/blog-planification-fiscale.jpg": blogPlanificationFiscale,
   "/blog-acquisition.jpg": blogAcheter,
   "/blog-vente.jpg": blogPreparer,
   "/blog-finance.jpg": blogFinancement,
