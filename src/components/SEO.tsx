@@ -11,8 +11,8 @@ interface SEOProps {
 }
 
 export const SEO = ({
-  title = "Vente.club - Plateforme d'Achat et Vente d'Entreprises au Québec",
-  description = "Plateforme québécoise #1 pour acheter et vendre des entreprises. Plus de 100 opportunités vérifiées : restaurants, commerces, franchises. Transactions sécurisées et contactez directement les vendeurs.",
+  title = "Vente.club - Achat et Vente d'Entreprises au Québec | Plateforme #1",
+  description = "Achetez ou vendez votre entreprise au Québec sur la plateforme #1. Des centaines d'opportunités vérifiées : restaurants, commerces, franchises. Contactez directement les propriétaires. Transactions sécurisées et accompagnement professionnel.",
   keywords = "vente entreprise Québec, achat commerce Montréal, vendre restaurant, acheter franchise, opportunité affaires, cession entreprise, reprise commerce",
   ogImage = "/og-image.jpg",
   canonical,
