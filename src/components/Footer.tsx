@@ -30,15 +30,13 @@ export const Footer = () => {
             </ul>
           </div>
 
-          {/* Régions */}
+          {/* Régions populaires */}
           <div>
-            <h3 className="font-bold text-lg mb-4">Régions</h3>
+            <h3 className="font-bold text-lg mb-4">Régions populaires</h3>
             <ul className="space-y-2">
               <li><Link to="/entreprises-a-vendre-montreal" className="text-sm text-muted-foreground hover:text-accent transition-colors">Montréal</Link></li>
-              <li><Link to="/entreprises-a-vendre-quebec" className="text-sm text-muted-foreground hover:text-accent transition-colors">Québec</Link></li>
-              <li><Link to="/entreprises-a-vendre-laval" className="text-sm text-muted-foreground hover:text-accent transition-colors">Laval</Link></li>
-              <li><Link to="/entreprises-a-vendre-gatineau" className="text-sm text-muted-foreground hover:text-accent transition-colors">Gatineau</Link></li>
-              <li><Link to="/entreprises-a-vendre-sherbrooke" className="text-sm text-muted-foreground hover:text-accent transition-colors">Sherbrooke</Link></li>
+              <li><Link to="/entreprises-a-vendre-quebec" className="text-sm text-muted-foreground hover:text-accent transition-colors">Capitale-Nationale</Link></li>
+              <li><Link to="/?region=16" className="text-sm text-muted-foreground hover:text-accent transition-colors">Montérégie</Link></li>
             </ul>
           </div>
 
