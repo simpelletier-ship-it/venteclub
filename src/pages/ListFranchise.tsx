@@ -10,6 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { Upload, X, ArrowLeft, Sparkles } from "lucide-react";
 import { TermsDialog } from "@/components/TermsDialog";
+import { CityCombobox } from "@/components/CityCombobox";
 
 const ListFranchise = () => {
   const navigate = useNavigate();
@@ -18,11 +19,6 @@ const ListFranchise = () => {
   const [user, setUser] = useState<any>(null);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [termsDialogOpen, setTermsDialogOpen] = useState(false);
-
-  const quebecCities = [
-    "Montréal", "Québec", "Laval", "Gatineau", "Longueuil", "Sherbrooke", "Saguenay", "Lévis", "Trois-Rivières", "Terrebonne",
-    "Saint-Jean-sur-Richelieu", "Repentigny", "Boucherville", "Drummondville", "Saint-Jérôme", "Granby", "Blainville", "Saint-Hyacinthe",
-  ].sort();
 
   const quebecRegions = [
     "Bas-Saint-Laurent", "Saguenay–Lac-Saint-Jean", "Capitale-Nationale", "Mauricie", "Estrie", "Montréal",
@@ -325,16 +321,11 @@ const ListFranchise = () => {
 
                   <div>
                     <Label htmlFor="city">Ville *</Label>
-                    <Select value={formData.city} onValueChange={(value) => setFormData({ ...formData, city: value })}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Sélectionner" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {quebecCities.map((city) => (
-                          <SelectItem key={city} value={city}>{city}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <CityCombobox 
+                      value={formData.city} 
+                      onChange={(value) => setFormData({ ...formData, city: value })}
+                      required
+                    />
                   </div>
                 </div>
               </div>

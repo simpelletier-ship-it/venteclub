@@ -27,6 +27,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { quebecCities } from "@/lib/quebecCities";
 
 const ListBusiness = () => {
   const navigate = useNavigate();
@@ -46,20 +47,7 @@ const ListBusiness = () => {
     }
   }, []);
 
-  // Liste des villes du Québec
-  const quebecCities = [
-    "Montréal", "Québec", "Laval", "Gatineau", "Longueuil", "Sherbrooke", "Saguenay", "Lévis", "Trois-Rivières", "Terrebonne",
-    "Saint-Jean-sur-Richelieu", "Repentigny", "Boucherville", "Drummondville", "Saint-Jérôme", "Granby", "Blainville", "Saint-Hyacinthe",
-    "Shawinigan", "Dollard-des-Ormeaux", "Châteauguay", "Rimouski", "Victoriaville", "Sorel-Tracy", "Salaberry-de-Valleyfield",
-    "Saint-Eustache", "Mascouche", "Rouyn-Noranda", "Mirabel", "Val-d'Or", "Alma", "Vaudreuil-Dorion", "Sept-Îles", "Sainte-Julie",
-    "Thetford Mines", "Côte-Saint-Luc", "Brossard", "Beaconsfield", "La Prairie", "Saint-Lambert", "Candiac", "Varennes", "Chambly",
-    "Mont-Royal", "Sainte-Thérèse", "Joliette", "Saint-Bruno-de-Montarville", "Matane", "Westmount", "Pointe-Claire", "Magog",
-    "Mont-Saint-Hilaire", "Saint-Constant", "Rosemère", "Boisbriand", "L'Assomption", "Baie-Comeau", "Saint-Basile-le-Grand",
-    "Sainte-Marthe-sur-le-Lac", "Pincourt", "Rivière-du-Loup", "Sainte-Catherine", "Lavaltrie", "Prévost", "Dorval", "Kirkland",
-    "Saint-Lazare", "Deux-Montagnes", "Sainte-Anne-des-Plaines", "Cowansville", "Mercier", "Sainte-Sophie", "L'Île-Perrot",
-    "Notre-Dame-de-l'Île-Perrot", "Saint-Augustin-de-Desmaures", "Saint-Lin-Laurentides", "Lorraine", "Amos", "Delson", "Beauharnois",
-    "Saint-Charles-Borromée", "Cantley", "Sainte-Adèle", "Charlemagne", "La Tuque", "Mont-Tremblant", "Saint-Colomban",
-  ].sort();
+  // Régions administratives du Québec - la liste des villes est maintenant importée
 
   // Régions administratives du Québec
   const quebecRegions = [
@@ -1025,22 +1013,69 @@ const ListBusiness = () => {
                         <PopoverContent className="w-full p-0" align="start">
                           <Command>
                             <CommandInput 
-                              placeholder="Rechercher une ville..." 
+                              placeholder="Rechercher ou taper une ville..." 
                               value={citySearchValue}
                               onValueChange={setCitySearchValue}
                             />
                             <CommandList>
-                              <CommandEmpty>Aucune ville trouvée.</CommandEmpty>
-                              <CommandGroup>
-                                {quebecCities
-                                  .filter(city => 
-                                    city.toLowerCase().includes(citySearchValue.toLowerCase())
-                                  )
-                                  .map((city) => (
-                                    <CommandItem
-                                      key={city}
-                                      value={city}
-                                  onSelect={async (currentValue) => {
+                              {citySearchValue && !quebecCities.some(city => city.toLowerCase() === citySearchValue.toLowerCase()) && (
+                                <CommandGroup>
+                                  <CommandItem
+                                    value={citySearchValue}
+                                    onSelect={async (currentValue) => {
+                                      setFormData({ ...formData, city: currentValue });
+                                      setCitySearchOpen(false);
+                                      setCitySearchValue("");
+
+                                      // Géocoder automatiquement la ville
+                                      try {
+                                        const { data, error } = await supabase.functions.invoke('geocode-city', {
+                                          body: { 
+                                            city: currentValue, 
+                                            province: formData.province 
+                                          }
+                                        });
+
+                                        if (error) {
+                                          console.error('[GEOCODE] Error:', error);
+                                          return;
+                                        }
+
+                                        if (data?.success) {
+                                          console.log('[GEOCODE] Coordinates obtained:', data);
+                                          setFormData(prev => ({
+                                            ...prev,
+                                            latitude: data.latitude,
+                                            longitude: data.longitude
+                                          }));
+                                        }
+                                      } catch (err) {
+                                        console.error('[GEOCODE] Failed to geocode city:', err);
+                                      }
+                                    }}
+                                    className="cursor-pointer bg-accent/10"
+                                  >
+                                    <Check className="mr-2 h-4 w-4 opacity-0" />
+                                    Utiliser "{citySearchValue}"
+                                  </CommandItem>
+                                </CommandGroup>
+                              )}
+                              {quebecCities.filter(city => 
+                                city.toLowerCase().includes(citySearchValue.toLowerCase())
+                              ).length === 0 && citySearchValue && quebecCities.some(city => city.toLowerCase() === citySearchValue.toLowerCase()) ? (
+                                <CommandEmpty>Aucune ville trouvée.</CommandEmpty>
+                              ) : (
+                                <CommandGroup>
+                                  {quebecCities
+                                    .filter(city => 
+                                      city.toLowerCase().includes(citySearchValue.toLowerCase())
+                                    )
+                                    .slice(0, 50)
+                                    .map((city) => (
+                                      <CommandItem
+                                        key={city}
+                                        value={city}
+                                    onSelect={async (currentValue) => {
                                     // Mettre à jour la ville
                                     setFormData({ ...formData, city: currentValue });
                                     setCitySearchOpen(false);
@@ -1079,10 +1114,11 @@ const ListBusiness = () => {
                                           formData.city === city ? "opacity-100" : "opacity-0"
                                         )}
                                       />
-                                      {city}
-                                    </CommandItem>
-                                  ))}
-                              </CommandGroup>
+                                        {city}
+                                      </CommandItem>
+                                    ))}
+                                </CommandGroup>
+                              )}
                             </CommandList>
                           </Command>
                         </PopoverContent>

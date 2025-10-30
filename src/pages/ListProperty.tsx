@@ -10,6 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { Upload, X, Home, Sparkles } from "lucide-react";
 import { TermsDialog } from "@/components/TermsDialog";
+import { CityCombobox } from "@/components/CityCombobox";
 
 const ListProperty = () => {
   const navigate = useNavigate();
@@ -19,9 +20,7 @@ const ListProperty = () => {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [termsDialogOpen, setTermsDialogOpen] = useState(false);
 
-  const quebecCities = [
-    "Montréal", "Québec", "Laval", "Gatineau", "Longueuil", "Sherbrooke", "Saguenay", "Lévis", "Trois-Rivières", "Terrebonne",
-  ].sort();
+  const [improvingDescription, setImprovingDescription] = useState(false);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -38,7 +37,6 @@ const ListProperty = () => {
   });
   const [photos, setPhotos] = useState<File[]>([]);
   const [photoPreviewUrls, setPhotoPreviewUrls] = useState<string[]>([]);
-  const [improvingDescription, setImprovingDescription] = useState(false);
 
   useEffect(() => {
     const checkSession = async () => {
@@ -227,19 +225,11 @@ const ListProperty = () => {
 
               <div className="space-y-2">
                 <Label htmlFor="city">Ville *</Label>
-                <Select
-                  value={formData.city}
-                  onValueChange={(value) => setFormData({ ...formData, city: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sélectionnez une ville" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {quebecCities.map((city) => (
-                      <SelectItem key={city} value={city}>{city}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <CityCombobox 
+                  value={formData.city} 
+                  onChange={(value) => setFormData({ ...formData, city: value })}
+                  required
+                />
               </div>
             </div>
 
