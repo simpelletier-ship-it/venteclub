@@ -219,11 +219,12 @@ const BlogPost = () => {
                 prose-h2:text-2xl prose-h2:md:text-3xl prose-h2:mt-16 prose-h2:mb-8 prose-h2:pb-4 prose-h2:border-b-2 prose-h2:border-primary/20
                 prose-h3:text-xl prose-h3:md:text-2xl prose-h3:mt-12 prose-h3:mb-6
                 prose-h4:text-lg prose-h4:md:text-xl prose-h4:mt-10 prose-h4:mb-5
-                prose-p:text-base prose-p:md:text-lg prose-p:text-foreground/90 prose-p:leading-relaxed prose-p:mb-8
+                prose-p:text-base prose-p:md:text-lg prose-p:text-foreground/90 prose-p:leading-relaxed prose-p:mb-8 prose-p:text-justify
                 prose-strong:text-foreground prose-strong:font-semibold
-                prose-ul:my-8 prose-ul:list-disc prose-ul:pl-6 prose-ul:space-y-3
-                prose-ol:my-8 prose-ol:list-decimal prose-ol:pl-6 prose-ol:space-y-3
-                prose-li:text-base prose-li:md:text-lg prose-li:text-foreground/90 prose-li:leading-relaxed
+                prose-ul:my-8 prose-ul:list-disc prose-ul:pl-8 prose-ul:space-y-3 prose-ul:ml-4
+                prose-ol:my-8 prose-ol:list-decimal prose-ol:pl-8 prose-ol:space-y-3 prose-ol:ml-4
+                prose-li:text-base prose-li:md:text-lg prose-li:text-foreground/90 prose-li:leading-relaxed prose-li:text-justify prose-li:pl-2
+                prose-li:marker:text-primary prose-li:marker:font-bold
                 prose-blockquote:border-l-4 prose-blockquote:border-primary 
                 prose-blockquote:pl-6 prose-blockquote:py-4 prose-blockquote:my-10
                 prose-blockquote:bg-primary/5 prose-blockquote:rounded-r-lg
