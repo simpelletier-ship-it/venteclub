@@ -267,7 +267,7 @@ const Dashboard = () => {
                           if (business.status === 'archived') {
                             navigate(`/list-business?edit=${business.id}`);
                           } else {
-                            navigate(`/business/${business.id}`);
+                            navigate(`/entreprise/${business.slug}`);
                           }
                         }}
                         className="cursor-pointer"
