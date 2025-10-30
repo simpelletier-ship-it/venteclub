@@ -3,6 +3,9 @@ project_id = "xmwsrvaricrfxovimffm"
 [functions.auto-generate-blog]
 verify_jwt = false
 
+[functions.generate-sitemap]
+verify_jwt = false
+
 [functions.send-welcome-email]
 verify_jwt = true
 

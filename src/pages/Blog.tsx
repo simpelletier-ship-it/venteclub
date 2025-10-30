@@ -89,11 +89,11 @@ const Blog = () => {
   return (
     <div className="min-h-screen bg-background">
       <SEO 
-        title="Blog Vente.Club | Guides et Conseils Achat-Vente Entreprise Québec"
-        description="Conseils d'experts, guides pratiques et actualités sur l'achat et la vente d'entreprises au Québec. Évaluation, financement, due diligence et plus."
-        keywords="blog achat entreprise, guide vente entreprise Québec, conseils acquisition PME, évaluation entreprise"
+        title="Blog Entreprises à Vendre Québec | Guides Achat-Vente PME et Franchises"
+        description="Articles d'experts sur l'achat et vente d'entreprises au Québec: évaluation, financement, due diligence, franchises. Conseils pratiques pour entrepreneurs québécois."
+        keywords="blog achat entreprise québec, guide vente PME, conseil acquisition commerce, évaluation entreprise, financement achat entreprise, franchise québec, transmission entreprise, vendre mon commerce"
         canonical="/blog"
-        type="article"
+        type="website"
         structuredData={structuredData}
       />
 

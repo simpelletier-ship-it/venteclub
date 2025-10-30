@@ -4,19 +4,22 @@ Allow: /
 Disallow: /admin
 Disallow: /settings
 Disallow: /dashboard/
+Disallow: /messages
 
 # Crawl-delay for polite crawlers
 Crawl-delay: 0
 
-# Sitemap location
-Sitemap: https://vente.club/sitemap.xml
+# Sitemap location (dynamic sitemap)
+Sitemap: https://xmwsrvaricrfxovimffm.supabase.co/functions/v1/generate-sitemap
 
 # Specific bot rules
 User-agent: Googlebot
 Allow: /
+Crawl-delay: 0
 
 User-agent: Bingbot
 Allow: /
+Crawl-delay: 0
 
 User-agent: Twitterbot
 Allow: /

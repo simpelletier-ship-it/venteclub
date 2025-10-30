@@ -8,6 +8,7 @@ import FilterBar from "@/components/FilterBar";
 import { ArrowRight, Grid3x3, List, TrendingUp, Shield, Clock, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { SEO } from "@/components/SEO";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import heroImage from "@/assets/hero-business-pro.jpg";
 
 const Index = () => {
@@ -109,30 +110,85 @@ const Index = () => {
 
   const structuredData = {
     "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "Vente.club",
-    "url": "https://vente.club",
-    "description": "Plateforme québécoise pour acheter et vendre des entreprises",
-    "potentialAction": {
-      "@type": "SearchAction",
-      "target": "https://vente.club/?search={search_term_string}",
-      "query-input": "required name=search_term_string"
-    },
-    "publisher": {
-      "@type": "Organization",
-      "name": "Vente.club",
-      "url": "https://vente.club"
-    }
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "name": "Vente.club",
+        "url": "https://vente.club",
+        "description": "Plateforme d'achat et vente d'entreprises au Québec",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": {
+            "@type": "EntryPoint",
+            "urlTemplate": "https://vente.club/?search={search_term_string}"
+          },
+          "query-input": "required name=search_term_string"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "Vente.club",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://vente.club/logo.png"
+          }
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Comment acheter une entreprise au Québec?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "L'achat d'une entreprise au Québec commence par l'identification d'opportunités sur des plateformes comme Vente.club. Ensuite, effectuez une due diligence approfondie, négociez le prix, organisez le financement et complétez la transaction avec l'aide de professionnels (avocats, comptables)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Quel est le prix moyen d'une PME au Québec?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Le prix d'une PME varie considérablement selon l'industrie, les revenus et la rentabilité. En général, une PME se vend entre 2 à 5 fois son BAIIA (bénéfice avant intérêts, impôts et amortissement). Vous trouverez des opportunités allant de 50 000$ pour de petits commerces jusqu'à plusieurs millions."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Comment vendre mon entreprise rapidement?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Pour vendre votre entreprise rapidement: préparez des états financiers clairs, fixez un prix réaliste basé sur l'évaluation du marché, créez une annonce détaillée avec photos, et soyez disponible pour répondre aux questions des acheteurs potentiels."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Quels sont les coûts associés à l'achat d'une entreprise?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Les coûts incluent: le prix d'achat de l'entreprise, les frais légaux, les frais comptables, la due diligence, les frais de transfert de permis et licences. Prévoyez aussi un fonds de roulement pour les premiers mois d'opération."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Faut-il un courtier pour vendre son entreprise?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Non, un courtier n'est pas obligatoire. Des plateformes comme Vente.club vous permettent de vendre directement votre entreprise sans commission de courtage élevée, avec tous les outils nécessaires."
+            }
+          }
+        ]
+      }
+    ]
   };
 
   return (
     <>
       <SEO 
-        title="Vente.club - Achat et Vente d'Entreprises au Québec | Opportunités Vérifiées" 
-        description="Découvrez plus de 100 entreprises à vendre au Québec : restaurants, commerces, franchises. Plateforme sécurisée avec vérification des annonces. Contactez directement les vendeurs." 
-        keywords="vente entreprise Québec, achat commerce Montréal, vendre restaurant, acheter franchise, opportunité affaires, cession entreprise, reprise commerce" 
+        title="Entreprises à Vendre au Québec | Achat Vente PME et Franchises"
+        description="Plus grande plateforme d'entreprises à vendre au Québec. Trouvez votre commerce, PME ou franchise. Contactez directement les propriétaires. Transactions sécurisées."
+        keywords="entreprise à vendre québec, commerce à vendre, PME à vendre, franchise québec, vente entreprise montréal, achat commerce québec, affaires à vendre, transmission entreprise"
         canonical="/" 
-        structuredData={structuredData} 
+        structuredData={structuredData}
       />
       
       {/* Hero Section - Modern Gradient Design */}
@@ -191,6 +247,19 @@ const Index = () => {
               >
                 Vendre mon entreprise
               </Button>
+            </div>
+
+            {/* SEO Rich Content */}
+            <div className="mt-12 max-w-4xl mx-auto space-y-4">
+              <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
+                <strong className="text-foreground">Vente.club</strong> est la plateforme leader pour l'<strong className="text-foreground">achat et la vente d'entreprises au Québec</strong>. 
+                Que vous cherchiez une <strong className="text-foreground">PME à vendre</strong>, un <strong className="text-foreground">commerce établi</strong> ou une <strong className="text-foreground">franchise rentable</strong>, 
+                découvrez des centaines d'opportunités à <strong className="text-foreground">Montréal</strong>, <strong className="text-foreground">Québec</strong>, <strong className="text-foreground">Laval</strong> et partout en province.
+              </p>
+              <p className="text-sm md:text-base text-muted-foreground/80">
+                Connectez-vous directement avec les propriétaires pour une <strong className="text-foreground">transaction sécurisée et transparente</strong>. 
+                Restaurants, dépanneurs, salons de coiffure, franchises de services - trouvez l'opportunité parfaite pour votre projet entrepreneurial.
+              </p>
             </div>
           </div>
         </div>
@@ -284,6 +353,92 @@ const Index = () => {
                 <p className="text-lg text-muted-foreground">Aucune annonce disponible pour le moment</p>
               </div>
             )}
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section for SEO */}
+      <section className="py-16 bg-muted/30">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                Questions Fréquentes sur l'Achat et la Vente d'Entreprises au Québec
+              </h2>
+              <p className="text-muted-foreground text-lg">
+                Tout ce que vous devez savoir pour acheter ou vendre une entreprise
+              </p>
+            </div>
+
+            <Accordion type="single" collapsible className="space-y-4">
+              <AccordionItem value="item-1" className="bg-background rounded-lg px-6 border">
+                <AccordionTrigger className="text-left hover:no-underline">
+                  <span className="font-semibold">Comment acheter une entreprise au Québec?</span>
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground leading-relaxed">
+                  L'achat d'une entreprise au Québec commence par l'identification d'opportunités sur des plateformes comme Vente.club. 
+                  Ensuite, effectuez une due diligence approfondie, négociez le prix, organisez le financement et complétez la transaction 
+                  avec l'aide de professionnels (avocats, comptables). Notre plateforme facilite le contact direct avec les vendeurs.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="item-2" className="bg-background rounded-lg px-6 border">
+                <AccordionTrigger className="text-left hover:no-underline">
+                  <span className="font-semibold">Quel est le prix moyen d'une PME au Québec?</span>
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground leading-relaxed">
+                  Le prix d'une PME varie considérablement selon l'industrie, les revenus et la rentabilité. En général, 
+                  une PME se vend entre 2 à 5 fois son BAIIA (bénéfice avant intérêts, impôts et amortissement). Sur Vente.club, 
+                  vous trouverez des opportunités allant de 50 000$ pour de petits commerces jusqu'à plusieurs millions pour des franchises établies.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="item-3" className="bg-background rounded-lg px-6 border">
+                <AccordionTrigger className="text-left hover:no-underline">
+                  <span className="font-semibold">Comment vendre mon entreprise rapidement?</span>
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground leading-relaxed">
+                  Pour vendre votre entreprise rapidement: préparez des états financiers clairs, fixez un prix réaliste basé 
+                  sur l'évaluation du marché, créez une annonce détaillée avec photos sur Vente.club, et soyez disponible pour 
+                  répondre aux questions des acheteurs potentiels. Notre plateforme met en avant les annonces Premium pour maximiser la visibilité.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="item-4" className="bg-background rounded-lg px-6 border">
+                <AccordionTrigger className="text-left hover:no-underline">
+                  <span className="font-semibold">Quels sont les coûts associés à l'achat d'une entreprise?</span>
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground leading-relaxed">
+                  Les coûts incluent: le prix d'achat de l'entreprise, les frais légaux (avocat), les frais comptables, 
+                  la due diligence, les frais de transfert de permis et licences, et potentiellement des frais de courtage. 
+                  Prévoyez aussi un fonds de roulement pour les premiers mois d'opération. Sur Vente.club, le contact direct 
+                  avec les vendeurs élimine les frais de courtage traditionnels.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="item-5" className="bg-background rounded-lg px-6 border">
+                <AccordionTrigger className="text-left hover:no-underline">
+                  <span className="font-semibold">Faut-il un courtier pour vendre son entreprise?</span>
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground leading-relaxed">
+                  Non, un courtier n'est pas obligatoire. Vente.club vous permet de vendre directement votre entreprise sans 
+                  commission de courtage élevée. Notre plateforme offre tous les outils nécessaires: création d'annonce optimisée, 
+                  messagerie sécurisée avec acheteurs, et visibilité maximale. Vous gardez le contrôle total et économisez des milliers en frais.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="item-6" className="bg-background rounded-lg px-6 border">
+                <AccordionTrigger className="text-left hover:no-underline">
+                  <span className="font-semibold">Quelle est la différence entre acheter une franchise et une entreprise indépendante?</span>
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground leading-relaxed">
+                  Une franchise offre un modèle d'affaires éprouvé, une marque reconnue et un soutien continu du franchiseur, 
+                  mais implique des frais de franchise et des redevances. Une entreprise indépendante offre plus de liberté et 
+                  d'autonomie, mais requiert plus d'efforts en marketing et développement. Sur Vente.club, explorez les deux options 
+                  pour trouver ce qui correspond à votre vision entrepreneuriale.
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
           </div>
         </div>
       </section>
