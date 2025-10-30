@@ -257,7 +257,7 @@ const Index = () => {
                 découvrez des centaines d'opportunités à <strong className="text-foreground">Montréal</strong>, <strong className="text-foreground">Québec</strong>, <strong className="text-foreground">Laval</strong> et partout en province.
               </p>
               <p className="text-sm md:text-base text-muted-foreground/80">
-                Connectez-vous directement avec les propriétaires pour une <strong className="text-foreground">transaction sécurisée et transparente</strong>. 
+                Connectez-vous directement avec les propriétaires. 
                 Restaurants, dépanneurs, salons de coiffure, franchises de services - trouvez l'opportunité parfaite pour votre projet entrepreneurial.
               </p>
             </div>
