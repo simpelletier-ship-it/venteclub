@@ -53,8 +53,8 @@ export const SEO = ({
       <link rel="canonical" href={currentUrl} />
       
       {/* Favicon and Logo */}
-      <link rel="icon" type="image/png" href="/logo.png" />
-      <link rel="apple-touch-icon" href="/logo.png" />
+      <link rel="icon" type="image/png" href="/favicon-vente.png" />
+      <link rel="apple-touch-icon" href="/favicon-vente.png" />
 
       {/* Open Graph / Facebook */}
       <meta property="og:type" content={type} />
