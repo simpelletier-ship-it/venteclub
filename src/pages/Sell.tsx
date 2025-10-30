@@ -26,7 +26,7 @@ const Sell = () => {
 
           <div className="grid md:grid-cols-3 gap-8">
             <Card 
-              className="group cursor-pointer hover:shadow-premium transition-all duration-300 hover:scale-105 border-2 hover:border-primary"
+              className="group cursor-pointer hover:shadow-premium transition-all duration-300 hover:scale-105 border-2 hover:border-primary flex flex-col"
               onClick={() => navigate("/list-business")}
             >
               <CardHeader className="text-center space-y-4 pb-6">
@@ -34,12 +34,12 @@ const Sell = () => {
                   <Building2 className="w-10 h-10 text-primary" />
                 </div>
                 <CardTitle className="text-2xl">Entreprise</CardTitle>
-                <CardDescription className="text-base">
+                <CardDescription className="text-base min-h-[48px]">
                   Vendez votre entreprise établie, commerciale ou industrielle
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-3 text-sm text-muted-foreground">
-                <ul className="space-y-2">
+              <CardContent className="flex-1 flex flex-col justify-between text-sm text-muted-foreground">
+                <ul className="space-y-2 mb-4">
                   <li className="flex items-start gap-2">
                     <span className="text-primary mt-0.5">•</span>
                     <span>Commerce de détail ou en ligne</span>
@@ -56,9 +56,13 @@ const Sell = () => {
                     <span className="text-primary mt-0.5">•</span>
                     <span>Restauration et hôtellerie</span>
                   </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary mt-0.5">•</span>
+                    <span>Distribution et import-export</span>
+                  </li>
                 </ul>
                 <Button 
-                  className="w-full mt-4 bg-primary hover:bg-primary/90" 
+                  className="w-full bg-primary hover:bg-primary/90" 
                   onClick={() => navigate("/list-business")}
                 >
                   Vendre une Entreprise
@@ -67,7 +71,7 @@ const Sell = () => {
             </Card>
 
             <Card 
-              className="group cursor-pointer hover:shadow-premium transition-all duration-300 hover:scale-105 border-2 hover:border-accent"
+              className="group cursor-pointer hover:shadow-premium transition-all duration-300 hover:scale-105 border-2 hover:border-accent flex flex-col"
               onClick={() => navigate("/list-franchise")}
             >
               <CardHeader className="text-center space-y-4 pb-6">
@@ -75,12 +79,12 @@ const Sell = () => {
                   <Store className="w-10 h-10 text-accent" />
                 </div>
                 <CardTitle className="text-2xl">Franchise</CardTitle>
-                <CardDescription className="text-base">
+                <CardDescription className="text-base min-h-[48px]">
                   Vendez votre franchise d'une marque reconnue
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-3 text-sm text-muted-foreground">
-                <ul className="space-y-2">
+              <CardContent className="flex-1 flex flex-col justify-between text-sm text-muted-foreground">
+                <ul className="space-y-2 mb-4">
                   <li className="flex items-start gap-2">
                     <span className="text-accent mt-0.5">•</span>
                     <span>Franchise alimentaire</span>
@@ -95,11 +99,15 @@ const Sell = () => {
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-accent mt-0.5">•</span>
+                    <span>Franchise de vente au détail</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-accent mt-0.5">•</span>
                     <span>Autres franchises établies</span>
                   </li>
                 </ul>
                 <Button 
-                  className="w-full mt-4 bg-accent hover:bg-accent/90" 
+                  className="w-full bg-accent hover:bg-accent/90" 
                   onClick={() => navigate("/list-franchise")}
                 >
                   Vendre une Franchise
@@ -108,7 +116,7 @@ const Sell = () => {
             </Card>
 
             <Card 
-              className="group cursor-pointer hover:shadow-premium transition-all duration-300 hover:scale-105 border-2 hover:border-secondary"
+              className="group cursor-pointer hover:shadow-premium transition-all duration-300 hover:scale-105 border-2 hover:border-secondary flex flex-col"
               onClick={() => navigate("/list-property")}
             >
               <CardHeader className="text-center space-y-4 pb-6">
@@ -116,12 +124,12 @@ const Sell = () => {
                   <Home className="w-10 h-10 text-secondary" />
                 </div>
                 <CardTitle className="text-2xl">Immeuble Commercial</CardTitle>
-                <CardDescription className="text-base">
+                <CardDescription className="text-base min-h-[48px]">
                   Vendez votre propriété commerciale, industrielle ou terrain
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-3 text-sm text-muted-foreground">
-                <ul className="space-y-2">
+              <CardContent className="flex-1 flex flex-col justify-between text-sm text-muted-foreground">
+                <ul className="space-y-2 mb-4">
                   <li className="flex items-start gap-2">
                     <span className="text-secondary mt-0.5">•</span>
                     <span>Bureaux commerciaux</span>
@@ -144,7 +152,7 @@ const Sell = () => {
                   </li>
                 </ul>
                 <Button 
-                  className="w-full mt-4 bg-secondary hover:bg-secondary/90" 
+                  className="w-full bg-secondary hover:bg-secondary/90" 
                   onClick={() => navigate("/list-property")}
                 >
                   Vendre un Immeuble
