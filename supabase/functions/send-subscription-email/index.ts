@@ -97,8 +97,8 @@ const handler = async (req: Request): Promise<Response> => {
                   <div class="benefit-item">Messagerie directe sans restrictions</div>
                   <div class="benefit-item">Alertes en temps réel sur les nouvelles annonces</div>
                   <div class="benefit-item">Badge Premium sur votre profil</div>
-                  <div class="benefit-item">Support prioritaire 24/7</div>
-                  <div class="benefit-item">Outils d'analyse et statistiques avancées</div>
+                  <div class="benefit-item">Support prioritaire</div>
+                  <div class="benefit-item">Outils d'analyse et statistiques</div>
                 </div>
 
                 <p style="margin-top: 30px;">Vous pouvez gérer votre abonnement à tout moment depuis votre espace membre.</p>

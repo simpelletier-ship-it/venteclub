@@ -96,7 +96,7 @@ const handler = async (req: Request): Promise<Response> => {
                   <p style="margin: 10px 0; font-size: 18px;">Votre annonce "<strong>${business.title}</strong>" est maintenant en ligne !</p>
                 </div>
 
-                <p>Excellente nouvelle ! Notre équipe a validé votre annonce et elle est désormais visible par des milliers d'acheteurs potentiels sur Vente.club.</p>
+                <p>Excellente nouvelle ! Notre équipe a validé votre annonce et elle est désormais visible par les acheteurs potentiels sur Vente.club.</p>
 
                 <div class="business-details">
                   <h3 style="color: #667eea; margin-top: 0;">📊 Détails de votre annonce</h3>
@@ -135,7 +135,7 @@ const handler = async (req: Request): Promise<Response> => {
 
                 <p style="background: #e7f3ff; border-left: 4px solid #007bff; padding: 15px; border-radius: 4px; margin: 20px 0;">
                   🚀 <strong>Boostez votre visibilité !</strong><br>
-                  Mettez votre annonce en vedette pour apparaître en haut des résultats et recevoir 3x plus de vues.
+                  Mettez votre annonce en vedette pour apparaître en haut des résultats et augmenter sa visibilité.
                 </p>
 
                 <p style="margin-top: 30px;">Nous vous souhaitons une vente rapide et réussie. Notre équipe reste à votre disposition pour toute question.</p>
