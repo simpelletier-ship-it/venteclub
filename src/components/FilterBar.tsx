@@ -9,10 +9,12 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { QUEBEC_INDUSTRIES, LISTING_TYPES } from "@/lib/constants";
+import { QUEBEC_REGIONS, getCitiesFromRegions } from "@/lib/quebecRegions";
 import { ChevronDown, X } from "lucide-react";
 
 interface FilterBarProps {
   onFilter?: (filters: { 
+    regions?: string[];
     cities?: string[]; 
     industries?: string[];
     listingTypes?: string[];
@@ -22,32 +24,19 @@ interface FilterBarProps {
 }
 
 const FilterBar = ({ onFilter }: FilterBarProps) => {
-  const [selectedCities, setSelectedCities] = useState<string[]>([]);
+  const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
   const [selectedIndustries, setSelectedIndustries] = useState<string[]>([]);
   const [selectedListingTypes, setSelectedListingTypes] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState<number[]>([0, 10000000]);
-  const [citiesOpen, setCitiesOpen] = useState(false);
+  const [regionsOpen, setRegionsOpen] = useState(false);
   const [industriesOpen, setIndustriesOpen] = useState(false);
   const [listingTypesOpen, setListingTypesOpen] = useState(false);
 
-  const cities = [
-    "Montréal",
-    "Québec",
-    "Laval",
-    "Gatineau",
-    "Longueuil",
-    "Sherbrooke",
-    "Saguenay",
-    "Trois-Rivières",
-    "Terrebonne",
-    "Saint-Jean-sur-Richelieu",
-  ];
-
-  const toggleCity = (city: string) => {
-    setSelectedCities(prev => 
-      prev.includes(city) 
-        ? prev.filter(c => c !== city)
-        : [...prev, city]
+  const toggleRegion = (regionCode: string) => {
+    setSelectedRegions(prev => 
+      prev.includes(regionCode) 
+        ? prev.filter(r => r !== regionCode)
+        : [...prev, regionCode]
     );
   };
 
@@ -67,8 +56,8 @@ const FilterBar = ({ onFilter }: FilterBarProps) => {
     );
   };
 
-  const removeCity = (city: string) => {
-    setSelectedCities(prev => prev.filter(c => c !== city));
+  const removeRegion = (regionCode: string) => {
+    setSelectedRegions(prev => prev.filter(r => r !== regionCode));
   };
 
   const removeIndustry = (industry: string) => {
@@ -81,8 +70,10 @@ const FilterBar = ({ onFilter }: FilterBarProps) => {
 
   const handleFilter = () => {
     if (onFilter) {
+      const cities = selectedRegions.length > 0 ? getCitiesFromRegions(selectedRegions) : undefined;
       onFilter({
-        cities: selectedCities.length > 0 ? selectedCities : undefined,
+        regions: selectedRegions.length > 0 ? selectedRegions : undefined,
+        cities,
         industries: selectedIndustries.length > 0 ? selectedIndustries : undefined,
         listingTypes: selectedListingTypes.length > 0 ? selectedListingTypes : undefined,
         minPrice: priceRange[0],
@@ -92,7 +83,7 @@ const FilterBar = ({ onFilter }: FilterBarProps) => {
   };
 
   const handleReset = () => {
-    setSelectedCities([]);
+    setSelectedRegions([]);
     setSelectedIndustries([]);
     setSelectedListingTypes([]);
     setPriceRange([0, 10000000]);
@@ -142,36 +133,36 @@ const FilterBar = ({ onFilter }: FilterBarProps) => {
             </PopoverContent>
           </Popover>
 
-          {/* Villes */}
-          <Popover open={citiesOpen} onOpenChange={setCitiesOpen}>
+          {/* Régions */}
+          <Popover open={regionsOpen} onOpenChange={setRegionsOpen}>
             <PopoverTrigger asChild>
               <Button 
                 variant="outline" 
                 className="flex-1 h-12 bg-background border-border justify-between"
               >
                 <span className="truncate">
-                  {selectedCities.length > 0 
-                    ? `${selectedCities.length} ville${selectedCities.length > 1 ? 's' : ''}`
-                    : "Villes (optionnel)"
+                  {selectedRegions.length > 0 
+                    ? `${selectedRegions.length} région${selectedRegions.length > 1 ? 's' : ''}`
+                    : "Régions (optionnel)"
                   }
                 </span>
                 <ChevronDown className="h-4 w-4 opacity-50 ml-2 flex-shrink-0" />
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-80 p-4 bg-card border-border z-50">
-              <div className="space-y-2 max-h-[300px] overflow-y-auto">
-                {cities.map((city) => (
-                  <div key={city} className="flex items-center space-x-2">
+              <div className="space-y-2 max-h-[400px] overflow-y-auto">
+                {QUEBEC_REGIONS.map((region) => (
+                  <div key={region.code} className="flex items-center space-x-2">
                     <Checkbox
-                      id={`city-${city}`}
-                      checked={selectedCities.includes(city)}
-                      onCheckedChange={() => toggleCity(city)}
+                      id={`region-${region.code}`}
+                      checked={selectedRegions.includes(region.code)}
+                      onCheckedChange={() => toggleRegion(region.code)}
                     />
                     <label
-                      htmlFor={`city-${city}`}
+                      htmlFor={`region-${region.code}`}
                       className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer flex-1"
                     >
-                      {city}
+                      {region.name}
                     </label>
                   </div>
                 ))}
@@ -218,7 +209,7 @@ const FilterBar = ({ onFilter }: FilterBarProps) => {
         </div>
 
         {/* Selected filters badges */}
-        {(selectedCities.length > 0 || selectedIndustries.length > 0 || selectedListingTypes.length > 0) && (
+        {(selectedRegions.length > 0 || selectedIndustries.length > 0 || selectedListingTypes.length > 0) && (
           <div className="flex flex-wrap gap-2">
             {selectedListingTypes.map((type) => (
               <Badge key={type} variant="default" className="pl-2 pr-1">
@@ -231,11 +222,11 @@ const FilterBar = ({ onFilter }: FilterBarProps) => {
                 </button>
               </Badge>
             ))}
-            {selectedCities.map((city) => (
-              <Badge key={city} variant="secondary" className="pl-2 pr-1">
-                {city}
+            {selectedRegions.map((regionCode) => (
+              <Badge key={regionCode} variant="secondary" className="pl-2 pr-1">
+                {QUEBEC_REGIONS.find(r => r.code === regionCode)?.name || regionCode}
                 <button
-                  onClick={() => removeCity(city)}
+                  onClick={() => removeRegion(regionCode)}
                   className="ml-1 hover:bg-destructive/20 rounded-full p-0.5"
                 >
                   <X className="h-3 w-3" />
@@ -282,7 +273,7 @@ const FilterBar = ({ onFilter }: FilterBarProps) => {
           >
             Filtrer
           </Button>
-          {(selectedCities.length > 0 || selectedIndustries.length > 0 || selectedListingTypes.length > 0 || priceRange[0] > 0 || priceRange[1] < 10000000) && (
+          {(selectedRegions.length > 0 || selectedIndustries.length > 0 || selectedListingTypes.length > 0 || priceRange[0] > 0 || priceRange[1] < 10000000) && (
             <Button 
               onClick={handleReset}
               variant="outline"
@@ -294,7 +285,7 @@ const FilterBar = ({ onFilter }: FilterBarProps) => {
         </div>
       </div>
       <p className="text-sm text-muted-foreground mt-3 text-center">
-        Affinez votre recherche par type, villes, secteurs ou fourchette de prix
+        Affinez votre recherche par type, régions, secteurs ou fourchette de prix
       </p>
     </div>
   );
