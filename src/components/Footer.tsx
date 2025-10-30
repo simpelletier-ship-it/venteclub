@@ -22,6 +22,8 @@ export const Footer = () => {
               <li><Link to="/" className="text-sm text-muted-foreground hover:text-accent transition-colors">Accueil</Link></li>
               <li><Link to="/map" className="text-sm text-muted-foreground hover:text-accent transition-colors">Carte interactive</Link></li>
               <li><Link to="/list-business" className="text-sm text-muted-foreground hover:text-accent transition-colors">Vendre une entreprise</Link></li>
+              <li><Link to="/list-franchise" className="text-sm text-muted-foreground hover:text-accent transition-colors">Vendre une franchise</Link></li>
+              <li><Link to="/list-property" className="text-sm text-muted-foreground hover:text-accent transition-colors">Vendre un immeuble</Link></li>
               <li><Link to="/a-propos" className="text-sm text-muted-foreground hover:text-accent transition-colors">À propos</Link></li>
               <li><Link to="/contact" className="text-sm text-muted-foreground hover:text-accent transition-colors">Contact</Link></li>
               <li><Link to="/blog" className="text-sm text-muted-foreground hover:text-accent transition-colors">Blog</Link></li>
