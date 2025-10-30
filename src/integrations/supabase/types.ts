@@ -429,6 +429,33 @@ export type Database = {
           },
         ]
       }
+      email_verification_codes: {
+        Row: {
+          code: string
+          created_at: string | null
+          email: string
+          expires_at: string
+          id: string
+          verified: boolean | null
+        }
+        Insert: {
+          code: string
+          created_at?: string | null
+          email: string
+          expires_at: string
+          id?: string
+          verified?: boolean | null
+        }
+        Update: {
+          code?: string
+          created_at?: string | null
+          email?: string
+          expires_at?: string
+          id?: string
+          verified?: boolean | null
+        }
+        Relationships: []
+      }
       featured_payments: {
         Row: {
           amount: number
@@ -1007,6 +1034,7 @@ export type Database = {
         Returns: boolean
       }
       cleanup_expired_sessions: { Args: never; Returns: undefined }
+      cleanup_expired_verification_codes: { Args: never; Returns: undefined }
       cleanup_old_login_attempts: { Args: never; Returns: undefined }
       create_demo_businesses: { Args: never; Returns: undefined }
       create_sample_businesses: { Args: never; Returns: undefined }

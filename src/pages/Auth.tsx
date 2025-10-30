@@ -18,6 +18,8 @@ const Auth = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showResetPassword, setShowResetPassword] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [verificationStep, setVerificationStep] = useState(false);
+  const [verificationCode, setVerificationCode] = useState("");
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -160,46 +162,22 @@ const Auth = () => {
 
       const validatedData = authSchema.parse({ email, password });
 
-      const { data, error } = await supabase.auth.signUp({
-        email: validatedData.email,
-        password: validatedData.password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/`,
-        },
+      // Appeler l'edge function pour créer et envoyer le code
+      const { error } = await supabase.functions.invoke('create-verification-code', {
+        body: { email: validatedData.email }
       });
 
       if (error) {
-        if (error.message.includes('User already registered')) {
-          toast({
-            variant: "destructive",
-            title: "Compte existant",
-            description: "Un compte existe déjà avec cet email. Veuillez vous connecter.",
-          });
-        } else {
-          throw error;
-        }
-        return;
+        throw error;
       }
 
-      // Send welcome email
-      if (data.user?.email) {
-        try {
-          await supabase.functions.invoke('send-welcome-email', {
-            body: {
-              email: data.user.email,
-              name: data.user.email.split('@')[0]
-            }
-          });
-        } catch (emailError) {
-          console.error("Error sending welcome email:", emailError);
-        }
-      }
-
+      // Passer à l'étape de vérification
+      setVerificationStep(true);
       toast({
-        title: "Compte créé avec succès !",
-        description: "Vous êtes maintenant connecté.",
+        title: "Code envoyé !",
+        description: "Nous vous avons envoyé un code de vérification par courriel. Merci de consulter vos pourriels.",
+        duration: 8000,
       });
-      navigate("/");
     } catch (error: any) {
       if (error.errors) {
         error.errors.forEach((err: any) => {
@@ -216,6 +194,59 @@ const Auth = () => {
           description: error.message,
         });
       }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyCode = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      // Vérifier le code et créer le compte
+      const { data, error } = await supabase.functions.invoke('verify-code-and-signup', {
+        body: {
+          email,
+          code: verificationCode,
+          password
+        }
+      });
+
+      if (error) {
+        if (error.message.includes('invalide') || error.message.includes('expiré')) {
+          toast({
+            variant: "destructive",
+            title: "Code invalide",
+            description: "Le code que vous avez entré est invalide ou expiré. Veuillez réessayer.",
+          });
+        } else {
+          throw error;
+        }
+        return;
+      }
+
+      // Maintenant se connecter avec les credentials
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (signInError) {
+        throw signInError;
+      }
+
+      toast({
+        title: "Compte vérifié avec succès !",
+        description: "Vous êtes maintenant connecté.",
+      });
+      navigate("/");
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: error.message,
+      });
     } finally {
       setLoading(false);
     }
@@ -346,7 +377,44 @@ const Auth = () => {
               </TabsContent>
               
               <TabsContent value="signup">
-                <form onSubmit={handleSignUp} className="space-y-4">
+                {verificationStep ? (
+                  <form onSubmit={handleVerifyCode} className="space-y-4">
+                    <div className="text-center mb-6">
+                      <h3 className="text-lg font-semibold mb-2">Code de vérification</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Nous vous avons envoyé un code de vérification par courriel. Merci de consulter vos pourriels.
+                      </p>
+                    </div>
+                    <div>
+                      <Label htmlFor="verification-code">Code de vérification</Label>
+                      <Input
+                        id="verification-code"
+                        type="text"
+                        placeholder="Entrez le code à 6 chiffres"
+                        value={verificationCode}
+                        onChange={(e) => setVerificationCode(e.target.value)}
+                        required
+                        maxLength={6}
+                        className="w-full mt-2 text-center text-2xl tracking-widest font-mono"
+                      />
+                    </div>
+                    <Button type="submit" disabled={loading || verificationCode.length !== 6} className="w-full">
+                      {loading ? "Vérification..." : "Vérifier le code"}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      onClick={() => {
+                        setVerificationStep(false);
+                        setVerificationCode("");
+                      }}
+                      className="w-full"
+                    >
+                      Retour
+                    </Button>
+                  </form>
+                ) : (
+                  <form onSubmit={handleSignUp} className="space-y-4">
                   <div>
                     <Label htmlFor="signup-email">Email</Label>
                     <Input
@@ -420,9 +488,10 @@ const Auth = () => {
                   </div>
 
                   <Button type="submit" disabled={loading || !acceptedTerms} className="w-full">
-                    {loading ? "Création..." : "Créer mon compte"}
+                    {loading ? "Envoi du code..." : "Recevoir le code de vérification"}
                   </Button>
                 </form>
+                )}
               </TabsContent>
             </Tabs>
           </div>
