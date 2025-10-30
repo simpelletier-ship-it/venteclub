@@ -163,6 +163,7 @@ const ListProperty = () => {
                     <SelectItem value="bureau">Bureau commercial</SelectItem>
                     <SelectItem value="commerce">Espace commercial</SelectItem>
                     <SelectItem value="industriel">Bâtiment industriel</SelectItem>
+                    <SelectItem value="terrain">Terrain commercial</SelectItem>
                     <SelectItem value="mixte">Propriété mixte</SelectItem>
                     <SelectItem value="autre">Autre</SelectItem>
                   </SelectContent>

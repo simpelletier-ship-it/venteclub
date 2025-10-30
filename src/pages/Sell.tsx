@@ -117,7 +117,7 @@ const Sell = () => {
                 </div>
                 <CardTitle className="text-2xl">Immeuble Commercial</CardTitle>
                 <CardDescription className="text-base">
-                  Vendez votre propriété commerciale ou industrielle
+                  Vendez votre propriété commerciale, industrielle ou terrain
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-3 text-sm text-muted-foreground">
@@ -133,6 +133,10 @@ const Sell = () => {
                   <li className="flex items-start gap-2">
                     <span className="text-secondary mt-0.5">•</span>
                     <span>Bâtiments industriels</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-secondary mt-0.5">•</span>
+                    <span>Terrains commerciaux</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-secondary mt-0.5">•</span>
