@@ -101,7 +101,7 @@ const ListProperty = () => {
         body: {
           description: formData.description,
           title: formData.title,
-          industry: formData.property_type || 'immeuble commercial',
+          industry: formData.property_type || 'immobilier',
           type: 'property'
         }
       });
@@ -151,10 +151,10 @@ const ListProperty = () => {
         <div className="mb-8 text-center">
           <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-secondary/10 border border-secondary/20 mb-4">
             <Home className="w-5 h-5 text-secondary" />
-            <span className="text-sm font-semibold">Immeuble Commercial</span>
+            <span className="text-sm font-semibold">Immobilier</span>
           </div>
           <h1 className="text-4xl md:text-5xl font-display font-bold mb-4">
-            Vendez votre <span className="text-secondary">immeuble commercial</span>
+            Vendez votre <span className="text-secondary">immobilier</span>
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Listez votre propriété commerciale ou industrielle sur notre plateforme

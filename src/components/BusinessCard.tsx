@@ -73,7 +73,7 @@ const BusinessCard = ({
   // Déterminer le type d'annonce
   const getBusinessType = () => {
     if (sale_type === 'property') {
-      return { label: 'Immeuble Commercial', icon: Home, color: 'bg-emerald-500' };
+      return { label: 'Immobilier', icon: Home, color: 'bg-emerald-500' };
     }
     if (is_franchise) {
       return { label: 'Franchise', icon: TrendingUp, color: 'bg-purple-500' };

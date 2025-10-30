@@ -103,9 +103,9 @@ const PropertyListings = () => {
   return (
     <>
       <SEO 
-        title="Immeubles Commerciaux à Vendre au Québec | Vente.club" 
-        description="Découvrez des immeubles commerciaux, bureaux, espaces commerciaux et propriétés industrielles à vendre au Québec. Contactez directement les propriétaires." 
-        keywords="immeuble commercial Québec, bureau à vendre Montréal, propriété commerciale, espace commercial, bâtiment industriel, terrain commercial" 
+        title="Immobilier à Vendre au Québec | Vente.club" 
+        description="Découvrez des propriétés immobilières, bureaux, espaces commerciaux et bâtiments industriels à vendre au Québec. Contactez directement les propriétaires." 
+        keywords="immobilier Québec, bureau à vendre Montréal, propriété commerciale, espace commercial, bâtiment industriel, terrain commercial" 
         canonical="/immeubles-commerciaux" 
         structuredData={structuredData} 
       />
@@ -143,7 +143,7 @@ const PropertyListings = () => {
             
             {/* Subtitle */}
             <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              Découvrez des opportunités d'investissement immobilier commercial vérifiées
+              Découvrez des opportunités d'investissement immobilier vérifiées
             </p>
             
             {/* CTA Buttons */}
@@ -293,7 +293,7 @@ const PropertyListings = () => {
         <div className="relative container mx-auto px-4 text-center">
           <div className="max-w-3xl mx-auto space-y-8 animate-slide-up">
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-foreground leading-tight">
-              Prêt à Investir dans <span className="text-secondary">l'Immobilier Commercial ?</span>
+              Prêt à Investir dans <span className="text-secondary">l'Immobilier ?</span>
             </h2>
             <p className="text-xl md:text-2xl text-muted-foreground">
               Rejoignez des investisseurs qui font confiance à Vente.club
