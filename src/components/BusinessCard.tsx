@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { TrendingUp, MapPin, Star, XCircle } from "lucide-react";
+import { TrendingUp, MapPin, Star, XCircle, Building2, Home, Store } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { FavoriteButton } from "./FavoriteButton";
 import { useState, useEffect } from "react";
@@ -27,6 +27,7 @@ interface BusinessCardProps {
   status?: string;
   approval_status?: string;
   is_franchise?: boolean;
+  sale_type?: 'assets' | 'shares' | 'both' | 'property';
   has_pending_changes?: boolean;
   onWithdraw?: () => void;
   onFeature?: () => void;
@@ -48,6 +49,7 @@ const BusinessCard = ({
   status,
   approval_status,
   is_franchise = false,
+  sale_type,
   has_pending_changes = false,
   onWithdraw,
   onFeature,
@@ -67,6 +69,19 @@ const BusinessCard = ({
   const displayRevenue = annual_revenue ? `${annual_revenue.toLocaleString('fr-CA')} $` : 'N/A';
   const displayPrice = asking_price ? `${asking_price.toLocaleString('fr-CA')} $` : 'N/A';
   const displayBaiia = baiia ? `${baiia.toLocaleString('fr-CA')} $` : 'N/D';
+
+  // Déterminer le type d'annonce
+  const getBusinessType = () => {
+    if (sale_type === 'property') {
+      return { label: 'Immeuble Commercial', icon: Home, color: 'bg-emerald-500' };
+    }
+    if (is_franchise) {
+      return { label: 'Franchise', icon: TrendingUp, color: 'bg-purple-500' };
+    }
+    return { label: 'Entreprise', icon: Store, color: 'bg-blue-500' };
+  };
+
+  const businessType = getBusinessType();
 
   const handleClick = () => {
     if (slug && status !== 'sold') {
@@ -94,15 +109,16 @@ const BusinessCard = ({
         <div className="flex items-start justify-between gap-2">
           <div className="space-y-3 flex-1">
             <div className="flex items-center gap-2 flex-wrap">
+              {/* Badge Type d'annonce */}
+              <Badge className={`${businessType.color} text-white border-0 shadow-md`}>
+                <businessType.icon className="w-3 h-3 mr-1" />
+                {businessType.label}
+              </Badge>
+              
               {featured && (
                 <Badge className="bg-gradient-to-r from-accent to-accent/80 text-accent-foreground border-0 shadow-md">
                   <Star className="w-3 h-3 fill-current mr-1" />
                   En Vedette
-                </Badge>
-              )}
-              {is_franchise && (
-                <Badge className="bg-gradient-to-r from-secondary to-secondary/80 text-secondary-foreground border-0 shadow-md">
-                  🏢 Franchise
                 </Badge>
               )}
               {has_pending_changes && showPendingBadge && (
