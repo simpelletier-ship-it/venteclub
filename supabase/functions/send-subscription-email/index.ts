@@ -104,10 +104,23 @@ const handler = async (req: Request): Promise<Response> => {
                 <p style="margin-top: 30px;">Vous pouvez gérer votre abonnement à tout moment depuis votre espace membre.</p>
                 
                 <p style="margin-top: 20px;">Merci de votre confiance,<br><strong>L'équipe Vente.club</strong></p>
+                
+                <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+                  <p style="margin: 5px 0; font-size: 14px; color: #666;">
+                    <strong>Vente.club</strong><br>
+                    Plateforme de vente d'entreprises au Québec<br>
+                    Web: <a href="https://vente.club" style="color: #667eea; text-decoration: none;">vente.club</a><br>
+                    Courriel: <a href="mailto:info@vente.club" style="color: #667eea; text-decoration: none;">info@vente.club</a>
+                  </p>
+                </div>
               </div>
               <div class="footer">
                 <p>© 2025 Vente.club. Tous droits réservés.</p>
-                <p>Cette facture a été générée automatiquement par notre système.</p>
+                <p style="margin-top: 10px;">Cette facture a été générée automatiquement par notre système.</p>
+                <p style="margin-top: 10px;">
+                  <a href="https://vente.club/terms" style="color: #666; text-decoration: none;">Conditions d'utilisation</a> | 
+                  <a href="https://vente.club/settings" style="color: #666; text-decoration: none;">Gérer mon abonnement</a>
+                </p>
               </div>
             </div>
           </body>
