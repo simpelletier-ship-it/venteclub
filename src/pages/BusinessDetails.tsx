@@ -382,8 +382,8 @@ const BusinessDetails = () => {
     },
     "offers": {
       "@type": "Offer",
-      "price": business.asking_price,
-      "priceCurrency": "CAD",
+      "price": business.asking_price > 0 ? business.asking_price : undefined,
+      "priceCurrency": business.asking_price > 0 ? "CAD" : undefined,
       "availability": business.status === 'active' ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
       "seller": {
         "@type": "Organization",
@@ -412,7 +412,7 @@ const BusinessDetails = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-secondary/10">
       <SEO
-        title={`${business.title} à Vendre - ${business.asking_price.toLocaleString()} $ | ${business.city}, Québec`}
+        title={`${business.title} à Vendre ${business.asking_price > 0 ? `- ${business.asking_price.toLocaleString()} $` : '- Prix à discuter'} | ${business.city}, Québec`}
         description={`${business.is_franchise ? 'Franchise' : 'Entreprise'} ${business.industry} à vendre à ${business.city}. ${business.description.substring(0, 120)}... ${business.annual_revenue ? `Revenus annuels: ${business.annual_revenue.toLocaleString()} $` : ''} Contact direct avec le propriétaire.`}
         keywords={`entreprise à vendre ${business.city}, ${business.industry} à vendre québec, commerce à vendre ${business.city}, achat entreprise ${business.industry}, ${business.is_franchise ? 'franchise à vendre' : 'PME à vendre'}, affaires québec, vente commerce ${business.city}`}
         canonical={`/business/${business.slug}`}
@@ -458,7 +458,7 @@ const BusinessDetails = () => {
                   </div>
                   <div className="text-right">
                     <div className="text-3xl font-bold text-accent">
-                      {business.asking_price.toLocaleString()} CAD
+                      {business.asking_price === 0 ? 'À discuter' : `${business.asking_price.toLocaleString()} CAD`}
                     </div>
                     <div className="text-sm text-muted-foreground">Prix demandé</div>
                     {business.sale_type && (

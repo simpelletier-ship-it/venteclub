@@ -37,6 +37,7 @@ const ListProperty = () => {
   });
   const [photos, setPhotos] = useState<File[]>([]);
   const [photoPreviewUrls, setPhotoPreviewUrls] = useState<string[]>([]);
+  const [priceNegotiable, setPriceNegotiable] = useState(false);
 
   useEffect(() => {
     const checkSession = async () => {
@@ -235,15 +236,33 @@ const ListProperty = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="asking_price">Prix demandé ($) *</Label>
+                <Label htmlFor="asking_price">
+                  Prix demandé ($) {!priceNegotiable && <span className="text-destructive">*</span>}
+                </Label>
                 <Input
                   id="asking_price"
                   type="number"
                   value={formData.asking_price}
                   onChange={(e) => setFormData({ ...formData, asking_price: e.target.value })}
-                  placeholder="500000"
-                  required
+                  placeholder={priceNegotiable ? "À discuter" : "500000"}
+                  required={!priceNegotiable}
+                  disabled={priceNegotiable}
                 />
+                <div className="flex items-center space-x-2 mt-2">
+                  <Checkbox
+                    id="price_negotiable"
+                    checked={priceNegotiable}
+                    onCheckedChange={(checked) => {
+                      setPriceNegotiable(checked as boolean);
+                      if (checked) {
+                        setFormData({ ...formData, asking_price: "" });
+                      }
+                    }}
+                  />
+                  <Label htmlFor="price_negotiable" className="text-sm font-normal cursor-pointer">
+                    Prix à discuter
+                  </Label>
+                </div>
               </div>
 
               <div className="space-y-2">

@@ -49,6 +49,7 @@ const ListFranchise = () => {
   const [photos, setPhotos] = useState<File[]>([]);
   const [photoPreviewUrls, setPhotoPreviewUrls] = useState<string[]>([]);
   const [improvingDescription, setImprovingDescription] = useState(false);
+  const [priceNegotiable, setPriceNegotiable] = useState(false);
 
   useEffect(() => {
     const checkSession = async () => {
@@ -162,8 +163,8 @@ const ListFranchise = () => {
           city: formData.city,
           region: formData.region,
           province: formData.province,
-          asking_price: parseFloat(formData.franchise_fee),
-          franchise_fee: parseFloat(formData.franchise_fee),
+          asking_price: priceNegotiable ? 0 : parseFloat(formData.franchise_fee),
+          franchise_fee: priceNegotiable ? 0 : parseFloat(formData.franchise_fee),
           royalty_percentage: formData.royalty_percentage ? parseFloat(formData.royalty_percentage) : null,
           marketing_fee: formData.marketing_fee ? parseFloat(formData.marketing_fee) : null,
           initial_investment_min: formData.initial_investment_min ? parseFloat(formData.initial_investment_min) : null,
@@ -336,15 +337,33 @@ const ListFranchise = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="franchise_fee">Droit d'entrée franchise ($) *</Label>
+                    <Label htmlFor="franchise_fee">
+                      Droit d'entrée franchise ($) {!priceNegotiable && <span className="text-destructive">*</span>}
+                    </Label>
                     <Input
                       id="franchise_fee"
                       type="number"
                       value={formData.franchise_fee}
                       onChange={(e) => setFormData({ ...formData, franchise_fee: e.target.value })}
-                      placeholder="Ex: 50000"
-                      required
+                      placeholder={priceNegotiable ? "À discuter" : "Ex: 50000"}
+                      required={!priceNegotiable}
+                      disabled={priceNegotiable}
                     />
+                    <div className="flex items-center space-x-2 mt-2">
+                      <Checkbox
+                        id="price_negotiable"
+                        checked={priceNegotiable}
+                        onCheckedChange={(checked) => {
+                          setPriceNegotiable(checked as boolean);
+                          if (checked) {
+                            setFormData({ ...formData, franchise_fee: "" });
+                          }
+                        }}
+                      />
+                      <Label htmlFor="price_negotiable" className="text-sm font-normal cursor-pointer">
+                        Prix à discuter
+                      </Label>
+                    </div>
                   </div>
 
                   <div>

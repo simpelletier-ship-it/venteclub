@@ -67,7 +67,7 @@ const BusinessCard = ({
   }, []);
   
   const displayRevenue = annual_revenue ? `${annual_revenue.toLocaleString('fr-CA')} $` : 'N/A';
-  const displayPrice = asking_price ? `${asking_price.toLocaleString('fr-CA')} $` : 'N/A';
+  const displayPrice = asking_price === 0 ? 'À discuter' : asking_price ? `${asking_price.toLocaleString('fr-CA')} $` : 'N/A';
   const displayBaiia = baiia ? `${baiia.toLocaleString('fr-CA')} $` : 'N/D';
 
   // Déterminer le type d'annonce

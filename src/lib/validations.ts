@@ -44,7 +44,7 @@ export const businessSchema = z.object({
     .min(2, 'La localisation doit contenir au moins 2 caractères')
     .max(100, 'La localisation ne peut pas dépasser 100 caractères'),
   asking_price: z.number()
-    .positive('Le prix doit être positif')
+    .min(0, 'Le prix doit être positif ou 0 pour "à discuter"')
     .max(999999999, 'Le prix ne peut pas dépasser 999 999 999'),
   annual_revenue: z.number()
     .positive('Le chiffre d\'affaires doit être positif')

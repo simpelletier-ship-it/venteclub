@@ -107,6 +107,7 @@ const ListBusiness = () => {
   const [imagePrompt, setImagePrompt] = useState("");
   const [citySearchOpen, setCitySearchOpen] = useState(false);
   const [citySearchValue, setCitySearchValue] = useState("");
+  const [priceNegotiable, setPriceNegotiable] = useState(false);
 
   useEffect(() => {
     const checkSession = async () => {
@@ -202,6 +203,11 @@ const ListBusiness = () => {
         instagram: "",
       });
 
+      // Vérifier si le prix est "à discuter"
+      if (business.asking_price === 0 || business.asking_price === null) {
+        setPriceNegotiable(true);
+      }
+
       // Charger les photos existantes
       if (business.business_photos && business.business_photos.length > 0) {
         const urls = business.business_photos
@@ -276,7 +282,7 @@ const ListBusiness = () => {
     if (!formData.description || formData.description.trim() === "" || formData.description.length < 100) {
       steps.push({ icon: FileText, text: "Rédiger une description détaillée", action: "description" });
     }
-    if (!formData.asking_price || formData.asking_price.trim() === "") {
+    if (!priceNegotiable && (!formData.asking_price || formData.asking_price.trim() === "")) {
       steps.push({ icon: DollarSign, text: "Indiquer le prix de vente", action: "asking_price" });
     }
     if (!formData.industry || formData.industry.trim() === "") {
@@ -392,7 +398,7 @@ const ListBusiness = () => {
         industry: formData.industry,
         location: formData.location,
         annual_revenue: formData.annual_revenue ? parseFloat(formData.annual_revenue) : null,
-        asking_price: parseFloat(formData.asking_price),
+        asking_price: priceNegotiable ? 0 : parseFloat(formData.asking_price),
         profit_margin: formData.profit_margin && !isNaN(parseFloat(formData.profit_margin)) ? parseFloat(formData.profit_margin) : null,
         baiia: formData.baiia && !isNaN(parseFloat(formData.baiia)) ? parseFloat(formData.baiia) : null,
         employees_count: formData.employees_count ? parseInt(formData.employees_count) : null,
@@ -1146,18 +1152,34 @@ const ListBusiness = () => {
 
                   <div className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div>
+                       <div>
                         <Label htmlFor="asking_price">
-                          Prix de vente <span className="text-destructive">*</span>
+                          Prix de vente {!priceNegotiable && <span className="text-destructive">*</span>}
                         </Label>
                         <Input
                           id="asking_price"
                           type="number"
                           value={formData.asking_price}
                           onChange={(e) => setFormData({ ...formData, asking_price: e.target.value })}
-                          required
-                          placeholder="Ex: 100 000"
+                          required={!priceNegotiable}
+                          disabled={priceNegotiable}
+                          placeholder={priceNegotiable ? "À discuter" : "Ex: 100 000"}
                         />
+                        <div className="flex items-center space-x-2 mt-2">
+                          <Checkbox
+                            id="price_negotiable"
+                            checked={priceNegotiable}
+                            onCheckedChange={(checked) => {
+                              setPriceNegotiable(checked as boolean);
+                              if (checked) {
+                                setFormData({ ...formData, asking_price: "" });
+                              }
+                            }}
+                          />
+                          <Label htmlFor="price_negotiable" className="text-sm font-normal cursor-pointer">
+                            Prix à discuter
+                          </Label>
+                        </div>
                       </div>
 
                       <div>
