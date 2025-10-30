@@ -1,7 +1,8 @@
 import { useNavigate } from "react-router-dom";
-import { Building2, Store } from "lucide-react";
+import { Building2, Store, Home } from "lucide-react";
 import { SEO } from "@/components/SEO";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 const Sell = () => {
   const navigate = useNavigate();
@@ -23,7 +24,7 @@ const Sell = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8">
+          <div className="grid md:grid-cols-3 gap-8">
             <Card 
               className="group cursor-pointer hover:shadow-premium transition-all duration-300 hover:scale-105 border-2 hover:border-primary"
               onClick={() => navigate("/list-business")}
@@ -56,6 +57,12 @@ const Sell = () => {
                     <span>Restauration et hôtellerie</span>
                   </li>
                 </ul>
+                <Button 
+                  className="w-full mt-4 bg-primary hover:bg-primary/90" 
+                  onClick={() => navigate("/list-business")}
+                >
+                  Vendre une Entreprise
+                </Button>
               </CardContent>
             </Card>
 
@@ -91,6 +98,53 @@ const Sell = () => {
                     <span>Autres franchises établies</span>
                   </li>
                 </ul>
+                <Button 
+                  className="w-full mt-4 bg-accent hover:bg-accent/90" 
+                  onClick={() => navigate("/list-franchise")}
+                >
+                  Vendre une Franchise
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card 
+              className="group cursor-pointer hover:shadow-premium transition-all duration-300 hover:scale-105 border-2 hover:border-secondary"
+              onClick={() => navigate("/list-property")}
+            >
+              <CardHeader className="text-center space-y-4 pb-6">
+                <div className="mx-auto w-20 h-20 rounded-full bg-secondary/10 flex items-center justify-center group-hover:bg-secondary/20 transition-colors">
+                  <Home className="w-10 h-10 text-secondary" />
+                </div>
+                <CardTitle className="text-2xl">Immeuble Commercial</CardTitle>
+                <CardDescription className="text-base">
+                  Vendez votre propriété commerciale ou industrielle
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm text-muted-foreground">
+                <ul className="space-y-2">
+                  <li className="flex items-start gap-2">
+                    <span className="text-secondary mt-0.5">•</span>
+                    <span>Bureaux commerciaux</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-secondary mt-0.5">•</span>
+                    <span>Espaces de vente au détail</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-secondary mt-0.5">•</span>
+                    <span>Bâtiments industriels</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-secondary mt-0.5">•</span>
+                    <span>Propriétés mixtes</span>
+                  </li>
+                </ul>
+                <Button 
+                  className="w-full mt-4 bg-secondary hover:bg-secondary/90" 
+                  onClick={() => navigate("/list-property")}
+                >
+                  Vendre un Immeuble
+                </Button>
               </CardContent>
             </Card>
           </div>

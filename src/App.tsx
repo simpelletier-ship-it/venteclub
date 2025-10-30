@@ -11,6 +11,7 @@ import ResetPassword from "./pages/ResetPassword";
 import Sell from "./pages/Sell";
 import ListBusiness from "./pages/ListBusiness";
 import ListFranchise from "./pages/ListFranchise";
+import ListProperty from "./pages/ListProperty";
 import Dashboard from "./pages/Dashboard";
 import BusinessDetails from "./pages/BusinessDetails";
 import Map from "./pages/Map";
@@ -44,6 +45,7 @@ const App = () => (
               <Route path="/sell" element={<Sell />} />
               <Route path="/list-business" element={<ListBusiness />} />
               <Route path="/list-franchise" element={<ListFranchise />} />
+              <Route path="/list-property" element={<ListProperty />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/entreprise/:slug" element={<BusinessDetails />} />
               <Route path="/map" element={<Map />} />

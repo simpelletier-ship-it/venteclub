@@ -65,10 +65,27 @@ const Index = () => {
   const handleFilter = (filters: {
     cities?: string[];
     industries?: string[];
+    listingTypes?: string[];
     minPrice?: number;
     maxPrice?: number;
   }) => {
     let filtered = [...allBusinesses];
+    
+    // Filter by listing type (this is a placeholder - actual implementation would need a listing_type field in the businesses table)
+    // For now we'll filter by is_franchise to demonstrate the concept
+    if (filters.listingTypes && filters.listingTypes.length > 0) {
+      filtered = filtered.filter(business => {
+        if (filters.listingTypes!.includes('franchise')) {
+          if (business.is_franchise) return true;
+        }
+        if (filters.listingTypes!.includes('business')) {
+          if (!business.is_franchise) return true;
+        }
+        // Property type would need to be added to the database schema
+        return false;
+      });
+    }
+    
     if (filters.cities && filters.cities.length > 0) {
       filtered = filtered.filter(business => 
         filters.cities!.some(city => 

@@ -26,3 +26,11 @@ export type IndustryType = typeof QUEBEC_INDUSTRIES[number];
 export const CURRENCY = {
   CAD: { symbol: '$', code: 'CAD', name: 'Dollar canadien' },
 } as const;
+
+export const LISTING_TYPES = [
+  { value: 'business', label: 'Entreprise' },
+  { value: 'franchise', label: 'Franchise' },
+  { value: 'property', label: 'Immeuble' },
+] as const;
+
+export type ListingType = typeof LISTING_TYPES[number];

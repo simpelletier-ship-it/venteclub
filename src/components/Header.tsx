@@ -165,7 +165,7 @@ const Header = () => {
                   onClick={() => navigate("/sell")}
                   className="hidden md:flex btn-premium bg-accent hover:bg-primary-dark text-white font-semibold shadow-soft hover:shadow-premium transition-all"
                 >
-                  Vendre une entreprise
+                  Je vends
                 </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -214,7 +214,7 @@ const Header = () => {
                   onClick={() => navigate("/sell")}
                   className="hidden md:inline-flex btn-premium bg-accent hover:bg-primary-dark text-white font-semibold"
                 >
-                  Vendre une entreprise
+                  Je vends
                 </Button>
               </>
             )}
@@ -295,7 +295,7 @@ const Header = () => {
               }}
               className="w-full btn-premium bg-primary hover:bg-primary-dark text-primary-foreground font-semibold mt-4"
             >
-              Vendre une entreprise
+              Je vends
             </Button>
           </div>
         )}
