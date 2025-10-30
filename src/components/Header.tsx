@@ -162,7 +162,7 @@ const Header = () => {
             {user ? (
               <>
                 <Button
-                  onClick={() => navigate("/list-business")}
+                  onClick={() => navigate("/sell")}
                   className="hidden md:flex btn-premium bg-accent hover:bg-primary-dark text-white font-semibold shadow-soft hover:shadow-premium transition-all"
                 >
                   Vendre une entreprise
@@ -211,7 +211,7 @@ const Header = () => {
                   Connexion
                 </Button>
                 <Button
-                  onClick={() => navigate("/list-business")}
+                  onClick={() => navigate("/sell")}
                   className="hidden md:inline-flex btn-premium bg-accent hover:bg-primary-dark text-white font-semibold"
                 >
                   Vendre une entreprise
@@ -290,7 +290,7 @@ const Header = () => {
             )}
             <Button
               onClick={() => {
-                navigate("/list-business");
+                navigate("/sell");
                 setMobileMenuOpen(false);
               }}
               className="w-full btn-premium bg-primary hover:bg-primary-dark text-primary-foreground font-semibold mt-4"

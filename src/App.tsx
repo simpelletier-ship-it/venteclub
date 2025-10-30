@@ -8,6 +8,7 @@ import { Layout } from "@/components/Layout";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
+import Sell from "./pages/Sell";
 import ListBusiness from "./pages/ListBusiness";
 import ListFranchise from "./pages/ListFranchise";
 import Dashboard from "./pages/Dashboard";
@@ -40,6 +41,7 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/sell" element={<Sell />} />
               <Route path="/list-business" element={<ListBusiness />} />
               <Route path="/list-franchise" element={<ListFranchise />} />
               <Route path="/dashboard" element={<Dashboard />} />
