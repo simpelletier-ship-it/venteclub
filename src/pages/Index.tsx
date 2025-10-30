@@ -170,7 +170,7 @@ const Index = () => {
             
             {/* Subtitle */}
             <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              Découvrez des opportunités d'affaires vérifiées et connectez-vous directement avec les propriétaires
+              Découvrez des opportunités d'affaires et connectez-vous directement avec les propriétaires
             </p>
             
             {/* CTA Buttons */}
