@@ -141,7 +141,7 @@ const ListProperty = () => {
 
     toast({
       title: "Fonctionnalité à venir",
-      description: "La vente d'immeubles commerciaux sera bientôt disponible.",
+      description: "La vente d'immobilier sera bientôt disponible.",
     });
   };
 

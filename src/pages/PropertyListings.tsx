@@ -79,8 +79,8 @@ const PropertyListings = () => {
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    "name": "Immeubles Commerciaux à Vendre au Québec",
-    "description": "Découvrez des immeubles commerciaux, bureaux et propriétés commerciales à vendre au Québec",
+    "name": "Immobilier à Vendre au Québec",
+    "description": "Découvrez des propriétés immobilières, bureaux et espaces commerciaux à vendre au Québec",
     "numberOfItems": allProperties.length,
     "itemListElement": featuredProperties.map((property, index) => ({
       "@type": "ListItem",
@@ -130,13 +130,13 @@ const PropertyListings = () => {
             <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-secondary/10 via-primary/10 to-accent/10 border border-secondary/20 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-secondary/20 hover:border-secondary/40 cursor-pointer group">
               <Building2 className="w-5 h-5 text-secondary animate-glow group-hover:rotate-12 transition-transform duration-300" />
               <span className="text-foreground text-sm font-semibold tracking-wide group-hover:text-secondary transition-colors duration-300">
-                Immeubles Commerciaux et Propriétés d'Affaires
+                Immobilier et Propriétés d'Affaires
               </span>
             </div>
             
             {/* Main Heading */}
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-display font-bold leading-[1.1] tracking-tight text-foreground">
-              Immeubles Commerciaux
+              Immobilier
               <br />
               <span className="text-secondary">à Vendre au Québec</span>
             </h1>
@@ -181,7 +181,7 @@ const PropertyListings = () => {
               Découvrez nos meilleures opportunités
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Immeubles commerciaux, bureaux et espaces commerciaux sélectionnés
+              Propriétés immobilières, bureaux et espaces commerciaux sélectionnés
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -196,7 +196,7 @@ const PropertyListings = () => {
                 <Building2 className="w-16 h-16 mx-auto mb-4 text-muted-foreground/50" />
                 <h3 className="text-xl font-semibold mb-2">Fonctionnalité à venir</h3>
                 <p className="text-lg text-muted-foreground mb-6">
-                  La section immeubles commerciaux sera bientôt disponible.
+                  La section immobilier sera bientôt disponible.
                 </p>
                 <Button onClick={() => navigate("/list-property")} className="bg-secondary hover:bg-secondary/90">
                   Inscrivez votre propriété dès maintenant
@@ -215,7 +215,7 @@ const PropertyListings = () => {
               Toutes les Propriétés
             </h2>
             <p className="text-lg text-muted-foreground mb-10">
-              Explorez tous les immeubles commerciaux disponibles
+              Explorez toutes les propriétés immobilières disponibles
             </p>
           </div>
 
@@ -252,7 +252,7 @@ const PropertyListings = () => {
                 <Building2 className="w-16 h-16 mx-auto mb-4 text-muted-foreground/50" />
                 <h3 className="text-xl font-semibold mb-2">Fonctionnalité à venir</h3>
                 <p className="text-lg text-muted-foreground mb-6">
-                  La section immeubles commerciaux sera bientôt disponible.
+                  La section immobilier sera bientôt disponible.
                   <br />
                   En attendant, vous pouvez dès maintenant inscrire votre propriété.
                 </p>
