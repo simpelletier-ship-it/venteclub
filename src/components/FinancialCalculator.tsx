@@ -2,8 +2,14 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Calculator, TrendingUp, DollarSign, Percent, Calendar } from "lucide-react";
+import { Calculator, TrendingUp, DollarSign, Percent, Calendar, HelpCircle } from "lucide-react";
 import { z } from "zod";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface FinancialCalculatorProps {
   askingPrice: number;
@@ -96,14 +102,41 @@ export const FinancialCalculator = ({ askingPrice }: FinancialCalculatorProps) =
   return (
     <Card className="border-border/50 shadow-lg">
       <CardHeader className="bg-gradient-to-r from-secondary/5 to-primary/5 border-b border-border/50">
-        <div className="flex items-center gap-3">
-          <div className="p-3 bg-secondary/10 rounded-xl">
-            <Calculator className="w-6 h-6 text-secondary" />
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="p-3 bg-secondary/10 rounded-xl">
+              <Calculator className="w-6 h-6 text-secondary" />
+            </div>
+            <div>
+              <CardTitle className="text-2xl font-display">Calculateur de financement</CardTitle>
+              <CardDescription>Estimez vos paiements mensuels pour l'achat de cette entreprise</CardDescription>
+            </div>
           </div>
-          <div>
-            <CardTitle className="text-2xl font-display">Calculateur de financement</CardTitle>
-            <CardDescription>Estimez vos paiements mensuels pour l'achat de cette entreprise</CardDescription>
-          </div>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button className="p-2 hover:bg-muted rounded-full transition-colors">
+                  <HelpCircle className="w-5 h-5 text-muted-foreground" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="left" className="max-w-md p-4 bg-card border-border shadow-lg">
+                <div className="space-y-3">
+                  <h4 className="font-semibold text-sm text-foreground">Information importante</h4>
+                  <div className="text-xs text-muted-foreground space-y-2 leading-relaxed">
+                    <p>
+                      Cet outil en ligne a été créé pour vous aider à planifier et à calculer le montant des versements pour le financement d'une entreprise. Les résultats sont des estimations fondées sur les renseignements que vous avez saisis.
+                    </p>
+                    <p>
+                      Ces estimations peuvent varier selon votre situation financière, votre cote de crédit et les conditions du marché au moment où le prêt est octroyé. Les calculs reposent sur l'hypothèse que le taux d'intérêt demeure le même pendant toute la durée du prêt.
+                    </p>
+                    <p>
+                      Les frais additionnels tels que les frais de clôture, les frais juridiques, les assurances et les frais d'évaluation ne sont pas inclus dans ces calculs. Nous vous recommandons fortement de consulter un conseiller financier et votre institution financière pour obtenir des conseils personnalisés et connaître les taux d'intérêt en vigueur.
+                    </p>
+                  </div>
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       </CardHeader>
       <CardContent className="p-6 space-y-6">
@@ -211,9 +244,11 @@ export const FinancialCalculator = ({ askingPrice }: FinancialCalculatorProps) =
           </div>
         </div>
 
-        <p className="text-xs text-muted-foreground text-center pt-2">
-          * Ces calculs sont fournis à titre indicatif seulement. Consultez un conseiller financier pour une estimation précise.
-        </p>
+        <div className="pt-2 border-t border-border/30 mt-4">
+          <p className="text-xs text-muted-foreground italic">
+            * Ces calculs sont fournis à titre indicatif seulement. Consultez un conseiller financier et votre institution financière pour une évaluation précise et personnalisée.
+          </p>
+        </div>
       </CardContent>
     </Card>
   );
