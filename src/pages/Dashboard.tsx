@@ -264,27 +264,6 @@ const Dashboard = () => {
                             </div>
                           </div>
                         )}
-                        {business.approval_status === 'approved' && business.status !== 'sold' && business.status !== 'archived' && !business.has_pending_changes && (
-                          <Button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              // Rediriger vers la bonne page selon le type
-                              if (business.sale_type === 'property') {
-                                navigate(`/list-property?edit=${business.id}`);
-                              } else if (business.is_franchise) {
-                                navigate(`/list-franchise?edit=${business.id}`);
-                              } else {
-                                navigate(`/list-business?edit=${business.id}`);
-                              }
-                            }}
-                            size="sm"
-                            variant="outline"
-                            className="w-full"
-                          >
-                            <Edit className="mr-1 h-3 w-3" />
-                            Modifier l'annonce
-                          </Button>
-                        )}
                       </div>
                       <div 
                         onClick={() => {
@@ -312,6 +291,27 @@ const Dashboard = () => {
                         />
                       </div>
                       <div className="flex gap-2">
+                        {business.approval_status === 'approved' && business.status !== 'sold' && business.status !== 'archived' && !business.has_pending_changes && (
+                          <Button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              // Rediriger vers la bonne page selon le type
+                              if (business.sale_type === 'property') {
+                                navigate(`/list-property?edit=${business.id}`);
+                              } else if (business.is_franchise) {
+                                navigate(`/list-franchise?edit=${business.id}`);
+                              } else {
+                                navigate(`/list-business?edit=${business.id}`);
+                              }
+                            }}
+                            size="sm"
+                            variant="outline"
+                            className="w-full"
+                          >
+                            <Edit className="mr-1 h-3 w-3" />
+                            Modifier l'annonce
+                          </Button>
+                        )}
                         {business.status === 'archived' && (
                           <Button
                             onClick={async () => {
