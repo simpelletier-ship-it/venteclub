@@ -95,7 +95,7 @@ const FilterBar = ({ onFilter }: FilterBarProps) => {
   return (
     <div className="w-full max-w-5xl mx-auto bg-card rounded-xl sm:rounded-2xl shadow-elegant p-4 sm:p-6 border border-border">
       <div className="flex flex-col gap-4 sm:gap-6">
-        <div className="flex flex-col gap-3 sm:gap-4">
+        <div className="flex flex-col md:flex-row gap-3 sm:gap-4">
           {/* Type d'annonce */}
           <Popover open={listingTypesOpen} onOpenChange={setListingTypesOpen}>
             <PopoverTrigger asChild>

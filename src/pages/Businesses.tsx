@@ -128,13 +128,6 @@ const Businesses = () => {
         </div>
       </section>
 
-      {/* Filter Section */}
-      <section className="py-8 bg-background border-b border-border">
-        <div className="container mx-auto px-4">
-          <FilterBar onFilter={handleFilter} />
-        </div>
-      </section>
-
       {/* Featured Businesses */}
       {featuredBusinesses.length > 0 && (
         <section className="py-12 bg-gradient-to-b from-muted/30 to-background">
@@ -158,6 +151,13 @@ const Businesses = () => {
           </div>
         </section>
       )}
+
+      {/* Filter Section */}
+      <section className="py-8 bg-background border-b border-border">
+        <div className="container mx-auto px-4">
+          <FilterBar onFilter={handleFilter} />
+        </div>
+      </section>
 
       {/* All Listings */}
       <section className="py-12 bg-background">
