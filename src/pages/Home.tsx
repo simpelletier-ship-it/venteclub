@@ -170,12 +170,7 @@ const Home = () => {
       {/* Features Section */}
       <section className="py-20 bg-background">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center p-8 rounded-2xl bg-card border border-border hover:shadow-lg transition-shadow">
-              <Shield className="w-12 h-12 mx-auto mb-4 text-secondary" />
-              <h3 className="text-xl font-bold mb-2">Plateforme sécurisée</h3>
-              <p className="text-muted-foreground">Système de paiement sécurisé pour protéger vos transactions</p>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="text-center p-8 rounded-2xl bg-card border border-border hover:shadow-lg transition-shadow">
               <Clock className="w-12 h-12 mx-auto mb-4 text-secondary" />
               <h3 className="text-xl font-bold mb-2">Support rapide</h3>
