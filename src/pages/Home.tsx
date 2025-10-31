@@ -135,8 +135,8 @@ const Home = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12 animate-slide-up">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/10 text-secondary text-sm font-semibold mb-6">
-              <Sparkles className="w-4 h-4" />
-              En vedette
+              <TrendingUp className="w-4 h-4" />
+              Opportunités du moment
             </div>
             <h2 className="text-4xl md:text-5xl font-display font-bold text-foreground mb-4">
               Opportunités en vedette
