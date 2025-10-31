@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { authSchema } from "@/lib/validations";
+import { loginSchema, signupSchema } from "@/lib/validations";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -34,7 +34,8 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      const validatedData = authSchema.parse({ email, password });
+      // Utiliser loginSchema pour la connexion (pas de validation stricte de longueur)
+      const validatedData = loginSchema.parse({ email, password });
 
       // Vérifier si le compte est verrouillé
       const { data: attemptCheck } = await supabase.functions.invoke('check-login-attempt', {
@@ -160,7 +161,8 @@ const Auth = () => {
         return;
       }
 
-      const validatedData = authSchema.parse({ email, password });
+      // Utiliser signupSchema pour l'inscription (validation stricte avec 8 caractères)
+      const validatedData = signupSchema.parse({ email, password });
 
       // Appeler l'edge function pour créer et envoyer le code
       const { error } = await supabase.functions.invoke('create-verification-code', {

@@ -75,7 +75,19 @@ export const businessSchema = z.object({
     .nullable(),
 });
 
-export const authSchema = z.object({
+// Schéma pour la connexion - validation légère
+export const loginSchema = z.object({
+  email: z.string()
+    .trim()
+    .email('Veuillez entrer une adresse email valide')
+    .max(255, 'L\'email ne peut pas dépasser 255 caractères'),
+  password: z.string()
+    .min(1, 'Le mot de passe est requis')
+    .max(100, 'Le mot de passe ne peut pas dépasser 100 caractères'),
+});
+
+// Schéma pour l'inscription - validation stricte avec 8 caractères minimum
+export const signupSchema = z.object({
   email: z.string()
     .trim()
     .email('Veuillez entrer une adresse email valide')
@@ -85,5 +97,10 @@ export const authSchema = z.object({
     .max(100, 'Le mot de passe ne peut pas dépasser 100 caractères'),
 });
 
+// Pour la compatibilité - utiliser signupSchema par défaut
+export const authSchema = signupSchema;
+
 export type BusinessFormData = z.infer<typeof businessSchema>;
+export type LoginFormData = z.infer<typeof loginSchema>;
+export type SignupFormData = z.infer<typeof signupSchema>;
 export type AuthFormData = z.infer<typeof authSchema>;
