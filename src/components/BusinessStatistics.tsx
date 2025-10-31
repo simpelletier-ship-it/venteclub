@@ -30,7 +30,7 @@ export const BusinessStatistics = ({ userId }: BusinessStatisticsProps) => {
       // Fetch user businesses
       const { data: businessData } = await supabase
         .from('businesses')
-        .select('id, title, views_count, created_at')
+        .select('id, title, views_count, created_at, featured')
         .eq('seller_id', userId)
         .order('created_at', { ascending: false });
 
@@ -76,10 +76,14 @@ export const BusinessStatistics = ({ userId }: BusinessStatisticsProps) => {
   const totalViewsWithHistorical = totalViews + historicalViews;
 
   // Calculate featured views (views from featured businesses)
-  const featuredBusinessIds = businesses.filter(b => b.featured).map(b => b.id);
-  const featuredViews = analytics.filter(a => 
+  const featuredBusinesses = businesses.filter(b => b.featured);
+  const featuredBusinessIds = featuredBusinesses.map(b => b.id);
+  const featuredAnalyticsViews = analytics.filter(a => 
     a.event_type === 'view' && featuredBusinessIds.includes(a.business_id)
   ).length;
+  // Add historical views from featured businesses
+  const featuredHistoricalViews = featuredBusinesses.reduce((sum, b) => sum + (b.views_count || 0), 0);
+  const featuredViews = featuredAnalyticsViews + featuredHistoricalViews;
 
   // Calculate conversion rate
   const conversionRate = totalViewsWithHistorical > 0 ? ((totalUnlocks / totalViewsWithHistorical) * 100).toFixed(2) : '0';
