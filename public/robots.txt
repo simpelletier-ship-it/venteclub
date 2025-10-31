@@ -26,3 +26,16 @@ Allow: /
 
 User-agent: facebookexternalhit
 Allow: /
+
+# OpenAI SearchGPT Bot
+User-agent: OAI-SearchBot
+Allow: /
+Crawl-delay: 0
+
+# OpenAI ChatGPT User Bot
+User-agent: ChatGPT-User
+Allow: /
+
+# OpenAI GPTBot
+User-agent: GPTBot
+Allow: /
