@@ -662,42 +662,95 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {filteredBusinesses.map((business) => (
-                  <Card 
-                    key={business.id}
-                    className="cursor-pointer hover:shadow-lg transition-all duration-200 hover:border-primary/50 hover:scale-105"
-                    onClick={() => navigate(`/entreprise/${business.slug}`)}
-                  >
-                    <CardContent className="p-4">
-                      {business.photo_url && (
-                        <img
-                          src={business.photo_url}
-                          alt={business.title}
-                          className="w-full h-40 object-cover rounded-lg mb-3"
-                        />
-                      )}
-                      <h4 className="font-bold text-foreground mb-2 line-clamp-2">
-                        {business.title}
-                      </h4>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
-                        <MapPin className="h-4 w-4" />
-                        <span className="truncate">{business.city || business.location}</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <div>
+                {filteredBusinesses.map((business) => {
+                  const isProperty = business.sale_type === 'property' || business.property_type;
+                  
+                  return (
+                    <Card 
+                      key={business.id}
+                      className="cursor-pointer hover:shadow-lg transition-all duration-200 hover:border-primary/50 hover:scale-105"
+                      onClick={() => navigate(`/entreprise/${business.slug}`)}
+                    >
+                      <CardContent className="p-4">
+                        {business.photo_url && (
+                          <img
+                            src={business.photo_url}
+                            alt={business.title}
+                            className="w-full h-40 object-cover rounded-lg mb-3"
+                          />
+                        )}
+                        
+                        {/* Badge Type */}
+                        <div className="mb-2">
+                          {business.is_franchise && (
+                            <Badge className="bg-purple-500 text-white">Franchise</Badge>
+                          )}
+                          {isProperty && (
+                            <Badge className="bg-emerald-500 text-white">Immobilier</Badge>
+                          )}
+                          {!business.is_franchise && !isProperty && (
+                            <Badge className="bg-blue-500 text-white">Entreprise</Badge>
+                          )}
+                        </div>
+                        
+                        <h4 className="font-bold text-foreground mb-2 line-clamp-2">
+                          {business.title}
+                        </h4>
+                        
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
+                          <MapPin className="h-4 w-4" />
+                          <span className="truncate">{business.city || business.location}</span>
+                        </div>
+                        
+                        {/* Info selon le type */}
+                        {isProperty ? (
+                          <div className="space-y-2 mb-3">
+                            {business.property_type && (
+                              <div className="flex justify-between text-xs">
+                                <span className="text-muted-foreground">Type</span>
+                                <span className="font-semibold">
+                                  {business.property_type === 'bureau' && 'Bureau'}
+                                  {business.property_type === 'commerce' && 'Commerce'}
+                                  {business.property_type === 'industriel' && 'Industriel'}
+                                  {business.property_type === 'immeuble_logement' && 'Immeuble'}
+                                  {business.property_type === 'mixte' && 'Mixte'}
+                                  {!['bureau', 'commerce', 'industriel', 'immeuble_logement', 'mixte'].includes(business.property_type) && 'Propriété'}
+                                </span>
+                              </div>
+                            )}
+                            {business.square_footage && (
+                              <div className="flex justify-between text-xs">
+                                <span className="text-muted-foreground">Superficie</span>
+                                <span className="font-semibold">{business.square_footage.toLocaleString('fr-CA')} pi²</span>
+                              </div>
+                            )}
+                            {business.year_built && (
+                              <div className="flex justify-between text-xs">
+                                <span className="text-muted-foreground">Année</span>
+                                <span className="font-semibold">{business.year_built}</span>
+                              </div>
+                            )}
+                          </div>
+                        ) : business.annual_revenue && !business.is_franchise ? (
+                          <div className="mb-3">
+                            <div className="flex justify-between text-xs">
+                              <span className="text-muted-foreground">Revenus annuels</span>
+                              <span className="font-semibold">{business.annual_revenue.toLocaleString('fr-CA')} $</span>
+                            </div>
+                          </div>
+                        ) : null}
+                        
+                        <div className="pt-3 border-t border-border/50">
                           <p className="text-xs text-muted-foreground uppercase mb-1">Prix demandé</p>
-                          <p className="font-bold text-primary flex items-center gap-1">
+                          <p className="font-bold text-primary text-lg flex items-center gap-1">
                             <DollarSign className="h-4 w-4" />
-                            {business.asking_price.toLocaleString('fr-CA')}
+                            {business.asking_price.toLocaleString('fr-CA')} $
                           </p>
                         </div>
-                        {business.is_franchise && (
-                          <Badge className="bg-purple-500 text-white">Franchise</Badge>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                      </CardContent>
+                    </Card>
+                  );
+                })}
               </div>
             </CardContent>
           </Card>
