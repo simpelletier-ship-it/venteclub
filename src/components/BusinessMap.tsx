@@ -184,27 +184,46 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
     return inside;
   };
 
-  const updateArea = () => {
-    if (!draw.current) return;
-    
-    const data = draw.current.getAll();
-    console.log('[MAP] Draw data:', data);
-    
-    if (data.features.length > 0) {
-      const polygon = data.features[0];
-      console.log('[MAP] Polygon:', polygon);
+  // Cleanup and re-attach draw events when businesses change
+  useEffect(() => {
+    if (!map.current || !draw.current) return;
+
+    const updateArea = () => {
+      if (!draw.current) return;
       
-      if (polygon.geometry.type === 'Polygon') {
-        const coordinates = polygon.geometry.coordinates[0];
-        console.log('[MAP] Filtering businesses in polygon with', coordinates.length, 'points');
-        filterBusinessesInPolygon(coordinates);
+      const data = draw.current.getAll();
+      console.log('[MAP] Draw data:', data);
+      console.log('[MAP] Total businesses available:', businesses.length);
+      
+      if (data.features.length > 0) {
+        const polygon = data.features[0];
+        console.log('[MAP] Polygon:', polygon);
+        
+        if (polygon.geometry.type === 'Polygon') {
+          const coordinates = polygon.geometry.coordinates[0];
+          console.log('[MAP] Filtering businesses in polygon with', coordinates.length, 'points');
+          filterBusinessesInPolygon(coordinates);
+        }
+      } else {
+        console.log('[MAP] No features drawn');
+        setFilteredBusinesses([]);
+        setShowSidebar(false);
       }
-    } else {
-      console.log('[MAP] No features drawn');
-      setFilteredBusinesses([]);
-      setShowSidebar(false);
-    }
-  };
+    };
+
+    // Re-attach event listeners with updated business data
+    map.current.off('draw.create', updateArea);
+    map.current.off('draw.update', updateArea);
+    map.current.on('draw.create', updateArea);
+    map.current.on('draw.update', updateArea);
+
+    return () => {
+      if (map.current) {
+        map.current.off('draw.create', updateArea);
+        map.current.off('draw.update', updateArea);
+      }
+    };
+  }, [businesses]);
 
   // Initialize map only once
   useEffect(() => {
@@ -282,9 +301,7 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
       'top-right'
     );
 
-    // Listen to draw events
-    map.current.on('draw.create', updateArea);
-    map.current.on('draw.update', updateArea);
+    // Listen to delete event only (create/update handled in separate useEffect)
     map.current.on('draw.delete', () => {
       setFilteredBusinesses([]);
       setShowSidebar(false);
