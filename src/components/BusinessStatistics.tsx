@@ -359,11 +359,9 @@ export const BusinessStatistics = ({ userId }: BusinessStatisticsProps) => {
       <Card>
         <CardHeader>
           <Tabs defaultValue="timeline" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4">
+            <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="timeline">Évolution</TabsTrigger>
               <TabsTrigger value="performance">Performance</TabsTrigger>
-              <TabsTrigger value="geography">Géographie</TabsTrigger>
-              <TabsTrigger value="events">Événements</TabsTrigger>
             </TabsList>
 
             <TabsContent value="timeline" className="mt-6">
@@ -437,134 +435,6 @@ export const BusinessStatistics = ({ userId }: BusinessStatisticsProps) => {
                 ) : (
                   <div className="h-[400px] flex items-center justify-center text-muted-foreground">
                     Aucune donnée de performance disponible
-                  </div>
-                )}
-              </div>
-            </TabsContent>
-
-            <TabsContent value="geography" className="mt-6">
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-lg font-semibold mb-1 flex items-center gap-2">
-                    <MapPin className="w-5 h-5" />
-                    Analyse géographique
-                  </h3>
-                  <p className="text-sm text-muted-foreground mb-4">Découvrez d'où proviennent vos visiteurs</p>
-                </div>
-                
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <div>
-                    <h4 className="text-sm font-semibold mb-3">Top villes</h4>
-                    {cityData.length > 0 ? (
-                      <ResponsiveContainer width="100%" height={300}>
-                    <BarChart data={cityData} layout="vertical">
-                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                      <XAxis type="number" stroke="hsl(var(--muted-foreground))" />
-                      <YAxis dataKey="name" type="category" width={100} stroke="hsl(var(--muted-foreground))" />
-                      <Tooltip 
-                        contentStyle={{ 
-                          backgroundColor: 'hsl(var(--card))', 
-                          border: '1px solid hsl(var(--border))',
-                          borderRadius: '8px'
-                        }} 
-                      />
-                      <Bar dataKey="value" fill="hsl(var(--primary))" radius={[0, 8, 8, 0]} name="Visites" />
-                      </BarChart>
-                    </ResponsiveContainer>
-                    ) : (
-                      <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-                        Aucune donnée géographique disponible
-                      </div>
-                    )}
-                  </div>
-
-                  <div>
-                    <h4 className="text-sm font-semibold mb-3">Top régions</h4>
-                    {regionData.length > 0 ? (
-                      <ResponsiveContainer width="100%" height={300}>
-                    <PieChart>
-                      <Pie
-                        data={regionData}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                        outerRadius={80}
-                        fill="#8884d8"
-                        dataKey="value"
-                      >
-                        {regionData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
-                      </Pie>
-                      <Tooltip 
-                        contentStyle={{ 
-                          backgroundColor: 'hsl(var(--card))', 
-                          border: '1px solid hsl(var(--border))',
-                          borderRadius: '8px'
-                        }} 
-                      />
-                      </PieChart>
-                    </ResponsiveContainer>
-                    ) : (
-                      <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-                        Aucune donnée de région disponible
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="events" className="mt-6">
-              <div>
-                <h3 className="text-lg font-semibold mb-1 flex items-center gap-2">
-                  <MousePointerClick className="w-5 h-5" />
-                  Répartition des événements
-                </h3>
-                <p className="text-sm text-muted-foreground mb-4">Analysez les types d'interactions avec vos annonces</p>
-                {eventTypeData.length > 0 ? (
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <ResponsiveContainer width="100%" height={300}>
-                    <PieChart>
-                      <Pie
-                        data={eventTypeData}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                        outerRadius={100}
-                        fill="#8884d8"
-                        dataKey="value"
-                      >
-                        {eventTypeData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                      </Pie>
-                      <Tooltip 
-                        contentStyle={{ 
-                          backgroundColor: 'hsl(var(--card))', 
-                          border: '1px solid hsl(var(--border))',
-                          borderRadius: '8px'
-                        }} 
-                      />
-                    </PieChart>
-                    </ResponsiveContainer>
-                    <div className="flex flex-col justify-center space-y-4">
-                      {eventTypeData.map((item, index) => (
-                        <div key={index} className="flex items-center justify-between p-4 rounded-lg bg-muted/50">
-                          <div className="flex items-center gap-3">
-                            <div className="w-4 h-4 rounded" style={{ backgroundColor: item.color }} />
-                            <span className="font-medium">{item.name}</span>
-                          </div>
-                          <span className="text-2xl font-bold">{item.value.toLocaleString()}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-                    Aucun événement enregistré
                   </div>
                 )}
               </div>
