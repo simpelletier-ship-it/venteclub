@@ -26,6 +26,11 @@ interface Business {
   is_franchise?: boolean;
   slug: string;
   city?: string;
+  sale_type?: 'assets' | 'shares' | 'both' | 'property';
+  property_type?: string;
+  year_built?: number;
+  square_footage?: number;
+  is_rental_property?: boolean;
 }
 
 interface BusinessMapProps {
@@ -87,6 +92,11 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
         status,
         approval_status,
         is_franchise,
+        sale_type,
+        property_type,
+        year_built,
+        square_footage,
+        is_rental_property,
         business_photos(photo_url)
       `)
       .eq('status', 'active')
@@ -314,6 +324,11 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
             photo_url: business.photo_url || null,
             status: business.status,
             is_franchise: business.is_franchise || false,
+            sale_type: business.sale_type || null,
+            property_type: business.property_type || null,
+            year_built: business.year_built || null,
+            square_footage: business.square_footage || null,
+            is_rental_property: business.is_rental_property || false,
           },
         })),
       };
@@ -465,6 +480,61 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
         const mutedForegroundColor = getComputedStyle(document.documentElement).getPropertyValue('--muted-foreground').trim();
         const borderColor = getComputedStyle(document.documentElement).getPropertyValue('--border').trim();
 
+        // Déterminer si c'est une propriété immobilière
+        const isProperty = props.sale_type === 'property' || props.property_type;
+        
+        // Créer les infos secondaires selon le type
+        let secondaryInfo = '';
+        if (isProperty) {
+          // Pour les immeubles : superficie et année
+          const sqFt = props.square_footage ? `${Number(props.square_footage).toLocaleString('fr-CA')} pi²` : 'N/D';
+          const year = props.year_built || 'N/D';
+          const propertyTypeLabel = props.property_type === 'bureau' ? 'Bureau' :
+                                   props.property_type === 'commerce' ? 'Commerce' :
+                                   props.property_type === 'industriel' ? 'Industriel' :
+                                   props.property_type === 'immeuble_logement' ? 'Immeuble' :
+                                   props.property_type === 'mixte' ? 'Mixte' : 'Propriété';
+          
+          secondaryInfo = `
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px;">
+              <div>
+                <div style="font-size: 11px; color: hsl(${mutedForegroundColor}); text-transform: uppercase; margin-bottom: 2px;">Type</div>
+                <div style="font-size: 13px; font-weight: 600; color: hsl(${foregroundColor});">${propertyTypeLabel}</div>
+              </div>
+              <div>
+                <div style="font-size: 11px; color: hsl(${mutedForegroundColor}); text-transform: uppercase; margin-bottom: 2px;">Superficie</div>
+                <div style="font-size: 13px; font-weight: 600; color: hsl(${foregroundColor});">${sqFt}</div>
+              </div>
+              <div>
+                <div style="font-size: 11px; color: hsl(${mutedForegroundColor}); text-transform: uppercase; margin-bottom: 2px;">Année</div>
+                <div style="font-size: 13px; font-weight: 600; color: hsl(${foregroundColor});">${year}</div>
+              </div>
+              ${props.is_rental_property ? `
+                <div>
+                  <div style="font-size: 11px; color: hsl(${mutedForegroundColor}); text-transform: uppercase; margin-bottom: 2px;">Type</div>
+                  <div style="font-size: 13px; font-weight: 600; color: hsl(${foregroundColor});">Locatif</div>
+                </div>
+              ` : ''}
+            </div>
+          `;
+        } else if (props.is_franchise) {
+          secondaryInfo = `
+            <div style="text-align: right; margin-top: 10px;">
+              <div style="font-size: 11px; color: hsl(${mutedForegroundColor}); text-transform: uppercase; margin-bottom: 2px;">Type</div>
+              <div style="font-size: 13px; font-weight: 600; color: hsl(${foregroundColor});">Opportunité Franchise</div>
+            </div>
+          `;
+        } else if (props.annual_revenue) {
+          secondaryInfo = `
+            <div style="text-align: right; margin-top: 10px;">
+              <div style="font-size: 11px; color: hsl(${mutedForegroundColor}); text-transform: uppercase; margin-bottom: 2px;">Chiffre d'affaires</div>
+              <div style="font-size: 13px; font-weight: 600; color: hsl(${foregroundColor});">
+                ${Number(props.annual_revenue).toLocaleString('fr-CA')} $
+              </div>
+            </div>
+          `;
+        }
+
         const popupContent = `
           <div 
             style="padding: 0; max-width: 300px; cursor: pointer;" 
@@ -491,21 +561,14 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
               <p style="color: hsl(${mutedForegroundColor}); font-size: 13px; margin-bottom: 10px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
                 ${props.description}
               </p>
-              <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid hsl(${borderColor});">
+              <div style="padding-top: 10px; border-top: 1px solid hsl(${borderColor});">
                 <div>
                   <div style="font-size: 11px; color: hsl(${mutedForegroundColor}); text-transform: uppercase; margin-bottom: 2px;">Prix demandé</div>
                   <div style="font-weight: 700; color: ${primaryHex}; font-size: 18px;">
                     ${Number(props.asking_price).toLocaleString('fr-CA')} $
                   </div>
                 </div>
-                ${props.annual_revenue ? `
-                  <div style="text-align: right;">
-                    <div style="font-size: 11px; color: hsl(${mutedForegroundColor}); text-transform: uppercase; margin-bottom: 2px;">Chiffre d'affaires</div>
-                    <div style="font-size: 13px; font-weight: 600; color: hsl(${foregroundColor});">
-                      ${Number(props.annual_revenue).toLocaleString('fr-CA')} $
-                    </div>
-                  </div>
-                ` : ''}
+                ${secondaryInfo}
               </div>
               <div style="margin-top: 12px; padding: 8px; background: ${primaryHex}15; border-radius: 6px; text-align: center; font-size: 12px; color: ${primaryHex}; font-weight: 600;">
                 Cliquez pour voir les détails
