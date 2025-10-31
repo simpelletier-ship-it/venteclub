@@ -10,9 +10,6 @@ const templates = [
   "Bonjour, je suis intéressé par votre entreprise. Pouvez-vous me fournir plus d'informations?",
   "Est-ce que l'entreprise est toujours disponible?",
   "J'aimerais planifier une rencontre pour discuter de l'opportunité.",
-  "Pourriez-vous me partager plus de détails financiers?",
-  "Quel est votre prix final pour cette entreprise?",
-  "Y a-t-il des employés en place?",
 ];
 
 export const QuickMessageTemplates = ({ onSelectTemplate }: QuickMessageTemplatesProps) => {
