@@ -132,14 +132,14 @@ const Home = () => {
       </section>
 
       {/* Featured Businesses Section */}
-      <section id="featured" className="py-12 sm:py-20 bg-gradient-to-b from-muted/30 to-background">
+      <section id="featured" className="py-8 sm:py-12 bg-gradient-to-b from-muted/30 to-background">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-8 sm:mb-12 animate-slide-up">
-            <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-secondary/10 text-secondary text-xs sm:text-sm font-semibold mb-4 sm:mb-6">
+          <div className="text-center mb-6 sm:mb-8 animate-slide-up">
+            <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-secondary/10 text-secondary text-xs sm:text-sm font-semibold mb-3 sm:mb-4">
               <TrendingUp className="w-3 sm:w-4 h-3 sm:h-4" />
               Opportunités du moment
             </div>
-            <h2 className="text-2xl sm:text-4xl md:text-5xl font-display font-bold text-foreground mb-3 sm:mb-4 px-4">
+            <h2 className="text-2xl sm:text-4xl md:text-5xl font-display font-bold text-foreground mb-2 sm:mb-3 px-4">
               Opportunités en vedette
             </h2>
             <p className="text-sm sm:text-lg text-muted-foreground max-w-2xl mx-auto px-4">
@@ -147,7 +147,7 @@ const Home = () => {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8 mb-8 sm:mb-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
             {featuredBusinesses.map((business, index) => (
               <div key={business.id} className="animate-slide-up h-full" style={{ animationDelay: `${index * 100}ms` }}>
                 <BusinessCard {...business} />
@@ -159,28 +159,28 @@ const Home = () => {
             <Button 
               size="lg" 
               onClick={() => navigate("/entreprises")}
-              className="bg-gradient-to-r from-secondary to-primary hover:from-secondary/90 hover:to-primary/90 text-white h-14 px-10 text-base font-semibold shadow-lg hover:shadow-xl transition-all hover:scale-105 group"
+              className="bg-gradient-to-r from-secondary to-primary hover:from-secondary/90 hover:to-primary/90 text-white h-12 sm:h-14 px-8 sm:px-10 text-sm sm:text-base font-semibold shadow-lg hover:shadow-xl transition-all hover:scale-105 group"
             >
               Voir toutes les entreprises à vendre
-              <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="ml-2 w-4 sm:w-5 h-4 sm:h-5 group-hover:translate-x-1 transition-transform" />
             </Button>
           </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="py-12 sm:py-20 bg-background">
+      <section className="py-8 sm:py-12 bg-background">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8">
-            <div className="text-center p-6 sm:p-8 rounded-2xl bg-card border border-border hover:shadow-lg transition-shadow">
-              <TrendingUp className="w-10 sm:w-12 h-10 sm:h-12 mx-auto mb-3 sm:mb-4 text-secondary" />
-              <h3 className="text-lg sm:text-xl font-bold mb-2">Statistiques en temps réel</h3>
-              <p className="text-sm sm:text-base text-muted-foreground">Suivez la performance de vos annonces avec des statistiques détaillées</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 max-w-4xl mx-auto">
+            <div className="text-center p-5 sm:p-6 rounded-xl bg-card border border-border hover:shadow-lg transition-shadow">
+              <TrendingUp className="w-8 sm:w-10 h-8 sm:h-10 mx-auto mb-2 sm:mb-3 text-secondary" />
+              <h3 className="text-base sm:text-lg font-bold mb-1.5 sm:mb-2">Statistiques en temps réel</h3>
+              <p className="text-xs sm:text-sm text-muted-foreground">Suivez la performance de vos annonces avec des statistiques détaillées</p>
             </div>
-            <div className="text-center p-6 sm:p-8 rounded-2xl bg-card border border-border hover:shadow-lg transition-shadow">
-              <Clock className="w-10 sm:w-12 h-10 sm:h-12 mx-auto mb-3 sm:mb-4 text-secondary" />
-              <h3 className="text-lg sm:text-xl font-bold mb-2">Plateforme intelligente</h3>
-              <p className="text-sm sm:text-base text-muted-foreground">Gérez vos annonces facilement et voyez leur impact en direct</p>
+            <div className="text-center p-5 sm:p-6 rounded-xl bg-card border border-border hover:shadow-lg transition-shadow">
+              <Clock className="w-8 sm:w-10 h-8 sm:h-10 mx-auto mb-2 sm:mb-3 text-secondary" />
+              <h3 className="text-base sm:text-lg font-bold mb-1.5 sm:mb-2">Plateforme intelligente</h3>
+              <p className="text-xs sm:text-sm text-muted-foreground">Gérez vos annonces facilement et voyez leur impact en direct</p>
             </div>
           </div>
         </div>
