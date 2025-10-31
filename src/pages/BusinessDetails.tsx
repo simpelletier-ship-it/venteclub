@@ -4,7 +4,7 @@ import { supabase, invokeWithTimeout } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Lock, MapPin, TrendingUp, Users, Calendar, Eye } from "lucide-react";
+import { ArrowLeft, Lock, MapPin, TrendingUp, Users, Calendar, Eye, Calculator } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { FavoriteButton } from "@/components/FavoriteButton";
@@ -13,6 +13,8 @@ import { SellerChatSection } from "@/components/SellerChatSection";
 import { ReportBusinessDialog } from "@/components/ReportBusinessDialog";
 import { SEO } from "@/components/SEO";
 import { FinancialCalculator } from "@/components/FinancialCalculator";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { ChevronDown } from "lucide-react";
 
 const BusinessDetails = () => {
   const { slug } = useParams();
@@ -34,6 +36,7 @@ const BusinessDetails = () => {
   const [showPremiumDialog, setShowPremiumDialog] = useState(false);
   const [isPremiumAccess, setIsPremiumAccess] = useState(false);
   const [sellerProfile, setSellerProfile] = useState<any>(null);
+  const [isCalculatorOpen, setIsCalculatorOpen] = useState(false);
 
   useEffect(() => {
     const initialize = async () => {
@@ -697,13 +700,6 @@ const BusinessDetails = () => {
                   </div>
                 )}
 
-                {/* Calculateur de financement */}
-                {business.asking_price > 0 && (
-                  <div className="mt-8">
-                    <FinancialCalculator askingPrice={business.asking_price} />
-                  </div>
-                )}
-
                 {business.is_franchise && (
                   <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 p-4 rounded-lg border-2 border-blue-200 dark:border-blue-800 flex items-center gap-3">
                     <div className="flex-shrink-0 w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
@@ -776,6 +772,39 @@ const BusinessDetails = () => {
                     </div>
                   )}
                 </div>
+
+                {/* Calculateur de financement - Collapsible */}
+                {business.asking_price > 0 && (
+                  <div className="border-t pt-6 mt-6">
+                    <Collapsible open={isCalculatorOpen} onOpenChange={setIsCalculatorOpen}>
+                      <CollapsibleTrigger asChild>
+                        <button className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-secondary/5 to-primary/5 hover:from-secondary/10 hover:to-primary/10 rounded-lg transition-colors group">
+                          <div className="flex items-center gap-3">
+                            <div className="p-2 bg-secondary/10 rounded-lg group-hover:bg-secondary/20 transition-colors">
+                              <Calculator className="w-5 h-5 text-secondary" />
+                            </div>
+                            <div className="text-left">
+                              <h3 className="text-lg font-semibold text-foreground">
+                                Calculateur de financement
+                              </h3>
+                              <p className="text-sm text-muted-foreground">
+                                Estimez vos paiements mensuels
+                              </p>
+                            </div>
+                          </div>
+                          <ChevronDown 
+                            className={`w-5 h-5 text-muted-foreground transition-transform duration-200 ${
+                              isCalculatorOpen ? 'rotate-180' : ''
+                            }`}
+                          />
+                        </button>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="mt-4">
+                        <FinancialCalculator askingPrice={business.asking_price} />
+                      </CollapsibleContent>
+                    </Collapsible>
+                  </div>
+                )}
 
                 {/* Chat Section - Show if buyer has access OR if seller and someone bought access */}
                 {user && business && (
