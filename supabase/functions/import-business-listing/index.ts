@@ -22,10 +22,15 @@ Deno.serve(async (req) => {
 
     console.log('[IMPORT-LISTING] Fetching URL:', url);
 
-    // Fetch the webpage content
+    // Fetch the webpage content with proper headers
     const response = await fetch(url, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        'Accept-Language': 'fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'Connection': 'keep-alive',
+        'Upgrade-Insecure-Requests': '1'
       }
     });
 
@@ -44,37 +49,42 @@ Deno.serve(async (req) => {
     // Use Lovable AI to extract structured data from the HTML
     console.log('[IMPORT-LISTING] Using AI to extract business data');
     
-    const prompt = `Analyze this HTML content from a business listing website and extract the following information in JSON format:
+    const prompt = `You are extracting business listing data from HTML. Look for these specific patterns:
 
+EXTRACTION RULES:
+1. Title: Look for <h1>, <title>, meta tags, or main heading with business name
+2. Price/Asking Price: Look for "$", "CAD", "USD", "price", "Prix demandé", numbers like "450,000" or "450000"
+3. Description: Look for paragraphs, article content, meta description
+4. Revenue: Look for "Revenue", "Revenu", "Chiffre d'affaires" + numbers
+5. Location: Look for city names, addresses, "Location", "Ville"
+6. Industry: Classify based on keywords (restaurant, salon, garage, etc.)
+7. Employees: Look for "employees", "employés", staff count
+8. Year: Look for "established", "fondé", "depuis", 4-digit years
+
+HTML TO ANALYZE:
+${html}
+
+Return this exact JSON structure (use null for missing data):
 {
-  "title": "Business title",
-  "description": "Full business description",
-  "asking_price": number (in dollars, no currency symbol),
-  "annual_revenue": number (in dollars, if available),
-  "city": "City name",
-  "province": "Province/State",
-  "region": "Region if specified",
-  "industry": "Industry category (choose from: restaurant, bar_bistro_discotheque, beaute_esthetique, boutique_commerce_detail, garage_mecanique_concessionnaire, education_garderie, sante_services_sociaux, communications_informatique, services_professionnels, tourisme_hotellerie, immobilier_location, agriculture, construction_renovation, fabrication_transformation, transport_logistique, divertissement_loisirs, services_personnels, autres)",
-  "employees_count": number (if available),
-  "year_established": number (4-digit year if available),
-  "baiia": number (EBITDA in dollars if available),
-  "net_profit": number (in dollars if available),
-  "profit_margin": number (percentage if available),
-  "location": "Full location string (city, province)"
+  "title": "exact business title or null",
+  "description": "full description or null",
+  "asking_price": number_only_without_symbols_or_null,
+  "annual_revenue": number_or_null,
+  "city": "city_name_or_null",
+  "province": "province_or_null",
+  "region": "region_or_null",
+  "industry": "best_match_or_autres",
+  "employees_count": number_or_null,
+  "year_established": 4_digit_year_or_null,
+  "baiia": number_or_null,
+  "net_profit": number_or_null,
+  "profit_margin": number_or_null,
+  "location": "city, province_or_null"
 }
 
-IMPORTANT RULES:
-1. Extract ONLY the information that is clearly present in the HTML
-2. For missing fields, use null
-3. Convert all monetary amounts to numbers without currency symbols
-4. Make sure asking_price is always extracted if present
-5. Choose the most appropriate industry category
-6. Be precise and accurate
+Industries: restaurant, bar_bistro_discotheque, beaute_esthetique, boutique_commerce_detail, garage_mecanique_concessionnaire, education_garderie, sante_services_sociaux, communications_informatique, services_professionnels, tourisme_hotellerie, immobilier_location, agriculture, construction_renovation, fabrication_transformation, transport_logistique, divertissement_loisirs, services_personnels, autres
 
-HTML Content (first 8000 characters):
-${html.substring(0, 8000)}
-
-Return ONLY valid JSON, no additional text.`;
+BE THOROUGH - extract all available information. Return ONLY valid JSON.`;
 
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) {
