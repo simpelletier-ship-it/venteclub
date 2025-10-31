@@ -49,6 +49,9 @@ const Admin = () => {
   const [deleteUserDialogOpen, setDeleteUserDialogOpen] = useState(false);
   const [reports, setReports] = useState<any[]>([]);
   const [subscriptions, setSubscriptions] = useState<any[]>([]);
+  const [importUrl, setImportUrl] = useState("");
+  const [importLoading, setImportLoading] = useState(false);
+  const [importedData, setImportedData] = useState<any>(null);
 
   useEffect(() => {
     checkAdminAccess();
@@ -740,6 +743,78 @@ const Admin = () => {
     }
   };
 
+  const handleImportListing = async () => {
+    if (!importUrl.trim()) {
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: "Veuillez entrer une URL valide",
+      });
+      return;
+    }
+
+    setImportLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('import-business-listing', {
+        body: { url: importUrl }
+      });
+
+      if (error) throw error;
+
+      if (!data.success) {
+        throw new Error(data.error || 'Import failed');
+      }
+
+      setImportedData(data.data);
+      toast({
+        title: "Succès",
+        description: "Les données ont été extraites avec succès. Vérifiez et ajustez avant de publier.",
+      });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: error.message || "Impossible d'importer l'annonce",
+      });
+    } finally {
+      setImportLoading(false);
+    }
+  };
+
+  const handlePublishImportedListing = async () => {
+    if (!importedData) return;
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error('Not authenticated');
+
+      const { error } = await supabase.from('businesses').insert({
+        ...importedData,
+        seller_id: session.user.id,
+        status: 'active',
+        approval_status: 'approved',
+        created_at: new Date().toISOString(),
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Succès",
+        description: "L'annonce a été publiée avec succès!",
+      });
+
+      setImportedData(null);
+      setImportUrl("");
+      fetchBusinesses();
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: error.message,
+      });
+    }
+  };
+
   const getStatusBadge = (status: string) => {
     const variants: Record<string, "default" | "secondary" | "destructive"> = {
       pending: "secondary",
@@ -785,8 +860,9 @@ const Admin = () => {
         </div>
 
         <Tabs defaultValue="businesses" className="w-full">
-          <TabsList className="grid w-full max-w-6xl grid-cols-6 mb-6">
+          <TabsList className="grid w-full max-w-6xl grid-cols-7 mb-6">
             <TabsTrigger value="businesses">Annonces</TabsTrigger>
+            <TabsTrigger value="import">Importer</TabsTrigger>
             <TabsTrigger value="pending-changes">Modifications</TabsTrigger>
             <TabsTrigger value="users">Utilisateurs</TabsTrigger>
             <TabsTrigger value="reports">Signalements</TabsTrigger>
@@ -888,6 +964,155 @@ const Admin = () => {
             </Card>
           ))}
             </div>
+          </TabsContent>
+
+          <TabsContent value="import">
+            <Card>
+              <CardHeader>
+                <CardTitle>Importer une annonce</CardTitle>
+                <CardDescription>
+                  Copiez l'URL d'une annonce d'un autre site pour l'importer automatiquement
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="import-url">URL de l'annonce</Label>
+                    <Input
+                      id="import-url"
+                      type="url"
+                      placeholder="https://exemple.com/annonce/123"
+                      value={importUrl}
+                      onChange={(e) => setImportUrl(e.target.value)}
+                      disabled={importLoading}
+                    />
+                  </div>
+                  <Button
+                    onClick={handleImportListing}
+                    disabled={importLoading || !importUrl.trim()}
+                    className="w-full sm:w-auto"
+                  >
+                    {importLoading ? "Extraction en cours..." : "Extraire les données"}
+                  </Button>
+                </div>
+
+                {importedData && (
+                  <div className="mt-8 space-y-6 p-6 bg-muted/30 rounded-lg border border-border">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-lg font-semibold">Données extraites</h3>
+                      <Badge variant="secondary">Vérifiez avant de publier</Badge>
+                    </div>
+
+                    <div className="grid gap-4">
+                      <div className="space-y-2">
+                        <Label>Titre</Label>
+                        <Input
+                          value={importedData.title || ''}
+                          onChange={(e) => setImportedData({ ...importedData, title: e.target.value })}
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>Description</Label>
+                        <Textarea
+                          value={importedData.description || ''}
+                          onChange={(e) => setImportedData({ ...importedData, description: e.target.value })}
+                          rows={6}
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label>Prix demandé ($)</Label>
+                          <Input
+                            type="number"
+                            value={importedData.asking_price || ''}
+                            onChange={(e) => setImportedData({ ...importedData, asking_price: parseFloat(e.target.value) })}
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label>Revenus annuels ($)</Label>
+                          <Input
+                            type="number"
+                            value={importedData.annual_revenue || ''}
+                            onChange={(e) => setImportedData({ ...importedData, annual_revenue: parseFloat(e.target.value) || null })}
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label>Ville</Label>
+                          <Input
+                            value={importedData.city || ''}
+                            onChange={(e) => setImportedData({ ...importedData, city: e.target.value })}
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label>Province</Label>
+                          <Input
+                            value={importedData.province || ''}
+                            onChange={(e) => setImportedData({ ...importedData, province: e.target.value })}
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label>Industrie</Label>
+                          <Select
+                            value={importedData.industry}
+                            onValueChange={(value) => setImportedData({ ...importedData, industry: value })}
+                          >
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {QUEBEC_INDUSTRIES.map((industry) => (
+                                <SelectItem key={industry.value} value={industry.value}>
+                                  {industry.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label>Employés</Label>
+                          <Input
+                            type="number"
+                            value={importedData.employees_count || ''}
+                            onChange={(e) => setImportedData({ ...importedData, employees_count: parseInt(e.target.value) || null })}
+                          />
+                        </div>
+                      </div>
+
+                      {importedData.source_url && (
+                        <div className="p-3 bg-muted rounded-lg text-sm">
+                          <span className="font-semibold">Source:</span>{' '}
+                          <a href={importedData.source_url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                            {importedData.source_url}
+                          </a>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex gap-3 pt-4 border-t">
+                      <Button onClick={handlePublishImportedListing} className="flex-1">
+                        Publier l'annonce
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setImportedData(null);
+                          setImportUrl("");
+                        }}
+                      >
+                        Annuler
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </TabsContent>
 
           <TabsContent value="pending-changes">
