@@ -193,14 +193,52 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
         zoom: 6,
       });
 
-      // Initialize draw control
+      // Initialize draw control with custom styles
       draw.current = new MapboxDraw({
         displayControlsDefault: false,
         controls: {
           polygon: true,
           trash: true
         },
-        defaultMode: 'simple_select'
+        defaultMode: 'simple_select',
+        styles: [
+          // Polygon fill
+          {
+            'id': 'gl-draw-polygon-fill',
+            'type': 'fill',
+            'filter': ['all', ['==', '$type', 'Polygon'], ['!=', 'mode', 'static']],
+            'paint': {
+              'fill-color': '#3b82f6',
+              'fill-opacity': 0.25
+            }
+          },
+          // Polygon outline
+          {
+            'id': 'gl-draw-polygon-stroke-active',
+            'type': 'line',
+            'filter': ['all', ['==', '$type', 'Polygon'], ['!=', 'mode', 'static']],
+            'layout': {
+              'line-cap': 'round',
+              'line-join': 'round'
+            },
+            'paint': {
+              'line-color': '#3b82f6',
+              'line-width': 3
+            }
+          },
+          // Vertex points
+          {
+            'id': 'gl-draw-polygon-and-line-vertex-active',
+            'type': 'circle',
+            'filter': ['all', ['==', 'meta', 'vertex'], ['==', '$type', 'Point']],
+            'paint': {
+              'circle-radius': 6,
+              'circle-color': '#3b82f6',
+              'circle-stroke-color': '#fff',
+              'circle-stroke-width': 2
+            }
+          }
+        ]
       });
 
       map.current.addControl(draw.current, 'top-left');
@@ -512,20 +550,27 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
   };
 
   return (
-    <div className="relative w-full h-[600px] rounded-xl overflow-hidden shadow-2xl border border-border/50">
-      <div ref={mapContainer} className="absolute inset-0" />
+    <div className="w-full space-y-6">
+      <div className="relative w-full h-[600px] rounded-xl overflow-hidden shadow-2xl border border-border/50">
+        <div ref={mapContainer} className="absolute inset-0" />
+      </div>
       
-      {showSidebar && (
-        <div className="absolute top-0 right-0 bottom-0 w-[400px] bg-background/95 backdrop-blur-lg border-l border-border/50 shadow-2xl">
-          <div className="h-full flex flex-col">
-            <div className="p-6 border-b border-border/50 bg-gradient-to-r from-primary/5 to-secondary/5">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-xl font-bold text-foreground">
-                  Annonces dans la zone
-                </h3>
+      {showSidebar && filteredBusinesses.length > 0 && (
+        <div className="w-full">
+          <Card className="bg-gradient-to-br from-background to-secondary/5 border-2 border-primary/20 shadow-xl">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h3 className="text-2xl font-bold text-foreground mb-1">
+                    Annonces dans la zone sélectionnée
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    {filteredBusinesses.length} {filteredBusinesses.length > 1 ? 'entreprises trouvées' : 'entreprise trouvée'}
+                  </p>
+                </div>
                 <Button
-                  variant="ghost"
-                  size="icon"
+                  variant="outline"
+                  size="sm"
                   onClick={() => {
                     if (draw.current) {
                       draw.current.deleteAll();
@@ -533,22 +578,18 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
                     setShowSidebar(false);
                     setFilteredBusinesses([]);
                   }}
-                  className="h-8 w-8"
+                  className="gap-2"
                 >
                   <X className="h-4 w-4" />
+                  Effacer
                 </Button>
               </div>
-              <p className="text-sm text-muted-foreground">
-                {filteredBusinesses.length} {filteredBusinesses.length > 1 ? 'entreprises trouvées' : 'entreprise trouvée'}
-              </p>
-            </div>
 
-            <ScrollArea className="flex-1 p-4">
-              <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {filteredBusinesses.map((business) => (
                   <Card 
                     key={business.id}
-                    className="cursor-pointer hover:shadow-lg transition-all duration-200 hover:border-primary/50"
+                    className="cursor-pointer hover:shadow-lg transition-all duration-200 hover:border-primary/50 hover:scale-105"
                     onClick={() => navigate(`/entreprise/${business.slug}`)}
                   >
                     <CardContent className="p-4">
@@ -556,7 +597,7 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
                         <img
                           src={business.photo_url}
                           alt={business.title}
-                          className="w-full h-32 object-cover rounded-lg mb-3"
+                          className="w-full h-40 object-cover rounded-lg mb-3"
                         />
                       )}
                       <h4 className="font-bold text-foreground mb-2 line-clamp-2">
@@ -564,11 +605,11 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
                       </h4>
                       <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
                         <MapPin className="h-4 w-4" />
-                        <span>{business.city || business.location}</span>
+                        <span className="truncate">{business.city || business.location}</span>
                       </div>
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-xs text-muted-foreground uppercase mb-1">Prix</p>
+                          <p className="text-xs text-muted-foreground uppercase mb-1">Prix demandé</p>
                           <p className="font-bold text-primary flex items-center gap-1">
                             <DollarSign className="h-4 w-4" />
                             {business.asking_price.toLocaleString('fr-CA')}
@@ -582,8 +623,8 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
                   </Card>
                 ))}
               </div>
-            </ScrollArea>
-          </div>
+            </CardContent>
+          </Card>
         </div>
       )}
     </div>

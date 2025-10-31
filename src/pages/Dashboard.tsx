@@ -250,17 +250,40 @@ const Dashboard = () => {
 
                   return (
                     <div key={business.id} className="space-y-2">
-                      {isActiveFeatured && (
-                        <div className="bg-gradient-to-r from-yellow-500/20 to-amber-500/20 border border-yellow-500/30 rounded-lg p-3 flex items-center gap-2">
-                          <Star className="h-4 w-4 fill-yellow-500 text-yellow-500 flex-shrink-0" />
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold text-foreground">Mise en avant active</p>
-                            <p className="text-xs text-muted-foreground">
-                              {daysRemaining} jour{daysRemaining > 1 ? 's' : ''} restant{daysRemaining > 1 ? 's' : ''} · Expire le {featuredUntil.toLocaleDateString('fr-CA', { day: 'numeric', month: 'short' })}
-                            </p>
+                      <div className="space-y-2">
+                        {isActiveFeatured && (
+                          <div className="bg-gradient-to-r from-yellow-500/20 to-amber-500/20 border border-yellow-500/30 rounded-lg p-3 flex items-center gap-2">
+                            <Star className="h-4 w-4 fill-yellow-500 text-yellow-500 flex-shrink-0" />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-semibold text-foreground">Mise en avant active</p>
+                              <p className="text-xs text-muted-foreground">
+                                {daysRemaining} jour{daysRemaining > 1 ? 's' : ''} restant{daysRemaining > 1 ? 's' : ''} · Expire le {featuredUntil.toLocaleDateString('fr-CA', { day: 'numeric', month: 'short' })}
+                              </p>
+                            </div>
                           </div>
-                        </div>
-                      )}
+                        )}
+                        {business.approval_status === 'approved' && business.status !== 'sold' && business.status !== 'archived' && !business.has_pending_changes && (
+                          <Button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              // Rediriger vers la bonne page selon le type
+                              if (business.sale_type === 'property') {
+                                navigate(`/list-property?edit=${business.id}`);
+                              } else if (business.is_franchise) {
+                                navigate(`/list-franchise?edit=${business.id}`);
+                              } else {
+                                navigate(`/list-business?edit=${business.id}`);
+                              }
+                            }}
+                            size="sm"
+                            variant="outline"
+                            className="w-full"
+                          >
+                            <Edit className="mr-1 h-3 w-3" />
+                            Modifier l'annonce
+                          </Button>
+                        )}
+                      </div>
                       <div 
                         onClick={() => {
                           if (business.status === 'archived') {
@@ -316,26 +339,6 @@ const Dashboard = () => {
                             className="flex-1"
                           >
                             Publier l'annonce
-                          </Button>
-                        )}
-                        {business.approval_status === 'approved' && business.status !== 'sold' && business.status !== 'archived' && !business.has_pending_changes && (
-                          <Button
-                            onClick={() => {
-                              // Rediriger vers la bonne page selon le type
-                              if (business.sale_type === 'property') {
-                                navigate(`/list-property?edit=${business.id}`);
-                              } else if (business.is_franchise) {
-                                navigate(`/list-franchise?edit=${business.id}`);
-                              } else {
-                                navigate(`/list-business?edit=${business.id}`);
-                              }
-                            }}
-                            size="sm"
-                            variant="outline"
-                            className="flex-1"
-                          >
-                            <Edit className="mr-1 h-3 w-3" />
-                            Modifier
                           </Button>
                         )}
                         {business.has_pending_changes && (
