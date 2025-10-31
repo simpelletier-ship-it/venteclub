@@ -133,9 +133,9 @@ const BusinessCard = ({
               </Badge>
               
               {featured && (
-                <Badge className="bg-gradient-to-r from-accent to-accent/80 text-accent-foreground border-0 shadow-md">
-                  <Star className="w-3 h-3 fill-current mr-1" />
-                  En Vedette
+                <Badge className="relative bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 text-amber-950 border-2 border-amber-300/50 shadow-[0_0_20px_rgba(251,191,36,0.5)] font-bold tracking-wide animate-pulse">
+                  <Star className="w-3 h-3 fill-amber-950 mr-1 drop-shadow-sm" />
+                  PREMIUM
                 </Badge>
               )}
               {has_pending_changes && showPendingBadge && (
