@@ -264,7 +264,14 @@ const Dashboard = () => {
                       <div 
                         onClick={() => {
                           if (business.status === 'archived') {
-                            navigate(`/list-business?edit=${business.id}`);
+                            // Rediriger vers la bonne page selon le type
+                            if (business.sale_type === 'property') {
+                              navigate(`/list-property?edit=${business.id}`);
+                            } else if (business.is_franchise) {
+                              navigate(`/list-franchise?edit=${business.id}`);
+                            } else {
+                              navigate(`/list-business?edit=${business.id}`);
+                            }
                           } else {
                             navigate(`/entreprise/${business.slug}`);
                           }
@@ -313,7 +320,16 @@ const Dashboard = () => {
                         )}
                         {business.approval_status === 'approved' && business.status !== 'sold' && business.status !== 'archived' && !business.has_pending_changes && (
                           <Button
-                            onClick={() => navigate(`/list-business?edit=${business.id}`)}
+                            onClick={() => {
+                              // Rediriger vers la bonne page selon le type
+                              if (business.sale_type === 'property') {
+                                navigate(`/list-property?edit=${business.id}`);
+                              } else if (business.is_franchise) {
+                                navigate(`/list-franchise?edit=${business.id}`);
+                              } else {
+                                navigate(`/list-business?edit=${business.id}`);
+                              }
+                            }}
                             size="sm"
                             variant="outline"
                             className="flex-1"
