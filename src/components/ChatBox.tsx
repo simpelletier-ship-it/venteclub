@@ -17,6 +17,7 @@ interface Message {
   content: string;
   created_at: string;
   read: boolean;
+  read_at?: string;
 }
 
 interface MessageAttachment {
@@ -215,7 +216,7 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
   const markAsRead = async (messageId: string) => {
     await supabase
       .from('messages')
-      .update({ read: true })
+      .update({ read: true, read_at: new Date().toISOString() })
       .eq('id', messageId);
   };
 
@@ -248,7 +249,11 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
     setSelectedFiles(selectedFiles.filter((_, i) => i !== index));
   };
 
-  const sendMessage = async () => {
+  const sendMessage = async (e?: React.FormEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     if (!newMessage.trim() && selectedFiles.length === 0) return;
 
     setLoading(true);
@@ -365,6 +370,7 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
+      e.stopPropagation();
       sendMessage();
     }
   };
@@ -514,8 +520,24 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
                           minute: '2-digit'
                         })}
                       </p>
-                      {isCurrentUser && message.read && (
-                        <span className="text-xs text-primary-foreground/70">✓✓</span>
+                      {isCurrentUser && (
+                        <div className="flex items-center gap-1">
+                          {message.read ? (
+                            <>
+                              <span className="text-xs text-primary-foreground/70">✓✓</span>
+                              {message.read_at && (
+                                <span className="text-xs text-primary-foreground/70">
+                                  Lu {new Date(message.read_at).toLocaleTimeString('fr-CA', {
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                  })}
+                                </span>
+                              )}
+                            </>
+                          ) : (
+                            <span className="text-xs text-primary-foreground/70">✓</span>
+                          )}
+                        </div>
                       )}
                     </div>
                   </div>
@@ -592,7 +614,8 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
               disabled={loading || uploading}
             />
             <Button
-              onClick={sendMessage}
+              type="button"
+              onClick={() => sendMessage()}
               disabled={loading || uploading || (!newMessage.trim() && selectedFiles.length === 0)}
               size="icon"
               className="h-10 sm:h-12 w-10 sm:w-12 shrink-0 rounded-lg sm:rounded-xl bg-gradient-to-br from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-lg hover:shadow-xl transition-all duration-200"
