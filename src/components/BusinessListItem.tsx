@@ -107,18 +107,19 @@ const BusinessListItem = ({
       {/* Left section - Badges & Title */}
       <div className="flex-1 min-w-0 space-y-2">
         <div className="flex items-center gap-2 flex-wrap">
-          {/* Badge Type d'annonce */}
-          <Badge className={`${businessType.color} text-white border-0 shadow-md text-xs`}>
-            <businessType.icon className="w-3 h-3 mr-1" />
-            {businessType.label}
-          </Badge>
-          
+          {/* Badge En Vedette en premier */}
           {featured && (
             <Badge className="relative bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 text-amber-950 border-2 border-amber-300/50 shadow-[0_0_20px_rgba(251,191,36,0.5)] font-bold tracking-wide text-xs animate-pulse">
               <Star className="w-3 h-3 fill-amber-950 mr-1 drop-shadow-sm" />
               EN VEDETTE
             </Badge>
           )}
+          
+          {/* Badge Type d'annonce */}
+          <Badge className={`${businessType.color} text-white border-0 shadow-md text-xs`}>
+            <businessType.icon className="w-3 h-3 mr-1" />
+            {businessType.label}
+          </Badge>
         </div>
         
         <div className="space-y-1">
