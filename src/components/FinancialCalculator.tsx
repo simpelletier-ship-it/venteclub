@@ -105,16 +105,13 @@ export const FinancialCalculator = ({ askingPrice }: FinancialCalculatorProps) =
 
   return (
     <Card className="border-border/50 shadow-lg">
-      <CardHeader className="bg-gradient-to-r from-secondary/5 to-primary/5 border-b border-border/50">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="p-3 bg-secondary/10 rounded-xl">
-              <Calculator className="w-6 h-6 text-secondary" />
-            </div>
-            <div>
-              <CardTitle className="text-2xl font-display">Calculateur de financement</CardTitle>
-              <CardDescription>Estimez vos paiements mensuels pour l'achat de cette entreprise</CardDescription>
-            </div>
+      <CardContent className="p-6 space-y-6">
+        {/* Info tooltip en haut */}
+        <div className="flex items-center justify-between pb-4 border-b border-border/50">
+          <div className="space-y-1">
+            <p className="text-sm text-muted-foreground">
+              Estimez vos paiements mensuels pour l'achat de cette entreprise
+            </p>
           </div>
           <TooltipProvider>
             <Tooltip>
@@ -142,8 +139,6 @@ export const FinancialCalculator = ({ askingPrice }: FinancialCalculatorProps) =
             </Tooltip>
           </TooltipProvider>
         </div>
-      </CardHeader>
-      <CardContent className="p-6 space-y-6">
         {/* Prix de vente */}
         <div className="space-y-2">
           <Label htmlFor="salePrice" className="text-sm font-semibold flex items-center gap-2">
