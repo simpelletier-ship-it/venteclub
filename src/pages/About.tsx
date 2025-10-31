@@ -75,7 +75,7 @@ const About = () => {
               </div>
               <h3 className="text-xl font-bold mb-3">Sécurité</h3>
               <p className="text-muted-foreground">
-                Toutes les annonces sont vérifiées et les transactions sont sécurisées pour votre tranquillité d'esprit.
+                Plateforme sécurisée avec système de paiement protégé pour votre tranquillité d'esprit.
               </p>
             </div>
 

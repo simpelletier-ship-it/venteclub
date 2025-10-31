@@ -67,8 +67,8 @@ const Home = () => {
     <>
       <SEO 
         title="Achat et Vente d'Entreprises au Québec | Vente.club" 
-        description="Découvrez des milliers d'opportunités d'affaires vérifiées au Québec. Achetez ou vendez votre entreprise en toute sécurité avec Vente.club." 
-        keywords="achat entreprise Québec, vente entreprise, PME à vendre, commerce à vendre, franchise Québec, opportunités affaires" 
+        description="Découvrez des milliers d'opportunités d'affaires au Québec. Achetez ou vendez votre entreprise en toute sécurité avec Vente.club." 
+        keywords="achat entreprise Québec, vente entreprise, PME à vendre, commerce à vendre, franchise Québec, opportunités affaires"
         canonical="/" 
         structuredData={structuredData} 
       />

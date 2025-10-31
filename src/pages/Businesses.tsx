@@ -117,11 +117,11 @@ const Businesses = () => {
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-display font-bold leading-[1.1] tracking-tight text-foreground">
               Toutes les entreprises
               <br />
-              <span className="text-secondary">à vendre au Québec</span>
+              <span className="text-primary">à vendre au Québec</span>
             </h1>
             
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-              Explorez {allBusinesses.length + featuredBusinesses.length} opportunités d'affaires vérifiées
+              Explorez {allBusinesses.length + featuredBusinesses.length} opportunités d'affaires
             </p>
           </div>
         </div>

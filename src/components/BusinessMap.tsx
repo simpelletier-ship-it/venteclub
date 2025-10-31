@@ -1,8 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
+import MapboxDraw from '@mapbox/mapbox-gl-draw';
+import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
+import { Card, CardContent } from './ui/card';
+import { ScrollArea } from './ui/scroll-area';
+import { Badge } from './ui/badge';
+import { Button } from './ui/button';
+import { X, MapPin, DollarSign } from 'lucide-react';
 
 interface Business {
   id: string;
@@ -18,6 +25,7 @@ interface Business {
   photo_url?: string | null;
   is_franchise?: boolean;
   slug: string;
+  city?: string;
 }
 
 interface BusinessMapProps {
@@ -32,14 +40,15 @@ interface BusinessMapProps {
 const BusinessMap = ({ filters }: BusinessMapProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
+  const draw = useRef<MapboxDraw | null>(null);
   const [businesses, setBusinesses] = useState<Business[]>([]);
-  const [zoomLevel, setZoomLevel] = useState(6);
+  const [filteredBusinesses, setFilteredBusinesses] = useState<Business[]>([]);
+  const [showSidebar, setShowSidebar] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchBusinesses();
 
-    // S'abonner aux changements en temps réel
     const channel = supabase
       .channel('businesses-changes')
       .on(
@@ -49,9 +58,7 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
           schema: 'public',
           table: 'businesses'
         },
-        (payload) => {
-          console.log('[MAP] Database change detected:', payload);
-          // Recharger les annonces quand il y a un changement
+        () => {
           fetchBusinesses();
         }
       )
@@ -63,7 +70,6 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
   }, [filters]);
 
   const fetchBusinesses = async () => {
-    console.log('[MAP] Fetching businesses for map...');
     let query = supabase
       .from('businesses')
       .select(`
@@ -86,7 +92,6 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
       .eq('status', 'active')
       .eq('approval_status', 'approved');
 
-    // Apply filters
     if (filters?.city) {
       query = query.ilike('city', `%${filters.city}%`);
     }
@@ -102,15 +107,12 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
 
     const { data, error } = await query;
 
-    console.log('[MAP] Query result:', { count: data?.length, error });
-
     if (error) {
       console.error('[MAP] Error fetching businesses:', error);
       return;
     }
 
     if (data) {
-      // Transform data to include first photo URL
       const businessesWithPhotos = data.map(b => ({
         ...b,
         photo_url: Array.isArray(b.business_photos) && b.business_photos.length > 0 
@@ -118,19 +120,15 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
           : null
       }));
       
-      // Géocoder les annonces sans coordonnées
       const businessesWithCoords = await Promise.all(
         businessesWithPhotos.map(async (business) => {
-          // Si pas de coordonnées mais a une ville, géocoder
           if ((!business.latitude || !business.longitude) && business.city) {
-            console.log('[MAP] Geocoding business:', business.title, 'in', business.city);
             try {
               const { data: geocodeData } = await supabase.functions.invoke('geocode-city', {
                 body: { city: business.city, province: 'Québec' }
               });
               
               if (geocodeData?.success && geocodeData.latitude && geocodeData.longitude) {
-                console.log('[MAP] Geocoded:', business.city, '→', geocodeData.latitude, geocodeData.longitude);
                 return {
                   ...business,
                   latitude: geocodeData.latitude,
@@ -138,45 +136,56 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
                 };
               }
             } catch (err) {
-              console.error('[MAP] Geocoding error for', business.city, ':', err);
+              console.error('[MAP] Geocoding error:', err);
             }
           }
           return business;
         })
       );
       
-      // Filtrer pour garder seulement ceux avec coordonnées
       const validBusinesses = businessesWithCoords.filter(b => b.latitude && b.longitude);
-      
-      console.log('[MAP] Businesses loaded for map:', {
-        total: businessesWithPhotos.length,
-        withCoords: validBusinesses.length,
-        geocoded: businessesWithCoords.length - businessesWithPhotos.filter(b => b.latitude && b.longitude).length,
-        sample: validBusinesses[0] ? {
-          title: validBusinesses[0].title,
-          lat: validBusinesses[0].latitude,
-          lng: validBusinesses[0].longitude
-        } : 'none'
-      });
       setBusinesses(validBusinesses);
     }
+  };
+
+  const filterBusinessesInPolygon = (polygon: number[][]) => {
+    const filtered = businesses.filter(business => {
+      return isPointInPolygon([business.longitude, business.latitude], polygon);
+    });
+    setFilteredBusinesses(filtered);
+    setShowSidebar(filtered.length > 0);
+  };
+
+  const isPointInPolygon = (point: number[], polygon: number[][]) => {
+    const x = point[0];
+    const y = point[1];
+    let inside = false;
+
+    for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+      const xi = polygon[i][0];
+      const yi = polygon[i][1];
+      const xj = polygon[j][0];
+      const yj = polygon[j][1];
+
+      const intersect = ((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+      if (intersect) inside = !inside;
+    }
+
+    return inside;
   };
 
   useEffect(() => {
     if (!mapContainer.current) return;
 
-    // Check if we have the Mapbox token
     const mapboxToken = import.meta.env.VITE_MAPBOX_TOKEN;
-    console.log('[MAP] Mapbox token present:', !!mapboxToken);
     if (!mapboxToken) {
-      console.error('[MAP] Mapbox token not found in environment variables');
+      console.error('[MAP] Mapbox token not found');
       return;
     }
 
     if (!map.current) {
       mapboxgl.accessToken = mapboxToken;
 
-      // Initialize map centered on Quebec with realistic map style
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
         style: 'mapbox://styles/mapbox/outdoors-v12',
@@ -184,7 +193,18 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
         zoom: 6,
       });
 
-      // Add navigation controls
+      // Initialize draw control
+      draw.current = new MapboxDraw({
+        displayControlsDefault: false,
+        controls: {
+          polygon: true,
+          trash: true
+        },
+        defaultMode: 'simple_select'
+      });
+
+      map.current.addControl(draw.current, 'top-left');
+
       map.current.addControl(
         new mapboxgl.NavigationControl({
           visualizePitch: true,
@@ -192,29 +212,20 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
         'top-right'
       );
 
-      // Listen to zoom events
-      map.current.on('zoom', () => {
-        if (map.current) {
-          setZoomLevel(map.current.getZoom());
-        }
+      // Listen to draw events
+      map.current.on('draw.create', updateArea);
+      map.current.on('draw.update', updateArea);
+      map.current.on('draw.delete', () => {
+        setFilteredBusinesses([]);
+        setShowSidebar(false);
       });
     }
 
-    // Only proceed if map is ready and businesses are loaded
-    if (!map.current || businesses.length === 0) {
-      console.log('[MAP] Waiting for map or businesses...', { mapReady: !!map.current, businessCount: businesses.length });
-      return;
-    }
+    if (!map.current || businesses.length === 0) return;
 
-    console.log('[MAP] Adding business layers to map, count:', businesses.length);
-
-    // Wait for map to load before adding sources and layers
     const addBusinessLayers = () => {
       if (!map.current) return;
-      
-      console.log('[MAP] Running addBusinessLayers function');
 
-      // Convert businesses to GeoJSON format
       const geojsonData = {
         type: 'FeatureCollection' as const,
         features: businesses.map((business) => ({
@@ -238,27 +249,23 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
         })),
       };
 
-      // Remove existing layers and source if they exist
       if (map.current.getLayer('clusters')) map.current.removeLayer('clusters');
       if (map.current.getLayer('cluster-count')) map.current.removeLayer('cluster-count');
       if (map.current.getLayer('unclustered-point')) map.current.removeLayer('unclustered-point');
       if (map.current.getSource('businesses')) map.current.removeSource('businesses');
 
-      // Add source with clustering
       map.current.addSource('businesses', {
         type: 'geojson',
         data: geojsonData,
         cluster: true,
-        clusterMaxZoom: 14, // Max zoom to cluster points on
-        clusterRadius: 50, // Radius of each cluster when clustering points
+        clusterMaxZoom: 14,
+        clusterRadius: 50,
       });
 
-      // Get primary color from CSS variables
       const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim();
       const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
-      const franchiseColor = '45 76 212'; // Blue color for franchises (HSL format)
+      const franchiseColor = '45 76 212';
       
-      // Convert HSL to hex for Mapbox
       const hslToHex = (hsl: string) => {
         const [h, s, l] = hsl.split(' ').map(v => parseFloat(v));
         const hue = h / 360;
@@ -287,7 +294,6 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
       const accentHex = hslToHex(accentColor);
       const franchiseHex = hslToHex(franchiseColor);
 
-      // Add cluster circles layer with theme colors
       map.current.addLayer({
         id: 'clusters',
         type: 'circle',
@@ -317,7 +323,6 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
         },
       });
 
-      // Add cluster count labels
       map.current.addLayer({
         id: 'cluster-count',
         type: 'symbol',
@@ -333,7 +338,6 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
         },
       });
 
-      // Add unclustered points layer with different colors for franchises
       map.current.addLayer({
         id: 'unclustered-point',
         type: 'circle',
@@ -352,7 +356,6 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
         },
       });
 
-      // Click on cluster to zoom in
       map.current.on('click', 'clusters', (e) => {
         if (!map.current) return;
         const features = map.current.queryRenderedFeatures(e.point, {
@@ -375,7 +378,6 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
         });
       });
 
-      // Show popup on unclustered point hover
       const popup = new mapboxgl.Popup({
         closeButton: false,
         closeOnClick: false,
@@ -390,7 +392,6 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
         const coordinates = (e.features![0].geometry as any).coordinates.slice();
         const props = e.features![0].properties!;
         
-        // Get theme colors
         const foregroundColor = getComputedStyle(document.documentElement).getPropertyValue('--foreground').trim();
         const mutedForegroundColor = getComputedStyle(document.documentElement).getPropertyValue('--muted-foreground').trim();
         const borderColor = getComputedStyle(document.documentElement).getPropertyValue('--border').trim();
@@ -453,20 +454,17 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
         popup.remove();
       });
 
-      // Click on unclustered point to navigate
       map.current.on('click', 'unclustered-point', (e) => {
         const businessSlug = e.features![0].properties!.slug;
         navigate(`/entreprise/${businessSlug}`);
       });
 
-      // Listen for navigation events from popup
       const handlePopupNavigation = (event: CustomEvent) => {
         navigate(`/entreprise/${event.detail}`);
       };
       
       window.addEventListener('navigate-to-business', handlePopupNavigation as EventListener);
 
-      // Change cursor on cluster hover
       map.current.on('mouseenter', 'clusters', () => {
         if (!map.current) return;
         map.current.getCanvas().style.cursor = 'pointer';
@@ -477,7 +475,6 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
         map.current.getCanvas().style.cursor = '';
       });
 
-      // Fit bounds if there are businesses
       if (businesses.length > 0) {
         const bounds = new mapboxgl.LngLatBounds();
         businesses.forEach(b => bounds.extend([b.longitude, b.latitude]));
@@ -485,7 +482,6 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
       }
     };
 
-    // Remove existing event listeners to avoid duplicates
     if (map.current.loaded()) {
       addBusinessLayers();
     } else {
@@ -496,49 +492,100 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
       map.current.on('load', loadHandler);
     }
 
+    return () => {
+      if (map.current) {
+        map.current.remove();
+      }
+    };
   }, [businesses, navigate]);
 
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      // Cleanup navigation event listener
-      const handlePopupNavigation = (event: CustomEvent) => {
-        navigate(`/entreprise/${event.detail}`);
-      };
-      window.removeEventListener('navigate-to-business', handlePopupNavigation as EventListener);
-      
-      map.current?.remove();
-    };
-  }, [navigate]);
+  const updateArea = () => {
+    if (!draw.current) return;
+    
+    const data = draw.current.getAll();
+    if (data.features.length > 0) {
+      const polygon = data.features[0];
+      if (polygon.geometry.type === 'Polygon') {
+        filterBusinessesInPolygon(polygon.geometry.coordinates[0]);
+      }
+    }
+  };
 
   return (
-    <div className="relative w-full max-w-6xl mx-auto h-[600px] rounded-2xl overflow-hidden shadow-elegant border border-border">
+    <div className="relative w-full h-[600px] rounded-xl overflow-hidden shadow-2xl border border-border/50">
       <div ref={mapContainer} className="absolute inset-0" />
       
-      {/* Message si aucune annonce */}
-      {businesses.length === 0 && (
-        <div className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm z-10">
-          <div className="text-center p-8">
-            <p className="text-lg font-semibold text-foreground mb-2">
-              Aucune annonce trouvée
-            </p>
-            <p className="text-sm text-muted-foreground">
-              Essayez de modifier vos filtres pour voir plus d'annonces
-            </p>
+      {showSidebar && (
+        <div className="absolute top-0 right-0 bottom-0 w-[400px] bg-background/95 backdrop-blur-lg border-l border-border/50 shadow-2xl">
+          <div className="h-full flex flex-col">
+            <div className="p-6 border-b border-border/50 bg-gradient-to-r from-primary/5 to-secondary/5">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-xl font-bold text-foreground">
+                  Annonces dans la zone
+                </h3>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => {
+                    if (draw.current) {
+                      draw.current.deleteAll();
+                    }
+                    setShowSidebar(false);
+                    setFilteredBusinesses([]);
+                  }}
+                  className="h-8 w-8"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                {filteredBusinesses.length} {filteredBusinesses.length > 1 ? 'entreprises trouvées' : 'entreprise trouvée'}
+              </p>
+            </div>
+
+            <ScrollArea className="flex-1 p-4">
+              <div className="space-y-4">
+                {filteredBusinesses.map((business) => (
+                  <Card 
+                    key={business.id}
+                    className="cursor-pointer hover:shadow-lg transition-all duration-200 hover:border-primary/50"
+                    onClick={() => navigate(`/entreprise/${business.slug}`)}
+                  >
+                    <CardContent className="p-4">
+                      {business.photo_url && (
+                        <img
+                          src={business.photo_url}
+                          alt={business.title}
+                          className="w-full h-32 object-cover rounded-lg mb-3"
+                        />
+                      )}
+                      <h4 className="font-bold text-foreground mb-2 line-clamp-2">
+                        {business.title}
+                      </h4>
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
+                        <MapPin className="h-4 w-4" />
+                        <span>{business.city || business.location}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-xs text-muted-foreground uppercase mb-1">Prix</p>
+                          <p className="font-bold text-primary flex items-center gap-1">
+                            <DollarSign className="h-4 w-4" />
+                            {business.asking_price.toLocaleString('fr-CA')}
+                          </p>
+                        </div>
+                        {business.is_franchise && (
+                          <Badge className="bg-purple-500 text-white">Franchise</Badge>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </ScrollArea>
           </div>
         </div>
       )}
-      
-      <style>{`
-        .business-popup .mapboxgl-popup-content {
-          padding: 0;
-          border-radius: 12px;
-          box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-        }
-        .business-popup .mapboxgl-popup-tip {
-          border-top-color: white;
-        }
-      `}</style>
     </div>
   );
 };
