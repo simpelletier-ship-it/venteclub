@@ -32,6 +32,7 @@ const BusinessDetails = () => {
   const [secondsRemaining, setSecondsRemaining] = useState<number | null>(null);
   const [showPremiumDialog, setShowPremiumDialog] = useState(false);
   const [isPremiumAccess, setIsPremiumAccess] = useState(false);
+  const [sellerProfile, setSellerProfile] = useState<any>(null);
 
   useEffect(() => {
     const initialize = async () => {
@@ -102,6 +103,19 @@ const BusinessDetails = () => {
         
         setBusiness({ ...data, views_count: (data.views_count || 0) + 1 });
         console.log('[BUSINESS DETAILS] Business set:', data.title);
+        
+        // Fetch seller profile to get name
+        if (data.seller_id) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('full_name, first_name, last_name, email')
+            .eq('id', data.seller_id)
+            .single();
+          
+          if (profile) {
+            setSellerProfile(profile);
+          }
+        }
       } else {
         console.log('[BUSINESS DETAILS] No business found');
         setBusiness(null);
@@ -763,7 +777,13 @@ const BusinessDetails = () => {
                           businessId={businessId}
                           currentUserId={user.id}
                           otherUserId={business.seller_id}
-                          otherUserName="Vendeur"
+                          otherUserName={
+                            sellerProfile?.full_name || 
+                            (sellerProfile?.first_name && sellerProfile?.last_name 
+                              ? `${sellerProfile.first_name} ${sellerProfile.last_name}` 
+                              : sellerProfile?.email?.split('@')[0] || "Vendeur")
+                          }
+                          businessTitle={business.title}
                         />
                       </div>
                     )}
