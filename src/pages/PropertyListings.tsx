@@ -152,7 +152,7 @@ const PropertyListings = () => {
             
             {/* Subtitle */}
             <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              Découvrez des opportunités d'investissement immobilier vérifiées
+              Découvrez des opportunités d'investissement immobilier au Québec
             </p>
             
             {/* CTA Buttons */}

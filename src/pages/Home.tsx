@@ -105,7 +105,7 @@ const Home = () => {
             </h1>
             
             <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              Des milliers d'opportunités d'affaires vérifiées au Québec
+              Des milliers d'opportunités d'affaires au Québec
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-6">
@@ -173,8 +173,8 @@ const Home = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center p-8 rounded-2xl bg-card border border-border hover:shadow-lg transition-shadow">
               <Shield className="w-12 h-12 mx-auto mb-4 text-secondary" />
-              <h3 className="text-xl font-bold mb-2">Transactions sécurisées</h3>
-              <p className="text-muted-foreground">Toutes les annonces sont vérifiées pour garantir votre sécurité</p>
+              <h3 className="text-xl font-bold mb-2">Plateforme sécurisée</h3>
+              <p className="text-muted-foreground">Système de paiement sécurisé pour protéger vos transactions</p>
             </div>
             <div className="text-center p-8 rounded-2xl bg-card border border-border hover:shadow-lg transition-shadow">
               <Clock className="w-12 h-12 mx-auto mb-4 text-secondary" />
@@ -183,17 +183,17 @@ const Home = () => {
             </div>
             <div className="text-center p-8 rounded-2xl bg-card border border-border hover:shadow-lg transition-shadow">
               <TrendingUp className="w-12 h-12 mx-auto mb-4 text-secondary" />
-              <h3 className="text-xl font-bold mb-2">Opportunités vérifiées</h3>
-              <p className="text-muted-foreground">Des milliers d'entreprises à vendre au Québec</p>
+              <h3 className="text-xl font-bold mb-2">Large sélection</h3>
+              <p className="text-muted-foreground">Des milliers d'opportunités d'affaires au Québec</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* FAQ Section */}
-      <section className="py-20 bg-muted/30">
+      <section className="py-12 bg-muted/30">
         <div className="container mx-auto px-4 max-w-4xl">
-          <h2 className="text-4xl font-display font-bold text-center mb-12">Questions fréquentes</h2>
+          <h2 className="text-4xl font-display font-bold text-center mb-8">Questions fréquentes</h2>
           <Accordion type="single" collapsible className="w-full">
             <AccordionItem value="item-1">
               <AccordionTrigger>Comment acheter une entreprise au Québec?</AccordionTrigger>
