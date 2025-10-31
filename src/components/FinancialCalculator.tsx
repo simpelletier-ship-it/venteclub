@@ -18,6 +18,7 @@ interface FinancialCalculatorProps {
 const calculatorSchema = z.object({
   salePrice: z.number().min(1, "Le prix doit être supérieur à 0"),
   downPayment: z.number().min(0, "La mise de fond ne peut pas être négative"),
+  sellerBalance: z.number().min(0, "La balance ne peut pas être négative"),
   interestRate: z.number().min(0, "Le taux d'intérêt ne peut pas être négatif").max(100, "Le taux d'intérêt ne peut pas dépasser 100%"),
   loanTerm: z.number().min(1, "La durée doit être d'au moins 1 an").max(30, "La durée ne peut pas dépasser 30 ans"),
 });
@@ -25,6 +26,7 @@ const calculatorSchema = z.object({
 export const FinancialCalculator = ({ askingPrice }: FinancialCalculatorProps) => {
   const [salePrice, setSalePrice] = useState(askingPrice);
   const [downPayment, setDownPayment] = useState(askingPrice * 0.2); // 20% par défaut
+  const [sellerBalance, setSellerBalance] = useState(0); // Balance de prix de vente
   const [interestRate, setInterestRate] = useState(6.5); // 6.5% par défaut
   const [loanTerm, setLoanTerm] = useState(10); // 10 ans par défaut
   
@@ -40,23 +42,25 @@ export const FinancialCalculator = ({ askingPrice }: FinancialCalculatorProps) =
 
   useEffect(() => {
     calculatePayments();
-  }, [salePrice, downPayment, interestRate, loanTerm]);
+  }, [salePrice, downPayment, sellerBalance, interestRate, loanTerm]);
 
   const calculatePayments = () => {
     try {
       const validated = calculatorSchema.parse({
         salePrice,
         downPayment,
+        sellerBalance,
         interestRate,
         loanTerm,
       });
 
-      const principal = validated.salePrice - validated.downPayment;
+      // Montant à financer = Prix de vente - Mise de fond - Balance de prix de vente
+      const principal = validated.salePrice - validated.downPayment - validated.sellerBalance;
       setLoanAmount(principal);
 
       if (principal <= 0) {
         setMonthlyPayment(0);
-        setTotalPayment(validated.downPayment);
+        setTotalPayment(validated.downPayment + validated.sellerBalance);
         setTotalInterest(0);
         return;
       }
@@ -68,7 +72,7 @@ export const FinancialCalculator = ({ askingPrice }: FinancialCalculatorProps) =
         // Si taux d'intérêt = 0, paiement simple
         const payment = principal / numPayments;
         setMonthlyPayment(payment);
-        setTotalPayment(principal + validated.downPayment);
+        setTotalPayment(principal + validated.downPayment + validated.sellerBalance);
         setTotalInterest(0);
       } else {
         // Formule standard de calcul de paiement mensuel
@@ -79,7 +83,7 @@ export const FinancialCalculator = ({ askingPrice }: FinancialCalculatorProps) =
         const interest = total - principal;
         
         setMonthlyPayment(payment);
-        setTotalPayment(total + validated.downPayment);
+        setTotalPayment(total + validated.downPayment + validated.sellerBalance);
         setTotalInterest(interest);
       }
     } catch (error) {
@@ -180,6 +184,49 @@ export const FinancialCalculator = ({ askingPrice }: FinancialCalculatorProps) =
           />
         </div>
 
+        {/* Balance de prix de vente (seller financing) */}
+        <div className="space-y-2">
+          <Label htmlFor="sellerBalance" className="text-sm font-semibold flex items-center gap-2">
+            <DollarSign className="w-4 h-4 text-accent" />
+            Balance de prix de vente
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button type="button" className="p-0.5 hover:bg-muted rounded-full transition-colors">
+                    <HelpCircle className="w-4 h-4 text-muted-foreground" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="right" className="max-w-sm p-3 bg-card border-border shadow-lg">
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-sm text-foreground">Balance de prix de vente</h4>
+                    <div className="text-xs text-muted-foreground space-y-1 leading-relaxed">
+                      <p>
+                        La balance de prix de vente est un montant que le vendeur accepte de financer directement à l'acheteur, sans passer par une institution financière.
+                      </p>
+                      <p className="font-medium text-foreground">
+                        ✓ Ce montant se négocie entre l'acheteur et le vendeur
+                      </p>
+                      <p>
+                        Cette balance est déduite du montant que vous devrez financer auprès d'une banque ou autre institution financière, réduisant ainsi vos paiements mensuels.
+                      </p>
+                    </div>
+                  </div>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </Label>
+          <Input
+            id="sellerBalance"
+            type="number"
+            value={sellerBalance}
+            onChange={(e) => setSellerBalance(Number(e.target.value))}
+            className="text-lg font-semibold"
+            min="0"
+            max={salePrice - downPayment}
+            step="1000"
+          />
+        </div>
+
         {/* Taux d'intérêt */}
         <div className="space-y-2">
           <Label htmlFor="interestRate" className="text-sm font-semibold flex items-center gap-2">
@@ -216,7 +263,7 @@ export const FinancialCalculator = ({ askingPrice }: FinancialCalculatorProps) =
           />
         </div>
 
-        {/* Balance de prix de vente */}
+        {/* Décomposition du financement */}
         <div className="pt-4 border-t border-border/50">
           <div className="bg-muted/30 rounded-lg p-4 space-y-3">
             <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider">Décomposition du financement</h3>
@@ -229,8 +276,14 @@ export const FinancialCalculator = ({ askingPrice }: FinancialCalculatorProps) =
                 <span className="text-muted-foreground">Mise de fond ({downPaymentPercent}%)</span>
                 <span className="font-semibold text-foreground">- {formatCurrency(downPayment)}</span>
               </div>
+              {sellerBalance > 0 && (
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-muted-foreground">Balance de prix de vente</span>
+                  <span className="font-semibold text-foreground">- {formatCurrency(sellerBalance)}</span>
+                </div>
+              )}
               <div className="flex justify-between items-center pt-2 border-t border-border/50">
-                <span className="text-base font-bold text-foreground">Balance de prix de vente</span>
+                <span className="text-base font-bold text-foreground">Montant à financer</span>
                 <span className="text-xl font-display font-bold text-secondary">{formatCurrency(loanAmount)}</span>
               </div>
             </div>
