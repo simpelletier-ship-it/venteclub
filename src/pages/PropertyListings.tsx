@@ -25,23 +25,13 @@ const PropertyListings = () => {
     try {
       // Fetch properties by checking if is_franchise is false and sale_type is not 'shares' or 'assets'
       // This is a workaround until we add 'property' to the sale_type enum
-      const { data: allBusinesses } = await supabase
+      const { data: properties } = await supabase
         .from('businesses')
         .select('*')
         .in('status', ['active', 'sold'])
         .eq('approval_status', 'approved')
-        .eq('is_franchise', false)
+        .not('property_type', 'is', null)
         .order('created_at', { ascending: false });
-
-      // Filter for properties (businesses that are not franchises and have property-related industries)
-      const propertyIndustries = ['Immobilier', 'Construction', 'Location immobilière'];
-      const properties = allBusinesses?.filter(b => 
-        propertyIndustries.includes(b.industry) || 
-        b.title.toLowerCase().includes('immeuble') ||
-        b.title.toLowerCase().includes('propriété') ||
-        b.description?.toLowerCase().includes('immeuble') ||
-        b.description?.toLowerCase().includes('propriété')
-      ) || [];
 
       if (properties) {
         const featured = properties.filter(p => p.featured && p.status === 'active').slice(0, 3);
@@ -179,7 +169,8 @@ const PropertyListings = () => {
       </section>
 
       {/* Featured Properties */}
-      <section id="featured" className="py-12 bg-gradient-to-b from-muted/30 to-background">
+      {featuredProperties.length > 0 && (
+        <section id="featured" className="py-12 bg-gradient-to-b from-muted/30 to-background">
         <div className="container mx-auto px-4">
           <div className="text-center mb-8 animate-slide-up">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/10 text-secondary text-sm font-semibold mb-6">
@@ -215,24 +206,23 @@ const PropertyListings = () => {
           </div>
         </div>
       </section>
+      )}
+
+      {/* Filter Section */}
+      <section className="py-8 bg-background border-b border-border">
+        <div className="container mx-auto px-4">
+          <FilterBar onFilter={handleFilter} />
+        </div>
+      </section>
 
       {/* All Listings */}
       <section className="py-12 bg-background">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-8">
-            <h2 className="text-4xl md:text-5xl font-display font-bold text-foreground mb-4">
-              Toutes les Propriétés
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
+            <h2 className="text-xl sm:text-3xl font-display font-bold text-foreground">
+              Toutes les propriétés ({filteredProperties.length})
             </h2>
-            <p className="text-lg text-muted-foreground mb-10">
-              Explorez toutes les propriétés immobilières disponibles
-            </p>
-          </div>
-
-          <div className="mb-10">
-            <FilterBar onFilter={handleFilter} />
-          </div>
-
-          <div className="flex justify-end mb-8">
+            
             <div className="inline-flex rounded-xl border border-border bg-card p-1.5 shadow-soft">
               <Button 
                 variant={viewMode === 'grid' ? 'default' : 'ghost'} 
@@ -255,7 +245,7 @@ const PropertyListings = () => {
             </div>
           </div>
 
-          <div className={viewMode === 'grid' ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" : "space-y-4"}>
+          <div className={viewMode === 'grid' ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8" : "space-y-3 sm:space-y-4"}>
             {allProperties.length === 0 && (
               <div className={viewMode === 'grid' ? "col-span-full text-center py-16" : "text-center py-16"}>
                 <Building2 className="w-16 h-16 mx-auto mb-4 text-muted-foreground/50" />
