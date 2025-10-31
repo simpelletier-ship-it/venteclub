@@ -34,7 +34,11 @@ const ListProperty = () => {
     year_built: "",
     seller_email: "",
     seller_phone: "",
+    is_rental_property: false,
   });
+  const [rentalUnits, setRentalUnits] = useState<Array<{unit_type: string, monthly_rent: string, count: string}>>([
+    { unit_type: "", monthly_rent: "", count: "" }
+  ]);
   const [photos, setPhotos] = useState<File[]>([]);
   const [photoPreviewUrls, setPhotoPreviewUrls] = useState<string[]>([]);
   const [priceNegotiable, setPriceNegotiable] = useState(false);
@@ -187,6 +191,16 @@ const ListProperty = () => {
       if (contactError) throw contactError;
 
       // Créer l'annonce immobilière
+      const rentalUnitsData = formData.is_rental_property && rentalUnits.filter(u => u.unit_type && u.count).length > 0 
+        ? rentalUnits
+            .filter(u => u.unit_type && u.count)
+            .map(u => ({
+              unit_type: u.unit_type,
+              monthly_rent: u.monthly_rent ? parseFloat(u.monthly_rent) : null,
+              count: parseInt(u.count)
+            }))
+        : null;
+
       const { data: business, error: businessError } = await supabase
         .from('businesses')
         .insert([{
@@ -199,6 +213,11 @@ const ListProperty = () => {
           province: formData.province,
           asking_price: priceNegotiable ? 0 : parseFloat(formData.asking_price),
           year_established: formData.year_built ? parseInt(formData.year_built) : null,
+          year_built: formData.year_built ? parseInt(formData.year_built) : null,
+          square_footage: formData.square_footage ? parseFloat(formData.square_footage) : null,
+          property_type: formData.property_type,
+          is_rental_property: formData.is_rental_property,
+          rental_units: rentalUnitsData,
           status: 'active',
           approval_status: 'pending',
           seller_phone: formData.seller_phone,
@@ -333,6 +352,7 @@ const ListProperty = () => {
                     <SelectItem value="commerce">Espace commercial</SelectItem>
                     <SelectItem value="industriel">Bâtiment industriel</SelectItem>
                     <SelectItem value="terrain">Terrain commercial</SelectItem>
+                    <SelectItem value="immeuble_logement">Immeuble à logement</SelectItem>
                     <SelectItem value="mixte">Propriété mixte</SelectItem>
                     <SelectItem value="autre">Autre</SelectItem>
                   </SelectContent>
@@ -379,7 +399,9 @@ const ListProperty = () => {
                   </Label>
                 </div>
               </div>
+            </div>
 
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="square_footage">Superficie (pi²)</Label>
                 <Input
@@ -390,20 +412,104 @@ const ListProperty = () => {
                   placeholder="5000"
                 />
               </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="year_built">Année de construction</Label>
+                <Input
+                  id="year_built"
+                  type="number"
+                  value={formData.year_built}
+                  onChange={(e) => setFormData({ ...formData, year_built: e.target.value })}
+                  placeholder="2000"
+                  min="1800"
+                  max={new Date().getFullYear()}
+                />
+              </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="year_built">Année de construction</Label>
-              <Input
-                id="year_built"
-                type="number"
-                value={formData.year_built}
-                onChange={(e) => setFormData({ ...formData, year_built: e.target.value })}
-                placeholder="2000"
-                min="1800"
-                max={new Date().getFullYear()}
-              />
-            </div>
+            {/* Immeuble à logement */}
+            {formData.property_type === 'immeuble_logement' && (
+              <div className="space-y-4 p-4 bg-muted/50 rounded-lg border border-border">
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="is_rental"
+                    checked={formData.is_rental_property}
+                    onCheckedChange={(checked) => setFormData({ ...formData, is_rental_property: checked as boolean })}
+                  />
+                  <Label htmlFor="is_rental" className="cursor-pointer">
+                    Afficher les informations sur les loyers
+                  </Label>
+                </div>
+
+                {formData.is_rental_property && (
+                  <div className="space-y-4">
+                    <Label className="text-base font-semibold">Unités de location</Label>
+                    {rentalUnits.map((unit, index) => (
+                      <div key={index} className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-background rounded-lg border border-border">
+                        <div className="space-y-2">
+                          <Label>Type d'unité</Label>
+                          <Input
+                            placeholder="Ex: 4-1/2, 5-1/2"
+                            value={unit.unit_type}
+                            onChange={(e) => {
+                              const newUnits = [...rentalUnits];
+                              newUnits[index].unit_type = e.target.value;
+                              setRentalUnits(newUnits);
+                            }}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Loyer mensuel ($)</Label>
+                          <Input
+                            type="number"
+                            placeholder="1200"
+                            value={unit.monthly_rent}
+                            onChange={(e) => {
+                              const newUnits = [...rentalUnits];
+                              newUnits[index].monthly_rent = e.target.value;
+                              setRentalUnits(newUnits);
+                            }}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Nombre d'unités</Label>
+                          <div className="flex gap-2">
+                            <Input
+                              type="number"
+                              placeholder="3"
+                              value={unit.count}
+                              onChange={(e) => {
+                                const newUnits = [...rentalUnits];
+                                newUnits[index].count = e.target.value;
+                                setRentalUnits(newUnits);
+                              }}
+                            />
+                            {rentalUnits.length > 1 && (
+                              <Button
+                                type="button"
+                                variant="destructive"
+                                size="icon"
+                                onClick={() => setRentalUnits(rentalUnits.filter((_, i) => i !== index))}
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setRentalUnits([...rentalUnits, { unit_type: "", monthly_rent: "", count: "" }])}
+                      className="w-full"
+                    >
+                      + Ajouter une unité
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Photos */}

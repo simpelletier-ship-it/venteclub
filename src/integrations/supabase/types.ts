@@ -267,6 +267,7 @@ export type Database = {
           initial_investment_min: number | null
           is_franchise: boolean | null
           is_premium: boolean | null
+          is_rental_property: boolean | null
           latitude: number | null
           location: string
           longitude: number | null
@@ -276,9 +277,11 @@ export type Database = {
           pending_changes: Json | null
           pending_changes_submitted_at: string | null
           profit_margin: number | null
+          property_type: string | null
           province: string | null
           region: string | null
           rejection_reason: string | null
+          rental_units: Json | null
           royalty_percentage: number | null
           sale_type: Database["public"]["Enums"]["sale_type"] | null
           seller_id: string
@@ -286,6 +289,7 @@ export type Database = {
           seller_phone: string | null
           slug: string
           sold_at: string | null
+          square_footage: number | null
           status: string | null
           territory_available: string | null
           title: string
@@ -293,6 +297,7 @@ export type Database = {
           updated_at: string | null
           views_count: number | null
           withdrawal_reason: string | null
+          year_built: number | null
           year_established: number | null
         }
         Insert: {
@@ -317,6 +322,7 @@ export type Database = {
           initial_investment_min?: number | null
           is_franchise?: boolean | null
           is_premium?: boolean | null
+          is_rental_property?: boolean | null
           latitude?: number | null
           location: string
           longitude?: number | null
@@ -326,9 +332,11 @@ export type Database = {
           pending_changes?: Json | null
           pending_changes_submitted_at?: string | null
           profit_margin?: number | null
+          property_type?: string | null
           province?: string | null
           region?: string | null
           rejection_reason?: string | null
+          rental_units?: Json | null
           royalty_percentage?: number | null
           sale_type?: Database["public"]["Enums"]["sale_type"] | null
           seller_id: string
@@ -336,6 +344,7 @@ export type Database = {
           seller_phone?: string | null
           slug: string
           sold_at?: string | null
+          square_footage?: number | null
           status?: string | null
           territory_available?: string | null
           title: string
@@ -343,6 +352,7 @@ export type Database = {
           updated_at?: string | null
           views_count?: number | null
           withdrawal_reason?: string | null
+          year_built?: number | null
           year_established?: number | null
         }
         Update: {
@@ -367,6 +377,7 @@ export type Database = {
           initial_investment_min?: number | null
           is_franchise?: boolean | null
           is_premium?: boolean | null
+          is_rental_property?: boolean | null
           latitude?: number | null
           location?: string
           longitude?: number | null
@@ -376,9 +387,11 @@ export type Database = {
           pending_changes?: Json | null
           pending_changes_submitted_at?: string | null
           profit_margin?: number | null
+          property_type?: string | null
           province?: string | null
           region?: string | null
           rejection_reason?: string | null
+          rental_units?: Json | null
           royalty_percentage?: number | null
           sale_type?: Database["public"]["Enums"]["sale_type"] | null
           seller_id?: string
@@ -386,6 +399,7 @@ export type Database = {
           seller_phone?: string | null
           slug?: string
           sold_at?: string | null
+          square_footage?: number | null
           status?: string | null
           territory_available?: string | null
           title?: string
@@ -393,6 +407,7 @@ export type Database = {
           updated_at?: string | null
           views_count?: number | null
           withdrawal_reason?: string | null
+          year_built?: number | null
           year_established?: number | null
         }
         Relationships: []

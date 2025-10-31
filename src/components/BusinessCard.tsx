@@ -33,6 +33,11 @@ interface BusinessCardProps {
   onFeature?: () => void;
   showActions?: boolean;
   showPendingBadge?: boolean;
+  property_type?: string;
+  year_built?: number;
+  square_footage?: number;
+  is_rental_property?: boolean;
+  rental_units?: Array<{unit_type: string, monthly_rent: number, count: number}>;
 }
 
 const BusinessCard = ({
@@ -55,6 +60,11 @@ const BusinessCard = ({
   onFeature,
   showActions = false,
   showPendingBadge = false,
+  property_type,
+  year_built,
+  square_footage,
+  is_rental_property,
+  rental_units,
 }: BusinessCardProps) => {
   const navigate = useNavigate();
   const [userId, setUserId] = useState<string | undefined>();
@@ -171,7 +181,54 @@ const BusinessCard = ({
         </div>
 
         <div className={`grid grid-cols-2 gap-4 pt-4 border-t border-border/50 ${status === 'sold' ? 'blur-[8px]' : ''}`}>
-          {!is_franchise && (
+          {/* Check if it's a property listing */}
+          {(sale_type === 'property' || property_type) && (
+            <>
+              {year_built && (
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Année construction</p>
+                  <p className="text-lg font-bold text-foreground">{year_built}</p>
+                </div>
+              )}
+              {square_footage && (
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Superficie</p>
+                  <p className="text-lg font-bold text-secondary">{square_footage.toLocaleString('fr-CA')} pi²</p>
+                </div>
+              )}
+              {property_type && (
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Type</p>
+                  <p className="text-sm font-bold text-foreground">
+                    {property_type === 'bureau' && 'Bureau commercial'}
+                    {property_type === 'commerce' && 'Espace commercial'}
+                    {property_type === 'industriel' && 'Bâtiment industriel'}
+                    {property_type === 'terrain' && 'Terrain commercial'}
+                    {property_type === 'immeuble_logement' && 'Immeuble à logement'}
+                    {property_type === 'mixte' && 'Propriété mixte'}
+                    {property_type === 'autre' && 'Autre'}
+                  </p>
+                </div>
+              )}
+              {is_rental_property && rental_units && rental_units.length > 0 && (
+                <div className="col-span-2 space-y-2">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Unités locatives</p>
+                  <div className="space-y-1">
+                    {rental_units.map((unit, idx) => (
+                      <div key={idx} className="flex justify-between items-center text-sm bg-muted/50 px-3 py-2 rounded-lg">
+                        <span className="font-semibold">{unit.count}x {unit.unit_type}</span>
+                        {unit.monthly_rent && (
+                          <span className="text-muted-foreground">{unit.monthly_rent.toLocaleString('fr-CA')} $/mois</span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+          {/* Regular business listing */}
+          {!sale_type && !property_type && !is_franchise && (
             <>
               <div className="space-y-1">
                 <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Revenus</p>
