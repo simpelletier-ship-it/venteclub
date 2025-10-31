@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area } from "recharts";
-import { Eye, MousePointerClick, Unlock, Heart, TrendingUp, MapPin, Calendar } from "lucide-react";
+import { Eye, MousePointerClick, Unlock, Heart, TrendingUp, MapPin, Calendar, Users } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
@@ -68,6 +68,7 @@ export const BusinessStatistics = ({ userId }: BusinessStatisticsProps) => {
   const totalClicks = analytics.filter(a => a.event_type === 'click').length;
   const totalUnlocks = analytics.filter(a => a.event_type === 'contact_unlock').length;
   const totalFavorites = analytics.filter(a => a.event_type === 'favorite').length;
+  const totalLeads = analytics.filter(a => a.event_type === 'lead').length;
 
   // Calculate conversion rate
   const conversionRate = totalViews > 0 ? ((totalUnlocks / totalViews) * 100).toFixed(2) : '0';
@@ -77,7 +78,8 @@ export const BusinessStatistics = ({ userId }: BusinessStatisticsProps) => {
     { name: 'Vues', value: totalViews, color: COLORS[0] },
     { name: 'Clics', value: totalClicks, color: COLORS[1] },
     { name: 'Déverrouillages', value: totalUnlocks, color: COLORS[2] },
-    { name: 'Favoris', value: totalFavorites, color: COLORS[3] }
+    { name: 'Favoris', value: totalFavorites, color: COLORS[3] },
+    { name: 'Leads', value: totalLeads, color: COLORS[4] }
   ].filter(item => item.value > 0);
 
   // Group by date for timeline
@@ -134,7 +136,8 @@ export const BusinessStatistics = ({ userId }: BusinessStatisticsProps) => {
       name: business.title.length > 30 ? business.title.substring(0, 30) + '...' : business.title,
       vues: businessAnalytics.filter(a => a.event_type === 'view').length,
       déverrouillages: businessAnalytics.filter(a => a.event_type === 'contact_unlock').length,
-      favoris: businessAnalytics.filter(a => a.event_type === 'favorite').length
+      favoris: businessAnalytics.filter(a => a.event_type === 'favorite').length,
+      leads: businessAnalytics.filter(a => a.event_type === 'lead').length
     };
   }).sort((a, b) => b.vues - a.vues);
 
@@ -193,7 +196,7 @@ export const BusinessStatistics = ({ userId }: BusinessStatisticsProps) => {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         <Card className="bg-gradient-to-br from-secondary/10 to-secondary/5 border-secondary/20">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
@@ -231,6 +234,20 @@ export const BusinessStatistics = ({ userId }: BusinessStatisticsProps) => {
               </div>
               <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center">
                 <Heart className="w-6 h-6 text-accent" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-purple-500/10 to-purple-500/5 border-purple-500/20">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Leads</p>
+                <h3 className="text-3xl font-bold mt-2">{totalLeads.toLocaleString()}</h3>
+              </div>
+              <div className="w-12 h-12 rounded-full bg-purple-500/10 flex items-center justify-center">
+                <Users className="w-6 h-6 text-purple-500" />
               </div>
             </div>
           </CardContent>
@@ -292,6 +309,7 @@ export const BusinessStatistics = ({ userId }: BusinessStatisticsProps) => {
                     <Area type="monotone" dataKey="view" stackId="1" stroke="hsl(var(--secondary))" fill="url(#colorTotal)" name="Vues" />
                     <Area type="monotone" dataKey="contact_unlock" stackId="1" stroke="hsl(var(--primary))" fill="hsl(var(--primary))" fillOpacity={0.6} name="Déverrouillages" />
                     <Area type="monotone" dataKey="favorite" stackId="1" stroke="hsl(var(--accent))" fill="hsl(var(--accent))" fillOpacity={0.6} name="Favoris" />
+                    <Area type="monotone" dataKey="lead" stackId="1" stroke="#8b5cf6" fill="#8b5cf6" fillOpacity={0.6} name="Leads" />
                   </AreaChart>
                 </ResponsiveContainer>
               ) : (
@@ -329,6 +347,7 @@ export const BusinessStatistics = ({ userId }: BusinessStatisticsProps) => {
                     <Bar dataKey="vues" fill="hsl(var(--secondary))" name="Vues" radius={[8, 8, 0, 0]} />
                     <Bar dataKey="déverrouillages" fill="hsl(var(--primary))" name="Déverrouillages" radius={[8, 8, 0, 0]} />
                     <Bar dataKey="favoris" fill="hsl(var(--accent))" name="Favoris" radius={[8, 8, 0, 0]} />
+                    <Bar dataKey="leads" fill="#8b5cf6" name="Leads" radius={[8, 8, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               ) : (

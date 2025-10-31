@@ -259,6 +259,16 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
 
     setLoading(true);
     try {
+      // Check if this is the first message from this user for this business
+      const { data: existingMessages } = await supabase
+        .from('messages')
+        .select('id')
+        .eq('business_id', businessId)
+        .eq('sender_id', currentUserId)
+        .limit(1);
+
+      const isFirstMessage = !existingMessages || existingMessages.length === 0;
+
       const { data: messageData, error } = await supabase
         .from('messages')
         .insert({
@@ -271,6 +281,17 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
         .single();
 
       if (error) throw error;
+
+      // Track lead analytics if this is the first message
+      if (isFirstMessage) {
+        await supabase
+          .from('business_analytics')
+          .insert({
+            business_id: businessId,
+            event_type: 'lead',
+            user_id: currentUserId,
+          });
+      }
 
       if (selectedFiles.length > 0) {
         await uploadFiles(messageData.id);

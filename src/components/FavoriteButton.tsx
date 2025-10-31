@@ -68,6 +68,15 @@ export const FavoriteButton = ({ businessId, userId }: FavoriteButtonProps) => {
             business_id: businessId,
           });
         
+        // Track analytics
+        await supabase
+          .from('business_analytics')
+          .insert({
+            business_id: businessId,
+            event_type: 'favorite',
+            user_id: userId,
+          });
+        
         setIsFavorite(true);
         toast({
           title: "Ajouté aux favoris",

@@ -96,12 +96,17 @@ const BusinessDetails = () => {
       // Increment view count
       if (data) {
         setBusinessId(data.id);
-        await supabase
-          .from("businesses")
-          .update({ views_count: (data.views_count || 0) + 1 })
-          .eq("id", data.id);
         
-        setBusiness({ ...data, views_count: (data.views_count || 0) + 1 });
+        // Track view analytics
+        await supabase
+          .from('business_analytics')
+          .insert({
+            business_id: data.id,
+            event_type: 'view',
+            user_id: (await supabase.auth.getSession()).data.session?.user?.id,
+          });
+        
+        setBusiness(data);
         console.log('[BUSINESS DETAILS] Business set:', data.title);
         
         // Fetch seller profile to get name
