@@ -178,11 +178,21 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
     if (!draw.current) return;
     
     const data = draw.current.getAll();
+    console.log('[MAP] Draw data:', data);
+    
     if (data.features.length > 0) {
       const polygon = data.features[0];
+      console.log('[MAP] Polygon:', polygon);
+      
       if (polygon.geometry.type === 'Polygon') {
-        filterBusinessesInPolygon(polygon.geometry.coordinates[0]);
+        const coordinates = polygon.geometry.coordinates[0];
+        console.log('[MAP] Filtering businesses in polygon with', coordinates.length, 'points');
+        filterBusinessesInPolygon(coordinates);
       }
+    } else {
+      console.log('[MAP] No features drawn');
+      setFilteredBusinesses([]);
+      setShowSidebar(false);
     }
   };
 

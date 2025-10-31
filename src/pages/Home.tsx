@@ -148,7 +148,7 @@ const Home = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
             {featuredBusinesses.map((business, index) => (
-              <div key={business.id} className="animate-slide-up" style={{ animationDelay: `${index * 100}ms` }}>
+              <div key={business.id} className="animate-slide-up h-full" style={{ animationDelay: `${index * 100}ms` }}>
                 <BusinessCard {...business} />
               </div>
             ))}

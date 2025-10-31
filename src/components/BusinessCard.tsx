@@ -108,7 +108,7 @@ const BusinessCard = ({
 
   return (
     <Card 
-      className={`group relative overflow-hidden card-premium border-border/50 ${
+      className={`group relative overflow-hidden card-premium border-border/50 h-full flex flex-col ${
         status !== 'sold' ? 'hover:shadow-premium cursor-pointer' : 'cursor-default'
       } ${featured ? 'ring-2 ring-accent/30' : ''}`}
       onClick={handleClick}
@@ -122,7 +122,7 @@ const BusinessCard = ({
         </div>
       )}
 
-      <CardContent className="p-6 space-y-4">
+      <CardContent className="p-6 space-y-4 flex flex-col flex-1">
         <div className="flex items-start justify-between gap-2">
           <div className="space-y-3 flex-1">
             <div className="flex items-center gap-2 flex-wrap">
@@ -179,6 +179,8 @@ const BusinessCard = ({
             </button>
           )}
         </div>
+
+        <div className="flex-1" />
 
         <div className={`grid grid-cols-2 gap-4 pt-4 border-t border-border/50 ${status === 'sold' ? 'blur-[8px]' : ''}`}>
           {/* Check if it's a property listing */}
