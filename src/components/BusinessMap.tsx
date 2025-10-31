@@ -174,8 +174,21 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
     return inside;
   };
 
+  const updateArea = () => {
+    if (!draw.current) return;
+    
+    const data = draw.current.getAll();
+    if (data.features.length > 0) {
+      const polygon = data.features[0];
+      if (polygon.geometry.type === 'Polygon') {
+        filterBusinessesInPolygon(polygon.geometry.coordinates[0]);
+      }
+    }
+  };
+
+  // Initialize map only once
   useEffect(() => {
-    if (!mapContainer.current) return;
+    if (!mapContainer.current || map.current) return;
 
     const mapboxToken = import.meta.env.VITE_MAPBOX_TOKEN;
     if (!mapboxToken) {
@@ -183,82 +196,90 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
       return;
     }
 
-    if (!map.current) {
-      mapboxgl.accessToken = mapboxToken;
+    mapboxgl.accessToken = mapboxToken;
 
-      map.current = new mapboxgl.Map({
-        container: mapContainer.current,
-        style: 'mapbox://styles/mapbox/outdoors-v12',
-        center: [-71.2082, 46.8139],
-        zoom: 6,
-      });
+    map.current = new mapboxgl.Map({
+      container: mapContainer.current,
+      style: 'mapbox://styles/mapbox/outdoors-v12',
+      center: [-71.2082, 46.8139],
+      zoom: 6,
+    });
 
-      // Initialize draw control with custom styles
-      draw.current = new MapboxDraw({
-        displayControlsDefault: false,
-        controls: {
-          polygon: true,
-          trash: true
-        },
-        defaultMode: 'simple_select',
-        styles: [
-          // Polygon fill
-          {
-            'id': 'gl-draw-polygon-fill',
-            'type': 'fill',
-            'filter': ['all', ['==', '$type', 'Polygon'], ['!=', 'mode', 'static']],
-            'paint': {
-              'fill-color': '#3b82f6',
-              'fill-opacity': 0.25
-            }
-          },
-          // Polygon outline
-          {
-            'id': 'gl-draw-polygon-stroke-active',
-            'type': 'line',
-            'filter': ['all', ['==', '$type', 'Polygon'], ['!=', 'mode', 'static']],
-            'layout': {
-              'line-cap': 'round',
-              'line-join': 'round'
-            },
-            'paint': {
-              'line-color': '#3b82f6',
-              'line-width': 3
-            }
-          },
-          // Vertex points
-          {
-            'id': 'gl-draw-polygon-and-line-vertex-active',
-            'type': 'circle',
-            'filter': ['all', ['==', 'meta', 'vertex'], ['==', '$type', 'Point']],
-            'paint': {
-              'circle-radius': 6,
-              'circle-color': '#3b82f6',
-              'circle-stroke-color': '#fff',
-              'circle-stroke-width': 2
-            }
+    // Initialize draw control with custom styles
+    draw.current = new MapboxDraw({
+      displayControlsDefault: false,
+      controls: {
+        polygon: true,
+        trash: true
+      },
+      defaultMode: 'simple_select',
+      styles: [
+        // Polygon fill
+        {
+          'id': 'gl-draw-polygon-fill',
+          'type': 'fill',
+          'filter': ['all', ['==', '$type', 'Polygon'], ['!=', 'mode', 'static']],
+          'paint': {
+            'fill-color': '#3b82f6',
+            'fill-opacity': 0.25
           }
-        ]
-      });
+        },
+        // Polygon outline
+        {
+          'id': 'gl-draw-polygon-stroke-active',
+          'type': 'line',
+          'filter': ['all', ['==', '$type', 'Polygon'], ['!=', 'mode', 'static']],
+          'layout': {
+            'line-cap': 'round',
+            'line-join': 'round'
+          },
+          'paint': {
+            'line-color': '#3b82f6',
+            'line-width': 3
+          }
+        },
+        // Vertex points
+        {
+          'id': 'gl-draw-polygon-and-line-vertex-active',
+          'type': 'circle',
+          'filter': ['all', ['==', 'meta', 'vertex'], ['==', '$type', 'Point']],
+          'paint': {
+            'circle-radius': 6,
+            'circle-color': '#3b82f6',
+            'circle-stroke-color': '#fff',
+            'circle-stroke-width': 2
+          }
+        }
+      ]
+    });
 
-      map.current.addControl(draw.current, 'top-left');
+    map.current.addControl(draw.current, 'top-left');
 
-      map.current.addControl(
-        new mapboxgl.NavigationControl({
-          visualizePitch: true,
-        }),
-        'top-right'
-      );
+    map.current.addControl(
+      new mapboxgl.NavigationControl({
+        visualizePitch: true,
+      }),
+      'top-right'
+    );
 
-      // Listen to draw events
-      map.current.on('draw.create', updateArea);
-      map.current.on('draw.update', updateArea);
-      map.current.on('draw.delete', () => {
-        setFilteredBusinesses([]);
-        setShowSidebar(false);
-      });
-    }
+    // Listen to draw events
+    map.current.on('draw.create', updateArea);
+    map.current.on('draw.update', updateArea);
+    map.current.on('draw.delete', () => {
+      setFilteredBusinesses([]);
+      setShowSidebar(false);
+    });
 
+    return () => {
+      if (map.current) {
+        map.current.remove();
+        map.current = null;
+      }
+    };
+  }, []);
+
+  // Update business markers when businesses change
+  useEffect(() => {
     if (!map.current || businesses.length === 0) return;
 
     const addBusinessLayers = () => {
@@ -529,25 +550,7 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
       };
       map.current.on('load', loadHandler);
     }
-
-    return () => {
-      if (map.current) {
-        map.current.remove();
-      }
-    };
   }, [businesses, navigate]);
-
-  const updateArea = () => {
-    if (!draw.current) return;
-    
-    const data = draw.current.getAll();
-    if (data.features.length > 0) {
-      const polygon = data.features[0];
-      if (polygon.geometry.type === 'Polygon') {
-        filterBusinessesInPolygon(polygon.geometry.coordinates[0]);
-      }
-    }
-  };
 
   return (
     <div className="w-full space-y-6">
