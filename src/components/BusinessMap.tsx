@@ -75,6 +75,7 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
   }, [filters]);
 
   const fetchBusinesses = async () => {
+    console.log('[MAP] Fetching businesses...');
     let query = supabase
       .from('businesses')
       .select(`
@@ -101,6 +102,8 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
       `)
       .eq('status', 'active')
       .eq('approval_status', 'approved');
+    
+    console.log('[MAP] Query built');
 
     if (filters?.city) {
       query = query.ilike('city', `%${filters.city}%`);
@@ -154,6 +157,8 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
       );
       
       const validBusinesses = businessesWithCoords.filter(b => b.latitude && b.longitude);
+      console.log('[MAP] Valid businesses with coordinates:', validBusinesses.length);
+      console.log('[MAP] First business:', validBusinesses[0]);
       setBusinesses(validBusinesses);
     }
   };
@@ -317,10 +322,20 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
 
   // Update business markers when businesses change
   useEffect(() => {
-    if (!map.current || businesses.length === 0) return;
+    if (!map.current || businesses.length === 0) {
+      console.log('[MAP] Cannot add markers:', { hasMap: !!map.current, businessCount: businesses.length });
+      return;
+    }
+
+    console.log('[MAP] Adding business layers for', businesses.length, 'businesses');
 
     const addBusinessLayers = () => {
-      if (!map.current) return;
+      if (!map.current) {
+        console.log('[MAP] No map ref');
+        return;
+      }
+
+      console.log('[MAP] Adding layers with', businesses.length, 'businesses');
 
       const geojsonData = {
         type: 'FeatureCollection' as const,
@@ -350,10 +365,17 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
         })),
       };
 
-      if (map.current.getLayer('clusters')) map.current.removeLayer('clusters');
-      if (map.current.getLayer('cluster-count')) map.current.removeLayer('cluster-count');
-      if (map.current.getLayer('unclustered-point')) map.current.removeLayer('unclustered-point');
-      if (map.current.getSource('businesses')) map.current.removeSource('businesses');
+      console.log('[MAP] GeoJSON data prepared:', geojsonData.features.length, 'features');
+
+      // Remove existing layers and source
+      try {
+        if (map.current.getLayer('clusters')) map.current.removeLayer('clusters');
+        if (map.current.getLayer('cluster-count')) map.current.removeLayer('cluster-count');
+        if (map.current.getLayer('unclustered-point')) map.current.removeLayer('unclustered-point');
+        if (map.current.getSource('businesses')) map.current.removeSource('businesses');
+      } catch (e) {
+        console.log('[MAP] No existing layers to remove');
+      }
 
       map.current.addSource('businesses', {
         type: 'geojson',
@@ -362,6 +384,8 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
         clusterMaxZoom: 14,
         clusterRadius: 50,
       });
+
+      console.log('[MAP] Source added');
 
       const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim();
       const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
@@ -456,6 +480,8 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
           'circle-stroke-color': '#fff',
         },
       });
+
+      console.log('[MAP] All layers added successfully');
 
       map.current.on('click', 'clusters', (e) => {
         if (!map.current) return;
@@ -627,18 +653,23 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
       if (businesses.length > 0) {
         const bounds = new mapboxgl.LngLatBounds();
         businesses.forEach(b => bounds.extend([b.longitude, b.latitude]));
-        map.current.fitBounds(bounds, { padding: 50 });
+        map.current.fitBounds(bounds, { padding: 50, duration: 1000 });
+        console.log('[MAP] Map fitted to bounds');
       }
     };
 
-    if (map.current.loaded()) {
+    // Wait for map to be fully loaded before adding layers
+    if (map.current.isStyleLoaded()) {
+      console.log('[MAP] Style already loaded, adding layers immediately');
       addBusinessLayers();
     } else {
-      const loadHandler = () => {
+      console.log('[MAP] Waiting for style to load...');
+      const styleLoadHandler = () => {
+        console.log('[MAP] Style loaded, adding layers now');
         addBusinessLayers();
-        map.current?.off('load', loadHandler);
+        map.current?.off('style.load', styleLoadHandler);
       };
-      map.current.on('load', loadHandler);
+      map.current.on('style.load', styleLoadHandler);
     }
   }, [businesses, navigate]);
 
