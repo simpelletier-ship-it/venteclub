@@ -4,13 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Send, Paperclip, X, Download, FileText, Image as ImageIcon, ExternalLink, Mail, Phone, User, IdCard } from "lucide-react";
+import { Send, Paperclip, X, Download, FileText, Image as ImageIcon, ExternalLink, Mail, Phone, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { QuickMessageTemplates } from "@/components/QuickMessageTemplates";
 import { ProfileCompletionAlert } from "@/components/ProfileCompletionAlert";
-import { ContactCard } from "@/components/ContactCard";
-import html2canvas from "html2canvas";
 
 interface Message {
   id: string;
@@ -48,11 +46,8 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
   const [sellerContact, setSellerContact] = useState<any>(null);
   const [businessSlug, setBusinessSlug] = useState<string | null>(null);
   const [currentUserProfile, setCurrentUserProfile] = useState<any>(null);
-  const [includeContactCard, setIncludeContactCard] = useState(false);
-  const [isGeneratingCard, setIsGeneratingCard] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const contactCardRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -249,55 +244,12 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
     setSelectedFiles(selectedFiles.filter((_, i) => i !== index));
   };
 
-  const generateContactCardImage = async (): Promise<File | null> => {
-    if (!contactCardRef.current) return null;
-    
-    try {
-      setIsGeneratingCard(true);
-      const canvas = await html2canvas(contactCardRef.current, {
-        backgroundColor: '#ffffff',
-        scale: 2,
-        logging: false,
-        useCORS: true,
-      });
-      
-      return new Promise((resolve) => {
-        canvas.toBlob((blob) => {
-          if (blob) {
-            const file = new File([blob], 'carte-contact.png', { type: 'image/png' });
-            resolve(file);
-          } else {
-            resolve(null);
-          }
-        }, 'image/png');
-      });
-    } catch (error) {
-      console.error('Error generating contact card:', error);
-      toast({
-        variant: "destructive",
-        title: "Erreur",
-        description: "Impossible de générer la carte de contact",
-      });
-      return null;
-    } finally {
-      setIsGeneratingCard(false);
-    }
-  };
-
   const sendMessage = async () => {
-    if (!newMessage.trim() && selectedFiles.length === 0 && !includeContactCard) return;
+    if (!newMessage.trim() && selectedFiles.length === 0) return;
 
     setLoading(true);
     try {
-      let filesToUpload = [...selectedFiles];
-      
-      // Generate contact card image if requested
-      if (includeContactCard && currentUserProfile) {
-        const contactCardFile = await generateContactCardImage();
-        if (contactCardFile) {
-          filesToUpload = [...filesToUpload, contactCardFile];
-        }
-      }
+      const filesToUpload = [...selectedFiles];
 
       // Check if this is the first message from this user for this business
       const { data: existingMessages } = await supabase
@@ -368,7 +320,6 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
 
       setNewMessage("");
       setSelectedFiles([]);
-      setIncludeContactCard(false);
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -420,15 +371,7 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
   };
 
   return (
-    <>
-      {/* Hidden contact card for image generation */}
-      <div className="fixed -left-[9999px] -top-[9999px]">
-        <div ref={contactCardRef}>
-          {currentUserProfile && <ContactCard profile={currentUserProfile} />}
-        </div>
-      </div>
-
-      <div className="flex flex-col h-full bg-background rounded-2xl shadow-lg overflow-hidden">
+    <div className="flex flex-col h-full bg-background rounded-2xl shadow-lg overflow-hidden">
       {/* Header - Style moderne */}
       <div className="bg-gradient-to-r from-primary/5 via-secondary/5 to-primary/5 p-6 border-b border-border/50 backdrop-blur-sm">
         <div className="flex items-center gap-4">
@@ -645,17 +588,6 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
               disabled={loading || uploading}
             />
             <Button
-              type="button"
-              variant={includeContactCard ? "default" : "outline"}
-              size="icon"
-              onClick={() => setIncludeContactCard(!includeContactCard)}
-              disabled={loading || uploading}
-              className="h-12 w-12 shrink-0 rounded-xl transition-all duration-200"
-              title="Inclure ma fiche de contact"
-            >
-              <IdCard className="h-5 w-5" />
-            </Button>
-            <Button
               onClick={sendMessage}
               disabled={loading || uploading || (!newMessage.trim() && selectedFiles.length === 0)}
               size="icon"
@@ -664,12 +596,6 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
               <Send className="h-5 w-5" />
             </Button>
           </div>
-          {includeContactCard && (
-            <p className="text-xs text-muted-foreground flex items-center gap-1">
-              <IdCard className="h-3 w-3" />
-              Votre fiche de contact sera incluse dans le message
-            </p>
-          )}
         </div>
         <p className="text-xs text-muted-foreground/70 mt-3 flex items-center gap-1">
           <span>Appuyez sur Entrée pour envoyer</span>
@@ -677,7 +603,6 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
           <span>Max 5 fichiers (10 Mo chacun)</span>
         </p>
       </div>
-      </div>
-    </>
+    </div>
   );
 };
