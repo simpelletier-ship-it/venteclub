@@ -104,27 +104,26 @@ const Admin = () => {
 
       if (error) throw error;
 
-      // Then fetch seller contacts and featured status for each
-      const businessesWithDetails = await Promise.all(
-        (businessesData || []).map(async (business) => {
-          // Get seller contact
-          const { data: contactData } = await supabase
-            .from('seller_contacts')
-            .select('email')
-            .eq('seller_id', business.seller_id)
-            .single();
+      // Get all unique seller IDs
+      const sellerIds = [...new Set(businessesData?.map(b => b.seller_id) || [])];
+      
+      // Fetch all seller contacts in one query
+      const { data: contactsData } = await supabase
+        .from('seller_contacts')
+        .select('seller_id, email')
+        .in('seller_id', sellerIds);
 
-          // Get featured status
-          const { data: isFeatured } = await supabase
-            .rpc('is_business_featured', { business_uuid: business.id });
-
-          return {
-            ...business,
-            seller_email: contactData?.email || null,
-            is_featured: !!isFeatured
-          };
-        })
+      // Create a map of seller_id -> email
+      const contactsMap = new Map(
+        contactsData?.map(c => [c.seller_id, c.email]) || []
       );
+
+      // Map businesses with their details (no need for is_business_featured, use featured column)
+      const businessesWithDetails = (businessesData || []).map(business => ({
+        ...business,
+        seller_email: contactsMap.get(business.seller_id) || null,
+        is_featured: business.featured
+      }));
 
       setBusinesses(businessesWithDetails);
     } catch (error: any) {

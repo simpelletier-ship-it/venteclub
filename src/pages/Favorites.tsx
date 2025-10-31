@@ -54,16 +54,8 @@ const Favorites = () => {
 
       if (bizError) throw bizError;
 
-      // Check featured status for each
-      const businessesWithFeature = await Promise.all(
-        (businesses || []).map(async (business) => {
-          const { data: isFeatured } = await supabase
-            .rpc('is_business_featured', { business_uuid: business.id });
-          return { ...business, featured: !!isFeatured };
-        })
-      );
-
-      setFavorites(businessesWithFeature);
+      // No need to check featured status - use the featured column directly
+      setFavorites(businesses || []);
     } catch (error: any) {
       toast({
         variant: "destructive",

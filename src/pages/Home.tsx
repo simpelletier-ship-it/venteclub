@@ -38,9 +38,10 @@ const Home = () => {
 
   const fetchFeaturedBusinesses = async () => {
     try {
+      // Fetch only the columns we need for display
       const { data: businesses } = await supabase
         .from('businesses')
-        .select('*')
+        .select('id, slug, title, industry, city, region, annual_revenue, asking_price, baiia, description, featured, status, approval_status, is_franchise, sale_type, property_type, year_built, square_footage, is_rental_property, rental_units, created_at')
         .eq('status', 'active')
         .eq('approval_status', 'approved')
         .eq('featured', true)
