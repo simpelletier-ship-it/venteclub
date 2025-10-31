@@ -212,7 +212,7 @@ export const BusinessStatistics = ({ userId }: BusinessStatisticsProps) => {
           <Card className="bg-gradient-to-br from-secondary/10 to-secondary/5 border-secondary/20">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-2">
-                <p className="text-sm font-medium text-muted-foreground flex items-center gap-1">
+                <div className="text-sm font-medium text-muted-foreground flex items-center gap-1">
                   Total des vues
                   <UITooltip>
                     <TooltipTrigger>
@@ -222,7 +222,7 @@ export const BusinessStatistics = ({ userId }: BusinessStatisticsProps) => {
                       <p>Nombre total de fois où vos annonces ont été consultées par des visiteurs</p>
                     </TooltipContent>
                   </UITooltip>
-                </p>
+                </div>
               </div>
               <div className="flex items-center justify-between">
                 <h3 className="text-3xl font-bold">{totalViewsWithHistorical.toLocaleString()}</h3>
@@ -236,7 +236,7 @@ export const BusinessStatistics = ({ userId }: BusinessStatisticsProps) => {
           <Card className="bg-gradient-to-br from-amber-500/10 to-amber-500/5 border-amber-500/20">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-2">
-                <p className="text-sm font-medium text-muted-foreground flex items-center gap-1">
+                <div className="text-sm font-medium text-muted-foreground flex items-center gap-1">
                   Vues en vedette
                   <UITooltip>
                     <TooltipTrigger>
@@ -246,7 +246,7 @@ export const BusinessStatistics = ({ userId }: BusinessStatisticsProps) => {
                       <p>Nombre de vues provenant de vos annonces mises en avant (featured)</p>
                     </TooltipContent>
                   </UITooltip>
-                </p>
+                </div>
               </div>
               <div className="flex items-center justify-between">
                 <h3 className="text-3xl font-bold">{featuredViews.toLocaleString()}</h3>
@@ -260,7 +260,7 @@ export const BusinessStatistics = ({ userId }: BusinessStatisticsProps) => {
           <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-2">
-                <p className="text-sm font-medium text-muted-foreground flex items-center gap-1">
+                <div className="text-sm font-medium text-muted-foreground flex items-center gap-1">
                   Déverrouillages
                   <UITooltip>
                     <TooltipTrigger>
@@ -270,7 +270,7 @@ export const BusinessStatistics = ({ userId }: BusinessStatisticsProps) => {
                       <p>Nombre de fois où vos coordonnées ont été débloquées par des acheteurs intéressés</p>
                     </TooltipContent>
                   </UITooltip>
-                </p>
+                </div>
               </div>
               <div className="flex items-center justify-between">
                 <h3 className="text-3xl font-bold">{totalUnlocks.toLocaleString()}</h3>
@@ -284,7 +284,7 @@ export const BusinessStatistics = ({ userId }: BusinessStatisticsProps) => {
           <Card className="bg-gradient-to-br from-accent/10 to-accent/5 border-accent/20">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-2">
-                <p className="text-sm font-medium text-muted-foreground flex items-center gap-1">
+                <div className="text-sm font-medium text-muted-foreground flex items-center gap-1">
                   Favoris
                   <UITooltip>
                     <TooltipTrigger>
@@ -294,7 +294,7 @@ export const BusinessStatistics = ({ userId }: BusinessStatisticsProps) => {
                       <p>Nombre de fois où vos annonces ont été ajoutées aux favoris par des visiteurs</p>
                     </TooltipContent>
                   </UITooltip>
-                </p>
+                </div>
               </div>
               <div className="flex items-center justify-between">
                 <h3 className="text-3xl font-bold">{totalFavorites.toLocaleString()}</h3>
@@ -308,7 +308,7 @@ export const BusinessStatistics = ({ userId }: BusinessStatisticsProps) => {
           <Card className="bg-gradient-to-br from-purple-500/10 to-purple-500/5 border-purple-500/20">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-2">
-                <p className="text-sm font-medium text-muted-foreground flex items-center gap-1">
+                <div className="text-sm font-medium text-muted-foreground flex items-center gap-1">
                   Leads
                   <UITooltip>
                     <TooltipTrigger>
@@ -318,7 +318,7 @@ export const BusinessStatistics = ({ userId }: BusinessStatisticsProps) => {
                       <p>Nombre de personnes uniques qui vous ont écrit un premier message</p>
                     </TooltipContent>
                   </UITooltip>
-                </p>
+                </div>
               </div>
               <div className="flex items-center justify-between">
                 <h3 className="text-3xl font-bold">{totalLeads.toLocaleString()}</h3>
@@ -332,7 +332,7 @@ export const BusinessStatistics = ({ userId }: BusinessStatisticsProps) => {
           <Card className="bg-gradient-to-br from-green-500/10 to-green-500/5 border-green-500/20">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-2">
-                <p className="text-sm font-medium text-muted-foreground flex items-center gap-1">
+                <div className="text-sm font-medium text-muted-foreground flex items-center gap-1">
                   Taux de conversion
                   <UITooltip>
                     <TooltipTrigger>
@@ -342,7 +342,7 @@ export const BusinessStatistics = ({ userId }: BusinessStatisticsProps) => {
                       <p>Pourcentage de visiteurs ayant déverrouillé vos coordonnées (déverrouillages ÷ vues totales)</p>
                     </TooltipContent>
                   </UITooltip>
-                </p>
+                </div>
               </div>
               <div className="flex items-center justify-between">
                 <h3 className="text-3xl font-bold">{conversionRate}%</h3>
