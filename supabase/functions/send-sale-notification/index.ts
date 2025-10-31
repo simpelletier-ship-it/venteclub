@@ -48,7 +48,7 @@ const handler = async (req: Request): Promise<Response> => {
     const emailResponse = await resend.emails.send({
       from: "Vente.club <info@vente.club>",
       to: [sellerEmail],
-      subject: `🎉 Félicitations ! "${businessTitle}" a été vendue`,
+      subject: `Confirmation de vente - "${businessTitle}"`,
       html: `
         <!DOCTYPE html>
         <html>
@@ -71,13 +71,13 @@ const handler = async (req: Request): Promise<Response> => {
           <body>
             <div class="container">
               <div class="header">
-                <h1 style="margin: 0; font-size: 32px;">🎉 Vente Confirmée !</h1>
+                <h1 style="margin: 0; font-size: 32px;">Vente Confirmée</h1>
               </div>
               <div class="content">
                 <p style="font-size: 18px; color: #28a745; font-weight: 600;">Félicitations ${sellerName || 'cher vendeur'},</p>
                 
                 <div class="success-box">
-                  <h2 style="margin: 0 0 10px 0; font-size: 24px;">Votre entreprise a été vendue ! 🎊</h2>
+                  <h2 style="margin: 0 0 10px 0; font-size: 24px;">Votre entreprise a été vendue</h2>
                   <p style="margin: 10px 0; font-size: 18px;"><strong>"${businessTitle}"</strong></p>
                   <p style="margin: 0; font-size: 16px;">Date de vente : ${formattedDate}</p>
                 </div>
@@ -85,7 +85,7 @@ const handler = async (req: Request): Promise<Response> => {
                 <p>Nous sommes ravis de vous annoncer que votre annonce a été marquée comme vendue sur notre plateforme.</p>
 
                 <div class="details-box">
-                  <h3 style="color: #28a745; margin-top: 0;">📊 Résumé de la transaction</h3>
+                  <h3 style="color: #28a745; margin-top: 0;">Résumé de la transaction</h3>
                   <div class="detail-row">
                     <span>Entreprise</span>
                     <span><strong>${businessTitle}</strong></span>
@@ -101,7 +101,7 @@ const handler = async (req: Request): Promise<Response> => {
                 </div>
 
                 <div class="next-steps">
-                  <h3 style="margin-top: 0; color: #856404;">📝 Prochaines étapes</h3>
+                  <h3 style="margin-top: 0; color: #856404;">Prochaines étapes</h3>
                   <div class="next-step">Finalisez la transition avec l'acheteur</div>
                   <div class="next-step">Complétez les documents légaux nécessaires</div>
                   <div class="next-step">Organisez le transfert d'actifs et de propriété</div>
@@ -109,7 +109,7 @@ const handler = async (req: Request): Promise<Response> => {
                 </div>
 
                 <p style="background: #e7f3ff; border-left: 4px solid #007bff; padding: 15px; border-radius: 4px; margin: 20px 0;">
-                  💼 <strong>Vous avez d'autres entreprises à vendre ?</strong><br>
+                  <strong>Vous avez d'autres entreprises à vendre ?</strong><br>
                   Créez une nouvelle annonce sur Vente.club et profitez de notre réseau d'acheteurs qualifiés.
                 </p>
 

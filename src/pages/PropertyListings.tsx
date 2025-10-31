@@ -23,16 +23,13 @@ const PropertyListings = () => {
 
   const fetchProperties = async () => {
     try {
-      // Pour le moment, on affiche un message que cette fonctionnalité arrive bientôt
-      // Une fois que le champ sale_type sera mis à jour pour supporter "property",
-      // on pourra filtrer avec: .eq('sale_type', 'property')
       const { data: properties } = await supabase
         .from('businesses')
         .select('*')
+        .eq('sale_type', 'property')
         .in('status', ['active', 'sold'])
         .eq('approval_status', 'approved')
-        .order('created_at', { ascending: false })
-        .limit(0); // Limite à 0 pour le moment jusqu'à ce que le type soit ajouté
+        .order('created_at', { ascending: false });
 
       if (properties) {
         const featured = properties.filter(p => p.featured && p.status === 'active').slice(0, 3);

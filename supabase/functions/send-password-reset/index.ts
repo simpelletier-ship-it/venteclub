@@ -75,13 +75,13 @@ const handler = async (req: Request): Promise<Response> => {
               .footer { text-align: center; color: #666; font-size: 12px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0; }
               .security-info { background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; }
               .info-item { margin: 10px 0; padding-left: 25px; position: relative; }
-              .info-item:before { content: "🔒"; position: absolute; left: 0; }
+              .info-item:before { content: "•"; position: absolute; left: 0; font-weight: bold; color: #667eea; }
             </style>
           </head>
           <body>
             <div class="container">
               <div class="header">
-                <h1 style="margin: 0; font-size: 28px;">🔐 Réinitialisation de mot de passe</h1>
+                <h1 style="margin: 0; font-size: 28px;">Réinitialisation de mot de passe</h1>
               </div>
               <div class="content">
                 <p style="font-size: 18px; color: #667eea; font-weight: 600;">Bonjour ${userName},</p>
@@ -97,11 +97,11 @@ const handler = async (req: Request): Promise<Response> => {
                 </div>
 
                 <div class="warning-box">
-                  <strong>⚠️ Important :</strong> Ce lien expirera dans 1 heure pour des raisons de sécurité.
+                  <strong>Important :</strong> Ce lien expirera dans 1 heure pour des raisons de sécurité.
                 </div>
 
                 <div class="security-info">
-                  <h3 style="margin-top: 0; color: #667eea;">🛡️ Conseils de sécurité</h3>
+                  <h3 style="margin-top: 0; color: #667eea;">Conseils de sécurité</h3>
                   <div class="info-item">Choisissez un mot de passe d'au moins 8 caractères</div>
                   <div class="info-item">Utilisez une combinaison de lettres, chiffres et symboles</div>
                   <div class="info-item">Ne réutilisez pas de mots de passe d'autres comptes</div>

@@ -78,7 +78,7 @@ const handler = async (req: Request): Promise<Response> => {
           <body>
             <div class="container">
               <div class="header">
-                <h1 style="margin: 0; font-size: 28px;">🧾 Facture de votre achat</h1>
+                <h1 style="margin: 0; font-size: 28px;">Facture de votre achat</h1>
               </div>
               <div class="content">
                 <p style="font-size: 18px; color: #667eea; font-weight: 600;">Bonjour ${name || 'cher membre'},</p>
@@ -86,7 +86,7 @@ const handler = async (req: Request): Promise<Response> => {
                 <p>Merci pour votre achat sur Vente.club. Voici votre facture détaillée.</p>
                 
                 <div class="success-box">
-                  <h3 style="margin: 0 0 10px 0;">✅ Accès déverrouillé avec succès</h3>
+                  <h3 style="margin: 0 0 10px 0;">Accès déverrouillé avec succès</h3>
                   <p style="margin: 0;">Vous pouvez maintenant contacter le vendeur de "<strong>${businessTitle}</strong>"</p>
                 </div>
 
@@ -121,7 +121,7 @@ const handler = async (req: Request): Promise<Response> => {
                 </div>
 
                 <p style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; border-radius: 4px; margin: 20px 0;">
-                  💡 <strong>Astuce :</strong> Vous pouvez retrouver vos achats et factures dans votre espace membre, section "Mes achats".
+                  <strong>Note :</strong> Vous pouvez retrouver vos achats et factures dans votre espace membre, section "Mes achats".
                 </p>
 
                 <p style="margin-top: 30px;">Si vous avez des questions, n'hésitez pas à nous contacter.</p>

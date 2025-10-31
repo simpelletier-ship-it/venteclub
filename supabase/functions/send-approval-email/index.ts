@@ -61,7 +61,7 @@ const handler = async (req: Request): Promise<Response> => {
     const emailResponse = await resend.emails.send({
       from: "Vente.club <info@vente.club>",
       to: [profile.email],
-      subject: `✅ Votre annonce "${business.title}" a été approuvée !`,
+      subject: `Votre annonce "${business.title}" a été approuvée`,
       html: `
         <!DOCTYPE html>
         <html>
@@ -79,7 +79,7 @@ const handler = async (req: Request): Promise<Response> => {
               .cta-button { display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 16px 40px; text-decoration: none; border-radius: 8px; font-weight: 600; margin: 25px 0; text-align: center; }
               .tips-box { background: #fff3cd; border-left: 4px solid #ffc107; padding: 20px; border-radius: 4px; margin: 20px 0; }
               .tip-item { margin: 10px 0; padding-left: 25px; position: relative; }
-              .tip-item:before { content: "💡"; position: absolute; left: 0; }
+              .tip-item:before { content: "•"; position: absolute; left: 0; font-weight: bold; color: #856404; }
               .footer { text-align: center; color: #666; font-size: 12px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0; }
             </style>
           </head>

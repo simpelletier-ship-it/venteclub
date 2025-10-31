@@ -146,7 +146,7 @@ serve(async (req) => {
         <body>
           <div class="container">
             <div class="header">
-              <h1>🔔 Alerte Vente.Club</h1>
+              <h1>Alerte Vente.Club</h1>
             </div>
             <div class="content">
               <div class="alert-badge">${alertDescription}</div>
@@ -157,8 +157,8 @@ serve(async (req) => {
               
               <div class="business-card">
                 <h2>${businessTitle}</h2>
-                <div class="detail"><strong>📍 Localisation:</strong> ${businessCity}</div>
-                <div class="detail"><strong>🏢 Secteur:</strong> ${businessIndustry}</div>
+                <div class="detail"><strong>Localisation:</strong> ${businessCity}</div>
+                <div class="detail"><strong>Secteur:</strong> ${businessIndustry}</div>
                 <div class="price">${businessPrice.toLocaleString('fr-CA')} $ CAD</div>
               </div>
               
@@ -169,7 +169,7 @@ serve(async (req) => {
               </center>
               
               <p style="margin-top: 30px; font-size: 14px; color: #666;">
-                💡 <strong>Conseil:</strong> Les meilleures opportunités partent vite. Agissez rapidement pour ne pas manquer cette occasion.
+                <strong>Conseil:</strong> Les meilleures opportunités partent vite. Agissez rapidement pour ne pas manquer cette occasion.
               </p>
             </div>
             <div class="footer">
@@ -191,7 +191,7 @@ serve(async (req) => {
     const { data, error } = await resend.emails.send({
       from: "Vente.Club Alertes <notifications@vente.club>",
       to: [userEmail],
-      subject: `🔔 ${alertDescription}: ${businessTitle}`,
+      subject: `${alertDescription}: ${businessTitle}`,
       html: emailHtml,
     });
 
