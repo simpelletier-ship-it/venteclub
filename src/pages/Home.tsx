@@ -101,7 +101,7 @@ const Home = () => {
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-display font-bold leading-[1.1] tracking-tight text-foreground">
               Trouvez l'entreprise
               <br />
-              <span className="text-secondary">de vos rêves</span>
+              <span className="text-secondary">de vos rêves au Québec</span>
             </h1>
             
             <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
