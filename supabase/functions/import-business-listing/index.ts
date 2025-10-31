@@ -76,9 +76,19 @@ ${html.substring(0, 8000)}
 
 Return ONLY valid JSON, no additional text.`;
 
-    const { data: aiData, error: aiError } = await supabase.functions.invoke('lovable-ai', {
-      body: {
-        model: 'openai/gpt-5-mini',
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    if (!LOVABLE_API_KEY) {
+      throw new Error('LOVABLE_API_KEY is not configured');
+    }
+
+    const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'google/gemini-2.5-flash',
         messages: [
           {
             role: 'user',
@@ -87,24 +97,26 @@ Return ONLY valid JSON, no additional text.`;
         ],
         temperature: 0.1,
         max_tokens: 2000
-      }
+      })
     });
 
-    if (aiError) {
-      console.error('[IMPORT-LISTING] AI Error:', aiError);
-      throw new Error(`AI extraction failed: ${aiError.message}`);
+    if (!aiResponse.ok) {
+      const errorText = await aiResponse.text();
+      console.error('[IMPORT-LISTING] AI Gateway Error:', aiResponse.status, errorText);
+      throw new Error(`AI Gateway returned ${aiResponse.status}: ${errorText}`);
     }
 
+    const aiData = await aiResponse.json();
     console.log('[IMPORT-LISTING] AI Response:', JSON.stringify(aiData, null, 2));
 
     // Extract the JSON from AI response
     let extractedData;
     try {
-      const aiResponse = aiData.choices[0].message.content;
+      const aiContent = aiData.choices[0].message.content;
       // Remove markdown code blocks if present
-      const jsonMatch = aiResponse.match(/```json\s*([\s\S]*?)\s*```/) || 
-                       aiResponse.match(/```\s*([\s\S]*?)\s*```/) ||
-                       [null, aiResponse];
+      const jsonMatch = aiContent.match(/```json\s*([\s\S]*?)\s*```/) || 
+                       aiContent.match(/```\s*([\s\S]*?)\s*```/) ||
+                       [null, aiContent];
       const jsonString = jsonMatch[1].trim();
       extractedData = JSON.parse(jsonString);
     } catch (parseError) {
