@@ -199,7 +199,7 @@ const Home = () => {
             <AccordionItem value="item-3">
               <AccordionTrigger>Comment vendre mon entreprise?</AccordionTrigger>
               <AccordionContent>
-                Créez un compte gratuit, soumettez votre annonce avec les détails de votre entreprise. Notre équipe la vérifiera avant publication.
+                Créez un compte gratuit, soumettez votre annonce avec les détails de votre entreprise. Notre équipe l'approuvera après avoir vérifié que l'annonce est conforme à nos règlements.
               </AccordionContent>
             </AccordionItem>
           </Accordion>
