@@ -12,6 +12,7 @@ import { ChatBox } from "@/components/ChatBox";
 import { SellerChatSection } from "@/components/SellerChatSection";
 import { ReportBusinessDialog } from "@/components/ReportBusinessDialog";
 import { SEO } from "@/components/SEO";
+import { FinancialCalculator } from "@/components/FinancialCalculator";
 
 const BusinessDetails = () => {
   const { slug } = useParams();
@@ -693,6 +694,13 @@ const BusinessDetails = () => {
                         </div>
                       </div>
                     )}
+                  </div>
+                )}
+
+                {/* Calculateur de financement */}
+                {business.asking_price > 0 && (
+                  <div className="mt-8">
+                    <FinancialCalculator askingPrice={business.asking_price} />
                   </div>
                 )}
 
