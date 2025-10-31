@@ -167,50 +167,50 @@ const Messages = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-secondary/10">
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-6">
+      <div className="container mx-auto px-4 py-6 sm:py-8">
+        <div className="mb-4 sm:mb-6">
           <Button
             variant="ghost"
             onClick={() => navigate("/dashboard")}
-            className="mb-4"
+            className="mb-3 sm:mb-4 text-sm sm:text-base"
           >
-            <ArrowLeft className="mr-2 h-4 w-4" />
+            <ArrowLeft className="mr-2 h-3 sm:h-4 w-3 sm:w-4" />
             Retour au tableau de bord
           </Button>
-          <h1 className="text-4xl font-bold text-foreground mb-2">
+          <h1 className="text-2xl sm:text-4xl font-bold text-foreground mb-2">
             Messagerie
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-sm sm:text-base text-muted-foreground">
             Gérez vos conversations avec les acheteurs et vendeurs
           </p>
         </div>
 
         {conversations.length === 0 ? (
           <Card>
-            <CardContent className="text-center py-12">
-              <MessageSquare className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-              <p className="text-muted-foreground">
+            <CardContent className="text-center py-8 sm:py-12">
+              <MessageSquare className="mx-auto h-10 sm:h-12 w-10 sm:w-12 text-muted-foreground mb-3 sm:mb-4" />
+              <p className="text-sm sm:text-base text-muted-foreground">
                 Aucune conversation pour le moment
               </p>
             </CardContent>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         {/* Liste des conversations - Style moderne */}
         <Card className="lg:col-span-1 border-border/50 shadow-lg">
-          <CardContent className="p-5">
-            <h2 className="font-bold text-lg mb-5 flex items-center gap-2 text-foreground">
-              <div className="p-2 rounded-lg bg-primary/10">
-                <MessageSquare className="h-5 w-5 text-primary" />
+          <CardContent className="p-3 sm:p-5">
+            <h2 className="font-bold text-base sm:text-lg mb-4 sm:mb-5 flex items-center gap-2 text-foreground">
+              <div className="p-1.5 sm:p-2 rounded-lg bg-primary/10">
+                <MessageSquare className="h-4 sm:h-5 w-4 sm:w-5 text-primary" />
               </div>
               Conversations
             </h2>
-            <ScrollArea className="h-[600px] pr-4">
-              <div className="space-y-3">
+            <ScrollArea className="h-[400px] sm:h-[500px] lg:h-[600px] pr-2 sm:pr-4">
+              <div className="space-y-2 sm:space-y-3">
                 {conversations.map((conv) => (
                   <div
                     key={`${conv.business_id}-${conv.other_user_id}`}
-                    className={`p-4 rounded-xl cursor-pointer transition-all duration-200 ${
+                    className={`p-3 sm:p-4 rounded-lg sm:rounded-xl cursor-pointer transition-all duration-200 ${
                       selectedConversation?.business_id === conv.business_id &&
                       selectedConversation?.other_user_id === conv.other_user_id
                         ? 'bg-gradient-to-br from-primary/15 to-primary/5 border-2 border-primary/50 shadow-md'
@@ -218,33 +218,33 @@ const Messages = () => {
                     }`}
                     onClick={() => handleConversationClick(conv)}
                   >
-                    <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-start justify-between mb-2 sm:mb-3">
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-2">
-                          <h3 className="font-bold text-sm truncate">{conv.business_title}</h3>
+                        <div className="flex items-center gap-2 mb-1.5 sm:mb-2">
+                          <h3 className="font-bold text-xs sm:text-sm truncate">{conv.business_title}</h3>
                           {conv.unread_count > 0 && (
-                            <Badge className="h-5 min-w-5 px-2 text-xs flex-shrink-0 bg-gradient-to-r from-primary to-primary/90 shadow-sm">
+                            <Badge className="h-4 sm:h-5 min-w-4 sm:min-w-5 px-1.5 sm:px-2 text-[10px] sm:text-xs flex-shrink-0 bg-gradient-to-r from-primary to-primary/90 shadow-sm">
                               {conv.unread_count}
                             </Badge>
                           )}
                         </div>
-                        <p className="text-xs font-medium text-muted-foreground mb-2 flex items-center gap-1.5">
-                          <span className="text-base">{conv.is_seller ? '🛒' : '🔑'}</span>
-                          {conv.is_seller ? 'Acheteur' : 'Vendeur'}: {conv.other_user_name}
+                        <p className="text-[10px] sm:text-xs font-medium text-muted-foreground mb-1.5 sm:mb-2 flex items-center gap-1 sm:gap-1.5">
+                          <span className="text-sm sm:text-base">{conv.is_seller ? '🛒' : '🔑'}</span>
+                          {conv.is_seller ? 'Acheteur' : 'Vendeur'}: <span className="truncate">{conv.other_user_name}</span>
                         </p>
-                        <p className="text-sm text-muted-foreground/80 truncate leading-relaxed">
+                        <p className="text-xs sm:text-sm text-muted-foreground/80 truncate leading-relaxed">
                           {conv.last_message}
                         </p>
                       </div>
-                      <div className="flex flex-col items-end gap-2 ml-3 flex-shrink-0">
-                        <span className="text-xs font-medium text-muted-foreground whitespace-nowrap">
+                      <div className="flex flex-col items-end gap-1.5 sm:gap-2 ml-2 sm:ml-3 flex-shrink-0">
+                        <span className="text-[10px] sm:text-xs font-medium text-muted-foreground whitespace-nowrap">
                           {new Date(conv.last_message_time).toLocaleDateString('fr-CA', {
                             day: 'numeric',
                             month: 'short',
                           })}
                         </span>
                         {conv.unread_count > 0 && (
-                          <div className="w-2 h-2 rounded-full bg-gradient-to-r from-primary to-primary/90 shadow-sm" />
+                          <div className="w-1.5 sm:w-2 h-1.5 sm:h-2 rounded-full bg-gradient-to-r from-primary to-primary/90 shadow-sm" />
                         )}
                       </div>
                     </div>
@@ -257,7 +257,7 @@ const Messages = () => {
 
             {/* Zone de chat - Style moderne */}
             <Card className="lg:col-span-2 border-border/50 shadow-lg overflow-hidden">
-              <CardContent className="p-0 h-[690px] flex flex-col">
+              <CardContent className="p-0 h-[500px] sm:h-[600px] lg:h-[690px] flex flex-col">
                 {selectedConversation ? (
                   <>
                     <div className="p-6 border-b border-border/50 bg-gradient-to-r from-background via-muted/5 to-background">

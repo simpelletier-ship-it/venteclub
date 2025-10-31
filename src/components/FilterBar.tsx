@@ -93,15 +93,15 @@ const FilterBar = ({ onFilter }: FilterBarProps) => {
   };
 
   return (
-    <div className="w-full max-w-5xl mx-auto bg-card rounded-2xl shadow-elegant p-6 border border-border">
-      <div className="flex flex-col gap-6">
-        <div className="flex flex-col md:flex-row gap-4">
+    <div className="w-full max-w-5xl mx-auto bg-card rounded-xl sm:rounded-2xl shadow-elegant p-4 sm:p-6 border border-border">
+      <div className="flex flex-col gap-4 sm:gap-6">
+        <div className="flex flex-col gap-3 sm:gap-4">
           {/* Type d'annonce */}
           <Popover open={listingTypesOpen} onOpenChange={setListingTypesOpen}>
             <PopoverTrigger asChild>
               <Button 
                 variant="outline" 
-                className="flex-1 h-12 bg-background border-border justify-between"
+                className="w-full h-10 sm:h-12 bg-background border-border justify-between text-sm sm:text-base"
               >
                 <span className="truncate">
                   {selectedListingTypes.length > 0 
@@ -109,7 +109,7 @@ const FilterBar = ({ onFilter }: FilterBarProps) => {
                     : "Type (optionnel)"
                   }
                 </span>
-                <ChevronDown className="h-4 w-4 opacity-50 ml-2 flex-shrink-0" />
+                <ChevronDown className="h-3 sm:h-4 w-3 sm:w-4 opacity-50 ml-2 flex-shrink-0" />
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-80 p-4 bg-card border-border z-50">
@@ -138,7 +138,7 @@ const FilterBar = ({ onFilter }: FilterBarProps) => {
             <PopoverTrigger asChild>
               <Button 
                 variant="outline" 
-                className="flex-1 h-12 bg-background border-border justify-between"
+                className="w-full h-10 sm:h-12 bg-background border-border justify-between text-sm sm:text-base"
               >
                 <span className="truncate">
                   {selectedRegions.length > 0 
@@ -146,7 +146,7 @@ const FilterBar = ({ onFilter }: FilterBarProps) => {
                     : "Régions (optionnel)"
                   }
                 </span>
-                <ChevronDown className="h-4 w-4 opacity-50 ml-2 flex-shrink-0" />
+                <ChevronDown className="h-3 sm:h-4 w-3 sm:w-4 opacity-50 ml-2 flex-shrink-0" />
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-80 p-4 bg-card border-border z-50">
@@ -175,7 +175,7 @@ const FilterBar = ({ onFilter }: FilterBarProps) => {
             <PopoverTrigger asChild>
               <Button 
                 variant="outline" 
-                className="flex-1 h-12 bg-background border-border justify-between"
+                className="w-full h-10 sm:h-12 bg-background border-border justify-between text-sm sm:text-base"
               >
                 <span className="truncate">
                   {selectedIndustries.length > 0 
@@ -183,7 +183,7 @@ const FilterBar = ({ onFilter }: FilterBarProps) => {
                     : "Secteurs (optionnel)"
                   }
                 </span>
-                <ChevronDown className="h-4 w-4 opacity-50 ml-2 flex-shrink-0" />
+                <ChevronDown className="h-3 sm:h-4 w-3 sm:w-4 opacity-50 ml-2 flex-shrink-0" />
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-80 p-4 bg-card border-border z-50">
@@ -266,10 +266,10 @@ const FilterBar = ({ onFilter }: FilterBarProps) => {
           </div>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-2">
           <Button 
             onClick={handleFilter}
-            className="flex-1 h-12 bg-accent hover:bg-accent/90 text-accent-foreground font-semibold"
+            className="flex-1 h-10 sm:h-12 bg-accent hover:bg-accent/90 text-accent-foreground font-semibold text-sm sm:text-base"
           >
             Filtrer
           </Button>
@@ -277,7 +277,7 @@ const FilterBar = ({ onFilter }: FilterBarProps) => {
             <Button 
               onClick={handleReset}
               variant="outline"
-              className="h-12 px-6"
+              className="h-10 sm:h-12 px-4 sm:px-6 text-sm sm:text-base"
             >
               Réinitialiser
             </Button>

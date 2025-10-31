@@ -211,10 +211,10 @@ const Dashboard = () => {
             <p className="text-muted-foreground mb-6">
               Gérez vos annonces et vos conversations
             </p>
-            <TabsList className="grid w-full max-w-3xl grid-cols-3">
-              <TabsTrigger value="businesses">Mes annonces</TabsTrigger>
-              <TabsTrigger value="statistics">Mes statistiques</TabsTrigger>
-              <TabsTrigger value="messages">Messages</TabsTrigger>
+            <TabsList className="grid w-full max-w-3xl grid-cols-3 h-auto">
+              <TabsTrigger value="businesses" className="text-xs sm:text-sm py-2 sm:py-3">Mes annonces</TabsTrigger>
+              <TabsTrigger value="statistics" className="text-xs sm:text-sm py-2 sm:py-3">Statistiques</TabsTrigger>
+              <TabsTrigger value="messages" className="text-xs sm:text-sm py-2 sm:py-3">Messages</TabsTrigger>
             </TabsList>
           </div>
 
@@ -241,7 +241,7 @@ const Dashboard = () => {
                     Créer une nouvelle annonce
                   </Button>
                 </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 {businesses.map((business) => {
                   const featuredUntil = business.featured_until ? new Date(business.featured_until) : null;
                   const now = new Date();

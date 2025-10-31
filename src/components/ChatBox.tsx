@@ -375,22 +375,22 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
   };
 
   return (
-    <div className="flex flex-col h-full bg-background rounded-2xl shadow-lg overflow-hidden">
+    <div className="flex flex-col h-full bg-background rounded-lg sm:rounded-2xl shadow-lg overflow-hidden">
       {/* Header - Style moderne */}
-      <div className="bg-gradient-to-r from-primary/5 via-secondary/5 to-primary/5 p-6 border-b border-border/50 backdrop-blur-sm">
-        <div className="flex items-center gap-4">
+      <div className="bg-gradient-to-r from-primary/5 via-secondary/5 to-primary/5 p-4 sm:p-6 border-b border-border/50 backdrop-blur-sm">
+        <div className="flex items-center gap-3 sm:gap-4">
           <div className="relative">
-            <Avatar className="h-14 w-14 ring-2 ring-primary/20 shadow-md">
+            <Avatar className="h-10 sm:h-14 w-10 sm:w-14 ring-2 ring-primary/20 shadow-md">
               <AvatarImage src={otherUserProfile?.avatar_url} />
-              <AvatarFallback className="bg-gradient-to-br from-primary/20 to-secondary/20 text-primary font-semibold text-lg">
+              <AvatarFallback className="bg-gradient-to-br from-primary/20 to-secondary/20 text-primary font-semibold text-sm sm:text-lg">
                 {getInitials(otherUserProfile?.full_name || otherUserName)}
               </AvatarFallback>
             </Avatar>
-            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-background shadow-sm" />
+            <div className="absolute -bottom-1 -right-1 w-3 sm:w-4 h-3 sm:h-4 bg-green-500 rounded-full border-2 border-background shadow-sm" />
           </div>
           
           <div className="flex-1 min-w-0">
-            <h3 className="font-bold text-lg text-foreground mb-0.5">
+            <h3 className="font-bold text-base sm:text-lg text-foreground mb-0.5 truncate">
               {otherUserProfile?.full_name || otherUserName || "Utilisateur"}
             </h3>
             
@@ -398,27 +398,27 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
               <Button
                 variant="link"
                 size="sm"
-                className="h-auto p-0 text-sm font-medium hover:text-primary mb-2"
+                className="h-auto p-0 text-xs sm:text-sm font-medium hover:text-primary mb-1 sm:mb-2"
                 onClick={() => navigate(`/entreprise/${businessSlug}`)}
               >
-                <ExternalLink className="mr-1 h-4 w-4" />
-                {businessTitle}
+                <ExternalLink className="mr-1 h-3 sm:h-4 w-3 sm:w-4" />
+                <span className="truncate">{businessTitle}</span>
               </Button>
             )}
 
             {sellerContact && (
-              <div className="space-y-1 text-sm">
+              <div className="space-y-0.5 sm:space-y-1 text-xs sm:text-sm">
                 {sellerContact.email && (
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <Mail className="h-4 w-4" />
-                    <a href={`mailto:${sellerContact.email}`} className="hover:text-primary">
+                  <div className="flex items-center gap-1 sm:gap-2 text-muted-foreground">
+                    <Mail className="h-3 sm:h-4 w-3 sm:w-4 flex-shrink-0" />
+                    <a href={`mailto:${sellerContact.email}`} className="hover:text-primary truncate">
                       {sellerContact.email}
                     </a>
                   </div>
                 )}
                 {sellerContact.phone && (
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <Phone className="h-4 w-4" />
+                  <div className="flex items-center gap-1 sm:gap-2 text-muted-foreground">
+                    <Phone className="h-3 sm:h-4 w-3 sm:w-4 flex-shrink-0" />
                     <a href={`tel:${sellerContact.phone}`} className="hover:text-primary">
                       {sellerContact.phone}
                     </a>
@@ -431,8 +431,8 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
       </div>
 
       {/* Messages Area - Style moderne */}
-      <ScrollArea className="flex-1 p-6 bg-gradient-to-b from-background to-muted/5" ref={scrollRef}>
-        <div className="space-y-4">
+      <ScrollArea className="flex-1 p-3 sm:p-6 bg-gradient-to-b from-background to-muted/5" ref={scrollRef}>
+        <div className="space-y-3 sm:space-y-4">
           {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-center">
               <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-4">
@@ -527,7 +527,7 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
       </ScrollArea>
 
       {/* Input Area - Style moderne */}
-      <div className="p-6 border-t border-border/50 bg-gradient-to-r from-background via-muted/5 to-background backdrop-blur-sm space-y-4">
+      <div className="p-3 sm:p-6 border-t border-border/50 bg-gradient-to-r from-background via-muted/5 to-background backdrop-blur-sm space-y-3 sm:space-y-4">
         {/* Profile completion alert - Only for buyers */}
         {!isSeller && <ProfileCompletionAlert profile={currentUserProfile} />}
         
@@ -541,22 +541,22 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
             {selectedFiles.map((file, index) => (
               <div
                 key={index}
-                className="flex items-center gap-3 bg-card border border-border/50 rounded-xl p-3 text-sm shadow-sm"
+                className="flex items-center gap-2 sm:gap-3 bg-card border border-border/50 rounded-lg sm:rounded-xl p-2 sm:p-3 text-xs sm:text-sm shadow-sm"
               >
                 {file.type.startsWith('image/') ? (
-                  <ImageIcon className="w-4 h-4 shrink-0 text-muted-foreground" />
+                  <ImageIcon className="w-3 sm:w-4 h-3 sm:h-4 shrink-0 text-muted-foreground" />
                 ) : (
-                  <FileText className="w-4 h-4 shrink-0 text-muted-foreground" />
+                  <FileText className="w-3 sm:w-4 h-3 sm:h-4 shrink-0 text-muted-foreground" />
                 )}
-                <span className="flex-1 truncate">{file.name}</span>
+                <span className="flex-1 truncate text-xs sm:text-sm">{file.name}</span>
                 <span className="text-xs text-muted-foreground">{formatFileSize(file.size)}</span>
                 <Button
                   size="sm"
                   variant="ghost"
                   onClick={() => removeFile(index)}
-                  className="h-6 w-6 p-0"
+                  className="h-5 sm:h-6 w-5 sm:w-6 p-0"
                 >
-                  <X className="h-3 w-3" />
+                  <X className="h-2.5 sm:h-3 w-2.5 sm:w-3" />
                 </Button>
               </div>
             ))}
@@ -564,7 +564,7 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
         )}
         
         <div className="space-y-2">
-          <div className="flex gap-3">
+          <div className="flex gap-2 sm:gap-3">
             <input
               ref={fileInputRef}
               type="file"
@@ -579,29 +579,29 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
               size="icon"
               onClick={() => fileInputRef.current?.click()}
               disabled={loading || uploading}
-              className="h-12 w-12 shrink-0 rounded-xl hover:bg-primary/10 hover:border-primary/50 transition-all duration-200"
+              className="h-10 sm:h-12 w-10 sm:w-12 shrink-0 rounded-lg sm:rounded-xl hover:bg-primary/10 hover:border-primary/50 transition-all duration-200"
             >
-              <Paperclip className="h-5 w-5" />
+              <Paperclip className="h-4 sm:h-5 w-4 sm:w-5" />
             </Button>
             <Textarea
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder="Écrivez votre message..."
-              className="min-h-[56px] max-h-[120px] resize-none rounded-xl border-border/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-200"
+              className="min-h-[44px] sm:min-h-[56px] max-h-[100px] sm:max-h-[120px] resize-none rounded-lg sm:rounded-xl border-border/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-200 text-sm sm:text-base"
               disabled={loading || uploading}
             />
             <Button
               onClick={sendMessage}
               disabled={loading || uploading || (!newMessage.trim() && selectedFiles.length === 0)}
               size="icon"
-              className="h-12 w-12 shrink-0 rounded-xl bg-gradient-to-br from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-lg hover:shadow-xl transition-all duration-200"
+              className="h-10 sm:h-12 w-10 sm:w-12 shrink-0 rounded-lg sm:rounded-xl bg-gradient-to-br from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-lg hover:shadow-xl transition-all duration-200"
             >
-              <Send className="h-5 w-5" />
+              <Send className="h-4 sm:h-5 w-4 sm:w-5" />
             </Button>
           </div>
         </div>
-        <p className="text-xs text-muted-foreground/70 mt-3 flex items-center gap-1">
+        <p className="text-[10px] sm:text-xs text-muted-foreground/70 mt-2 sm:mt-3 flex items-center gap-1 flex-wrap">
           <span>Appuyez sur Entrée pour envoyer</span>
           <span className="text-muted-foreground/50">•</span>
           <span>Max 5 fichiers (10 Mo chacun)</span>

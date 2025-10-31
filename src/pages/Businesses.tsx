@@ -115,13 +115,13 @@ const Businesses = () => {
         
         <div className="relative container mx-auto px-4 py-16">
           <div className="max-w-4xl mx-auto text-center space-y-6 animate-slide-up">
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-display font-bold leading-[1.1] tracking-tight text-foreground">
+            <h1 className="text-2xl sm:text-4xl md:text-6xl lg:text-7xl font-display font-bold leading-[1.1] tracking-tight text-foreground px-4">
               Toutes les entreprises
               <br />
               <span className="text-primary">à vendre au Québec</span>
             </h1>
             
-            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-sm sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
               Explorez {allBusinesses.length + featuredBusinesses.length} opportunités d'affaires
             </p>
           </div>
@@ -162,8 +162,8 @@ const Businesses = () => {
       {/* All Listings */}
       <section className="py-12 bg-background">
         <div className="container mx-auto px-4">
-          <div className="flex justify-between items-center mb-8">
-            <h2 className="text-3xl font-display font-bold text-foreground">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
+            <h2 className="text-xl sm:text-3xl font-display font-bold text-foreground">
               Toutes les annonces ({filteredBusinesses.length})
             </h2>
             
@@ -172,24 +172,24 @@ const Businesses = () => {
                 variant={viewMode === 'grid' ? 'default' : 'ghost'} 
                 size="sm" 
                 onClick={() => setViewMode('grid')} 
-                className="gap-2 rounded-lg"
+                className="gap-1 sm:gap-2 rounded-lg text-xs sm:text-sm px-2 sm:px-3"
               >
-                <Grid3x3 className="h-4 w-4" />
-                Grille
+                <Grid3x3 className="h-3 sm:h-4 w-3 sm:w-4" />
+                <span className="hidden sm:inline">Grille</span>
               </Button>
               <Button 
                 variant={viewMode === 'list' ? 'default' : 'ghost'} 
                 size="sm" 
                 onClick={() => setViewMode('list')} 
-                className="gap-2 rounded-lg"
+                className="gap-1 sm:gap-2 rounded-lg text-xs sm:text-sm px-2 sm:px-3"
               >
-                <List className="h-4 w-4" />
-                Liste
+                <List className="h-3 sm:h-4 w-3 sm:w-4" />
+                <span className="hidden sm:inline">Liste</span>
               </Button>
             </div>
           </div>
 
-          <div className={viewMode === 'grid' ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" : "space-y-4"}>
+          <div className={viewMode === 'grid' ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8" : "space-y-3 sm:space-y-4"}>
             {filteredBusinesses.length > 0 ? (
               filteredBusinesses.map((business) => 
                 viewMode === 'grid' ? (
