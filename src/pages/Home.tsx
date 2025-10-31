@@ -172,14 +172,14 @@ const Home = () => {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="text-center p-8 rounded-2xl bg-card border border-border hover:shadow-lg transition-shadow">
-              <Clock className="w-12 h-12 mx-auto mb-4 text-secondary" />
-              <h3 className="text-xl font-bold mb-2">Support rapide</h3>
-              <p className="text-muted-foreground">Notre équipe vous accompagne à chaque étape</p>
+              <TrendingUp className="w-12 h-12 mx-auto mb-4 text-secondary" />
+              <h3 className="text-xl font-bold mb-2">Statistiques en temps réel</h3>
+              <p className="text-muted-foreground">Suivez la performance de vos annonces avec des statistiques détaillées</p>
             </div>
             <div className="text-center p-8 rounded-2xl bg-card border border-border hover:shadow-lg transition-shadow">
-              <TrendingUp className="w-12 h-12 mx-auto mb-4 text-secondary" />
-              <h3 className="text-xl font-bold mb-2">Large sélection</h3>
-              <p className="text-muted-foreground">Des milliers d'opportunités d'affaires au Québec</p>
+              <Clock className="w-12 h-12 mx-auto mb-4 text-secondary" />
+              <h3 className="text-xl font-bold mb-2">Plateforme intelligente</h3>
+              <p className="text-muted-foreground">Gérez vos annonces facilement et voyez leur impact en direct</p>
             </div>
           </div>
         </div>
