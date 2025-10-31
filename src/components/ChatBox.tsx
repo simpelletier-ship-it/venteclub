@@ -46,6 +46,7 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
   const [sellerContact, setSellerContact] = useState<any>(null);
   const [businessSlug, setBusinessSlug] = useState<string | null>(null);
   const [currentUserProfile, setCurrentUserProfile] = useState<any>(null);
+  const [isSeller, setIsSeller] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
@@ -91,12 +92,15 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
   const fetchBusinessSlug = async () => {
     const { data } = await supabase
       .from('businesses')
-      .select('slug')
+      .select('slug, seller_id')
       .eq('id', businessId)
       .maybeSingle();
     
     if (data?.slug) {
       setBusinessSlug(data.slug);
+    }
+    if (data?.seller_id) {
+      setIsSeller(data.seller_id === currentUserId);
     }
   };
 
@@ -524,11 +528,11 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
 
       {/* Input Area - Style moderne */}
       <div className="p-6 border-t border-border/50 bg-gradient-to-r from-background via-muted/5 to-background backdrop-blur-sm space-y-4">
-        {/* Profile completion alert */}
-        <ProfileCompletionAlert profile={currentUserProfile} />
+        {/* Profile completion alert - Only for buyers */}
+        {!isSeller && <ProfileCompletionAlert profile={currentUserProfile} />}
         
-        {/* Quick message templates - Show only if no messages sent yet */}
-        {messages.filter(m => m.sender_id === currentUserId).length === 0 && (
+        {/* Quick message templates - Show only for buyers who haven't sent messages yet */}
+        {!isSeller && messages.filter(m => m.sender_id === currentUserId).length === 0 && (
           <QuickMessageTemplates onSelectTemplate={(template) => setNewMessage(template)} />
         )}
         
