@@ -302,7 +302,7 @@ const PropertyListings = () => {
         <div className="relative container mx-auto px-4 text-center">
           <div className="max-w-3xl mx-auto space-y-8 animate-slide-up">
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-foreground leading-tight">
-              Prêt à Investir dans <span className="text-secondary">l'Immobilier ?</span>
+              Prêt à Investir dans <span className="text-secondary whitespace-nowrap">l'Immobilier ?</span>
             </h2>
             <p className="text-xl md:text-2xl text-muted-foreground">
               Rejoignez des investisseurs qui font confiance à Vente.club
