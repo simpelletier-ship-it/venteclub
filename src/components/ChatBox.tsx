@@ -9,6 +9,8 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { QuickMessageTemplates } from "@/components/QuickMessageTemplates";
 import { ProfileCompletionAlert } from "@/components/ProfileCompletionAlert";
+import { ContactCard } from "@/components/ContactCard";
+import html2canvas from "html2canvas";
 
 interface Message {
   id: string;
@@ -47,8 +49,10 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
   const [businessSlug, setBusinessSlug] = useState<string | null>(null);
   const [currentUserProfile, setCurrentUserProfile] = useState<any>(null);
   const [includeContactCard, setIncludeContactCard] = useState(false);
+  const [isGeneratingCard, setIsGeneratingCard] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const contactCardRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -245,51 +249,56 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
     setSelectedFiles(selectedFiles.filter((_, i) => i !== index));
   };
 
-  const uploadFiles = async (messageId: string) => {
-    if (selectedFiles.length === 0) return;
-
-    setUploading(true);
+  const generateContactCardImage = async (): Promise<File | null> => {
+    if (!contactCardRef.current) return null;
+    
     try {
-      for (const file of selectedFiles) {
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${currentUserId}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-
-        const { error: uploadError } = await supabase.storage
-          .from('message-attachments')
-          .upload(fileName, file);
-
-        if (uploadError) throw uploadError;
-
-        const { data: { publicUrl } } = supabase.storage
-          .from('message-attachments')
-          .getPublicUrl(fileName);
-
-        await supabase.from('message_attachments').insert({
-          message_id: messageId,
-          file_name: file.name,
-          file_url: publicUrl,
-          file_type: file.type,
-          file_size: file.size,
-        });
-      }
-
-      setSelectedFiles([]);
-    } catch (error: any) {
+      setIsGeneratingCard(true);
+      const canvas = await html2canvas(contactCardRef.current, {
+        backgroundColor: '#ffffff',
+        scale: 2,
+        logging: false,
+        useCORS: true,
+      });
+      
+      return new Promise((resolve) => {
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const file = new File([blob], 'carte-contact.png', { type: 'image/png' });
+            resolve(file);
+          } else {
+            resolve(null);
+          }
+        }, 'image/png');
+      });
+    } catch (error) {
+      console.error('Error generating contact card:', error);
       toast({
         variant: "destructive",
         title: "Erreur",
-        description: "Impossible d'envoyer les fichiers",
+        description: "Impossible de générer la carte de contact",
       });
+      return null;
     } finally {
-      setUploading(false);
+      setIsGeneratingCard(false);
     }
   };
 
   const sendMessage = async () => {
-    if (!newMessage.trim() && selectedFiles.length === 0) return;
+    if (!newMessage.trim() && selectedFiles.length === 0 && !includeContactCard) return;
 
     setLoading(true);
     try {
+      let filesToUpload = [...selectedFiles];
+      
+      // Generate contact card image if requested
+      if (includeContactCard && currentUserProfile) {
+        const contactCardFile = await generateContactCardImage();
+        if (contactCardFile) {
+          filesToUpload = [...filesToUpload, contactCardFile];
+        }
+      }
+
       // Check if this is the first message from this user for this business
       const { data: existingMessages } = await supabase
         .from('messages')
@@ -300,13 +309,7 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
 
       const isFirstMessage = !existingMessages || existingMessages.length === 0;
 
-      let messageContent = newMessage.trim() || "[Fichier joint]";
-      
-      // Add contact card if requested
-      if (includeContactCard && currentUserProfile) {
-        const contactCard = `\n\n━━━━━━━━━━━━━━━━━━━━\n📇 MES COORDONNÉES\n━━━━━━━━━━━━━━━━━━━━\n${currentUserProfile.first_name && currentUserProfile.last_name ? `👤 ${currentUserProfile.first_name} ${currentUserProfile.last_name}\n` : ''}${currentUserProfile.phone ? `📱 ${currentUserProfile.phone}\n` : ''}${currentUserProfile.email ? `📧 ${currentUserProfile.email}\n` : ''}${currentUserProfile.company_name ? `🏢 ${currentUserProfile.company_name}\n` : ''}${currentUserProfile.job_title ? `💼 ${currentUserProfile.job_title}\n` : ''}${currentUserProfile.linkedin_url ? `🔗 ${currentUserProfile.linkedin_url}\n` : ''}━━━━━━━━━━━━━━━━━━━━`;
-        messageContent += contactCard;
-      }
+      const messageContent = newMessage.trim() || (filesToUpload.length > 0 ? "[Fichier joint]" : "");
 
       const { data: messageData, error } = await supabase
         .from('messages')
@@ -332,11 +335,39 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
           });
       }
 
-      if (selectedFiles.length > 0) {
-        await uploadFiles(messageData.id);
+      // Upload files including contact card if generated
+      if (filesToUpload.length > 0) {
+        setUploading(true);
+        try {
+          for (const file of filesToUpload) {
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${currentUserId}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+
+            const { error: uploadError } = await supabase.storage
+              .from('message-attachments')
+              .upload(fileName, file);
+
+            if (uploadError) throw uploadError;
+
+            const { data: { publicUrl } } = supabase.storage
+              .from('message-attachments')
+              .getPublicUrl(fileName);
+
+            await supabase.from('message_attachments').insert({
+              message_id: messageData.id,
+              file_name: file.name,
+              file_url: publicUrl,
+              file_type: file.type,
+              file_size: file.size,
+            });
+          }
+        } finally {
+          setUploading(false);
+        }
       }
 
       setNewMessage("");
+      setSelectedFiles([]);
       setIncludeContactCard(false);
     } catch (error: any) {
       toast({
@@ -389,7 +420,15 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
   };
 
   return (
-    <div className="flex flex-col h-full bg-background rounded-2xl shadow-lg overflow-hidden">
+    <>
+      {/* Hidden contact card for image generation */}
+      <div className="fixed -left-[9999px] -top-[9999px]">
+        <div ref={contactCardRef}>
+          {currentUserProfile && <ContactCard profile={currentUserProfile} />}
+        </div>
+      </div>
+
+      <div className="flex flex-col h-full bg-background rounded-2xl shadow-lg overflow-hidden">
       {/* Header - Style moderne */}
       <div className="bg-gradient-to-r from-primary/5 via-secondary/5 to-primary/5 p-6 border-b border-border/50 backdrop-blur-sm">
         <div className="flex items-center gap-4">
@@ -638,6 +677,7 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
           <span>Max 5 fichiers (10 Mo chacun)</span>
         </p>
       </div>
-    </div>
+      </div>
+    </>
   );
 };
