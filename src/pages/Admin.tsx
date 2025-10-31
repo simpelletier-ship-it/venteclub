@@ -569,7 +569,7 @@ const Admin = () => {
           // Get business details
           const { data: businessData } = await supabase
             .from('businesses')
-            .select('title, industry, location')
+            .select('title, industry, location, slug')
             .eq('id', report.business_id)
             .maybeSingle();
 
@@ -835,7 +835,7 @@ const Admin = () => {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => navigate(`/business/${business.id}`)}
+                    onClick={() => navigate(`/entreprise/${business.slug}`)}
                   >
                     <Eye className="mr-2 h-4 w-4" />
                     Voir
@@ -960,7 +960,7 @@ const Admin = () => {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => navigate(`/business/${business.id}`)}
+                            onClick={() => navigate(`/entreprise/${business.slug}`)}
                           >
                             <Eye className="mr-2 h-4 w-4" />
                             Voir l'annonce actuelle
@@ -1106,11 +1106,11 @@ const Admin = () => {
                         )}
 
                         <div className="flex gap-2 flex-wrap">
-                          {report.business_id && (
+                          {report.business_id && report.businesses?.slug && (
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => navigate(`/business/${report.business_id}`)}
+                              onClick={() => navigate(`/entreprise/${report.businesses.slug}`)}
                             >
                               <Eye className="mr-2 h-4 w-4" />
                               Voir l'annonce

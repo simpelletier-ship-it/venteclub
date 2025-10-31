@@ -413,7 +413,7 @@ const BusinessDetails = () => {
         "name": "Vente.club"
       },
       "itemCondition": "https://schema.org/UsedCondition",
-      "url": `https://vente.club/business/${business.slug}`
+      "url": `https://vente.club/entreprise/${business.slug}`
     },
     "location": {
       "@type": "Place",
@@ -438,7 +438,7 @@ const BusinessDetails = () => {
         title={`${business.title} à Vendre ${business.asking_price > 0 ? `- ${business.asking_price.toLocaleString()} $` : '- Prix à discuter'} | ${business.city}, Québec`}
         description={`${business.is_franchise ? 'Franchise' : 'Entreprise'} ${business.industry} à vendre à ${business.city}. ${business.description.substring(0, 120)}... ${business.annual_revenue ? `Revenus annuels: ${business.annual_revenue.toLocaleString()} $` : ''} Contact direct avec le propriétaire.`}
         keywords={`entreprise à vendre ${business.city}, ${business.industry} à vendre québec, commerce à vendre ${business.city}, achat entreprise ${business.industry}, ${business.is_franchise ? 'franchise à vendre' : 'PME à vendre'}, affaires québec, vente commerce ${business.city}`}
-        canonical={`/business/${business.slug}`}
+        canonical={`/entreprise/${business.slug}`}
         type="product"
         structuredData={businessStructuredData}
       />

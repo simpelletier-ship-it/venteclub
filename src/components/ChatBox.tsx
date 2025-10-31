@@ -42,6 +42,7 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
   const [uploading, setUploading] = useState(false);
   const [otherUserProfile, setOtherUserProfile] = useState<any>(null);
   const [sellerContact, setSellerContact] = useState<any>(null);
+  const [businessSlug, setBusinessSlug] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
@@ -51,6 +52,7 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
     fetchMessages();
     fetchOtherUserProfile();
     fetchSellerContact();
+    fetchBusinessSlug();
     
     // Subscribe to realtime messages
     const channel = supabase
@@ -81,6 +83,18 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
       supabase.removeChannel(channel);
     };
   }, [businessId, currentUserId, otherUserId]);
+
+  const fetchBusinessSlug = async () => {
+    const { data } = await supabase
+      .from('businesses')
+      .select('slug')
+      .eq('id', businessId)
+      .maybeSingle();
+    
+    if (data?.slug) {
+      setBusinessSlug(data.slug);
+    }
+  };
 
   const fetchOtherUserProfile = async () => {
     const { data } = await supabase
@@ -368,12 +382,12 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
               {otherUserProfile?.full_name || otherUserName || "Utilisateur"}
             </h3>
             
-            {businessTitle && (
+            {businessTitle && businessSlug && (
               <Button
                 variant="link"
                 size="sm"
                 className="h-auto p-0 text-sm font-medium hover:text-primary mb-2"
-                onClick={() => navigate(`/business/${businessId}`)}
+                onClick={() => navigate(`/entreprise/${businessSlug}`)}
               >
                 <ExternalLink className="mr-1 h-4 w-4" />
                 {businessTitle}
