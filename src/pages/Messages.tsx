@@ -196,55 +196,58 @@ const Messages = () => {
           </Card>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Liste des conversations */}
-            <Card className="lg:col-span-1">
-              <CardContent className="p-4">
-                <h2 className="font-semibold mb-4 flex items-center gap-2">
-                  <MessageSquare className="h-5 w-5" />
-                  Conversations
-                </h2>
-                <ScrollArea className="h-[600px]">
-                  <div className="space-y-2">
-                    {conversations.map((conv) => (
-                      <div
-                        key={`${conv.business_id}-${conv.other_user_id}`}
-                        className={`p-3 rounded-lg cursor-pointer transition-colors ${
-                          selectedConversation?.business_id === conv.business_id &&
-                          selectedConversation?.other_user_id === conv.other_user_id
-                            ? 'bg-primary/10 border-2 border-primary'
-                            : 'bg-accent/20 hover:bg-accent/50 border-2 border-transparent'
-                        }`}
-                        onClick={() => handleConversationClick(conv)}
-                      >
-                        <div className="flex items-start justify-between mb-2">
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-1">
-                              <h3 className="font-semibold text-sm truncate">{conv.business_title}</h3>
-                              {conv.unread_count > 0 && (
-                                <Badge variant="destructive" className="h-5 min-w-5 px-1.5 text-xs flex-shrink-0">
-                                  {conv.unread_count}
-                                </Badge>
-                              )}
-                            </div>
-                            <p className="text-xs text-muted-foreground mb-1">
-                              {conv.is_seller ? '🔑 Acheteur' : '🛒 Vendeur'}: {conv.other_user_email}
-                            </p>
-                            <p className="text-sm text-muted-foreground truncate">
-                              {conv.last_message}
-                            </p>
-                          </div>
-                          <div className="flex flex-col items-end gap-1 ml-2 flex-shrink-0">
-                            <span className="text-xs text-muted-foreground whitespace-nowrap">
-                              {new Date(conv.last_message_time).toLocaleDateString('fr-CA', {
-                                day: 'numeric',
-                                month: 'short',
-                              })}
-                            </span>
-                            {conv.unread_count > 0 && (
-                              <Circle className="w-2 h-2 fill-primary text-primary" />
-                            )}
-                          </div>
+        {/* Liste des conversations - Style moderne */}
+        <Card className="lg:col-span-1 border-border/50 shadow-lg">
+          <CardContent className="p-5">
+            <h2 className="font-bold text-lg mb-5 flex items-center gap-2 text-foreground">
+              <div className="p-2 rounded-lg bg-primary/10">
+                <MessageSquare className="h-5 w-5 text-primary" />
+              </div>
+              Conversations
+            </h2>
+            <ScrollArea className="h-[600px] pr-4">
+              <div className="space-y-3">
+                {conversations.map((conv) => (
+                  <div
+                    key={`${conv.business_id}-${conv.other_user_id}`}
+                    className={`p-4 rounded-xl cursor-pointer transition-all duration-200 ${
+                      selectedConversation?.business_id === conv.business_id &&
+                      selectedConversation?.other_user_id === conv.other_user_id
+                        ? 'bg-gradient-to-br from-primary/15 to-primary/5 border-2 border-primary/50 shadow-md'
+                        : 'bg-card border border-border/50 hover:bg-muted/50 hover:border-primary/30 hover:shadow-md'
+                    }`}
+                    onClick={() => handleConversationClick(conv)}
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-2">
+                          <h3 className="font-bold text-sm truncate">{conv.business_title}</h3>
+                          {conv.unread_count > 0 && (
+                            <Badge className="h-5 min-w-5 px-2 text-xs flex-shrink-0 bg-gradient-to-r from-primary to-primary/90 shadow-sm">
+                              {conv.unread_count}
+                            </Badge>
+                          )}
                         </div>
+                        <p className="text-xs font-medium text-muted-foreground mb-2 flex items-center gap-1.5">
+                          <span className="text-base">{conv.is_seller ? '🛒' : '🔑'}</span>
+                          {conv.is_seller ? 'Acheteur' : 'Vendeur'}: {conv.other_user_name}
+                        </p>
+                        <p className="text-sm text-muted-foreground/80 truncate leading-relaxed">
+                          {conv.last_message}
+                        </p>
+                      </div>
+                      <div className="flex flex-col items-end gap-2 ml-3 flex-shrink-0">
+                        <span className="text-xs font-medium text-muted-foreground whitespace-nowrap">
+                          {new Date(conv.last_message_time).toLocaleDateString('fr-CA', {
+                            day: 'numeric',
+                            month: 'short',
+                          })}
+                        </span>
+                        {conv.unread_count > 0 && (
+                          <div className="w-2 h-2 rounded-full bg-gradient-to-r from-primary to-primary/90 shadow-sm" />
+                        )}
+                      </div>
+                    </div>
                       </div>
                     ))}
                   </div>
@@ -252,30 +255,37 @@ const Messages = () => {
               </CardContent>
             </Card>
 
-            {/* Zone de chat */}
-            <Card className="lg:col-span-2">
-              <CardContent className="p-6">
+            {/* Zone de chat - Style moderne */}
+            <Card className="lg:col-span-2 border-border/50 shadow-lg overflow-hidden">
+              <CardContent className="p-0 h-[690px] flex flex-col">
                 {selectedConversation ? (
-                  <div>
-                    <div className="mb-4 pb-4 border-b">
-                      <h2 className="text-xl font-bold">{selectedConversation.business_title}</h2>
-                      <p className="text-sm text-muted-foreground">
+                  <>
+                    <div className="p-6 border-b border-border/50 bg-gradient-to-r from-background via-muted/5 to-background">
+                      <h2 className="text-xl font-bold text-foreground mb-1">{selectedConversation.business_title}</h2>
+                      <p className="text-sm text-muted-foreground font-medium">
                         Conversation avec {selectedConversation.other_user_name}
                       </p>
                     </div>
-                    <ChatBox
-                      businessId={selectedConversation.business_id}
-                      currentUserId={user?.id}
-                      otherUserId={selectedConversation.other_user_id}
-                      otherUserName={selectedConversation.other_user_name}
-                    />
-                  </div>
+                    <div className="flex-1 overflow-hidden">
+                      <ChatBox
+                        businessId={selectedConversation.business_id}
+                        currentUserId={user?.id}
+                        otherUserId={selectedConversation.other_user_id}
+                        otherUserName={selectedConversation.other_user_name}
+                      />
+                    </div>
+                  </>
                 ) : (
-                  <div className="flex items-center justify-center h-[600px]">
+                  <div className="flex items-center justify-center h-full bg-gradient-to-br from-background to-muted/5">
                     <div className="text-center">
-                      <MessageSquare className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+                      <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
+                        <MessageSquare className="h-12 w-12 text-primary/50" />
+                      </div>
+                      <p className="text-lg font-semibold text-foreground mb-2">
+                        Sélectionnez une conversation
+                      </p>
                       <p className="text-muted-foreground">
-                        Sélectionnez une conversation pour commencer
+                        Choisissez une conversation pour commencer à discuter
                       </p>
                     </div>
                   </div>

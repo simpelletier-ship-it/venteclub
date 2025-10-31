@@ -70,9 +70,16 @@ const BusinessCard = ({
   const displayPrice = asking_price === 0 ? 'À discuter' : asking_price ? `${asking_price.toLocaleString('fr-CA')} $` : 'N/A';
   const displayBaiia = baiia ? `${baiia.toLocaleString('fr-CA')} $` : 'N/D';
 
-  // Déterminer le type d'annonce
+  // Déterminer le type d'annonce - check both sale_type and industry for property detection
   const getBusinessType = () => {
-    if (sale_type === 'property') {
+    const propertyIndustries = ['Immobilier', 'Construction', 'Location immobilière'];
+    const isProperty = sale_type === 'property' || 
+                      propertyIndustries.some(ind => title.toLowerCase().includes('immeuble') || 
+                      title.toLowerCase().includes('propriété') ||
+                      description?.toLowerCase().includes('immeuble') ||
+                      description?.toLowerCase().includes('propriété'));
+    
+    if (isProperty) {
       return { label: 'Immobilier', icon: Home, color: 'bg-emerald-500' };
     }
     if (is_franchise) {
