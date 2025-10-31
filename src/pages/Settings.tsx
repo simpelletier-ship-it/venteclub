@@ -31,6 +31,10 @@ const Settings = () => {
     is_public: false,
     newsletter_enabled: false,
     marketing_emails: false,
+    date_of_birth: "",
+    linkedin_url: "",
+    company_name: "",
+    job_title: "",
   });
   const [uploading, setUploading] = useState(false);
   const [activeTab, setActiveTab] = useState("personal");
@@ -68,6 +72,10 @@ const Settings = () => {
           is_public: profileData.is_public || false,
           newsletter_enabled: profileData.newsletter_enabled || false,
           marketing_emails: profileData.marketing_emails || false,
+          date_of_birth: profileData.date_of_birth || "",
+          linkedin_url: profileData.linkedin_url || "",
+          company_name: profileData.company_name || "",
+          job_title: profileData.job_title || "",
         });
       }
     } catch (error: any) {
@@ -95,6 +103,10 @@ const Settings = () => {
           is_public: profile.is_public,
           newsletter_enabled: profile.newsletter_enabled,
           marketing_emails: profile.marketing_emails,
+          date_of_birth: profile.date_of_birth || null,
+          linkedin_url: profile.linkedin_url,
+          company_name: profile.company_name,
+          job_title: profile.job_title,
           updated_at: new Date().toISOString(),
         });
 
@@ -239,13 +251,13 @@ const Settings = () => {
 
             <TabsContent value="personal" className="space-y-6">
               <Card>
-                <CardHeader>
+                  <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-primary">
                     <User className="h-5 w-5" />
                     Informations personnelles
                   </CardTitle>
                   <CardDescription>
-                    Informations personnelles
+                    Ces informations seront visibles par les vendeurs lors de vos échanges.
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -300,6 +312,55 @@ const Settings = () => {
                         value={profile.email}
                         disabled
                         className="bg-muted mt-2"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="date_of_birth">Date de naissance</Label>
+                      <Input
+                        id="date_of_birth"
+                        type="date"
+                        value={profile.date_of_birth}
+                        onChange={(e) => setProfile({ ...profile, date_of_birth: e.target.value })}
+                        className="mt-2"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="linkedin_url">Profil LinkedIn</Label>
+                      <Input
+                        id="linkedin_url"
+                        type="url"
+                        value={profile.linkedin_url}
+                        onChange={(e) => setProfile({ ...profile, linkedin_url: e.target.value })}
+                        placeholder="https://linkedin.com/in/votre-profil"
+                        className="mt-2"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="company_name">Entreprise</Label>
+                      <Input
+                        id="company_name"
+                        type="text"
+                        value={profile.company_name}
+                        onChange={(e) => setProfile({ ...profile, company_name: e.target.value })}
+                        placeholder="Nom de votre entreprise"
+                        className="mt-2"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="job_title">Titre de poste</Label>
+                      <Input
+                        id="job_title"
+                        type="text"
+                        value={profile.job_title}
+                        onChange={(e) => setProfile({ ...profile, job_title: e.target.value })}
+                        placeholder="Ex: Entrepreneur, Investisseur"
+                        className="mt-2"
                       />
                     </div>
                   </div>

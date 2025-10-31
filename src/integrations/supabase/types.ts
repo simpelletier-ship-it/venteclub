@@ -762,14 +762,18 @@ export type Database = {
           avatar_url: string | null
           bio: string | null
           city: string | null
+          company_name: string | null
           country: string | null
           created_at: string | null
+          date_of_birth: string | null
           email: string | null
           first_name: string | null
           full_name: string | null
           id: string
           is_public: boolean | null
+          job_title: string | null
           last_name: string | null
+          linkedin_url: string | null
           marketing_emails: boolean | null
           newsletter_enabled: boolean | null
           phone: string | null
@@ -783,14 +787,18 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           city?: string | null
+          company_name?: string | null
           country?: string | null
           created_at?: string | null
+          date_of_birth?: string | null
           email?: string | null
           first_name?: string | null
           full_name?: string | null
           id: string
           is_public?: boolean | null
+          job_title?: string | null
           last_name?: string | null
+          linkedin_url?: string | null
           marketing_emails?: boolean | null
           newsletter_enabled?: boolean | null
           phone?: string | null
@@ -804,14 +812,18 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           city?: string | null
+          company_name?: string | null
           country?: string | null
           created_at?: string | null
+          date_of_birth?: string | null
           email?: string | null
           first_name?: string | null
           full_name?: string | null
           id?: string
           is_public?: boolean | null
+          job_title?: string | null
           last_name?: string | null
+          linkedin_url?: string | null
           marketing_emails?: boolean | null
           newsletter_enabled?: boolean | null
           phone?: string | null

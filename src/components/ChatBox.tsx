@@ -4,9 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Send, Paperclip, X, Download, FileText, Image as ImageIcon, ExternalLink, Mail, Phone, User } from "lucide-react";
+import { Send, Paperclip, X, Download, FileText, Image as ImageIcon, ExternalLink, Mail, Phone, User, IdCard } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { QuickMessageTemplates } from "@/components/QuickMessageTemplates";
+import { ProfileCompletionAlert } from "@/components/ProfileCompletionAlert";
 
 interface Message {
   id: string;
@@ -43,6 +45,8 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
   const [otherUserProfile, setOtherUserProfile] = useState<any>(null);
   const [sellerContact, setSellerContact] = useState<any>(null);
   const [businessSlug, setBusinessSlug] = useState<string | null>(null);
+  const [currentUserProfile, setCurrentUserProfile] = useState<any>(null);
+  const [includeContactCard, setIncludeContactCard] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
@@ -53,6 +57,7 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
     fetchOtherUserProfile();
     fetchSellerContact();
     fetchBusinessSlug();
+    fetchCurrentUserProfile();
     
     // Subscribe to realtime messages
     const channel = supabase
@@ -93,6 +98,18 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
     
     if (data?.slug) {
       setBusinessSlug(data.slug);
+    }
+  };
+
+  const fetchCurrentUserProfile = async () => {
+    const { data } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', currentUserId)
+      .single();
+    
+    if (data) {
+      setCurrentUserProfile(data);
     }
   };
 
@@ -283,13 +300,21 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
 
       const isFirstMessage = !existingMessages || existingMessages.length === 0;
 
+      let messageContent = newMessage.trim() || "[Fichier joint]";
+      
+      // Add contact card if requested
+      if (includeContactCard && currentUserProfile) {
+        const contactCard = `\n\n━━━━━━━━━━━━━━━━━━━━\n📇 MES COORDONNÉES\n━━━━━━━━━━━━━━━━━━━━\n${currentUserProfile.first_name && currentUserProfile.last_name ? `👤 ${currentUserProfile.first_name} ${currentUserProfile.last_name}\n` : ''}${currentUserProfile.phone ? `📱 ${currentUserProfile.phone}\n` : ''}${currentUserProfile.email ? `📧 ${currentUserProfile.email}\n` : ''}${currentUserProfile.company_name ? `🏢 ${currentUserProfile.company_name}\n` : ''}${currentUserProfile.job_title ? `💼 ${currentUserProfile.job_title}\n` : ''}${currentUserProfile.linkedin_url ? `🔗 ${currentUserProfile.linkedin_url}\n` : ''}━━━━━━━━━━━━━━━━━━━━`;
+        messageContent += contactCard;
+      }
+
       const { data: messageData, error } = await supabase
         .from('messages')
         .insert({
           business_id: businessId,
           sender_id: currentUserId,
           receiver_id: otherUserId,
-          content: newMessage.trim() || "[Fichier joint]",
+          content: messageContent,
         })
         .select()
         .single();
@@ -312,6 +337,7 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
       }
 
       setNewMessage("");
+      setIncludeContactCard(false);
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -515,9 +541,17 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
       </ScrollArea>
 
       {/* Input Area - Style moderne */}
-      <div className="p-6 border-t border-border/50 bg-gradient-to-r from-background via-muted/5 to-background backdrop-blur-sm">
+      <div className="p-6 border-t border-border/50 bg-gradient-to-r from-background via-muted/5 to-background backdrop-blur-sm space-y-4">
+        {/* Profile completion alert */}
+        <ProfileCompletionAlert profile={currentUserProfile} />
+        
+        {/* Quick message templates - Show only if no messages sent yet */}
+        {messages.filter(m => m.sender_id === currentUserId).length === 0 && (
+          <QuickMessageTemplates onSelectTemplate={(template) => setNewMessage(template)} />
+        )}
+        
         {selectedFiles.length > 0 && (
-          <div className="mb-4 space-y-2">
+          <div className="space-y-2">
             {selectedFiles.map((file, index) => (
               <div
                 key={index}
@@ -543,41 +577,60 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
           </div>
         )}
         
-        <div className="flex gap-3">
-          <input
-            ref={fileInputRef}
-            type="file"
-            multiple
-            className="hidden"
-            onChange={handleFileSelect}
-            accept="image/*,.pdf,.doc,.docx,.txt"
-          />
-          <Button
-            type="button"
-            variant="outline"
-            size="icon"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={loading || uploading}
-            className="h-12 w-12 shrink-0 rounded-xl hover:bg-primary/10 hover:border-primary/50 transition-all duration-200"
-          >
-            <Paperclip className="h-5 w-5" />
-          </Button>
-          <Textarea
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-            onKeyPress={handleKeyPress}
-            placeholder="Écrivez votre message..."
-            className="min-h-[56px] max-h-[120px] resize-none rounded-xl border-border/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-200"
-            disabled={loading || uploading}
-          />
-          <Button
-            onClick={sendMessage}
-            disabled={loading || uploading || (!newMessage.trim() && selectedFiles.length === 0)}
-            size="icon"
-            className="h-12 w-12 shrink-0 rounded-xl bg-gradient-to-br from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-lg hover:shadow-xl transition-all duration-200"
-          >
-            <Send className="h-5 w-5" />
-          </Button>
+        <div className="space-y-2">
+          <div className="flex gap-3">
+            <input
+              ref={fileInputRef}
+              type="file"
+              multiple
+              className="hidden"
+              onChange={handleFileSelect}
+              accept="image/*,.pdf,.doc,.docx,.txt"
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={loading || uploading}
+              className="h-12 w-12 shrink-0 rounded-xl hover:bg-primary/10 hover:border-primary/50 transition-all duration-200"
+            >
+              <Paperclip className="h-5 w-5" />
+            </Button>
+            <Textarea
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder="Écrivez votre message..."
+              className="min-h-[56px] max-h-[120px] resize-none rounded-xl border-border/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-200"
+              disabled={loading || uploading}
+            />
+            <Button
+              type="button"
+              variant={includeContactCard ? "default" : "outline"}
+              size="icon"
+              onClick={() => setIncludeContactCard(!includeContactCard)}
+              disabled={loading || uploading}
+              className="h-12 w-12 shrink-0 rounded-xl transition-all duration-200"
+              title="Inclure ma fiche de contact"
+            >
+              <IdCard className="h-5 w-5" />
+            </Button>
+            <Button
+              onClick={sendMessage}
+              disabled={loading || uploading || (!newMessage.trim() && selectedFiles.length === 0)}
+              size="icon"
+              className="h-12 w-12 shrink-0 rounded-xl bg-gradient-to-br from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-lg hover:shadow-xl transition-all duration-200"
+            >
+              <Send className="h-5 w-5" />
+            </Button>
+          </div>
+          {includeContactCard && (
+            <p className="text-xs text-muted-foreground flex items-center gap-1">
+              <IdCard className="h-3 w-3" />
+              Votre fiche de contact sera incluse dans le message
+            </p>
+          )}
         </div>
         <p className="text-xs text-muted-foreground/70 mt-3 flex items-center gap-1">
           <span>Appuyez sur Entrée pour envoyer</span>
