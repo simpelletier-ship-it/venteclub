@@ -39,11 +39,20 @@ const imageMap: Record<string, string> = {
   "/src/assets/blog-evaluation-realiste.jpg": blogEvaluationRealiste,
   "/src/assets/blog-conseiller-juridique.jpg": blogConseillerJuridique,
   "/src/assets/blog-planification-fiscale.jpg": blogPlanificationFiscale,
+  "/blog-10-choses-vente.jpg": blog10Choses,
   "/blog-acquisition.jpg": blogAcheter,
   "/blog-vente.jpg": blogPreparer,
   "/blog-finance.jpg": blogFinancement,
   "/blog-franchises.jpg": blogDueDiligence,
   "/blog-tendances.jpg": blogTendances,
+  "/blog-preparer-vente.jpg": blogPreparer,
+  "/blog-acheter-entreprise.jpg": blogAcheter,
+  "/blog-evaluation-entreprise.jpg": blogEvaluation,
+  "/blog-financement.jpg": blogFinancement,
+  "/blog-due-diligence.jpg": blogDueDiligence,
+  "/blog-conseiller-juridique.jpg": blogConseillerJuridique,
+  "/blog-evaluation-realiste.jpg": blogEvaluationRealiste,
+  "/blog-planification-fiscale.jpg": blogPlanificationFiscale,
 };
 
 const BlogPost = () => {
