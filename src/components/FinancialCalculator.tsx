@@ -216,16 +216,32 @@ export const FinancialCalculator = ({ askingPrice }: FinancialCalculatorProps) =
           />
         </div>
 
-        {/* Résultats */}
-        <div className="pt-6 border-t border-border/50 space-y-4">
-          <div className="bg-gradient-to-r from-primary/5 to-secondary/5 rounded-xl p-4 space-y-3">
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-muted-foreground font-medium">Montant à financer</span>
-              <span className="text-lg font-bold text-foreground">{formatCurrency(loanAmount)}</span>
+        {/* Balance de prix de vente */}
+        <div className="pt-4 border-t border-border/50">
+          <div className="bg-muted/30 rounded-lg p-4 space-y-3">
+            <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider">Décomposition du financement</h3>
+            <div className="space-y-2">
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-muted-foreground">Prix de vente</span>
+                <span className="font-semibold text-foreground">{formatCurrency(salePrice)}</span>
+              </div>
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-muted-foreground">Mise de fond ({downPaymentPercent}%)</span>
+                <span className="font-semibold text-foreground">- {formatCurrency(downPayment)}</span>
+              </div>
+              <div className="flex justify-between items-center pt-2 border-t border-border/50">
+                <span className="text-base font-bold text-foreground">Balance de prix de vente</span>
+                <span className="text-xl font-display font-bold text-secondary">{formatCurrency(loanAmount)}</span>
+              </div>
             </div>
-            
-            <div className="flex justify-between items-center pt-3 border-t border-border/30">
-              <span className="text-base font-semibold text-foreground">Paiement mensuel</span>
+          </div>
+        </div>
+
+        {/* Résultats */}
+        <div className="space-y-4">
+          <div className="bg-gradient-to-r from-primary/5 to-secondary/5 rounded-xl p-4">
+            <div className="flex justify-between items-center">
+              <span className="text-base font-semibold text-foreground">Paiement mensuel estimé</span>
               <span className="text-2xl font-display font-bold text-primary">
                 {formatCurrency(monthlyPayment)}<span className="text-sm text-muted-foreground">/mois</span>
               </span>
