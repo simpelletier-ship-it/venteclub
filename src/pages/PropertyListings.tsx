@@ -23,13 +23,25 @@ const PropertyListings = () => {
 
   const fetchProperties = async () => {
     try {
-      const { data: properties } = await supabase
+      // Fetch properties by checking if is_franchise is false and sale_type is not 'shares' or 'assets'
+      // This is a workaround until we add 'property' to the sale_type enum
+      const { data: allBusinesses } = await supabase
         .from('businesses')
         .select('*')
-        .eq('sale_type', 'property')
         .in('status', ['active', 'sold'])
         .eq('approval_status', 'approved')
+        .eq('is_franchise', false)
         .order('created_at', { ascending: false });
+
+      // Filter for properties (businesses that are not franchises and have property-related industries)
+      const propertyIndustries = ['Immobilier', 'Construction', 'Location immobilière'];
+      const properties = allBusinesses?.filter(b => 
+        propertyIndustries.includes(b.industry) || 
+        b.title.toLowerCase().includes('immeuble') ||
+        b.title.toLowerCase().includes('propriété') ||
+        b.description?.toLowerCase().includes('immeuble') ||
+        b.description?.toLowerCase().includes('propriété')
+      ) || [];
 
       if (properties) {
         const featured = properties.filter(p => p.featured && p.status === 'active').slice(0, 3);

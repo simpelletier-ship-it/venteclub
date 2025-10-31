@@ -111,6 +111,13 @@ const Header = () => {
               onClick={() => navigate("/")} 
               className="text-foreground/80 hover:text-foreground transition-colors font-medium relative group"
             >
+              Accueil
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full" />
+            </button>
+            <button 
+              onClick={() => navigate("/entreprises")} 
+              className="text-foreground/80 hover:text-foreground transition-colors font-medium relative group"
+            >
               Entreprises
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full" />
             </button>
@@ -244,6 +251,15 @@ const Header = () => {
             <button
               onClick={() => {
                 navigate("/");
+                setMobileMenuOpen(false);
+              }}
+              className="w-full text-left px-4 py-2 rounded-lg hover:bg-muted/50 transition-colors"
+            >
+              Accueil
+            </button>
+            <button
+              onClick={() => {
+                navigate("/entreprises");
                 setMobileMenuOpen(false);
               }}
               className="w-full text-left px-4 py-2 rounded-lg hover:bg-muted/50 transition-colors"
