@@ -196,12 +196,6 @@ const Home = () => {
                 L'achat d'une entreprise commence par l'identification d'opportunités sur Vente.club. Contactez les vendeurs, effectuez une due diligence, négociez le prix et finalisez avec des professionnels.
               </AccordionContent>
             </AccordionItem>
-            <AccordionItem value="item-2">
-              <AccordionTrigger>Combien coûte l'accès aux coordonnées du vendeur?</AccordionTrigger>
-              <AccordionContent>
-                L'accès aux coordonnées coûte 20$ CAD par annonce. Vous pouvez également souscrire à un abonnement Premium pour un accès illimité.
-              </AccordionContent>
-            </AccordionItem>
             <AccordionItem value="item-3">
               <AccordionTrigger>Comment vendre mon entreprise?</AccordionTrigger>
               <AccordionContent>
