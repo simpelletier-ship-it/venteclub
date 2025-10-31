@@ -21,6 +21,8 @@ const Auth = () => {
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [verificationStep, setVerificationStep] = useState(false);
   const [verificationCode, setVerificationCode] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [phoneAuthStep, setPhoneAuthStep] = useState<'input' | 'verify' | null>(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -306,6 +308,62 @@ const Auth = () => {
     }
   };
 
+  const handlePhoneSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const { error } = await supabase.auth.signInWithOtp({
+        phone: phoneNumber,
+      });
+
+      if (error) throw error;
+
+      setPhoneAuthStep('verify');
+      toast({
+        title: "Code envoyé !",
+        description: "Vérifiez vos SMS pour le code de vérification.",
+      });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: error.message,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyPhoneCode = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const { error } = await supabase.auth.verifyOtp({
+        phone: phoneNumber,
+        token: verificationCode,
+        type: 'sms',
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Connexion réussie !",
+        description: "Bienvenue sur Vente.Club",
+      });
+      navigate("/");
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Code invalide",
+        description: "Le code que vous avez entré est invalide ou expiré.",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/20 flex items-center justify-center p-4">
       <div className="max-w-md w-full">
@@ -359,6 +417,73 @@ const Auth = () => {
               </TabsList>
               
               <TabsContent value="login">
+                {phoneAuthStep === 'verify' ? (
+                  <form onSubmit={handleVerifyPhoneCode} className="space-y-4">
+                    <div className="text-center mb-6">
+                      <h3 className="text-lg font-semibold mb-2">Code de vérification SMS</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Entrez le code reçu au {phoneNumber}
+                      </p>
+                    </div>
+                    <div>
+                      <Label htmlFor="phone-verification-code">Code de vérification</Label>
+                      <Input
+                        id="phone-verification-code"
+                        type="text"
+                        placeholder="Entrez le code à 6 chiffres"
+                        value={verificationCode}
+                        onChange={(e) => setVerificationCode(e.target.value)}
+                        required
+                        maxLength={6}
+                        className="w-full mt-2 text-center text-2xl tracking-widest font-mono"
+                      />
+                    </div>
+                    <Button type="submit" disabled={loading || verificationCode.length !== 6} className="w-full">
+                      {loading ? "Vérification..." : "Vérifier le code"}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      onClick={() => {
+                        setPhoneAuthStep(null);
+                        setVerificationCode("");
+                        setPhoneNumber("");
+                      }}
+                      className="w-full"
+                    >
+                      Retour
+                    </Button>
+                  </form>
+                ) : phoneAuthStep === 'input' ? (
+                  <form onSubmit={handlePhoneSignIn} className="space-y-4">
+                    <div>
+                      <Label htmlFor="phone-login">Numéro de téléphone</Label>
+                      <Input
+                        id="phone-login"
+                        type="tel"
+                        placeholder="+1 (514) 555-0123"
+                        value={phoneNumber}
+                        onChange={(e) => setPhoneNumber(e.target.value)}
+                        required
+                        className="w-full mt-2"
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Format international requis (ex: +15145550123)
+                      </p>
+                    </div>
+                    <Button type="submit" disabled={loading} className="w-full">
+                      {loading ? "Envoi..." : "Recevoir le code SMS"}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      onClick={() => setPhoneAuthStep(null)}
+                      className="w-full"
+                    >
+                      Retour
+                    </Button>
+                  </form>
+                ) : (
                 <form onSubmit={handleSignIn} className="space-y-4">
                   <div>
                     <Label htmlFor="login-email">Email</Label>
@@ -431,7 +556,20 @@ const Auth = () => {
                     </svg>
                     Google
                   </Button>
+
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setPhoneAuthStep('input')}
+                    className="w-full"
+                  >
+                    <svg className="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                    </svg>
+                    Téléphone
+                  </Button>
                 </form>
+                )}
               </TabsContent>
               
               <TabsContent value="signup">
@@ -583,6 +721,18 @@ const Auth = () => {
                       />
                     </svg>
                     Google
+                  </Button>
+
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setPhoneAuthStep('input')}
+                    className="w-full"
+                  >
+                    <svg className="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                    </svg>
+                    Téléphone
                   </Button>
                 </form>
                 )}
