@@ -182,12 +182,12 @@ const ListProperty = () => {
           year_established: formData.year_built ? parseInt(formData.year_built) : null,
           status: 'active',
           approval_status: 'pending',
-          sale_type: 'immobilier' as any,
+          sale_type: 'property' as any,
           seller_phone: formData.seller_phone,
           slug: '',
         }])
         .select()
-        .single();
+        .maybeSingle();
 
       if (businessError) throw businessError;
 
