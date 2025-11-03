@@ -459,7 +459,7 @@ const Admin = () => {
     try {
       setUploadingImage(true);
       
-      // Validate form data
+      // Validate form data client-side first for immediate feedback
       const validated = editBusinessSchema.parse(editFormData);
 
       // Upload image if provided
@@ -468,8 +468,8 @@ const Admin = () => {
         photoUrl = await handleImageUpload(selectedBusiness?.id);
       }
 
-      // Update business
-      const updateData: any = {
+      // Use secure edge function for server-side validation and update
+      const updateData = {
         title: validated.title,
         description: validated.description,
         asking_price: parseFloat(validated.asking_price),
@@ -480,15 +480,16 @@ const Admin = () => {
         location: validated.location,
         city: validated.city,
         province: validated.province,
-        industry: validated.industry as any, // Cast to any to handle ENUM type
+        industry: validated.industry,
+        business_id: selectedBusiness?.id,
       };
 
-      const { error } = await supabase
-        .from('businesses')
-        .update(updateData)
-        .eq('id', selectedBusiness?.id);
+      const { data, error } = await supabase.functions.invoke('admin-update-business', {
+        body: updateData
+      });
 
       if (error) throw error;
+      if (data?.error) throw new Error(data.error);
 
       // Update or insert photo if uploaded
       if (photoUrl) {

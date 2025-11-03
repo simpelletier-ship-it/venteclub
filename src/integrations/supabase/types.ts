@@ -1096,6 +1096,33 @@ export type Database = {
         }
         Relationships: []
       }
+      verification_code_rate_limit: {
+        Row: {
+          attempts: number
+          created_at: string
+          email: string
+          id: string
+          ip_address: string | null
+          window_start: string
+        }
+        Insert: {
+          attempts?: number
+          created_at?: string
+          email: string
+          id?: string
+          ip_address?: string | null
+          window_start?: string
+        }
+        Update: {
+          attempts?: number
+          created_at?: string
+          email?: string
+          id?: string
+          ip_address?: string | null
+          window_start?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -1113,6 +1140,7 @@ export type Database = {
       cleanup_expired_sessions: { Args: never; Returns: undefined }
       cleanup_expired_verification_codes: { Args: never; Returns: undefined }
       cleanup_old_login_attempts: { Args: never; Returns: undefined }
+      cleanup_old_rate_limits: { Args: never; Returns: undefined }
       create_demo_businesses: { Args: never; Returns: undefined }
       create_sample_businesses: { Args: never; Returns: undefined }
       generate_slug: { Args: { title: string }; Returns: string }

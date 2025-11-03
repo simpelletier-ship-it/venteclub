@@ -285,15 +285,20 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
 
       if (error) throw error;
 
-      // Track lead analytics if this is the first message
+      // Track lead analytics if this is the first message - with error handling
       if (isFirstMessage) {
-        await supabase
-          .from('business_analytics')
-          .insert({
-            business_id: businessId,
-            event_type: 'lead',
-            user_id: currentUserId,
-          });
+        try {
+          await supabase
+            .from('business_analytics')
+            .insert({
+              business_id: businessId,
+              event_type: 'lead',
+              user_id: currentUserId,
+            });
+        } catch (analyticsError) {
+          // Silently fail if rate limited
+          console.log('Analytics tracking skipped:', analyticsError);
+        }
       }
 
       // Upload files including contact card if generated

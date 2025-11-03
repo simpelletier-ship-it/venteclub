@@ -23,6 +23,52 @@ const handler = async (req: Request): Promise<Response> => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
+    // Rate limiting: Check for existing requests in the last hour
+    const clientIp = req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "unknown";
+    
+    // Check rate limit by email (max 3 attempts per hour per email)
+    const { data: emailRateLimit, error: rateLimitError } = await supabase
+      .from('verification_code_rate_limit')
+      .select('attempts, window_start')
+      .eq('email', email)
+      .gte('window_start', new Date(Date.now() - 60 * 60 * 1000).toISOString())
+      .maybeSingle();
+
+    if (rateLimitError) {
+      console.error("Rate limit check error:", rateLimitError);
+    }
+
+    if (emailRateLimit) {
+      if (emailRateLimit.attempts >= 3) {
+        console.warn(`Rate limit exceeded for email: ${email}`);
+        return new Response(
+          JSON.stringify({ 
+            error: "Trop de tentatives. Veuillez réessayer dans une heure." 
+          }),
+          {
+            status: 429,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          }
+        );
+      }
+
+      // Increment attempts
+      await supabase
+        .from('verification_code_rate_limit')
+        .update({ attempts: emailRateLimit.attempts + 1 })
+        .eq('email', email)
+        .eq('window_start', emailRateLimit.window_start);
+    } else {
+      // Create new rate limit record
+      await supabase
+        .from('verification_code_rate_limit')
+        .insert({
+          email,
+          ip_address: clientIp,
+          attempts: 1,
+        });
+    }
+
     // Générer un code à 6 chiffres
     const code = Math.floor(100000 + Math.random() * 900000).toString();
     

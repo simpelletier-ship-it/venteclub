@@ -68,14 +68,19 @@ export const FavoriteButton = ({ businessId, userId }: FavoriteButtonProps) => {
             business_id: businessId,
           });
         
-        // Track analytics
-        await supabase
-          .from('business_analytics')
-          .insert({
-            business_id: businessId,
-            event_type: 'favorite',
-            user_id: userId,
-          });
+        // Track analytics - with error handling for rate limiting
+        try {
+          await supabase
+            .from('business_analytics')
+            .insert({
+              business_id: businessId,
+              event_type: 'favorite',
+              user_id: userId,
+            });
+        } catch (analyticsError) {
+          // Silently fail if rate limited
+          console.log('Analytics tracking skipped:', analyticsError);
+        }
         
         setIsFavorite(true);
         toast({

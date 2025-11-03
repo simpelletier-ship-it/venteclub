@@ -1,5 +1,8 @@
 project_id = "xmwsrvaricrfxovimffm"
 
+[functions.admin-update-business]
+verify_jwt = true
+
 [functions.auto-generate-blog]
 verify_jwt = false
 

@@ -102,14 +102,20 @@ const BusinessDetails = () => {
       if (data) {
         setBusinessId(data.id);
         
-        // Track view analytics
-        await supabase
-          .from('business_analytics')
-          .insert({
-            business_id: data.id,
-            event_type: 'view',
-            user_id: (await supabase.auth.getSession()).data.session?.user?.id,
-          });
+        // Track view analytics - with error handling for rate limiting
+        try {
+          const session = await supabase.auth.getSession();
+          await supabase
+            .from('business_analytics')
+            .insert({
+              business_id: data.id,
+              event_type: 'view',
+              user_id: session.data.session?.user?.id,
+            });
+        } catch (analyticsError) {
+          // Silently fail if rate limited or duplicate view
+          console.log('Analytics tracking skipped:', analyticsError);
+        }
         
         setBusiness(data);
         console.log('[BUSINESS DETAILS] Business set:', data.title);
