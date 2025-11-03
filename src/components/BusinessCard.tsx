@@ -116,12 +116,18 @@ const BusinessCard = ({
       } ${featured ? 'ring-2 ring-accent/30' : ''}`}
       onClick={handleClick}
     >
-      {/* Sold Overlay - Modern Design */}
+      {/* Sold Diagonal Banner */}
       {status === 'sold' && (
-        <div className="absolute inset-0 z-10 bg-gradient-to-br from-background/80 via-background/85 to-background/80">
-          <div className="absolute top-8 right-8 px-6 py-3 bg-gradient-to-r from-primary to-primary-dark rounded-xl shadow-premium">
-            <p className="text-xl font-display font-bold text-white uppercase tracking-wider">VENDU</p>
+        <div className="absolute inset-0 z-10 pointer-events-none">
+          <div className="absolute top-0 left-0 w-full h-full">
+            <div className="absolute top-[50%] left-[-25%] w-[150%] h-16 bg-gradient-to-r from-primary via-primary-dark to-primary transform -translate-y-1/2 rotate-[-45deg] shadow-2xl flex items-center justify-center">
+              <span className="text-white text-3xl font-display font-bold uppercase tracking-[0.3em] drop-shadow-lg">
+                VENDU
+              </span>
+            </div>
           </div>
+          {/* Semi-transparent overlay */}
+          <div className="absolute inset-0 bg-background/60 backdrop-blur-[1px]" />
         </div>
       )}
 

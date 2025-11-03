@@ -97,16 +97,18 @@ const BusinessListItem = ({
       }`}
       onClick={handleClick}
     >
-      {/* Sold Overlay */}
+      {/* Sold Diagonal Banner */}
       {status === 'sold' && (
-        <div className="absolute inset-0 z-[5] bg-background/30 pointer-events-none">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rotate-[-30deg] w-[160%] md:w-[120%]">
-            <div className="bg-purple-600 text-white py-4 md:py-6 shadow-2xl">
-              <p className="text-2xl md:text-4xl font-bold text-center tracking-[0.4em] uppercase">
+        <div className="absolute inset-0 z-[5] pointer-events-none">
+          <div className="absolute top-0 left-0 w-full h-full">
+            <div className="absolute top-[50%] left-[-25%] w-[150%] h-12 md:h-16 bg-gradient-to-r from-primary via-primary-dark to-primary transform -translate-y-1/2 rotate-[-45deg] shadow-2xl flex items-center justify-center">
+              <span className="text-white text-2xl md:text-3xl font-display font-bold uppercase tracking-[0.3em] drop-shadow-lg">
                 VENDU
-              </p>
+              </span>
             </div>
           </div>
+          {/* Semi-transparent overlay */}
+          <div className="absolute inset-0 bg-background/60 backdrop-blur-[1px]" />
         </div>
       )}
 
