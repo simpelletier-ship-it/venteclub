@@ -224,14 +224,87 @@ const Dashboard = () => {
                 <p className="text-muted-foreground">Chargement...</p>
               </div>
             ) : businesses.length === 0 ? (
-              <div className="text-center py-12 bg-card rounded-2xl border border-border/50">
-                <p className="text-muted-foreground mb-4">
-                  Vous n'avez pas encore d'annonces
-                </p>
-                <Button onClick={() => navigate("/sell")}>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Créer ma première annonce
-                </Button>
+              <div className="max-w-4xl mx-auto space-y-8">
+                <div className="text-center py-8">
+                  <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-muted/50 mb-4">
+                    <Plus className="h-10 w-10 text-muted-foreground" />
+                  </div>
+                  <h2 className="text-2xl font-bold mb-2">Aucune annonce ajoutée</h2>
+                  <p className="text-muted-foreground">
+                    Commencez par ajouter votre première annonce
+                  </p>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <Card 
+                    className="cursor-pointer hover:shadow-lg transition-all border-2 hover:border-primary/50"
+                    onClick={() => navigate("/list-business")}
+                  >
+                    <CardContent className="p-6 text-center space-y-4">
+                      <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10">
+                        <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                        </svg>
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-lg mb-2">Entreprise</h3>
+                        <p className="text-sm text-muted-foreground mb-4">
+                          Commerce, restaurant, service, etc.
+                        </p>
+                        <Button className="w-full">
+                          <Plus className="mr-2 h-4 w-4" />
+                          Ajouter
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card 
+                    className="cursor-pointer hover:shadow-lg transition-all border-2 hover:border-primary/50"
+                    onClick={() => navigate("/list-franchise")}
+                  >
+                    <CardContent className="p-6 text-center space-y-4">
+                      <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10">
+                        <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-lg mb-2">Franchise</h3>
+                        <p className="text-sm text-muted-foreground mb-4">
+                          Réseau de franchises établi
+                        </p>
+                        <Button className="w-full">
+                          <Plus className="mr-2 h-4 w-4" />
+                          Ajouter
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card 
+                    className="cursor-pointer hover:shadow-lg transition-all border-2 hover:border-primary/50"
+                    onClick={() => navigate("/list-property")}
+                  >
+                    <CardContent className="p-6 text-center space-y-4">
+                      <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10">
+                        <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                        </svg>
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-lg mb-2">Immeuble</h3>
+                        <p className="text-sm text-muted-foreground mb-4">
+                          Immeuble à revenus, commercial
+                        </p>
+                        <Button className="w-full">
+                          <Plus className="mr-2 h-4 w-4" />
+                          Ajouter
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
               </div>
             ) : (
               <>
