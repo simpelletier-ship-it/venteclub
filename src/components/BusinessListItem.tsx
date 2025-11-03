@@ -26,6 +26,7 @@ interface BusinessListItemProps {
   status?: string;
   is_franchise?: boolean;
   sale_type?: 'assets' | 'shares' | 'both' | 'property';
+  property_type?: string;
 }
 
 const BusinessListItem = ({
@@ -48,6 +49,7 @@ const BusinessListItem = ({
   status,
   is_franchise = false,
   sale_type,
+  property_type,
 }: BusinessListItemProps) => {
   const navigate = useNavigate();
   const [userId, setUserId] = useState<string | undefined>();
@@ -65,6 +67,10 @@ const BusinessListItem = ({
 
   // Déterminer le type d'annonce
   const getBusinessType = () => {
+    // Si property_type est défini, c'est un immeuble
+    if (property_type) {
+      return { label: 'Immobilier', icon: Home, color: 'bg-emerald-500' };
+    }
     if (sale_type === 'property') {
       return { label: 'Immobilier', icon: Home, color: 'bg-emerald-500' };
     }

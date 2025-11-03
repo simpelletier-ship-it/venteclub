@@ -80,21 +80,24 @@ const BusinessCard = ({
   const displayPrice = asking_price === 0 ? 'À discuter' : asking_price ? `${asking_price.toLocaleString('fr-CA')} $` : 'N/A';
   const displayBaiia = baiia ? `${baiia.toLocaleString('fr-CA')} $` : 'N/D';
 
-  // Déterminer le type d'annonce - check both sale_type and industry for property detection
+  // Déterminer le type d'annonce - check sale_type, property_type, and keywords
   const getBusinessType = () => {
-    const propertyIndustries = ['Immobilier', 'Construction', 'Location immobilière'];
-    const isProperty = sale_type === 'property' || 
-                      propertyIndustries.some(ind => title.toLowerCase().includes('immeuble') || 
-                      title.toLowerCase().includes('propriété') ||
-                      description?.toLowerCase().includes('immeuble') ||
-                      description?.toLowerCase().includes('propriété'));
-    
-    if (isProperty) {
+    // Si property_type est défini, c'est définitivement un immeuble
+    if (property_type) {
       return { label: 'Immobilier', icon: Home, color: 'bg-emerald-500' };
     }
+    
+    // Vérifier sale_type
+    if (sale_type === 'property') {
+      return { label: 'Immobilier', icon: Home, color: 'bg-emerald-500' };
+    }
+    
+    // Vérifier si c'est une franchise
     if (is_franchise) {
       return { label: 'Franchise', icon: TrendingUp, color: 'bg-purple-500' };
     }
+    
+    // Par défaut, c'est une entreprise
     return { label: 'Entreprise', icon: Store, color: 'bg-blue-500' };
   };
 
