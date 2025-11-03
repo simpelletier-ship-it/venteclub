@@ -66,6 +66,9 @@ verify_jwt = true
 [functions.geocode-city]
 verify_jwt = true
 
+[functions.geocode-address]
+verify_jwt = true
+
 [functions.update-missing-coordinates]
 verify_jwt = false
 

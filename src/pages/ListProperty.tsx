@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Upload, X, Home, Sparkles, FileText, DollarSign } from "lucide-react";
 import { TermsDialog } from "@/components/TermsDialog";
 import { CityCombobox } from "@/components/CityCombobox";
+import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { Progress } from "@/components/ui/progress";
 
 const ListProperty = () => {
@@ -516,10 +517,10 @@ const ListProperty = () => {
 
             <div className="space-y-2">
               <Label htmlFor="address">Adresse</Label>
-              <Input
-                id="address"
+              <AddressAutocomplete
                 value={formData.address}
-                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                onChange={(address) => setFormData({ ...formData, address })}
+                city={formData.city}
                 placeholder="Ex: 123 rue Principale"
               />
               <p className="text-xs text-muted-foreground">
