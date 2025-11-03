@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { TrendingUp, MapPin, Star, XCircle, Building2, Home, Store } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { FavoriteButton } from "./FavoriteButton";
-import { ShareButton } from "./ShareButton";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -163,12 +162,7 @@ const BusinessCard = ({
               </span>
             </div>
           </div>
-          {id && status !== 'sold' && (
-            <div className="flex gap-2">
-              <FavoriteButton businessId={id} userId={userId} />
-              {slug && <ShareButton title={title} slug={slug} description={description} size="icon" />}
-            </div>
-          )}
+          {id && status !== 'sold' && <FavoriteButton businessId={id} userId={userId} />}
         </div>
 
         <div>
