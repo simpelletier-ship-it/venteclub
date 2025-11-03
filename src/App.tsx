@@ -29,6 +29,7 @@ import BlogPost from "./pages/BlogPost";
 import CityPage from "./pages/CityPage";
 import Terms from "./pages/Terms";
 import PropertyListings from "./pages/PropertyListings";
+import Profile from "./pages/Profile";
 
 const queryClient = new QueryClient();
 
@@ -57,6 +58,7 @@ const App = () => (
               <Route path="/settings" element={<Settings />} />
               <Route path="/favorites" element={<Favorites />} />
               <Route path="/messages" element={<Messages />} />
+              <Route path="/profile/:userId" element={<Profile />} />
               <Route path="/logout-success" element={<LogoutSuccess />} />
               
               {/* SEO Pages */}
