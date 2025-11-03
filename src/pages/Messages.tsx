@@ -166,88 +166,107 @@ const Messages = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-secondary/10">
-      <div className="container mx-auto px-4 py-6 sm:py-8">
+    <div className="min-h-screen bg-gradient-to-br from-background via-muted/5 to-background">
+      <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6">
         <div className="mb-4 sm:mb-6">
           <Button
             variant="ghost"
             onClick={() => navigate("/dashboard")}
-            className="mb-3 sm:mb-4 text-sm sm:text-base"
+            className="mb-3 text-sm hover:bg-muted/50 transition-colors group"
           >
-            <ArrowLeft className="mr-2 h-3 sm:h-4 w-3 sm:w-4" />
+            <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
             Retour au tableau de bord
           </Button>
-          <h1 className="text-2xl sm:text-4xl font-bold text-foreground mb-2">
-            Messagerie
-          </h1>
-          <p className="text-sm sm:text-base text-muted-foreground">
-            Gérez vos conversations avec les acheteurs et vendeurs
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2.5 rounded-xl bg-gradient-to-br from-primary/10 to-secondary/10 shadow-sm">
+              <MessageSquare className="h-6 sm:h-7 w-6 sm:w-7 text-primary" />
+            </div>
+            <h1 className="text-2xl sm:text-4xl font-bold text-foreground">
+              Messagerie
+            </h1>
+          </div>
+          <p className="text-sm sm:text-base text-muted-foreground font-medium">
+            Gérez vos conversations professionnelles en temps réel
           </p>
         </div>
 
         {conversations.length === 0 ? (
-          <Card>
-            <CardContent className="text-center py-8 sm:py-12">
-              <MessageSquare className="mx-auto h-10 sm:h-12 w-10 sm:w-12 text-muted-foreground mb-3 sm:mb-4" />
-              <p className="text-sm sm:text-base text-muted-foreground">
-                Aucune conversation pour le moment
+          <Card className="border-border/60 shadow-xl">
+            <CardContent className="text-center py-16">
+              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center mx-auto mb-5 shadow-lg">
+                <MessageSquare className="h-10 w-10 text-primary" />
+              </div>
+              <p className="text-lg font-bold text-foreground mb-2">
+                Aucune conversation
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Vos conversations apparaîtront ici
               </p>
             </CardContent>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-        {/* Liste des conversations - Style moderne */}
-        <Card className="lg:col-span-1 border-border/50 shadow-lg">
-          <CardContent className="p-3 sm:p-5">
-            <h2 className="font-bold text-base sm:text-lg mb-4 sm:mb-5 flex items-center gap-2 text-foreground">
-              <div className="p-1.5 sm:p-2 rounded-lg bg-primary/10">
-                <MessageSquare className="h-4 sm:h-5 w-4 sm:w-5 text-primary" />
-              </div>
-              Conversations
-            </h2>
-            <ScrollArea className="h-[400px] sm:h-[500px] lg:h-[600px] pr-2 sm:pr-4">
-              <div className="space-y-2 sm:space-y-3">
-                {conversations.map((conv) => (
-                  <div
-                    key={`${conv.business_id}-${conv.other_user_id}`}
-                    className={`p-3 sm:p-4 rounded-lg sm:rounded-xl cursor-pointer transition-all duration-200 ${
-                      selectedConversation?.business_id === conv.business_id &&
-                      selectedConversation?.other_user_id === conv.other_user_id
-                        ? 'bg-gradient-to-br from-primary/15 to-primary/5 border-2 border-primary/50 shadow-md'
-                        : 'bg-card border border-border/50 hover:bg-muted/50 hover:border-primary/30 hover:shadow-md'
-                    }`}
-                    onClick={() => handleConversationClick(conv)}
-                  >
-                    <div className="flex items-start justify-between mb-2 sm:mb-3">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1.5 sm:mb-2">
-                          <h3 className="font-bold text-xs sm:text-sm truncate">{conv.business_title}</h3>
-                          {conv.unread_count > 0 && (
-                            <Badge className="h-4 sm:h-5 min-w-4 sm:min-w-5 px-1.5 sm:px-2 text-[10px] sm:text-xs flex-shrink-0 bg-gradient-to-r from-primary to-primary/90 shadow-sm">
-                              {conv.unread_count}
-                            </Badge>
-                          )}
-                        </div>
-                        <p className="text-[10px] sm:text-xs font-medium text-muted-foreground mb-1.5 sm:mb-2 flex items-center gap-1 sm:gap-1.5">
-                          <span className="text-sm sm:text-base">{conv.is_seller ? '🛒' : '🔑'}</span>
-                          {conv.is_seller ? 'Acheteur' : 'Vendeur'}: <span className="truncate">{conv.other_user_name}</span>
-                        </p>
-                        <p className="text-xs sm:text-sm text-muted-foreground/80 truncate leading-relaxed">
-                          {conv.last_message}
-                        </p>
-                      </div>
-                      <div className="flex flex-col items-end gap-1.5 sm:gap-2 ml-2 sm:ml-3 flex-shrink-0">
-                        <span className="text-[10px] sm:text-xs font-medium text-muted-foreground whitespace-nowrap">
-                          {new Date(conv.last_message_time).toLocaleDateString('fr-CA', {
-                            day: 'numeric',
-                            month: 'short',
-                          })}
-                        </span>
-                        {conv.unread_count > 0 && (
-                          <div className="w-1.5 sm:w-2 h-1.5 sm:h-2 rounded-full bg-gradient-to-r from-primary to-primary/90 shadow-sm" />
-                        )}
-                      </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            {/* Liste des conversations Professional */}
+            <Card className="lg:col-span-1 border-border/60 shadow-xl overflow-hidden">
+              <CardContent className="p-4 sm:p-5 bg-card/50 backdrop-blur-sm">
+                <div className="flex items-center justify-between mb-5">
+                  <h2 className="font-bold text-lg flex items-center gap-2.5 text-foreground">
+                    <div className="p-2 rounded-xl bg-gradient-to-br from-primary/10 to-secondary/10 shadow-sm">
+                      <MessageSquare className="h-5 w-5 text-primary" />
                     </div>
+                    Conversations
+                  </h2>
+                  <Badge variant="secondary" className="font-semibold">
+                    {conversations.length}
+                  </Badge>
+                </div>
+                <ScrollArea className="h-[400px] sm:h-[500px] lg:h-[600px] pr-3">
+                  <div className="space-y-2">
+                    {conversations.map((conv) => (
+                      <div
+                        key={`${conv.business_id}-${conv.other_user_id}`}
+                        className={`group p-3.5 sm:p-4 rounded-xl cursor-pointer transition-all duration-300 hover:scale-[1.02] ${
+                          selectedConversation?.business_id === conv.business_id &&
+                          selectedConversation?.other_user_id === conv.other_user_id
+                            ? 'bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border-2 border-primary/60 shadow-lg shadow-primary/10'
+                            : 'bg-card/80 backdrop-blur-sm border border-border/60 hover:bg-card hover:border-primary/40 hover:shadow-md'
+                        }`}
+                        onClick={() => handleConversationClick(conv)}
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-2">
+                              <h3 className="font-bold text-sm truncate group-hover:text-primary transition-colors">
+                                {conv.business_title}
+                              </h3>
+                              {conv.unread_count > 0 && (
+                                <Badge className="h-5 min-w-5 px-2 text-xs flex-shrink-0 bg-gradient-to-r from-primary to-primary/90 shadow-md animate-pulse">
+                                  {conv.unread_count}
+                                </Badge>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-2 mb-2">
+                              <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+                                <span className="text-base">{conv.is_seller ? '🛒' : '🔑'}</span>
+                                <span className="truncate">{conv.other_user_name}</span>
+                              </div>
+                            </div>
+                            <p className="text-xs text-muted-foreground/90 truncate leading-relaxed">
+                              {conv.last_message}
+                            </p>
+                          </div>
+                          <div className="flex flex-col items-end gap-2 ml-3 flex-shrink-0">
+                            <span className="text-[10px] font-semibold text-muted-foreground/70 whitespace-nowrap bg-muted/50 px-2 py-0.5 rounded-full">
+                              {new Date(conv.last_message_time).toLocaleDateString('fr-FR', {
+                                day: 'numeric',
+                                month: 'short',
+                              })}
+                            </span>
+                            {conv.unread_count > 0 && (
+                              <div className="w-2 h-2 rounded-full bg-gradient-to-r from-primary to-primary/90 shadow-lg animate-pulse" />
+                            )}
+                          </div>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -255,37 +274,28 @@ const Messages = () => {
               </CardContent>
             </Card>
 
-            {/* Zone de chat - Style moderne */}
-            <Card className="lg:col-span-2 border-border/50 shadow-lg overflow-hidden">
-              <CardContent className="p-0 h-[500px] sm:h-[600px] lg:h-[690px] flex flex-col">
+            {/* Zone de chat Professional */}
+            <Card className="lg:col-span-2 border-border/60 shadow-xl overflow-hidden">
+              <CardContent className="p-0 h-[500px] sm:h-[600px] lg:h-[690px] flex flex-col bg-card/30 backdrop-blur-sm">
                 {selectedConversation ? (
-                  <>
-                    <div className="p-6 border-b border-border/50 bg-gradient-to-r from-background via-muted/5 to-background">
-                      <h2 className="text-xl font-bold text-foreground mb-1">{selectedConversation.business_title}</h2>
-                      <p className="text-sm text-muted-foreground font-medium">
-                        Conversation avec {selectedConversation.other_user_name}
-                      </p>
-                    </div>
-                    <div className="flex-1 overflow-hidden">
-                      <ChatBox
-                        businessId={selectedConversation.business_id}
-                        currentUserId={user?.id}
-                        otherUserId={selectedConversation.other_user_id}
-                        otherUserName={selectedConversation.other_user_name}
-                      />
-                    </div>
-                  </>
+                  <ChatBox
+                    businessId={selectedConversation.business_id}
+                    currentUserId={user?.id}
+                    otherUserId={selectedConversation.other_user_id}
+                    otherUserName={selectedConversation.other_user_name}
+                    businessTitle={selectedConversation.business_title}
+                  />
                 ) : (
-                  <div className="flex items-center justify-center h-full bg-gradient-to-br from-background to-muted/5">
-                    <div className="text-center">
-                      <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
-                        <MessageSquare className="h-12 w-12 text-primary/50" />
+                  <div className="flex items-center justify-center h-full bg-gradient-to-br from-background via-muted/10 to-background">
+                    <div className="text-center px-6 animate-fade-in">
+                      <div className="w-28 h-28 rounded-3xl bg-gradient-to-br from-primary/10 via-secondary/5 to-primary/10 flex items-center justify-center mx-auto mb-6 shadow-xl">
+                        <MessageSquare className="h-14 w-14 text-primary animate-pulse" />
                       </div>
-                      <p className="text-lg font-semibold text-foreground mb-2">
+                      <p className="text-xl font-bold text-foreground mb-3">
                         Sélectionnez une conversation
                       </p>
-                      <p className="text-muted-foreground">
-                        Choisissez une conversation pour commencer à discuter
+                      <p className="text-muted-foreground text-sm max-w-sm mx-auto leading-relaxed">
+                        Choisissez une conversation dans la liste pour commencer à échanger en temps réel
                       </p>
                     </div>
                   </div>

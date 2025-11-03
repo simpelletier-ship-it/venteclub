@@ -14,24 +14,26 @@ const templates = [
 
 export const QuickMessageTemplates = ({ onSelectTemplate }: QuickMessageTemplatesProps) => {
   return (
-    <Card className="p-4 bg-muted/30 border-dashed">
-      <div className="flex items-center gap-2 mb-3">
-        <MessageSquare className="w-4 h-4 text-primary" />
-        <h4 className="text-sm font-semibold text-foreground">Messages rapides</h4>
+    <Card className="p-3 bg-gradient-to-br from-muted/40 to-muted/20 backdrop-blur-sm border-dashed border-border/60 shadow-sm">
+      <div className="flex items-center gap-2 mb-2.5">
+        <div className="p-1 rounded-lg bg-primary/10">
+          <MessageSquare className="w-3.5 h-3.5 text-primary" />
+        </div>
+        <h4 className="text-xs font-bold text-foreground">Messages rapides</h4>
       </div>
-      <p className="text-xs text-muted-foreground mb-3">
-        Cliquez sur un message pour l'utiliser :
+      <p className="text-[10px] text-muted-foreground/80 mb-2.5 font-medium">
+        Gagnez du temps avec ces modèles :
       </p>
-      <div className="grid gap-2">
+      <div className="grid gap-1.5">
         {templates.map((template, index) => (
           <Button
             key={index}
             variant="outline"
             size="sm"
-            className="justify-start text-left h-auto py-2 px-3 whitespace-normal"
+            className="justify-start text-left h-auto py-2 px-2.5 text-xs whitespace-normal hover:bg-primary/10 hover:text-primary hover:border-primary/50 transition-all"
             onClick={() => onSelectTemplate(template)}
           >
-            {template}
+            <span className="line-clamp-2">{template}</span>
           </Button>
         ))}
       </div>

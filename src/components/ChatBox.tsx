@@ -381,22 +381,22 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
   };
 
   return (
-    <div className="flex flex-col h-full bg-background rounded-lg sm:rounded-2xl shadow-lg overflow-hidden">
-      {/* Header - Style moderne */}
-      <div className="bg-gradient-to-r from-primary/5 via-secondary/5 to-primary/5 p-4 sm:p-6 border-b border-border/50 backdrop-blur-sm">
+    <div className="flex flex-col h-full bg-gradient-to-br from-background via-muted/10 to-background">
+      {/* Header Professional */}
+      <div className="bg-card/50 backdrop-blur-xl p-4 sm:p-5 border-b border-border/60 shadow-sm">
         <div className="flex items-center gap-3 sm:gap-4">
-          <div className="relative">
-            <Avatar className="h-10 sm:h-14 w-10 sm:w-14 ring-2 ring-primary/20 shadow-md">
+          <div className="relative group">
+            <Avatar className="h-11 sm:h-12 w-11 sm:w-12 ring-2 ring-primary/30 shadow-md transition-all group-hover:ring-primary/50">
               <AvatarImage src={otherUserProfile?.avatar_url} />
-              <AvatarFallback className="bg-gradient-to-br from-primary/20 to-secondary/20 text-primary font-semibold text-sm sm:text-lg">
+              <AvatarFallback className="bg-gradient-to-br from-primary/30 to-secondary/30 text-primary font-bold text-base sm:text-lg">
                 {getInitials(otherUserProfile?.full_name || otherUserName)}
               </AvatarFallback>
             </Avatar>
-            <div className="absolute -bottom-1 -right-1 w-3 sm:w-4 h-3 sm:h-4 bg-green-500 rounded-full border-2 border-background shadow-sm" />
+            <div className="absolute -bottom-0.5 -right-0.5 w-3.5 sm:w-4 h-3.5 sm:h-4 bg-emerald-500 rounded-full border-2 border-card shadow-sm animate-pulse" />
           </div>
           
           <div className="flex-1 min-w-0">
-            <h3 className="font-bold text-base sm:text-lg text-foreground mb-0.5 truncate">
+            <h3 className="font-bold text-base sm:text-lg text-foreground mb-0.5 truncate leading-tight">
               {otherUserProfile?.full_name || otherUserName || "Utilisateur"}
             </h3>
             
@@ -404,28 +404,28 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
               <Button
                 variant="link"
                 size="sm"
-                className="h-auto p-0 text-xs sm:text-sm font-medium hover:text-primary mb-1 sm:mb-2"
+                className="h-auto p-0 text-xs sm:text-sm font-medium text-muted-foreground hover:text-primary mb-1 transition-colors"
                 onClick={() => navigate(`/entreprise/${businessSlug}`)}
               >
-                <ExternalLink className="mr-1 h-3 sm:h-4 w-3 sm:w-4" />
+                <ExternalLink className="mr-1.5 h-3 sm:h-3.5 w-3 sm:w-3.5" />
                 <span className="truncate">{businessTitle}</span>
               </Button>
             )}
 
             {sellerContact && (
-              <div className="space-y-0.5 sm:space-y-1 text-xs sm:text-sm">
+              <div className="flex flex-wrap gap-3 sm:gap-4 mt-1.5 text-xs sm:text-sm">
                 {sellerContact.email && (
-                  <div className="flex items-center gap-1 sm:gap-2 text-muted-foreground">
-                    <Mail className="h-3 sm:h-4 w-3 sm:w-4 flex-shrink-0" />
-                    <a href={`mailto:${sellerContact.email}`} className="hover:text-primary truncate">
+                  <div className="flex items-center gap-1.5 text-muted-foreground hover:text-primary transition-colors">
+                    <Mail className="h-3.5 sm:h-4 w-3.5 sm:w-4 flex-shrink-0" />
+                    <a href={`mailto:${sellerContact.email}`} className="truncate max-w-[180px]">
                       {sellerContact.email}
                     </a>
                   </div>
                 )}
                 {sellerContact.phone && (
-                  <div className="flex items-center gap-1 sm:gap-2 text-muted-foreground">
-                    <Phone className="h-3 sm:h-4 w-3 sm:w-4 flex-shrink-0" />
-                    <a href={`tel:${sellerContact.phone}`} className="hover:text-primary">
+                  <div className="flex items-center gap-1.5 text-muted-foreground hover:text-primary transition-colors">
+                    <Phone className="h-3.5 sm:h-4 w-3.5 sm:w-4 flex-shrink-0" />
+                    <a href={`tel:${sellerContact.phone}`}>
                       {sellerContact.phone}
                     </a>
                   </div>
@@ -436,110 +436,130 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
         </div>
       </div>
 
-      {/* Messages Area - Style moderne */}
-      <ScrollArea className="flex-1 p-3 sm:p-6 bg-gradient-to-b from-background to-muted/5" ref={scrollRef}>
-        <div className="space-y-3 sm:space-y-4">
+      {/* Messages Area Professional */}
+      <ScrollArea className="flex-1 p-4 sm:p-6" ref={scrollRef}>
+        <div className="space-y-4 sm:space-y-5">
           {messages.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 text-center">
-              <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                <Send className="w-10 h-10 text-primary/50" />
+            <div className="flex flex-col items-center justify-center py-20 text-center">
+              <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center mb-5 shadow-lg">
+                <Send className="w-12 h-12 text-primary" />
               </div>
-              <p className="text-muted-foreground text-lg font-medium">
+              <p className="text-foreground text-xl font-bold mb-2">
                 Aucun message pour le moment
               </p>
-              <p className="text-muted-foreground/70 text-sm mt-1">
-                Démarrez la conversation !
+              <p className="text-muted-foreground text-sm">
+                Commencez la conversation dès maintenant
               </p>
             </div>
           ) : (
-            messages.map((message) => {
+            messages.map((message, index) => {
               const isCurrentUser = message.sender_id === currentUserId;
               const attachments = messageAttachments[message.id] || [];
+              const prevMessage = index > 0 ? messages[index - 1] : null;
+              const showDate = !prevMessage || 
+                new Date(message.created_at).toDateString() !== new Date(prevMessage.created_at).toDateString();
+              
               return (
-                <div
-                  key={message.id}
-                  className={`flex items-end gap-2 ${isCurrentUser ? 'justify-end' : 'justify-start'}`}
-                >
-                  {!isCurrentUser && (
-                    <Avatar className="h-8 w-8 mb-1 ring-2 ring-background shadow-sm">
-                      <AvatarImage src={otherUserProfile?.avatar_url} />
-                      <AvatarFallback className="bg-primary/10 text-primary text-xs">
-                        {getInitials(otherUserProfile?.full_name || otherUserName)}
-                      </AvatarFallback>
-                    </Avatar>
-                  )}
-                  <div
-                    className={`max-w-[75%] rounded-2xl p-4 shadow-sm ${
-                      isCurrentUser
-                        ? 'bg-gradient-to-br from-primary to-primary/90 text-primary-foreground rounded-br-sm'
-                        : 'bg-card border border-border/50 text-foreground rounded-bl-sm'
-                    }`}
-                  >
-                    {message.content !== "[Fichier joint]" && (
-                      <p className={`text-sm leading-relaxed whitespace-pre-wrap break-words ${isCurrentUser ? 'text-primary-foreground' : 'text-foreground'}`}>
-                        {message.content}
-                      </p>
-                    )}
-                    
-                    {attachments.length > 0 && (
-                      <div className="mt-3 space-y-2">
-                        {attachments.map((att) => {
-                          const isImage = att.file_type.startsWith('image/');
-                          return (
-                            <div
-                              key={att.id}
-                              className={`${isCurrentUser ? 'bg-primary-foreground/10' : 'bg-muted/50'} rounded-xl p-3 flex items-center gap-3 backdrop-blur-sm`}
-                            >
-                              {isImage ? (
-                                <ImageIcon className="w-4 h-4 shrink-0" />
-                              ) : (
-                                <FileText className="w-4 h-4 shrink-0" />
-                              )}
-                              <div className="flex-1 min-w-0">
-                                <p className="text-xs font-medium truncate">{att.file_name}</p>
-                                <p className="text-xs opacity-70">{formatFileSize(att.file_size)}</p>
-                              </div>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => downloadFile(att.file_url, att.file_name)}
-                                className="h-7 w-7 p-0"
-                              >
-                                <Download className="h-3 w-3" />
-                              </Button>
-                            </div>
-                          );
+                <div key={message.id}>
+                  {showDate && (
+                    <div className="flex items-center justify-center my-6">
+                      <div className="bg-muted/80 backdrop-blur-sm px-4 py-1.5 rounded-full text-xs font-semibold text-muted-foreground shadow-sm">
+                        {new Date(message.created_at).toLocaleDateString('fr-FR', {
+                          weekday: 'long',
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
                         })}
                       </div>
+                    </div>
+                  )}
+                  
+                  <div
+                    className={`flex items-end gap-2.5 sm:gap-3 animate-fade-in ${
+                      isCurrentUser ? 'justify-end' : 'justify-start'
+                    }`}
+                  >
+                    {!isCurrentUser && (
+                      <Avatar className="h-8 sm:h-9 w-8 sm:w-9 mb-0.5 ring-2 ring-border shadow-md flex-shrink-0">
+                        <AvatarImage src={otherUserProfile?.avatar_url} />
+                        <AvatarFallback className="bg-gradient-to-br from-primary/15 to-secondary/15 text-primary font-semibold text-xs">
+                          {getInitials(otherUserProfile?.full_name || otherUserName)}
+                        </AvatarFallback>
+                      </Avatar>
                     )}
                     
-                    <div className="flex items-center gap-2 mt-2">
-                      <p className={`text-xs font-medium ${isCurrentUser ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>
-                        {new Date(message.created_at).toLocaleTimeString('fr-CA', {
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        })}
-                      </p>
-                      {isCurrentUser && (
-                        <div className="flex items-center gap-1">
-                          {message.read ? (
-                            <>
-                              <span className="text-xs text-primary-foreground/70">✓✓</span>
-                              {message.read_at && (
-                                <span className="text-xs text-primary-foreground/70">
-                                  Lu {new Date(message.read_at).toLocaleTimeString('fr-CA', {
-                                    hour: '2-digit',
-                                    minute: '2-digit'
-                                  })}
-                                </span>
-                              )}
-                            </>
-                          ) : (
-                            <span className="text-xs text-primary-foreground/70">✓</span>
-                          )}
-                        </div>
-                      )}
+                    <div className={`flex flex-col ${isCurrentUser ? 'items-end' : 'items-start'} max-w-[75%]`}>
+                      <div
+                        className={`rounded-2xl px-4 py-3 shadow-md backdrop-blur-sm transition-all hover:shadow-lg ${
+                          isCurrentUser
+                            ? 'bg-gradient-to-br from-primary via-primary to-primary/90 text-primary-foreground rounded-br-md'
+                            : 'bg-card/95 border border-border/60 text-foreground rounded-bl-md'
+                        }`}
+                      >
+                        {message.content !== "[Fichier joint]" && (
+                          <p className={`text-sm sm:text-[15px] leading-relaxed whitespace-pre-wrap break-words ${
+                            isCurrentUser ? 'text-primary-foreground' : 'text-foreground'
+                          }`}>
+                            {message.content}
+                          </p>
+                        )}
+                        
+                        {attachments.length > 0 && (
+                          <div className="mt-2.5 space-y-2">
+                            {attachments.map((att) => {
+                              const isImage = att.file_type.startsWith('image/');
+                              return (
+                                <div
+                                  key={att.id}
+                                  className={`${
+                                    isCurrentUser ? 'bg-primary-foreground/15' : 'bg-muted/70'
+                                  } rounded-xl p-2.5 sm:p-3 flex items-center gap-2.5 sm:gap-3 backdrop-blur-sm hover:bg-opacity-80 transition-colors`}
+                                >
+                                  {isImage ? (
+                                    <ImageIcon className="w-4 h-4 shrink-0" />
+                                  ) : (
+                                    <FileText className="w-4 h-4 shrink-0" />
+                                  )}
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-xs font-medium truncate">{att.file_name}</p>
+                                    <p className="text-xs opacity-70">{formatFileSize(att.file_size)}</p>
+                                  </div>
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    onClick={() => downloadFile(att.file_url, att.file_name)}
+                                    className="h-7 w-7 p-0"
+                                  >
+                                    <Download className="h-3 w-3" />
+                                  </Button>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div className="flex items-center gap-2 mt-1.5">
+                        <span className={`text-[10px] sm:text-xs ${isCurrentUser ? 'text-primary-foreground/60' : 'text-muted-foreground/80'}`}>
+                          {new Date(message.created_at).toLocaleTimeString('fr-FR', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </span>
+                        {isCurrentUser && message.read && (
+                          <span className="text-[10px]">✓✓</span>
+                        )}
+                      </div>
                     </div>
+                    
+                    {isCurrentUser && (
+                      <Avatar className="h-8 sm:h-9 w-8 sm:w-9 mb-0.5 ring-2 ring-border shadow-md flex-shrink-0">
+                        <AvatarImage src={currentUserProfile?.avatar_url} />
+                        <AvatarFallback className="bg-gradient-to-br from-primary/15 to-secondary/15 text-primary font-semibold text-xs">
+                          {getInitials(currentUserProfile?.full_name)}
+                        </AvatarFallback>
+                      </Avatar>
+                    )}
                   </div>
                 </div>
               );
