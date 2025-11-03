@@ -3,12 +3,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { MessageSquare, Circle } from "lucide-react";
+import { MessageSquare, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface Conversation {
   business_id: string;
   business_title: string;
+  business_photo: string | null;
   other_user_id: string;
   other_user_email: string;
   last_message: string;
@@ -94,9 +95,19 @@ export const ConversationsList = ({ userId }: ConversationsListProps) => {
             .eq('receiver_id', userId)
             .eq('read', false);
 
+          // Get business photo
+          const { data: photoData } = await supabase
+            .from('business_photos')
+            .select('photo_url')
+            .eq('business_id', msg.business_id)
+            .order('display_order', { ascending: true })
+            .limit(1)
+            .maybeSingle();
+
           conversationsMap.set(key, {
             business_id: msg.business_id,
             business_title: business.title,
+            business_photo: photoData?.photo_url || null,
             other_user_id: otherUserId,
             other_user_email: otherUserData?.email || 'Utilisateur',
             last_message: msg.content,
@@ -146,37 +157,57 @@ export const ConversationsList = ({ userId }: ConversationsListProps) => {
         {conversations.map((conv) => (
           <Card
             key={`${conv.business_id}-${conv.other_user_id}`}
-            className="cursor-pointer hover:bg-accent/50 transition-colors"
+            className="cursor-pointer hover:bg-card/80 hover:border-primary/40 hover:shadow-lg transition-all duration-300 border-border/60 backdrop-blur-sm"
             onClick={() => handleConversationClick(conv)}
           >
-            <CardContent className="p-4">
-              <div className="flex items-start justify-between mb-2">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h3 className="font-semibold text-sm">{conv.business_title}</h3>
-                    {conv.unread_count > 0 && (
-                      <Badge variant="destructive" className="h-5 min-w-5 px-1.5 text-xs">
-                        {conv.unread_count}
-                      </Badge>
+            <CardContent className="p-3">
+              <div className="flex items-center gap-3">
+                {/* Image annonce */}
+                <div className="relative flex-shrink-0">
+                  <div className="w-14 h-14 rounded-xl overflow-hidden bg-muted shadow-md ring-2 ring-border/40">
+                    {conv.business_photo ? (
+                      <img 
+                        src={conv.business_photo} 
+                        alt={conv.business_title}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center">
+                        <span className="text-2xl">🏢</span>
+                      </div>
                     )}
                   </div>
-                  <p className="text-xs text-muted-foreground mb-1">
+                  {conv.unread_count > 0 && (
+                    <div className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 rounded-full bg-gradient-to-br from-primary to-primary/90 shadow-lg animate-pulse">
+                      <span className="text-[10px] font-bold text-primary-foreground">{conv.unread_count}</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Contenu */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between mb-1">
+                    <h3 className="font-bold text-sm truncate leading-tight">
+                      {conv.business_title}
+                    </h3>
+                    <span className="text-[10px] font-semibold text-muted-foreground/70 whitespace-nowrap ml-2">
+                      {new Date(conv.last_message_time).toLocaleDateString('fr-FR', {
+                        day: '2-digit',
+                        month: '2-digit',
+                      })}
+                    </span>
+                  </div>
+                  
+                  <p className="text-[11px] text-muted-foreground/60 mb-1.5 truncate">
                     {conv.is_seller ? '🔑 Acheteur' : '🛒 Vendeur'}: {conv.other_user_email}
                   </p>
-                  <p className="text-sm text-muted-foreground truncate">
-                    {conv.last_message}
-                  </p>
-                </div>
-                <div className="flex flex-col items-end gap-1">
-                  <span className="text-xs text-muted-foreground whitespace-nowrap">
-                    {new Date(conv.last_message_time).toLocaleDateString('fr-CA', {
-                      day: 'numeric',
-                      month: 'short',
-                    })}
-                  </span>
-                  {conv.unread_count > 0 && (
-                    <Circle className="w-2 h-2 fill-primary text-primary" />
-                  )}
+                  
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-xs text-foreground/80 truncate leading-tight flex-1">
+                      {conv.last_message}
+                    </p>
+                    <ChevronRight className="w-4 h-4 text-muted-foreground/50 hover:text-primary transition-colors flex-shrink-0" />
+                  </div>
                 </div>
               </div>
             </CardContent>

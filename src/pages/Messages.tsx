@@ -4,13 +4,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { MessageSquare, Circle, ArrowLeft } from "lucide-react";
+import { MessageSquare, ArrowLeft, ChevronRight } from "lucide-react";
 import { ChatBox } from "@/components/ChatBox";
 import { Button } from "@/components/ui/button";
 
 interface Conversation {
   business_id: string;
   business_title: string;
+  business_photo: string | null;
   other_user_id: string;
   other_user_email: string;
   other_user_name: string;
@@ -113,6 +114,15 @@ const Messages = () => {
             .eq('id', otherUserId)
             .maybeSingle();
 
+          // Get business photo
+          const { data: photoData } = await supabase
+            .from('business_photos')
+            .select('photo_url')
+            .eq('business_id', msg.business_id)
+            .order('display_order', { ascending: true })
+            .limit(1)
+            .maybeSingle();
+
           // Count unread messages
           const { count: unreadCount } = await supabase
             .from('messages')
@@ -125,6 +135,7 @@ const Messages = () => {
           conversationsMap.set(key, {
             business_id: msg.business_id,
             business_title: business.title,
+            business_photo: photoData?.photo_url || null,
             other_user_id: otherUserId,
             other_user_email: otherUserData?.email || 'Utilisateur',
             other_user_name: otherUserData?.full_name || otherUserData?.email || 'Utilisateur',
@@ -225,46 +236,61 @@ const Messages = () => {
                     {conversations.map((conv) => (
                       <div
                         key={`${conv.business_id}-${conv.other_user_id}`}
-                        className={`group p-3.5 sm:p-4 rounded-xl cursor-pointer transition-all duration-300 hover:scale-[1.02] ${
+                        className={`group p-3 rounded-xl cursor-pointer transition-all duration-300 ${
                           selectedConversation?.business_id === conv.business_id &&
                           selectedConversation?.other_user_id === conv.other_user_id
-                            ? 'bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border-2 border-primary/60 shadow-lg shadow-primary/10'
+                            ? 'bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border-2 border-primary/60 shadow-lg'
                             : 'bg-card/80 backdrop-blur-sm border border-border/60 hover:bg-card hover:border-primary/40 hover:shadow-md'
                         }`}
                         onClick={() => handleConversationClick(conv)}
                       >
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-2">
-                              <h3 className="font-bold text-sm truncate group-hover:text-primary transition-colors">
-                                {conv.business_title}
-                              </h3>
-                              {conv.unread_count > 0 && (
-                                <Badge className="h-5 min-w-5 px-2 text-xs flex-shrink-0 bg-gradient-to-r from-primary to-primary/90 shadow-md animate-pulse">
-                                  {conv.unread_count}
-                                </Badge>
+                        <div className="flex items-center gap-3">
+                          {/* Image annonce carrée */}
+                          <div className="relative flex-shrink-0">
+                            <div className="w-14 h-14 rounded-xl overflow-hidden bg-muted shadow-md ring-2 ring-border/40">
+                              {conv.business_photo ? (
+                                <img 
+                                  src={conv.business_photo} 
+                                  alt={conv.business_title}
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <div className="w-full h-full bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center">
+                                  <span className="text-2xl">🏢</span>
+                                </div>
                               )}
                             </div>
-                            <div className="flex items-center gap-2 mb-2">
-                              <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-                                <span className="text-base">{conv.is_seller ? '🛒' : '🔑'}</span>
-                                <span className="truncate">{conv.other_user_name}</span>
-                              </div>
-                            </div>
-                            <p className="text-xs text-muted-foreground/90 truncate leading-relaxed">
-                              {conv.last_message}
-                            </p>
-                          </div>
-                          <div className="flex flex-col items-end gap-2 ml-3 flex-shrink-0">
-                            <span className="text-[10px] font-semibold text-muted-foreground/70 whitespace-nowrap bg-muted/50 px-2 py-0.5 rounded-full">
-                              {new Date(conv.last_message_time).toLocaleDateString('fr-FR', {
-                                day: 'numeric',
-                                month: 'short',
-                              })}
-                            </span>
                             {conv.unread_count > 0 && (
-                              <div className="w-2 h-2 rounded-full bg-gradient-to-r from-primary to-primary/90 shadow-lg animate-pulse" />
+                              <div className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 rounded-full bg-gradient-to-br from-primary to-primary/90 shadow-lg animate-pulse">
+                                <span className="text-[10px] font-bold text-primary-foreground">{conv.unread_count}</span>
+                              </div>
                             )}
+                          </div>
+
+                          {/* Contenu conversation */}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-start justify-between mb-1">
+                              <h3 className="font-bold text-sm truncate group-hover:text-primary transition-colors leading-tight">
+                                {conv.other_user_name}
+                              </h3>
+                              <span className="text-[10px] font-semibold text-muted-foreground/70 whitespace-nowrap ml-2">
+                                {new Date(conv.last_message_time).toLocaleDateString('fr-FR', {
+                                  day: '2-digit',
+                                  month: '2-digit',
+                                })}
+                              </span>
+                            </div>
+                            
+                            <p className="text-[11px] text-muted-foreground/60 mb-1.5 truncate font-medium">
+                              {conv.business_title}
+                            </p>
+                            
+                            <div className="flex items-center justify-between gap-2">
+                              <p className="text-xs text-foreground/80 truncate leading-tight flex-1">
+                                {conv.last_message}
+                              </p>
+                              <ChevronRight className="w-4 h-4 text-muted-foreground/50 group-hover:text-primary group-hover:translate-x-1 transition-all flex-shrink-0" />
+                            </div>
                           </div>
                         </div>
                       </div>

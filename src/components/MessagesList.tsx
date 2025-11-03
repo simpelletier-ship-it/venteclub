@@ -3,12 +3,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MessageSquare, ArrowLeft } from "lucide-react";
+import { MessageSquare, ArrowLeft, ChevronRight } from "lucide-react";
 import { ChatBox } from "@/components/ChatBox";
 
 interface Conversation {
   business_id: string;
   business_title: string;
+  business_photo: string | null;
   other_user_id: string;
   last_message: string;
   last_message_time: string;
@@ -93,9 +94,19 @@ export const MessagesList = ({ userId }: MessagesListProps) => {
                  !m.read
           ).length;
 
+          // Get business photo
+          const { data: photoData } = await supabase
+            .from('business_photos')
+            .select('photo_url')
+            .eq('business_id', msg.business_id)
+            .order('display_order', { ascending: true })
+            .limit(1)
+            .maybeSingle();
+
           conversationsMap.set(key, {
             business_id: msg.business_id,
             business_title: (msg.businesses as any).title,
+            business_photo: photoData?.photo_url || null,
             other_user_id: otherUserId,
             last_message: msg.content,
             last_message_time: msg.created_at,
@@ -160,36 +171,64 @@ export const MessagesList = ({ userId }: MessagesListProps) => {
 
   // Show conversation list
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {conversations.map((conv) => (
         <Card
           key={`${conv.business_id}-${conv.other_user_id}`}
-          className="cursor-pointer hover:shadow-lg transition-shadow"
+          className={`cursor-pointer transition-all duration-300 border-border/60 hover:border-primary/40 hover:shadow-lg ${
+            selectedConversation?.business_id === conv.business_id && 
+            selectedConversation?.other_user_id === conv.other_user_id
+              ? 'bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border-2 border-primary/60 shadow-lg'
+              : 'bg-card/80 backdrop-blur-sm hover:bg-card'
+          }`}
           onClick={() => setSelectedConversation(conv)}
         >
-          <CardHeader>
-            <div className="flex items-start justify-between">
-              <CardTitle className="text-lg">{conv.business_title}</CardTitle>
-              {conv.unread_count > 0 && (
-                <Badge variant="default" className="bg-accent">
-                  {conv.unread_count} nouveau{conv.unread_count > 1 ? 'x' : ''}
-                </Badge>
-              )}
+          <CardContent className="p-3">
+            <div className="flex items-center gap-3">
+              {/* Image annonce */}
+              <div className="relative flex-shrink-0">
+                <div className="w-14 h-14 rounded-xl overflow-hidden bg-muted shadow-md ring-2 ring-border/40">
+                  {conv.business_photo ? (
+                    <img 
+                      src={conv.business_photo} 
+                      alt={conv.business_title}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center">
+                      <span className="text-2xl">🏢</span>
+                    </div>
+                  )}
+                </div>
+                {conv.unread_count > 0 && (
+                  <div className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 rounded-full bg-gradient-to-br from-primary to-primary/90 shadow-lg animate-pulse">
+                    <span className="text-[10px] font-bold text-primary-foreground">{conv.unread_count}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Contenu */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-start justify-between mb-1">
+                  <h3 className="font-bold text-sm truncate leading-tight">
+                    {conv.business_title}
+                  </h3>
+                  <span className="text-[10px] font-semibold text-muted-foreground/70 whitespace-nowrap ml-2">
+                    {new Date(conv.last_message_time).toLocaleDateString('fr-FR', {
+                      day: '2-digit',
+                      month: '2-digit',
+                    })}
+                  </span>
+                </div>
+                
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-xs text-foreground/80 truncate leading-tight flex-1">
+                    {conv.last_message}
+                  </p>
+                  <ChevronRight className="w-4 h-4 text-muted-foreground/50 hover:text-primary transition-colors flex-shrink-0" />
+                </div>
+              </div>
             </div>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
-              {conv.last_message}
-            </p>
-            <p className="text-xs text-muted-foreground">
-              {new Date(conv.last_message_time).toLocaleDateString('fr-CA', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-              })}
-            </p>
           </CardContent>
         </Card>
       ))}
