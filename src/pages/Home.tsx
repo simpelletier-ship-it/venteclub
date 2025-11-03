@@ -189,7 +189,9 @@ const Home = () => {
       {/* FAQ Section */}
       <section className="py-12 bg-muted/30">
         <div className="container mx-auto px-4 max-w-4xl">
-          <h2 className="text-4xl font-display font-bold text-center mb-8">Questions fréquentes</h2>
+          <div className="text-center mb-8">
+            <h2 className="text-4xl font-display font-bold">Questions fréquentes</h2>
+          </div>
           <Accordion type="single" collapsible className="w-full">
             <AccordionItem value="item-1">
               <AccordionTrigger>Comment acheter une entreprise au Québec?</AccordionTrigger>
@@ -214,22 +216,24 @@ const Home = () => {
           <div className="absolute -bottom-40 -left-40 w-[600px] h-[600px] bg-gradient-to-tr from-accent/30 via-primary/20 to-transparent rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
         </div>
         
-        <div className="relative container mx-auto px-4 text-center">
-          <div className="max-w-3xl mx-auto space-y-8 animate-slide-up">
+        <div className="relative container mx-auto px-4">
+          <div className="max-w-3xl mx-auto space-y-8 text-center animate-slide-up">
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-foreground leading-tight">
               Prêt à trouver <span className="text-secondary">votre prochaine opportunité ?</span>
             </h2>
             <p className="text-xl md:text-2xl text-muted-foreground">
               Rejoignez des milliers d'entrepreneurs qui font confiance à Vente.club
             </p>
-            <Button 
-              size="lg" 
-              className="bg-secondary hover:bg-secondary/90 text-secondary-foreground h-14 px-12 text-lg font-semibold shadow-lg hover:shadow-xl transition-all hover:scale-105 group"
-              onClick={() => navigate("/entreprises")}
-            >
-              Commencer gratuitement
-              <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </Button>
+            <div className="flex justify-center">
+              <Button 
+                size="lg" 
+                className="bg-secondary hover:bg-secondary/90 text-secondary-foreground h-14 px-12 text-lg font-semibold shadow-lg hover:shadow-xl transition-all hover:scale-105 group"
+                onClick={() => navigate("/entreprises")}
+              >
+                Commencer gratuitement
+                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </Button>
+            </div>
           </div>
         </div>
       </section>
