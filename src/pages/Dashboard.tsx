@@ -363,7 +363,7 @@ const Dashboard = () => {
                           onFeature={() => handleFeatureClick(business)}
                         />
                       </div>
-                      <div className="flex gap-2">
+                      <div className="flex gap-2 justify-center">
                         {business.approval_status === 'approved' && business.status !== 'sold' && business.status !== 'archived' && !business.has_pending_changes && (
                           <Button
                             onClick={(e) => {
