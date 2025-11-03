@@ -462,12 +462,6 @@ const BusinessDetails = () => {
                       {businessId && (
                         <div className="flex items-center gap-2">
                           <FavoriteButton businessId={businessId} userId={user?.id} />
-                          <ShareButton 
-                            title={business.title} 
-                            slug={business.slug} 
-                            description={business.description}
-                            size="icon"
-                          />
                           <span className="text-xs text-muted-foreground">
                             Activer les notifications
                           </span>
@@ -852,6 +846,17 @@ const BusinessDetails = () => {
                     )}
                   </>
                 )}
+
+                {/* Share button at the end of the listing */}
+                <div className="border-t pt-6 mt-6 flex justify-center">
+                  {businessId && (
+                    <ShareButton 
+                      title={business.title} 
+                      slug={business.slug} 
+                      description={business.description}
+                    />
+                  )}
+                </div>
               </div>
             </div>
           </div>
