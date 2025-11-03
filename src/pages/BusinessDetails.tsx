@@ -8,6 +8,7 @@ import { ArrowLeft, Lock, MapPin, TrendingUp, Users, Calendar, Eye, Calculator }
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { FavoriteButton } from "@/components/FavoriteButton";
+import { ShareButton } from "@/components/ShareButton";
 import { ChatBox } from "@/components/ChatBox";
 import { SellerChatSection } from "@/components/SellerChatSection";
 import { ReportBusinessDialog } from "@/components/ReportBusinessDialog";
@@ -455,6 +456,12 @@ const BusinessDetails = () => {
                       {businessId && (
                         <div className="flex items-center gap-2">
                           <FavoriteButton businessId={businessId} userId={user?.id} />
+                          <ShareButton 
+                            title={business.title} 
+                            slug={business.slug} 
+                            description={business.description}
+                            size="icon"
+                          />
                           <span className="text-xs text-muted-foreground">
                             Activer les notifications
                           </span>
