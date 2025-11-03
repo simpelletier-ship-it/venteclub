@@ -358,55 +358,50 @@ const Messages = () => {
                     {filteredConversations.map((conv) => (
                       <div
                         key={`${conv.business_id}-${conv.other_user_id}`}
-                        className={`group p-3 rounded-xl transition-all duration-300 ${
+                        className={`group p-2 rounded-lg transition-all duration-300 cursor-pointer ${
                           selectedConversation?.business_id === conv.business_id &&
                           selectedConversation?.other_user_id === conv.other_user_id
                             ? 'bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border-2 border-primary/60 shadow-lg'
                             : 'bg-card/80 backdrop-blur-sm border border-border/60 hover:bg-card hover:border-primary/40 hover:shadow-md'
                         }`}
+                        onClick={() => handleConversationClick(conv)}
                       >
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2">
                           {/* Avatar de la personne à gauche */}
-                          <div 
-                            className="relative flex-shrink-0 cursor-pointer"
-                            onClick={() => handleConversationClick(conv)}
-                          >
-                            <Avatar className="h-14 w-14 ring-2 ring-border/40">
+                          <div className="relative flex-shrink-0">
+                            <Avatar className="h-10 w-10 ring-2 ring-border/40">
                               <AvatarImage src={conv.other_user_avatar || undefined} alt={conv.other_user_name} />
-                              <AvatarFallback className="bg-gradient-to-br from-primary/20 to-secondary/20 text-foreground font-semibold">
+                              <AvatarFallback className="bg-gradient-to-br from-primary/20 to-secondary/20 text-foreground font-semibold text-xs">
                                 {getInitials(conv.other_user_name)}
                               </AvatarFallback>
                             </Avatar>
                             {conv.unread_count > 0 && (
-                              <div className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 rounded-full bg-gradient-to-br from-primary to-primary/90 shadow-lg animate-pulse">
-                                <span className="text-[10px] font-bold text-primary-foreground">{conv.unread_count}</span>
+                              <div className="absolute -top-1 -right-1 flex items-center justify-center w-4 h-4 rounded-full bg-gradient-to-br from-primary to-primary/90 shadow-lg animate-pulse">
+                                <span className="text-[9px] font-bold text-primary-foreground">{conv.unread_count}</span>
                               </div>
                             )}
                           </div>
 
                           {/* Contenu au milieu */}
-                          <div 
-                            className="flex-1 min-w-0 cursor-pointer"
-                            onClick={() => handleConversationClick(conv)}
-                          >
-                            <div className="flex items-start justify-between mb-1">
-                              <div className="flex items-center gap-2 flex-1 min-w-0">
-                                <h3 className="font-bold text-sm truncate group-hover:text-primary transition-colors leading-tight">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-start justify-between mb-0.5">
+                              <div className="flex items-center gap-1.5 flex-1 min-w-0">
+                                <h3 className="font-bold text-xs truncate group-hover:text-primary transition-colors leading-tight">
                                   {conv.other_user_name}
                                 </h3>
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                                  className="h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity"
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     navigate(`/profile/${conv.other_user_id}`);
                                   }}
                                 >
-                                  <User className="h-3 w-3" />
+                                  <User className="h-2.5 w-2.5" />
                                 </Button>
                               </div>
-                              <span className="text-[10px] font-semibold text-muted-foreground/70 whitespace-nowrap ml-2">
+                              <span className="text-[9px] font-semibold text-muted-foreground/70 whitespace-nowrap ml-1">
                                 {new Date(conv.last_message_time).toLocaleDateString('fr-FR', {
                                   day: '2-digit',
                                   month: '2-digit',
@@ -414,31 +409,28 @@ const Messages = () => {
                               </span>
                             </div>
                             
-                            <p className="text-[11px] text-muted-foreground/60 mb-1.5 truncate font-medium">
+                            <p className="text-[10px] text-muted-foreground/60 mb-0.5 truncate font-medium">
                               {conv.business_title}
                             </p>
                             
-                            <div className="flex items-center gap-2">
-                              <p className="text-xs text-foreground/70 truncate leading-tight flex-1">
+                            <div className="flex items-center gap-1.5">
+                              <p className="text-[10px] text-foreground/70 truncate leading-tight flex-1">
                                 {conv.last_message}
                               </p>
                               {conv.last_message_sender_id === user?.id && (
                                 conv.last_message_read ? (
-                                  <CheckCheck className="w-3.5 h-3.5 text-primary flex-shrink-0" />
+                                  <CheckCheck className="w-3 h-3 text-primary flex-shrink-0" />
                                 ) : (
-                                  <Check className="w-3.5 h-3.5 text-muted-foreground/50 flex-shrink-0" />
+                                  <Check className="w-3 h-3 text-muted-foreground/50 flex-shrink-0" />
                                 )
                               )}
-                              <ChevronRight className="w-4 h-4 text-muted-foreground/50 group-hover:text-primary group-hover:translate-x-1 transition-all flex-shrink-0" />
+                              <ChevronRight className="w-3 h-3 text-muted-foreground/50 group-hover:text-primary group-hover:translate-x-0.5 transition-all flex-shrink-0" />
                             </div>
                           </div>
 
                           {/* Image annonce à droite */}
-                          <div className="flex items-center gap-2 flex-shrink-0">
-                            <div 
-                              className="w-12 h-12 rounded-lg overflow-hidden bg-muted shadow-sm ring-1 ring-border/40 cursor-pointer"
-                              onClick={() => handleConversationClick(conv)}
-                            >
+                          <div className="flex items-center gap-1.5 flex-shrink-0">
+                            <div className="w-10 h-10 rounded-lg overflow-hidden bg-muted shadow-sm ring-1 ring-border/40">
                               {conv.business_photo ? (
                                 <img 
                                   src={conv.business_photo} 
@@ -447,7 +439,7 @@ const Messages = () => {
                                 />
                               ) : (
                                 <div className="w-full h-full bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center">
-                                  <span className="text-lg">🏢</span>
+                                  <span className="text-sm">🏢</span>
                                 </div>
                               )}
                             </div>
@@ -458,10 +450,10 @@ const Messages = () => {
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                                  className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
                                   onClick={(e) => e.stopPropagation()}
                                 >
-                                  <Trash2 className="h-4 w-4 text-destructive" />
+                                  <Trash2 className="h-3 w-3 text-destructive" />
                                 </Button>
                               </AlertDialogTrigger>
                               <AlertDialogContent>
