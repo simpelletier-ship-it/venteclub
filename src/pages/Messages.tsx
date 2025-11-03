@@ -7,7 +7,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { MessageSquare, ArrowLeft, ChevronRight, Search, Trash2, SortDesc } from "lucide-react";
+import { MessageSquare, ArrowLeft, ChevronRight, Search, Trash2, SortDesc, User, CheckCheck, Check } from "lucide-react";
 import { ChatBox } from "@/components/ChatBox";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -22,6 +22,8 @@ interface Conversation {
   other_user_avatar: string | null;
   last_message: string;
   last_message_time: string;
+  last_message_sender_id: string;
+  last_message_read: boolean;
   unread_count: number;
   is_seller: boolean;
 }
@@ -153,6 +155,8 @@ const Messages = () => {
             other_user_avatar: otherUserData?.avatar_url || null,
             last_message: msg.content,
             last_message_time: msg.created_at,
+            last_message_sender_id: msg.sender_id,
+            last_message_read: msg.read,
             unread_count: unreadCount || 0,
             is_seller: isSeller,
           });
@@ -386,13 +390,21 @@ const Messages = () => {
                             onClick={() => handleConversationClick(conv)}
                           >
                             <div className="flex items-start justify-between mb-1">
-                              <div className="flex-1 min-w-0">
-                                <h3 className="font-bold text-sm truncate group-hover:text-primary transition-colors leading-tight mb-0.5">
+                              <div className="flex items-center gap-2 flex-1 min-w-0">
+                                <h3 className="font-bold text-sm truncate group-hover:text-primary transition-colors leading-tight">
                                   {conv.other_user_name}
                                 </h3>
-                                <p className="text-[11px] text-muted-foreground/60 truncate font-medium">
-                                  {conv.business_title}
-                                </p>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    navigate(`/profile/${conv.other_user_id}`);
+                                  }}
+                                >
+                                  <User className="h-3 w-3" />
+                                </Button>
                               </div>
                               <span className="text-[10px] font-semibold text-muted-foreground/70 whitespace-nowrap ml-2">
                                 {new Date(conv.last_message_time).toLocaleDateString('fr-FR', {
@@ -402,10 +414,21 @@ const Messages = () => {
                               </span>
                             </div>
                             
+                            <p className="text-[11px] text-muted-foreground/60 mb-1.5 truncate font-medium">
+                              {conv.business_title}
+                            </p>
+                            
                             <div className="flex items-center gap-2">
                               <p className="text-xs text-foreground/70 truncate leading-tight flex-1">
                                 {conv.last_message}
                               </p>
+                              {conv.last_message_sender_id === user?.id && (
+                                conv.last_message_read ? (
+                                  <CheckCheck className="w-3.5 h-3.5 text-primary flex-shrink-0" />
+                                ) : (
+                                  <Check className="w-3.5 h-3.5 text-muted-foreground/50 flex-shrink-0" />
+                                )
+                              )}
                               <ChevronRight className="w-4 h-4 text-muted-foreground/50 group-hover:text-primary group-hover:translate-x-1 transition-all flex-shrink-0" />
                             </div>
                           </div>
