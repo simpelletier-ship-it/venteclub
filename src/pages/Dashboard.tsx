@@ -314,7 +314,7 @@ const Dashboard = () => {
                     Créer une nouvelle annonce
                   </Button>
                 </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 items-stretch">
                 {businesses.map((business) => {
                   const featuredUntil = business.featured_until ? new Date(business.featured_until) : null;
                   const now = new Date();
@@ -324,7 +324,7 @@ const Dashboard = () => {
                     : 0;
 
                   return (
-                    <div key={business.id} className="space-y-2">
+                    <div key={business.id} className="flex flex-col space-y-2">
                       <div className="space-y-2">
                         {isActiveFeatured && (
                           <div className="bg-gradient-to-r from-yellow-500/20 to-amber-500/20 border border-yellow-500/30 rounded-lg p-3 flex items-center gap-2">
@@ -338,30 +338,32 @@ const Dashboard = () => {
                           </div>
                         )}
                       </div>
-                      <div 
-                        onClick={() => {
-                          if (business.status === 'archived') {
-                            // Rediriger vers la bonne page selon le type
-                            if (business.sale_type === 'property') {
-                              navigate(`/list-property?edit=${business.id}`);
-                            } else if (business.is_franchise) {
-                              navigate(`/list-franchise?edit=${business.id}`);
+                      <div className="flex-1">
+                        <div
+                          onClick={() => {
+                            if (business.status === 'archived') {
+                              // Rediriger vers la bonne page selon le type
+                              if (business.sale_type === 'property') {
+                                navigate(`/list-property?edit=${business.id}`);
+                              } else if (business.is_franchise) {
+                                navigate(`/list-franchise?edit=${business.id}`);
+                              } else {
+                                navigate(`/list-business?edit=${business.id}`);
+                              }
                             } else {
-                              navigate(`/list-business?edit=${business.id}`);
+                              navigate(`/entreprise/${business.slug}`);
                             }
-                          } else {
-                            navigate(`/entreprise/${business.slug}`);
-                          }
-                        }}
-                        className="cursor-pointer"
-                      >
-                        <BusinessCard 
+                          }}
+                          className="cursor-pointer h-full"
+                        >
+                          <BusinessCard
                           {...business}
                           showActions={business.status !== 'archived'}
                           showPendingBadge={true}
                           onWithdraw={() => handleWithdrawClick(business)}
                           onFeature={() => handleFeatureClick(business)}
                         />
+                        </div>
                       </div>
                       <div className="flex gap-2 justify-center">
                         {business.approval_status === 'approved' && business.status !== 'sold' && business.status !== 'archived' && !business.has_pending_changes && (
