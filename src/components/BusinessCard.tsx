@@ -127,7 +127,7 @@ const BusinessCard = ({
             </div>
           </div>
           {/* Semi-transparent overlay */}
-          <div className="absolute inset-0 bg-background/60 backdrop-blur-[1px]" />
+          <div className="absolute inset-0 bg-background/60" />
         </div>
       )}
 
