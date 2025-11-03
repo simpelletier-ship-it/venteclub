@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -8,9 +8,10 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, X, Home, Sparkles } from "lucide-react";
+import { Upload, X, Home, Sparkles, FileText, DollarSign } from "lucide-react";
 import { TermsDialog } from "@/components/TermsDialog";
 import { CityCombobox } from "@/components/CityCombobox";
+import { Progress } from "@/components/ui/progress";
 
 const ListProperty = () => {
   const navigate = useNavigate();
@@ -19,6 +20,16 @@ const ListProperty = () => {
   const [user, setUser] = useState<any>(null);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [termsDialogOpen, setTermsDialogOpen] = useState(false);
+  const [editingBusinessId, setEditingBusinessId] = useState<string | null>(null);
+
+  // Récupérer l'ID de l'annonce à éditer depuis l'URL
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const editId = params.get('edit');
+    if (editId) {
+      setEditingBusinessId(editId);
+    }
+  }, []);
 
   const [improvingDescription, setImprovingDescription] = useState(false);
 
@@ -29,6 +40,7 @@ const ListProperty = () => {
     location: "",
     city: "",
     province: "Québec",
+    address: "",
     asking_price: "",
     square_footage: "",
     year_built: "",
@@ -50,6 +62,11 @@ const ListProperty = () => {
         navigate("/auth");
       } else {
         setUser(session.user);
+        
+        // Charger l'annonce existante si on est en mode édition
+        if (editingBusinessId) {
+          await loadBusinessForEdit(editingBusinessId, session.user.id);
+        }
       }
     };
 
@@ -64,7 +81,131 @@ const ListProperty = () => {
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  }, [navigate, editingBusinessId]);
+
+  const loadBusinessForEdit = async (businessId: string, userId: string) => {
+    try {
+      const { data: business, error } = await supabase
+        .from('businesses')
+        .select('*, business_photos(*)')
+        .eq('id', businessId)
+        .eq('seller_id', userId)
+        .maybeSingle();
+
+      if (error) throw error;
+
+      if (!business) {
+        toast({
+          variant: "destructive",
+          title: "Erreur",
+          description: "Annonce introuvable",
+        });
+        navigate('/dashboard');
+        return;
+      }
+
+      // Vérifier si l'annonce a des modifications en attente
+      if (business.has_pending_changes) {
+        toast({
+          variant: "destructive",
+          title: "Modification impossible",
+          description: "Cette annonce a déjà des modifications en attente d'approbation.",
+          duration: 6000,
+        });
+        navigate('/dashboard');
+        return;
+      }
+
+      // Remplir le formulaire avec les données existantes
+      setFormData({
+        title: business.title || "",
+        description: business.description || "",
+        property_type: business.property_type || "",
+        location: business.location || "",
+        city: business.city || "",
+        province: business.province || "Québec",
+        address: business.address || "",
+        asking_price: business.asking_price?.toString() || "",
+        square_footage: business.square_footage?.toString() || "",
+        year_built: business.year_built?.toString() || "",
+        seller_email: "",
+        seller_phone: "",
+        is_rental_property: business.is_rental_property || false,
+      });
+
+      // Vérifier si le prix est "à discuter"
+      if (business.asking_price === 0 || business.asking_price === null) {
+        setPriceNegotiable(true);
+      }
+
+      // Charger les unités de location si présentes
+      if (business.rental_units && Array.isArray(business.rental_units)) {
+        setRentalUnits(business.rental_units.map((u: any) => ({
+          unit_type: u.unit_type || "",
+          monthly_rent: u.monthly_rent?.toString() || "",
+          count: u.count?.toString() || ""
+        })));
+      }
+
+      // Charger les photos existantes
+      if (business.business_photos && business.business_photos.length > 0) {
+        const urls = business.business_photos
+          .sort((a: any, b: any) => a.display_order - b.display_order)
+          .map((photo: any) => photo.photo_url);
+        setPhotoPreviewUrls(urls);
+      }
+
+      // Charger les informations de contact
+      const { data: contact } = await supabase
+        .from('seller_contacts')
+        .select('*')
+        .eq('seller_id', userId)
+        .maybeSingle();
+
+      if (contact) {
+        setFormData(prev => ({
+          ...prev,
+          seller_email: contact.email || "",
+          seller_phone: contact.phone || "",
+        }));
+      }
+
+      toast({
+        title: "Annonce chargée",
+        description: "Vous pouvez maintenant modifier votre annonce",
+      });
+    } catch (error: any) {
+      console.error('Error loading business:', error);
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: error.message,
+      });
+      navigate('/dashboard');
+    }
+  };
+
+  // Calculate visibility score
+  const visibilityScore = useMemo(() => {
+    const fields = [
+      formData.title,
+      formData.description,
+      formData.property_type,
+      formData.city,
+      formData.address,
+      formData.asking_price,
+      formData.square_footage,
+      formData.year_built,
+    ];
+    
+    const filledFields = fields.filter(field => field && String(field).trim() !== "").length;
+    const totalFilledFields = filledFields + (photos.length > 0 ? 1 : 0);
+    const totalFields = fields.length + 1;
+    
+    if (totalFilledFields === 0) return 0;
+    
+    return Math.round((totalFilledFields / totalFields) * 100);
+  }, [formData, photos]);
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -201,7 +342,7 @@ const ListProperty = () => {
             }))
         : null;
 
-      const { data: business, error: businessError } = await supabase
+      const { data: business, error: businessError} = await supabase
         .from('businesses')
         .insert([{
           seller_id: user.id,
@@ -211,6 +352,7 @@ const ListProperty = () => {
           location: `${formData.city}, ${formData.province}`,
           city: formData.city,
           province: formData.province,
+          address: formData.address || null,
           asking_price: priceNegotiable ? 0 : parseFloat(formData.asking_price),
           year_established: formData.year_built ? parseInt(formData.year_built) : null,
           year_built: formData.year_built ? parseInt(formData.year_built) : null,
@@ -276,20 +418,23 @@ const ListProperty = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 py-12">
-      <div className="container max-w-4xl mx-auto px-4">
+      <div className="container max-w-7xl mx-auto px-4">
         <div className="mb-8 text-center">
           <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-secondary/10 border border-secondary/20 mb-4">
             <Home className="w-5 h-5 text-secondary" />
             <span className="text-sm font-semibold">Immobilier</span>
           </div>
           <h1 className="text-4xl md:text-5xl font-display font-bold mb-4">
-            Vendez votre <span className="text-secondary">immobilier</span>
+            {editingBusinessId ? "Modifier votre" : "Vendez votre"} <span className="text-secondary">immobilier</span>
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Listez votre propriété commerciale ou industrielle sur notre plateforme
           </p>
         </div>
 
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Formulaire - 2/3 width */}
+          <div className="lg:col-span-2">
         <form onSubmit={handleSubmit} className="space-y-8 bg-card rounded-2xl shadow-elegant p-8 border border-border">
           {/* Informations de base */}
           <div className="space-y-6">
@@ -367,6 +512,19 @@ const ListProperty = () => {
                   required
                 />
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="address">Adresse</Label>
+              <Input
+                id="address"
+                value={formData.address}
+                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                placeholder="Ex: 123 rue Principale"
+              />
+              <p className="text-xs text-muted-foreground">
+                L'adresse complète ne sera visible que pour les acheteurs intéressés
+              </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -603,9 +761,76 @@ const ListProperty = () => {
             className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground"
             disabled={loading}
           >
-            {loading ? "Publication en cours..." : "Publier l'annonce"}
+            {loading ? "Publication en cours..." : editingBusinessId ? "Enregistrer les modifications" : "Publier l'annonce"}
           </Button>
         </form>
+          </div>
+
+          {/* Sidebar - 1/3 width */}
+          <div className="space-y-6">
+            {/* Score de visibilité */}
+            <div className="bg-card p-6 rounded-lg shadow-sm border border-border sticky top-24">
+              <div className="mb-6">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-base font-semibold text-foreground">Score de visibilité</h3>
+                  <div className="flex items-center gap-2">
+                    <div className={`w-2 h-2 rounded-full ${
+                      visibilityScore === 0 ? "bg-gray-400" :
+                      visibilityScore < 30 ? "bg-red-500" :
+                      visibilityScore < 60 ? "bg-orange-500" :
+                      visibilityScore < 80 ? "bg-yellow-500" :
+                      "bg-green-500"
+                    }`} />
+                    <span className="text-2xl font-bold text-foreground">{visibilityScore}%</span>
+                  </div>
+                </div>
+                <Progress 
+                  value={visibilityScore} 
+                  className={`h-1.5 ${
+                    visibilityScore === 0 ? "[&>div]:bg-gray-400" :
+                    visibilityScore < 30 ? "[&>div]:bg-red-500" :
+                    visibilityScore < 60 ? "[&>div]:bg-orange-500" :
+                    visibilityScore < 80 ? "[&>div]:bg-yellow-500" :
+                    "[&>div]:bg-green-500"
+                  }`}
+                />
+                <p className="text-xs text-muted-foreground mt-2">
+                  {visibilityScore === 0 ? "Aucune donnée" :
+                   visibilityScore < 30 ? "Visibilité faible" :
+                   visibilityScore < 60 ? "Visibilité moyenne" :
+                   visibilityScore < 80 ? "Bonne visibilité" :
+                   "Excellente visibilité"}
+                </p>
+              </div>
+
+              <div className="space-y-3 text-sm text-muted-foreground">
+                <p>Complétez votre annonce pour augmenter sa visibilité et attirer plus d'acheteurs potentiels.</p>
+                <ul className="space-y-2">
+                  <li className="flex items-start gap-2">
+                    <span className={formData.title ? "text-green-500" : "text-muted-foreground"}>✓</span>
+                    <span>Titre descriptif</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className={formData.description.length >= 50 ? "text-green-500" : "text-muted-foreground"}>✓</span>
+                    <span>Description détaillée</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className={formData.property_type ? "text-green-500" : "text-muted-foreground"}>✓</span>
+                    <span>Type de propriété</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className={formData.address ? "text-green-500" : "text-muted-foreground"}>✓</span>
+                    <span>Adresse</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className={photos.length > 0 ? "text-green-500" : "text-muted-foreground"}>✓</span>
+                    <span>Photos</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
 
         <TermsDialog open={termsDialogOpen} onOpenChange={setTermsDialogOpen} />
       </div>
