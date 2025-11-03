@@ -382,6 +382,7 @@ const ListProperty = () => {
                   placeholder={priceNegotiable ? "À discuter" : "500000"}
                   required={!priceNegotiable}
                   disabled={priceNegotiable}
+                  min="0"
                 />
                 <div className="flex items-center space-x-2 mt-2">
                   <Checkbox

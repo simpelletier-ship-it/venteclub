@@ -1164,6 +1164,7 @@ const ListBusiness = () => {
                           required={!priceNegotiable}
                           disabled={priceNegotiable}
                           placeholder={priceNegotiable ? "À discuter" : "Ex: 100 000"}
+                          min="0"
                         />
                         <div className="flex items-center space-x-2 mt-2">
                           <Checkbox
