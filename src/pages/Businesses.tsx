@@ -31,15 +31,9 @@ const Businesses = () => {
         .eq('approval_status', 'approved')
         .order('created_at', { ascending: false });
 
-      // Filter out properties (property_type not null OR property-related industries)
-      const propertyIndustries = ['immeuble_revenus', 'residentiel'];
-      const filtered = businesses?.filter(b => 
-        !b.property_type && !propertyIndustries.includes(b.industry)
-      ) || [];
-
-      if (filtered) {
-        const featured = filtered.filter(b => b.featured && b.status === 'active');
-        const regular = filtered.filter(b => !b.featured || b.status === 'sold');
+      if (businesses) {
+        const featured = businesses.filter(b => b.featured && b.status === 'active');
+        const regular = businesses.filter(b => !b.featured || b.status === 'sold');
         setFeaturedBusinesses(featured);
         setAllBusinesses(regular);
         setFilteredBusinesses(regular);

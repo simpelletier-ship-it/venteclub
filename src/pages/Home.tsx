@@ -44,7 +44,7 @@ const Home = () => {
         .select('id, slug, title, industry, city, region, annual_revenue, asking_price, baiia, description, featured, status, approval_status, is_franchise, sale_type, property_type, year_built, square_footage, is_rental_property, rental_units, created_at')
         .eq('status', 'active')
         .eq('approval_status', 'approved')
-        .order('featured', { ascending: false })
+        .eq('featured', true)
         .order('created_at', { ascending: false })
         .limit(6);
 
