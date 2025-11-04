@@ -31,6 +31,8 @@ interface Business {
   year_built?: number;
   square_footage?: number;
   is_rental_property?: boolean;
+  rental_units?: Array<{unit_type: string, monthly_rent: number | null, count: number}> | null;
+  address?: string;
 }
 
 interface BusinessMapProps {
@@ -98,6 +100,8 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
         year_built,
         square_footage,
         is_rental_property,
+        rental_units,
+        address,
         business_photos(photo_url)
       `)
       .eq('status', 'active')
@@ -130,6 +134,9 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
         ...b,
         photo_url: Array.isArray(b.business_photos) && b.business_photos.length > 0 
           ? b.business_photos[0].photo_url 
+          : null,
+        rental_units: b.rental_units && Array.isArray(b.rental_units) 
+          ? b.rental_units as Array<{unit_type: string, monthly_rent: number | null, count: number}>
           : null
       }));
       
@@ -361,6 +368,8 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
             year_built: business.year_built || null,
             square_footage: business.square_footage || null,
             is_rental_property: business.is_rental_property || false,
+            rental_units: business.rental_units ? JSON.stringify(business.rental_units) : null,
+            address: business.address || null,
           },
         })),
       };
@@ -509,7 +518,7 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
         closeButton: false,
         closeOnClick: false,
         className: 'business-popup',
-        maxWidth: '300px',
+        maxWidth: '380px',
       });
 
       map.current.on('mouseenter', 'unclustered-point', (e) => {
@@ -529,33 +538,79 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
         // Créer les infos secondaires selon le type
         let secondaryInfo = '';
         if (isProperty) {
-          // Pour les immeubles : superficie et année
+          // Pour les immeubles : toutes les infos détaillées
           const sqFt = props.square_footage ? `${Number(props.square_footage).toLocaleString('fr-CA')} pi²` : 'N/D';
           const year = props.year_built || 'N/D';
-          const propertyTypeLabel = props.property_type === 'bureau' ? 'Bureau' :
-                                   props.property_type === 'commerce' ? 'Commerce' :
-                                   props.property_type === 'industriel' ? 'Industriel' :
-                                   props.property_type === 'immeuble_logement' ? 'Immeuble' :
-                                   props.property_type === 'mixte' ? 'Mixte' : 'Propriété';
+          const address = props.address || 'Adresse non spécifiée';
+          const propertyTypeLabel = props.property_type === 'bureau' ? 'Bureau commercial' :
+                                   props.property_type === 'commerce' ? 'Espace commercial' :
+                                   props.property_type === 'industriel' ? 'Bâtiment industriel' :
+                                   props.property_type === 'terrain' ? 'Terrain commercial' :
+                                   props.property_type === 'immeuble_logement' ? 'Immeuble à logement' :
+                                   props.property_type === 'mixte' ? 'Propriété mixte' : 'Propriété';
+          
+          // Parser les rental_units si présents
+          let rentalUnitsHTML = '';
+          if (props.is_rental_property && props.rental_units) {
+            try {
+              const units = JSON.parse(props.rental_units);
+              if (Array.isArray(units) && units.length > 0) {
+                rentalUnitsHTML = `
+                  <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid hsl(${borderColor});">
+                    <div style="font-size: 12px; font-weight: 700; color: hsl(${foregroundColor}); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">
+                      🏠 Unités locatives
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                      ${units.map(unit => `
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; background: hsl(${mutedForegroundColor} / 0.05); border-radius: 6px; border-left: 3px solid ${primaryHex};">
+                          <div>
+                            <span style="font-weight: 600; color: hsl(${foregroundColor}); font-size: 13px;">${unit.count}x ${unit.unit_type}</span>
+                          </div>
+                          ${unit.monthly_rent ? `
+                            <div style="text-align: right;">
+                              <span style="font-size: 12px; color: hsl(${mutedForegroundColor});">Loyer</span>
+                              <div style="font-weight: 700; color: ${primaryHex}; font-size: 14px;">${Number(unit.monthly_rent).toLocaleString('fr-CA')} $/mois</div>
+                            </div>
+                          ` : ''}
+                        </div>
+                      `).join('')}
+                    </div>
+                  </div>
+                `;
+              }
+            } catch (e) {
+              console.error('Error parsing rental_units:', e);
+            }
+          }
           
           secondaryInfo = `
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px;">
-              <div>
-                <div style="font-size: 11px; color: hsl(${mutedForegroundColor}); text-transform: uppercase; margin-bottom: 2px;">Type</div>
-                <div style="font-size: 13px; font-weight: 600; color: hsl(${foregroundColor});">${propertyTypeLabel}</div>
+            <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid hsl(${borderColor});">
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                <div style="background: hsl(${mutedForegroundColor} / 0.05); padding: 10px; border-radius: 8px;">
+                  <div style="font-size: 10px; color: hsl(${mutedForegroundColor}); text-transform: uppercase; margin-bottom: 4px; font-weight: 600; letter-spacing: 0.5px;">Type de propriété</div>
+                  <div style="font-size: 13px; font-weight: 700; color: hsl(${foregroundColor});">${propertyTypeLabel}</div>
+                </div>
+                <div style="background: hsl(${mutedForegroundColor} / 0.05); padding: 10px; border-radius: 8px;">
+                  <div style="font-size: 10px; color: hsl(${mutedForegroundColor}); text-transform: uppercase; margin-bottom: 4px; font-weight: 600; letter-spacing: 0.5px;">Année construction</div>
+                  <div style="font-size: 13px; font-weight: 700; color: hsl(${foregroundColor});">${year}</div>
+                </div>
               </div>
-              <div>
-                <div style="font-size: 11px; color: hsl(${mutedForegroundColor}); text-transform: uppercase; margin-bottom: 2px;">Superficie</div>
-                <div style="font-size: 13px; font-weight: 600; color: hsl(${foregroundColor});">${sqFt}</div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div style="background: hsl(${mutedForegroundColor} / 0.05); padding: 10px; border-radius: 8px;">
+                  <div style="font-size: 10px; color: hsl(${mutedForegroundColor}); text-transform: uppercase; margin-bottom: 4px; font-weight: 600; letter-spacing: 0.5px;">Superficie</div>
+                  <div style="font-size: 13px; font-weight: 700; color: hsl(${foregroundColor});">${sqFt}</div>
+                </div>
+                ${props.is_rental_property ? `
+                  <div style="background: linear-gradient(135deg, ${primaryHex}15, ${primaryHex}25); padding: 10px; border-radius: 8px; border: 1px solid ${primaryHex}30;">
+                    <div style="font-size: 10px; color: ${primaryHex}; text-transform: uppercase; margin-bottom: 4px; font-weight: 700; letter-spacing: 0.5px;">Type</div>
+                    <div style="font-size: 13px; font-weight: 700; color: ${primaryHex};">Locatif</div>
+                  </div>
+                ` : ''}
               </div>
-              <div>
-                <div style="font-size: 11px; color: hsl(${mutedForegroundColor}); text-transform: uppercase; margin-bottom: 2px;">Année</div>
-                <div style="font-size: 13px; font-weight: 600; color: hsl(${foregroundColor});">${year}</div>
-              </div>
-              ${props.is_rental_property ? `
-                <div>
-                  <div style="font-size: 11px; color: hsl(${mutedForegroundColor}); text-transform: uppercase; margin-bottom: 2px;">Type</div>
-                  <div style="font-size: 13px; font-weight: 600; color: hsl(${foregroundColor});">Locatif</div>
+              ${rentalUnitsHTML}
+              ${address !== 'Adresse non spécifiée' ? `
+                <div style="margin-top: 10px; padding: 8px 10px; background: hsl(${mutedForegroundColor} / 0.05); border-radius: 6px; font-size: 12px; color: hsl(${mutedForegroundColor});">
+                  📍 ${address}
                 </div>
               ` : ''}
             </div>
@@ -580,41 +635,41 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
 
         const popupContent = `
           <div 
-            style="padding: 0; max-width: 300px; cursor: pointer;" 
+            style="padding: 0; max-width: 380px; cursor: pointer;" 
             onclick="window.dispatchEvent(new CustomEvent('navigate-to-business', { detail: '${props.slug}' }))"
           >
             ${props.photo_url ? `
               <img 
                 src="${props.photo_url}" 
                 alt="${props.title}"
-                style="width: 100%; height: 150px; object-fit: cover; border-radius: 12px 12px 0 0;"
+                style="width: 100%; height: 180px; object-fit: cover; border-radius: 12px 12px 0 0;"
               />
             ` : ''}
-            <div style="padding: 12px;">
-              <h3 style="font-weight: 700; margin-bottom: 8px; font-size: 16px; color: hsl(${foregroundColor}); line-height: 1.3;">
+            <div style="padding: 14px;">
+              <h3 style="font-weight: 700; margin-bottom: 8px; font-size: 17px; color: hsl(${foregroundColor}); line-height: 1.3;">
                 ${props.title}
               </h3>
-              <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 8px;">
+              <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 10px;">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="${primaryHex}" stroke-width="2">
                   <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                   <circle cx="12" cy="10" r="3"></circle>
                 </svg>
-                <span style="color: hsl(${mutedForegroundColor}); font-size: 13px;">${props.location}</span>
+                <span style="color: hsl(${mutedForegroundColor}); font-size: 13px; font-weight: 500;">${props.location}</span>
               </div>
-              <p style="color: hsl(${mutedForegroundColor}); font-size: 13px; margin-bottom: 10px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+              <p style="color: hsl(${mutedForegroundColor}); font-size: 13px; margin-bottom: 12px; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
                 ${props.description}
               </p>
-              <div style="padding-top: 10px; border-top: 1px solid hsl(${borderColor});">
+              <div style="padding-top: 12px; border-top: 2px solid hsl(${borderColor});">
                 <div>
-                  <div style="font-size: 11px; color: hsl(${mutedForegroundColor}); text-transform: uppercase; margin-bottom: 2px;">Prix demandé</div>
-                  <div style="font-weight: 700; color: ${primaryHex}; font-size: 18px;">
+                  <div style="font-size: 11px; color: hsl(${mutedForegroundColor}); text-transform: uppercase; margin-bottom: 4px; font-weight: 600; letter-spacing: 0.5px;">Prix demandé</div>
+                  <div style="font-weight: 700; color: ${primaryHex}; font-size: 22px;">
                     ${Number(props.asking_price).toLocaleString('fr-CA')} $
                   </div>
                 </div>
                 ${secondaryInfo}
               </div>
-              <div style="margin-top: 12px; padding: 8px; background: ${primaryHex}15; border-radius: 6px; text-align: center; font-size: 12px; color: ${primaryHex}; font-weight: 600;">
-                Cliquez pour voir les détails
+              <div style="margin-top: 14px; padding: 10px; background: ${primaryHex}; border-radius: 8px; text-align: center; font-size: 13px; color: white; font-weight: 700; box-shadow: 0 4px 12px ${primaryHex}40;">
+                ✨ Cliquez pour voir tous les détails
               </div>
             </div>
           </div>
