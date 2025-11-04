@@ -329,8 +329,13 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
 
   // Update business markers when businesses change
   useEffect(() => {
-    if (!map.current || businesses.length === 0) {
-      console.log('[MAP] Cannot add markers:', { hasMap: !!map.current, businessCount: businesses.length });
+    if (!map.current) {
+      console.log('[MAP] No map ref');
+      return;
+    }
+    
+    if (businesses.length === 0) {
+      console.log('[MAP] No businesses to display');
       return;
     }
 
@@ -338,7 +343,7 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
 
     const addBusinessLayers = () => {
       if (!map.current) {
-        console.log('[MAP] No map ref');
+        console.log('[MAP] No map ref in addBusinessLayers');
         return;
       }
 
@@ -719,18 +724,27 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
     };
 
     // Wait for map to be fully loaded before adding layers
-    if (map.current.isStyleLoaded()) {
-      console.log('[MAP] Style already loaded, adding layers immediately');
-      addBusinessLayers();
-    } else {
-      console.log('[MAP] Waiting for style to load...');
-      const styleLoadHandler = () => {
-        console.log('[MAP] Style loaded, adding layers now');
+    const initializeLayers = () => {
+      if (!map.current) return;
+      
+      if (map.current.isStyleLoaded()) {
+        console.log('[MAP] Style already loaded, adding layers immediately');
         addBusinessLayers();
-        map.current?.off('style.load', styleLoadHandler);
-      };
-      map.current.on('style.load', styleLoadHandler);
-    }
+      } else {
+        console.log('[MAP] Waiting for style to load...');
+        map.current.once('load', () => {
+          console.log('[MAP] Map loaded, adding layers now');
+          addBusinessLayers();
+        });
+      }
+    };
+    
+    // Small delay to ensure map is ready
+    const timeoutId = setTimeout(initializeLayers, 100);
+    
+    return () => {
+      clearTimeout(timeoutId);
+    };
   }, [businesses, navigate]);
 
   return (
