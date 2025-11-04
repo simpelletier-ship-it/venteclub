@@ -388,35 +388,56 @@ const Dashboard = () => {
                           </Button>
                         )}
                         {business.status === 'archived' && (
-                          <Button
-                            onClick={async () => {
-                              try {
-                                await supabase
-                                  .from('businesses')
-                                  .update({ 
-                                    status: 'active',
-                                    approval_status: 'pending'
-                                  })
-                                  .eq('id', business.id);
-                                
-                                toast({
-                                  title: "Annonce publiée!",
-                                  description: "Votre annonce a été soumise pour approbation.",
-                                });
-                                fetchUserBusinesses(user.id);
-                              } catch (error: any) {
-                                toast({
-                                  variant: "destructive",
-                                  title: "Erreur",
-                                  description: error.message,
-                                });
-                              }
-                            }}
-                            size="sm"
-                            className="flex-1"
-                          >
-                            Publier l'annonce
-                          </Button>
+                          <>
+                            <Button
+                              onClick={async () => {
+                                try {
+                                  await supabase
+                                    .from('businesses')
+                                    .update({ 
+                                      status: 'active',
+                                      approval_status: 'pending'
+                                    })
+                                    .eq('id', business.id);
+                                  
+                                  toast({
+                                    title: "Annonce publiée!",
+                                    description: "Votre annonce a été soumise pour approbation.",
+                                  });
+                                  fetchUserBusinesses(user.id);
+                                } catch (error: any) {
+                                  toast({
+                                    variant: "destructive",
+                                    title: "Erreur",
+                                    description: error.message,
+                                  });
+                                }
+                              }}
+                              size="sm"
+                              className="w-full"
+                            >
+                              Publier l'annonce
+                            </Button>
+                            <Button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                // Rediriger vers la bonne page selon le type
+                                if (business.sale_type === 'property') {
+                                  navigate(`/list-property?edit=${business.id}`);
+                                } else if (business.is_franchise) {
+                                  navigate(`/list-franchise?edit=${business.id}`);
+                                } else {
+                                  navigate(`/list-business?edit=${business.id}`);
+                                }
+                              }}
+                              size="sm"
+                              variant="outline"
+                              className="w-full"
+                            >
+                              <Edit className="mr-1 h-3 w-3" />
+                              Modifier l'annonce
+                            </Button>
+                          </>
                         )}
                         {business.has_pending_changes && (
                           <div className="p-3 bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-800 rounded-lg">
