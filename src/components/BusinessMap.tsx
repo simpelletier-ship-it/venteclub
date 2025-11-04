@@ -363,6 +363,16 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
 
     console.log('[MAP] Adding business layers for', businesses.length, 'businesses');
 
+    let isHoveringPopup = false;
+
+    const handlePopupHover = (event: CustomEvent) => {
+      isHoveringPopup = event.detail;
+    };
+
+    const handlePopupNavigation = (event: CustomEvent) => {
+      navigate(`/entreprise/${event.detail}`);
+    };
+
     const addBusinessLayers = () => {
       if (!map.current) {
         console.log('[MAP] No map ref in addBusinessLayers');
@@ -539,11 +549,18 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
 
         const isProperty = props.sale_type === 'property' || props.property_type;
         const markerColor = isProperty ? propertyColor : primaryColor;
+        
+        // Truncate description to ~80 characters
+        const shortDescription = props.description 
+          ? (props.description.length > 80 ? props.description.substring(0, 80) + '...' : props.description)
+          : '';
 
         const popupContent = `
           <div 
             style="padding: 0; max-width: 260px; cursor: pointer;" 
             onclick="window.dispatchEvent(new CustomEvent('navigate-to-business', { detail: '${props.slug}' }))"
+            onmouseenter="window.dispatchEvent(new CustomEvent('popup-hover', { detail: true }))"
+            onmouseleave="window.dispatchEvent(new CustomEvent('popup-hover', { detail: false }))"
           >
             ${props.photo_url ? `
               <img 
@@ -556,13 +573,18 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
               <h3 style="font-weight: 700; margin-bottom: 6px; font-size: 14px; color: hsl(${foregroundColor}); line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
                 ${props.title}
               </h3>
-              <div style="display: flex; align-items: center; gap: 3px; margin-bottom: 8px;">
+              <div style="display: flex; align-items: center; gap: 3px; margin-bottom: 6px;">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="${markerColor}" stroke-width="2">
                   <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                   <circle cx="12" cy="10" r="3"></circle>
                 </svg>
                 <span style="color: hsl(${mutedForegroundColor}); font-size: 11px; font-weight: 500;">${props.location}</span>
               </div>
+              ${shortDescription ? `
+                <p style="color: hsl(${mutedForegroundColor}); font-size: 11px; line-height: 1.4; margin-bottom: 8px;">
+                  ${shortDescription}
+                </p>
+              ` : ''}
               <div style="padding: 8px 0; border-top: 1px solid hsl(${borderColor}); border-bottom: 1px solid hsl(${borderColor});">
                 <div style="font-weight: 700; color: ${markerColor}; font-size: 16px;">
                   ${Number(props.asking_price).toLocaleString('fr-CA')} $
@@ -578,20 +600,24 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
         popup.setLngLat(coordinates).setHTML(popupContent).addTo(map.current);
       });
 
+      window.addEventListener('popup-hover', handlePopupHover as EventListener);
+
       map.current.on('mouseleave', 'unclustered-point', () => {
         if (!map.current) return;
         map.current.getCanvas().style.cursor = '';
-        popup.remove();
+        
+        // Delay removing popup to check if hovering over it
+        setTimeout(() => {
+          if (!isHoveringPopup) {
+            popup.remove();
+          }
+        }, 100);
       });
 
       map.current.on('click', 'unclustered-point', (e) => {
         const businessSlug = e.features![0].properties!.slug;
         navigate(`/entreprise/${businessSlug}`);
       });
-
-      const handlePopupNavigation = (event: CustomEvent) => {
-        navigate(`/entreprise/${event.detail}`);
-      };
       
       window.addEventListener('navigate-to-business', handlePopupNavigation as EventListener);
 
@@ -634,6 +660,8 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
     
     return () => {
       clearTimeout(timeoutId);
+      window.removeEventListener('popup-hover', handlePopupHover as EventListener);
+      window.removeEventListener('navigate-to-business', handlePopupNavigation as EventListener);
     };
   }, [businesses, navigate]);
 
