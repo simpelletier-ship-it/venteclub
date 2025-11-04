@@ -312,6 +312,7 @@ export type Database = {
           industry: Database["public"]["Enums"]["industry_type"]
           initial_investment_max: number | null
           initial_investment_min: number | null
+          is_demo: boolean | null
           is_franchise: boolean | null
           is_premium: boolean | null
           is_rental_property: boolean | null
@@ -367,6 +368,7 @@ export type Database = {
           industry: Database["public"]["Enums"]["industry_type"]
           initial_investment_max?: number | null
           initial_investment_min?: number | null
+          is_demo?: boolean | null
           is_franchise?: boolean | null
           is_premium?: boolean | null
           is_rental_property?: boolean | null
@@ -422,6 +424,7 @@ export type Database = {
           industry?: Database["public"]["Enums"]["industry_type"]
           initial_investment_max?: number | null
           initial_investment_min?: number | null
+          is_demo?: boolean | null
           is_franchise?: boolean | null
           is_premium?: boolean | null
           is_rental_property?: boolean | null
