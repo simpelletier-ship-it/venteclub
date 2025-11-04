@@ -63,6 +63,50 @@ const BusinessDetails = () => {
     initialize();
   }, [slug]);
 
+  // Subscribe to real-time updates for business data
+  useEffect(() => {
+    if (!businessId) return;
+
+    const businessChannel = supabase
+      .channel(`business_${businessId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'businesses',
+          filter: `id=eq.${businessId}`
+        },
+        () => {
+          console.log('[REALTIME] Business data changed, refreshing...');
+          fetchBusiness();
+        }
+      )
+      .subscribe();
+
+    const photosChannel = supabase
+      .channel(`business_photos_${businessId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'business_photos',
+          filter: `business_id=eq.${businessId}`
+        },
+        () => {
+          console.log('[REALTIME] Photos changed, refreshing...');
+          fetchPhotos();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(businessChannel);
+      supabase.removeChannel(photosChannel);
+    };
+  }, [businessId]);
+
   // Re-check access when premium status changes
   useEffect(() => {
     if (user && hasPremium) {
