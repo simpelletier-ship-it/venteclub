@@ -140,6 +140,19 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
           : null
       }));
       
+      // Fonction pour vérifier si un point est dans l'eau (approximatif pour le Québec)
+      const isInWater = (lat: number, lng: number): boolean => {
+        // Golfe du Saint-Laurent et zones côtières approximatives
+        if (lat > 48.5 && lng > -64) return true; // Golfe du Saint-Laurent Est
+        if (lat > 49.5 && lng < -66) return true; // Baie d'Ungava
+        if (lat > 51 && lng < -78) return true; // Baie d'Hudson
+        
+        // Océan Atlantique (Est du Québec)
+        if (lng > -62) return true;
+        
+        return false;
+      };
+
       const businessesWithCoords = await Promise.all(
         businessesWithPhotos.map(async (business) => {
           if (!business.latitude || !business.longitude) {
@@ -185,7 +198,12 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
         })
       );
       
-      const validBusinesses = businessesWithCoords.filter(b => b.latitude && b.longitude);
+      // Filtrer les points valides ET qui ne sont pas dans l'eau
+      const validBusinesses = businessesWithCoords.filter(b => 
+        b.latitude && 
+        b.longitude && 
+        !isInWater(b.latitude, b.longitude)
+      );
       console.log('[MAP] Valid businesses with coordinates:', validBusinesses.length);
       console.log('[MAP] First business:', validBusinesses[0]);
       setBusinesses(validBusinesses);

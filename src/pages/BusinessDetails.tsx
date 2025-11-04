@@ -496,6 +496,11 @@ const BusinessDetails = () => {
                         <MapPin className="w-4 h-4" />
                         {business.city || business.location}
                         {business.region && <span className="text-muted-foreground/70">, {business.region}</span>}
+                        {!business.address && (
+                          <span className="text-xs text-muted-foreground/60 italic ml-1">
+                            (localisation approximative)
+                          </span>
+                        )}
                       </span>
                       {business.created_at && (
                         <span className="flex items-center gap-1">
