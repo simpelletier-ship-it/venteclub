@@ -23,12 +23,26 @@ const Auth = () => {
   const [verificationCode, setVerificationCode] = useState("");
 
   useEffect(() => {
+    // Vérifier la session existante
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
         navigate("/");
       }
     });
-  }, [navigate]);
+
+    // Écouter les changements d'authentification (important pour le callback Google)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session) {
+        toast({
+          title: "Connexion réussie !",
+          description: "Bienvenue sur Vente.Club",
+        });
+        navigate("/");
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [navigate, toast]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
