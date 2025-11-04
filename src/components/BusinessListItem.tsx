@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Skeleton } from "@/components/ui/skeleton";
 import { TrendingUp, MapPin, Star, Home, Store, HelpCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { FavoriteButton } from "./FavoriteButton";
@@ -57,6 +58,7 @@ const BusinessListItem = ({
   const navigate = useNavigate();
   const [userId, setUserId] = useState<string | undefined>();
   const [mainImage, setMainImage] = useState<string | null>(null);
+  const [imageLoading, setImageLoading] = useState(true);
   
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -67,26 +69,36 @@ const BusinessListItem = ({
   useEffect(() => {
     const fetchMainImage = async () => {
       if (id) {
-        const { data, error } = await supabase
-          .from('business_photos')
-          .select('photo_url')
-          .eq('business_id', id)
-          .order('display_order', { ascending: true })
-          .limit(1);
-        
-        if (error) {
-          console.error('[BUSINESS-LIST] Error fetching photo:', error);
-          setMainImage(null);
-        } else if (data && data.length > 0 && data[0]?.photo_url) {
-          setMainImage(data[0].photo_url);
-        } else {
-          setMainImage(null);
-        }
+        // Utiliser un timeout pour éviter de bloquer le rendu
+        const timeoutId = setTimeout(async () => {
+          const { data, error } = await supabase
+            .from('business_photos')
+            .select('photo_url')
+            .eq('business_id', id)
+            .order('display_order', { ascending: true })
+            .limit(1);
+          
+          if (error) {
+            console.error('[BUSINESS-LIST] Error fetching photo:', error);
+            setMainImage(null);
+          } else if (data && data.length > 0 && data[0]?.photo_url) {
+            setMainImage(data[0].photo_url);
+          } else {
+            setMainImage(null);
+          }
+          setImageLoading(false);
+        }, 100);
+
+        return () => clearTimeout(timeoutId);
+      } else {
+        setImageLoading(false);
       }
     };
     
     fetchMainImage();
     
+    // Désactiver les subscriptions temps réel pour améliorer les performances
+    /*
     // Subscribe to photo changes
     if (id) {
       const channel = supabase
@@ -110,6 +122,7 @@ const BusinessListItem = ({
         supabase.removeChannel(channel);
       };
     }
+    */
   }, [id]);
   
   const displayRevenue = revenue || (annual_revenue ? `${annual_revenue.toLocaleString('fr-CA', { useGrouping: true }).replace(/\$/g, '')} $` : 'N/A');
@@ -170,11 +183,16 @@ const BusinessListItem = ({
 
       {/* Image à gauche */}
       <div className="relative w-32 h-32 flex-shrink-0 overflow-hidden rounded-lg bg-muted">
-        {mainImage ? (
+        {imageLoading ? (
+          <Skeleton className="w-full h-full" />
+        ) : mainImage ? (
           <img 
             src={mainImage} 
             alt={title}
-            className="w-full h-full object-cover"
+            loading="lazy"
+            className="w-full h-full object-cover transition-opacity duration-300"
+            onLoad={(e) => e.currentTarget.style.opacity = '1'}
+            style={{ opacity: 0 }}
           />
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-muted to-muted/50">
