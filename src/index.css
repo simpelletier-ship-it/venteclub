@@ -36,6 +36,10 @@ All colors MUST be HSL.
     --accent: 219 100% 50%;
     --accent-foreground: 0 0% 100%;
     
+    /* Franchise: Orange vif (#FF6B00) */
+    --franchise: 24 100% 50%;
+    --franchise-foreground: 0 0% 100%;
+    
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
     
@@ -97,6 +101,9 @@ All colors MUST be HSL.
     
     --accent: 219 100% 58%;
     --accent-foreground: 0 0% 100%;
+    
+    --franchise: 24 100% 55%;
+    --franchise-foreground: 0 0% 100%;
     
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;

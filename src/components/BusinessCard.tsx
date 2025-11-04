@@ -94,7 +94,7 @@ const BusinessCard = ({
     
     // Vérifier si c'est une franchise
     if (is_franchise) {
-      return { label: 'Franchise', icon: TrendingUp, color: 'bg-purple-500' };
+      return { label: 'Franchise', icon: TrendingUp, color: 'bg-[#FF6B00]' };
     }
     
     // Par défaut, c'est une entreprise
@@ -264,7 +264,7 @@ const BusinessCard = ({
               </div>
               <div className="space-y-1">
                 <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Droit d'entrée</p>
-                <p className="text-lg font-bold text-secondary">{displayPrice}</p>
+                <p className="text-lg font-bold text-[#FF6B00]">{displayPrice}</p>
               </div>
             </>
           )}

@@ -75,7 +75,7 @@ const BusinessListItem = ({
       return { label: 'Immobilier', icon: Home, color: 'bg-emerald-500' };
     }
     if (is_franchise) {
-      return { label: 'Franchise', icon: TrendingUp, color: 'bg-purple-500' };
+      return { label: 'Franchise', icon: TrendingUp, color: 'bg-[#FF6B00]' };
     }
     return { label: 'Entreprise', icon: Store, color: 'bg-blue-500' };
   };

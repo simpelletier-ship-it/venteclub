@@ -452,10 +452,10 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
       console.log('[MAP] Source added');
 
       // Utiliser des couleurs simples et visibles
-      const primaryColor = '#3b82f6';      // Blue
+      const primaryColor = '#3b82f6';      // Blue - Entreprises
       const accentColor = '#8b5cf6';       // Purple  
-      const franchiseColor = '#a855f7';    // Violet
-      const propertyColor = '#10b981';     // Green
+      const franchiseColor = '#FF6B00';    // Orange - Franchises
+      const propertyColor = '#10b981';     // Green - Immeubles
 
       map.current.addLayer({
         id: 'clusters',
@@ -566,7 +566,8 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
         const borderColor = getComputedStyle(document.documentElement).getPropertyValue('--border').trim();
 
         const isProperty = props.sale_type === 'property' || props.property_type;
-        const markerColor = isProperty ? propertyColor : primaryColor;
+        const isFranchise = props.is_franchise;
+        const markerColor = isProperty ? propertyColor : (isFranchise ? franchiseColor : primaryColor);
         
         // Truncate description to ~80 characters
         const shortDescription = props.description 

@@ -71,12 +71,12 @@ const Sell = () => {
             </Card>
 
             <Card 
-              className="group cursor-pointer hover:shadow-premium transition-all duration-300 hover:scale-105 border-2 hover:border-accent flex flex-col"
+              className="group cursor-pointer hover:shadow-premium transition-all duration-300 hover:scale-105 border-2 hover:border-[#FF6B00] flex flex-col"
               onClick={() => navigate("/list-franchise")}
             >
               <CardHeader className="text-center space-y-4 pb-6">
-                <div className="mx-auto w-20 h-20 rounded-full bg-accent/10 flex items-center justify-center group-hover:bg-accent/20 transition-colors">
-                  <Store className="w-10 h-10 text-accent" />
+                <div className="mx-auto w-20 h-20 rounded-full bg-[#FF6B00]/10 flex items-center justify-center group-hover:bg-[#FF6B00]/20 transition-colors">
+                  <Store className="w-10 h-10 text-[#FF6B00]" />
                 </div>
                 <CardTitle className="text-2xl">Franchise</CardTitle>
                 <CardDescription className="text-base min-h-[48px]">
@@ -86,28 +86,28 @@ const Sell = () => {
               <CardContent className="flex-1 flex flex-col justify-between text-sm text-muted-foreground">
                 <ul className="space-y-2 mb-4">
                   <li className="flex items-start gap-2">
-                    <span className="text-accent mt-0.5">•</span>
+                    <span className="text-[#FF6B00] mt-0.5">•</span>
                     <span>Franchise alimentaire</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-accent mt-0.5">•</span>
+                    <span className="text-[#FF6B00] mt-0.5">•</span>
                     <span>Franchise de services</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-accent mt-0.5">•</span>
+                    <span className="text-[#FF6B00] mt-0.5">•</span>
                     <span>Franchise de distribution</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-accent mt-0.5">•</span>
+                    <span className="text-[#FF6B00] mt-0.5">•</span>
                     <span>Franchise de vente au détail</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-accent mt-0.5">•</span>
+                    <span className="text-[#FF6B00] mt-0.5">•</span>
                     <span>Autres franchises établies</span>
                   </li>
                 </ul>
                 <Button 
-                  className="w-full bg-accent hover:bg-accent/90" 
+                  className="w-full bg-[#FF6B00] hover:bg-[#FF6B00]/90 text-white" 
                   onClick={() => navigate("/list-franchise")}
                 >
                   Vendre une Franchise
