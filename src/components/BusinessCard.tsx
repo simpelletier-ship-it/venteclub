@@ -184,17 +184,21 @@ const BusinessCard = ({
 
       {/* Sold Diagonal Banner */}
       {status === 'sold' && (
-        <div className="absolute inset-0 z-10 pointer-events-none">
-          <div className="absolute top-0 left-0 w-full h-full">
-            <div className="absolute top-[50%] left-[-25%] w-[150%] h-16 bg-gradient-to-r from-primary via-primary-dark to-primary transform -translate-y-1/2 rotate-[-45deg] shadow-2xl flex items-center justify-center">
-              <span className="text-white text-3xl font-display font-bold uppercase tracking-[0.3em] drop-shadow-lg">
-                VENDU
-              </span>
+        <>
+          {/* Semi-transparent overlay - derrière tout */}
+          <div className="absolute inset-0 z-[8] bg-background/60 pointer-events-none" />
+          
+          {/* Banderole VENDU - au-dessus de tout, sans flou */}
+          <div className="absolute inset-0 z-20 pointer-events-none">
+            <div className="absolute top-0 left-0 w-full h-full">
+              <div className="absolute top-[50%] left-[-25%] w-[150%] h-16 bg-gradient-to-r from-primary via-primary-dark to-primary transform -translate-y-1/2 rotate-[-45deg] shadow-2xl flex items-center justify-center">
+                <span className="text-white text-3xl font-display font-bold uppercase tracking-[0.3em] drop-shadow-lg">
+                  VENDU
+                </span>
+              </div>
             </div>
           </div>
-          {/* Semi-transparent overlay */}
-          <div className="absolute inset-0 bg-background/60" />
-        </div>
+        </>
       )}
 
       <CardContent className="p-6 space-y-4 flex flex-col flex-1">
