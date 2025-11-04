@@ -10,7 +10,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { Upload, X, Home, Sparkles, FileText, DollarSign } from "lucide-react";
 import { TermsDialog } from "@/components/TermsDialog";
-import { CityCombobox } from "@/components/CityCombobox";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { Progress } from "@/components/ui/progress";
 import { useAutosaveDraft } from "@/hooks/useAutosaveDraft";
@@ -213,7 +212,6 @@ const ListProperty = () => {
       formData.title,
       formData.description,
       formData.property_type,
-      formData.city,
       formData.address,
       formData.asking_price,
       formData.square_footage,
@@ -364,6 +362,15 @@ const ListProperty = () => {
             }))
         : null;
 
+      // Extraire la ville de l'adresse si elle n'est pas encore définie
+      let cityValue = formData.city;
+      if (!cityValue && formData.address) {
+        const addressParts = formData.address.split(',').map(part => part.trim());
+        if (addressParts.length >= 2) {
+          cityValue = addressParts[addressParts.length - 2];
+        }
+      }
+
       const { data: business, error: businessError} = await supabase
         .from('businesses')
         .insert([{
@@ -371,8 +378,8 @@ const ListProperty = () => {
           title: formData.title,
           description: formData.description,
           industry: 'boutique_commerce_detail' as any,
-          location: `${formData.city}, ${formData.province}`,
-          city: formData.city,
+          location: `${cityValue || 'Québec'}, ${formData.province}`,
+          city: cityValue || null,
           province: formData.province,
           address: formData.address || null,
           asking_price: priceNegotiable ? 0 : parseFloat(formData.asking_price),
@@ -507,48 +514,46 @@ const ListProperty = () => {
               </Button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="property_type">Type de propriété *</Label>
-                <Select
-                  value={formData.property_type}
-                  onValueChange={(value) => setFormData({ ...formData, property_type: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sélectionnez un type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="bureau">Bureau commercial</SelectItem>
-                    <SelectItem value="commerce">Espace commercial</SelectItem>
-                    <SelectItem value="industriel">Bâtiment industriel</SelectItem>
-                    <SelectItem value="terrain">Terrain commercial</SelectItem>
-                    <SelectItem value="immeuble_logement">Immeuble à logement</SelectItem>
-                    <SelectItem value="mixte">Propriété mixte</SelectItem>
-                    <SelectItem value="autre">Autre</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="city">Ville *</Label>
-                <CityCombobox 
-                  value={formData.city} 
-                  onChange={(value) => setFormData({ ...formData, city: value })}
-                  required
-                />
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="property_type">Type de propriété *</Label>
+              <Select
+                value={formData.property_type}
+                onValueChange={(value) => setFormData({ ...formData, property_type: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Sélectionnez un type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="bureau">Bureau commercial</SelectItem>
+                  <SelectItem value="commerce">Espace commercial</SelectItem>
+                  <SelectItem value="industriel">Bâtiment industriel</SelectItem>
+                  <SelectItem value="terrain">Terrain commercial</SelectItem>
+                  <SelectItem value="immeuble_logement">Immeuble à logement</SelectItem>
+                  <SelectItem value="mixte">Propriété mixte</SelectItem>
+                  <SelectItem value="autre">Autre</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="address">Adresse</Label>
+              <Label htmlFor="address">Adresse complète *</Label>
               <AddressAutocomplete
                 value={formData.address}
-                onChange={(address) => setFormData({ ...formData, address })}
-                city={formData.city}
-                placeholder="Ex: 123 rue Principale"
+                onChange={(address) => {
+                  setFormData({ ...formData, address });
+                  // Extraire automatiquement la ville de l'adresse
+                  const addressParts = address.split(',').map(part => part.trim());
+                  if (addressParts.length >= 2) {
+                    const cityPart = addressParts[addressParts.length - 2];
+                    setFormData(prev => ({ ...prev, address, city: cityPart }));
+                  }
+                }}
+                city=""
+                placeholder="Ex: 123 rue Principale, Montréal, QC"
+                required
               />
               <p className="text-xs text-muted-foreground">
-                L'adresse complète ne sera visible que pour les acheteurs intéressés
+                Entrez l'adresse complète incluant la ville
               </p>
             </div>
 
