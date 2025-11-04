@@ -142,18 +142,40 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
       
       const businessesWithCoords = await Promise.all(
         businessesWithPhotos.map(async (business) => {
-          if ((!business.latitude || !business.longitude) && business.city) {
+          if (!business.latitude || !business.longitude) {
             try {
-              const { data: geocodeData } = await supabase.functions.invoke('geocode-city', {
-                body: { city: business.city, province: 'Québec' }
-              });
+              // Pour les propriétés avec adresse complète, utiliser geocode-address
+              if (business.address && business.property_type) {
+                console.log('[MAP] Geocoding address for property:', business.title, business.address);
+                const { data: geocodeData } = await supabase.functions.invoke('geocode-address', {
+                  body: { address: business.address }
+                });
+                
+                if (geocodeData?.success && geocodeData.latitude && geocodeData.longitude) {
+                  console.log('[MAP] Geocoded property:', geocodeData.latitude, geocodeData.longitude);
+                  return {
+                    ...business,
+                    latitude: geocodeData.latitude,
+                    longitude: geocodeData.longitude
+                  };
+                }
+              }
               
-              if (geocodeData?.success && geocodeData.latitude && geocodeData.longitude) {
-                return {
-                  ...business,
-                  latitude: geocodeData.latitude,
-                  longitude: geocodeData.longitude
-                };
+              // Sinon, essayer avec la ville
+              if (business.city) {
+                console.log('[MAP] Geocoding city for business:', business.title, business.city);
+                const { data: geocodeData } = await supabase.functions.invoke('geocode-city', {
+                  body: { city: business.city, province: 'Québec' }
+                });
+                
+                if (geocodeData?.success && geocodeData.latitude && geocodeData.longitude) {
+                  console.log('[MAP] Geocoded city:', geocodeData.latitude, geocodeData.longitude);
+                  return {
+                    ...business,
+                    latitude: geocodeData.latitude,
+                    longitude: geocodeData.longitude
+                  };
+                }
               }
             } catch (err) {
               console.error('[MAP] Geocoding error:', err);
