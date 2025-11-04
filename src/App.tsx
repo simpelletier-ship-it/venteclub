@@ -30,7 +30,6 @@ import CityPage from "./pages/CityPage";
 import Terms from "./pages/Terms";
 import PropertyListings from "./pages/PropertyListings";
 import Profile from "./pages/Profile";
-import CategoryPage from "./pages/CategoryPage";
 
 const queryClient = new QueryClient();
 
@@ -45,7 +44,6 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/entreprises" element={<Businesses />} />
-              <Route path="/categorie" element={<CategoryPage />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/sell" element={<Sell />} />

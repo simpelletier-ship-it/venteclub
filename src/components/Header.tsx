@@ -8,12 +8,10 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Heart, LayoutDashboard, Settings, LogOut, Menu, Sparkles, ChevronDown } from "lucide-react";
+import { Heart, LayoutDashboard, Settings, LogOut, Menu, Sparkles } from "lucide-react";
 import { NotificationBell } from "./NotificationBell";
-import { QUEBEC_INDUSTRIES } from "@/lib/constants";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -116,36 +114,13 @@ const Header = () => {
               Accueil
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full" />
             </button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="text-foreground/80 hover:text-foreground transition-colors font-medium relative group flex items-center gap-1">
-                  Entreprises
-                  <ChevronDown className="w-4 h-4" />
-                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full" />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-64 max-h-[400px] overflow-y-auto bg-card/95 backdrop-blur-xl border-border/50 shadow-premium">
-                <DropdownMenuLabel className="text-xs text-muted-foreground uppercase tracking-wider">
-                  Toutes les catégories
-                </DropdownMenuLabel>
-                <DropdownMenuItem 
-                  onClick={() => navigate("/entreprises")}
-                  className="cursor-pointer hover:bg-muted/50 font-medium"
-                >
-                  Toutes les entreprises
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                {QUEBEC_INDUSTRIES.map((industry) => (
-                  <DropdownMenuItem 
-                    key={industry.value}
-                    onClick={() => navigate(`/categorie?category=${industry.value}`)}
-                    className="cursor-pointer hover:bg-muted/50"
-                  >
-                    {industry.label}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <button 
+              onClick={() => navigate("/entreprises")} 
+              className="text-foreground/80 hover:text-foreground transition-colors font-medium relative group"
+            >
+              Entreprises
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full" />
+            </button>
             <button 
               onClick={() => navigate("/immeubles-commerciaux")} 
               className="text-foreground/80 hover:text-foreground transition-colors font-medium relative group"
@@ -282,41 +257,15 @@ const Header = () => {
             >
               Accueil
             </button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="w-full text-left px-4 py-2 rounded-lg hover:bg-muted/50 transition-colors flex items-center justify-between">
-                  Entreprises
-                  <ChevronDown className="w-4 h-4" />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent side="right" className="w-64 max-h-[300px] overflow-y-auto bg-card/95 backdrop-blur-xl border-border/50 shadow-premium">
-                <DropdownMenuLabel className="text-xs text-muted-foreground uppercase tracking-wider">
-                  Catégories
-                </DropdownMenuLabel>
-                <DropdownMenuItem 
-                  onClick={() => {
-                    navigate("/entreprises");
-                    setMobileMenuOpen(false);
-                  }}
-                  className="cursor-pointer hover:bg-muted/50 font-medium"
-                >
-                  Toutes les entreprises
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                {QUEBEC_INDUSTRIES.map((industry) => (
-                  <DropdownMenuItem 
-                    key={industry.value}
-                    onClick={() => {
-                      navigate(`/categorie?category=${industry.value}`);
-                      setMobileMenuOpen(false);
-                    }}
-                    className="cursor-pointer hover:bg-muted/50"
-                  >
-                    {industry.label}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <button
+              onClick={() => {
+                navigate("/entreprises");
+                setMobileMenuOpen(false);
+              }}
+              className="w-full text-left px-4 py-2 rounded-lg hover:bg-muted/50 transition-colors"
+            >
+              Entreprises
+            </button>
             <button
               onClick={() => {
                 navigate("/immeubles-commerciaux");

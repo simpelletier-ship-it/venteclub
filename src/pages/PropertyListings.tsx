@@ -282,6 +282,37 @@ const PropertyListings = () => {
         </div>
       </section>
 
+      {/* CTA Section */}
+      <section className="relative py-20 overflow-hidden bg-gradient-to-br from-white via-muted to-white">
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-gradient-to-br from-secondary/30 via-primary/20 to-transparent rounded-full blur-3xl animate-float" />
+          <div className="absolute -bottom-40 -left-40 w-[600px] h-[600px] bg-gradient-to-tr from-accent/30 via-primary/20 to-transparent rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
+          
+          <div className="absolute inset-0 opacity-[0.02]" style={{
+            backgroundImage: 'radial-gradient(circle at 1px 1px, rgb(0 0 0) 1px, transparent 0)',
+            backgroundSize: '40px 40px'
+          }} />
+        </div>
+        
+        <div className="relative container mx-auto px-4 text-center">
+          <div className="max-w-3xl mx-auto space-y-8 animate-slide-up">
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-foreground leading-tight">
+              Prêt à Investir dans <span className="text-secondary whitespace-nowrap">l'Immobilier ?</span>
+            </h2>
+            <p className="text-xl md:text-2xl text-muted-foreground">
+              Rejoignez des investisseurs qui font confiance à Vente.club
+            </p>
+            <Button 
+              size="lg" 
+              className="bg-secondary hover:bg-secondary/90 text-secondary-foreground h-14 px-12 text-lg font-semibold shadow-lg hover:shadow-xl transition-all hover:scale-105 group"
+              onClick={() => navigate("/list-property")}
+            >
+              Commencer gratuitement
+              <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </Button>
+          </div>
+        </div>
+      </section>
     </>
   );
 };
