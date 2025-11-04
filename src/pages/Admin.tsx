@@ -52,6 +52,7 @@ const Admin = () => {
   const [importUrl, setImportUrl] = useState("");
   const [importLoading, setImportLoading] = useState(false);
   const [importedData, setImportedData] = useState<any>(null);
+  const [generatingDemoImages, setGeneratingDemoImages] = useState(false);
 
   useEffect(() => {
     checkAdminAccess();
@@ -799,6 +800,33 @@ const Admin = () => {
     }
   };
 
+  const handleGenerateDemoImages = async () => {
+    setGeneratingDemoImages(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-demo-images', {
+        body: {},
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Succès",
+        description: `Images générées: ${data.successfulGenerations}/${data.totalProcessed}`,
+      });
+
+      // Rafraîchir les annonces pour voir les nouvelles images
+      fetchBusinesses();
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: error.message || "Impossible de générer les images",
+      });
+    } finally {
+      setGeneratingDemoImages(false);
+    }
+  };
+
   const getStatusBadge = (status: string) => {
     const variants: Record<string, "default" | "secondary" | "destructive"> = {
       pending: "secondary",
@@ -1095,6 +1123,28 @@ const Admin = () => {
                     </div>
                   </div>
                 )}
+              </CardContent>
+            </Card>
+
+            <Card className="mt-6">
+              <CardHeader>
+                <CardTitle>Outils de démonstration</CardTitle>
+                <CardDescription>
+                  Génération automatique d'images pour les annonces démo
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Cliquez sur ce bouton pour générer automatiquement des images pour toutes les annonces marquées comme "démo".
+                  Ce processus peut prendre quelques minutes.
+                </p>
+                <Button
+                  onClick={handleGenerateDemoImages}
+                  disabled={generatingDemoImages}
+                  className="w-full sm:w-auto"
+                >
+                  {generatingDemoImages ? "Génération en cours..." : "Générer les images démo"}
+                </Button>
               </CardContent>
             </Card>
           </TabsContent>

@@ -1,7 +1,8 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { TrendingUp, MapPin, Star, XCircle, Building2, Home, Store } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { TrendingUp, MapPin, Star, XCircle, Building2, Home, Store, HelpCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { FavoriteButton } from "./FavoriteButton";
 import { useState, useEffect } from "react";
@@ -38,6 +39,7 @@ interface BusinessCardProps {
   square_footage?: number;
   is_rental_property?: boolean;
   rental_units?: Array<{unit_type: string, monthly_rent: number, count: number}>;
+  is_demo?: boolean;
 }
 
 const BusinessCard = ({
@@ -65,6 +67,7 @@ const BusinessCard = ({
   square_footage,
   is_rental_property,
   rental_units,
+  is_demo = false,
 }: BusinessCardProps) => {
   const navigate = useNavigate();
   const [userId, setUserId] = useState<string | undefined>();
@@ -218,6 +221,25 @@ const BusinessCard = ({
                 <businessType.icon className="w-3 h-3 mr-1" />
                 {businessType.label}
               </Badge>
+              
+              {/* Badge Démo */}
+              {is_demo && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Badge className="bg-purple-500 text-white border-0 shadow-md cursor-help">
+                        <HelpCircle className="w-3 h-3 mr-1" />
+                        DÉMO
+                      </Badge>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-xs">
+                      <p className="font-semibold mb-2">Annonce fictive</p>
+                      <p className="text-sm mb-2">Cette annonce est à titre démonstratif en attendant le lancement officiel du site.</p>
+                      <p className="text-sm font-medium">Il est déjà possible de soumettre votre annonce pour le grand lancement prévu le 1er décembre 2025!</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
               
               {has_pending_changes && showPendingBadge && (
                 <Badge className="bg-orange-500 text-white">
