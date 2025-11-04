@@ -213,31 +213,6 @@ const Businesses = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="relative py-16 overflow-hidden bg-gradient-to-br from-white via-muted to-white">
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-gradient-to-br from-secondary/30 via-primary/20 to-transparent rounded-full blur-3xl animate-float" />
-        </div>
-        
-        <div className="relative container mx-auto px-4 text-center">
-          <div className="max-w-3xl mx-auto space-y-6 animate-slide-up">
-            <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground">
-              Vous avez une entreprise à vendre ?
-            </h2>
-            <p className="text-lg text-muted-foreground">
-              Publiez votre annonce gratuitement et trouvez des acheteurs qualifiés
-            </p>
-            <Button 
-              size="lg" 
-              className="bg-secondary hover:bg-secondary/90 text-secondary-foreground h-14 px-12 text-lg font-semibold shadow-lg hover:shadow-xl transition-all hover:scale-105 group"
-              onClick={() => navigate("/sell")}
-            >
-              Vendre mon entreprise
-              <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </Button>
-          </div>
-        </div>
-      </section>
     </>
   );
 };

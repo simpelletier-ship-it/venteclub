@@ -21,9 +21,10 @@ interface FilterBarProps {
     minPrice?: number;
     maxPrice?: number;
   }) => void;
+  hideIndustryFilter?: boolean;
 }
 
-const FilterBar = ({ onFilter }: FilterBarProps) => {
+const FilterBar = ({ onFilter, hideIndustryFilter = false }: FilterBarProps) => {
   const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
   const [selectedIndustries, setSelectedIndustries] = useState<string[]>([]);
   const [selectedListingTypes, setSelectedListingTypes] = useState<string[]>([]);
@@ -171,41 +172,43 @@ const FilterBar = ({ onFilter }: FilterBarProps) => {
           </Popover>
 
           {/* Secteurs */}
-          <Popover open={industriesOpen} onOpenChange={setIndustriesOpen}>
-            <PopoverTrigger asChild>
-              <Button 
-                variant="outline" 
-                className="w-full h-10 sm:h-12 bg-background border-border justify-between text-sm sm:text-base"
-              >
-                <span className="truncate">
-                  {selectedIndustries.length > 0 
-                    ? `${selectedIndustries.length} secteur${selectedIndustries.length > 1 ? 's' : ''}`
-                    : "Secteurs (optionnel)"
-                  }
-                </span>
-                <ChevronDown className="h-3 sm:h-4 w-3 sm:w-4 opacity-50 ml-2 flex-shrink-0" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-80 p-4 bg-card border-border z-50">
-              <div className="space-y-2 max-h-[300px] overflow-y-auto">
-                {QUEBEC_INDUSTRIES.map((ind) => (
-                  <div key={ind.value} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`industry-${ind.value}`}
-                      checked={selectedIndustries.includes(ind.value)}
-                      onCheckedChange={() => toggleIndustry(ind.value)}
-                    />
-                    <label
-                      htmlFor={`industry-${ind.value}`}
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer flex-1"
-                    >
-                      {ind.label}
-                    </label>
-                  </div>
-                ))}
-              </div>
-            </PopoverContent>
-          </Popover>
+          {!hideIndustryFilter && (
+            <Popover open={industriesOpen} onOpenChange={setIndustriesOpen}>
+              <PopoverTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  className="w-full h-10 sm:h-12 bg-background border-border justify-between text-sm sm:text-base"
+                >
+                  <span className="truncate">
+                    {selectedIndustries.length > 0 
+                      ? `${selectedIndustries.length} secteur${selectedIndustries.length > 1 ? 's' : ''}`
+                      : "Secteurs (optionnel)"
+                    }
+                  </span>
+                  <ChevronDown className="h-3 sm:h-4 w-3 sm:w-4 opacity-50 ml-2 flex-shrink-0" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-80 p-4 bg-card border-border z-50">
+                <div className="space-y-2 max-h-[300px] overflow-y-auto">
+                  {QUEBEC_INDUSTRIES.map((ind) => (
+                    <div key={ind.value} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`industry-${ind.value}`}
+                        checked={selectedIndustries.includes(ind.value)}
+                        onCheckedChange={() => toggleIndustry(ind.value)}
+                      />
+                      <label
+                        htmlFor={`industry-${ind.value}`}
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer flex-1"
+                      >
+                        {ind.label}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </PopoverContent>
+            </Popover>
+          )}
         </div>
 
         {/* Selected filters badges */}
