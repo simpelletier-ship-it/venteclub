@@ -482,6 +482,7 @@ const Admin = () => {
         province: validated.province,
         industry: validated.industry,
         business_id: selectedBusiness?.id,
+        photo_url: photoUrl,
       };
 
       const { data, error } = await supabase.functions.invoke('admin-update-business', {
@@ -490,24 +491,6 @@ const Admin = () => {
 
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
-
-      // Update or insert photo if uploaded
-      if (photoUrl) {
-        // Delete existing photos first
-        await supabase
-          .from('business_photos')
-          .delete()
-          .eq('business_id', selectedBusiness?.id);
-
-        // Insert new photo
-        await supabase
-          .from('business_photos')
-          .insert({
-            business_id: selectedBusiness?.id,
-            photo_url: photoUrl,
-            display_order: 1
-          });
-      }
 
       toast({
         title: "Succès",

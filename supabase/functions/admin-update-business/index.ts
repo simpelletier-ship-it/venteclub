@@ -21,6 +21,7 @@ const editBusinessSchema = z.object({
   province: z.string().trim().min(2, "Province requise").max(100),
   industry: z.string().min(1, "Secteur requis"),
   business_id: z.string().uuid("ID d'entreprise invalide"),
+  photo_url: z.string().url().nullable().optional(),
 });
 
 const handler = async (req: Request): Promise<Response> => {
@@ -88,7 +89,7 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     // Update business with validated data
-    const { business_id, ...updateData } = validated;
+    const { business_id, photo_url, ...updateData } = validated;
     
     const { error: updateError } = await supabase
       .from('businesses')
@@ -98,6 +99,35 @@ const handler = async (req: Request): Promise<Response> => {
     if (updateError) {
       console.error("Update error:", updateError);
       throw updateError;
+    }
+
+    // Handle photo update if provided
+    if (photo_url) {
+      // Get current photos to determine next display_order
+      const { data: existingPhotos } = await supabase
+        .from('business_photos')
+        .select('display_order')
+        .eq('business_id', business_id)
+        .order('display_order', { ascending: false })
+        .limit(1);
+
+      const nextOrder = existingPhotos && existingPhotos.length > 0 
+        ? (existingPhotos[0].display_order || 0) + 1 
+        : 1;
+
+      // Insert new photo
+      const { error: photoError } = await supabase
+        .from('business_photos')
+        .insert({
+          business_id: business_id,
+          photo_url: photo_url,
+          display_order: nextOrder
+        });
+
+      if (photoError) {
+        console.error("Photo insert error:", photoError);
+        // Don't fail the whole operation if photo fails
+      }
     }
 
     console.log(`Admin ${user.id} updated business ${business_id}`);
