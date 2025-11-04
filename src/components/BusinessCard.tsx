@@ -90,11 +90,36 @@ const BusinessCard = ({
         
         if (data?.photo_url) {
           setMainImage(data.photo_url);
+        } else {
+          setMainImage(null);
         }
       }
     };
     
     fetchMainImage();
+    
+    // Subscribe to changes in business_photos for this business
+    if (id) {
+      const channel = supabase
+        .channel(`business_photos_${id}`)
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'business_photos',
+            filter: `business_id=eq.${id}`
+          },
+          () => {
+            fetchMainImage();
+          }
+        )
+        .subscribe();
+      
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    }
   }, [id]);
   
   const displayRevenue = annual_revenue ? `${annual_revenue.toLocaleString('fr-CA')} $` : 'N/A';
