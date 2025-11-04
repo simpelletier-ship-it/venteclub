@@ -15,7 +15,7 @@ const PropertyListings = () => {
   const [featuredProperties, setFeaturedProperties] = useState<any[]>([]);
   const [allProperties, setAllProperties] = useState<any[]>([]);
   const [filteredProperties, setFilteredProperties] = useState<any[]>([]);
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
   
   useEffect(() => {
     fetchProperties();
