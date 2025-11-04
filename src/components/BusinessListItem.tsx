@@ -209,7 +209,7 @@ const BusinessListItem = ({
                   <div onClick={(e) => e.stopPropagation()}>
                     <Badge className="bg-purple-500 text-white border-0 shadow-md cursor-help text-xs hover:bg-purple-600 transition-colors">
                       <HelpCircle className="w-3 h-3 mr-1" />
-                      DÉMO
+                      Annonce fictive
                     </Badge>
                   </div>
                 </TooltipTrigger>
