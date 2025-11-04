@@ -10,8 +10,7 @@ export const Footer = () => {
           <div>
             <h3 className="font-bold text-lg mb-4">Vente.Club</h3>
             <p className="text-sm text-muted-foreground mb-4">
-              La plateforme québécoise de référence pour l'achat et la vente d'entreprises. 
-              Transactions sécurisées, vérification rigoureuse, accompagnement professionnel.
+              La plateforme québécoise de référence pour l'achat et la vente d'entreprises.
             </p>
           </div>
 
