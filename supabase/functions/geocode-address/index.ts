@@ -52,13 +52,32 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-
-    return new Response(
-      JSON.stringify(data),
-      { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      }
-    );
+    
+    // Extract coordinates from Mapbox response
+    if (data.features && data.features.length > 0) {
+      const [longitude, latitude] = data.features[0].center;
+      console.log('Geocoded successfully:', { latitude, longitude });
+      
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          latitude, 
+          longitude,
+          place_name: data.features[0].place_name
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    } else {
+      console.log('No results found');
+      return new Response(
+        JSON.stringify({ success: false, error: 'No results found' }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
   } catch (error) {
     console.error('Error in geocode-address function:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
