@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { FavoriteButton } from "./FavoriteButton";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import venteLogo from "@/assets/vente-logo.png";
+import noPhotoPlaceholder from "@/assets/no-photo-placeholder.jpg";
 
 interface BusinessCardProps {
   id?: string;
@@ -141,9 +141,9 @@ const BusinessCard = ({
       {/* Image principale */}
       <div className="relative w-full h-48 overflow-hidden bg-muted">
         <img 
-          src={mainImage || venteLogo} 
+          src={mainImage || noPhotoPlaceholder} 
           alt={title}
-          className={`w-full h-full ${mainImage ? 'object-cover' : 'object-contain p-8'}`}
+          className={`w-full h-full ${mainImage ? 'object-cover' : 'object-cover'}`}
         />
       </div>
 
