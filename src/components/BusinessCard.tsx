@@ -202,56 +202,6 @@ const BusinessCard = ({
             <p className="text-sm text-muted-foreground">Aucune photo disponible</p>
           </div>
         )}
-        
-        {/* Badges sur l'image */}
-        <div className="absolute top-3 left-3 right-3 flex flex-wrap gap-2 z-10">
-          {/* Badge En Vedette en premier */}
-          {featured && (
-            <Badge className="relative bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 text-amber-950 border-2 border-amber-300/50 shadow-[0_0_20px_rgba(251,191,36,0.5)] font-bold tracking-wide">
-              <Star className="w-3 h-3 fill-amber-950 mr-1 drop-shadow-sm" />
-              EN VEDETTE
-            </Badge>
-          )}
-          
-          {/* Badge Type d'annonce */}
-          <Badge className={`${businessType.color} text-white border-0 shadow-md`}>
-            <businessType.icon className="w-3 h-3 mr-1" />
-            {businessType.label}
-          </Badge>
-          
-          {/* Badge Démo */}
-          {is_demo && (
-            <TooltipProvider delayDuration={200}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div onClick={(e) => e.stopPropagation()}>
-                    <Badge className="bg-purple-500 text-white border-0 shadow-md cursor-help hover:bg-purple-600 transition-colors">
-                      <HelpCircle className="w-3 h-3 mr-1" />
-                      Annonce fictive
-                    </Badge>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent side="top" className="max-w-xs bg-popover border-border">
-                  <p className="font-semibold mb-2 text-foreground">Annonce fictive</p>
-                  <p className="text-sm mb-2 text-muted-foreground">Cette annonce est à titre démonstratif en attendant le lancement officiel du site.</p>
-                  <p className="text-sm font-medium text-foreground">Il est déjà possible de soumettre votre annonce pour le grand lancement prévu le 1er décembre 2025!</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          )}
-          
-          {has_pending_changes && showPendingBadge && (
-            <Badge className="bg-orange-500 text-white">
-              ✏️ Modification en attente d'approbation
-            </Badge>
-          )}
-          {showActions && approval_status === 'approved' && (
-            <Badge className="bg-green-500 text-white">✓ Approuvée</Badge>
-          )}
-          {showActions && approval_status === 'pending' && (
-            <Badge className="bg-orange-500 text-white">⏳ En attente</Badge>
-          )}
-        </div>
       </div>
 
       {/* Sold Diagonal Banner */}
@@ -276,6 +226,54 @@ const BusinessCard = ({
       <CardContent className="p-6 space-y-4 flex flex-col flex-1">
         <div className="flex items-start justify-between gap-2">
           <div className="space-y-3 flex-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              {/* Badge En Vedette en premier */}
+              {featured && (
+                <Badge className="relative bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 text-amber-950 border-2 border-amber-300/50 shadow-[0_0_20px_rgba(251,191,36,0.5)] font-bold tracking-wide">
+                  <Star className="w-3 h-3 fill-amber-950 mr-1 drop-shadow-sm" />
+                  EN VEDETTE
+                </Badge>
+              )}
+              
+              {/* Badge Type d'annonce */}
+              <Badge className={`${businessType.color} text-white border-0 shadow-md`}>
+                <businessType.icon className="w-3 h-3 mr-1" />
+                {businessType.label}
+              </Badge>
+              
+              {/* Badge Démo */}
+              {is_demo && (
+                <TooltipProvider delayDuration={200}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div onClick={(e) => e.stopPropagation()}>
+                        <Badge className="bg-purple-500 text-white border-0 shadow-md cursor-help hover:bg-purple-600 transition-colors">
+                          <HelpCircle className="w-3 h-3 mr-1" />
+                          Annonce fictive
+                        </Badge>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent side="top" className="max-w-xs bg-popover border-border">
+                      <p className="font-semibold mb-2 text-foreground">Annonce fictive</p>
+                      <p className="text-sm mb-2 text-muted-foreground">Cette annonce est à titre démonstratif en attendant le lancement officiel du site.</p>
+                      <p className="text-sm font-medium text-foreground">Il est déjà possible de soumettre votre annonce pour le grand lancement prévu le 1er décembre 2025!</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
+              
+              {has_pending_changes && showPendingBadge && (
+                <Badge className="bg-orange-500 text-white">
+                  ✏️ Modification en attente d'approbation
+                </Badge>
+              )}
+              {showActions && approval_status === 'approved' && (
+                <Badge className="bg-green-500 text-white">✓ Approuvée</Badge>
+              )}
+              {showActions && approval_status === 'pending' && (
+                <Badge className="bg-orange-500 text-white">⏳ En attente</Badge>
+              )}
+            </div>
             <h3 className={`text-lg sm:text-2xl font-display font-bold text-foreground group-hover:text-primary transition-colors line-clamp-2 ${status === 'sold' ? 'blur-[0.5px]' : ''}`}>
               {title}
             </h3>
