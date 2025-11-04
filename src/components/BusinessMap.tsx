@@ -105,7 +105,8 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
         business_photos(photo_url)
       `)
       .eq('status', 'active')
-      .eq('approval_status', 'approved');
+      .eq('approval_status', 'approved')
+      .neq('status', 'sold');
     
     console.log('[MAP] Query built');
 
