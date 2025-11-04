@@ -423,39 +423,11 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
 
       console.log('[MAP] Source added');
 
-      const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim();
-      const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
-      const franchiseColor = '45 76 212';
-      const propertyColor = getComputedStyle(document.documentElement).getPropertyValue('--secondary').trim();
-      
-      const hslToHex = (hsl: string) => {
-        const [h, s, l] = hsl.split(' ').map(v => parseFloat(v));
-        const hue = h / 360;
-        const saturation = s / 100;
-        const lightness = l / 100;
-        
-        const hue2rgb = (p: number, q: number, t: number) => {
-          if (t < 0) t += 1;
-          if (t > 1) t -= 1;
-          if (t < 1/6) return p + (q - p) * 6 * t;
-          if (t < 1/2) return q;
-          if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
-          return p;
-        };
-        
-        const q = lightness < 0.5 ? lightness * (1 + saturation) : lightness + saturation - lightness * saturation;
-        const p = 2 * lightness - q;
-        const r = Math.round(hue2rgb(p, q, hue + 1/3) * 255);
-        const g = Math.round(hue2rgb(p, q, hue) * 255);
-        const b = Math.round(hue2rgb(p, q, hue - 1/3) * 255);
-        
-        return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
-      };
-      
-      const primaryHex = hslToHex(primaryColor);
-      const accentHex = hslToHex(accentColor);
-      const franchiseHex = hslToHex(franchiseColor);
-      const propertyHex = hslToHex(propertyColor);
+      // Utiliser des couleurs simples et visibles
+      const primaryColor = '#3b82f6';      // Blue
+      const accentColor = '#8b5cf6';       // Purple  
+      const franchiseColor = '#a855f7';    // Violet
+      const propertyColor = '#10b981';     // Green
 
       map.current.addLayer({
         id: 'clusters',
@@ -466,23 +438,24 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
           'circle-color': [
             'step',
             ['get', 'point_count'],
-            primaryHex,
+            primaryColor,
             10,
-            accentHex,
+            accentColor,
             30,
-            primaryHex,
+            primaryColor,
           ],
           'circle-radius': [
             'step',
             ['get', 'point_count'],
-            20,
+            25,
             10,
+            35,
             30,
-            30,
-            40,
+            45,
           ],
-          'circle-stroke-width': 3,
-          'circle-stroke-color': '#fff',
+          'circle-stroke-width': 4,
+          'circle-stroke-color': '#ffffff',
+          'circle-opacity': 0.9,
         },
       });
 
@@ -510,14 +483,15 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
           'circle-color': [
             'case',
             ['get', 'is_franchise'],
-            franchiseHex,
+            franchiseColor,
             ['any', ['==', ['get', 'sale_type'], 'property'], ['!=', ['get', 'property_type'], null]],
-            propertyHex,
-            primaryHex
+            propertyColor,
+            primaryColor
           ],
-          'circle-radius': 16,
-          'circle-stroke-width': 3,
-          'circle-stroke-color': '#fff',
+          'circle-radius': 20,
+          'circle-stroke-width': 4,
+          'circle-stroke-color': '#ffffff',
+          'circle-opacity': 0.9,
         },
       });
 
@@ -565,7 +539,7 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
 
         // Déterminer si c'est une propriété immobilière
         const isProperty = props.sale_type === 'property' || props.property_type;
-        const markerColor = isProperty ? propertyHex : primaryHex;
+        const markerColor = isProperty ? propertyColor : primaryColor;
         
         // Créer les infos secondaires selon le type
         let secondaryInfo = '';
@@ -594,14 +568,14 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
                     </div>
                     <div style="display: flex; flex-direction: column; gap: 6px;">
                       ${units.map(unit => `
-                         <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; background: hsl(${mutedForegroundColor} / 0.05); border-radius: 6px; border-left: 3px solid ${propertyHex};">
+                         <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; background: hsl(${mutedForegroundColor} / 0.05); border-radius: 6px; border-left: 3px solid ${propertyColor};">
                           <div>
                             <span style="font-weight: 600; color: hsl(${foregroundColor}); font-size: 13px;">${unit.count}x ${unit.unit_type}</span>
                           </div>
                           ${unit.monthly_rent ? `
                             <div style="text-align: right;">
                               <span style="font-size: 12px; color: hsl(${mutedForegroundColor});">Loyer</span>
-                              <div style="font-weight: 700; color: ${propertyHex}; font-size: 14px;">${Number(unit.monthly_rent).toLocaleString('fr-CA')} $/mois</div>
+                              <div style="font-weight: 700; color: ${propertyColor}; font-size: 14px;">${Number(unit.monthly_rent).toLocaleString('fr-CA')} $/mois</div>
                             </div>
                           ` : ''}
                         </div>
@@ -633,9 +607,9 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
                   <div style="font-size: 13px; font-weight: 700; color: hsl(${foregroundColor});">${sqFt}</div>
                 </div>
                 ${props.is_rental_property ? `
-                  <div style="background: linear-gradient(135deg, ${propertyHex}15, ${propertyHex}25); padding: 10px; border-radius: 8px; border: 1px solid ${propertyHex}30;">
-                    <div style="font-size: 10px; color: ${propertyHex}; text-transform: uppercase; margin-bottom: 4px; font-weight: 700; letter-spacing: 0.5px;">Type</div>
-                    <div style="font-size: 13px; font-weight: 700; color: ${propertyHex};">Locatif</div>
+                  <div style="background: linear-gradient(135deg, ${propertyColor}15, ${propertyColor}25); padding: 10px; border-radius: 8px; border: 1px solid ${propertyColor}30;">
+                    <div style="font-size: 10px; color: ${propertyColor}; text-transform: uppercase; margin-bottom: 4px; font-weight: 700; letter-spacing: 0.5px;">Type</div>
+                    <div style="font-size: 13px; font-weight: 700; color: ${propertyColor};">Locatif</div>
                   </div>
                 ` : ''}
               </div>
