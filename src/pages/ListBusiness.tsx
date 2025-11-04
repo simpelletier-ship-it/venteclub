@@ -438,6 +438,44 @@ const ListBusiness = () => {
         const isAlreadyApproved = existingBusiness?.approval_status === 'approved';
 
         if (isAlreadyApproved && !isDraft) {
+          // Upload new photos and get their URLs for pending_changes
+          const newPhotoUrls: Array<{photo_url: string, display_order: number}> = [];
+          
+          if (photos.length > 0) {
+            for (let i = 0; i < photos.length; i++) {
+              const file = photos[i];
+              const fileExt = file.name.split('.').pop();
+              const fileName = `${editingBusinessId}/${Date.now()}-${i}.${fileExt}`;
+
+              const { error: uploadError } = await supabase.storage
+                .from('business-photos')
+                .upload(fileName, file);
+
+              if (uploadError) {
+                console.error('Photo upload error:', uploadError);
+                continue;
+              }
+
+              const { data: { publicUrl } } = supabase.storage
+                .from('business-photos')
+                .getPublicUrl(fileName);
+
+              newPhotoUrls.push({
+                photo_url: publicUrl,
+                display_order: photoPreviewUrls.length + i
+              });
+            }
+          }
+
+          // Combine existing photos (photoPreviewUrls) with new photos
+          const allPhotos = [
+            ...photoPreviewUrls.map((url, index) => ({
+              photo_url: url,
+              display_order: index
+            })),
+            ...newPhotoUrls
+          ];
+
           // Si l'annonce est déjà approuvée, stocker les modifications en attente
           const pendingChanges = {
             title: validatedData.title,
@@ -456,6 +494,7 @@ const ListBusiness = () => {
             employees_count: validatedData.employees_count,
             year_established: validatedData.year_established,
             seller_phone: formData.seller_phone,
+            photos: allPhotos,
           };
 
           const { error: updateError } = await supabase
@@ -473,9 +512,13 @@ const ListBusiness = () => {
             title: "Modifications soumises !",
             description: "Vos modifications sont en attente d'approbation par un administrateur. Votre annonce reste active avec son contenu actuel.",
           });
-        } else {
-          // Sinon, appliquer les modifications normalement
-          const { error: updateError } = await supabase
+          
+          navigate("/dashboard");
+          return;
+        }
+        
+        // Sinon, appliquer les modifications normalement
+        const { error: updateError } = await supabase
             .from("businesses")
             .update({
               title: validatedData.title,
@@ -509,9 +552,9 @@ const ListBusiness = () => {
               ? "Votre annonce a été modifiée et reste en brouillon." 
               : "Votre annonce a été publiée et est en attente d'approbation.",
           });
-        }
+        
 
-        // Upload new photos if any
+        // Upload new photos if any (for non-approved or draft edits)
         if (photos.length > 0) {
           for (let i = 0; i < photos.length; i++) {
             const file = photos[i];
@@ -542,8 +585,6 @@ const ListBusiness = () => {
         navigate("/dashboard");
         return;
       }
-
-      // Sinon, créer une nouvelle annonce
       const { data: businessData, error: businessError } = await supabase
         .from("businesses")
         .insert({
