@@ -72,14 +72,26 @@ const BusinessDetails = () => {
       .on(
         'postgres_changes',
         {
-          event: '*',
+          event: 'UPDATE',
           schema: 'public',
           table: 'businesses',
           filter: `id=eq.${businessId}`
         },
-        () => {
-          console.log('[REALTIME] Business data changed, refreshing...');
-          fetchBusiness();
+        (payload) => {
+          console.log('[REALTIME] Business update received:', payload);
+          // Only refresh if it's not just pending_changes being updated
+          // Check if has_pending_changes went from true to false (approval)
+          const oldRecord = payload.old as any;
+          const newRecord = payload.new as any;
+          
+          if (oldRecord?.has_pending_changes === true && newRecord?.has_pending_changes === false) {
+            console.log('[REALTIME] Changes approved by admin, refreshing...');
+            fetchBusiness();
+          } else if (!newRecord?.has_pending_changes) {
+            // Or if there are direct updates (no pending changes)
+            console.log('[REALTIME] Direct update detected, refreshing...');
+            fetchBusiness();
+          }
         }
       )
       .subscribe();

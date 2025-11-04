@@ -99,9 +99,10 @@ const BusinessCard = ({
     fetchMainImage();
     
     // Subscribe to changes in business_photos for this business
+    // Only update when photos are actually changed (INSERT/UPDATE/DELETE)
     if (id) {
       const channel = supabase
-        .channel(`business_photos_${id}`)
+        .channel(`business_photos_card_${id}`)
         .on(
           'postgres_changes',
           {
@@ -111,6 +112,7 @@ const BusinessCard = ({
             filter: `business_id=eq.${id}`
           },
           () => {
+            console.log('[REALTIME-CARD] Photos changed for business, refreshing image...');
             fetchMainImage();
           }
         )
