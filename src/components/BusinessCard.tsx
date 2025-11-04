@@ -227,10 +227,12 @@ const BusinessCard = ({
                 <TooltipProvider delayDuration={200}>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Badge className="bg-purple-500 text-white border-0 shadow-md cursor-help hover:bg-purple-600 transition-colors">
-                        <HelpCircle className="w-3 h-3 mr-1" />
-                        DÉMO
-                      </Badge>
+                      <div onClick={(e) => e.stopPropagation()}>
+                        <Badge className="bg-purple-500 text-white border-0 shadow-md cursor-help hover:bg-purple-600 transition-colors">
+                          <HelpCircle className="w-3 h-3 mr-1" />
+                          DÉMO
+                        </Badge>
+                      </div>
                     </TooltipTrigger>
                     <TooltipContent side="top" className="max-w-xs bg-popover border-border">
                       <p className="font-semibold mb-2 text-foreground">Annonce fictive</p>

@@ -652,6 +652,21 @@ const BusinessDetails = () => {
                   <p className="text-muted-foreground leading-relaxed">
                     {business.description}
                   </p>
+                  
+                  {/* Notice Démo */}
+                  {business.is_demo && (
+                    <div className="mt-6 p-4 bg-purple-50 dark:bg-purple-950/30 border-2 border-purple-200 dark:border-purple-800 rounded-lg">
+                      <p className="font-semibold text-purple-900 dark:text-purple-100 mb-2">
+                        📢 Annonce fictive à titre démonstratif
+                      </p>
+                      <p className="text-sm text-purple-800 dark:text-purple-200 mb-2">
+                        Cette annonce est à titre démonstratif en attendant le lancement officiel de notre plateforme.
+                      </p>
+                      <p className="text-sm font-medium text-purple-900 dark:text-purple-100">
+                        Il est déjà possible de soumettre votre annonce pour le grand lancement prévu le 1er décembre 2025!
+                      </p>
+                    </div>
+                  )}
                 </div>
 
                 {/* Property Characteristics - For Real Estate Only */}
