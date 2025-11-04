@@ -470,7 +470,28 @@ const BusinessDetails = () => {
                     </div>
                     <div className="flex items-center justify-between">
                     <div className="flex flex-wrap gap-2 items-center text-muted-foreground">
-                      <Badge variant="secondary">{business.industry}</Badge>
+                      {business.property_type ? (
+                        <>
+                          <Badge variant="secondary" className="bg-secondary/10 text-secondary border-secondary/20">
+                            🏢 Immobilier
+                          </Badge>
+                          <Badge variant="outline">
+                            {business.property_type === 'bureau' && 'Bureau commercial'}
+                            {business.property_type === 'commerce' && 'Espace commercial'}
+                            {business.property_type === 'industriel' && 'Bâtiment industriel'}
+                            {business.property_type === 'terrain' && 'Terrain commercial'}
+                            {business.property_type === 'immeuble_logement' && 'Immeuble à logement'}
+                            {business.property_type === 'mixte' && 'Propriété mixte'}
+                            {!['bureau', 'commerce', 'industriel', 'terrain', 'immeuble_logement', 'mixte'].includes(business.property_type) && 'Propriété'}
+                          </Badge>
+                        </>
+                      ) : business.is_franchise ? (
+                        <Badge variant="secondary" className="bg-purple-500/10 text-purple-700 dark:text-purple-300 border-purple-500/20">
+                          🎯 Franchise
+                        </Badge>
+                      ) : (
+                        <Badge variant="secondary">Entreprise</Badge>
+                      )}
                       <span className="flex items-center gap-1 font-medium">
                         <MapPin className="w-4 h-4" />
                         {business.city || business.location}
@@ -480,6 +501,12 @@ const BusinessDetails = () => {
                         <Eye className="w-4 h-4" />
                         {business.views_count || 0} vues
                       </span>
+                      {business.created_at && (
+                        <span className="flex items-center gap-1">
+                          <Calendar className="w-4 h-4" />
+                          Publié le {new Date(business.created_at).toLocaleDateString('fr-CA')}
+                        </span>
+                      )}
                     </div>
                       {!isSeller && businessId && (
                         <ReportBusinessDialog businessId={businessId} businessTitle={business.title} />
@@ -570,8 +597,109 @@ const BusinessDetails = () => {
                   </p>
                 </div>
 
+                {/* Property Characteristics - For Real Estate Only */}
+                {business.property_type && (
+                  <div className="border border-border/50 rounded-xl p-6 bg-gradient-to-br from-secondary/5 to-secondary/10">
+                    <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
+                      🏢 Caractéristiques de la propriété
+                    </h2>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Type de propriété */}
+                      <div className="bg-background/50 p-4 rounded-lg">
+                        <div className="text-sm text-muted-foreground mb-1">Type de propriété</div>
+                        <div className="text-lg font-semibold text-foreground">
+                          {business.property_type === 'bureau' && 'Bureau commercial'}
+                          {business.property_type === 'commerce' && 'Espace commercial'}
+                          {business.property_type === 'industriel' && 'Bâtiment industriel'}
+                          {business.property_type === 'terrain' && 'Terrain commercial'}
+                          {business.property_type === 'immeuble_logement' && 'Immeuble à logement'}
+                          {business.property_type === 'mixte' && 'Propriété mixte'}
+                          {!['bureau', 'commerce', 'industriel', 'terrain', 'immeuble_logement', 'mixte'].includes(business.property_type) && 'Propriété commerciale'}
+                        </div>
+                      </div>
+
+                      {/* Superficie */}
+                      {business.square_footage && (
+                        <div className="bg-background/50 p-4 rounded-lg">
+                          <div className="text-sm text-muted-foreground mb-1">Superficie</div>
+                          <div className="text-lg font-semibold text-foreground">
+                            {Number(business.square_footage).toLocaleString('fr-CA')} pi²
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Année de construction */}
+                      {business.year_built && (
+                        <div className="bg-background/50 p-4 rounded-lg">
+                          <div className="text-sm text-muted-foreground mb-1">Année de construction</div>
+                          <div className="text-lg font-semibold text-foreground">
+                            {business.year_built}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Type de propriété locative */}
+                      {business.is_rental_property && (
+                        <div className="bg-background/50 p-4 rounded-lg">
+                          <div className="text-sm text-muted-foreground mb-1">Type</div>
+                          <div className="text-lg font-semibold text-secondary">
+                            🏠 Propriété locative
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Adresse complète */}
+                    {business.address && (
+                      <div className="mt-4 bg-background/50 p-4 rounded-lg">
+                        <div className="text-sm text-muted-foreground mb-1">Adresse</div>
+                        <div className="text-base font-medium text-foreground flex items-center gap-2">
+                          <MapPin className="w-4 h-4 text-secondary" />
+                          {business.address}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Unités de location */}
+                    {business.is_rental_property && business.rental_units && Array.isArray(business.rental_units) && business.rental_units.length > 0 && (
+                      <div className="mt-4 pt-4 border-t border-border/30">
+                        <h3 className="text-lg font-semibold text-foreground mb-3">📊 Unités de location</h3>
+                        <div className="space-y-3">
+                          {business.rental_units.map((unit: any, index: number) => (
+                            <div key={index} className="bg-background/70 p-4 rounded-lg border border-secondary/20">
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  <div className="font-semibold text-foreground text-base">
+                                    {unit.count}x {unit.unit_type}
+                                  </div>
+                                  {unit.monthly_rent && (
+                                    <div className="text-sm text-muted-foreground mt-1">
+                                      Loyer mensuel
+                                    </div>
+                                  )}
+                                </div>
+                                {unit.monthly_rent && (
+                                  <div className="text-right">
+                                    <div className="text-xl font-bold text-secondary">
+                                      {Number(unit.monthly_rent).toLocaleString('fr-CA')} $
+                                    </div>
+                                    <div className="text-xs text-muted-foreground">
+                                      par mois
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 {/* Location Information */}
-                {(business.city || business.region) && (
+                {!business.property_type && (business.city || business.region) && (
                   <div className="bg-gradient-to-r from-primary/5 to-accent/5 p-5 rounded-xl border border-border/50">
                     <div className="flex items-start gap-3">
                       <MapPin className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
@@ -587,55 +715,57 @@ const BusinessDetails = () => {
                   </div>
                 )}
 
-                {/* Financial Information Grid */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {business.annual_revenue && (
-                    <div className="bg-muted/30 p-4 rounded-lg">
-                      <div className="flex items-center gap-2 text-muted-foreground mb-1">
-                        <TrendingUp className="w-4 h-4" />
-                        <span className="text-sm">Chiffre d'affaires annuel</span>
+                {/* Financial Information Grid - Only show for non-property businesses */}
+                {!business.property_type && (
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {business.annual_revenue && (
+                      <div className="bg-muted/30 p-4 rounded-lg">
+                        <div className="flex items-center gap-2 text-muted-foreground mb-1">
+                          <TrendingUp className="w-4 h-4" />
+                          <span className="text-sm">Chiffre d'affaires annuel</span>
+                        </div>
+                        <div className="text-xl font-semibold">
+                          {business.annual_revenue.toLocaleString()} CAD
+                        </div>
                       </div>
-                      <div className="text-xl font-semibold">
-                        {business.annual_revenue.toLocaleString()} CAD
+                    )}
+                    {business.profit_margin && (
+                      <div className="bg-muted/30 p-4 rounded-lg">
+                        <div className="text-sm text-muted-foreground mb-1">
+                          Marge de profit
+                        </div>
+                        <div className="text-xl font-semibold">
+                          {business.profit_margin}%
+                        </div>
                       </div>
-                    </div>
-                  )}
-                  {business.profit_margin && (
-                    <div className="bg-muted/30 p-4 rounded-lg">
-                      <div className="text-sm text-muted-foreground mb-1">
-                        Marge de profit
+                    )}
+                    {business.employees_count && (
+                      <div className="bg-muted/30 p-4 rounded-lg">
+                        <div className="flex items-center gap-2 text-muted-foreground mb-1">
+                          <Users className="w-4 h-4" />
+                          <span className="text-sm">Employés</span>
+                        </div>
+                        <div className="text-xl font-semibold">
+                          {business.employees_count}
+                        </div>
                       </div>
-                      <div className="text-xl font-semibold">
-                        {business.profit_margin}%
+                    )}
+                    {business.year_established && (
+                      <div className="bg-muted/30 p-4 rounded-lg">
+                        <div className="flex items-center gap-2 text-muted-foreground mb-1">
+                          <Calendar className="w-4 h-4" />
+                          <span className="text-sm">Année</span>
+                        </div>
+                        <div className="text-xl font-semibold">
+                          {business.year_established}
+                        </div>
                       </div>
-                    </div>
-                  )}
-                  {business.employees_count && (
-                    <div className="bg-muted/30 p-4 rounded-lg">
-                      <div className="flex items-center gap-2 text-muted-foreground mb-1">
-                        <Users className="w-4 h-4" />
-                        <span className="text-sm">Employés</span>
-                      </div>
-                      <div className="text-xl font-semibold">
-                        {business.employees_count}
-                      </div>
-                    </div>
-                  )}
-                  {business.year_established && (
-                    <div className="bg-muted/30 p-4 rounded-lg">
-                      <div className="flex items-center gap-2 text-muted-foreground mb-1">
-                        <Calendar className="w-4 h-4" />
-                        <span className="text-sm">Année</span>
-                      </div>
-                      <div className="text-xl font-semibold">
-                        {business.year_established}
-                      </div>
-                    </div>
-                  )}
-                </div>
+                    )}
+                  </div>
+                )}
 
-                {/* Portrait Financier */}
-                {(business.annual_revenue || business.baiia || business.net_profit) && (
+                {/* Portrait Financier - Only show for non-property businesses */}
+                {!business.property_type && (business.annual_revenue || business.baiia || business.net_profit) && (
                   <div className="border border-border/50 rounded-xl p-8 bg-gradient-to-br from-background to-muted/20 shadow-sm">
                     <h2 className="text-2xl font-bold text-foreground mb-2">Portrait financier</h2>
                     <p className="text-sm text-muted-foreground mb-6">Aperçu des performances financières de l'entreprise</p>
