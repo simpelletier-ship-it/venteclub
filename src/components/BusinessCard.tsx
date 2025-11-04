@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { FavoriteButton } from "./FavoriteButton";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import venteLogo from "@/assets/vente-logo.png";
 
 interface BusinessCardProps {
   id?: string;
@@ -69,12 +70,33 @@ const BusinessCard = ({
   const navigate = useNavigate();
   const [userId, setUserId] = useState<string | undefined>();
   const [showFullDescription, setShowFullDescription] = useState(false);
+  const [mainImage, setMainImage] = useState<string | null>(null);
   
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUserId(session?.user?.id);
     });
   }, []);
+
+  useEffect(() => {
+    const fetchMainImage = async () => {
+      if (id) {
+        const { data } = await supabase
+          .from('business_photos')
+          .select('photo_url')
+          .eq('business_id', id)
+          .order('display_order', { ascending: true })
+          .limit(1)
+          .single();
+        
+        if (data?.photo_url) {
+          setMainImage(data.photo_url);
+        }
+      }
+    };
+    
+    fetchMainImage();
+  }, [id]);
   
   const displayRevenue = annual_revenue ? `${annual_revenue.toLocaleString('fr-CA')} $` : 'N/A';
   const displayPrice = asking_price === 0 ? 'À discuter' : asking_price ? `${asking_price.toLocaleString('fr-CA')} $` : 'N/A';
@@ -116,6 +138,15 @@ const BusinessCard = ({
       } ${featured ? 'ring-2 ring-accent/30' : ''}`}
       onClick={handleClick}
     >
+      {/* Image principale */}
+      <div className="relative w-full h-48 overflow-hidden bg-muted">
+        <img 
+          src={mainImage || venteLogo} 
+          alt={title}
+          className={`w-full h-full ${mainImage ? 'object-cover' : 'object-contain p-8'}`}
+        />
+      </div>
+
       {/* Sold Diagonal Banner */}
       {status === 'sold' && (
         <div className="absolute inset-0 z-10 pointer-events-none">
