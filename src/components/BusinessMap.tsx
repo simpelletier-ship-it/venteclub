@@ -148,7 +148,7 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
               if (business.address && business.property_type) {
                 console.log('[MAP] Geocoding address for property:', business.title, business.address);
                 const { data: geocodeData } = await supabase.functions.invoke('geocode-address', {
-                  body: { address: business.address }
+                  body: { query: business.address }
                 });
                 
                 if (geocodeData?.success && geocodeData.latitude && geocodeData.longitude) {
