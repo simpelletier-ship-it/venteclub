@@ -497,10 +497,6 @@ const BusinessDetails = () => {
                         {business.city || business.location}
                         {business.region && <span className="text-muted-foreground/70">, {business.region}</span>}
                       </span>
-                      <span className="flex items-center gap-1">
-                        <Eye className="w-4 h-4" />
-                        {business.views_count || 0} vues
-                      </span>
                       {business.created_at && (
                         <span className="flex items-center gap-1">
                           <Calendar className="w-4 h-4" />
