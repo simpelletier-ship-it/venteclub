@@ -619,6 +619,20 @@ const BusinessDetails = () => {
                         </div>
                       </div>
 
+                      {/* Date de création de l'annonce */}
+                      {business.created_at && (
+                        <div className="bg-background/50 p-4 rounded-lg">
+                          <div className="text-sm text-muted-foreground mb-1">Date de publication</div>
+                          <div className="text-lg font-semibold text-foreground">
+                            {new Date(business.created_at).toLocaleDateString('fr-CA', { 
+                              year: 'numeric', 
+                              month: 'long', 
+                              day: 'numeric' 
+                            })}
+                          </div>
+                        </div>
+                      )}
+
                       {/* Superficie */}
                       {business.square_footage && (
                         <div className="bg-background/50 p-4 rounded-lg">
@@ -630,14 +644,12 @@ const BusinessDetails = () => {
                       )}
 
                       {/* Année de construction */}
-                      {business.year_built && (
-                        <div className="bg-background/50 p-4 rounded-lg">
-                          <div className="text-sm text-muted-foreground mb-1">Année de construction</div>
-                          <div className="text-lg font-semibold text-foreground">
-                            {business.year_built}
-                          </div>
+                      <div className="bg-background/50 p-4 rounded-lg">
+                        <div className="text-sm text-muted-foreground mb-1">Année de construction</div>
+                        <div className="text-lg font-semibold text-foreground">
+                          {business.year_built || 'Non spécifiée'}
                         </div>
-                      )}
+                      </div>
 
                       {/* Type de propriété locative */}
                       {business.is_rental_property && (
