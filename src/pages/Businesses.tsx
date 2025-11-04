@@ -31,9 +31,14 @@ const Businesses = () => {
         .eq('approval_status', 'approved')
         .order('created_at', { ascending: false });
 
-      if (businesses) {
-        const featured = businesses.filter(b => b.featured && b.status === 'active');
-        const regular = businesses.filter(b => !b.featured || b.status === 'sold');
+      // Filter out properties (property_type not null)
+      const filtered = businesses?.filter(b => 
+        !b.property_type
+      ) || [];
+
+      if (filtered) {
+        const featured = filtered.filter(b => b.featured && b.status === 'active');
+        const regular = filtered.filter(b => !b.featured || b.status === 'sold');
         setFeaturedBusinesses(featured);
         setAllBusinesses(regular);
         setFilteredBusinesses(regular);
