@@ -80,16 +80,18 @@ const BusinessCard = ({
   useEffect(() => {
     const fetchMainImage = async () => {
       if (id) {
-        const { data } = await supabase
+        const { data, error } = await supabase
           .from('business_photos')
           .select('photo_url')
           .eq('business_id', id)
           .order('display_order', { ascending: true })
-          .limit(1)
-          .single();
+          .limit(1);
         
-        if (data?.photo_url) {
-          setMainImage(data.photo_url);
+        if (error) {
+          console.error('[BUSINESS-CARD] Error fetching photo:', error);
+          setMainImage(null);
+        } else if (data && data.length > 0 && data[0]?.photo_url) {
+          setMainImage(data[0].photo_url);
         } else {
           setMainImage(null);
         }
