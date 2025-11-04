@@ -399,6 +399,7 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
       const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim();
       const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
       const franchiseColor = '45 76 212';
+      const propertyColor = getComputedStyle(document.documentElement).getPropertyValue('--secondary').trim();
       
       const hslToHex = (hsl: string) => {
         const [h, s, l] = hsl.split(' ').map(v => parseFloat(v));
@@ -427,6 +428,7 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
       const primaryHex = hslToHex(primaryColor);
       const accentHex = hslToHex(accentColor);
       const franchiseHex = hslToHex(franchiseColor);
+      const propertyHex = hslToHex(propertyColor);
 
       map.current.addLayer({
         id: 'clusters',
@@ -482,6 +484,8 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
             'case',
             ['get', 'is_franchise'],
             franchiseHex,
+            ['any', ['==', ['get', 'sale_type'], 'property'], ['!=', ['get', 'property_type'], null]],
+            propertyHex,
             primaryHex
           ],
           'circle-radius': 16,
@@ -534,6 +538,7 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
 
         // Déterminer si c'est une propriété immobilière
         const isProperty = props.sale_type === 'property' || props.property_type;
+        const markerColor = isProperty ? propertyHex : primaryHex;
         
         // Créer les infos secondaires selon le type
         let secondaryInfo = '';
@@ -562,14 +567,14 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
                     </div>
                     <div style="display: flex; flex-direction: column; gap: 6px;">
                       ${units.map(unit => `
-                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; background: hsl(${mutedForegroundColor} / 0.05); border-radius: 6px; border-left: 3px solid ${primaryHex};">
+                         <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; background: hsl(${mutedForegroundColor} / 0.05); border-radius: 6px; border-left: 3px solid ${propertyHex};">
                           <div>
                             <span style="font-weight: 600; color: hsl(${foregroundColor}); font-size: 13px;">${unit.count}x ${unit.unit_type}</span>
                           </div>
                           ${unit.monthly_rent ? `
                             <div style="text-align: right;">
                               <span style="font-size: 12px; color: hsl(${mutedForegroundColor});">Loyer</span>
-                              <div style="font-weight: 700; color: ${primaryHex}; font-size: 14px;">${Number(unit.monthly_rent).toLocaleString('fr-CA')} $/mois</div>
+                              <div style="font-weight: 700; color: ${propertyHex}; font-size: 14px;">${Number(unit.monthly_rent).toLocaleString('fr-CA')} $/mois</div>
                             </div>
                           ` : ''}
                         </div>
@@ -601,9 +606,9 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
                   <div style="font-size: 13px; font-weight: 700; color: hsl(${foregroundColor});">${sqFt}</div>
                 </div>
                 ${props.is_rental_property ? `
-                  <div style="background: linear-gradient(135deg, ${primaryHex}15, ${primaryHex}25); padding: 10px; border-radius: 8px; border: 1px solid ${primaryHex}30;">
-                    <div style="font-size: 10px; color: ${primaryHex}; text-transform: uppercase; margin-bottom: 4px; font-weight: 700; letter-spacing: 0.5px;">Type</div>
-                    <div style="font-size: 13px; font-weight: 700; color: ${primaryHex};">Locatif</div>
+                  <div style="background: linear-gradient(135deg, ${propertyHex}15, ${propertyHex}25); padding: 10px; border-radius: 8px; border: 1px solid ${propertyHex}30;">
+                    <div style="font-size: 10px; color: ${propertyHex}; text-transform: uppercase; margin-bottom: 4px; font-weight: 700; letter-spacing: 0.5px;">Type</div>
+                    <div style="font-size: 13px; font-weight: 700; color: ${propertyHex};">Locatif</div>
                   </div>
                 ` : ''}
               </div>
@@ -650,7 +655,7 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
                 ${props.title}
               </h3>
               <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 10px;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="${primaryHex}" stroke-width="2">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="${markerColor}" stroke-width="2">
                   <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                   <circle cx="12" cy="10" r="3"></circle>
                 </svg>
@@ -662,13 +667,13 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
               <div style="padding-top: 12px; border-top: 2px solid hsl(${borderColor});">
                 <div>
                   <div style="font-size: 11px; color: hsl(${mutedForegroundColor}); text-transform: uppercase; margin-bottom: 4px; font-weight: 600; letter-spacing: 0.5px;">Prix demandé</div>
-                  <div style="font-weight: 700; color: ${primaryHex}; font-size: 22px;">
+                  <div style="font-weight: 700; color: ${markerColor}; font-size: 22px;">
                     ${Number(props.asking_price).toLocaleString('fr-CA')} $
                   </div>
                 </div>
                 ${secondaryInfo}
               </div>
-              <div style="margin-top: 14px; padding: 10px; background: ${primaryHex}; border-radius: 8px; text-align: center; font-size: 13px; color: white; font-weight: 700; box-shadow: 0 4px 12px ${primaryHex}40;">
+              <div style="margin-top: 14px; padding: 10px; background: ${markerColor}; border-radius: 8px; text-align: center; font-size: 13px; color: white; font-weight: 700; box-shadow: 0 4px 12px ${markerColor}40;">
                 ✨ Cliquez pour voir tous les détails
               </div>
             </div>
