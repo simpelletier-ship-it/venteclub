@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Upload, X, ArrowLeft, Sparkles } from "lucide-react";
 import { TermsDialog } from "@/components/TermsDialog";
 import { CityCombobox } from "@/components/CityCombobox";
+import { useAutosaveDraft } from "@/hooks/useAutosaveDraft";
 
 const ListFranchise = () => {
   const navigate = useNavigate();
@@ -51,6 +52,14 @@ const ListFranchise = () => {
   const [improvingDescription, setImprovingDescription] = useState(false);
   const [priceNegotiable, setPriceNegotiable] = useState(false);
 
+  // Autosave draft hook
+  const { loadDraft, deleteDraft } = useAutosaveDraft({
+    formData,
+    userId: user?.id,
+    draftType: 'franchise',
+    minFieldsFilled: 2,
+  });
+
   useEffect(() => {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -58,6 +67,17 @@ const ListFranchise = () => {
         navigate("/auth");
       } else {
         setUser(session.user);
+        
+        // Charger le brouillon s'il existe
+        const draftData = await loadDraft();
+        if (draftData) {
+          setFormData(prev => ({ ...prev, ...draftData }));
+          toast({
+            title: "Brouillon restauré",
+            description: "Votre brouillon a été chargé. Vous pouvez continuer où vous vous étiez arrêté.",
+            duration: 5000,
+          });
+        }
       }
     };
     checkSession();
@@ -219,6 +239,9 @@ const ListFranchise = () => {
         title: "Franchise publiée !",
         description: "Votre franchise a été soumise et est en attente d'approbation.",
       });
+
+      // Supprimer le brouillon après publication réussie
+      await deleteDraft();
 
       navigate("/dashboard");
     } catch (error: any) {

@@ -13,6 +13,7 @@ import { businessSchema } from "@/lib/validations";
 import { TermsDialog } from "@/components/TermsDialog";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { useAutosaveDraft } from "@/hooks/useAutosaveDraft";
 import {
   Command,
   CommandEmpty,
@@ -109,6 +110,15 @@ const ListBusiness = () => {
   const [citySearchValue, setCitySearchValue] = useState("");
   const [priceNegotiable, setPriceNegotiable] = useState(false);
 
+  // Autosave draft hook
+  const { loadDraft, deleteDraft } = useAutosaveDraft({
+    formData,
+    userId: user?.id,
+    draftType: 'business',
+    editingBusinessId,
+    minFieldsFilled: 2,
+  });
+
   useEffect(() => {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -120,6 +130,17 @@ const ListBusiness = () => {
         // Charger l'annonce existante si on est en mode édition
         if (editingBusinessId) {
           await loadBusinessForEdit(editingBusinessId, session.user.id);
+        } else {
+          // Charger le brouillon s'il existe
+          const draftData = await loadDraft();
+          if (draftData) {
+            setFormData(prev => ({ ...prev, ...draftData }));
+            toast({
+              title: "Brouillon restauré",
+              description: "Votre brouillon a été chargé. Vous pouvez continuer où vous vous étiez arrêté.",
+              duration: 5000,
+            });
+          }
         }
       }
     };
@@ -616,6 +637,12 @@ const ListBusiness = () => {
           ? "Votre annonce a été enregistrée mais n'est pas encore publiée. Elle est visible uniquement dans votre tableau de bord." 
           : "Votre annonce a été soumise et est en attente d'approbation. Vous recevrez un email de confirmation.",
       });
+      
+      // Supprimer le brouillon si l'annonce est publiée avec succès
+      if (!isDraft) {
+        await deleteDraft();
+      }
+      
       navigate("/dashboard");
     } catch (error: any) {
       console.error("[CREATE BUSINESS] Error:", error);

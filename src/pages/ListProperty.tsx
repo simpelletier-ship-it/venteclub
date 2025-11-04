@@ -13,6 +13,7 @@ import { TermsDialog } from "@/components/TermsDialog";
 import { CityCombobox } from "@/components/CityCombobox";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { Progress } from "@/components/ui/progress";
+import { useAutosaveDraft } from "@/hooks/useAutosaveDraft";
 
 const ListProperty = () => {
   const navigate = useNavigate();
@@ -56,6 +57,15 @@ const ListProperty = () => {
   const [photoPreviewUrls, setPhotoPreviewUrls] = useState<string[]>([]);
   const [priceNegotiable, setPriceNegotiable] = useState(false);
 
+  // Autosave draft hook
+  const { loadDraft, deleteDraft } = useAutosaveDraft({
+    formData,
+    userId: user?.id,
+    draftType: 'property',
+    editingBusinessId,
+    minFieldsFilled: 2,
+  });
+
   useEffect(() => {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -67,6 +77,17 @@ const ListProperty = () => {
         // Charger l'annonce existante si on est en mode édition
         if (editingBusinessId) {
           await loadBusinessForEdit(editingBusinessId, session.user.id);
+        } else {
+          // Charger le brouillon s'il existe
+          const draftData = await loadDraft();
+          if (draftData) {
+            setFormData(prev => ({ ...prev, ...draftData }));
+            toast({
+              title: "Brouillon restauré",
+              description: "Votre brouillon a été chargé. Vous pouvez continuer où vous vous étiez arrêté.",
+              duration: 5000,
+            });
+          }
         }
       }
     };
@@ -403,6 +424,9 @@ const ListProperty = () => {
         title: "Annonce publiée avec succès !",
         description: "Votre annonce immobilière est en cours de vérification. Vous serez notifié une fois approuvée.",
       });
+
+      // Supprimer le brouillon après publication réussie
+      await deleteDraft();
 
       navigate('/dashboard');
     } catch (error: any) {
