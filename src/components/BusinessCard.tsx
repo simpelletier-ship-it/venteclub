@@ -224,18 +224,18 @@ const BusinessCard = ({
               
               {/* Badge Démo */}
               {is_demo && (
-                <TooltipProvider>
+                <TooltipProvider delayDuration={200}>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Badge className="bg-purple-500 text-white border-0 shadow-md cursor-help">
+                      <Badge className="bg-purple-500 text-white border-0 shadow-md cursor-help hover:bg-purple-600 transition-colors">
                         <HelpCircle className="w-3 h-3 mr-1" />
                         DÉMO
                       </Badge>
                     </TooltipTrigger>
-                    <TooltipContent className="max-w-xs">
-                      <p className="font-semibold mb-2">Annonce fictive</p>
-                      <p className="text-sm mb-2">Cette annonce est à titre démonstratif en attendant le lancement officiel du site.</p>
-                      <p className="text-sm font-medium">Il est déjà possible de soumettre votre annonce pour le grand lancement prévu le 1er décembre 2025!</p>
+                    <TooltipContent side="top" className="max-w-xs bg-popover border-border">
+                      <p className="font-semibold mb-2 text-foreground">Annonce fictive</p>
+                      <p className="text-sm mb-2 text-muted-foreground">Cette annonce est à titre démonstratif en attendant le lancement officiel du site.</p>
+                      <p className="text-sm font-medium text-foreground">Il est déjà possible de soumettre votre annonce pour le grand lancement prévu le 1er décembre 2025!</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
