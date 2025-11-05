@@ -778,9 +778,11 @@ export type Database = {
           id: string
           is_public: boolean | null
           job_title: string | null
+          last_conversation_reset: string | null
           last_name: string | null
           linkedin_url: string | null
           marketing_emails: boolean | null
+          monthly_conversations_count: number | null
           newsletter_enabled: boolean | null
           phone: string | null
           postal_code: string | null
@@ -803,9 +805,11 @@ export type Database = {
           id: string
           is_public?: boolean | null
           job_title?: string | null
+          last_conversation_reset?: string | null
           last_name?: string | null
           linkedin_url?: string | null
           marketing_emails?: boolean | null
+          monthly_conversations_count?: number | null
           newsletter_enabled?: boolean | null
           phone?: string | null
           postal_code?: string | null
@@ -828,9 +832,11 @@ export type Database = {
           id?: string
           is_public?: boolean | null
           job_title?: string | null
+          last_conversation_reset?: string | null
           last_name?: string | null
           linkedin_url?: string | null
           marketing_emails?: boolean | null
+          monthly_conversations_count?: number | null
           newsletter_enabled?: boolean | null
           phone?: string | null
           postal_code?: string | null
@@ -1136,6 +1142,10 @@ export type Database = {
         Returns: undefined
       }
       archive_old_sold_businesses: { Args: never; Returns: undefined }
+      can_start_conversation: {
+        Args: { p_business_id: string; p_user_id: string }
+        Returns: Json
+      }
       check_business_access: {
         Args: { business_uuid: string }
         Returns: boolean

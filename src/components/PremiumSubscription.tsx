@@ -135,19 +135,19 @@ export const PremiumSubscription = ({ userId }: PremiumSubscriptionProps) => {
             <div className="space-y-3">
               <div className="flex items-center gap-2 text-sm">
                 <Check className="h-4 w-4 text-green-500" />
-                <span>✨ Accès automatique et illimité à TOUS les vendeurs</span>
+                <span>✨ Accès illimité aux coordonnées de TOUS les vendeurs</span>
               </div>
               <div className="flex items-center gap-2 text-sm">
                 <Check className="h-4 w-4 text-green-500" />
-                <span>🚀 Déblocage instantané sans limitation de temps</span>
+                <span>💬 Chat illimité avec tous les vendeurs</span>
               </div>
               <div className="flex items-center gap-2 text-sm">
                 <Check className="h-4 w-4 text-green-500" />
-                <span>💬 Messagerie illimitée avec tous les vendeurs</span>
+                <span>🚀 Aucune limitation mensuelle</span>
               </div>
               <div className="flex items-center gap-2 text-sm">
                 <Check className="h-4 w-4 text-green-500" />
-                <span>⏱️ Valide pendant toute la durée de l'abonnement (1 mois)</span>
+                <span>⏱️ Valide pendant 1 mois, renouvelable automatiquement</span>
               </div>
             </div>
 
@@ -220,7 +220,7 @@ export const PremiumSubscription = ({ userId }: PremiumSubscriptionProps) => {
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-2xl font-bold">Premium</h3>
                 <div className="text-right">
-                  <p className="text-3xl font-bold text-primary">4,99$</p>
+                  <p className="text-3xl font-bold text-primary">19,99$</p>
                   <p className="text-sm text-muted-foreground">CAD / mois</p>
                 </div>
               </div>
@@ -228,15 +228,15 @@ export const PremiumSubscription = ({ userId }: PremiumSubscriptionProps) => {
               <ul className="space-y-3">
                 <li className="flex items-center gap-2">
                   <Check className="h-5 w-5 text-green-500 flex-shrink-0" />
-                  <span className="text-sm">Accès illimité à tous les vendeurs</span>
+                  <span className="text-sm">Accès illimité aux coordonnées de TOUS les vendeurs</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="h-5 w-5 text-green-500 flex-shrink-0" />
-                  <span className="text-sm">Aucune limite de temps d'attente</span>
+                  <span className="text-sm">Chat illimité avec tous les vendeurs</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="h-5 w-5 text-green-500 flex-shrink-0" />
-                  <span className="text-sm">Messagerie illimitée avec tous les vendeurs</span>
+                  <span className="text-sm">Pas de limitation mensuelle</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="h-5 w-5 text-green-500 flex-shrink-0" />
@@ -251,9 +251,9 @@ export const PremiumSubscription = ({ userId }: PremiumSubscriptionProps) => {
                 Plan Gratuit (actuel)
               </h4>
               <ul className="space-y-1 text-sm text-muted-foreground">
-                <li>• 1 accès vendeur par 7 jours</li>
-                <li>• Temps d'attente entre chaque accès</li>
-                <li>• Accès limité</li>
+                <li>• Maximum 3 conversations par mois</li>
+                <li>• Accès aux coordonnées limité</li>
+                <li>• Fonctionnalités restreintes</li>
               </ul>
             </div>
 
