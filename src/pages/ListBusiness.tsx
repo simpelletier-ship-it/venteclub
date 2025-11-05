@@ -1180,12 +1180,38 @@ const ListBusiness = () => {
                           id="postal_code"
                           value={formData.postal_code}
                           onChange={(e) => {
-                            const value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-                            setFormData({ ...formData, postal_code: value });
+                            let value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+                            
+                            // Formater automatiquement: A1A 1A1
+                            if (value.length > 3) {
+                              value = value.slice(0, 3) + ' ' + value.slice(3, 6);
+                            }
+                            
+                            // Limiter à 6 caractères (sans l'espace)
+                            const cleanValue = value.replace(/\s/g, '');
+                            if (cleanValue.length <= 6) {
+                              setFormData({ ...formData, postal_code: value });
+                            }
+                          }}
+                          onBlur={(e) => {
+                            const value = e.target.value.replace(/\s/g, '');
+                            // Valider le format québécois: A1A1A1
+                            const quebecPostalRegex = /^[A-Z]\d[A-Z]\d[A-Z]\d$/;
+                            if (value && !quebecPostalRegex.test(value)) {
+                              toast({
+                                variant: "destructive",
+                                title: "Code postal invalide",
+                                description: "Le format doit être A1A 1A1 (ex: H1A 1A1)",
+                              });
+                            }
                           }}
                           placeholder="H1A 1A1"
                           maxLength={7}
+                          className={formData.postal_code && !/^[A-Z]\d[A-Z]\s\d[A-Z]\d$/.test(formData.postal_code) && formData.postal_code.replace(/\s/g, '').length === 6 ? "border-destructive" : ""}
                         />
+                        {formData.postal_code && formData.postal_code.replace(/\s/g, '').length === 6 && !/^[A-Z]\d[A-Z]\s\d[A-Z]\d$/.test(formData.postal_code) && (
+                          <p className="text-xs text-destructive mt-1">Format invalide. Utilisez A1A 1A1</p>
+                        )}
                       </div>
                     </div>
 
