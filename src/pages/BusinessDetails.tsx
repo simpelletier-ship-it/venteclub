@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Lock, MapPin, TrendingUp, Users, Calendar, Eye, Calculator } from "lucide-react";
+import { ArrowLeft, Lock, MapPin, TrendingUp, Users, Calendar, Eye, Calculator, Phone, Mail } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { FavoriteButton } from "@/components/FavoriteButton";
@@ -1256,14 +1256,14 @@ const BusinessDetails = () => {
                     <div className="bg-gradient-to-br from-primary/5 to-secondary/5 border-2 border-primary/20 rounded-xl p-6 max-w-md mx-auto">
                       <div className="text-center mb-4">
                         <h3 className="text-xl font-bold text-foreground mb-2 flex items-center gap-2 justify-center">
-                          📞 Coordonnées du vendeur
+                          <Phone className="w-5 h-5" /> Coordonnées du vendeur
                         </h3>
                       </div>
                       
                       <div className="space-y-3">
                         {sellerContact.email && (
                           <div className="flex items-start gap-3">
-                            <span className="text-2xl">📧</span>
+                            <Mail className="w-5 h-5 text-primary mt-1" />
                             <div className="flex-1">
                               <div className="text-sm text-muted-foreground mb-1">Email</div>
                               <a 
@@ -1278,7 +1278,7 @@ const BusinessDetails = () => {
                         
                         {sellerContact.phone && (
                           <div className="flex items-start gap-3">
-                            <span className="text-2xl">📱</span>
+                            <Phone className="w-5 h-5 text-primary mt-1" />
                             <div className="flex-1">
                               <div className="text-sm text-muted-foreground mb-1">Téléphone</div>
                               <a 
