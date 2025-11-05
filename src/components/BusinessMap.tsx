@@ -314,16 +314,17 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
 
     const initMap = async () => {
       try {
-        // Utiliser le token Mapbox depuis les variables d'environnement
-        const mapboxToken = import.meta.env.VITE_MAPBOX_TOKEN;
+        // Récupérer le token Mapbox depuis l'edge function
+        console.log('[MAP] Fetching Mapbox token...');
+        const { data: tokenData, error: tokenError } = await supabase.functions.invoke('get-mapbox-token');
         
-        if (!mapboxToken) {
-          console.error('[MAP] No Mapbox token found in environment variables');
+        if (tokenError || !tokenData?.token) {
+          console.error('[MAP] Failed to get Mapbox token:', tokenError);
           return;
         }
 
-        console.log('[MAP] Using Mapbox token from environment');
-        mapboxgl.accessToken = mapboxToken;
+        console.log('[MAP] Mapbox token retrieved successfully');
+        mapboxgl.accessToken = tokenData.token;
 
         map.current = new mapboxgl.Map({
           container: mapContainer.current!,
