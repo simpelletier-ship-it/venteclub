@@ -51,8 +51,23 @@ const BusinessDetails = () => {
       const { data: { session } } = await supabase.auth.getSession();
       setUser(session?.user ?? null);
       
-      await fetchBusiness();
+      const businessData = await fetchBusiness();
       await fetchPhotos();
+
+      // Track view analytics ONCE at initialization only
+      if (businessData?.id) {
+        try {
+          await supabase
+            .from('business_analytics')
+            .insert({
+              business_id: businessData.id,
+              event_type: 'view',
+              user_id: session?.user?.id,
+            });
+        } catch (analyticsError) {
+          console.log('Analytics tracking skipped:', analyticsError);
+        }
+      }
 
       if (session?.user) {
         console.log('[INIT] Checking Premium subscription first');
@@ -177,28 +192,8 @@ const BusinessDetails = () => {
 
       if (error) throw error;
       
-      // Increment view count - only on initial load, not on realtime updates
       if (data) {
-        const isInitialLoad = !business || business.id !== data.id;
         setBusinessId(data.id);
-        
-        // Track view analytics - only on initial load to prevent duplicates
-        if (isInitialLoad) {
-          try {
-            const session = await supabase.auth.getSession();
-            await supabase
-              .from('business_analytics')
-              .insert({
-                business_id: data.id,
-                event_type: 'view',
-                user_id: session.data.session?.user?.id,
-              });
-          } catch (analyticsError) {
-            // Silently fail if rate limited or duplicate view
-            console.log('Analytics tracking skipped:', analyticsError);
-          }
-        }
-        
         setBusiness(data);
         console.log('[BUSINESS DETAILS] Business set:', data.title);
         
@@ -214,6 +209,8 @@ const BusinessDetails = () => {
             setSellerProfile(profile);
           }
         }
+        
+        return data;
       } else {
         console.log('[BUSINESS DETAILS] No business found');
         setBusiness(null);
