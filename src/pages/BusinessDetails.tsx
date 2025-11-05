@@ -787,29 +787,6 @@ const BusinessDetails = () => {
                   </div>
                 </div>
 
-                {/* Photo Gallery */}
-                {photos.length > 0 && (
-                  <div className="mb-6">
-                    <h2 className="text-xl font-semibold mb-4">Galerie Photos</h2>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                       {photos.map((photo, index) => (
-                        <div 
-                          key={photo.id} 
-                          className="aspect-video rounded-lg overflow-hidden cursor-pointer hover:opacity-90 transition-opacity shadow-md hover:shadow-lg"
-                          onClick={() => setSelectedPhotoIndex(index)}
-                        >
-                          <img
-                            src={photo.photo_url}
-                            alt={`Photo ${index + 1} de ${business.title} - ${business.industry} à ${business.city}`}
-                            className="w-full h-full object-cover"
-                            loading="lazy"
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
                 {/* Photo Lightbox */}
                 {selectedPhotoIndex !== null && (
                   <Dialog open={true} onOpenChange={() => setSelectedPhotoIndex(null)}>
@@ -847,6 +824,29 @@ const BusinessDetails = () => {
                 )}
 
               <div className="space-y-6">
+                {/* Photo Gallery - Affichée en premier */}
+                {photos.length > 0 && (
+                  <div>
+                    <h2 className="text-xl font-semibold mb-4">Photos de l'annonce</h2>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                       {photos.map((photo, index) => (
+                        <div 
+                          key={photo.id} 
+                          className="aspect-video rounded-lg overflow-hidden cursor-pointer hover:opacity-90 transition-opacity shadow-md hover:shadow-lg border-2 border-primary/20"
+                          onClick={() => setSelectedPhotoIndex(index)}
+                        >
+                          <img
+                            src={photo.photo_url}
+                            alt={`Photo ${index + 1} de ${business.title} - ${business.industry} à ${business.city}`}
+                            className="w-full h-full object-cover"
+                            loading="lazy"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 <div>
                   <h2 className="text-xl font-semibold mb-3">Description</h2>
                   <p className="text-muted-foreground leading-relaxed">
@@ -1215,28 +1215,38 @@ const BusinessDetails = () => {
                   </div>
                 )}
 
-                {/* Chat Section - Affiché seulement si déverrouillé ou Premium ou vendeur */}
+                {/* Messagerie - Bouton d'accès rapide */}
                 {user && business && (isSeller || hasPremium || hasUnlockedChat) && (
                   <div className="border-t pt-6 mt-6">
-                    {!isSeller ? (
-                      <ChatBox
-                        businessId={businessId}
-                        currentUserId={user.id}
-                        otherUserId={business.seller_id}
-                        otherUserName={
-                          sellerProfile?.full_name || 
-                          (sellerProfile?.first_name && sellerProfile?.last_name 
-                            ? `${sellerProfile.first_name} ${sellerProfile.last_name}` 
-                            : sellerProfile?.email?.split('@')[0] || "Vendeur")
-                        }
-                        businessTitle={business.title}
-                      />
-                    ) : (
-                      <SellerChatSection 
-                        businessId={businessId}
-                        sellerId={user.id}
-                      />
-                    )}
+                    <div className="bg-gradient-to-br from-primary/10 to-primary/5 border-2 border-primary/30 rounded-xl p-6">
+                      <div className="flex items-center gap-4 mb-4">
+                        <div className="p-3 bg-primary/20 rounded-full">
+                          <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                          </svg>
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="text-lg font-semibold text-foreground">
+                            {isSeller ? "Vos conversations" : "Contacter le vendeur"}
+                          </h3>
+                          <p className="text-sm text-muted-foreground">
+                            {isSeller 
+                              ? "Gérez vos conversations avec les acheteurs intéressés" 
+                              : "Discutez directement avec le vendeur via la messagerie"}
+                          </p>
+                        </div>
+                      </div>
+                      <Button
+                        onClick={() => navigate('/messages')}
+                        className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-6 text-base"
+                        size="lg"
+                      >
+                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                        </svg>
+                        {isSeller ? "Voir mes conversations" : "Ouvrir la messagerie"}
+                      </Button>
+                    </div>
                   </div>
                 )}
 
@@ -1248,11 +1258,6 @@ const BusinessDetails = () => {
                         <h3 className="text-xl font-bold text-foreground mb-2 flex items-center gap-2 justify-center">
                           📞 Coordonnées du vendeur
                         </h3>
-                        {hasPremium && (
-                          <Badge variant="secondary" className="text-xs bg-gradient-to-r from-yellow-400/20 to-yellow-600/20 text-yellow-700 dark:text-yellow-300 border-yellow-500/30">
-                            ⭐ Membre Club Select
-                          </Badge>
-                        )}
                       </div>
                       
                       <div className="space-y-3">
