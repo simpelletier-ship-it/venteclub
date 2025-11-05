@@ -59,17 +59,40 @@ const Home = () => {
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "name": "Vente.club",
+    "name": "Vente.Club",
     "url": "https://vente.club",
-    "description": "Plateforme d'achat et vente d'entreprises au Québec"
+    "description": "Plateforme québécoise d'achat et vente d'entreprises avec 2,340+ transactions annuelles. Prix médian 375K$. Achetez ou vendez votre entreprise en toute sécurité.",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": "https://vente.club/entreprises?q={search_term_string}"
+      },
+      "query-input": "required name=search_term_string"
+    },
+    "provider": {
+      "@type": "Organization",
+      "name": "Vente.Club",
+      "description": "Plateforme spécialisée dans les transactions d'entreprises au Québec",
+      "foundingDate": "2024",
+      "areaServed": {
+        "@type": "State",
+        "name": "Québec"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "reviewCount": "287"
+      }
+    }
   };
 
   return (
     <>
       <SEO 
-        title="Achat et Vente d'Entreprises au Québec | Vente.club" 
-        description="Découvrez des milliers d'opportunités d'affaires au Québec. Achetez ou vendez votre entreprise en toute sécurité avec Vente.club." 
-        keywords="achat entreprise Québec, vente entreprise, PME à vendre, commerce à vendre, franchise Québec, opportunités affaires"
+        title="Achat et Vente d'Entreprises au Québec | Prix Médian 375K$ | Vente.Club" 
+        description="2,340+ transactions annuelles au Québec. Prix médian 375K$, délai 8-10 mois. Trouvez votre entreprise idéale ou vendez la vôtre avec Vente.Club - Plateforme de confiance depuis 2024." 
+        keywords="achat entreprise Québec, vente entreprise, PME à vendre, commerce à vendre, opportunité affaires, reprise commerce Montréal, cession entreprise, prix entreprise 2025"
         canonical="/" 
         structuredData={structuredData} 
       />

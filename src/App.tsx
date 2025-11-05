@@ -32,6 +32,7 @@ import PropertyListings from "./pages/PropertyListings";
 import Profile from "./pages/Profile";
 import Resources from "./pages/Resources";
 import FAQ from "./pages/FAQ";
+import Market from "./pages/Market";
 
 const queryClient = new QueryClient();
 
@@ -71,6 +72,7 @@ const App = () => (
               <Route path="/terms" element={<Terms />} />
               <Route path="/ressources" element={<Resources />} />
               <Route path="/faq" element={<FAQ />} />
+              <Route path="/marche" element={<Market />} />
               
               {/* City Pages - Static routes for SEO */}
               <Route path="/entreprises-a-vendre-montreal" element={<CityPage />} />
