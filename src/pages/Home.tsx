@@ -143,7 +143,7 @@ const Home = () => {
               </Button>
               <Button 
                 size="lg" 
-                className="bg-white hover:bg-white/90 text-foreground h-12 sm:h-16 px-8 sm:px-12 text-base sm:text-lg font-semibold shadow-xl hover:shadow-2xl transition-all hover:scale-105 w-full sm:w-auto border-2 border-border/20"
+                className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white h-12 sm:h-16 px-8 sm:px-12 text-base sm:text-lg font-semibold shadow-xl hover:shadow-2xl transition-all hover:scale-105 w-full sm:w-auto"
                 onClick={() => navigate("/sell")}
               >
                 Vendre mon entreprise
