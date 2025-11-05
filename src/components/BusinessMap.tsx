@@ -631,7 +631,6 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
                   <SelectValue placeholder="Toutes les industries" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Toutes les industries</SelectItem>
                   <SelectItem value="restaurant">Restaurant</SelectItem>
                   <SelectItem value="bar_bistro_discotheque">Bar / Bistro / Discothèque</SelectItem>
                   <SelectItem value="boutique_commerce_detail">Boutique / Commerce de détail</SelectItem>
