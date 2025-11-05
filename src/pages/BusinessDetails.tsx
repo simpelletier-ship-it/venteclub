@@ -18,6 +18,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { ChevronDown } from "lucide-react";
 import { PriceHistory } from "@/components/PriceHistory";
 import { MakeOfferDialog } from "@/components/MakeOfferDialog";
+import { ConversationLimitAlert } from "@/components/ConversationLimitAlert";
 
 const BusinessDetails = () => {
   const { slug } = useParams();
@@ -40,6 +41,8 @@ const BusinessDetails = () => {
   const [isPremiumAccess, setIsPremiumAccess] = useState(false);
   const [sellerProfile, setSellerProfile] = useState<any>(null);
   const [isCalculatorOpen, setIsCalculatorOpen] = useState(false);
+  const [conversationsRemaining, setConversationsRemaining] = useState<number>(3);
+  const [nextResetDate, setNextResetDate] = useState<Date | undefined>(undefined);
 
   useEffect(() => {
     const initialize = async () => {
@@ -53,6 +56,9 @@ const BusinessDetails = () => {
       if (session?.user) {
         console.log('[INIT] Checking Premium subscription first');
         await checkPremiumSubscription(session.user.id);
+        
+        console.log('[INIT] Checking conversation limits');
+        await checkConversationLimits(session.user.id);
         
         console.log('[INIT] Then checking access for user');
         await checkAccess(session.user.id);
@@ -291,6 +297,34 @@ const BusinessDetails = () => {
       setHasPremium(data?.subscribed || false);
     } catch (error) {
       console.error('Error in checkPremiumSubscription:', error);
+    }
+  };
+
+  const checkConversationLimits = async (userId: string) => {
+    if (!businessId) return;
+    
+    try {
+      const { data, error } = await supabase.rpc('can_start_conversation', {
+        p_user_id: userId,
+        p_business_id: businessId
+      });
+      
+      if (error) {
+        console.error('Error checking conversation limits:', error);
+        return;
+      }
+      
+      if (data && typeof data === 'object') {
+        const conversationData = data as { conversations_remaining?: number };
+        setConversationsRemaining(conversationData.conversations_remaining || 0);
+        
+        // Calculer la date de réinitialisation (début du mois prochain)
+        const now = new Date();
+        const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+        setNextResetDate(nextMonth);
+      }
+    } catch (error) {
+      console.error('Error in checkConversationLimits:', error);
     }
   };
 
@@ -1091,16 +1125,22 @@ const BusinessDetails = () => {
                   <div className="border-t pt-6 mt-6">
                     <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
                       💬 Messagerie avec le vendeur
-                      <Badge variant="secondary" className="text-xs">Gratuit</Badge>
+                      <Badge variant="secondary" className="text-xs">
+                        {hasPremium ? "Illimité" : `${conversationsRemaining}/3`}
+                      </Badge>
                     </h2>
                     
                     {!isSeller ? (
                       <div className="space-y-4">
-                        <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 p-4 rounded-lg border border-green-200 dark:border-green-800">
-                          <p className="text-sm text-green-800 dark:text-green-200">
-                            ✅ Le chat est gratuit et accessible à tous les utilisateurs connectés
-                          </p>
-                        </div>
+                        {/* Alerte de limite de conversations */}
+                        {!hasPremium && (
+                          <ConversationLimitAlert
+                            conversationsRemaining={conversationsRemaining}
+                            hasPremium={hasPremium}
+                            nextResetDate={nextResetDate}
+                          />
+                        )}
+                        
                         <ChatBox
                           businessId={businessId}
                           currentUserId={user.id}
