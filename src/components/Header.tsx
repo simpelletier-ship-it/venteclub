@@ -135,13 +135,6 @@ const Header = () => {
               Carte
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full" />
             </button>
-            <button 
-              onClick={() => navigate("/ressources")} 
-              className="text-foreground/80 hover:text-foreground transition-colors font-medium relative group"
-            >
-              Ressources
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full" />
-            </button>
             {user && (
               <>
                 <button 

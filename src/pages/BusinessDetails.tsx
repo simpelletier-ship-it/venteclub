@@ -17,7 +17,6 @@ import { FinancialCalculator } from "@/components/FinancialCalculator";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ChevronDown } from "lucide-react";
 import { PriceHistory } from "@/components/PriceHistory";
-import { BusinessDocuments } from "@/components/BusinessDocuments";
 import { MakeOfferDialog } from "@/components/MakeOfferDialog";
 
 const BusinessDetails = () => {
@@ -1083,17 +1082,6 @@ const BusinessDetails = () => {
                       businessId={businessId}
                       currentPrice={business.asking_price}
                       currency={business.currency}
-                    />
-                  </div>
-                )}
-
-                {/* Documents sécurisés */}
-                {businessId && (
-                  <div className="border-t pt-6 mt-6">
-                    <BusinessDocuments
-                      businessId={businessId}
-                      sellerId={business.seller_id}
-                      hasAccess={hasAccess || isSeller}
                     />
                   </div>
                 )}

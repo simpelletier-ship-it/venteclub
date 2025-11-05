@@ -63,6 +63,15 @@ const FAQ = () => {
             <h2 className="text-3xl font-bold mb-8">Questions Fréquentes</h2>
             
             <Accordion type="single" collapsible className="space-y-4">
+              <AccordionItem value="premium" className="border rounded-lg px-6">
+                <AccordionTrigger className="text-left">
+                  À quoi sert l'abonnement Premium ?
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground">
+                  L'abonnement Premium à 19,99$/mois vous permet de : 1) Débloquer un nombre illimité de vendeurs sans limite de temps pour contacter directement les propriétaires d'entreprises, 2) Mettre en vedette vos annonces pour augmenter leur visibilité et apparaître en tête des résultats, attirant ainsi plus d'acheteurs potentiels, 3) Accéder à des fonctionnalités avancées pour gérer efficacement vos transactions. C'est l'outil idéal pour les acheteurs actifs recherchant plusieurs opportunités et les vendeurs sérieux souhaitant maximiser leur exposition.
+                </AccordionContent>
+              </AccordionItem>
+
               <AccordionItem value="item-1" className="border rounded-lg px-6">
                 <AccordionTrigger className="text-left">
                   Comment fonctionne l'achat d'une entreprise sur Vente.Club ?

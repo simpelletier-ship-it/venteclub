@@ -22,10 +22,10 @@ export const Footer = () => {
               <li><Link to="/entreprises" className="text-sm text-muted-foreground hover:text-accent transition-colors">Entreprises à vendre</Link></li>
               <li><Link to="/map" className="text-sm text-muted-foreground hover:text-accent transition-colors">Carte interactive</Link></li>
               <li><Link to="/marche" className="text-sm text-muted-foreground hover:text-accent transition-colors">Marché 2025</Link></li>
-              <li><Link to="/ressources" className="text-sm text-muted-foreground hover:text-accent transition-colors">Ressources</Link></li>
               <li><Link to="/faq" className="text-sm text-muted-foreground hover:text-accent transition-colors">FAQ</Link></li>
               <li><Link to="/a-propos" className="text-sm text-muted-foreground hover:text-accent transition-colors">À propos</Link></li>
               <li><Link to="/blog" className="text-sm text-muted-foreground hover:text-accent transition-colors">Blog</Link></li>
+              <li><Link to="/ressources" className="text-sm text-muted-foreground hover:text-accent transition-colors">Ressources</Link></li>
             </ul>
           </div>
 
