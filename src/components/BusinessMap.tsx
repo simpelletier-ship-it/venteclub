@@ -8,7 +8,10 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from './ui/card';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
-import { X, MapPin, DollarSign } from 'lucide-react';
+import { X, MapPin, DollarSign, Filter, Building2, Store, Home } from 'lucide-react';
+import { Input } from './ui/input';
+import { Label } from './ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
 interface Business {
   id: string;
@@ -51,6 +54,15 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
   const [filteredBusinesses, setFilteredBusinesses] = useState<Business[]>([]);
   const [showSidebar, setShowSidebar] = useState(false);
   const navigate = useNavigate();
+  
+  // Filtres locaux
+  const [localFilters, setLocalFilters] = useState({
+    industry: '',
+    minPrice: '',
+    maxPrice: '',
+    businessType: 'all' // all, business, franchise, property
+  });
+  const [displayedBusinesses, setDisplayedBusinesses] = useState<Business[]>([]);
 
   useEffect(() => {
     fetchBusinesses();
@@ -200,8 +212,40 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
       );
       console.log('[MAP] Valid businesses with coordinates:', validBusinesses.length);
       setBusinesses(validBusinesses);
+      setDisplayedBusinesses(validBusinesses);
     }
   };
+
+  // Appliquer les filtres locaux
+  useEffect(() => {
+    let filtered = [...businesses];
+
+    if (localFilters.industry) {
+      filtered = filtered.filter(b => b.industry === localFilters.industry);
+    }
+
+    if (localFilters.minPrice) {
+      const min = parseFloat(localFilters.minPrice);
+      filtered = filtered.filter(b => b.asking_price >= min);
+    }
+
+    if (localFilters.maxPrice) {
+      const max = parseFloat(localFilters.maxPrice);
+      filtered = filtered.filter(b => b.asking_price <= max);
+    }
+
+    if (localFilters.businessType !== 'all') {
+      if (localFilters.businessType === 'franchise') {
+        filtered = filtered.filter(b => b.is_franchise === true);
+      } else if (localFilters.businessType === 'property') {
+        filtered = filtered.filter(b => b.sale_type === 'property' || b.property_type);
+      } else if (localFilters.businessType === 'business') {
+        filtered = filtered.filter(b => !b.is_franchise && !b.property_type && b.sale_type !== 'property');
+      }
+    }
+
+    setDisplayedBusinesses(filtered);
+  }, [businesses, localFilters]);
 
   const filterBusinessesInPolygon = (polygon: number[][]) => {
     const filtered = businesses.filter(business => {
@@ -362,14 +406,14 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
 
   // Update markers
   useEffect(() => {
-    if (!map.current || businesses.length === 0) return;
+    if (!map.current || displayedBusinesses.length === 0) return;
 
     const addLayers = () => {
       if (!map.current) return;
 
       const geojsonData = {
         type: 'FeatureCollection' as const,
-        features: businesses.map((business) => ({
+        features: displayedBusinesses.map((business) => ({
           type: 'Feature' as const,
           geometry: {
             type: 'Point' as const,
@@ -503,9 +547,9 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
         if (map.current) map.current.getCanvas().style.cursor = '';
       });
 
-      if (businesses.length > 0) {
+      if (displayedBusinesses.length > 0) {
         const bounds = new mapboxgl.LngLatBounds();
-        businesses.forEach(b => bounds.extend([b.longitude, b.latitude]));
+        displayedBusinesses.forEach(b => bounds.extend([b.longitude, b.latitude]));
         map.current.fitBounds(bounds, { padding: 50, duration: 1000 });
       }
     };
@@ -515,10 +559,134 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
     } else {
       map.current.once('load', addLayers);
     }
-  }, [businesses, navigate]);
+  }, [displayedBusinesses, navigate]);
+
+  const resetFilters = () => {
+    setLocalFilters({
+      industry: '',
+      minPrice: '',
+      maxPrice: '',
+      businessType: 'all'
+    });
+  };
 
   return (
     <div className="w-full space-y-6">
+      {/* Filtres */}
+      <Card className="bg-gradient-to-br from-background to-secondary/5 border-2 border-primary/20">
+        <CardContent className="p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Filter className="h-5 w-5 text-primary" />
+            <h3 className="text-lg font-semibold text-foreground">Filtres de recherche</h3>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Type d'entreprise */}
+            <div className="space-y-2">
+              <Label htmlFor="businessType" className="text-sm font-medium">Type</Label>
+              <div className="grid grid-cols-2 gap-2">
+                <Button
+                  variant={localFilters.businessType === 'all' ? 'default' : 'outline'}
+                  onClick={() => setLocalFilters({ ...localFilters, businessType: 'all' })}
+                  className="h-auto py-3 flex flex-col items-center gap-1"
+                >
+                  <Store className="h-4 w-4" />
+                  <span className="text-xs">Tous</span>
+                </Button>
+                <Button
+                  variant={localFilters.businessType === 'business' ? 'default' : 'outline'}
+                  onClick={() => setLocalFilters({ ...localFilters, businessType: 'business' })}
+                  className="h-auto py-3 flex flex-col items-center gap-1"
+                >
+                  <Building2 className="h-4 w-4" />
+                  <span className="text-xs">Entreprise</span>
+                </Button>
+                <Button
+                  variant={localFilters.businessType === 'franchise' ? 'default' : 'outline'}
+                  onClick={() => setLocalFilters({ ...localFilters, businessType: 'franchise' })}
+                  className="h-auto py-3 flex flex-col items-center gap-1 bg-purple-500/10 hover:bg-purple-500/20 border-purple-500/30"
+                >
+                  <Store className="h-4 w-4 text-purple-500" />
+                  <span className="text-xs">Franchise</span>
+                </Button>
+                <Button
+                  variant={localFilters.businessType === 'property' ? 'default' : 'outline'}
+                  onClick={() => setLocalFilters({ ...localFilters, businessType: 'property' })}
+                  className="h-auto py-3 flex flex-col items-center gap-1 bg-emerald-500/10 hover:bg-emerald-500/20 border-emerald-500/30"
+                >
+                  <Home className="h-4 w-4 text-emerald-500" />
+                  <span className="text-xs">Immobilier</span>
+                </Button>
+              </div>
+            </div>
+
+            {/* Industrie */}
+            <div className="space-y-2">
+              <Label htmlFor="industry" className="text-sm font-medium">Industrie</Label>
+              <Select
+                value={localFilters.industry}
+                onValueChange={(value) => setLocalFilters({ ...localFilters, industry: value })}
+              >
+                <SelectTrigger id="industry">
+                  <SelectValue placeholder="Toutes les industries" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Toutes les industries</SelectItem>
+                  <SelectItem value="restaurant">Restaurant</SelectItem>
+                  <SelectItem value="bar_bistro_discotheque">Bar / Bistro / Discothèque</SelectItem>
+                  <SelectItem value="boutique_commerce_detail">Boutique / Commerce de détail</SelectItem>
+                  <SelectItem value="beaute_esthetique">Beauté / Esthétique</SelectItem>
+                  <SelectItem value="sante_services_medicaux">Santé / Services médicaux</SelectItem>
+                  <SelectItem value="garage_mecanique_concessionnaire">Garage / Mécanique</SelectItem>
+                  <SelectItem value="education_garderie">Éducation / Garderie</SelectItem>
+                  <SelectItem value="communications_informatique">Communications / Informatique</SelectItem>
+                  <SelectItem value="entreprise_service">Entreprise de service</SelectItem>
+                  <SelectItem value="construction">Construction</SelectItem>
+                  <SelectItem value="depanneur">Dépanneur</SelectItem>
+                  <SelectItem value="autres">Autres</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Prix minimum */}
+            <div className="space-y-2">
+              <Label htmlFor="minPrice" className="text-sm font-medium">Prix minimum</Label>
+              <Input
+                id="minPrice"
+                type="number"
+                placeholder="Ex: 50000"
+                value={localFilters.minPrice}
+                onChange={(e) => setLocalFilters({ ...localFilters, minPrice: e.target.value })}
+                className="bg-background"
+              />
+            </div>
+
+            {/* Prix maximum */}
+            <div className="space-y-2">
+              <Label htmlFor="maxPrice" className="text-sm font-medium">Prix maximum</Label>
+              <Input
+                id="maxPrice"
+                type="number"
+                placeholder="Ex: 500000"
+                value={localFilters.maxPrice}
+                onChange={(e) => setLocalFilters({ ...localFilters, maxPrice: e.target.value })}
+                className="bg-background"
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between mt-4 pt-4 border-t border-border">
+            <p className="text-sm text-muted-foreground">
+              <span className="font-semibold text-foreground">{displayedBusinesses.length}</span> annonce{displayedBusinesses.length > 1 ? 's' : ''} affichée{displayedBusinesses.length > 1 ? 's' : ''}
+            </p>
+            <Button variant="outline" size="sm" onClick={resetFilters}>
+              Réinitialiser les filtres
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Carte */}
       <div className="relative w-full h-[600px] rounded-xl overflow-hidden shadow-2xl border border-border/50">
         <div ref={mapContainer} className="absolute inset-0" />
       </div>
