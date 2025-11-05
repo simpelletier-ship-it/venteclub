@@ -69,7 +69,7 @@ const BusinessDetails = () => {
         }
       }
 
-      if (session?.user) {
+      if (session?.user && businessData?.id) {
         console.log('[INIT] Checking Premium subscription first');
         await checkPremiumSubscription(session.user.id);
         
@@ -77,9 +77,9 @@ const BusinessDetails = () => {
         await checkConversationLimits(session.user.id);
         
         console.log('[INIT] Then checking access for user');
-        await checkAccess(session.user.id);
+        await checkAccess(session.user.id, businessData.id);
       } else {
-        console.log('[INIT] No user session');
+        console.log('[INIT] No user session or no business data');
         setLoading(false);
       }
     };
@@ -226,15 +226,20 @@ const BusinessDetails = () => {
     }
   };
 
-  const checkAccess = async (userId: string) => {
-    if (!businessId) return;
+  const checkAccess = async (userId: string, checkBusinessId?: string) => {
+    const idToCheck = checkBusinessId || businessId;
+    if (!idToCheck) {
+      console.log('[ACCESS CHECK] No business ID available');
+      setLoading(false);
+      return;
+    }
     
     try {
-      console.log('[ACCESS CHECK] Checking access for business:', businessId);
+      console.log('[ACCESS CHECK] Checking access for business:', idToCheck);
       
       // Use RPC to check access server-side
       const { data: accessGranted, error } = await supabase
-        .rpc('check_business_access', { business_uuid: businessId });
+        .rpc('check_business_access', { business_uuid: idToCheck });
 
       console.log('[ACCESS CHECK] RPC result:', { accessGranted, error });
 
@@ -256,7 +261,7 @@ const BusinessDetails = () => {
           .from('contact_access')
           .select('used_token')
           .eq('user_id', userId)
-          .eq('business_id', businessId)
+          .eq('business_id', idToCheck)
           .maybeSingle();
         
         if (accessData) {
@@ -268,7 +273,7 @@ const BusinessDetails = () => {
         const { data: businessData } = await supabase
           .from('businesses')
           .select('seller_id')
-          .eq('id', businessId)
+          .eq('id', idToCheck)
           .single();
 
         console.log('[ACCESS CHECK] Business seller_id:', businessData?.seller_id);
