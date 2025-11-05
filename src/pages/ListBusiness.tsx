@@ -14,6 +14,7 @@ import { TermsDialog } from "@/components/TermsDialog";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useAutosaveDraft } from "@/hooks/useAutosaveDraft";
+import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import {
   Command,
   CommandEmpty,
@@ -418,12 +419,12 @@ const ListBusiness = () => {
         description: formData.description,
         industry: formData.industry,
         location: formData.location,
-        annual_revenue: formData.annual_revenue ? parseFloat(formData.annual_revenue) : null,
-        asking_price: priceNegotiable ? 0 : parseFloat(formData.asking_price),
-        profit_margin: formData.profit_margin && !isNaN(parseFloat(formData.profit_margin)) ? parseFloat(formData.profit_margin) : null,
-        baiia: formData.baiia && !isNaN(parseFloat(formData.baiia)) ? parseFloat(formData.baiia) : null,
-        employees_count: formData.employees_count ? parseInt(formData.employees_count) : null,
-        year_established: formData.year_established ? parseInt(formData.year_established) : null,
+        annual_revenue: formData.annual_revenue && formData.annual_revenue.trim() !== "" ? parseFloat(formData.annual_revenue) : null,
+        asking_price: priceNegotiable ? 0 : (formData.asking_price && formData.asking_price.trim() !== "" ? parseFloat(formData.asking_price) : 0),
+        profit_margin: formData.profit_margin && formData.profit_margin.trim() !== "" && !isNaN(parseFloat(formData.profit_margin)) ? parseFloat(formData.profit_margin) : null,
+        baiia: formData.baiia && formData.baiia.trim() !== "" && !isNaN(parseFloat(formData.baiia)) ? parseFloat(formData.baiia) : null,
+        employees_count: formData.employees_count && formData.employees_count.trim() !== "" ? parseInt(formData.employees_count) : null,
+        year_established: formData.year_established && formData.year_established.trim() !== "" ? parseInt(formData.year_established) : null,
       });
 
       // Si on édite une annonce existante
@@ -713,24 +714,13 @@ const ListBusiness = () => {
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-7xl mx-auto">
           <div className="mb-8">
-            <div className="flex items-center gap-4 mb-2">
-              <h1 className="text-4xl font-bold text-foreground">
-                {editingBusinessId ? "Modifier l'annonce" : "Nouvelle Fiche Entreprise"}
-              </h1>
-              {!editingBusinessId && (
-                <Button
-                  variant="outline"
-                  onClick={() => navigate("/list-franchise")}
-                  className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700 border-0 shadow-md"
-                >
-                  🏢 Vendre une franchise
-                </Button>
-              )}
-            </div>
+            <h1 className="text-4xl font-bold text-foreground mb-2">
+              {editingBusinessId ? "Modifier l'annonce" : "Nouvelle Fiche Entreprise"}
+            </h1>
             <p className="text-muted-foreground">
               {editingBusinessId 
                 ? "Modifiez les informations de votre annonce et publiez-la." 
-                : "Remplissez les informations pour créer une nouvelle annonce. Si vous vendez une franchise, cliquez sur le bouton ci-dessus pour accéder au formulaire spécialisé."}
+                : "Remplissez les informations pour créer une nouvelle annonce."}
             </p>
           </div>
 
@@ -906,7 +896,7 @@ const ListBusiness = () => {
                       <div className="mt-2 space-y-3">
                         <label
                           htmlFor="main-photo"
-                          className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary transition-colors bg-secondary/20"
+                          className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-primary/30 rounded-lg cursor-pointer hover:border-primary transition-colors bg-primary/5"
                         >
                           {photoPreviewUrls.length > 0 ? (
                             <img
@@ -943,7 +933,7 @@ const ListBusiness = () => {
                       <div className="mt-2 space-y-3">
                         <label
                           htmlFor="photos"
-                          className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary transition-colors bg-secondary/20"
+                          className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-primary/30 rounded-lg cursor-pointer hover:border-primary transition-colors bg-primary/5"
                         >
                           {photoPreviewUrls.length > 1 ? (
                             <p className="text-muted-foreground text-center">
@@ -1038,176 +1028,18 @@ const ListBusiness = () => {
 
                 {/* Emplacement */}
                 <div className="bg-card p-6 rounded-2xl shadow-elegant border border-border/50">
-                  <h2 className="text-xl font-semibold text-primary mb-4">Emplacement</h2>
+                  <h2 className="text-xl font-semibold text-primary mb-4">Emplacement (optionnel)</h2>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="province">Province</Label>
-                      <Input
-                        id="province"
-                        value={formData.province}
-                        disabled
-                        className="bg-muted"
-                      />
-                    </div>
-
-                    <div>
-                      <Label htmlFor="region">Région</Label>
-                      <Select
-                        value={formData.region}
-                        onValueChange={(value) => setFormData({ ...formData, region: value })}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Sélectionner une région..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {quebecRegions.map((region) => (
-                            <SelectItem key={region} value={region}>
-                              {region}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div>
-                      <Label htmlFor="city">Ville</Label>
-                      <Popover open={citySearchOpen} onOpenChange={setCitySearchOpen}>
-                        <PopoverTrigger asChild>
-                          <Button
-                            variant="outline"
-                            role="combobox"
-                            aria-expanded={citySearchOpen}
-                            className="w-full justify-between"
-                          >
-                            {formData.city || "Sélectionner une ville..."}
-                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-full p-0" align="start">
-                          <Command>
-                            <CommandInput 
-                              placeholder="Rechercher ou taper une ville..." 
-                              value={citySearchValue}
-                              onValueChange={setCitySearchValue}
-                            />
-                            <CommandList>
-                              {citySearchValue && !quebecCities.some(city => city.toLowerCase() === citySearchValue.toLowerCase()) && (
-                                <CommandGroup>
-                                  <CommandItem
-                                    value={citySearchValue}
-                                    onSelect={async (currentValue) => {
-                                      setFormData({ ...formData, city: currentValue });
-                                      setCitySearchOpen(false);
-                                      setCitySearchValue("");
-
-                                      // Géocoder automatiquement la ville
-                                      try {
-                                        const { data, error } = await supabase.functions.invoke('geocode-city', {
-                                          body: { 
-                                            city: currentValue, 
-                                            province: formData.province 
-                                          }
-                                        });
-
-                                        if (error) {
-                                          console.error('[GEOCODE] Error:', error);
-                                          return;
-                                        }
-
-                                        if (data?.success) {
-                                          console.log('[GEOCODE] Coordinates obtained:', data);
-                                          setFormData(prev => ({
-                                            ...prev,
-                                            latitude: data.latitude,
-                                            longitude: data.longitude
-                                          }));
-                                        }
-                                      } catch (err) {
-                                        console.error('[GEOCODE] Failed to geocode city:', err);
-                                      }
-                                    }}
-                                    className="cursor-pointer bg-accent/10"
-                                  >
-                                    <Check className="mr-2 h-4 w-4 opacity-0" />
-                                    Utiliser "{citySearchValue}"
-                                  </CommandItem>
-                                </CommandGroup>
-                              )}
-                              {quebecCities.filter(city => 
-                                city.toLowerCase().includes(citySearchValue.toLowerCase())
-                              ).length === 0 && citySearchValue && quebecCities.some(city => city.toLowerCase() === citySearchValue.toLowerCase()) ? (
-                                <CommandEmpty>Aucune ville trouvée.</CommandEmpty>
-                              ) : (
-                                <CommandGroup>
-                                  {quebecCities
-                                    .filter(city => 
-                                      city.toLowerCase().includes(citySearchValue.toLowerCase())
-                                    )
-                                    .slice(0, 50)
-                                    .map((city) => (
-                                      <CommandItem
-                                        key={city}
-                                        value={city}
-                                    onSelect={async (currentValue) => {
-                                    // Mettre à jour la ville
-                                    setFormData({ ...formData, city: currentValue });
-                                    setCitySearchOpen(false);
-                                    setCitySearchValue("");
-
-                                    // Géocoder automatiquement la ville
-                                    try {
-                                      const { data, error } = await supabase.functions.invoke('geocode-city', {
-                                        body: { 
-                                          city: currentValue, 
-                                          province: formData.province 
-                                        }
-                                      });
-
-                                      if (error) {
-                                        console.error('[GEOCODE] Error:', error);
-                                        return;
-                                      }
-
-                                      if (data?.success) {
-                                        console.log('[GEOCODE] Coordinates obtained:', data);
-                                        setFormData(prev => ({
-                                          ...prev,
-                                          latitude: data.latitude,
-                                          longitude: data.longitude
-                                        }));
-                                      }
-                                    } catch (err) {
-                                      console.error('[GEOCODE] Failed to geocode city:', err);
-                                    }
-                                  }}
-                                    >
-                                      <Check
-                                        className={cn(
-                                          "mr-2 h-4 w-4",
-                                          formData.city === city ? "opacity-100" : "opacity-0"
-                                        )}
-                                      />
-                                        {city}
-                                      </CommandItem>
-                                    ))}
-                                </CommandGroup>
-                              )}
-                            </CommandList>
-                          </Command>
-                        </PopoverContent>
-                      </Popover>
-                    </div>
-                  </div>
-
-                  <div className="mt-4">
+                  <div>
                     <Label htmlFor="location">Adresse complète</Label>
-                    <Input
-                      id="location"
+                    <AddressAutocomplete
                       value={formData.location}
-                      onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                      placeholder="Ex: 123 Rue Principale, Montréal, QC"
+                      onChange={(address) => setFormData({ ...formData, location: address })}
+                      placeholder="Ex: 123 Rue Principale, Montréal, QC H1A 1A1"
                     />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      L'adresse exacte sera visible uniquement pour les acheteurs qualifiés.
+                    </p>
                   </div>
                 </div>
 
@@ -1519,12 +1351,12 @@ const ListBusiness = () => {
                   </div>
                   <Progress 
                     value={visibilityScore} 
-                    className={`h-1.5 ${
-                      visibilityScore === 0 ? "[&>div]:bg-gray-400" :
+                    className={`h-2 ${
+                      visibilityScore === 0 ? "[&>div]:bg-slate-400" :
                       visibilityScore < 30 ? "[&>div]:bg-red-500" :
-                      visibilityScore < 60 ? "[&>div]:bg-orange-500" :
-                      visibilityScore < 80 ? "[&>div]:bg-yellow-500" :
-                      "[&>div]:bg-green-500"
+                      visibilityScore < 60 ? "[&>div]:bg-amber-500" :
+                      visibilityScore < 80 ? "[&>div]:bg-blue-500" :
+                      "[&>div]:bg-primary"
                     }`}
                   />
                   <p className="text-xs text-muted-foreground mt-2">
@@ -1534,34 +1366,6 @@ const ListBusiness = () => {
                      visibilityScore < 80 ? "Bonne visibilité" :
                      "Excellente visibilité"}
                   </p>
-                </div>
-
-                <div className="space-y-3">
-                  {/* Fiche publiable */}
-                  <div className="flex items-start gap-3 p-3 rounded-md bg-muted/50 border border-border/50">
-                    <div className="w-5 h-5 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-semibold flex-shrink-0 mt-0.5">
-                      1
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-medium text-sm text-foreground">Fiche publiable</p>
-                      <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
-                        Votre annonce respecte les critères minimums et peut être publiée.
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Mise en avant */}
-                  <div className="flex items-start gap-3 p-3 rounded-md bg-muted/50 border border-border/50">
-                    <div className="w-5 h-5 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-semibold flex-shrink-0 mt-0.5">
-                      2
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-medium text-sm text-foreground">Mise en avant</p>
-                      <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
-                        Votre fiche est éligible à une mise en avant et à un positionnement premium.
-                      </p>
-                    </div>
-                  </div>
                 </div>
 
                 {/* Prochaines étapes */}
