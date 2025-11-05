@@ -11,11 +11,14 @@ serve(async (req) => {
   }
 
   try {
-    const mapboxToken = Deno.env.get('MAPBOX_ACCESS_TOKEN');
+    // Try MAPBOX_ACCESS_TOKEN first, then fallback to VITE_MAPBOX_TOKEN
+    const mapboxToken = Deno.env.get('MAPBOX_ACCESS_TOKEN') || Deno.env.get('VITE_MAPBOX_TOKEN');
     
     if (!mapboxToken) {
       throw new Error('Mapbox token not configured');
     }
+
+    console.log('[MAPBOX TOKEN] Token found and returned');
 
     return new Response(
       JSON.stringify({ token: mapboxToken }),

@@ -53,6 +53,8 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [filteredBusinesses, setFilteredBusinesses] = useState<Business[]>([]);
   const [showSidebar, setShowSidebar] = useState(false);
+  const [isMapLoading, setIsMapLoading] = useState(true);
+  const [mapError, setMapError] = useState<string | null>(null);
   const navigate = useNavigate();
   
   // Filtres locaux
@@ -314,23 +316,42 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
 
     const initMap = async () => {
       try {
+        setIsMapLoading(true);
+        setMapError(null);
+        
         // Récupérer le token Mapbox depuis l'edge function
         console.log('[MAP] Fetching Mapbox token...');
         const { data: tokenData, error: tokenError } = await supabase.functions.invoke('get-mapbox-token');
         
         if (tokenError || !tokenData?.token) {
           console.error('[MAP] Failed to get Mapbox token:', tokenError);
+          setMapError('Impossible de charger la carte. Veuillez réessayer plus tard.');
+          setIsMapLoading(false);
           return;
         }
 
         console.log('[MAP] Mapbox token retrieved successfully');
         mapboxgl.accessToken = tokenData.token;
 
+        console.log('[MAP] Initializing map...');
         map.current = new mapboxgl.Map({
           container: mapContainer.current!,
           style: 'mapbox://styles/mapbox/outdoors-v12',
           center: [-71.2082, 46.8139],
           zoom: 6,
+        });
+
+        console.log('[MAP] Map instance created');
+
+        map.current.on('error', (e) => {
+          console.error('[MAP] Mapbox error:', e);
+          setMapError('Erreur lors du chargement de la carte.');
+          setIsMapLoading(false);
+        });
+
+        map.current.on('load', () => {
+          console.log('[MAP] Map style loaded successfully');
+          setIsMapLoading(false);
         });
 
         draw.current = new MapboxDraw({
@@ -391,7 +412,9 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
           setShowSidebar(false);
         });
       } catch (error) {
-        console.error('[MAP] Error:', error);
+        console.error('[MAP] Error initializing map:', error);
+        setMapError('Erreur lors de l\'initialisation de la carte.');
+        setIsMapLoading(false);
       }
     };
 
@@ -689,6 +712,30 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
       {/* Carte */}
       <div className="relative w-full h-[600px] rounded-xl overflow-hidden shadow-2xl border border-border/50">
         <div ref={mapContainer} className="absolute inset-0" />
+        
+        {isMapLoading && (
+          <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-10">
+            <div className="text-center space-y-4">
+              <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent mx-auto"></div>
+              <p className="text-sm text-muted-foreground">Chargement de la carte interactive...</p>
+            </div>
+          </div>
+        )}
+        
+        {mapError && (
+          <div className="absolute inset-0 bg-background/95 backdrop-blur-sm flex items-center justify-center z-10">
+            <div className="text-center space-y-4 p-6">
+              <div className="text-destructive text-4xl">⚠️</div>
+              <p className="text-lg font-semibold text-foreground">{mapError}</p>
+              <Button 
+                onClick={() => window.location.reload()} 
+                variant="outline"
+              >
+                Recharger la page
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
       
       {showSidebar && filteredBusinesses.length > 0 && (
