@@ -961,6 +961,23 @@ const BusinessDetails = () => {
                     </div>
                   ) : (
                     <div className="bg-gradient-to-br from-primary/5 to-accent/5 p-6 rounded-lg">
+                      {!user && (
+                        <div className="mb-6 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 p-6 rounded-lg border-2 border-green-200 dark:border-green-800 text-center">
+                          <h3 className="text-lg font-semibold text-green-900 dark:text-green-100 mb-3 flex items-center justify-center gap-2">
+                            💬 Discutez gratuitement avec le vendeur
+                          </h3>
+                          <p className="text-green-800 dark:text-green-200 mb-4">
+                            Connectez-vous pour accéder au chat gratuit et illimité avec tous les vendeurs
+                          </p>
+                          <Button 
+                            onClick={() => navigate("/auth")}
+                            className="bg-green-600 hover:bg-green-700 text-white"
+                          >
+                            Se connecter maintenant
+                          </Button>
+                        </div>
+                      )}
+                      
                       <div className="text-center mb-6">
                         <Lock className="w-12 h-12 mx-auto mb-4 text-accent" />
                         <h3 className="text-lg font-semibold mb-2">
