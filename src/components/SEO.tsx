@@ -19,6 +19,25 @@ export const SEO = ({
   type = "website",
   structuredData,
 }: SEOProps) => {
-  // Temporairement désactivé pour debug
-  return null;
+  const siteUrl = window.location.origin;
+  const currentUrl = canonical ? `${siteUrl}${canonical}` : window.location.href;
+
+  return (
+    <Helmet>
+      <title>{title}</title>
+      <meta name="description" content={description} />
+      <meta name="keywords" content={keywords} />
+      <link rel="canonical" href={currentUrl} />
+      <meta property="og:title" content={title} />
+      <meta property="og:description" content={description} />
+      <meta property="og:image" content={`${siteUrl}${ogImage}`} />
+      <meta property="og:url" content={currentUrl} />
+      <meta name="twitter:card" content="summary_large_image" />
+      {structuredData && (
+        <script type="application/ld+json">
+          {JSON.stringify(structuredData)}
+        </script>
+      )}
+    </Helmet>
+  );
 };
