@@ -125,7 +125,7 @@ const BusinessListItem = ({
 
   return (
     <div 
-      className={`group relative flex items-center gap-4 p-4 bg-card border border-border rounded-xl transition-all duration-300 ${
+      className={`group relative flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-card border border-border rounded-xl transition-all duration-300 ${
         status !== 'sold' ? 'hover:shadow-[var(--shadow-hover)] cursor-pointer' : 'cursor-default'
       } overflow-hidden ${
         featured ? 'ring-2 ring-amber-500/30' : ''
@@ -151,8 +151,8 @@ const BusinessListItem = ({
         </>
       )}
 
-      {/* Image à gauche */}
-      <div className="relative w-32 h-32 flex-shrink-0 overflow-hidden rounded-lg bg-muted">
+      {/* Image - pleine largeur sur mobile, à gauche sur desktop */}
+      <div className="relative w-full sm:w-28 md:w-32 h-40 sm:h-28 md:h-32 flex-shrink-0 overflow-hidden rounded-lg bg-muted">
         {imageLoading ? (
           <Skeleton className="w-full h-full" />
         ) : mainImageUrl ? (
@@ -165,98 +165,101 @@ const BusinessListItem = ({
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-muted to-muted/50">
             <ImageIcon className="w-8 h-8 text-muted-foreground/40 mb-1" />
-            <p className="text-[10px] text-muted-foreground">Voir photos</p>
+            <p className="text-xs text-muted-foreground">Voir photos</p>
           </div>
         )}
       </div>
 
-      {/* Left section - Badges & Title */}
-      <div className="flex-1 min-w-0 space-y-2">
-        <div className="flex items-center gap-2 flex-wrap">
-          {/* Badge En Vedette en premier */}
-          {featured && (
-            <Badge className="relative bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 text-amber-950 border-2 border-amber-300/50 shadow-[0_0_20px_rgba(251,191,36,0.5)] font-bold tracking-wide text-xs animate-pulse">
-              <Star className="w-3 h-3 fill-amber-950 mr-1 drop-shadow-sm" />
-              EN VEDETTE
+      {/* Content container - full width sur mobile */}
+      <div className="flex-1 min-w-0 flex flex-col gap-3 sm:gap-2">
+        {/* Badges & Title */}
+        <div className="space-y-2">
+          <div className="flex items-center gap-1.5 flex-wrap">
+            {/* Badge En Vedette en premier */}
+            {featured && (
+              <Badge className="relative bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 text-amber-950 border-2 border-amber-300/50 shadow-[0_0_20px_rgba(251,191,36,0.5)] font-bold tracking-wide text-[10px] sm:text-xs animate-pulse">
+                <Star className="w-2.5 sm:w-3 h-2.5 sm:h-3 fill-amber-950 mr-1 drop-shadow-sm" />
+                EN VEDETTE
+              </Badge>
+            )}
+            
+            {/* Badge Type d'annonce */}
+            <Badge className={`${businessType.color} text-white border-0 shadow-md text-[10px] sm:text-xs`}>
+              <businessType.icon className="w-2.5 sm:w-3 h-2.5 sm:h-3 mr-1" />
+              {businessType.label}
             </Badge>
-          )}
-          
-          {/* Badge Type d'annonce */}
-          <Badge className={`${businessType.color} text-white border-0 shadow-md text-xs`}>
-            <businessType.icon className="w-3 h-3 mr-1" />
-            {businessType.label}
-          </Badge>
-          
-          {/* Badge Démo */}
-          {is_demo && (
-            <TooltipProvider delayDuration={200}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div onClick={(e) => e.stopPropagation()}>
-                    <Badge className="bg-purple-500 text-white border-0 shadow-md cursor-help text-xs hover:bg-purple-600 transition-colors">
-                      <HelpCircle className="w-3 h-3 mr-1" />
-                      Annonce fictive
-                    </Badge>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent side="top" className="max-w-xs bg-popover border-border">
-                  <p className="font-semibold mb-2 text-foreground">Annonce fictive</p>
-                  <p className="text-sm mb-2 text-muted-foreground">Cette annonce est à titre démonstratif en attendant le lancement officiel du site.</p>
-                  <p className="text-sm font-medium text-foreground">Il est déjà possible de soumettre votre annonce pour le grand lancement prévu le 1er décembre 2025!</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          )}
-        </div>
-        
-        <div className="space-y-1">
-          <h3 className="text-lg font-bold text-foreground group-hover:text-accent transition-colors line-clamp-2">
-            {title}
-          </h3>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <MapPin className="w-4 h-4 flex-shrink-0" />
-            <span className="truncate font-medium">
-              {city || location}
-              {region && <span className="text-muted-foreground/70">, {region}</span>}
-            </span>
+            
+            {/* Badge Démo */}
+            {is_demo && (
+              <TooltipProvider delayDuration={200}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div onClick={(e) => e.stopPropagation()}>
+                      <Badge className="bg-purple-500 text-white border-0 shadow-md cursor-help text-[10px] sm:text-xs hover:bg-purple-600 transition-colors">
+                        <HelpCircle className="w-2.5 sm:w-3 h-2.5 sm:h-3 mr-1" />
+                        Annonce fictive
+                      </Badge>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className="max-w-xs bg-popover border-border">
+                    <p className="font-semibold mb-2 text-foreground">Annonce fictive</p>
+                    <p className="text-sm mb-2 text-muted-foreground">Cette annonce est à titre démonstratif en attendant le lancement officiel du site.</p>
+                    <p className="text-sm font-medium text-foreground">Il est déjà possible de soumettre votre annonce pour le grand lancement prévu le 1er décembre 2025!</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
           </div>
+          
+          <div className="space-y-1">
+            <h3 className="text-base sm:text-lg font-bold text-foreground group-hover:text-accent transition-colors line-clamp-2">
+              {title}
+            </h3>
+            <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
+              <MapPin className="w-3 sm:w-4 h-3 sm:h-4 flex-shrink-0" />
+              <span className="truncate font-medium">
+                {city || location}
+                {region && <span className="text-muted-foreground/70">, {region}</span>}
+              </span>
+            </div>
+          </div>
+
+          <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 sm:line-clamp-1">
+            {description}
+          </p>
         </div>
 
-        <p className="text-sm text-muted-foreground line-clamp-1">
-          {description}
-        </p>
+        {/* Stats - visible sur toutes les tailles */}
+        <div className={`flex items-center gap-3 sm:gap-6 flex-wrap ${status === 'sold' ? 'blur-sm' : ''}`}>
+          {!is_franchise && (
+            <>
+              <div className="flex-1 min-w-[100px]">
+                <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider mb-0.5">Chiffre d'affaires</p>
+                <p className="text-xs sm:text-sm font-semibold text-foreground flex items-center gap-1">
+                  <TrendingUp className="w-3 sm:w-3.5 h-3 sm:h-3.5 text-accent" />
+                  {displayRevenue}
+                </p>
+              </div>
+              <div className="flex-1 min-w-[80px]">
+                <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider mb-0.5">BAIIA</p>
+                <p className="text-xs sm:text-sm font-semibold text-accent">{displayBaiia}</p>
+              </div>
+            </>
+          )}
+          {is_franchise && (
+            <div className="flex-1">
+              <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider mb-0.5">Type</p>
+              <p className="text-xs sm:text-sm font-semibold text-foreground">Opportunité Franchise</p>
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Middle section - Stats */}
-      <div className={`hidden md:flex items-center gap-6 ${status === 'sold' ? 'blur-sm' : ''}`}>
-        {!is_franchise && (
-          <>
-            <div className="text-center">
-              <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Chiffre d'affaires</p>
-              <p className="text-sm font-semibold text-foreground flex items-center gap-1">
-                <TrendingUp className="w-3.5 h-3.5 text-accent" />
-                {displayRevenue}
-              </p>
-            </div>
-            <div className="text-center">
-              <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">BAIIA</p>
-              <p className="text-sm font-semibold text-accent">{displayBaiia}</p>
-            </div>
-          </>
-        )}
-        {is_franchise && (
-          <div className="text-center">
-            <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Type</p>
-            <p className="text-sm font-semibold text-foreground">Opportunité Franchise</p>
-          </div>
-        )}
-      </div>
-
-      {/* Right section - Price & Actions */}
-      <div className="flex items-center gap-4">
-        <div className={`text-right ${status === 'sold' ? 'blur-sm' : ''}`}>
-          <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Prix demandé</p>
-          <p className="text-xl font-bold text-primary whitespace-nowrap">
+      {/* Price & Actions - sticky sur mobile en bas */}
+      <div className="flex sm:flex-col items-center justify-between sm:justify-start gap-3 sm:gap-2 border-t sm:border-t-0 sm:border-l border-border pt-3 sm:pt-0 sm:pl-4">
+        <div className={`text-left sm:text-right ${status === 'sold' ? 'blur-sm' : ''}`}>
+          <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider mb-0.5 sm:mb-1">Prix demandé</p>
+          <p className="text-lg sm:text-xl font-bold text-primary whitespace-nowrap">
             {displayPrice}
           </p>
         </div>
@@ -268,7 +271,7 @@ const BusinessListItem = ({
           {status !== 'sold' && (
             <Button 
               size="sm"
-              className="bg-accent hover:bg-accent/90 text-accent-foreground font-semibold shadow-md"
+              className="bg-accent hover:bg-accent/90 text-accent-foreground font-semibold shadow-md text-xs sm:text-sm px-3 sm:px-4"
               onClick={(e) => {
                 e.stopPropagation();
                 handleClick();
