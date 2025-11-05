@@ -20,33 +20,5 @@ export default defineConfig(({ mode }) => ({
     minify: 'esbuild',
     sourcemap: false,
     chunkSizeWarningLimit: 1000,
-    rollupOptions: {
-      output: {
-        manualChunks: (id) => {
-          // Conservative code splitting - only split large vendor libraries
-          if (id.includes('node_modules')) {
-            // React ecosystem
-            if (id.includes('react') || id.includes('react-dom')) {
-              return 'vendor-react';
-            }
-            // Supabase
-            if (id.includes('@supabase')) {
-              return 'vendor-supabase';
-            }
-            // UI libraries (Radix)
-            if (id.includes('@radix-ui')) {
-              return 'vendor-ui';
-            }
-            // All other vendors in one chunk
-            return 'vendor';
-          }
-        },
-      },
-    },
-    cssCodeSplit: true,
-    reportCompressedSize: false,
-  },
-  optimizeDeps: {
-    include: ['react', 'react-dom', 'react-router-dom'],
   },
 }));
