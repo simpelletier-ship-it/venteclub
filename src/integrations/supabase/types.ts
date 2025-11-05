@@ -1144,7 +1144,7 @@ export type Database = {
       archive_old_sold_businesses: { Args: never; Returns: undefined }
       can_start_conversation:
         | { Args: { p_business_id: string; p_user_id: string }; Returns: Json }
-        | { Args: { p_user_id: string }; Returns: boolean }
+        | { Args: { p_user_id: string }; Returns: Json }
       check_business_access: {
         Args: { business_uuid: string }
         Returns: boolean
