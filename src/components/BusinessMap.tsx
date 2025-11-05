@@ -282,83 +282,93 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
   useEffect(() => {
     if (!mapContainer.current || map.current) return;
 
-    const mapboxToken = import.meta.env.VITE_MAPBOX_TOKEN;
-    if (!mapboxToken) {
-      console.error('[MAP] Mapbox token not found');
-      return;
-    }
-
-    mapboxgl.accessToken = mapboxToken;
-
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/outdoors-v12',
-      center: [-71.2082, 46.8139],
-      zoom: 6,
-    });
-
-    // Initialize draw control with custom styles
-    draw.current = new MapboxDraw({
-      displayControlsDefault: false,
-      controls: {
-        polygon: true,
-        trash: true
-      },
-      defaultMode: 'simple_select',
-      styles: [
-        // Polygon fill
-        {
-          'id': 'gl-draw-polygon-fill',
-          'type': 'fill',
-          'filter': ['all', ['==', '$type', 'Polygon'], ['!=', 'mode', 'static']],
-          'paint': {
-            'fill-color': '#3b82f6',
-            'fill-opacity': 0.25
-          }
-        },
-        // Polygon outline
-        {
-          'id': 'gl-draw-polygon-stroke-active',
-          'type': 'line',
-          'filter': ['all', ['==', '$type', 'Polygon'], ['!=', 'mode', 'static']],
-          'layout': {
-            'line-cap': 'round',
-            'line-join': 'round'
-          },
-          'paint': {
-            'line-color': '#3b82f6',
-            'line-width': 3
-          }
-        },
-        // Vertex points
-        {
-          'id': 'gl-draw-polygon-and-line-vertex-active',
-          'type': 'circle',
-          'filter': ['all', ['==', 'meta', 'vertex'], ['==', '$type', 'Point']],
-          'paint': {
-            'circle-radius': 6,
-            'circle-color': '#3b82f6',
-            'circle-stroke-color': '#fff',
-            'circle-stroke-width': 2
-          }
+    const initializeMap = async () => {
+      try {
+        // Get Mapbox token from edge function
+        const { data, error } = await supabase.functions.invoke('get-mapbox-token');
+        
+        if (error || !data?.token) {
+          console.error('[MAP] Failed to get Mapbox token:', error);
+          return;
         }
-      ]
-    });
 
-    map.current.addControl(draw.current, 'top-left');
+        mapboxgl.accessToken = data.token;
 
-    map.current.addControl(
-      new mapboxgl.NavigationControl({
-        visualizePitch: true,
-      }),
-      'top-right'
-    );
+        map.current = new mapboxgl.Map({
+          container: mapContainer.current!,
+          style: 'mapbox://styles/mapbox/outdoors-v12',
+          center: [-71.2082, 46.8139],
+          zoom: 6,
+        });
 
-    // Listen to delete event only (create/update handled in separate useEffect)
-    map.current.on('draw.delete', () => {
-      setFilteredBusinesses([]);
-      setShowSidebar(false);
-    });
+        // Initialize draw control with custom styles
+        draw.current = new MapboxDraw({
+          displayControlsDefault: false,
+          controls: {
+            polygon: true,
+            trash: true
+          },
+          defaultMode: 'simple_select',
+          styles: [
+            // Polygon fill
+            {
+              'id': 'gl-draw-polygon-fill',
+              'type': 'fill',
+              'filter': ['all', ['==', '$type', 'Polygon'], ['!=', 'mode', 'static']],
+              'paint': {
+                'fill-color': '#3b82f6',
+                'fill-opacity': 0.25
+              }
+            },
+            // Polygon outline
+            {
+              'id': 'gl-draw-polygon-stroke-active',
+              'type': 'line',
+              'filter': ['all', ['==', '$type', 'Polygon'], ['!=', 'mode', 'static']],
+              'layout': {
+                'line-cap': 'round',
+                'line-join': 'round'
+              },
+              'paint': {
+                'line-color': '#3b82f6',
+                'line-width': 3
+              }
+            },
+            // Vertex points
+            {
+              'id': 'gl-draw-polygon-and-line-vertex-active',
+              'type': 'circle',
+              'filter': ['all', ['==', 'meta', 'vertex'], ['==', '$type', 'Point']],
+              'paint': {
+                'circle-radius': 6,
+                'circle-color': '#3b82f6',
+                'circle-stroke-color': '#fff',
+                'circle-stroke-width': 2
+              }
+            }
+          ]
+        });
+
+        map.current.addControl(draw.current, 'top-left');
+
+        map.current.addControl(
+          new mapboxgl.NavigationControl({
+            visualizePitch: true,
+          }),
+          'top-right'
+        );
+
+        // Listen to delete event only (create/update handled in separate useEffect)
+        map.current.on('draw.delete', () => {
+          setFilteredBusinesses([]);
+          setShowSidebar(false);
+        });
+      } catch (error) {
+        console.error('[MAP] Error initializing map:', error);
+      }
+    };
+
+    initializeMap();
 
     return () => {
       if (map.current) {
