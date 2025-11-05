@@ -13,6 +13,7 @@ export const TwoFactorAuth = () => {
   const [loading, setLoading] = useState(false);
   const [enabled, setEnabled] = useState(false);
   const [qrCode, setQrCode] = useState<string>("");
+  const [factorId, setFactorId] = useState<string>("");
   const [verificationCode, setVerificationCode] = useState("");
   const [backupCodes, setBackupCodes] = useState<string[]>([]);
   const [copied, setCopied] = useState(false);
@@ -40,19 +41,21 @@ export const TwoFactorAuth = () => {
     try {
       const { data, error } = await supabase.auth.mfa.enroll({
         factorType: 'totp',
+        friendlyName: 'Authenticator App',
       });
 
       if (error) throw error;
 
       if (data) {
         setQrCode(data.totp.qr_code);
+        setFactorId(data.id);
         setShowSetup(true);
       }
     } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Erreur",
-        description: error.message,
+        description: error.message || "Impossible d'activer 2FA. Veuillez réessayer.",
       });
     } finally {
       setLoading(false);
@@ -69,15 +72,29 @@ export const TwoFactorAuth = () => {
       return;
     }
 
+    if (!factorId) {
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: "Session expirée. Veuillez recommencer.",
+      });
+      setShowSetup(false);
+      return;
+    }
+
     setLoading(true);
     try {
-      const factors = await supabase.auth.mfa.listFactors();
-      const totpFactor = factors.data?.totp?.[0];
-      
-      if (!totpFactor) throw new Error("Factor not found");
+      // Créer un challenge pour vérifier le code TOTP
+      const { data: challengeData, error: challengeError } = await supabase.auth.mfa.challenge({
+        factorId: factorId,
+      });
 
-      const { error } = await supabase.auth.mfa.challengeAndVerify({
-        factorId: totpFactor.id,
+      if (challengeError) throw challengeError;
+
+      // Vérifier le code TOTP pour finaliser l'enrollment
+      const { data, error } = await supabase.auth.mfa.verify({
+        factorId: factorId,
+        challengeId: challengeData.id,
         code: verificationCode,
       });
 
@@ -97,11 +114,13 @@ export const TwoFactorAuth = () => {
       setEnabled(true);
       setShowSetup(false);
       setVerificationCode("");
+      setFactorId("");
     } catch (error: any) {
+      console.error("2FA verification error:", error);
       toast({
         variant: "destructive",
         title: "Erreur de vérification",
-        description: "Le code est incorrect. Veuillez réessayer.",
+        description: "Le code est incorrect. Assurez-vous d'utiliser le code actuel de votre application d'authentification.",
       });
     } finally {
       setLoading(false);
@@ -196,6 +215,7 @@ export const TwoFactorAuth = () => {
               onClick={() => {
                 setShowSetup(false);
                 setVerificationCode("");
+                setFactorId("");
               }}
               className="flex-1"
             >
