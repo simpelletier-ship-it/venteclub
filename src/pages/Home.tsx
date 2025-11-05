@@ -61,7 +61,7 @@ const Home = () => {
     "@type": "WebSite",
     "name": "Vente.Club",
     "url": "https://vente.club",
-    "description": "Plateforme québécoise d'achat et vente d'entreprises avec 2,340+ transactions annuelles. Prix médian 375K$. Achetez ou vendez votre entreprise en toute sécurité.",
+    "description": "Plateforme intelligente optimisée par IA qui facilite la mise en relation entre acquéreurs et propriétaires d'entreprises au Québec. Tous secteurs d'activité : restauration, hôtellerie, commerce, industrie.",
     "potentialAction": {
       "@type": "SearchAction",
       "target": {
@@ -91,7 +91,7 @@ const Home = () => {
     <>
       <SEO 
         title="Achat et Vente d'Entreprises au Québec | Prix Médian 375K$ | Vente.Club" 
-        description="2,340+ transactions annuelles au Québec. Prix médian 375K$, délai 8-10 mois. Trouvez votre entreprise idéale ou vendez la vôtre avec Vente.Club - Plateforme de confiance depuis 2024." 
+        description="Plateforme intelligente qui connecte acheteurs et vendeurs d'entreprises au Québec. Restaurants, commerces, industries - Trouvez l'opportunité qui correspond à vos compétences et moyens. Optimisé par IA."
         keywords="achat entreprise Québec, vente entreprise, PME à vendre, commerce à vendre, opportunité affaires, reprise commerce Montréal, cession entreprise, prix entreprise 2025"
         canonical="/" 
         structuredData={structuredData} 
@@ -129,7 +129,7 @@ const Home = () => {
             </h1>
             
             <p className="text-base sm:text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed px-4">
-              Des milliers d'opportunités d'affaires au Québec
+              Plateforme intelligente qui facilite la connexion entre acquéreurs et propriétaires. Explorez un vaste répertoire d'occasions commerciales dans tous les domaines : restauration, hôtellerie, commerce de détail, services et secteur industriel.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center pt-4 sm:pt-6 px-4">
@@ -192,18 +192,30 @@ const Home = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-8 sm:py-12 bg-background">
+      <section className="py-12 sm:py-16 bg-background">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 max-w-4xl mx-auto">
+          <div className="text-center mb-10 max-w-3xl mx-auto">
+            <h2 className="text-3xl sm:text-4xl font-display font-bold mb-4">Pour tous les entrepreneurs</h2>
+            <p className="text-base sm:text-lg text-muted-foreground">
+              Quel que soit votre secteur d'activité, découvrez un large éventail d'opportunités adaptées à vos compétences et à votre budget. Notre plateforme vous permet d'acquérir une entreprise selon différentes modalités : immobilisation complète incluant bâtiment et équipements, acquisition d'actions pour devenir actionnaire, ou rachat de fonds de commerce pour reprendre l'activité existante.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 max-w-5xl mx-auto mb-12">
             <div className="text-center p-5 sm:p-6 rounded-xl bg-card border border-border hover:shadow-lg transition-shadow">
               <TrendingUp className="w-8 sm:w-10 h-8 sm:h-10 mx-auto mb-2 sm:mb-3 text-secondary" />
-              <h3 className="text-base sm:text-lg font-bold mb-1.5 sm:mb-2">Statistiques en temps réel</h3>
-              <p className="text-xs sm:text-sm text-muted-foreground">Suivez la performance de vos annonces avec des statistiques détaillées</p>
+              <h3 className="text-base sm:text-lg font-bold mb-1.5 sm:mb-2">Recherche optimisée par IA</h3>
+              <p className="text-xs sm:text-sm text-muted-foreground">Trouvez rapidement les opportunités qui correspondent à votre profil grâce à notre intelligence artificielle</p>
+            </div>
+            <div className="text-center p-5 sm:p-6 rounded-xl bg-card border border-border hover:shadow-lg transition-shadow">
+              <Shield className="w-8 sm:w-10 h-8 sm:h-10 mx-auto mb-2 sm:mb-3 text-secondary" />
+              <h3 className="text-base sm:text-lg font-bold mb-1.5 sm:mb-2">Transactions sécurisées</h3>
+              <p className="text-xs sm:text-sm text-muted-foreground">Plateforme fiable et sécurisée pour toutes vos négociations d'achat ou de vente</p>
             </div>
             <div className="text-center p-5 sm:p-6 rounded-xl bg-card border border-border hover:shadow-lg transition-shadow">
               <Clock className="w-8 sm:w-10 h-8 sm:h-10 mx-auto mb-2 sm:mb-3 text-secondary" />
-              <h3 className="text-base sm:text-lg font-bold mb-1.5 sm:mb-2">Plateforme intelligente</h3>
-              <p className="text-xs sm:text-sm text-muted-foreground">Gérez vos annonces facilement et voyez leur impact en direct</p>
+              <h3 className="text-base sm:text-lg font-bold mb-1.5 sm:mb-2">Interface simplifiée</h3>
+              <p className="text-xs sm:text-sm text-muted-foreground">Navigation intuitive et gestion facile de vos annonces grâce à notre technologie avancée</p>
             </div>
           </div>
         </div>
