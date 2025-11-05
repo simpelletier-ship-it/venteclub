@@ -3,6 +3,7 @@ import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { supabase, invokeWithTimeout } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Lock, MapPin, TrendingUp, Users, Calendar, Eye, Calculator } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -1169,34 +1170,50 @@ const BusinessDetails = () => {
                 {/* Chat Section - Affiché seulement si déverrouillé ou Premium ou vendeur */}
                 {user && business && (isSeller || hasPremium || hasUnlockedChat) && (
                   <div className="border-t pt-6 mt-6">
-                    <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                      💬 Messagerie avec le vendeur
-                      {!isSeller && (
-                        <Badge variant="secondary" className="text-xs">
-                          {hasPremium ? "Illimité" : "Déverrouillé"}
-                        </Badge>
-                      )}
-                    </h2>
-                    
-                    {!isSeller ? (
-                      <ChatBox
-                        businessId={businessId}
-                        currentUserId={user.id}
-                        otherUserId={business.seller_id}
-                        otherUserName={
-                          sellerProfile?.full_name || 
-                          (sellerProfile?.first_name && sellerProfile?.last_name 
-                            ? `${sellerProfile.first_name} ${sellerProfile.last_name}` 
-                            : sellerProfile?.email?.split('@')[0] || "Vendeur")
-                        }
-                        businessTitle={business.title}
-                      />
-                    ) : (
-                      <SellerChatSection 
-                        businessId={businessId}
-                        sellerId={user.id}
-                      />
-                    )}
+                    <Card className="bg-gradient-to-br from-primary/5 via-background to-secondary/5 border-2 border-primary/20 shadow-lg">
+                      <CardContent className="p-6">
+                        <div className="flex items-center gap-3 mb-6 pb-4 border-b border-border/50">
+                          <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                            <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                            </svg>
+                          </div>
+                          <div className="flex-1">
+                            <h2 className="text-xl font-bold text-foreground">
+                              💬 Messagerie
+                            </h2>
+                            <p className="text-sm text-muted-foreground">
+                              {isSeller ? "Vos conversations" : "Discutez avec le vendeur"}
+                            </p>
+                          </div>
+                          {!isSeller && (
+                            <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">
+                              {hasPremium ? "Illimité" : "Déverrouillé"}
+                            </Badge>
+                          )}
+                        </div>
+                        
+                        {!isSeller ? (
+                          <ChatBox
+                            businessId={businessId}
+                            currentUserId={user.id}
+                            otherUserId={business.seller_id}
+                            otherUserName={
+                              sellerProfile?.full_name || 
+                              (sellerProfile?.first_name && sellerProfile?.last_name 
+                                ? `${sellerProfile.first_name} ${sellerProfile.last_name}` 
+                                : sellerProfile?.email?.split('@')[0] || "Vendeur")
+                            }
+                            businessTitle={business.title}
+                          />
+                        ) : (
+                          <SellerChatSection 
+                            businessId={businessId}
+                            sellerId={user.id}
+                          />
+                        )}
+                      </CardContent>
+                    </Card>
                   </div>
                 )}
 
@@ -1204,12 +1221,17 @@ const BusinessDetails = () => {
                 {!isSeller && user && hasAccess && sellerContact && (
                   <div className="border-t pt-6 mt-6">
                     <div className="bg-gradient-to-br from-primary/5 to-secondary/5 border-2 border-primary/20 rounded-xl p-6 max-w-md mx-auto">
-                      <h3 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
-                        📞 Coordonnées du vendeur
-                        <Badge variant="secondary" className="text-xs">
-                          Déverrouillé
-                        </Badge>
-                      </h3>
+                      <div className="text-center mb-4">
+                        <h3 className="text-xl font-bold text-foreground mb-1 flex items-center gap-2 justify-center">
+                          📞 Coordonnées du vendeur
+                          <Badge variant="secondary" className="text-xs bg-green-500/10 text-green-700 dark:text-green-300 border-green-500/20">
+                            Déverrouillé
+                          </Badge>
+                        </h3>
+                        <p className="text-xs text-muted-foreground">
+                          grâce au Club Select
+                        </p>
+                      </div>
                       
                       <div className="space-y-4">
                         {sellerContact.email && (
@@ -1249,65 +1271,24 @@ const BusinessDetails = () => {
 
                 {!hasAccess && !isSeller && user && conversationsRemaining === 0 && !hasPremium && (
                   <div className="border-t pt-6 mt-6">
-                    <div className="relative bg-gradient-to-br from-gray-900 via-black to-gray-900 border-2 border-yellow-500/30 rounded-xl p-8 max-w-md mx-auto overflow-hidden shadow-2xl">
-                      {/* Effet de brillance animé */}
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-yellow-500/10 to-transparent animate-shimmer" />
-                      
-                      <div className="relative z-10">
-                        <div className="mb-6 text-center">
-                          {/* Icône premium */}
-                          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-yellow-400 via-yellow-500 to-yellow-600 mb-4 shadow-lg">
-                            <svg className="w-8 h-8 text-black" fill="currentColor" viewBox="0 0 20 20">
-                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                            </svg>
-                          </div>
-                          
-                          <h4 className="font-bold text-2xl mb-2 bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 bg-clip-text text-transparent">
-                            Club Select
-                          </h4>
-                          <div className="text-5xl font-extrabold text-white mb-2 tracking-tight">
-                            19,99$
-                          </div>
-                          <p className="text-sm text-gray-400 font-medium">par mois · annulez à tout moment</p>
-                        </div>
-                        
-                        <div className="space-y-4 mb-6">
-                          <div className="flex items-start gap-3 bg-white/5 backdrop-blur-sm rounded-lg p-3 border border-yellow-500/20">
-                            <div className="flex-shrink-0 w-6 h-6 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center">
-                              <svg className="w-4 h-4 text-black" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                              </svg>
-                            </div>
-                            <span className="text-white font-semibold text-sm">Accès illimité à tous les vendeurs</span>
-                          </div>
-                          
-                          <div className="flex items-start gap-3 bg-white/5 backdrop-blur-sm rounded-lg p-3 border border-yellow-500/20">
-                            <div className="flex-shrink-0 w-6 h-6 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center">
-                              <svg className="w-4 h-4 text-black" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                              </svg>
-                            </div>
-                            <span className="text-white font-semibold text-sm">Conversations illimitées 24/7</span>
-                          </div>
-                          
-                          <div className="flex items-start gap-3 bg-white/5 backdrop-blur-sm rounded-lg p-3 border border-yellow-500/20">
-                            <div className="flex-shrink-0 w-6 h-6 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center">
-                              <svg className="w-4 h-4 text-black" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                              </svg>
-                            </div>
-                            <span className="text-white font-semibold text-sm">Emails et téléphones débloqués</span>
-                          </div>
-                        </div>
-                        
-                        <Button 
-                          size="lg" 
-                          className="w-full bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 hover:from-yellow-500 hover:via-yellow-600 hover:to-yellow-700 text-black font-bold text-base shadow-xl hover:shadow-2xl transition-all duration-300 border-0 hover:scale-105"
-                          onClick={handlePremiumCheckout}
-                        >
-                          Rejoindre le Club Select
-                        </Button>
-                      </div>
+                    <div className="text-center">
+                      <p className="text-sm text-muted-foreground mb-4">
+                        Limite de conversations gratuites atteinte pour aujourd'hui
+                      </p>
+                      <Button 
+                        size="lg"
+                        variant="outline"
+                        className="bg-gradient-to-r from-yellow-400/10 to-yellow-600/10 border-yellow-500/30 hover:from-yellow-400/20 hover:to-yellow-600/20"
+                        onClick={() => setShowPremiumDialog(true)}
+                      >
+                        <svg className="w-5 h-5 text-yellow-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                        Déverrouiller avec le Club Select
+                      </Button>
+                      <p className="text-xs text-muted-foreground mt-2">
+                        Conversations illimitées · 19,99$/mois
+                      </p>
                     </div>
                   </div>
                 )}
@@ -1360,6 +1341,73 @@ const BusinessDetails = () => {
           </div>
         </div>
       </div>
+
+      {/* Dialog pour le Club Premium */}
+      <Dialog open={showPremiumDialog} onOpenChange={setShowPremiumDialog}>
+        <DialogContent className="max-w-lg p-0 overflow-hidden">
+          <div className="relative bg-gradient-to-br from-gray-900 via-black to-gray-900 border-2 border-yellow-500/30 p-8">
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-yellow-500/10 to-transparent animate-shimmer" />
+            
+            <div className="relative z-10">
+              <div className="mb-6 text-center">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-yellow-400 via-yellow-500 to-yellow-600 mb-4 shadow-lg">
+                  <svg className="w-8 h-8 text-black" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                </div>
+                
+                <h4 className="font-bold text-2xl mb-2 bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 bg-clip-text text-transparent">
+                  Club Select
+                </h4>
+                <div className="text-5xl font-extrabold text-white mb-2 tracking-tight">
+                  19,99$
+                </div>
+                <p className="text-sm text-gray-400 font-medium">par mois · annulez à tout moment</p>
+              </div>
+              
+              <div className="space-y-4 mb-6">
+                <div className="flex items-start gap-3 bg-white/5 backdrop-blur-sm rounded-lg p-3 border border-yellow-500/20">
+                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center">
+                    <svg className="w-4 h-4 text-black" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <span className="text-white font-semibold text-sm">Accès illimité à tous les vendeurs</span>
+                </div>
+                
+                <div className="flex items-start gap-3 bg-white/5 backdrop-blur-sm rounded-lg p-3 border border-yellow-500/20">
+                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center">
+                    <svg className="w-4 h-4 text-black" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <span className="text-white font-semibold text-sm">Conversations illimitées 24/7</span>
+                </div>
+                
+                <div className="flex items-start gap-3 bg-white/5 backdrop-blur-sm rounded-lg p-3 border border-yellow-500/20">
+                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center">
+                    <svg className="w-4 h-4 text-black" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <span className="text-white font-semibold text-sm">Emails et téléphones débloqués</span>
+                </div>
+              </div>
+              
+              <Button 
+                size="lg" 
+                className="w-full bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 hover:from-yellow-500 hover:via-yellow-600 hover:to-yellow-700 text-black font-bold text-base shadow-xl hover:shadow-2xl transition-all duration-300 border-0 hover:scale-105"
+                onClick={() => {
+                  setShowPremiumDialog(false);
+                  handlePremiumCheckout();
+                }}
+              >
+                Rejoindre le Club Select
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={showUnlockDialog} onOpenChange={setShowUnlockDialog}>
         <DialogContent className="max-w-md">

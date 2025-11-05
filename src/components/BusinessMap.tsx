@@ -271,13 +271,19 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
     const initMap = async () => {
       try {
         // Récupérer le token Mapbox depuis l'edge function
+        console.log('[MAP] Fetching Mapbox token...');
         const { data: tokenData, error: tokenError } = await supabase.functions.invoke('get-mapbox-token');
         
-        if (tokenError || !tokenData?.token) {
+        if (tokenError) {
           console.error('[MAP] Error fetching Mapbox token:', tokenError);
+        }
+        
+        if (!tokenData?.token) {
+          console.error('[MAP] No token received from edge function');
           return;
         }
 
+        console.log('[MAP] Mapbox token received successfully');
         mapboxgl.accessToken = tokenData.token;
 
         map.current = new mapboxgl.Map({
