@@ -19,10 +19,8 @@ Allow: /entreprises-a-vendre-quebec
 # Crawl-delay for polite crawlers
 Crawl-delay: 0
 
-# Sitemap locations
+# Sitemap location
 Sitemap: https://vente.club/sitemap.xml
-Sitemap: https://vente.club/sitemap-dynamic.xml
-Sitemap: https://xmwsrvaricrfxovimffm.supabase.co/functions/v1/generate-sitemap
 
 # Specific bot rules
 User-agent: Googlebot
