@@ -12,6 +12,7 @@ import { FavoriteButton } from "@/components/FavoriteButton";
 import { ShareButton } from "@/components/ShareButton";
 import { ChatBox } from "@/components/ChatBox";
 import { SellerChatSection } from "@/components/SellerChatSection";
+import BusinessMap from "@/components/BusinessMap";
 import { ReportBusinessDialog } from "@/components/ReportBusinessDialog";
 import { SEO } from "@/components/SEO";
 import { FinancialCalculator } from "@/components/FinancialCalculator";
@@ -792,10 +793,15 @@ const BusinessDetails = () => {
                   <Dialog open={true} onOpenChange={() => setSelectedPhotoIndex(null)}>
                     <DialogContent className="max-w-4xl w-full p-0">
                       <div className="relative bg-black">
-                        <img
+                         <img
                           src={photos[selectedPhotoIndex].photo_url}
                           alt={`Photo ${selectedPhotoIndex + 1}`}
                           className="w-full h-auto max-h-[80vh] object-contain"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.onerror = null;
+                            target.src = 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&auto=format&fit=crop';
+                          }}
                         />
                         <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
                           {selectedPhotoIndex > 0 && (
@@ -835,11 +841,16 @@ const BusinessDetails = () => {
                           className="aspect-video rounded-lg overflow-hidden cursor-pointer hover:opacity-90 transition-opacity shadow-md hover:shadow-lg border-2 border-primary/20"
                           onClick={() => setSelectedPhotoIndex(index)}
                         >
-                          <img
+                           <img
                             src={photo.photo_url}
                             alt={`Photo ${index + 1} de ${business.title} - ${business.industry} à ${business.city}`}
                             className="w-full h-full object-cover"
                             loading="lazy"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.onerror = null; // Éviter la boucle infinie
+                              target.src = 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&auto=format&fit=crop';
+                            }}
                           />
                         </div>
                       ))}
@@ -995,6 +1006,19 @@ const BusinessDetails = () => {
                             : business.location}
                         </p>
                       </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Carte interactive - Affichée si coordonnées disponibles */}
+                {business.latitude && business.longitude && (
+                  <div className="rounded-xl overflow-hidden border-2 border-border/50 shadow-lg">
+                    <h2 className="text-xl font-semibold px-6 py-4 bg-card border-b border-border/50">
+                      <MapPin className="w-5 h-5 inline-block mr-2 text-primary" />
+                      Carte interactive
+                    </h2>
+                    <div className="h-[400px]">
+                      <BusinessMap />
                     </div>
                   </div>
                 )}
