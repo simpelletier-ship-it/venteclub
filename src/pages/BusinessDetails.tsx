@@ -327,62 +327,36 @@ const BusinessDetails = () => {
     
     setIsUnlocking(true);
     try {
-      console.log('[UNLOCK] Attempting to unlock business access');
+      console.log('[UNLOCK] Starting checkout for one-time access');
       
-      // La vérification premium est maintenant faite côté serveur pour la sécurité
-      const { data, error } = await supabase.rpc('use_token_for_access', {
-        business_uuid: businessId
+      const { data, error } = await supabase.functions.invoke('create-contact-access-checkout', {
+        body: {
+          businessId: businessId,
+          accessType: 'one_time'
+        }
       });
 
       if (error) {
-        console.error('[UNLOCK] Error from RPC:', error);
-        
-        // Extraire le nombre de secondes de l'erreur
-        const match = error.message.match(/attendre (\d+) secondes/);
-        if (match) {
-          const seconds = parseInt(match[1]);
-          setSecondsRemaining(seconds);
-          setShowUnlockDialog(false);
-          setShowPremiumDialog(true);
-        } else {
-          throw error;
-        }
-        return;
+        console.error('[UNLOCK] Error creating checkout:', error);
+        throw error;
       }
 
-      console.log('[UNLOCK] RPC result:', data);
-      const result = data as any;
-      
-      if (result?.success) {
-        setHasAccess(true);
-        setSellerContact(result.seller_contact);
-        setIsPremiumAccess(!!result.premium_access);
+      if (data?.url) {
+        // Open Stripe checkout in new tab
+        window.open(data.url, '_blank');
         setShowUnlockDialog(false);
         
-        // Message différent selon si c'est premium ou token gratuit
-        if (result.premium_access) {
-          toast({
-            title: "Accès déverrouillé !",
-            description: "✨ Grâce à votre abonnement Premium, vous avez un accès illimité à tous les vendeurs !",
-          });
-        } else {
-          toast({
-            title: "Accès déverrouillé !",
-            description: "Vous pouvez maintenant voir les coordonnées du vendeur et lui envoyer des messages.",
-          });
-        }
-        
-        setTimeout(() => {
-          const element = document.getElementById('seller-contact');
-          element?.scrollIntoView({ behavior: 'smooth' });
-        }, 500);
+        toast({
+          title: "Redirection vers le paiement",
+          description: "Vous allez être redirigé vers la page de paiement sécurisée.",
+        });
       }
     } catch (error: any) {
       console.error('[UNLOCK] Unexpected error:', error);
       toast({
         variant: "destructive",
         title: "Erreur",
-        description: error.message || "Impossible de déverrouiller l'accès.",
+        description: error.message || "Impossible de créer la session de paiement.",
       });
     } finally {
       setIsUnlocking(false);
@@ -390,8 +364,15 @@ const BusinessDetails = () => {
   };
 
   const handlePremiumCheckout = async () => {
+    if (!businessId) return;
+    
     try {
-      const { data, error } = await supabase.functions.invoke('create-premium-checkout');
+      const { data, error } = await supabase.functions.invoke('create-contact-access-checkout', {
+        body: {
+          businessId: businessId,
+          accessType: 'subscription'
+        }
+      });
       
       if (error) throw error;
       
@@ -979,17 +960,98 @@ const BusinessDetails = () => {
                       )}
                     </div>
                   ) : (
-                    <div className="bg-gradient-to-br from-primary/5 to-accent/5 p-6 rounded-lg text-center">
-                      <Lock className="w-12 h-12 mx-auto mb-4 text-accent" />
-                      <h3 className="text-lg font-semibold mb-2">
-                        Coordonnées du vendeur verrouillées
-                      </h3>
-                      <p className="text-muted-foreground mb-4">
-                        Déverrouillez gratuitement les informations de contact du vendeur (email et téléphone)
-                      </p>
-                      <Button size="lg" onClick={handleUnlockRequest}>
-                        Déverrouiller les informations gratuitement
-                      </Button>
+                    <div className="bg-gradient-to-br from-primary/5 to-accent/5 p-6 rounded-lg">
+                      <div className="text-center mb-6">
+                        <Lock className="w-12 h-12 mx-auto mb-4 text-accent" />
+                        <h3 className="text-lg font-semibold mb-2">
+                          Coordonnées du vendeur verrouillées
+                        </h3>
+                        <p className="text-muted-foreground">
+                          Choisissez votre option d'accès pour voir l'email et le téléphone du vendeur
+                        </p>
+                      </div>
+                      
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div className="bg-card border-2 border-border rounded-lg p-6 flex flex-col">
+                          <div className="mb-4">
+                            <h4 className="font-semibold text-lg mb-2">Accès unique</h4>
+                            <div className="text-3xl font-bold text-primary mb-2">9,99$</div>
+                            <p className="text-sm text-muted-foreground">Paiement unique</p>
+                          </div>
+                          <ul className="space-y-2 mb-6 flex-grow">
+                            <li className="flex items-start gap-2 text-sm">
+                              <svg className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                              </svg>
+                              <span>Coordonnées de ce vendeur uniquement</span>
+                            </li>
+                            <li className="flex items-start gap-2 text-sm">
+                              <svg className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                              </svg>
+                              <span>Accès permanent</span>
+                            </li>
+                            <li className="flex items-start gap-2 text-sm">
+                              <svg className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                              </svg>
+                              <span>Chat illimité avec ce vendeur</span>
+                            </li>
+                          </ul>
+                          <Button 
+                            size="lg" 
+                            className="w-full"
+                            onClick={handleUnlockRequest}
+                          >
+                            Déverrouiller
+                          </Button>
+                        </div>
+                        
+                        <div className="bg-gradient-to-br from-secondary/10 to-primary/10 border-2 border-secondary rounded-lg p-6 flex flex-col relative">
+                          <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-secondary text-secondary-foreground px-3 py-1 rounded-full text-xs font-semibold">
+                            RECOMMANDÉ
+                          </div>
+                          <div className="mb-4">
+                            <h4 className="font-semibold text-lg mb-2">Premium</h4>
+                            <div className="text-3xl font-bold text-secondary mb-2">19,99$</div>
+                            <p className="text-sm text-muted-foreground">Par mois</p>
+                          </div>
+                          <ul className="space-y-2 mb-6 flex-grow">
+                            <li className="flex items-start gap-2 text-sm">
+                              <svg className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                              </svg>
+                              <span className="font-semibold">Accès illimité à tous les vendeurs</span>
+                            </li>
+                            <li className="flex items-start gap-2 text-sm">
+                              <svg className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                              </svg>
+                              <span>Aucune limite de contacts</span>
+                            </li>
+                            <li className="flex items-start gap-2 text-sm">
+                              <svg className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                              </svg>
+                              <span>Chat illimité avec tous</span>
+                            </li>
+                            <li className="flex items-start gap-2 text-sm">
+                              <svg className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                              </svg>
+                              <span>Annulez à tout moment</span>
+                            </li>
+                          </ul>
+                          <Button 
+                            size="lg" 
+                            className="w-full"
+                            variant="secondary"
+                            onClick={handlePremiumCheckout}
+                          >
+                            S'abonner au Premium
+                          </Button>
+                        </div>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -1027,11 +1089,11 @@ const BusinessDetails = () => {
                   </div>
                 )}
 
-                {/* Chat Section - Show if buyer has access OR if seller and someone bought access */}
-                {user && business && (
+                {/* Chat Section - Free for all authenticated users */}
+                {user && business && !isSeller && (
                   <>
-                    {/* Buyer view - chat with seller */}
-                    {hasAccess && !isSeller && (
+                    {/* Buyer view - chat is always available */}
+                    {true && (
                       <div className="border-t pt-6 mt-6">
                         <h2 className="text-xl font-semibold mb-4">
                           Messagerie avec le vendeur
@@ -1080,30 +1142,41 @@ const BusinessDetails = () => {
       <Dialog open={showUnlockDialog} onOpenChange={setShowUnlockDialog}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Déverrouiller les informations du vendeur</DialogTitle>
-            <DialogDescription className="space-y-3 pt-4">
-              <div className="bg-amber-50 dark:bg-amber-950/30 border-2 border-amber-200 dark:border-amber-800 rounded-lg p-4">
-                <p className="font-semibold text-amber-900 dark:text-amber-100 flex items-center gap-2">
-                  <span className="text-2xl">⚠️</span>
-                  Attention : Limite de 1 vendeur par semaine
-                </p>
-                <p className="text-sm text-amber-800 dark:text-amber-200 mt-2">
-                  Vous avez droit aux informations de <strong>1 vendeur par période de 7 jours</strong>.
-                </p>
+            <DialogTitle>Déverrouiller les coordonnées du vendeur</DialogTitle>
+            <DialogDescription className="space-y-4 pt-4">
+              <div className="text-center">
+                <div className="text-4xl font-bold text-primary mb-2">9,99$</div>
+                <p className="text-sm text-muted-foreground">Paiement unique</p>
               </div>
               
-              <div className="space-y-2 text-sm text-foreground">
-                <p>
-                  Si vous déverrouillez cet accès maintenant, <strong>vous ne pourrez pas accéder aux informations d'autres vendeurs pendant une semaine</strong>.
-                </p>
-                <p>
-                  Une fois déverrouillé, vous pourrez :
-                </p>
-                <ul className="list-disc list-inside space-y-1 ml-2">
-                  <li>Voir les coordonnées complètes du vendeur</li>
-                  <li>Communiquer avec lui par messagerie intégrée</li>
-                  <li>Garder cet accès de façon permanente</li>
+              <div className="bg-primary/5 rounded-lg p-4">
+                <p className="font-semibold mb-2">Ce que vous obtenez :</p>
+                <ul className="space-y-2 text-sm">
+                  <li className="flex items-start gap-2">
+                    <svg className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span>Email et téléphone du vendeur</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <svg className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span>Accès permanent à ce vendeur</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <svg className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span>Chat illimité avec ce vendeur</span>
+                  </li>
                 </ul>
+              </div>
+              
+              <div className="bg-muted/50 rounded-lg p-3">
+                <p className="text-sm text-center text-muted-foreground">
+                  💡 <strong>Astuce:</strong> Besoin de contacter plusieurs vendeurs ? L'abonnement Premium à 19,99$/mois vous donne accès illimité à tous les vendeurs.
+                </p>
               </div>
             </DialogDescription>
           </DialogHeader>
@@ -1119,7 +1192,7 @@ const BusinessDetails = () => {
               onClick={handleConfirmUnlock}
               disabled={isUnlocking}
             >
-              {isUnlocking ? 'Déverrouillage...' : 'Confirmer et déverrouiller'}
+              {isUnlocking ? 'Traitement...' : 'Payer 9,99$'}
             </Button>
           </div>
         </DialogContent>
