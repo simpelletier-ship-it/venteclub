@@ -1061,38 +1061,6 @@ const BusinessDetails = () => {
                   )}
                 </div>
 
-                {/* Calculateur de financement - Collapsible */}
-                {business.asking_price > 0 && (
-                  <div className="border-t pt-6 mt-6">
-                    <Collapsible open={isCalculatorOpen} onOpenChange={setIsCalculatorOpen}>
-                      <CollapsibleTrigger asChild>
-                        <button className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-secondary/5 to-primary/5 hover:from-secondary/10 hover:to-primary/10 rounded-lg transition-colors group">
-                          <div className="flex items-center gap-3">
-                            <div className="p-2 bg-secondary/10 rounded-lg group-hover:bg-secondary/20 transition-colors">
-                              <Calculator className="w-5 h-5 text-secondary" />
-                            </div>
-                            <div className="text-left">
-                              <h3 className="text-lg font-semibold text-foreground">
-                                Calculateur de financement
-                              </h3>
-                              <p className="text-sm text-muted-foreground">
-                                Estimez vos paiements mensuels
-                              </p>
-                            </div>
-                          </div>
-                          <ChevronDown 
-                            className={`w-5 h-5 text-muted-foreground transition-transform duration-200 ${
-                              isCalculatorOpen ? 'rotate-180' : ''
-                            }`}
-                          />
-                        </button>
-                      </CollapsibleTrigger>
-                      <CollapsibleContent className="mt-4">
-                        <FinancialCalculator askingPrice={business.asking_price} />
-                      </CollapsibleContent>
-                    </Collapsible>
-                  </div>
-                )}
 
                 {/* Chat Section - Gratuit pour tous les utilisateurs authentifiés */}
                 {user && business && (
@@ -1131,7 +1099,7 @@ const BusinessDetails = () => {
                   </div>
                 )}
 
-                {/* Share button at the end of the listing */}
+                {/* Share button */}
                 <div className="border-t pt-6 mt-6 flex justify-center">
                   {businessId && (
                     <ShareButton 
@@ -1141,6 +1109,39 @@ const BusinessDetails = () => {
                     />
                   )}
                 </div>
+
+                {/* Calculateur de financement - Tout en bas */}
+                {business.asking_price > 0 && (
+                  <div className="border-t pt-6 mt-6">
+                    <Collapsible open={isCalculatorOpen} onOpenChange={setIsCalculatorOpen}>
+                      <CollapsibleTrigger asChild>
+                        <button className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-secondary/5 to-primary/5 hover:from-secondary/10 hover:to-primary/10 rounded-lg transition-colors group">
+                          <div className="flex items-center gap-3">
+                            <div className="p-2 bg-secondary/10 rounded-lg group-hover:bg-secondary/20 transition-colors">
+                              <Calculator className="w-5 h-5 text-secondary" />
+                            </div>
+                            <div className="text-left">
+                              <h3 className="text-lg font-semibold text-foreground">
+                                Calculateur de financement
+                              </h3>
+                              <p className="text-sm text-muted-foreground">
+                                Estimez vos paiements mensuels
+                              </p>
+                            </div>
+                          </div>
+                          <ChevronDown 
+                            className={`w-5 h-5 text-muted-foreground transition-transform duration-200 ${
+                              isCalculatorOpen ? 'rotate-180' : ''
+                            }`}
+                          />
+                        </button>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="mt-4">
+                        <FinancialCalculator askingPrice={business.asking_price} />
+                      </CollapsibleContent>
+                    </Collapsible>
+                  </div>
+                )}
               </div>
             </div>
           </div>
