@@ -1087,7 +1087,7 @@ const ListBusiness = () => {
                   <h2 className="text-xl font-semibold text-primary mb-4">Emplacement (optionnel)</h2>
 
                   <div className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div>
                         <Label htmlFor="city">Ville</Label>
                         <Popover open={citySearchOpen} onOpenChange={setCitySearchOpen}>
@@ -1162,6 +1162,16 @@ const ListBusiness = () => {
                             </Command>
                           </PopoverContent>
                         </Popover>
+                      </div>
+
+                      <div>
+                        <Label htmlFor="province">Province</Label>
+                        <Input
+                          id="province"
+                          value={formData.province}
+                          disabled
+                          className="bg-muted"
+                        />
                       </div>
 
                       <div>
