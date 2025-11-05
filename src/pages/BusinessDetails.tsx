@@ -998,107 +998,56 @@ const BusinessDetails = () => {
                     </div>
                   ) : (
                     <div className="bg-gradient-to-br from-primary/5 to-accent/5 p-6 rounded-lg">
-                      {!user && (
-                        <div className="mb-6 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 p-6 rounded-lg border-2 border-green-200 dark:border-green-800 text-center">
-                          <h3 className="text-lg font-semibold text-green-900 dark:text-green-100 mb-3 flex items-center justify-center gap-2">
-                            💬 Discutez gratuitement avec le vendeur
-                          </h3>
-                          <p className="text-green-800 dark:text-green-200 mb-4">
-                            Connectez-vous pour accéder au chat gratuit et illimité avec tous les vendeurs
-                          </p>
-                          <Button 
-                            onClick={() => navigate("/auth")}
-                            className="bg-green-600 hover:bg-green-700 text-white"
-                          >
-                            Se connecter maintenant
-                          </Button>
-                        </div>
-                      )}
-                      
                       <div className="text-center mb-6">
                         <Lock className="w-12 h-12 mx-auto mb-4 text-accent" />
                         <h3 className="text-lg font-semibold mb-2">
                           Coordonnées du vendeur verrouillées
                         </h3>
-                        <p className="text-muted-foreground">
-                          Choisissez votre option d'accès pour voir l'email et le téléphone du vendeur
+                        <p className="text-muted-foreground mb-4">
+                          Rejoignez le Club Select pour accéder aux coordonnées de tous les vendeurs
                         </p>
                       </div>
                       
-                      <div className="grid md:grid-cols-2 gap-4">
-                        <div className="bg-card border-2 border-border rounded-lg p-6 flex flex-col">
-                          <div className="mb-4">
-                            <h4 className="font-semibold text-lg mb-2">Accès unique</h4>
-                            <div className="text-3xl font-bold text-primary mb-2">9,99$</div>
-                            <p className="text-sm text-muted-foreground">Un seul paiement</p>
-                          </div>
-                          <ul className="space-y-2 mb-6 flex-grow">
-                            <li className="flex items-start gap-2 text-sm">
-                              <svg className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                              </svg>
-                              <span>Coordonnées de ce vendeur uniquement</span>
-                            </li>
-                            <li className="flex items-start gap-2 text-sm">
-                              <svg className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                              </svg>
-                              <span>Accès permanent à cette annonce</span>
-                            </li>
-                          </ul>
-                          <Button 
-                            size="lg" 
-                            className="w-full"
-                            onClick={handleUnlockRequest}
-                          >
-                            Déverrouiller
-                          </Button>
+                      <div className="bg-gradient-to-br from-secondary/10 to-primary/10 border-2 border-secondary rounded-lg p-6 max-w-md mx-auto">
+                        <div className="mb-4 text-center">
+                          <h4 className="font-semibold text-xl mb-2">Club Select</h4>
+                          <div className="text-4xl font-bold text-secondary mb-2">19,99$</div>
+                          <p className="text-sm text-muted-foreground">Abonnement mensuel</p>
                         </div>
-                        
-                        <div className="bg-gradient-to-br from-secondary/10 to-primary/10 border-2 border-secondary rounded-lg p-6 flex flex-col relative">
-                          <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-secondary text-secondary-foreground px-3 py-1 rounded-full text-xs font-semibold">
-                            RECOMMANDÉ
-                          </div>
-                          <div className="mb-4">
-                            <h4 className="font-semibold text-lg mb-2">Club Select</h4>
-                            <div className="text-3xl font-bold text-secondary mb-2">19,99$</div>
-                            <p className="text-sm text-muted-foreground">Abonnement mensuel</p>
-                          </div>
-                          <ul className="space-y-2 mb-6 flex-grow">
-                            <li className="flex items-start gap-2 text-sm">
-                              <svg className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                              </svg>
-                              <span className="font-semibold">Accès illimité à tous les vendeurs</span>
-                            </li>
-                            <li className="flex items-start gap-2 text-sm">
-                              <svg className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                              </svg>
-                              <span className="font-semibold">Conversations illimitées</span>
-                            </li>
-                            <li className="flex items-start gap-2 text-sm">
-                              <svg className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                              </svg>
-                              <span>Aucune limite de contacts</span>
-                            </li>
-                            <li className="flex items-start gap-2 text-sm">
-                              <svg className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                              </svg>
-                              <span>Annulez à tout moment</span>
-                            </li>
-                          </ul>
-                          <Button 
-                            size="lg" 
-                            className="w-full"
-                            variant="secondary"
-                            onClick={handlePremiumCheckout}
-                          >
-                            Rejoindre le Club Select
-                          </Button>
-                        </div>
+                        <ul className="space-y-3 mb-6">
+                          <li className="flex items-start gap-2 text-sm">
+                            <svg className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                            <span className="font-semibold">Accès illimité à tous les vendeurs</span>
+                          </li>
+                          <li className="flex items-start gap-2 text-sm">
+                            <svg className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                            <span className="font-semibold">Conversations illimitées</span>
+                          </li>
+                          <li className="flex items-start gap-2 text-sm">
+                            <svg className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                            <span>Emails et téléphones débloqués</span>
+                          </li>
+                          <li className="flex items-start gap-2 text-sm">
+                            <svg className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                            <span>Annulez à tout moment</span>
+                          </li>
+                        </ul>
+                        <Button 
+                          size="lg" 
+                          className="w-full"
+                          variant="secondary"
+                          onClick={handlePremiumCheckout}
+                        >
+                          Rejoindre le Club Select
+                        </Button>
                       </div>
                     </div>
                   )}
