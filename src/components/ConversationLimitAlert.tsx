@@ -35,7 +35,7 @@ export const ConversationLimitAlert = ({
       <AlertDescription className="space-y-3">
         <div className="text-sm space-y-2">
           <p className="font-medium">
-            🔒 Vous êtes limité à <strong>1 conversation toutes les 24 heures</strong> avec le plan gratuit.
+            🔒 Plan gratuit : <strong>Débloquez le chat avec 1 annonceur par jour</strong> (messages illimités une fois débloqué).
           </p>
           
           {conversationsRemaining === 0 && hoursUntilReset !== undefined && minutesUntilReset !== undefined && (
