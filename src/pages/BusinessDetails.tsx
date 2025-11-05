@@ -1026,8 +1026,8 @@ const BusinessDetails = () => {
 
 
 
-                {/* Bouton faire une offre - Acheteurs seulement */}
-                {!isSeller && user && businessId && (
+                {/* Bouton faire une offre - Membres Club Select seulement */}
+                {!isSeller && user && businessId && hasPremium && (
                   <div className="border-t pt-6 mt-6">
                     <MakeOfferDialog
                       businessId={businessId}
