@@ -23,14 +23,14 @@ const Home = () => {
     if (searchParams.get('premium_success') === 'true') {
       toast({
         title: "Paiement réussi",
-        description: "Votre abonnement Premium est activé. Rechargez la page pour voir les changements.",
+        description: "Votre abonnement Club Select est activé. Rechargez la page pour voir les changements.",
       });
       setSearchParams({});
     } else if (searchParams.get('premium_cancel') === 'true') {
       toast({
         variant: "destructive",
         title: "Abonnement annulé",
-        description: "L'abonnement Premium a été annulé.",
+        description: "L'abonnement Club Select a été annulé.",
       });
       setSearchParams({});
     }
@@ -241,9 +241,9 @@ const Home = () => {
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="item-3">
-              <AccordionTrigger>À quoi sert l'abonnement Premium?</AccordionTrigger>
+              <AccordionTrigger>À quoi sert le Club Select?</AccordionTrigger>
               <AccordionContent>
-                L'abonnement Premium vous permet de mettre en vedette vos annonces pour augmenter leur visibilité sur la plateforme. Les annonces en vedette apparaissent en priorité dans les résultats de recherche et sur la page d'accueil, maximisant ainsi vos chances de trouver un acheteur rapidement.
+                Le Club Select à 19,99$/mois vous offre un accès illimité à tous les vendeurs, des conversations sans limite, et la possibilité de contacter autant d'entreprises que vous le souhaitez chaque jour. C'est l'outil idéal pour les acheteurs sérieux qui recherchent activement la perle rare.
               </AccordionContent>
             </AccordionItem>
           </Accordion>

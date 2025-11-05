@@ -116,15 +116,15 @@ export const PremiumSubscription = ({ userId }: PremiumSubscriptionProps) => {
   return (
     <div className="space-y-6">
       {isSubscribed ? (
-        <Card className="border-2 border-primary">
-          <CardHeader className="bg-gradient-to-r from-primary/10 to-accent/10">
+        <Card className="border-2 border-yellow-500/50 shadow-2xl">
+          <CardHeader className="bg-gradient-to-r from-yellow-400/10 via-yellow-500/10 to-yellow-600/10">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Crown className="h-6 w-6 text-primary" />
-                <CardTitle>Abonnement Premium Actif</CardTitle>
+                <Crown className="h-6 w-6 text-yellow-600" />
+                <CardTitle className="bg-gradient-to-r from-yellow-600 to-yellow-500 bg-clip-text text-transparent">Abonnement Club Select Actif</CardTitle>
               </div>
-              <Badge className="bg-gradient-to-r from-primary to-accent text-white">
-                PREMIUM
+              <Badge className="bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 text-black font-bold border-0">
+                ⭐ CLUB SELECT
               </Badge>
             </div>
             <CardDescription>
@@ -205,22 +205,22 @@ export const PremiumSubscription = ({ userId }: PremiumSubscriptionProps) => {
           </CardContent>
         </Card>
       ) : (
-        <Card>
+        <Card className="border-2 border-yellow-500/30 shadow-xl">
           <CardHeader>
             <div className="flex items-center gap-2">
-              <Crown className="h-6 w-6 text-muted-foreground" />
-              <CardTitle>Passer à Premium</CardTitle>
+              <Crown className="h-6 w-6 text-yellow-600" />
+              <CardTitle className="bg-gradient-to-r from-yellow-600 to-yellow-500 bg-clip-text text-transparent">Rejoindre le Club Select</CardTitle>
             </div>
             <CardDescription>
               Débloquez un accès illimité aux contacts des vendeurs
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="bg-gradient-to-br from-primary/10 to-accent/10 border-2 border-primary/30 rounded-lg p-6">
+            <div className="bg-gradient-to-br from-yellow-400/10 via-yellow-500/10 to-yellow-600/10 border-2 border-yellow-500/30 rounded-lg p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-2xl font-bold">Premium</h3>
+                <h3 className="text-2xl font-bold bg-gradient-to-r from-yellow-600 to-yellow-500 bg-clip-text text-transparent">Club Select</h3>
                 <div className="text-right">
-                  <p className="text-3xl font-bold text-primary">19,99$</p>
+                  <p className="text-3xl font-bold text-yellow-600">19,99$</p>
                   <p className="text-sm text-muted-foreground">CAD / mois</p>
                 </div>
               </div>
@@ -245,13 +245,13 @@ export const PremiumSubscription = ({ userId }: PremiumSubscriptionProps) => {
               </ul>
             </div>
 
-            <div className="bg-muted p-4 rounded-lg">
+            <div className="bg-muted p-4 rounded-lg border border-border/50">
               <h4 className="font-semibold mb-2 flex items-center gap-2">
                 <X className="h-4 w-4 text-muted-foreground" />
                 Plan Gratuit (actuel)
               </h4>
               <ul className="space-y-1 text-sm text-muted-foreground">
-                <li>• Maximum 3 conversations par mois</li>
+                <li>• 1 conversation par jour seulement</li>
                 <li>• Accès aux coordonnées limité</li>
                 <li>• Fonctionnalités restreintes</li>
               </ul>
@@ -260,10 +260,10 @@ export const PremiumSubscription = ({ userId }: PremiumSubscriptionProps) => {
             <Button
               onClick={handleSubscribe}
               disabled={processing}
-              className="w-full bg-gradient-to-r from-primary to-accent hover:opacity-90"
+              className="w-full bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 hover:from-yellow-500 hover:via-yellow-600 hover:to-yellow-700 text-black font-bold shadow-lg hover:shadow-xl transition-all hover:scale-105"
               size="lg"
             >
-              {processing ? "Chargement..." : "S'abonner à Premium"}
+              {processing ? "Chargement..." : "⭐ Rejoindre le Club Select"}
             </Button>
 
             <p className="text-xs text-muted-foreground text-center">

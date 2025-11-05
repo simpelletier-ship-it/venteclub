@@ -1408,15 +1408,15 @@ const Admin = () => {
             <div className="grid gap-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>Abonnements Premium Actifs</CardTitle>
+                  <CardTitle>Abonnements Club Select Actifs</CardTitle>
                   <CardDescription>
-                    Gestion des abonnements Premium en cours
+                    Gestion des abonnements Club Select en cours
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   {subscriptions.filter(sub => sub.status === 'active' && new Date(sub.current_period_end) > new Date()).length === 0 ? (
                     <p className="text-center text-muted-foreground py-8">
-                      Aucun abonnement Premium actif
+                      Aucun abonnement Club Select actif
                     </p>
                   ) : (
                     <div className="space-y-4">
@@ -1442,8 +1442,8 @@ const Admin = () => {
                                         {subscription.user_email}
                                       </p>
                                     </div>
-                                    <Badge className="bg-gradient-to-r from-primary to-accent text-white">
-                                      PREMIUM
+                                    <Badge className="bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 text-black font-bold border-0">
+                                      ⭐ CLUB SELECT
                                     </Badge>
                                   </div>
 
