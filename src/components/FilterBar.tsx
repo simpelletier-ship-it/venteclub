@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import {
   Popover,
   PopoverContent,
@@ -260,9 +261,37 @@ const FilterBar = ({ onFilter }: FilterBarProps) => {
             step={50000}
             className="w-full"
           />
-          <div className="flex justify-between text-sm text-muted-foreground">
-            <span>{priceRange[0].toLocaleString('fr-CA')} $</span>
-            <span>{priceRange[1].toLocaleString('fr-CA')} $</span>
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-4">
+            <div className="flex-1">
+              <label className="text-xs text-muted-foreground mb-1 block">Prix minimum</label>
+              <Input
+                type="number"
+                value={priceRange[0]}
+                onChange={(e) => {
+                  const value = Math.max(0, Math.min(Number(e.target.value), priceRange[1]));
+                  setPriceRange([value, priceRange[1]]);
+                }}
+                min={0}
+                max={priceRange[1]}
+                step={50000}
+                className="h-10"
+              />
+            </div>
+            <div className="flex-1">
+              <label className="text-xs text-muted-foreground mb-1 block">Prix maximum</label>
+              <Input
+                type="number"
+                value={priceRange[1]}
+                onChange={(e) => {
+                  const value = Math.min(10000000, Math.max(Number(e.target.value), priceRange[0]));
+                  setPriceRange([priceRange[0], value]);
+                }}
+                min={priceRange[0]}
+                max={10000000}
+                step={50000}
+                className="h-10"
+              />
+            </div>
           </div>
         </div>
 
