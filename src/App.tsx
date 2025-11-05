@@ -30,6 +30,8 @@ import CityPage from "./pages/CityPage";
 import Terms from "./pages/Terms";
 import PropertyListings from "./pages/PropertyListings";
 import Profile from "./pages/Profile";
+import Resources from "./pages/Resources";
+import FAQ from "./pages/FAQ";
 
 const queryClient = new QueryClient();
 
@@ -67,6 +69,8 @@ const App = () => (
               <Route path="/blog" element={<Blog />} />
               <Route path="/blog/:slug" element={<BlogPost />} />
               <Route path="/terms" element={<Terms />} />
+              <Route path="/ressources" element={<Resources />} />
+              <Route path="/faq" element={<FAQ />} />
               
               {/* City Pages - Static routes for SEO */}
               <Route path="/entreprises-a-vendre-montreal" element={<CityPage />} />
