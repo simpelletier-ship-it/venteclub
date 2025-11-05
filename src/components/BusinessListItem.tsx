@@ -57,73 +57,12 @@ const BusinessListItem = ({
 }: BusinessListItemProps) => {
   const navigate = useNavigate();
   const [userId, setUserId] = useState<string | undefined>();
-  const [mainImage, setMainImage] = useState<string | null>(null);
-  const [imageLoading, setImageLoading] = useState(true);
   
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUserId(session?.user?.id);
     });
   }, []);
-
-  useEffect(() => {
-    const fetchMainImage = async () => {
-      if (id) {
-        // Utiliser un timeout pour éviter de bloquer le rendu
-        const timeoutId = setTimeout(async () => {
-          const { data, error } = await supabase
-            .from('business_photos')
-            .select('photo_url')
-            .eq('business_id', id)
-            .order('display_order', { ascending: true })
-            .limit(1);
-          
-          if (error) {
-            console.error('[BUSINESS-LIST] Error fetching photo:', error);
-            setMainImage(null);
-          } else if (data && data.length > 0 && data[0]?.photo_url) {
-            setMainImage(data[0].photo_url);
-          } else {
-            setMainImage(null);
-          }
-          setImageLoading(false);
-        }, 100);
-
-        return () => clearTimeout(timeoutId);
-      } else {
-        setImageLoading(false);
-      }
-    };
-    
-    fetchMainImage();
-    
-    // Désactiver les subscriptions temps réel pour améliorer les performances
-    /*
-    // Subscribe to photo changes
-    if (id) {
-      const channel = supabase
-        .channel(`business_photos_list_${id}`)
-        .on(
-          'postgres_changes',
-          {
-            event: '*',
-            schema: 'public',
-            table: 'business_photos',
-            filter: `business_id=eq.${id}`
-          },
-          () => {
-            console.log('[REALTIME-LIST] Photos changed, refreshing...');
-            fetchMainImage();
-          }
-        )
-        .subscribe();
-      
-      return () => {
-        supabase.removeChannel(channel);
-      };
-    }
-    */
-  }, [id]);
   
   const displayRevenue = revenue || (annual_revenue ? `${annual_revenue.toLocaleString('fr-CA', { useGrouping: true }).replace(/\$/g, '')} $` : 'N/A');
   const displayPrice = price || (asking_price === 0 ? 'À discuter' : asking_price ? `${asking_price.toLocaleString('fr-CA', { useGrouping: true }).replace(/\$/g, '')} $` : 'N/A');
@@ -183,23 +122,10 @@ const BusinessListItem = ({
 
       {/* Image à gauche */}
       <div className="relative w-32 h-32 flex-shrink-0 overflow-hidden rounded-lg bg-muted">
-        {imageLoading ? (
-          <Skeleton className="w-full h-full" />
-        ) : mainImage ? (
-          <img 
-            src={mainImage} 
-            alt={title}
-            loading="lazy"
-            className="w-full h-full object-cover transition-opacity duration-300"
-            onLoad={(e) => e.currentTarget.style.opacity = '1'}
-            style={{ opacity: 0 }}
-          />
-        ) : (
-          <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-muted to-muted/50">
-            <p className="text-xs font-bold text-foreground">vente.club</p>
-            <p className="text-[10px] text-muted-foreground">Aucune photo</p>
-          </div>
-        )}
+        <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-muted to-muted/50">
+          <p className="text-xs font-bold text-foreground">vente.club</p>
+          <p className="text-[10px] text-muted-foreground">Voir photos</p>
+        </div>
       </div>
 
       {/* Left section - Badges & Title */}
