@@ -80,6 +80,9 @@ const ListBusiness = () => {
     city: "",
     region: "",
     province: "Québec",
+    street_number: "",
+    street_name: "",
+    postal_code: "",
     annual_revenue: "",
     asking_price: "",
     profit_margin: "",
@@ -119,6 +122,56 @@ const ListBusiness = () => {
     editingBusinessId,
     minFieldsFilled: 2,
   });
+
+  // Géocoder l'adresse complète quand les champs sont remplis
+  useEffect(() => {
+    const geocodeAddress = async () => {
+      // Construire l'adresse complète
+      const addressParts = [
+        formData.street_number,
+        formData.street_name,
+        formData.city,
+        formData.province,
+        formData.postal_code
+      ].filter(part => part && part.trim() !== "");
+
+      if (addressParts.length < 3) return; // Au minimum rue + ville + province
+
+      const fullAddress = addressParts.join(", ");
+      
+      // Mettre à jour location
+      setFormData(prev => ({ ...prev, location: fullAddress }));
+
+      try {
+        const { data, error } = await supabase.functions.invoke('geocode-address', {
+          body: { query: fullAddress }
+        });
+
+        if (error) {
+          console.error('[GEOCODE] Error:', error);
+          return;
+        }
+
+        if (data?.success && data.latitude && data.longitude) {
+          console.log('[GEOCODE] Coordinates obtained:', data);
+          setFormData(prev => ({
+            ...prev,
+            latitude: data.latitude,
+            longitude: data.longitude
+          }));
+        }
+      } catch (err) {
+        console.error('[GEOCODE] Failed to geocode address:', err);
+      }
+    };
+
+    // Debounce le géocodage
+    const timer = setTimeout(() => {
+      geocodeAddress();
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [formData.street_number, formData.street_name, formData.city, formData.postal_code]);
 
   useEffect(() => {
     const checkSession = async () => {
@@ -201,6 +254,9 @@ const ListBusiness = () => {
         city: business.city || "",
         region: business.region || "",
         province: business.province || "Québec",
+        street_number: "",
+        street_name: "",
+        postal_code: "",
         annual_revenue: business.annual_revenue?.toString() || "",
         asking_price: business.asking_price?.toString() || "",
         profit_margin: business.profit_margin?.toString() || "",
@@ -1030,14 +1086,122 @@ const ListBusiness = () => {
                 <div className="bg-card p-6 rounded-2xl shadow-elegant border border-border/50">
                   <h2 className="text-xl font-semibold text-primary mb-4">Emplacement (optionnel)</h2>
 
-                  <div>
-                    <Label htmlFor="location">Adresse complète</Label>
-                    <AddressAutocomplete
-                      value={formData.location}
-                      onChange={(address) => setFormData({ ...formData, location: address })}
-                      placeholder="Ex: 123 Rue Principale, Montréal, QC H1A 1A1"
-                    />
-                    <p className="text-xs text-muted-foreground mt-1">
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="city">Ville</Label>
+                        <Popover open={citySearchOpen} onOpenChange={setCitySearchOpen}>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              aria-expanded={citySearchOpen}
+                              className="w-full justify-between"
+                            >
+                              {formData.city || "Sélectionner une ville..."}
+                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-full p-0" align="start">
+                            <Command>
+                              <CommandInput 
+                                placeholder="Rechercher une ville..." 
+                                value={citySearchValue}
+                                onValueChange={setCitySearchValue}
+                              />
+                              <CommandList>
+                                {citySearchValue && !quebecCities.some(city => city.toLowerCase() === citySearchValue.toLowerCase()) && (
+                                  <CommandGroup>
+                                    <CommandItem
+                                      value={citySearchValue}
+                                      onSelect={(currentValue) => {
+                                        setFormData({ ...formData, city: currentValue });
+                                        setCitySearchOpen(false);
+                                        setCitySearchValue("");
+                                      }}
+                                      className="cursor-pointer bg-accent/10"
+                                    >
+                                      <Check className="mr-2 h-4 w-4 opacity-0" />
+                                      Utiliser "{citySearchValue}"
+                                    </CommandItem>
+                                  </CommandGroup>
+                                )}
+                                {quebecCities.filter(city => 
+                                  city.toLowerCase().includes(citySearchValue.toLowerCase())
+                                ).length === 0 && citySearchValue && quebecCities.some(city => city.toLowerCase() === citySearchValue.toLowerCase()) ? (
+                                  <CommandEmpty>Aucune ville trouvée.</CommandEmpty>
+                                ) : (
+                                  <CommandGroup>
+                                    {quebecCities
+                                      .filter(city => 
+                                        city.toLowerCase().includes(citySearchValue.toLowerCase())
+                                      )
+                                      .slice(0, 50)
+                                      .map((city) => (
+                                        <CommandItem
+                                          key={city}
+                                          value={city}
+                                          onSelect={(currentValue) => {
+                                            setFormData({ ...formData, city: currentValue });
+                                            setCitySearchOpen(false);
+                                            setCitySearchValue("");
+                                          }}
+                                        >
+                                          <Check
+                                            className={cn(
+                                              "mr-2 h-4 w-4",
+                                              formData.city === city ? "opacity-100" : "opacity-0"
+                                            )}
+                                          />
+                                          {city}
+                                        </CommandItem>
+                                      ))}
+                                  </CommandGroup>
+                                )}
+                              </CommandList>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
+                      </div>
+
+                      <div>
+                        <Label htmlFor="postal_code">Code postal</Label>
+                        <Input
+                          id="postal_code"
+                          value={formData.postal_code}
+                          onChange={(e) => {
+                            const value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+                            setFormData({ ...formData, postal_code: value });
+                          }}
+                          placeholder="H1A 1A1"
+                          maxLength={7}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="md:col-span-1">
+                        <Label htmlFor="street_number">Numéro civique</Label>
+                        <Input
+                          id="street_number"
+                          value={formData.street_number}
+                          onChange={(e) => setFormData({ ...formData, street_number: e.target.value })}
+                          placeholder="123"
+                        />
+                      </div>
+
+                      <div className="md:col-span-2">
+                        <Label htmlFor="street_name">Nom de la rue</Label>
+                        <AddressAutocomplete
+                          value={formData.street_name}
+                          onChange={(street) => setFormData({ ...formData, street_name: street })}
+                          city={formData.city}
+                          placeholder="Ex: Rue Principale"
+                        />
+                      </div>
+                    </div>
+
+                    <p className="text-xs text-muted-foreground">
                       L'adresse exacte sera visible uniquement pour les acheteurs qualifiés.
                     </p>
                   </div>
