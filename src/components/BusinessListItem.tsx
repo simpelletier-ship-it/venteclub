@@ -2,7 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Skeleton } from "@/components/ui/skeleton";
-import { TrendingUp, MapPin, Star, Home, Store, HelpCircle } from "lucide-react";
+import { TrendingUp, MapPin, Star, Home, Store, HelpCircle, Image as ImageIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { FavoriteButton } from "./FavoriteButton";
 import { useState, useEffect } from "react";
@@ -57,12 +57,43 @@ const BusinessListItem = ({
 }: BusinessListItemProps) => {
   const navigate = useNavigate();
   const [userId, setUserId] = useState<string | undefined>();
+  const [mainImageUrl, setMainImageUrl] = useState<string | null>(null);
+  const [imageLoading, setImageLoading] = useState(true);
   
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUserId(session?.user?.id);
     });
   }, []);
+
+  useEffect(() => {
+    if (!id) {
+      setImageLoading(false);
+      return;
+    }
+    
+    const fetchMainImage = async () => {
+      try {
+        // @ts-ignore - Supabase types can be too complex
+        const { data } = await supabase
+          .from('business_photos')
+          .select('photo_url')
+          .eq('business_id', id)
+          .order('display_order', { ascending: true })
+          .limit(1);
+        
+        if (data && data[0]?.photo_url) {
+          setMainImageUrl(data[0].photo_url as string);
+        }
+      } catch (error) {
+        console.error('Error fetching image:', error);
+      } finally {
+        setImageLoading(false);
+      }
+    };
+    
+    fetchMainImage();
+  }, [id]);
   
   const displayRevenue = revenue || (annual_revenue ? `${annual_revenue.toLocaleString('fr-CA', { useGrouping: true }).replace(/\$/g, '')} $` : 'N/A');
   const displayPrice = price || (asking_price === 0 ? 'À discuter' : asking_price ? `${asking_price.toLocaleString('fr-CA', { useGrouping: true }).replace(/\$/g, '')} $` : 'N/A');
@@ -122,10 +153,21 @@ const BusinessListItem = ({
 
       {/* Image à gauche */}
       <div className="relative w-32 h-32 flex-shrink-0 overflow-hidden rounded-lg bg-muted">
-        <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-muted to-muted/50">
-          <p className="text-xs font-bold text-foreground">vente.club</p>
-          <p className="text-[10px] text-muted-foreground">Voir photos</p>
-        </div>
+        {imageLoading ? (
+          <Skeleton className="w-full h-full" />
+        ) : mainImageUrl ? (
+          <img
+            src={mainImageUrl}
+            alt={title}
+            className="w-full h-full object-cover"
+            loading="lazy"
+          />
+        ) : (
+          <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-muted to-muted/50">
+            <ImageIcon className="w-8 h-8 text-muted-foreground/40 mb-1" />
+            <p className="text-[10px] text-muted-foreground">Voir photos</p>
+          </div>
+        )}
       </div>
 
       {/* Left section - Badges & Title */}

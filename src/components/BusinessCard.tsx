@@ -95,7 +95,7 @@ const BusinessCard = ({
           .from('business_photos')
           .select('photo_url')
           .eq('business_id', id)
-          .eq('is_main', true)
+          .order('display_order', { ascending: true })
           .limit(1);
         
         if (data && data[0]?.photo_url) {
