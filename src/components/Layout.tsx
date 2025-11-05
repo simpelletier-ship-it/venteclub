@@ -2,7 +2,6 @@ import { ReactNode } from "react";
 import Header from "./Header";
 import { Footer } from "./Footer";
 import { AlertCircle } from "lucide-react";
-import { OrganizationSchema } from "./OrganizationSchema";
 
 interface LayoutProps {
   children: ReactNode;
@@ -11,7 +10,6 @@ interface LayoutProps {
 export const Layout = ({ children }: LayoutProps) => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <OrganizationSchema />
       <div className="bg-accent text-accent-foreground py-2 px-4 text-center text-sm font-medium flex items-center justify-center gap-2">
         <AlertCircle className="h-4 w-4" />
         <span>
