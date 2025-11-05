@@ -2,7 +2,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { TrendingUp, MapPin, Star, XCircle, Building2, Home, Store, HelpCircle } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { TrendingUp, MapPin, Star, XCircle, Building2, Home, Store, HelpCircle, Image as ImageIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { FavoriteButton } from "./FavoriteButton";
 import { useState, useEffect } from "react";
@@ -72,7 +73,8 @@ const BusinessCard = ({
   const navigate = useNavigate();
   const [userId, setUserId] = useState<string | undefined>();
   const [showFullDescription, setShowFullDescription] = useState(false);
-  const [mainImage, setMainImage] = useState<string | null>(null);
+  const [mainImageUrl, setMainImageUrl] = useState<string | null>(null);
+  const [imageLoading, setImageLoading] = useState(true);
   
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -81,8 +83,14 @@ const BusinessCard = ({
   }, []);
 
   useEffect(() => {
+    if (!id) {
+      setImageLoading(false);
+      return;
+    }
+    
     const fetchMainImage = async () => {
-      if (id) {
+      try {
+        // @ts-ignore - Supabase types can be too complex
         const { data, error } = await supabase
           .from('business_photos')
           .select('photo_url')
@@ -90,43 +98,17 @@ const BusinessCard = ({
           .order('display_order', { ascending: true })
           .limit(1);
         
-        if (error) {
-          console.error('[BUSINESS-CARD] Error fetching photo:', error);
-          setMainImage(null);
-        } else if (data && data.length > 0 && data[0]?.photo_url) {
-          setMainImage(data[0].photo_url);
-        } else {
-          setMainImage(null);
+        if (data && data[0]?.photo_url) {
+          setMainImageUrl(data[0].photo_url as string);
         }
+      } catch (error) {
+        console.error('Error fetching image:', error);
+      } finally {
+        setImageLoading(false);
       }
     };
     
     fetchMainImage();
-    
-    // Subscribe to changes in business_photos for this business
-    // Only update when photos are actually changed (INSERT/UPDATE/DELETE)
-    if (id) {
-      const channel = supabase
-        .channel(`business_photos_card_${id}`)
-        .on(
-          'postgres_changes',
-          {
-            event: '*',
-            schema: 'public',
-            table: 'business_photos',
-            filter: `business_id=eq.${id}`
-          },
-          () => {
-            console.log('[REALTIME-CARD] Photos changed for business, refreshing image...');
-            fetchMainImage();
-          }
-        )
-        .subscribe();
-      
-      return () => {
-        supabase.removeChannel(channel);
-      };
-    }
   }, [id]);
   
   const displayRevenue = annual_revenue ? `${annual_revenue.toLocaleString('fr-CA')} $` : 'N/A';
@@ -171,16 +153,19 @@ const BusinessCard = ({
     >
       {/* Image principale */}
       <div className="relative w-full h-48 overflow-hidden bg-muted">
-        {mainImage ? (
-          <img 
-            src={mainImage} 
+        {imageLoading ? (
+          <Skeleton className="w-full h-full" />
+        ) : mainImageUrl ? (
+          <img
+            src={mainImageUrl}
             alt={title}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+            loading="lazy"
           />
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-muted to-muted/50">
-            <p className="text-2xl font-bold text-foreground mb-2">vente.club</p>
-            <p className="text-sm text-muted-foreground">Aucune photo disponible</p>
+            <ImageIcon className="w-12 h-12 text-muted-foreground/40 mb-2" />
+            <p className="text-sm text-muted-foreground">Photos disponibles dans l'annonce</p>
           </div>
         )}
       </div>
@@ -224,18 +209,20 @@ const BusinessCard = ({
               
               {/* Badge Démo */}
               {is_demo && (
-                <TooltipProvider>
+                <TooltipProvider delayDuration={200}>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Badge className="bg-purple-500 text-white border-0 shadow-md cursor-help">
-                        <HelpCircle className="w-3 h-3 mr-1" />
-                        DÉMO
-                      </Badge>
+                      <div onClick={(e) => e.stopPropagation()}>
+                        <Badge className="bg-purple-500 text-white border-0 shadow-md cursor-help hover:bg-purple-600 transition-colors">
+                          <HelpCircle className="w-3 h-3 mr-1" />
+                          Annonce fictive
+                        </Badge>
+                      </div>
                     </TooltipTrigger>
-                    <TooltipContent className="max-w-xs">
-                      <p className="font-semibold mb-2">Annonce fictive</p>
-                      <p className="text-sm mb-2">Cette annonce est à titre démonstratif en attendant le lancement officiel du site.</p>
-                      <p className="text-sm font-medium">Il est déjà possible de soumettre votre annonce pour le grand lancement prévu le 1er décembre 2025!</p>
+                    <TooltipContent side="top" className="max-w-xs bg-popover border-border">
+                      <p className="font-semibold mb-2 text-foreground">Annonce fictive</p>
+                      <p className="text-sm mb-2 text-muted-foreground">Cette annonce est à titre démonstratif en attendant le lancement officiel du site.</p>
+                      <p className="text-sm font-medium text-foreground">Il est déjà possible de soumettre votre annonce pour le grand lancement prévu le 1er décembre 2025!</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>

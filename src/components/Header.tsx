@@ -132,7 +132,14 @@ const Header = () => {
               onClick={() => navigate("/map")} 
               className="text-foreground/80 hover:text-foreground transition-colors font-medium relative group"
             >
-              Carte Interactive
+              Carte
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full" />
+            </button>
+            <button 
+              onClick={() => navigate("/ressources")} 
+              className="text-foreground/80 hover:text-foreground transition-colors font-medium relative group"
+            >
+              Ressources
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full" />
             </button>
             {user && (
@@ -150,7 +157,7 @@ const Header = () => {
                   className="text-foreground/80 hover:text-foreground transition-colors font-medium flex items-center gap-2 relative group"
                 >
                   <Heart className="w-4 h-4" />
-                  Mes favoris
+                  Favoris
                   <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full" />
                 </button>
               </>
@@ -282,7 +289,16 @@ const Header = () => {
               }}
               className="w-full text-left px-4 py-2 rounded-lg hover:bg-muted/50 transition-colors"
             >
-              Carte Interactive
+              Carte
+            </button>
+            <button
+              onClick={() => {
+                navigate("/ressources");
+                setMobileMenuOpen(false);
+              }}
+              className="w-full text-left px-4 py-2 rounded-lg hover:bg-muted/50 transition-colors"
+            >
+              Ressources
             </button>
             {user && (
               <>
@@ -304,7 +320,7 @@ const Header = () => {
                   className="w-full text-left px-4 py-2 rounded-lg hover:bg-muted/50 transition-colors flex items-center gap-2"
                 >
                   <Heart className="w-4 h-4" />
-                  Mes favoris
+                  Favoris
                 </button>
               </>
             )}

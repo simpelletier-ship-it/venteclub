@@ -45,8 +45,8 @@ serve(async (req) => {
     }
 
     const priceId = accessType === 'one_time' 
-      ? 'price_1SNQIrARiAO4VbXUlJrSMphq' // 5$ one-time
-      : 'price_1SNQJ2ARiAO4VbXUE6TMVGQr'; // 9.99$ monthly
+      ? 'price_1SPug9ARiAO4VbXUM3wF9bZ3' // 9.99$ one-time
+      : 'price_1SPugQARiAO4VbXUnfktoGBN'; // 19.99$ monthly
 
     const mode = accessType === 'one_time' ? 'payment' : 'subscription';
 

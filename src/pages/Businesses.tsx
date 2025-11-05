@@ -23,10 +23,10 @@ const Businesses = () => {
 
   const fetchBusinesses = async () => {
     try {
-      // Fetch only the columns we need for display
+      // Fetch only the columns we need for display (NO photos)
       const { data: businesses } = await supabase
         .from('businesses')
-        .select('id, slug, title, industry, city, region, annual_revenue, asking_price, baiia, description, featured, status, approval_status, is_franchise, sale_type, property_type, year_built, square_footage, is_rental_property, rental_units, created_at')
+        .select('id, slug, title, industry, city, region, annual_revenue, asking_price, baiia, description, featured, status, approval_status, is_franchise, sale_type, property_type, year_built, square_footage, is_rental_property, rental_units, is_demo, created_at')
         .in('status', ['active', 'sold'])
         .eq('approval_status', 'approved')
         .order('created_at', { ascending: false });

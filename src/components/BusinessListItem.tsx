@@ -1,7 +1,8 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { TrendingUp, MapPin, Star, Home, Store, HelpCircle } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { TrendingUp, MapPin, Star, Home, Store, HelpCircle, Image as ImageIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { FavoriteButton } from "./FavoriteButton";
 import { useState, useEffect } from "react";
@@ -56,7 +57,8 @@ const BusinessListItem = ({
 }: BusinessListItemProps) => {
   const navigate = useNavigate();
   const [userId, setUserId] = useState<string | undefined>();
-  const [mainImage, setMainImage] = useState<string | null>(null);
+  const [mainImageUrl, setMainImageUrl] = useState<string | null>(null);
+  const [imageLoading, setImageLoading] = useState(true);
   
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -65,51 +67,32 @@ const BusinessListItem = ({
   }, []);
 
   useEffect(() => {
+    if (!id) {
+      setImageLoading(false);
+      return;
+    }
+    
     const fetchMainImage = async () => {
-      if (id) {
-        const { data, error } = await supabase
+      try {
+        // @ts-ignore - Supabase types can be too complex
+        const { data } = await supabase
           .from('business_photos')
           .select('photo_url')
           .eq('business_id', id)
           .order('display_order', { ascending: true })
           .limit(1);
         
-        if (error) {
-          console.error('[BUSINESS-LIST] Error fetching photo:', error);
-          setMainImage(null);
-        } else if (data && data.length > 0 && data[0]?.photo_url) {
-          setMainImage(data[0].photo_url);
-        } else {
-          setMainImage(null);
+        if (data && data[0]?.photo_url) {
+          setMainImageUrl(data[0].photo_url as string);
         }
+      } catch (error) {
+        console.error('Error fetching image:', error);
+      } finally {
+        setImageLoading(false);
       }
     };
     
     fetchMainImage();
-    
-    // Subscribe to photo changes
-    if (id) {
-      const channel = supabase
-        .channel(`business_photos_list_${id}`)
-        .on(
-          'postgres_changes',
-          {
-            event: '*',
-            schema: 'public',
-            table: 'business_photos',
-            filter: `business_id=eq.${id}`
-          },
-          () => {
-            console.log('[REALTIME-LIST] Photos changed, refreshing...');
-            fetchMainImage();
-          }
-        )
-        .subscribe();
-      
-      return () => {
-        supabase.removeChannel(channel);
-      };
-    }
   }, [id]);
   
   const displayRevenue = revenue || (annual_revenue ? `${annual_revenue.toLocaleString('fr-CA', { useGrouping: true }).replace(/\$/g, '')} $` : 'N/A');
@@ -170,16 +153,19 @@ const BusinessListItem = ({
 
       {/* Image à gauche */}
       <div className="relative w-32 h-32 flex-shrink-0 overflow-hidden rounded-lg bg-muted">
-        {mainImage ? (
-          <img 
-            src={mainImage} 
+        {imageLoading ? (
+          <Skeleton className="w-full h-full" />
+        ) : mainImageUrl ? (
+          <img
+            src={mainImageUrl}
             alt={title}
             className="w-full h-full object-cover"
+            loading="lazy"
           />
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-muted to-muted/50">
-            <p className="text-xs font-bold text-foreground">vente.club</p>
-            <p className="text-[10px] text-muted-foreground">Aucune photo</p>
+            <ImageIcon className="w-8 h-8 text-muted-foreground/40 mb-1" />
+            <p className="text-[10px] text-muted-foreground">Voir photos</p>
           </div>
         )}
       </div>
@@ -203,18 +189,20 @@ const BusinessListItem = ({
           
           {/* Badge Démo */}
           {is_demo && (
-            <TooltipProvider>
+            <TooltipProvider delayDuration={200}>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Badge className="bg-purple-500 text-white border-0 shadow-md cursor-help text-xs">
-                    <HelpCircle className="w-3 h-3 mr-1" />
-                    DÉMO
-                  </Badge>
+                  <div onClick={(e) => e.stopPropagation()}>
+                    <Badge className="bg-purple-500 text-white border-0 shadow-md cursor-help text-xs hover:bg-purple-600 transition-colors">
+                      <HelpCircle className="w-3 h-3 mr-1" />
+                      Annonce fictive
+                    </Badge>
+                  </div>
                 </TooltipTrigger>
-                <TooltipContent className="max-w-xs">
-                  <p className="font-semibold mb-2">Annonce fictive</p>
-                  <p className="text-sm mb-2">Cette annonce est à titre démonstratif en attendant le lancement officiel du site.</p>
-                  <p className="text-sm font-medium">Il est déjà possible de soumettre votre annonce pour le grand lancement prévu le 1er décembre 2025!</p>
+                <TooltipContent side="top" className="max-w-xs bg-popover border-border">
+                  <p className="font-semibold mb-2 text-foreground">Annonce fictive</p>
+                  <p className="text-sm mb-2 text-muted-foreground">Cette annonce est à titre démonstratif en attendant le lancement officiel du site.</p>
+                  <p className="text-sm font-medium text-foreground">Il est déjà possible de soumettre votre annonce pour le grand lancement prévu le 1er décembre 2025!</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>

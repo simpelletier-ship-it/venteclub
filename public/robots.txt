@@ -5,11 +5,23 @@ Disallow: /admin
 Disallow: /settings
 Disallow: /dashboard/
 Disallow: /messages
+Disallow: /auth
+
+# High-value pages for AI crawlers (GEO optimization)
+Allow: /marche
+Allow: /ressources
+Allow: /faq
+Allow: /blog
+Allow: /entreprises
+Allow: /entreprises-a-vendre-montreal
+Allow: /entreprises-a-vendre-quebec
 
 # Crawl-delay for polite crawlers
 Crawl-delay: 0
 
-# Sitemap location (dynamic sitemap)
+# Sitemap locations
+Sitemap: https://vente.club/sitemap.xml
+Sitemap: https://vente.club/sitemap-dynamic.xml
 Sitemap: https://xmwsrvaricrfxovimffm.supabase.co/functions/v1/generate-sitemap
 
 # Specific bot rules
@@ -38,4 +50,22 @@ Allow: /
 
 # OpenAI GPTBot
 User-agent: GPTBot
+Allow: /
+
+# Google Gemini
+User-agent: Google-Extended
+Allow: /
+
+# Anthropic Claude
+User-agent: ClaudeBot
+Allow: /
+Crawl-delay: 0
+
+# Perplexity AI
+User-agent: PerplexityBot
+Allow: /
+Crawl-delay: 0
+
+# Meta AI
+User-agent: Meta-ExternalAgent
 Allow: /

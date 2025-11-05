@@ -19,28 +19,26 @@ export const Footer = () => {
             <h3 className="font-bold text-lg mb-4">Navigation</h3>
             <ul className="space-y-2">
               <li><Link to="/" className="text-sm text-muted-foreground hover:text-accent transition-colors">Accueil</Link></li>
+              <li><Link to="/entreprises" className="text-sm text-muted-foreground hover:text-accent transition-colors">Entreprises à vendre</Link></li>
               <li><Link to="/map" className="text-sm text-muted-foreground hover:text-accent transition-colors">Carte interactive</Link></li>
-              <li><Link to="/list-business" className="text-sm text-muted-foreground hover:text-accent transition-colors">Vendre une entreprise</Link></li>
-              <li><Link to="/list-franchise" className="text-sm text-muted-foreground hover:text-accent transition-colors">Vendre une franchise</Link></li>
-              <li><Link to="/list-property" className="text-sm text-muted-foreground hover:text-accent transition-colors">Vendre un immeuble</Link></li>
+              <li><Link to="/marche" className="text-sm text-muted-foreground hover:text-accent transition-colors">Marché 2025</Link></li>
+              <li><Link to="/ressources" className="text-sm text-muted-foreground hover:text-accent transition-colors">Ressources</Link></li>
+              <li><Link to="/faq" className="text-sm text-muted-foreground hover:text-accent transition-colors">FAQ</Link></li>
               <li><Link to="/a-propos" className="text-sm text-muted-foreground hover:text-accent transition-colors">À propos</Link></li>
-              <li><Link to="/contact" className="text-sm text-muted-foreground hover:text-accent transition-colors">Contact</Link></li>
               <li><Link to="/blog" className="text-sm text-muted-foreground hover:text-accent transition-colors">Blog</Link></li>
             </ul>
           </div>
 
-          {/* Régions populaires */}
+          {/* Régions & Vendre */}
           <div>
-            <h3 className="font-bold text-lg mb-4">Régions populaires</h3>
+            <h3 className="font-bold text-lg mb-4">Régions & Services</h3>
             <ul className="space-y-2">
-              <li><Link to="/?region=06" className="text-sm text-muted-foreground hover:text-accent transition-colors">Montréal</Link></li>
-              <li><Link to="/?region=03" className="text-sm text-muted-foreground hover:text-accent transition-colors">Capitale-Nationale</Link></li>
-              <li><Link to="/?region=16" className="text-sm text-muted-foreground hover:text-accent transition-colors">Montérégie</Link></li>
-              <li><Link to="/?region=13" className="text-sm text-muted-foreground hover:text-accent transition-colors">Laval</Link></li>
-              <li><Link to="/?region=14" className="text-sm text-muted-foreground hover:text-accent transition-colors">Lanaudière</Link></li>
-              <li><Link to="/?region=15" className="text-sm text-muted-foreground hover:text-accent transition-colors">Laurentides</Link></li>
-              <li><Link to="/?region=05" className="text-sm text-muted-foreground hover:text-accent transition-colors">Estrie</Link></li>
-              <li><Link to="/?region=07" className="text-sm text-muted-foreground hover:text-accent transition-colors">Outaouais</Link></li>
+              <li><Link to="/entreprises-a-vendre-montreal" className="text-sm text-muted-foreground hover:text-accent transition-colors">Entreprises Montréal</Link></li>
+              <li><Link to="/entreprises-a-vendre-quebec" className="text-sm text-muted-foreground hover:text-accent transition-colors">Entreprises Québec</Link></li>
+              <li><Link to="/entreprises-a-vendre-laval" className="text-sm text-muted-foreground hover:text-accent transition-colors">Entreprises Laval</Link></li>
+              <li><Link to="/list-business" className="text-sm text-muted-foreground hover:text-accent transition-colors">Vendre une entreprise</Link></li>
+              <li><Link to="/list-franchise" className="text-sm text-muted-foreground hover:text-accent transition-colors">Vendre une franchise</Link></li>
+              <li><Link to="/list-property" className="text-sm text-muted-foreground hover:text-accent transition-colors">Vendre un immeuble</Link></li>
             </ul>
           </div>
 
