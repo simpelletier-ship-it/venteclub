@@ -30,12 +30,13 @@ serve(async (req) => {
     }
 
     // Create a detailed prompt for image generation
-    const prompt = `Create a professional business photograph for: ${title}. 
+    const prompt = `Create a professional, high-quality business photograph for: ${title}. 
 Description: ${description}
 Industry: ${industry || 'business'}
 
-Generate a realistic, modern business image. Professional photography style, well-lit.
-Optimize for web display - medium resolution, efficient file size.`;
+Generate a realistic, modern business image that represents this business professionally. 
+The image should be suitable for a business listing website.
+High resolution, professional photography style, well-lit, appealing to potential buyers.`;
 
     console.log("Generating image with prompt:", prompt);
 

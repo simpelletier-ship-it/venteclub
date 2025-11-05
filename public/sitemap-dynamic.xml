@@ -8,26 +8,6 @@
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://vente.club/entreprises</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://vente.club/marche</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://vente.club/ressources</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://vente.club/faq</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://vente.club/blog</loc>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
@@ -38,7 +18,7 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://vente.club/a-propos</loc>
+    <loc>https://vente.club/about</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -50,32 +30,6 @@
   <url>
     <loc>https://vente.club/sell</loc>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <!-- City pages -->
-  <url>
-    <loc>https://vente.club/entreprises-a-vendre-montreal</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://vente.club/entreprises-a-vendre-quebec</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://vente.club/entreprises-a-vendre-laval</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://vente.club/entreprises-a-vendre-gatineau</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://vente.club/entreprises-a-vendre-sherbrooke</loc>
-    <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
 </urlset>
