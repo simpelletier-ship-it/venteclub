@@ -359,28 +359,60 @@ const BusinessDetails = () => {
 
   const checkChatUnlocked = async (userId: string, checkBusinessId: string) => {
     try {
+      // Vérifier si l'utilisateur a déverrouillé le chat pour cette annonce spécifique
+      // Soit via contact_access, soit via des messages existants
+      const { data: accessData, error: accessError } = await supabase
+        .from('contact_access')
+        .select('id')
+        .eq('user_id', userId)
+        .eq('business_id', checkBusinessId)
+        .limit(1);
+      
+      if (accessError) {
+        console.error('Error checking contact access:', accessError);
+      }
+      
       // Vérifier s'il existe déjà des messages pour cette conversation
-      const { data, error } = await supabase
+      const { data: messagesData, error: messagesError } = await supabase
         .from('messages')
         .select('id')
         .eq('business_id', checkBusinessId)
         .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`)
         .limit(1);
       
-      if (error) {
-        console.error('Error checking chat unlock:', error);
-        return;
+      if (messagesError) {
+        console.error('Error checking messages:', messagesError);
       }
       
-      // Si des messages existent, le chat est déverrouillé à vie
-      setHasUnlockedChat(data && data.length > 0);
+      // Le chat est déverrouillé si l'utilisateur a un access OU des messages existants
+      const isUnlocked = (accessData && accessData.length > 0) || (messagesData && messagesData.length > 0);
+      setHasUnlockedChat(isUnlocked);
+      
+      console.log('[CHAT UNLOCK CHECK] Business:', checkBusinessId, 'Unlocked:', isUnlocked);
     } catch (error) {
       console.error('Error in checkChatUnlocked:', error);
     }
   };
 
   const handleUnlockChat = async () => {
-    if (!user || !businessId) return;
+    if (!user || !businessId || !business) return;
+    
+    // Vérifier si l'utilisateur a déjà déverrouillé cette annonce spécifique
+    const { data: existingAccess } = await supabase
+      .from('contact_access')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('business_id', businessId)
+      .limit(1);
+    
+    if (existingAccess && existingAccess.length > 0) {
+      toast({
+        title: "Déjà déverrouillé",
+        description: "Vous avez déjà déverrouillé le chat pour cette annonce.",
+      });
+      setHasUnlockedChat(true);
+      return;
+    }
     
     // Vérifier si l'utilisateur a des conversations restantes
     if (conversationsRemaining <= 0 && !hasPremium) {
@@ -394,11 +426,40 @@ const BusinessDetails = () => {
     
     setIsUnlockingChat(true);
     try {
-      // Déverrouiller le chat en créant un message initial vide (ou un message système)
-      // Cela marquera la conversation comme déverrouillée
+      // 1. Créer une entrée dans contact_access pour cette annonce spécifique
+      const { error: accessError } = await supabase
+        .from('contact_access')
+        .insert({
+          user_id: user.id,
+          business_id: businessId,
+          used_token: true
+        });
+      
+      if (accessError) {
+        console.error('Error creating contact access:', accessError);
+        throw accessError;
+      }
+      
+      // 2. Créer un message initial pour déclencher le compteur de conversations
+      const { error: messageError } = await supabase
+        .from('messages')
+        .insert({
+          business_id: businessId,
+          sender_id: user.id,
+          receiver_id: business.seller_id,
+          content: "Bonjour, je suis intéressé par votre annonce.",
+          read: false
+        });
+      
+      if (messageError) {
+        console.error('Error creating initial message:', messageError);
+        throw messageError;
+      }
+      
+      // 3. Marquer comme déverrouillé localement
       setHasUnlockedChat(true);
       
-      // Recharger les limites de conversation
+      // 4. Recharger les limites de conversation
       await checkConversationLimits(user.id);
       
       toast({
@@ -410,8 +471,11 @@ const BusinessDetails = () => {
       toast({
         variant: "destructive",
         title: "Erreur",
-        description: "Impossible de déverrouiller le chat.",
+        description: error.message || "Impossible de déverrouiller le chat.",
       });
+      
+      // Recharger l'état du chat en cas d'erreur
+      await checkChatUnlocked(user.id, businessId);
     } finally {
       setIsUnlockingChat(false);
     }
