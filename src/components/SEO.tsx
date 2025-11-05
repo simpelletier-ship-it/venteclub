@@ -21,50 +21,6 @@ export const SEO = ({
 }: SEOProps) => {
   const siteUrl = window.location.origin;
   const currentUrl = canonical ? `${siteUrl}${canonical}` : window.location.href;
-  
-  // Core Organization
-  const organizationData = {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "@id": `${siteUrl}/#organization`,
-    "name": "Vente.club",
-    "url": siteUrl,
-    "logo": `${siteUrl}/logo.png`,
-    "address": {
-      "@type": "PostalAddress",
-      "addressCountry": "CA",
-      "addressRegion": "QC"
-    }
-  };
-
-  // Website avec potentiel de recherche
-  const websiteData = {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "@id": `${siteUrl}/#website`,
-    "url": siteUrl,
-    "name": "Vente.club",
-    "publisher": {
-      "@id": `${siteUrl}/#organization`
-    },
-    "potentialAction": {
-      "@type": "SearchAction",
-      "target": {
-        "@type": "EntryPoint",
-        "urlTemplate": `${siteUrl}/entreprises?search={search_term_string}`
-      },
-      "query-input": "required name=search_term_string"
-    }
-  };
-
-  // Combiner les schémas
-  const completeStructuredData = {
-    "@context": "https://schema.org",
-    "@graph": [
-      organizationData,
-      websiteData
-    ]
-  };
 
   return (
     <Helmet>
@@ -110,12 +66,7 @@ export const SEO = ({
       <meta name="geo.region" content="CA-QC" />
       <meta name="geo.placename" content="Québec" />
 
-      {/* Complete Interconnected Schema - Toile d'araignée SEO */}
-      <script type="application/ld+json">
-        {JSON.stringify(completeStructuredData)}
-      </script>
-
-      {/* Additional Page-Specific Structured Data */}
+      {/* Schema.org Structured Data */}
       {structuredData && (
         <script type="application/ld+json">
           {JSON.stringify(structuredData)}
