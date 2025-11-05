@@ -301,7 +301,7 @@ export const ConversationsList = ({ userId }: ConversationsListProps) => {
 
                         {/* Contenu au milieu */}
                         <div 
-                          className="flex-1 min-w-0"
+                          className="flex-1 min-w-0 max-w-[calc(100%-200px)]"
                           onClick={() => handleConversationClick(conv)}
                         >
                           <div className="flex items-start justify-between mb-1">
@@ -312,7 +312,7 @@ export const ConversationsList = ({ userId }: ConversationsListProps) => {
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                                className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   navigate(`/profile/${conv.other_user_id}`);
@@ -321,7 +321,7 @@ export const ConversationsList = ({ userId }: ConversationsListProps) => {
                                 <User className="h-3 w-3" />
                               </Button>
                             </div>
-                            <span className="text-[10px] font-semibold text-muted-foreground/70 whitespace-nowrap ml-2">
+                            <span className="text-[10px] font-semibold text-muted-foreground/70 whitespace-nowrap ml-2 flex-shrink-0">
                               {new Date(conv.last_message_time).toLocaleDateString('fr-FR', {
                                 day: '2-digit',
                                 month: '2-digit',
@@ -333,8 +333,8 @@ export const ConversationsList = ({ userId }: ConversationsListProps) => {
                             {conv.business_title}
                           </p>
                           
-                          <div className="flex items-center gap-2">
-                            <p className="text-xs text-foreground/70 truncate leading-tight flex-1">
+                          <div className="flex items-center gap-2 max-w-full">
+                            <p className="text-xs text-foreground/70 truncate leading-tight flex-1 min-w-0">
                               {conv.last_message}
                             </p>
                             {conv.last_message_sender_id === userId && (
