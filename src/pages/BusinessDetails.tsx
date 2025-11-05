@@ -42,6 +42,8 @@ const BusinessDetails = () => {
   const [sellerProfile, setSellerProfile] = useState<any>(null);
   const [isCalculatorOpen, setIsCalculatorOpen] = useState(false);
   const [conversationsRemaining, setConversationsRemaining] = useState<number>(1);
+  const [hoursUntilReset, setHoursUntilReset] = useState<number>(0);
+  const [minutesUntilReset, setMinutesUntilReset] = useState<number>(0);
 
   useEffect(() => {
     const initialize = async () => {
@@ -304,8 +306,7 @@ const BusinessDetails = () => {
     
     try {
       const { data, error } = await supabase.rpc('can_start_conversation', {
-        p_user_id: userId,
-        p_business_id: businessId
+        p_user_id: userId
       });
       
       if (error) {
@@ -314,8 +315,14 @@ const BusinessDetails = () => {
       }
       
       if (data && typeof data === 'object') {
-        const conversationData = data as { conversations_remaining?: number };
+        const conversationData = data as { 
+          conversations_remaining?: number;
+          hours_until_reset?: number;
+          minutes_until_reset?: number;
+        };
         setConversationsRemaining(conversationData.conversations_remaining || 0);
+        setHoursUntilReset(conversationData.hours_until_reset || 0);
+        setMinutesUntilReset(conversationData.minutes_until_reset || 0);
       }
     } catch (error) {
       console.error('Error in checkConversationLimits:', error);
@@ -1130,7 +1137,9 @@ const BusinessDetails = () => {
                         {!hasPremium && (
                           <ConversationLimitAlert
                             conversationsRemaining={conversationsRemaining}
-                            hasPremium={hasPremium}
+                            hasClubSelect={hasPremium}
+                            hoursUntilReset={hoursUntilReset}
+                            minutesUntilReset={minutesUntilReset}
                           />
                         )}
                         
