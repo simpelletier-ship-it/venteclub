@@ -19,7 +19,6 @@ import { ChevronDown } from "lucide-react";
 import { PriceHistory } from "@/components/PriceHistory";
 import { BusinessDocuments } from "@/components/BusinessDocuments";
 import { MakeOfferDialog } from "@/components/MakeOfferDialog";
-import { DisclaimerAlert } from "@/components/DisclaimerAlert";
 
 const BusinessDetails = () => {
   const { slug } = useParams();
@@ -492,7 +491,6 @@ const BusinessDetails = () => {
       />
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
-          <DisclaimerAlert />
           <div className="bg-card rounded-2xl shadow-elegant border border-border/50 overflow-hidden">
               <div className="p-8">
                 <div className="flex items-start justify-between mb-6">

@@ -2,6 +2,7 @@ import { SEO } from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
+import { DisclaimerAlert } from "@/components/DisclaimerAlert";
 
 const Terms = () => {
   const navigate = useNavigate();
@@ -29,6 +30,8 @@ const Terms = () => {
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 md:mb-8 leading-tight tracking-tight">
               Conditions d'utilisation
             </h1>
+
+            <DisclaimerAlert />
 
             <div className="prose prose-base md:prose-lg max-w-none space-y-6">
               <p className="text-muted-foreground leading-relaxed">

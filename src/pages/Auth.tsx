@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
+import { DisclaimerAlert } from "@/components/DisclaimerAlert";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -487,6 +488,7 @@ const Auth = () => {
                   </form>
                 ) : (
                   <form onSubmit={handleSignUp} className="space-y-4">
+                  <DisclaimerAlert />
                   <div>
                     <Label htmlFor="signup-email">Email</Label>
                     <Input
