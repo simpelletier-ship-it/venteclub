@@ -16,6 +16,10 @@ import { SEO } from "@/components/SEO";
 import { FinancialCalculator } from "@/components/FinancialCalculator";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ChevronDown } from "lucide-react";
+import { PriceHistory } from "@/components/PriceHistory";
+import { BusinessDocuments } from "@/components/BusinessDocuments";
+import { MakeOfferDialog } from "@/components/MakeOfferDialog";
+import { DisclaimerAlert } from "@/components/DisclaimerAlert";
 
 const BusinessDetails = () => {
   const { slug } = useParams();
@@ -488,6 +492,7 @@ const BusinessDetails = () => {
       />
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
+          <DisclaimerAlert />
           <div className="bg-card rounded-2xl shadow-elegant border border-border/50 overflow-hidden">
               <div className="p-8">
                 <div className="flex items-start justify-between mb-6">
@@ -1061,6 +1066,39 @@ const BusinessDetails = () => {
                   )}
                 </div>
 
+
+                {/* Bouton faire une offre - Acheteurs seulement */}
+                {!isSeller && user && businessId && (
+                  <div className="border-t pt-6 mt-6">
+                    <MakeOfferDialog
+                      businessId={businessId}
+                      businessTitle={business.title}
+                      askingPrice={business.asking_price}
+                    />
+                  </div>
+                )}
+
+                {/* Historique des prix */}
+                {businessId && (
+                  <div className="border-t pt-6 mt-6">
+                    <PriceHistory
+                      businessId={businessId}
+                      currentPrice={business.asking_price}
+                      currency={business.currency}
+                    />
+                  </div>
+                )}
+
+                {/* Documents sécurisés */}
+                {businessId && (
+                  <div className="border-t pt-6 mt-6">
+                    <BusinessDocuments
+                      businessId={businessId}
+                      sellerId={business.seller_id}
+                      hasAccess={hasAccess || isSeller}
+                    />
+                  </div>
+                )}
 
                 {/* Chat Section - Gratuit pour tous les utilisateurs authentifiés */}
                 {user && business && (
