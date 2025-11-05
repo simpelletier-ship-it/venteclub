@@ -270,13 +270,15 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
 
     const initMap = async () => {
       try {
-        // Utiliser le token Mapbox depuis les variables d'environnement
-        mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN || '';
-
-        if (!mapboxgl.accessToken) {
-          console.error('[MAP] No Mapbox token configured');
+        // Récupérer le token Mapbox depuis l'edge function
+        const { data: tokenData, error: tokenError } = await supabase.functions.invoke('get-mapbox-token');
+        
+        if (tokenError || !tokenData?.token) {
+          console.error('[MAP] Error fetching Mapbox token:', tokenError);
           return;
         }
+
+        mapboxgl.accessToken = tokenData.token;
 
         map.current = new mapboxgl.Map({
           container: mapContainer.current!,
