@@ -1004,51 +1004,89 @@ const BusinessDetails = () => {
                           Coordonnées du vendeur verrouillées
                         </h3>
                         <p className="text-muted-foreground mb-4">
-                          Rejoignez le Club Select pour accéder aux coordonnées de tous les vendeurs
+                          {!user 
+                            ? "Connectez-vous pour accéder au chat gratuit avec le vendeur"
+                            : "Rejoignez le Club Select pour accéder aux coordonnées de tous les vendeurs"
+                          }
                         </p>
                       </div>
                       
-                      <div className="bg-gradient-to-br from-secondary/10 to-primary/10 border-2 border-secondary rounded-lg p-6 max-w-md mx-auto">
-                        <div className="mb-4 text-center">
-                          <h4 className="font-semibold text-xl mb-2">Club Select</h4>
-                          <div className="text-4xl font-bold text-secondary mb-2">19,99$</div>
-                          <p className="text-sm text-muted-foreground">Abonnement mensuel</p>
+                      {!user ? (
+                        <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 p-6 rounded-lg border-2 border-green-200 dark:border-green-800 max-w-md mx-auto">
+                          <h3 className="text-lg font-semibold text-green-900 dark:text-green-100 mb-3 text-center flex items-center justify-center gap-2">
+                            💬 Discutez gratuitement avec le vendeur
+                          </h3>
+                          <ul className="space-y-2 mb-4">
+                            <li className="flex items-start gap-2 text-sm text-green-800 dark:text-green-200">
+                              <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                              </svg>
+                              <span><strong>1 conversation gratuite</strong> toutes les 24 heures</span>
+                            </li>
+                            <li className="flex items-start gap-2 text-sm text-green-800 dark:text-green-200">
+                              <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                              </svg>
+                              <span>Chat en temps réel avec tous les vendeurs</span>
+                            </li>
+                            <li className="flex items-start gap-2 text-sm text-green-800 dark:text-green-200">
+                              <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                              </svg>
+                              <span>Aucune carte de crédit requise</span>
+                            </li>
+                          </ul>
+                          <Button 
+                            onClick={() => navigate("/auth")}
+                            className="w-full bg-green-600 hover:bg-green-700 text-white"
+                            size="lg"
+                          >
+                            Se connecter maintenant
+                          </Button>
                         </div>
-                        <ul className="space-y-3 mb-6">
-                          <li className="flex items-start gap-2 text-sm">
-                            <svg className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                            </svg>
-                            <span className="font-semibold">Accès illimité à tous les vendeurs</span>
-                          </li>
-                          <li className="flex items-start gap-2 text-sm">
-                            <svg className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                            </svg>
-                            <span className="font-semibold">Conversations illimitées</span>
-                          </li>
-                          <li className="flex items-start gap-2 text-sm">
-                            <svg className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                            </svg>
-                            <span>Emails et téléphones débloqués</span>
-                          </li>
-                          <li className="flex items-start gap-2 text-sm">
-                            <svg className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                            </svg>
-                            <span>Annulez à tout moment</span>
-                          </li>
-                        </ul>
-                        <Button 
-                          size="lg" 
-                          className="w-full"
-                          variant="secondary"
-                          onClick={handlePremiumCheckout}
-                        >
-                          Rejoindre le Club Select
-                        </Button>
-                      </div>
+                      ) : (
+                        <div className="bg-gradient-to-br from-secondary/10 to-primary/10 border-2 border-secondary rounded-lg p-6 max-w-md mx-auto">
+                          <div className="mb-4 text-center">
+                            <h4 className="font-semibold text-xl mb-2">Club Select</h4>
+                            <div className="text-4xl font-bold text-secondary mb-2">19,99$</div>
+                            <p className="text-sm text-muted-foreground">Abonnement mensuel</p>
+                          </div>
+                          <ul className="space-y-3 mb-6">
+                            <li className="flex items-start gap-2 text-sm">
+                              <svg className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                              </svg>
+                              <span className="font-semibold">Accès illimité à tous les vendeurs</span>
+                            </li>
+                            <li className="flex items-start gap-2 text-sm">
+                              <svg className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                              </svg>
+                              <span className="font-semibold">Conversations illimitées</span>
+                            </li>
+                            <li className="flex items-start gap-2 text-sm">
+                              <svg className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                              </svg>
+                              <span>Emails et téléphones débloqués</span>
+                            </li>
+                            <li className="flex items-start gap-2 text-sm">
+                              <svg className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                              </svg>
+                              <span>Annulez à tout moment</span>
+                            </li>
+                          </ul>
+                          <Button 
+                            size="lg" 
+                            className="w-full"
+                            variant="secondary"
+                            onClick={handlePremiumCheckout}
+                          >
+                            Rejoindre le Club Select
+                          </Button>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
