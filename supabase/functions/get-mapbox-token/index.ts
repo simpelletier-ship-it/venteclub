@@ -11,7 +11,7 @@ serve(async (req) => {
   }
 
   try {
-    const mapboxToken = Deno.env.get('VITE_MAPBOX_TOKEN');
+    const mapboxToken = Deno.env.get('MAPBOX_ACCESS_TOKEN');
     
     if (!mapboxToken) {
       throw new Error('Mapbox token not configured');
