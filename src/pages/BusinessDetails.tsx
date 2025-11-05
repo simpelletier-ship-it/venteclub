@@ -1136,8 +1136,53 @@ const BusinessDetails = () => {
                   </div>
                 )}
 
+                {/* Informations du vendeur - Affichées APRÈS le chat si l'utilisateur a accès */}
+                {!isSeller && user && hasAccess && sellerContact && (
+                  <div className="border-t pt-6 mt-6">
+                    <div className="bg-gradient-to-br from-primary/5 to-secondary/5 border-2 border-primary/20 rounded-xl p-6 max-w-md mx-auto">
+                      <h3 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
+                        📞 Coordonnées du vendeur
+                        <Badge variant="secondary" className="text-xs">
+                          Déverrouillé
+                        </Badge>
+                      </h3>
+                      
+                      <div className="space-y-4">
+                        {sellerContact.email && (
+                          <div className="bg-background/50 p-4 rounded-lg">
+                            <div className="flex items-center gap-2 text-muted-foreground mb-1">
+                              <span className="text-base">📧</span>
+                              <span className="text-sm font-medium">Email</span>
+                            </div>
+                            <a 
+                              href={`mailto:${sellerContact.email}`}
+                              className="text-base font-semibold text-primary hover:underline break-all"
+                            >
+                              {sellerContact.email}
+                            </a>
+                          </div>
+                        )}
+                        
+                        {sellerContact.phone && (
+                          <div className="bg-background/50 p-4 rounded-lg">
+                            <div className="flex items-center gap-2 text-muted-foreground mb-1">
+                              <span className="text-base">📱</span>
+                              <span className="text-sm font-medium">Téléphone</span>
+                            </div>
+                            <a 
+                              href={`tel:${sellerContact.phone}`}
+                              className="text-base font-semibold text-primary hover:underline"
+                            >
+                              {sellerContact.phone}
+                            </a>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
 
-                {/* Section Club Select - Affichée seulement quand la limite quotidienne est atteinte */}
+
                 {!hasAccess && !isSeller && user && conversationsRemaining === 0 && !hasPremium && (
                   <div className="border-t pt-6 mt-6">
                     <div className="relative bg-gradient-to-br from-gray-900 via-black to-gray-900 border-2 border-yellow-500/30 rounded-xl p-8 max-w-md mx-auto overflow-hidden shadow-2xl">
