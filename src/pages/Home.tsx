@@ -257,7 +257,7 @@ const Home = () => {
               Prêt à trouver <span className="text-secondary">votre prochaine opportunité ?</span>
             </h2>
             <p className="text-xl md:text-2xl text-muted-foreground">
-              Rejoignez des milliers d'entrepreneurs qui font confiance à Vente.club
+              Commencez dès maintenant votre recherche ou déposez votre annonce gratuitement
             </p>
             <div className="flex justify-center">
               <Button 
