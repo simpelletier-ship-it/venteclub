@@ -88,11 +88,25 @@ const BusinessDetails = () => {
         },
         (payload) => {
           console.log('[REALTIME] Business update received:', payload);
-          // Only refresh if it's not just pending_changes being updated
-          // Check if has_pending_changes went from true to false (approval)
           const oldRecord = payload.old as any;
           const newRecord = payload.new as any;
           
+          // Ignore updates that are only view count changes
+          const onlyViewsChanged = oldRecord && newRecord && 
+            oldRecord.views_count !== newRecord.views_count &&
+            Object.keys(newRecord).every(key => 
+              key === 'views_count' || 
+              key === 'updated_at' || 
+              key === 'id' ||
+              oldRecord[key] === newRecord[key]
+            );
+          
+          if (onlyViewsChanged) {
+            console.log('[REALTIME] Only views count changed, skipping refresh');
+            return;
+          }
+          
+          // Check if has_pending_changes went from true to false (approval)
           if (oldRecord?.has_pending_changes === true && newRecord?.has_pending_changes === false) {
             console.log('[REALTIME] Changes approved by admin, refreshing...');
             fetchBusiness();
@@ -163,23 +177,26 @@ const BusinessDetails = () => {
 
       if (error) throw error;
       
-      // Increment view count
+      // Increment view count - only on initial load, not on realtime updates
       if (data) {
+        const isInitialLoad = !business || business.id !== data.id;
         setBusinessId(data.id);
         
-        // Track view analytics - with error handling for rate limiting
-        try {
-          const session = await supabase.auth.getSession();
-          await supabase
-            .from('business_analytics')
-            .insert({
-              business_id: data.id,
-              event_type: 'view',
-              user_id: session.data.session?.user?.id,
-            });
-        } catch (analyticsError) {
-          // Silently fail if rate limited or duplicate view
-          console.log('Analytics tracking skipped:', analyticsError);
+        // Track view analytics - only on initial load to prevent duplicates
+        if (isInitialLoad) {
+          try {
+            const session = await supabase.auth.getSession();
+            await supabase
+              .from('business_analytics')
+              .insert({
+                business_id: data.id,
+                event_type: 'view',
+                user_id: session.data.session?.user?.id,
+              });
+          } catch (analyticsError) {
+            // Silently fail if rate limited or duplicate view
+            console.log('Analytics tracking skipped:', analyticsError);
+          }
         }
         
         setBusiness(data);
