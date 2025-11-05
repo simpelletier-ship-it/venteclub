@@ -968,7 +968,7 @@ const BusinessDetails = () => {
                           <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                         </svg>
                         <span className="font-semibold">
-                          {isPremiumAccess ? "✨ Accès débloqué grâce à votre abonnement Premium" : "Accès débloqué"}
+                          {isPremiumAccess ? "✨ Accès débloqué grâce à votre abonnement Club Select" : "Accès débloqué"}
                         </span>
                       </div>
                       {sellerContact ? (
@@ -1060,7 +1060,7 @@ const BusinessDetails = () => {
                             RECOMMANDÉ
                           </div>
                           <div className="mb-4">
-                            <h4 className="font-semibold text-lg mb-2">Premium</h4>
+                            <h4 className="font-semibold text-lg mb-2">Club Select</h4>
                             <div className="text-3xl font-bold text-secondary mb-2">19,99$</div>
                             <p className="text-sm text-muted-foreground">Abonnement mensuel</p>
                           </div>
@@ -1070,6 +1070,12 @@ const BusinessDetails = () => {
                                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                               </svg>
                               <span className="font-semibold">Accès illimité à tous les vendeurs</span>
+                            </li>
+                            <li className="flex items-start gap-2 text-sm">
+                              <svg className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                              </svg>
+                              <span className="font-semibold">Conversations illimitées</span>
                             </li>
                             <li className="flex items-start gap-2 text-sm">
                               <svg className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
@@ -1090,7 +1096,7 @@ const BusinessDetails = () => {
                             variant="secondary"
                             onClick={handlePremiumCheckout}
                           >
-                            S'abonner au Premium
+                            Rejoindre le Club Select
                           </Button>
                         </div>
                       </div>
