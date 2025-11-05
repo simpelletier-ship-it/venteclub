@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Skeleton } from "@/components/ui/skeleton";
-import { TrendingUp, MapPin, Star, XCircle, Building2, Home, Store, HelpCircle } from "lucide-react";
+import { TrendingUp, MapPin, Star, XCircle, Building2, Home, Store, HelpCircle, Image as ImageIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { FavoriteButton } from "./FavoriteButton";
 import { useState, useEffect } from "react";
@@ -73,12 +73,43 @@ const BusinessCard = ({
   const navigate = useNavigate();
   const [userId, setUserId] = useState<string | undefined>();
   const [showFullDescription, setShowFullDescription] = useState(false);
+  const [mainImageUrl, setMainImageUrl] = useState<string | null>(null);
+  const [imageLoading, setImageLoading] = useState(true);
   
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUserId(session?.user?.id);
     });
   }, []);
+
+  useEffect(() => {
+    if (!id) {
+      setImageLoading(false);
+      return;
+    }
+    
+    const fetchMainImage = async () => {
+      try {
+        // @ts-ignore - Supabase types can be too complex
+        const { data, error } = await supabase
+          .from('business_photos')
+          .select('photo_url')
+          .eq('business_id', id)
+          .eq('is_main', true)
+          .limit(1);
+        
+        if (data && data[0]?.photo_url) {
+          setMainImageUrl(data[0].photo_url as string);
+        }
+      } catch (error) {
+        console.error('Error fetching image:', error);
+      } finally {
+        setImageLoading(false);
+      }
+    };
+    
+    fetchMainImage();
+  }, [id]);
   
   const displayRevenue = annual_revenue ? `${annual_revenue.toLocaleString('fr-CA')} $` : 'N/A';
   const displayPrice = asking_price === 0 ? 'À discuter' : asking_price ? `${asking_price.toLocaleString('fr-CA')} $` : 'N/A';
@@ -122,10 +153,21 @@ const BusinessCard = ({
     >
       {/* Image principale */}
       <div className="relative w-full h-48 overflow-hidden bg-muted">
-        <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-muted to-muted/50">
-          <p className="text-2xl font-bold text-foreground mb-2">vente.club</p>
-          <p className="text-sm text-muted-foreground">Photos disponibles dans l'annonce</p>
-        </div>
+        {imageLoading ? (
+          <Skeleton className="w-full h-full" />
+        ) : mainImageUrl ? (
+          <img
+            src={mainImageUrl}
+            alt={title}
+            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+            loading="lazy"
+          />
+        ) : (
+          <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-muted to-muted/50">
+            <ImageIcon className="w-12 h-12 text-muted-foreground/40 mb-2" />
+            <p className="text-sm text-muted-foreground">Photos disponibles dans l'annonce</p>
+          </div>
+        )}
       </div>
 
       {/* Sold Diagonal Banner */}
