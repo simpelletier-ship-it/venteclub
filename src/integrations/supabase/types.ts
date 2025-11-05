@@ -771,6 +771,7 @@ export type Database = {
           company_name: string | null
           country: string | null
           created_at: string | null
+          daily_conversations_count: number | null
           date_of_birth: string | null
           email: string | null
           first_name: string | null
@@ -778,11 +779,10 @@ export type Database = {
           id: string
           is_public: boolean | null
           job_title: string | null
-          last_conversation_reset: string | null
+          last_conversation_date: string | null
           last_name: string | null
           linkedin_url: string | null
           marketing_emails: boolean | null
-          monthly_conversations_count: number | null
           newsletter_enabled: boolean | null
           phone: string | null
           postal_code: string | null
@@ -798,6 +798,7 @@ export type Database = {
           company_name?: string | null
           country?: string | null
           created_at?: string | null
+          daily_conversations_count?: number | null
           date_of_birth?: string | null
           email?: string | null
           first_name?: string | null
@@ -805,11 +806,10 @@ export type Database = {
           id: string
           is_public?: boolean | null
           job_title?: string | null
-          last_conversation_reset?: string | null
+          last_conversation_date?: string | null
           last_name?: string | null
           linkedin_url?: string | null
           marketing_emails?: boolean | null
-          monthly_conversations_count?: number | null
           newsletter_enabled?: boolean | null
           phone?: string | null
           postal_code?: string | null
@@ -825,6 +825,7 @@ export type Database = {
           company_name?: string | null
           country?: string | null
           created_at?: string | null
+          daily_conversations_count?: number | null
           date_of_birth?: string | null
           email?: string | null
           first_name?: string | null
@@ -832,11 +833,10 @@ export type Database = {
           id?: string
           is_public?: boolean | null
           job_title?: string | null
-          last_conversation_reset?: string | null
+          last_conversation_date?: string | null
           last_name?: string | null
           linkedin_url?: string | null
           marketing_emails?: boolean | null
-          monthly_conversations_count?: number | null
           newsletter_enabled?: boolean | null
           phone?: string | null
           postal_code?: string | null

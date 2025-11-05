@@ -68,7 +68,16 @@ const FAQ = () => {
                   À quoi sert l'abonnement Premium ?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground">
-                  L'abonnement Premium à 19,99$/mois vous permet de : 1) Débloquer un nombre illimité de vendeurs sans limite de temps pour contacter directement les propriétaires d'entreprises, 2) Mettre en vedette vos annonces pour augmenter leur visibilité et apparaître en tête des résultats, attirant ainsi plus d'acheteurs potentiels, 3) Accéder à des fonctionnalités avancées pour gérer efficacement vos transactions. C'est l'outil idéal pour les acheteurs actifs recherchant plusieurs opportunités et les vendeurs sérieux souhaitant maximiser leur exposition.
+                  L'abonnement Premium à 19,99$/mois vous permet d'avoir des conversations illimitées (vs 1 par jour gratuit), d'accéder aux coordonnées de TOUS les vendeurs sans restriction, et de bénéficier d'un chat illimité. C'est l'outil idéal pour les acheteurs actifs recherchant plusieurs opportunités et les vendeurs sérieux souhaitant maximiser leur exposition.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="free-limit" className="border rounded-lg px-6">
+                <AccordionTrigger className="text-left">
+                  Combien de conversations puis-je avoir gratuitement ?
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground">
+                  Le plan gratuit vous permet de démarrer 1 nouvelle conversation par jour avec un vendeur différent. Une fois une conversation démarrée, vous pouvez continuer à échanger sans limite avec ce vendeur. La limite se réinitialise chaque jour à minuit. Pour des conversations illimitées, abonnez-vous au Premium à 19,99$/mois.
                 </AccordionContent>
               </AccordionItem>
 

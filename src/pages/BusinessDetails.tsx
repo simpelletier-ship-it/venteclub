@@ -41,8 +41,7 @@ const BusinessDetails = () => {
   const [isPremiumAccess, setIsPremiumAccess] = useState(false);
   const [sellerProfile, setSellerProfile] = useState<any>(null);
   const [isCalculatorOpen, setIsCalculatorOpen] = useState(false);
-  const [conversationsRemaining, setConversationsRemaining] = useState<number>(3);
-  const [nextResetDate, setNextResetDate] = useState<Date | undefined>(undefined);
+  const [conversationsRemaining, setConversationsRemaining] = useState<number>(1);
 
   useEffect(() => {
     const initialize = async () => {
@@ -317,11 +316,6 @@ const BusinessDetails = () => {
       if (data && typeof data === 'object') {
         const conversationData = data as { conversations_remaining?: number };
         setConversationsRemaining(conversationData.conversations_remaining || 0);
-        
-        // Calculer la date de réinitialisation (début du mois prochain)
-        const now = new Date();
-        const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-        setNextResetDate(nextMonth);
       }
     } catch (error) {
       console.error('Error in checkConversationLimits:', error);
@@ -1126,7 +1120,7 @@ const BusinessDetails = () => {
                     <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
                       💬 Messagerie avec le vendeur
                       <Badge variant="secondary" className="text-xs">
-                        {hasPremium ? "Illimité" : `${conversationsRemaining}/3`}
+                        {hasPremium ? "Illimité" : `${conversationsRemaining}/1 par jour`}
                       </Badge>
                     </h2>
                     
@@ -1137,7 +1131,6 @@ const BusinessDetails = () => {
                           <ConversationLimitAlert
                             conversationsRemaining={conversationsRemaining}
                             hasPremium={hasPremium}
-                            nextResetDate={nextResetDate}
                           />
                         )}
                         
