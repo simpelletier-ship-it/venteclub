@@ -1176,7 +1176,7 @@ const BusinessDetails = () => {
                           <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                           </svg>
-                          <span><strong>1 annonceur par jour</strong> ({conversationsRemaining} restant{conversationsRemaining > 1 ? 's' : ''})</span>
+                          <span><strong>1 vendeur par jour</strong> ({conversationsRemaining} restant)</span>
                         </li>
                       </ul>
                       <Button 
@@ -1185,12 +1185,31 @@ const BusinessDetails = () => {
                         className="w-full bg-green-600 hover:bg-green-700 text-white"
                         size="lg"
                       >
-                        {isUnlockingChat ? "Déverrouillage..." : conversationsRemaining <= 0 ? "Limite atteinte" : "Déverrouiller le chat gratuitement"}
+                        {isUnlockingChat ? "Déverrouillage..." : conversationsRemaining <= 0 ? "Limite atteinte - Voir le Club Select" : "Déverrouiller le chat gratuitement"}
                       </Button>
                       {conversationsRemaining <= 0 && (
-                        <p className="text-xs text-green-700 dark:text-green-300 mt-2">
-                          Prochaine utilisation dans {hoursUntilReset}h{minutesUntilReset}min
-                        </p>
+                        <div className="mt-4 space-y-3">
+                          <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-lg p-3">
+                            <p className="text-sm text-red-800 dark:text-red-200 text-center">
+                              <strong>⏰ Limite gratuite atteinte</strong><br/>
+                              1 chat par jour · Prochaine disponibilité dans {hoursUntilReset}h{minutesUntilReset}min
+                            </p>
+                          </div>
+                          <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 dark:from-yellow-950/30 dark:to-yellow-900/30 border-2 border-yellow-500/30 rounded-xl p-4">
+                            <h4 className="font-bold text-center mb-2 text-yellow-900 dark:text-yellow-100">
+                              ⭐ Rejoignez le Club Select
+                            </h4>
+                            <p className="text-sm text-center text-yellow-800 dark:text-yellow-200 mb-3">
+                              19,99$/mois · Conversations illimitées
+                            </p>
+                            <Button
+                              onClick={() => navigate('/dashboard?tab=premium')}
+                              className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 text-black font-bold"
+                            >
+                              Voir les avantages du Club Select
+                            </Button>
+                          </div>
+                        </div>
                       )}
                     </div>
                   </div>
@@ -1226,45 +1245,44 @@ const BusinessDetails = () => {
                   <div className="border-t pt-6 mt-6">
                     <div className="bg-gradient-to-br from-primary/5 to-secondary/5 border-2 border-primary/20 rounded-xl p-6 max-w-md mx-auto">
                       <div className="text-center mb-4">
-                        <h3 className="text-xl font-bold text-foreground mb-1 flex items-center gap-2 justify-center">
+                        <h3 className="text-xl font-bold text-foreground mb-2 flex items-center gap-2 justify-center">
                           📞 Coordonnées du vendeur
-                          <Badge variant="secondary" className="text-xs bg-green-500/10 text-green-700 dark:text-green-300 border-green-500/20">
-                            Déverrouillé
-                          </Badge>
                         </h3>
-                        <p className="text-xs text-muted-foreground">
-                          grâce au Club Select
-                        </p>
+                        {hasPremium && (
+                          <Badge variant="secondary" className="text-xs bg-gradient-to-r from-yellow-400/20 to-yellow-600/20 text-yellow-700 dark:text-yellow-300 border-yellow-500/30">
+                            ⭐ Membre Club Select
+                          </Badge>
+                        )}
                       </div>
                       
-                      <div className="space-y-4">
+                      <div className="space-y-3">
                         {sellerContact.email && (
-                          <div className="bg-background/50 p-4 rounded-lg">
-                            <div className="flex items-center gap-2 text-muted-foreground mb-1">
-                              <span className="text-base">📧</span>
-                              <span className="text-sm font-medium">Email</span>
+                          <div className="flex items-start gap-3">
+                            <span className="text-2xl">📧</span>
+                            <div className="flex-1">
+                              <div className="text-sm text-muted-foreground mb-1">Email</div>
+                              <a 
+                                href={`mailto:${sellerContact.email}`}
+                                className="text-base font-semibold text-primary hover:underline break-all"
+                              >
+                                {sellerContact.email}
+                              </a>
                             </div>
-                            <a 
-                              href={`mailto:${sellerContact.email}`}
-                              className="text-base font-semibold text-primary hover:underline break-all"
-                            >
-                              {sellerContact.email}
-                            </a>
                           </div>
                         )}
                         
                         {sellerContact.phone && (
-                          <div className="bg-background/50 p-4 rounded-lg">
-                            <div className="flex items-center gap-2 text-muted-foreground mb-1">
-                              <span className="text-base">📱</span>
-                              <span className="text-sm font-medium">Téléphone</span>
+                          <div className="flex items-start gap-3">
+                            <span className="text-2xl">📱</span>
+                            <div className="flex-1">
+                              <div className="text-sm text-muted-foreground mb-1">Téléphone</div>
+                              <a 
+                                href={`tel:${sellerContact.phone}`}
+                                className="text-base font-semibold text-primary hover:underline"
+                              >
+                                {sellerContact.phone}
+                              </a>
                             </div>
-                            <a 
-                              href={`tel:${sellerContact.phone}`}
-                              className="text-base font-semibold text-primary hover:underline"
-                            >
-                              {sellerContact.phone}
-                            </a>
                           </div>
                         )}
                       </div>
@@ -1273,29 +1291,6 @@ const BusinessDetails = () => {
                 )}
 
 
-                {!hasAccess && !isSeller && user && conversationsRemaining === 0 && !hasPremium && (
-                  <div className="border-t pt-6 mt-6">
-                    <div className="text-center">
-                      <p className="text-sm text-muted-foreground mb-4">
-                        Limite de conversations gratuites atteinte pour aujourd'hui
-                      </p>
-                      <Button 
-                        size="lg"
-                        variant="outline"
-                        className="bg-gradient-to-r from-yellow-400/10 to-yellow-600/10 border-yellow-500/30 hover:from-yellow-400/20 hover:to-yellow-600/20"
-                        onClick={() => setShowPremiumDialog(true)}
-                      >
-                        <svg className="w-5 h-5 text-yellow-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                        </svg>
-                        Déverrouiller avec le Club Select
-                      </Button>
-                      <p className="text-xs text-muted-foreground mt-2">
-                        Conversations illimitées · 19,99$/mois
-                      </p>
-                    </div>
-                  </div>
-                )}
 
                 {/* Calculateur de financement */}
                 {business.asking_price > 0 && (
@@ -1447,9 +1442,9 @@ const BusinessDetails = () => {
                 </ul>
               </div>
               
-              <div className="bg-muted/50 rounded-lg p-3">
+              <div className="bg-yellow-50/50 dark:bg-yellow-950/20 rounded-lg p-3 border border-yellow-500/20">
                 <p className="text-sm text-center text-muted-foreground">
-                  💡 <strong>Astuce:</strong> Besoin de contacter plusieurs vendeurs ? L'abonnement Premium à 19,99$/mois vous donne accès illimité à tous les vendeurs.
+                  💡 <strong>Astuce:</strong> Besoin de contacter plusieurs vendeurs ? Le Club Select à 19,99$/mois vous donne accès illimité à tous les vendeurs.
                 </p>
               </div>
             </DialogDescription>
@@ -1490,11 +1485,11 @@ const BusinessDetails = () => {
                 )}
               </div>
 
-              <div className="bg-gradient-to-br from-primary/10 to-accent/10 border-2 border-primary/30 rounded-lg p-4">
+              <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 dark:from-yellow-950/30 dark:to-yellow-900/30 border-2 border-yellow-500/30 rounded-lg p-4">
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="font-bold text-lg">Abonnement Premium</h3>
-                  <Badge className="bg-gradient-to-r from-primary to-accent text-white font-bold">
-                    4,99$ CAD/mois
+                  <h3 className="font-bold text-lg">Club Select</h3>
+                  <Badge className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-black font-bold">
+                    19,99$ CAD/mois
                   </Badge>
                 </div>
                 <p className="text-sm mb-3">

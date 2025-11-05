@@ -39,7 +39,7 @@ serve(async (req) => {
       customer_email: customerId ? undefined : user.email,
       line_items: [
         {
-          price: "price_1SNcUWARiAO4VbXUJAS2uu8E",
+          price: "price_1SPugQARiAO4VbXUnfktoGBN", // Club Select 19.99$ monthly
           quantity: 1,
         },
       ],
