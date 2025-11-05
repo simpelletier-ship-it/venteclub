@@ -175,6 +175,24 @@ const BusinessDetails = () => {
     }
   }, [hasPremium, user?.id]);
 
+  // Charger les coordonnées du vendeur si chat déverrouillé ou premium
+  useEffect(() => {
+    if (user && business && (hasUnlockedChat || hasPremium) && !sellerContact) {
+      console.log('[SELLER CONTACT] Loading seller contact info...');
+      supabase
+        .from('seller_contacts')
+        .select('email, phone')
+        .eq('seller_id', business.seller_id)
+        .maybeSingle()
+        .then(({ data }) => {
+          if (data) {
+            setSellerContact(data);
+            console.log('[SELLER CONTACT] Contact loaded successfully');
+          }
+        });
+    }
+  }, [hasUnlockedChat, hasPremium, business, user]);
+
   const fetchPhotos = async () => {
     if (!businessId) return;
     
@@ -460,7 +478,18 @@ const BusinessDetails = () => {
       // 3. Marquer comme déverrouillé localement
       setHasUnlockedChat(true);
       
-      // 4. Recharger les limites de conversation
+      // 4. Charger les coordonnées du vendeur
+      const { data: contact } = await supabase
+        .from('seller_contacts')
+        .select('email, phone')
+        .eq('seller_id', business.seller_id)
+        .maybeSingle();
+      
+      if (contact) {
+        setSellerContact(contact);
+      }
+      
+      // 5. Recharger les limites de conversation
       await checkConversationLimits(user.id);
       
       toast({
@@ -1170,55 +1199,30 @@ const BusinessDetails = () => {
                 {/* Chat Section - Affiché seulement si déverrouillé ou Premium ou vendeur */}
                 {user && business && (isSeller || hasPremium || hasUnlockedChat) && (
                   <div className="border-t pt-6 mt-6">
-                    <Card className="bg-gradient-to-br from-primary/5 via-background to-secondary/5 border-2 border-primary/20 shadow-lg">
-                      <CardContent className="p-6">
-                        <div className="flex items-center gap-3 mb-6 pb-4 border-b border-border/50">
-                          <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                            <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                            </svg>
-                          </div>
-                          <div className="flex-1">
-                            <h2 className="text-xl font-bold text-foreground">
-                              💬 Messagerie
-                            </h2>
-                            <p className="text-sm text-muted-foreground">
-                              {isSeller ? "Vos conversations" : "Discutez avec le vendeur"}
-                            </p>
-                          </div>
-                          {!isSeller && (
-                            <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">
-                              {hasPremium ? "Illimité" : "Déverrouillé"}
-                            </Badge>
-                          )}
-                        </div>
-                        
-                        {!isSeller ? (
-                          <ChatBox
-                            businessId={businessId}
-                            currentUserId={user.id}
-                            otherUserId={business.seller_id}
-                            otherUserName={
-                              sellerProfile?.full_name || 
-                              (sellerProfile?.first_name && sellerProfile?.last_name 
-                                ? `${sellerProfile.first_name} ${sellerProfile.last_name}` 
-                                : sellerProfile?.email?.split('@')[0] || "Vendeur")
-                            }
-                            businessTitle={business.title}
-                          />
-                        ) : (
-                          <SellerChatSection 
-                            businessId={businessId}
-                            sellerId={user.id}
-                          />
-                        )}
-                      </CardContent>
-                    </Card>
+                    {!isSeller ? (
+                      <ChatBox
+                        businessId={businessId}
+                        currentUserId={user.id}
+                        otherUserId={business.seller_id}
+                        otherUserName={
+                          sellerProfile?.full_name || 
+                          (sellerProfile?.first_name && sellerProfile?.last_name 
+                            ? `${sellerProfile.first_name} ${sellerProfile.last_name}` 
+                            : sellerProfile?.email?.split('@')[0] || "Vendeur")
+                        }
+                        businessTitle={business.title}
+                      />
+                    ) : (
+                      <SellerChatSection 
+                        businessId={businessId}
+                        sellerId={user.id}
+                      />
+                    )}
                   </div>
                 )}
 
                 {/* Informations du vendeur - Affichées APRÈS le chat si l'utilisateur a accès */}
-                {!isSeller && user && hasAccess && sellerContact && (
+                {!isSeller && user && (hasPremium || hasUnlockedChat) && sellerContact && (
                   <div className="border-t pt-6 mt-6">
                     <div className="bg-gradient-to-br from-primary/5 to-secondary/5 border-2 border-primary/20 rounded-xl p-6 max-w-md mx-auto">
                       <div className="text-center mb-4">
