@@ -1047,11 +1047,6 @@ const BusinessDetails = () => {
                           {/* Effet de brillance animé */}
                           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-yellow-500/10 to-transparent animate-[slide-in-right_3s_ease-in-out_infinite]" />
                           
-                          {/* Badge Premium */}
-                          <div className="absolute -top-1 -right-1 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black px-4 py-1.5 rounded-bl-lg rounded-tr-lg text-xs font-bold tracking-wider shadow-lg">
-                            ✨ EXCLUSIF
-                          </div>
-                          
                           <div className="relative z-10">
                             <div className="mb-6 text-center">
                               {/* Icône premium */}
@@ -1176,6 +1171,120 @@ const BusinessDetails = () => {
                         businessId={businessId}
                         sellerId={user.id}
                       />
+                    )}
+                  </div>
+                )}
+
+                {/* Section Club Select - Affichée après le chat */}
+                {!hasAccess && !isSeller && (
+                  <div className="border-t pt-6 mt-6">
+                    {!user ? (
+                      <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30 border-2 border-green-200 dark:border-green-800 rounded-xl p-6 text-center max-w-md mx-auto">
+                        <div className="mb-4">
+                          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 dark:bg-green-900 mb-3">
+                            <svg className="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                            </svg>
+                          </div>
+                          <h3 className="text-xl font-bold text-green-900 dark:text-green-100 mb-2">
+                            Discutez gratuitement avec le vendeur!
+                          </h3>
+                          <p className="text-green-700 dark:text-green-300 text-sm mb-4">
+                            {!user 
+                              ? "Connectez-vous pour accéder au chat gratuit avec le vendeur"
+                              : "Rejoignez le Club Select pour accéder aux coordonnées de tous les vendeurs"
+                            }
+                          </p>
+                        </div>
+                        <ul className="space-y-3 mb-6 text-left">
+                          <li className="flex items-start gap-2 text-sm text-green-800 dark:text-green-200">
+                            <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                            <span><strong>1 conversation gratuite</strong> toutes les 24 heures</span>
+                          </li>
+                          <li className="flex items-start gap-2 text-sm text-green-800 dark:text-green-200">
+                            <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                            <span>Chat en temps réel avec tous les vendeurs</span>
+                          </li>
+                          <li className="flex items-start gap-2 text-sm text-green-800 dark:text-green-200">
+                            <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                            <span>Aucune carte de crédit requise</span>
+                          </li>
+                        </ul>
+                        <Button 
+                          onClick={() => navigate("/auth")}
+                          className="w-full bg-green-600 hover:bg-green-700 text-white"
+                          size="lg"
+                        >
+                          Se connecter maintenant
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="relative bg-gradient-to-br from-gray-900 via-black to-gray-900 border-2 border-yellow-500/30 rounded-xl p-8 max-w-md mx-auto overflow-hidden shadow-2xl">
+                        {/* Effet de brillance animé */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-yellow-500/10 to-transparent animate-[slide-in-right_3s_ease-in-out_infinite]" />
+                        
+                        <div className="relative z-10">
+                          <div className="mb-6 text-center">
+                            {/* Icône premium */}
+                            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-yellow-400 via-yellow-500 to-yellow-600 mb-4 shadow-lg">
+                              <svg className="w-8 h-8 text-black" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                              </svg>
+                            </div>
+                            
+                            <h4 className="font-bold text-2xl mb-2 bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 bg-clip-text text-transparent">
+                              Club Select
+                            </h4>
+                            <div className="text-5xl font-extrabold text-white mb-2 tracking-tight">
+                              19,99$
+                            </div>
+                            <p className="text-sm text-gray-400 font-medium">par mois · annulez à tout moment</p>
+                          </div>
+                          
+                          <div className="space-y-4 mb-6">
+                            <div className="flex items-start gap-3 bg-white/5 backdrop-blur-sm rounded-lg p-3 border border-yellow-500/20">
+                              <div className="flex-shrink-0 w-6 h-6 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center">
+                                <svg className="w-4 h-4 text-black" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                </svg>
+                              </div>
+                              <span className="text-white font-semibold text-sm">Accès illimité à tous les vendeurs</span>
+                            </div>
+                            
+                            <div className="flex items-start gap-3 bg-white/5 backdrop-blur-sm rounded-lg p-3 border border-yellow-500/20">
+                              <div className="flex-shrink-0 w-6 h-6 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center">
+                                <svg className="w-4 h-4 text-black" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                </svg>
+                              </div>
+                              <span className="text-white font-semibold text-sm">Conversations illimitées 24/7</span>
+                            </div>
+                            
+                            <div className="flex items-start gap-3 bg-white/5 backdrop-blur-sm rounded-lg p-3 border border-yellow-500/20">
+                              <div className="flex-shrink-0 w-6 h-6 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center">
+                                <svg className="w-4 h-4 text-black" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                </svg>
+                              </div>
+                              <span className="text-white font-semibold text-sm">Emails et téléphones débloqués</span>
+                            </div>
+                          </div>
+                          
+                          <Button 
+                            size="lg" 
+                            className="w-full bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 hover:from-yellow-500 hover:via-yellow-600 hover:to-yellow-700 text-black font-bold text-base shadow-xl hover:shadow-2xl transition-all duration-300 border-0 hover:scale-105"
+                            onClick={handlePremiumCheckout}
+                          >
+                            Rejoindre le Club Select
+                          </Button>
+                        </div>
+                      </div>
                     )}
                   </div>
                 )}
