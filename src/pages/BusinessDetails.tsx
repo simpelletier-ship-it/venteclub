@@ -44,6 +44,9 @@ const BusinessDetails = () => {
   const [conversationsRemaining, setConversationsRemaining] = useState<number>(1);
   const [hoursUntilReset, setHoursUntilReset] = useState<number>(0);
   const [minutesUntilReset, setMinutesUntilReset] = useState<number>(0);
+  const [isSeller, setIsSeller] = useState(false);
+  const [hasUnlockedChat, setHasUnlockedChat] = useState(false);
+  const [isUnlockingChat, setIsUnlockingChat] = useState(false);
 
   useEffect(() => {
     const initialize = async () => {
@@ -75,6 +78,12 @@ const BusinessDetails = () => {
         
         console.log('[INIT] Checking conversation limits');
         await checkConversationLimits(session.user.id);
+        
+        console.log('[INIT] Checking if user is seller');
+        setIsSeller(session.user.id === businessData.seller_id);
+        
+        console.log('[INIT] Checking if chat is unlocked');
+        await checkChatUnlocked(session.user.id, businessData.id);
         
         console.log('[INIT] Then checking access for user');
         await checkAccess(session.user.id, businessData.id);
@@ -348,6 +357,66 @@ const BusinessDetails = () => {
     }
   };
 
+  const checkChatUnlocked = async (userId: string, checkBusinessId: string) => {
+    try {
+      // Vérifier s'il existe déjà des messages pour cette conversation
+      const { data, error } = await supabase
+        .from('messages')
+        .select('id')
+        .eq('business_id', checkBusinessId)
+        .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`)
+        .limit(1);
+      
+      if (error) {
+        console.error('Error checking chat unlock:', error);
+        return;
+      }
+      
+      // Si des messages existent, le chat est déverrouillé à vie
+      setHasUnlockedChat(data && data.length > 0);
+    } catch (error) {
+      console.error('Error in checkChatUnlocked:', error);
+    }
+  };
+
+  const handleUnlockChat = async () => {
+    if (!user || !businessId) return;
+    
+    // Vérifier si l'utilisateur a des conversations restantes
+    if (conversationsRemaining <= 0 && !hasPremium) {
+      toast({
+        variant: "destructive",
+        title: "Limite atteinte",
+        description: "Vous avez atteint votre limite quotidienne. Rejoignez le Club Select pour un accès illimité.",
+      });
+      return;
+    }
+    
+    setIsUnlockingChat(true);
+    try {
+      // Déverrouiller le chat en créant un message initial vide (ou un message système)
+      // Cela marquera la conversation comme déverrouillée
+      setHasUnlockedChat(true);
+      
+      // Recharger les limites de conversation
+      await checkConversationLimits(user.id);
+      
+      toast({
+        title: "Chat déverrouillé",
+        description: "Vous pouvez maintenant échanger avec le vendeur sans limite!",
+      });
+    } catch (error: any) {
+      console.error('Error unlocking chat:', error);
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: "Impossible de déverrouiller le chat.",
+      });
+    } finally {
+      setIsUnlockingChat(false);
+    }
+  };
+
   const getNextAccessTime = async () => {
     if (!user) return;
     
@@ -490,7 +559,7 @@ const BusinessDetails = () => {
     );
   }
 
-  const isSeller = user?.id === business.seller_id;
+  // isSeller est maintenant géré par le state
 
   // Structured data for business listing - Enhanced for SEO
   const businessStructuredData = business ? {
@@ -1131,41 +1200,85 @@ const BusinessDetails = () => {
                   </div>
                 )}
 
-                {/* Chat Section - Gratuit pour tous les utilisateurs authentifiés */}
-                {user && business && (
+                {/* Section Déverrouillage du Chat - Affichée AVANT le chat si pas encore déverrouillé */}
+                {user && business && !isSeller && !hasPremium && !hasUnlockedChat && (
+                  <div className="border-t pt-6 mt-6">
+                    <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30 border-2 border-green-200 dark:border-green-800 rounded-xl p-6 text-center max-w-md mx-auto">
+                      <div className="mb-4">
+                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 dark:bg-green-900 mb-3">
+                          <svg className="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                          </svg>
+                        </div>
+                        <h3 className="text-xl font-bold text-green-900 dark:text-green-100 mb-2">
+                          Accès Gratuit Limité
+                        </h3>
+                        <p className="text-green-700 dark:text-green-300 text-sm mb-4">
+                          Déverrouillez le chat avec ce vendeur gratuitement
+                        </p>
+                      </div>
+                      <ul className="space-y-3 mb-6 text-left">
+                        <li className="flex items-start gap-2 text-sm text-green-800 dark:text-green-200">
+                          <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                          </svg>
+                          <span><strong>Messages illimités</strong> avec ce vendeur une fois déverrouillé</span>
+                        </li>
+                        <li className="flex items-start gap-2 text-sm text-green-800 dark:text-green-200">
+                          <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                          </svg>
+                          <span><strong>Déverrouillé à vie</strong> pour cette annonce</span>
+                        </li>
+                        <li className="flex items-start gap-2 text-sm text-green-800 dark:text-green-200">
+                          <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                          </svg>
+                          <span><strong>1 annonceur par jour</strong> ({conversationsRemaining} restant{conversationsRemaining > 1 ? 's' : ''})</span>
+                        </li>
+                      </ul>
+                      <Button 
+                        onClick={handleUnlockChat}
+                        disabled={isUnlockingChat || conversationsRemaining <= 0}
+                        className="w-full bg-green-600 hover:bg-green-700 text-white"
+                        size="lg"
+                      >
+                        {isUnlockingChat ? "Déverrouillage..." : conversationsRemaining <= 0 ? "Limite atteinte" : "Déverrouiller le chat gratuitement"}
+                      </Button>
+                      {conversationsRemaining <= 0 && (
+                        <p className="text-xs text-green-700 dark:text-green-300 mt-2">
+                          Prochaine utilisation dans {hoursUntilReset}h{minutesUntilReset}min
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Chat Section - Affiché seulement si déverrouillé ou Premium ou vendeur */}
+                {user && business && (isSeller || hasPremium || hasUnlockedChat) && (
                   <div className="border-t pt-6 mt-6">
                     <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
                       💬 Messagerie avec le vendeur
-                      <Badge variant="secondary" className="text-xs">
-                        {hasPremium ? "Illimité" : `${conversationsRemaining}/1 annonceur par jour`}
-                      </Badge>
+                      {!isSeller && (
+                        <Badge variant="secondary" className="text-xs">
+                          {hasPremium ? "Illimité" : "Déverrouillé"}
+                        </Badge>
+                      )}
                     </h2>
                     
                     {!isSeller ? (
-                      <div className="space-y-4">
-                        {/* Alerte de limite de conversations */}
-                        {!hasPremium && (
-                          <ConversationLimitAlert
-                            conversationsRemaining={conversationsRemaining}
-                            hasClubSelect={hasPremium}
-                            hoursUntilReset={hoursUntilReset}
-                            minutesUntilReset={minutesUntilReset}
-                          />
-                        )}
-                        
-                        <ChatBox
-                          businessId={businessId}
-                          currentUserId={user.id}
-                          otherUserId={business.seller_id}
-                          otherUserName={
-                            sellerProfile?.full_name || 
-                            (sellerProfile?.first_name && sellerProfile?.last_name 
-                              ? `${sellerProfile.first_name} ${sellerProfile.last_name}` 
-                              : sellerProfile?.email?.split('@')[0] || "Vendeur")
-                          }
-                          businessTitle={business.title}
-                        />
-                      </div>
+                      <ChatBox
+                        businessId={businessId}
+                        currentUserId={user.id}
+                        otherUserId={business.seller_id}
+                        otherUserName={
+                          sellerProfile?.full_name || 
+                          (sellerProfile?.first_name && sellerProfile?.last_name 
+                            ? `${sellerProfile.first_name} ${sellerProfile.last_name}` 
+                            : sellerProfile?.email?.split('@')[0] || "Vendeur")
+                        }
+                        businessTitle={business.title}
+                      />
                     ) : (
                       <SellerChatSection 
                         businessId={businessId}
@@ -1175,56 +1288,10 @@ const BusinessDetails = () => {
                   </div>
                 )}
 
-                {/* Section Club Select - Affichée après le chat */}
-                {!hasAccess && !isSeller && (
+                {/* Section Club Select - Affichée seulement quand la limite quotidienne est atteinte */}
+                {!hasAccess && !isSeller && user && conversationsRemaining === 0 && !hasPremium && (
                   <div className="border-t pt-6 mt-6">
-                    {!user ? (
-                      <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30 border-2 border-green-200 dark:border-green-800 rounded-xl p-6 text-center max-w-md mx-auto">
-                        <div className="mb-4">
-                          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 dark:bg-green-900 mb-3">
-                            <svg className="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                            </svg>
-                          </div>
-                          <h3 className="text-xl font-bold text-green-900 dark:text-green-100 mb-2">
-                            Discutez gratuitement avec le vendeur!
-                          </h3>
-                          <p className="text-green-700 dark:text-green-300 text-sm mb-4">
-                            {!user 
-                              ? "Connectez-vous pour accéder au chat gratuit avec le vendeur"
-                              : "Rejoignez le Club Select pour accéder aux coordonnées de tous les vendeurs"
-                            }
-                          </p>
-                        </div>
-                        <ul className="space-y-3 mb-6 text-left">
-                          <li className="flex items-start gap-2 text-sm text-green-800 dark:text-green-200">
-                            <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                            </svg>
-                            <span><strong>Débloquez le chat avec 1 annonceur par jour</strong> (messages illimités)</span>
-                          </li>
-                          <li className="flex items-start gap-2 text-sm text-green-800 dark:text-green-200">
-                            <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                            </svg>
-                            <span>Chat en temps réel avec tous les vendeurs</span>
-                          </li>
-                          <li className="flex items-start gap-2 text-sm text-green-800 dark:text-green-200">
-                            <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                            </svg>
-                            <span>Aucune carte de crédit requise</span>
-                          </li>
-                        </ul>
-                        <Button 
-                          onClick={() => navigate("/auth")}
-                          className="w-full bg-green-600 hover:bg-green-700 text-white"
-                          size="lg"
-                        >
-                          Se connecter maintenant
-                        </Button>
-                      </div>
-                    ) : (
+                    {(
                       <div className="relative bg-gradient-to-br from-gray-900 via-black to-gray-900 border-2 border-yellow-500/30 rounded-xl p-8 max-w-md mx-auto overflow-hidden shadow-2xl">
                         {/* Effet de brillance animé */}
                         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-yellow-500/10 to-transparent animate-[slide-in-right_3s_ease-in-out_infinite]" />
