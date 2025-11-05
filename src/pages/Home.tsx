@@ -227,20 +227,37 @@ const Home = () => {
           <div className="text-center mb-8">
             <h2 className="text-4xl font-display font-bold">Questions fréquentes</h2>
           </div>
-          <Accordion type="single" collapsible className="w-full">
+          <Accordion type="single" collapsible className="w-full mb-8">
             <AccordionItem value="item-1">
               <AccordionTrigger>Comment acheter une entreprise au Québec?</AccordionTrigger>
               <AccordionContent>
                 L'achat d'une entreprise commence par l'identification d'opportunités sur Vente.club. Contactez les vendeurs, effectuez une due diligence, négociez le prix et finalisez avec des professionnels.
               </AccordionContent>
             </AccordionItem>
-            <AccordionItem value="item-3">
+            <AccordionItem value="item-2">
               <AccordionTrigger>Comment vendre mon entreprise?</AccordionTrigger>
               <AccordionContent>
                 Créez un compte gratuit, soumettez votre annonce avec les détails de votre entreprise. Notre équipe l'approuvera après avoir vérifié que l'annonce est conforme à nos règlements.
               </AccordionContent>
             </AccordionItem>
+            <AccordionItem value="item-3">
+              <AccordionTrigger>À quoi sert l'abonnement Premium?</AccordionTrigger>
+              <AccordionContent>
+                L'abonnement Premium vous permet de mettre en vedette vos annonces pour augmenter leur visibilité sur la plateforme. Les annonces en vedette apparaissent en priorité dans les résultats de recherche et sur la page d'accueil, maximisant ainsi vos chances de trouver un acheteur rapidement.
+              </AccordionContent>
+            </AccordionItem>
           </Accordion>
+          <div className="text-center">
+            <Button 
+              variant="outline"
+              size="lg"
+              onClick={() => navigate("/faq")}
+              className="h-12 px-8 text-base font-semibold"
+            >
+              Voir toutes les questions
+              <ArrowRight className="ml-2 w-4 h-4" />
+            </Button>
+          </div>
         </div>
       </section>
 
