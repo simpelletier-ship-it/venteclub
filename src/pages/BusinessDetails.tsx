@@ -1089,15 +1089,21 @@ const BusinessDetails = () => {
                   </div>
                 )}
 
-                {/* Chat Section - Free for all authenticated users */}
-                {user && business && !isSeller && (
-                  <>
-                    {/* Buyer view - chat is always available */}
-                    {true && (
-                      <div className="border-t pt-6 mt-6">
-                        <h2 className="text-xl font-semibold mb-4">
-                          Messagerie avec le vendeur
-                        </h2>
+                {/* Chat Section - Gratuit pour tous les utilisateurs authentifiés */}
+                {user && business && (
+                  <div className="border-t pt-6 mt-6">
+                    <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                      💬 Messagerie avec le vendeur
+                      <Badge variant="secondary" className="text-xs">Gratuit</Badge>
+                    </h2>
+                    
+                    {!isSeller ? (
+                      <div className="space-y-4">
+                        <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 p-4 rounded-lg border border-green-200 dark:border-green-800">
+                          <p className="text-sm text-green-800 dark:text-green-200">
+                            ✅ Le chat est gratuit et accessible à tous les utilisateurs connectés
+                          </p>
+                        </div>
                         <ChatBox
                           businessId={businessId}
                           currentUserId={user.id}
@@ -1111,16 +1117,13 @@ const BusinessDetails = () => {
                           businessTitle={business.title}
                         />
                       </div>
-                    )}
-                    
-                    {/* Seller view - show all buyers who have access */}
-                    {isSeller && businessId && (
+                    ) : (
                       <SellerChatSection 
                         businessId={businessId}
                         sellerId={user.id}
                       />
                     )}
-                  </>
+                  </div>
                 )}
 
                 {/* Share button at the end of the listing */}
