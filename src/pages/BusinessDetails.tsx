@@ -820,27 +820,6 @@ const BusinessDetails = () => {
                 {/* Financial Information Grid - Only show for non-property businesses */}
                 {!business.property_type && (
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {business.annual_revenue && (
-                      <div className="bg-muted/30 p-4 rounded-lg">
-                        <div className="flex items-center gap-2 text-muted-foreground mb-1">
-                          <TrendingUp className="w-4 h-4" />
-                          <span className="text-sm">Chiffre d'affaires annuel</span>
-                        </div>
-                        <div className="text-xl font-semibold">
-                          {business.annual_revenue.toLocaleString()} CAD
-                        </div>
-                      </div>
-                    )}
-                    {business.profit_margin && (
-                      <div className="bg-muted/30 p-4 rounded-lg">
-                        <div className="text-sm text-muted-foreground mb-1">
-                          Marge de profit
-                        </div>
-                        <div className="text-xl font-semibold">
-                          {business.profit_margin}%
-                        </div>
-                      </div>
-                    )}
                     {business.employees_count && (
                       <div className="bg-muted/30 p-4 rounded-lg">
                         <div className="flex items-center gap-2 text-muted-foreground mb-1">
@@ -1182,18 +1161,7 @@ const BusinessDetails = () => {
                   </div>
                 )}
 
-                {/* Share button */}
-                <div className="border-t pt-6 mt-6 flex justify-center">
-                  {businessId && (
-                    <ShareButton 
-                      title={business.title} 
-                      slug={business.slug} 
-                      description={business.description}
-                    />
-                  )}
-                </div>
-
-                {/* Calculateur de financement - Tout en bas */}
+                {/* Calculateur de financement */}
                 {business.asking_price > 0 && (
                   <div className="border-t pt-6 mt-6">
                     <Collapsible open={isCalculatorOpen} onOpenChange={setIsCalculatorOpen}>
@@ -1225,6 +1193,17 @@ const BusinessDetails = () => {
                     </Collapsible>
                   </div>
                 )}
+
+                {/* Share button - Après la calculatrice */}
+                <div className="border-t pt-6 mt-6 flex justify-center">
+                  {businessId && (
+                    <ShareButton 
+                      title={business.title} 
+                      slug={business.slug} 
+                      description={business.description}
+                    />
+                  )}
+                </div>
               </div>
             </div>
           </div>

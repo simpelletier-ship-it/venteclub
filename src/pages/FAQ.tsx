@@ -65,10 +65,18 @@ const FAQ = () => {
             <Accordion type="single" collapsible className="space-y-4">
               <AccordionItem value="premium" className="border rounded-lg px-6">
                 <AccordionTrigger className="text-left">
-                  À quoi sert l'abonnement Premium ?
+                  À quoi sert l'abonnement Club Select ?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground">
-                  L'abonnement Premium à 19,99$/mois vous permet d'avoir des conversations illimitées (vs 1 par jour gratuit), d'accéder aux coordonnées de TOUS les vendeurs sans restriction, et de bénéficier d'un chat illimité. C'est l'outil idéal pour les acheteurs actifs recherchant plusieurs opportunités et les vendeurs sérieux souhaitant maximiser leur exposition.
+                  <p className="mb-3">
+                    L'abonnement Club Select à 19,99$/mois vous permet d'avoir des conversations illimitées (vs 1 par 24h gratuit), d'accéder aux coordonnées de TOUS les vendeurs sans restriction, et de bénéficier d'un chat illimité. 
+                  </p>
+                  <p className="mb-3">
+                    <strong>Pourquoi un abonnement payant ?</strong> Le Club Select garantit des acheteurs sérieux et engagés, ce qui permet aux vendeurs de recevoir des demandes de qualité. Cela filtre le spam, les robots automatiques et réduit au maximum les courtiers opportunistes.
+                  </p>
+                  <p>
+                    C'est l'outil idéal pour les acheteurs actifs recherchant plusieurs opportunités et souhaitant être pris au sérieux par les vendeurs.
+                  </p>
                 </AccordionContent>
               </AccordionItem>
 
@@ -77,7 +85,7 @@ const FAQ = () => {
                   Combien de conversations puis-je avoir gratuitement ?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground">
-                  Le plan gratuit vous permet de démarrer 1 nouvelle conversation par jour avec un vendeur différent. Une fois une conversation démarrée, vous pouvez continuer à échanger sans limite avec ce vendeur. La limite se réinitialise chaque jour à minuit. Pour des conversations illimitées, abonnez-vous au Premium à 19,99$/mois.
+                  Le plan gratuit vous permet de démarrer 1 nouvelle conversation toutes les 24 heures avec un vendeur différent. Une fois une conversation démarrée, vous pouvez continuer à échanger sans limite avec ce vendeur. La limite se réinitialise 24 heures après votre dernière conversation. Pour des conversations illimitées et accès aux coordonnées complètes, rejoignez le Club Select à 19,99$/mois.
                 </AccordionContent>
               </AccordionItem>
 
