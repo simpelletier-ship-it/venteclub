@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Lock, MapPin, TrendingUp, Users, Calendar, Eye, Calculator, Phone, Mail, UserCircle } from "lucide-react";
+import { ArrowLeft, Lock, MapPin, TrendingUp, Users, Calendar, Eye, Calculator, Phone, Mail, UserCircle, ChevronLeft, ChevronRight, ZoomIn, ZoomOut, X } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { FavoriteButton } from "@/components/FavoriteButton";
@@ -48,6 +48,7 @@ const BusinessDetails = () => {
   const [isSeller, setIsSeller] = useState(false);
   const [hasUnlockedChat, setHasUnlockedChat] = useState(false);
   const [isUnlockingChat, setIsUnlockingChat] = useState(false);
+  const [imageZoom, setImageZoom] = useState(1);
 
   useEffect(() => {
     const initialize = async () => {
@@ -192,6 +193,31 @@ const BusinessDetails = () => {
         });
     }
   }, [hasUnlockedChat, hasPremium, business, user]);
+
+  // Navigation clavier pour la galerie
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (selectedPhotoIndex === null) return;
+
+      if (e.key === 'ArrowLeft' && selectedPhotoIndex > 0) {
+        setSelectedPhotoIndex(selectedPhotoIndex - 1);
+        setImageZoom(1);
+      } else if (e.key === 'ArrowRight' && selectedPhotoIndex < photos.length - 1) {
+        setSelectedPhotoIndex(selectedPhotoIndex + 1);
+        setImageZoom(1);
+      } else if (e.key === 'Escape') {
+        setSelectedPhotoIndex(null);
+        setImageZoom(1);
+      } else if (e.key === '+' || e.key === '=') {
+        setImageZoom(Math.min(3, imageZoom + 0.25));
+      } else if (e.key === '-') {
+        setImageZoom(Math.max(1, imageZoom - 0.25));
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedPhotoIndex, photos.length, imageZoom]);
 
   const fetchPhotos = async () => {
     if (!businessId) return;
@@ -787,41 +813,128 @@ const BusinessDetails = () => {
                   </div>
                 </div>
 
-                {/* Photo Lightbox */}
+                {/* Photo Lightbox avec Zoom et Navigation */}
                 {selectedPhotoIndex !== null && (
-                  <Dialog open={true} onOpenChange={() => setSelectedPhotoIndex(null)}>
-                    <DialogContent className="max-w-4xl w-full p-0">
-                      <div className="relative bg-black">
-                         <img
-                          src={photos[selectedPhotoIndex].photo_url}
-                          alt={`Photo ${selectedPhotoIndex + 1}`}
-                          className="w-full h-auto max-h-[80vh] object-contain"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.onerror = null;
-                            target.src = 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&auto=format&fit=crop';
-                          }}
-                        />
-                        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
-                          {selectedPhotoIndex > 0 && (
-                            <Button
-                              variant="secondary"
-                              onClick={() => setSelectedPhotoIndex(selectedPhotoIndex - 1)}
-                            >
-                              Précédent
-                            </Button>
-                          )}
-                          {selectedPhotoIndex < photos.length - 1 && (
-                            <Button
-                              variant="secondary"
-                              onClick={() => setSelectedPhotoIndex(selectedPhotoIndex + 1)}
-                            >
-                              Suivant
-                            </Button>
-                          )}
+                  <Dialog open={true} onOpenChange={() => {
+                    setSelectedPhotoIndex(null);
+                    setImageZoom(1);
+                  }}>
+                    <DialogContent className="max-w-7xl w-full h-[90vh] p-0 bg-black/95">
+                      <div className="relative w-full h-full flex flex-col">
+                        {/* Barre d'outils supérieure */}
+                        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 bg-black/70 backdrop-blur-sm rounded-full px-6 py-3">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-white hover:bg-white/20"
+                            onClick={() => setImageZoom(Math.max(1, imageZoom - 0.25))}
+                            disabled={imageZoom <= 1}
+                          >
+                            <ZoomOut className="w-5 h-5" />
+                          </Button>
+                          <span className="text-white font-medium min-w-[60px] text-center">
+                            {Math.round(imageZoom * 100)}%
+                          </span>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-white hover:bg-white/20"
+                            onClick={() => setImageZoom(Math.min(3, imageZoom + 0.25))}
+                            disabled={imageZoom >= 3}
+                          >
+                            <ZoomIn className="w-5 h-5" />
+                          </Button>
+                          <div className="w-px h-6 bg-white/30 mx-2" />
+                          <span className="text-white font-medium">
+                            {selectedPhotoIndex + 1} / {photos.length}
+                          </span>
                         </div>
-                        <div className="absolute top-4 right-4 text-white bg-black/50 px-3 py-1 rounded-full">
-                          {selectedPhotoIndex + 1} / {photos.length}
+
+                        {/* Bouton fermer */}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="absolute top-4 right-4 z-50 text-white hover:bg-white/20 rounded-full"
+                          onClick={() => {
+                            setSelectedPhotoIndex(null);
+                            setImageZoom(1);
+                          }}
+                        >
+                          <X className="w-6 h-6" />
+                        </Button>
+
+                        {/* Image principale avec zoom */}
+                        <div className="flex-1 flex items-center justify-center overflow-hidden p-4">
+                          <img
+                            src={photos[selectedPhotoIndex].photo_url}
+                            alt={`Photo ${selectedPhotoIndex + 1}`}
+                            className="max-w-full max-h-full object-contain transition-transform duration-200"
+                            style={{ transform: `scale(${imageZoom})` }}
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.onerror = null;
+                              target.src = 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&auto=format&fit=crop';
+                            }}
+                          />
+                        </div>
+
+                        {/* Boutons de navigation gauche/droite */}
+                        {selectedPhotoIndex > 0 && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="absolute left-4 top-1/2 -translate-y-1/2 z-40 w-12 h-12 rounded-full bg-black/70 backdrop-blur-sm text-white hover:bg-white/20 hover:scale-110 transition-all"
+                            onClick={() => {
+                              setSelectedPhotoIndex(selectedPhotoIndex - 1);
+                              setImageZoom(1);
+                            }}
+                          >
+                            <ChevronLeft className="w-8 h-8" />
+                          </Button>
+                        )}
+                        {selectedPhotoIndex < photos.length - 1 && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="absolute right-4 top-1/2 -translate-y-1/2 z-40 w-12 h-12 rounded-full bg-black/70 backdrop-blur-sm text-white hover:bg-white/20 hover:scale-110 transition-all"
+                            onClick={() => {
+                              setSelectedPhotoIndex(selectedPhotoIndex + 1);
+                              setImageZoom(1);
+                            }}
+                          >
+                            <ChevronRight className="w-8 h-8" />
+                          </Button>
+                        )}
+
+                        {/* Barre de miniatures en bas */}
+                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-4">
+                          <div className="flex gap-2 overflow-x-auto pb-2 justify-center">
+                            {photos.map((photo, index) => (
+                              <button
+                                key={photo.id}
+                                onClick={() => {
+                                  setSelectedPhotoIndex(index);
+                                  setImageZoom(1);
+                                }}
+                                className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
+                                  index === selectedPhotoIndex
+                                    ? 'border-primary scale-110 shadow-lg shadow-primary/50'
+                                    : 'border-white/30 opacity-60 hover:opacity-100 hover:border-white/60'
+                                }`}
+                              >
+                                <img
+                                  src={photo.photo_url}
+                                  alt={`Miniature ${index + 1}`}
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    const target = e.target as HTMLImageElement;
+                                    target.onerror = null;
+                                    target.src = 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=200&auto=format&fit=crop';
+                                  }}
+                                />
+                              </button>
+                            ))}
+                          </div>
                         </div>
                       </div>
                     </DialogContent>
