@@ -1410,19 +1410,23 @@ const BusinessDetails = () => {
                           <p className="text-sm text-muted-foreground">
                             {isSeller 
                               ? "Gérez vos conversations avec les acheteurs intéressés" 
-                              : "Discutez directement avec le vendeur via la messagerie"}
+                              : "Discutez directement avec le vendeur"}
                           </p>
                         </div>
                       </div>
                       <Button
-                        onClick={() => navigate('/messages')}
+                        onClick={() => {
+                          // Rediriger vers la messagerie avec la conversation spécifique
+                          const conversationParam = business.seller_id ? `?conversation=${business.id}` : '';
+                          navigate(`/messages${conversationParam}`);
+                        }}
                         className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-6 text-base"
                         size="lg"
                       >
                         <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                         </svg>
-                        {isSeller ? "Voir mes conversations" : "Ouvrir la messagerie"}
+                        {isSeller ? "Voir mes conversations" : "Ouvrir le chat"}
                       </Button>
                     </div>
                   </div>
