@@ -10,19 +10,14 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { DisclaimerAlert } from "@/components/DisclaimerAlert";
-import ReCAPTCHA from "react-google-recaptcha";
 import { useFingerprint } from "@/hooks/useFingerprint";
-import { Shield, AlertTriangle } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-
-// Clé publique reCAPTCHA v2
-const RECAPTCHA_SITE_KEY = "6Lf93wMsAAAAAKlX6GeEsPfLuM7fTmgbBRlh4HcT";
 
 const Auth = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { fingerprint, loading: fpLoading } = useFingerprint();
-  const recaptchaRef = useRef<ReCAPTCHA>(null);
   
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
@@ -32,7 +27,6 @@ const Auth = () => {
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [verificationStep, setVerificationStep] = useState(false);
   const [verificationCode, setVerificationCode] = useState("");
-  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
   const [securityWarning, setSecurityWarning] = useState<string | null>(null);
 
   useEffect(() => {
@@ -66,37 +60,6 @@ const Auth = () => {
       // Valider les données
       const validatedData = loginSchema.parse({ email, password });
 
-      // ⚠️ RECAPTCHA TEMPORAIREMENT DÉSACTIVÉ - À RÉACTIVER ⚠️
-      // Vérifier reCAPTCHA
-      /* TEMPORAIREMENT DÉSACTIVÉ POUR DÉPANNAGE
-      if (!recaptchaToken) {
-        toast({
-          variant: "destructive",
-          title: "Vérification requise",
-          description: "Veuillez compléter la vérification de sécurité.",
-        });
-        setLoading(false);
-        return;
-      }
-
-      // Vérifier le reCAPTCHA côté serveur
-      const { data: recaptchaResult } = await supabase.functions.invoke('verify-recaptcha', {
-        body: { token: recaptchaToken }
-      });
-
-      if (!recaptchaResult?.success) {
-        toast({
-          variant: "destructive",
-          title: "Vérification échouée",
-          description: "La vérification de sécurité a échoué. Veuillez réessayer.",
-        });
-        recaptchaRef.current?.reset();
-        setRecaptchaToken(null);
-        setLoading(false);
-        return;
-      }
-      */
-
       // Vérifier rate limiting
       const { data: rateLimitCheck } = await supabase.functions.invoke('check-rate-limit', {
         body: {
@@ -129,8 +92,6 @@ const Auth = () => {
           title: "Erreur de connexion",
           description: "Email ou mot de passe incorrect.",
         });
-        recaptchaRef.current?.reset();
-        setRecaptchaToken(null);
         setLoading(false);
         return;
       }
@@ -204,37 +165,6 @@ const Auth = () => {
 
       // Valider les données
       const validatedData = signupSchema.parse({ email, password });
-
-      // ⚠️ RECAPTCHA TEMPORAIREMENT DÉSACTIVÉ - À RÉACTIVER ⚠️
-      // Vérifier reCAPTCHA
-      /* TEMPORAIREMENT DÉSACTIVÉ POUR DÉPANNAGE
-      if (!recaptchaToken) {
-        toast({
-          variant: "destructive",
-          title: "Vérification requise",
-          description: "Veuillez compléter la vérification de sécurité.",
-        });
-        setLoading(false);
-        return;
-      }
-
-      // Vérifier le reCAPTCHA côté serveur
-      const { data: recaptchaResult } = await supabase.functions.invoke('verify-recaptcha', {
-        body: { token: recaptchaToken }
-      });
-
-      if (!recaptchaResult?.success) {
-        toast({
-          variant: "destructive",
-          title: "Vérification échouée",
-          description: "La vérification de sécurité a échoué. Veuillez réessayer.",
-        });
-        recaptchaRef.current?.reset();
-        setRecaptchaToken(null);
-        setLoading(false);
-        return;
-      }
-      */
 
       // Vérifier le fingerprint pour détecter les comptes multiples
       if (fingerprint) {
@@ -531,23 +461,6 @@ const Auth = () => {
                     />
                   </div>
                   
-                  {/* reCAPTCHA - TEMPORAIREMENT DÉSACTIVÉ */}
-                  {/* <div className="flex justify-center">
-                    <ReCAPTCHA
-                      ref={recaptchaRef}
-                      sitekey={RECAPTCHA_SITE_KEY}
-                      onChange={(token) => setRecaptchaToken(token)}
-                      onExpired={() => setRecaptchaToken(null)}
-                    />
-                  </div> */}
-                  
-                  <Alert className="bg-orange-500/10 border-orange-500/50">
-                    <AlertTriangle className="h-4 w-4 text-orange-500" />
-                    <AlertDescription className="text-orange-700 dark:text-orange-400">
-                      ⚠️ ReCAPTCHA temporairement désactivé pour dépannage. Réactiver dès que possible.
-                    </AlertDescription>
-                  </Alert>
-                  
                   <Button
                     type="button"
                     variant="link"
@@ -689,23 +602,6 @@ const Auth = () => {
                       className="w-full mt-2"
                     />
                   </div>
-                  
-                  {/* reCAPTCHA - TEMPORAIREMENT DÉSACTIVÉ */}
-                  {/* <div className="flex justify-center">
-                    <ReCAPTCHA
-                      ref={recaptchaRef}
-                      sitekey={RECAPTCHA_SITE_KEY}
-                      onChange={(token) => setRecaptchaToken(token)}
-                      onExpired={() => setRecaptchaToken(null)}
-                    />
-                  </div> */}
-                  
-                  <Alert className="bg-orange-500/10 border-orange-500/50">
-                    <AlertTriangle className="h-4 w-4 text-orange-500" />
-                    <AlertDescription className="text-orange-700 dark:text-orange-400">
-                      ⚠️ ReCAPTCHA temporairement désactivé pour dépannage. Réactiver dès que possible.
-                    </AlertDescription>
-                  </Alert>
                   
                   <div className="space-y-3">
                     <div className="flex items-start space-x-3 p-4 bg-muted/50 border border-border rounded-lg">
