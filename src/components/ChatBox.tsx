@@ -4,11 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Send, Paperclip, X, Download, FileText, Image as ImageIcon, ExternalLink, Mail, Phone, User } from "lucide-react";
+import { Send, Paperclip, X, Download, FileText, Image as ImageIcon, ExternalLink, User, Crown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { QuickMessageTemplates } from "@/components/QuickMessageTemplates";
 import { ProfileCompletionAlert } from "@/components/ProfileCompletionAlert";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 interface Message {
   id: string;
@@ -48,6 +49,7 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
   const [businessSlug, setBusinessSlug] = useState<string | null>(null);
   const [currentUserProfile, setCurrentUserProfile] = useState<any>(null);
   const [isSeller, setIsSeller] = useState(false);
+  const [showPremiumDialog, setShowPremiumDialog] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
@@ -158,6 +160,28 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
       if (data) {
         setSellerContact(data);
       }
+    }
+  };
+
+  const handleViewProfile = async () => {
+    try {
+      // Vérifier si l'utilisateur a un abonnement Premium actif
+      const { data: premiumData } = await supabase.functions.invoke('check-premium-subscription');
+      
+      if (premiumData?.subscribed) {
+        // Membre Club Select - peut voir le profil
+        navigate(`/profile/${otherUserId}`);
+      } else {
+        // Non membre - proposer l'abonnement
+        setShowPremiumDialog(true);
+      }
+    } catch (error) {
+      console.error('Error checking premium status:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de vérifier votre statut d'abonnement.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -417,26 +441,16 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
               </Button>
             )}
 
-            {sellerContact && (
-              <div className="flex flex-wrap gap-3 sm:gap-4 mt-1.5 text-xs sm:text-sm">
-                {sellerContact.email && (
-                  <div className="flex items-center gap-1.5 text-muted-foreground hover:text-primary transition-colors">
-                    <Mail className="h-3.5 sm:h-4 w-3.5 sm:w-4 flex-shrink-0" />
-                    <a href={`mailto:${sellerContact.email}`} className="truncate max-w-[180px]">
-                      {sellerContact.email}
-                    </a>
-                  </div>
-                )}
-                {sellerContact.phone && (
-                  <div className="flex items-center gap-1.5 text-muted-foreground hover:text-primary transition-colors">
-                    <Phone className="h-3.5 sm:h-4 w-3.5 sm:w-4 flex-shrink-0" />
-                    <a href={`tel:${sellerContact.phone}`}>
-                      {sellerContact.phone}
-                    </a>
-                  </div>
-                )}
-              </div>
-            )}
+            {/* Bouton pour voir le profil - Accessible uniquement aux membres Club Select */}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-auto p-0 text-xs sm:text-sm font-medium text-muted-foreground hover:text-primary transition-colors justify-start"
+              onClick={handleViewProfile}
+            >
+              <User className="mr-1.5 h-3.5 sm:h-4 w-3.5 sm:w-4" />
+              <span>Voir le profil</span>
+            </Button>
           </div>
         </div>
       </div>
@@ -655,6 +669,54 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
           <span>Max 5 fichiers (10 Mo chacun)</span>
         </p>
       </div>
+
+      {/* Dialog Premium Membership */}
+      <Dialog open={showPremiumDialog} onOpenChange={setShowPremiumDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Crown className="h-5 w-5 text-yellow-500" />
+              Abonnement Club Select requis
+            </DialogTitle>
+            <DialogDescription className="text-left space-y-3 pt-4">
+              <p>
+                Pour voir les profils complets des utilisateurs, vous devez être membre du <strong>Club Select</strong>.
+              </p>
+              <div className="bg-gradient-to-br from-yellow-500/10 to-amber-500/10 border border-yellow-500/20 rounded-lg p-4 space-y-2">
+                <h4 className="font-semibold text-sm flex items-center gap-2">
+                  <Crown className="h-4 w-4 text-yellow-500" />
+                  Avantages Club Select :
+                </h4>
+                <ul className="text-sm space-y-1 ml-4">
+                  <li>• Accès illimité aux profils complets</li>
+                  <li>• Coordonnées des vendeurs</li>
+                  <li>• Support prioritaire</li>
+                  <li>• Badge exclusif</li>
+                </ul>
+              </div>
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex gap-3 mt-4">
+            <Button
+              variant="outline"
+              onClick={() => setShowPremiumDialog(false)}
+              className="flex-1"
+            >
+              Plus tard
+            </Button>
+            <Button
+              onClick={() => {
+                setShowPremiumDialog(false);
+                navigate('/profile?tab=premium');
+              }}
+              className="flex-1 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-600 hover:to-amber-600"
+            >
+              <Crown className="mr-2 h-4 w-4" />
+              S'abonner
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

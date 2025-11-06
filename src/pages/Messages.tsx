@@ -356,95 +356,95 @@ const Messages = () => {
                 <ScrollArea className="flex-1">
                   <div className="space-y-2 pr-2">
                     {filteredConversations.map((conv) => (
-                       <div
-                        key={`${conv.business_id}-${conv.other_user_id}`}
-                        className={`group p-2.5 rounded-lg transition-all duration-300 cursor-pointer ${
-                          selectedConversation?.business_id === conv.business_id &&
-                          selectedConversation?.other_user_id === conv.other_user_id
-                            ? 'bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border-2 border-primary/60 shadow-lg'
-                            : 'bg-card/80 backdrop-blur-sm border border-border/60 hover:bg-card hover:border-primary/40 hover:shadow-md'
-                        }`}
-                        onClick={() => handleConversationClick(conv)}
-                      >
-                        {/* GRID LAYOUT AU LIEU DE FLEX */}
-                        <div className="grid grid-cols-[44px_1fr_44px] gap-2 items-start w-full">
-                          {/* Avatar - LARGEUR FIXE */}
-                          <div className="relative w-11 h-11">
-                            <Avatar className="h-11 w-11 ring-2 ring-border/40">
-                              <AvatarImage src={conv.other_user_avatar || undefined} alt={conv.other_user_name} />
-                              <AvatarFallback className="bg-gradient-to-br from-primary/20 to-secondary/20 text-foreground font-semibold text-xs">
-                                {getInitials(conv.other_user_name)}
-                              </AvatarFallback>
-                            </Avatar>
-                            {conv.unread_count > 0 && (
-                              <div className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 rounded-full bg-gradient-to-br from-primary to-primary/90 shadow-lg animate-pulse">
-                                <span className="text-[10px] font-bold text-primary-foreground">{conv.unread_count}</span>
-                              </div>
-                            )}
-                          </div>
+                        <div
+                         key={`${conv.business_id}-${conv.other_user_id}`}
+                         className={`group relative p-2.5 rounded-lg transition-all duration-300 cursor-pointer ${
+                           selectedConversation?.business_id === conv.business_id &&
+                           selectedConversation?.other_user_id === conv.other_user_id
+                             ? 'bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border-2 border-primary/60 shadow-lg'
+                             : 'bg-card/80 backdrop-blur-sm border border-border/60 hover:bg-card hover:border-primary/40 hover:shadow-md'
+                         }`}
+                         onClick={() => handleConversationClick(conv)}
+                       >
+                         {/* GRID LAYOUT */}
+                         <div className="grid grid-cols-[44px_1fr_44px] gap-2 items-start w-full">
+                           {/* Avatar */}
+                           <div className="relative w-11 h-11">
+                             <Avatar className="h-11 w-11 ring-2 ring-border/40">
+                               <AvatarImage src={conv.other_user_avatar || undefined} alt={conv.other_user_name} />
+                               <AvatarFallback className="bg-gradient-to-br from-primary/20 to-secondary/20 text-foreground font-semibold text-xs">
+                                 {getInitials(conv.other_user_name)}
+                               </AvatarFallback>
+                             </Avatar>
+                             {conv.unread_count > 0 && (
+                               <div className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 rounded-full bg-gradient-to-br from-primary to-primary/90 shadow-lg animate-pulse">
+                                 <span className="text-[10px] font-bold text-primary-foreground">{conv.unread_count}</span>
+                               </div>
+                             )}
+                           </div>
 
-                          {/* Contenu - PREND L'ESPACE RESTANT */}
-                          <div className="min-w-0 overflow-hidden">
-                            <div className="flex items-start justify-between gap-1 mb-0.5">
-                              <h3 className="font-bold text-sm truncate group-hover:text-primary transition-colors flex-1 min-w-0">
-                                {conv.other_user_name}
-                              </h3>
-                              <span className="text-[9px] font-semibold text-muted-foreground/70 whitespace-nowrap flex-shrink-0">
-                                {new Date(conv.last_message_time).toLocaleDateString('fr-FR', {
-                                  day: '2-digit',
-                                  month: '2-digit',
-                                })}
-                              </span>
-                            </div>
-                            
-                            <p className="text-[10px] text-muted-foreground/60 mb-0.5 truncate font-medium">
-                              {conv.business_title}
-                            </p>
-                            
-                            <div className="flex items-center gap-1">
-                              <p className="text-[10px] text-foreground/70 truncate leading-tight flex-1 min-w-0">
-                                {conv.last_message}
-                              </p>
-                              {conv.last_message_sender_id === user?.id && (
-                                <span className="flex-shrink-0">
-                                  {conv.last_message_read ? (
-                                    <CheckCheck className="w-3 h-3 text-primary" />
-                                  ) : (
-                                    <Check className="w-3 h-3 text-muted-foreground/50" />
-                                  )}
-                                </span>
-                              )}
-                            </div>
-                          </div>
+                           {/* Contenu */}
+                           <div className="min-w-0 overflow-hidden">
+                             <div className="flex items-start justify-between gap-1 mb-0.5">
+                               <h3 className="font-bold text-sm truncate group-hover:text-primary transition-colors flex-1 min-w-0">
+                                 {conv.other_user_name}
+                               </h3>
+                               <span className="text-[9px] font-semibold text-muted-foreground/70 whitespace-nowrap flex-shrink-0">
+                                 {new Date(conv.last_message_time).toLocaleDateString('fr-FR', {
+                                   day: '2-digit',
+                                   month: '2-digit',
+                                 })}
+                               </span>
+                             </div>
+                             
+                             <p className="text-[10px] text-muted-foreground/60 mb-0.5 truncate font-medium">
+                               {conv.business_title}
+                             </p>
+                             
+                             <div className="flex items-center gap-1">
+                               <p className="text-[10px] text-foreground/70 truncate leading-tight flex-1 min-w-0">
+                                 {conv.last_message}
+                               </p>
+                               {conv.last_message_sender_id === user?.id && (
+                                 <span className="flex-shrink-0">
+                                   {conv.last_message_read ? (
+                                     <CheckCheck className="w-3 h-3 text-primary" />
+                                   ) : (
+                                     <Check className="w-3 h-3 text-muted-foreground/50" />
+                                   )}
+                                 </span>
+                               )}
+                             </div>
+                           </div>
 
-                          {/* Image - LARGEUR FIXE */}
-                          <div className="w-11 h-11 rounded-lg overflow-hidden bg-muted shadow-sm ring-1 ring-border/40">
-                            {conv.business_photo ? (
-                              <img 
-                                src={conv.business_photo} 
-                                alt={conv.business_title}
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <div className="w-full h-full bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center">
-                                <span className="text-sm">🏢</span>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                        
-                        {/* Bouton supprimer - POSITION ABSOLUTE */}
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-6 w-6 absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <Trash2 className="h-3 w-3 text-destructive" />
-                            </Button>
-                          </AlertDialogTrigger>
+                           {/* Image annonce */}
+                           <div className="w-11 h-11 rounded-lg overflow-hidden bg-muted shadow-sm ring-1 ring-border/40">
+                             {conv.business_photo ? (
+                               <img 
+                                 src={conv.business_photo} 
+                                 alt={conv.business_title}
+                                 className="w-full h-full object-cover"
+                               />
+                             ) : (
+                               <div className="w-full h-full bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center">
+                                 <span className="text-sm">🏢</span>
+                               </div>
+                             )}
+                           </div>
+                         </div>
+                         
+                         {/* Bouton supprimer - EN HAUT À GAUCHE pour ne pas cacher l'image */}
+                         <AlertDialog>
+                           <AlertDialogTrigger asChild>
+                             <Button
+                               variant="ghost"
+                               size="icon"
+                               className="h-6 w-6 absolute -top-1 -left-1 opacity-0 group-hover:opacity-100 transition-opacity bg-destructive/10 hover:bg-destructive/20 rounded-full"
+                               onClick={(e) => e.stopPropagation()}
+                             >
+                               <Trash2 className="h-3 w-3 text-destructive" />
+                             </Button>
+                           </AlertDialogTrigger>
                           <AlertDialogContent>
                             <AlertDialogHeader>
                               <AlertDialogTitle>Supprimer la conversation</AlertDialogTitle>
