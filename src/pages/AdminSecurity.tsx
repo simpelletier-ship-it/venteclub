@@ -7,8 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Shield, AlertTriangle, Ban, Activity, Users, Lock, Unlock } from "lucide-react";
+import { Shield, AlertTriangle, Ban, Activity, Users, Lock, Unlock, TrendingUp } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { Line, LineChart, Bar, BarChart, CartesianGrid, XAxis, YAxis, Legend } from "recharts";
 
 interface BlockedIP {
   id: string;
@@ -58,6 +60,13 @@ interface SecurityStats {
   suspiciousFingerprints: number;
 }
 
+interface ChartData {
+  date: string;
+  successful: number;
+  failed: number;
+  blocked: number;
+}
+
 const AdminSecurity = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -75,6 +84,7 @@ const AdminSecurity = () => {
   const [rateLimits, setRateLimits] = useState<RateLimit[]>([]);
   const [loginAttempts, setLoginAttempts] = useState<LoginAttempt[]>([]);
   const [fingerprints, setFingerprints] = useState<Fingerprint[]>([]);
+  const [chartData, setChartData] = useState<ChartData[]>([]);
 
   useEffect(() => {
     checkAdminAccess();
@@ -122,8 +132,54 @@ const AdminSecurity = () => {
       loadRateLimits(),
       loadLoginAttempts(),
       loadFingerprints(),
-      loadStats()
+      loadStats(),
+      loadChartData()
     ]);
+  };
+
+  const loadChartData = async () => {
+    const data: ChartData[] = [];
+    const now = new Date();
+    
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date(now);
+      date.setDate(date.getDate() - i);
+      date.setHours(0, 0, 0, 0);
+      
+      const nextDate = new Date(date);
+      nextDate.setDate(nextDate.getDate() + 1);
+      
+      const dateStr = date.toLocaleDateString('fr-CA', { month: 'short', day: 'numeric' });
+      
+      const [successfulAttempts, failedAttempts, blockedIPs] = await Promise.all([
+        supabase
+          .from('login_attempts')
+          .select('id', { count: 'exact', head: true })
+          .eq('success', true)
+          .gte('attempted_at', date.toISOString())
+          .lt('attempted_at', nextDate.toISOString()),
+        supabase
+          .from('login_attempts')
+          .select('id', { count: 'exact', head: true })
+          .eq('success', false)
+          .gte('attempted_at', date.toISOString())
+          .lt('attempted_at', nextDate.toISOString()),
+        supabase
+          .from('blocked_ips')
+          .select('id', { count: 'exact', head: true })
+          .gte('blocked_at', date.toISOString())
+          .lt('blocked_at', nextDate.toISOString())
+      ]);
+      
+      data.push({
+        date: dateStr,
+        successful: successfulAttempts.count || 0,
+        failed: failedAttempts.count || 0,
+        blocked: blockedIPs.count || 0
+      });
+    }
+    
+    setChartData(data);
   };
 
   const loadStats = async () => {
@@ -271,6 +327,111 @@ const AdminSecurity = () => {
           <p className="text-muted-foreground">
             Moniteur en temps réel des tentatives de connexion et activités suspectes
           </p>
+        </div>
+
+        {/* Graphiques */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5" />
+                Tentatives de Connexion (7 jours)
+              </CardTitle>
+              <CardDescription>
+                Évolution des connexions réussies vs échouées
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ChartContainer
+                config={{
+                  successful: {
+                    label: "Réussies",
+                    color: "hsl(var(--chart-1))",
+                  },
+                  failed: {
+                    label: "Échouées",
+                    color: "hsl(var(--chart-2))",
+                  },
+                }}
+                className="h-[300px]"
+              >
+                <LineChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                  <XAxis 
+                    dataKey="date" 
+                    className="text-xs"
+                    tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                  />
+                  <YAxis 
+                    className="text-xs"
+                    tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                  />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <Legend />
+                  <Line 
+                    type="monotone" 
+                    dataKey="successful" 
+                    stroke="hsl(var(--chart-1))" 
+                    strokeWidth={2}
+                    name="Réussies"
+                    dot={{ fill: 'hsl(var(--chart-1))' }}
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="failed" 
+                    stroke="hsl(var(--chart-2))" 
+                    strokeWidth={2}
+                    name="Échouées"
+                    dot={{ fill: 'hsl(var(--chart-2))' }}
+                  />
+                </LineChart>
+              </ChartContainer>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Ban className="h-5 w-5" />
+                Blocages d'IP (7 jours)
+              </CardTitle>
+              <CardDescription>
+                Nombre de nouvelles IPs bloquées par jour
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ChartContainer
+                config={{
+                  blocked: {
+                    label: "IPs Bloquées",
+                    color: "hsl(var(--destructive))",
+                  },
+                }}
+                className="h-[300px]"
+              >
+                <BarChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                  <XAxis 
+                    dataKey="date" 
+                    className="text-xs"
+                    tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                  />
+                  <YAxis 
+                    className="text-xs"
+                    tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                  />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <Legend />
+                  <Bar 
+                    dataKey="blocked" 
+                    fill="hsl(var(--destructive))" 
+                    name="IPs Bloquées"
+                    radius={[4, 4, 0, 0]}
+                  />
+                </BarChart>
+              </ChartContainer>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Statistiques */}
