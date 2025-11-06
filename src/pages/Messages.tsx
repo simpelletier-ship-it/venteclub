@@ -353,8 +353,8 @@ const Messages = () => {
                   </div>
                 </div>
 
-                <ScrollArea className="flex-1 pr-3">
-                  <div className="space-y-2">
+                <ScrollArea className="flex-1">
+                  <div className="space-y-2 pr-2">
                     {filteredConversations.map((conv) => (
                        <div
                         key={`${conv.business_id}-${conv.other_user_id}`}
