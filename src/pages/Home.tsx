@@ -186,16 +186,12 @@ const Home = () => {
         {/* Decorative Top Border */}
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
         <div className="container mx-auto px-4">
-          <div className="text-center mb-6 sm:mb-8 animate-slide-up">
-            <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-secondary/10 text-secondary text-xs sm:text-sm font-semibold mb-3 sm:mb-4">
-              <TrendingUp className="w-3 sm:w-4 h-3 sm:h-4" />
-              Opportunités du moment
-            </div>
-            <h2 id="featured-heading" className="text-2xl sm:text-4xl md:text-5xl font-display font-bold text-foreground mb-2 sm:mb-3 px-4">
-              Opportunités en vedette
+          <div className="text-center mb-12 animate-slide-up">
+            <h2 id="featured-heading" className="text-3xl sm:text-4xl md:text-5xl font-display font-bold text-foreground mb-4">
+              Opportunités d'affaires en vedette
             </h2>
-            <p className="text-sm sm:text-lg text-muted-foreground max-w-2xl mx-auto px-4">
-              Découvrez nos meilleures opportunités d'affaires sélectionnées pour vous
+            <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
+              Découvrez notre sélection des meilleures entreprises à vendre, rigoureusement vérifiées et prêtes à être acquises
             </p>
           </div>
           
