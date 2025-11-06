@@ -134,13 +134,6 @@ export type Database = {
             referencedRelation: "businesses"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "business_analytics_business_id_fkey"
-            columns: ["business_id"]
-            isOneToOne: false
-            referencedRelation: "businesses_public"
-            referencedColumns: ["id"]
-          },
         ]
       }
       business_edit_proposals: {
@@ -185,13 +178,6 @@ export type Database = {
             referencedRelation: "businesses"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "business_edit_proposals_business_id_fkey"
-            columns: ["business_id"]
-            isOneToOne: false
-            referencedRelation: "businesses_public"
-            referencedColumns: ["id"]
-          },
         ]
       }
       business_favorites: {
@@ -221,13 +207,6 @@ export type Database = {
             referencedRelation: "businesses"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "business_favorites_business_id_fkey"
-            columns: ["business_id"]
-            isOneToOne: false
-            referencedRelation: "businesses_public"
-            referencedColumns: ["id"]
-          },
         ]
       }
       business_inquiries: {
@@ -255,13 +234,6 @@ export type Database = {
             columns: ["business_id"]
             isOneToOne: false
             referencedRelation: "businesses"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "business_inquiries_business_id_fkey"
-            columns: ["business_id"]
-            isOneToOne: false
-            referencedRelation: "businesses_public"
             referencedColumns: ["id"]
           },
           {
@@ -301,13 +273,6 @@ export type Database = {
             columns: ["business_id"]
             isOneToOne: false
             referencedRelation: "businesses"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "business_photos_business_id_fkey"
-            columns: ["business_id"]
-            isOneToOne: false
-            referencedRelation: "businesses_public"
             referencedColumns: ["id"]
           },
         ]
@@ -352,13 +317,6 @@ export type Database = {
             columns: ["business_id"]
             isOneToOne: false
             referencedRelation: "businesses"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "business_reports_business_id_fkey"
-            columns: ["business_id"]
-            isOneToOne: false
-            referencedRelation: "businesses_public"
             referencedColumns: ["id"]
           },
         ]
@@ -564,13 +522,6 @@ export type Database = {
             referencedRelation: "businesses"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "contact_access_business_id_fkey"
-            columns: ["business_id"]
-            isOneToOne: false
-            referencedRelation: "businesses_public"
-            referencedColumns: ["id"]
-          },
         ]
       }
       device_fingerprints: {
@@ -682,13 +633,6 @@ export type Database = {
             columns: ["business_id"]
             isOneToOne: false
             referencedRelation: "businesses"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "featured_payments_business_id_fkey"
-            columns: ["business_id"]
-            isOneToOne: false
-            referencedRelation: "businesses_public"
             referencedColumns: ["id"]
           },
         ]
@@ -806,13 +750,6 @@ export type Database = {
             referencedRelation: "businesses"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "messages_business_id_fkey"
-            columns: ["business_id"]
-            isOneToOne: false
-            referencedRelation: "businesses_public"
-            referencedColumns: ["id"]
-          },
         ]
       }
       notifications: {
@@ -849,13 +786,6 @@ export type Database = {
             columns: ["business_id"]
             isOneToOne: false
             referencedRelation: "businesses"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "notifications_business_id_fkey"
-            columns: ["business_id"]
-            isOneToOne: false
-            referencedRelation: "businesses_public"
             referencedColumns: ["id"]
           },
         ]
@@ -1348,117 +1278,7 @@ export type Database = {
       }
     }
     Views: {
-      businesses_public: {
-        Row: {
-          annual_revenue: number | null
-          approval_status: string | null
-          asking_price: number | null
-          baiia: number | null
-          baiia_margin: number | null
-          city: string | null
-          created_at: string | null
-          currency: string | null
-          description: string | null
-          employees_count: number | null
-          featured: boolean | null
-          has_pending_changes: boolean | null
-          id: string | null
-          industry: Database["public"]["Enums"]["industry_type"] | null
-          latitude: number | null
-          location: string | null
-          longitude: number | null
-          net_profit: number | null
-          net_profit_margin: number | null
-          pending_changes_submitted_at: string | null
-          profit_margin: number | null
-          province: string | null
-          region: string | null
-          rejection_reason: string | null
-          seller_email: string | null
-          seller_id: string | null
-          seller_name: string | null
-          seller_phone: string | null
-          slug: string | null
-          status: string | null
-          title: string | null
-          updated_at: string | null
-          views_count: number | null
-          year_established: number | null
-        }
-        Insert: {
-          annual_revenue?: number | null
-          approval_status?: string | null
-          asking_price?: number | null
-          baiia?: number | null
-          baiia_margin?: number | null
-          city?: string | null
-          created_at?: string | null
-          currency?: string | null
-          description?: string | null
-          employees_count?: number | null
-          featured?: boolean | null
-          has_pending_changes?: boolean | null
-          id?: string | null
-          industry?: Database["public"]["Enums"]["industry_type"] | null
-          latitude?: number | null
-          location?: string | null
-          longitude?: number | null
-          net_profit?: number | null
-          net_profit_margin?: number | null
-          pending_changes_submitted_at?: string | null
-          profit_margin?: number | null
-          province?: string | null
-          region?: string | null
-          rejection_reason?: string | null
-          seller_email?: never
-          seller_id?: string | null
-          seller_name?: never
-          seller_phone?: never
-          slug?: string | null
-          status?: string | null
-          title?: string | null
-          updated_at?: string | null
-          views_count?: number | null
-          year_established?: number | null
-        }
-        Update: {
-          annual_revenue?: number | null
-          approval_status?: string | null
-          asking_price?: number | null
-          baiia?: number | null
-          baiia_margin?: number | null
-          city?: string | null
-          created_at?: string | null
-          currency?: string | null
-          description?: string | null
-          employees_count?: number | null
-          featured?: boolean | null
-          has_pending_changes?: boolean | null
-          id?: string | null
-          industry?: Database["public"]["Enums"]["industry_type"] | null
-          latitude?: number | null
-          location?: string | null
-          longitude?: number | null
-          net_profit?: number | null
-          net_profit_margin?: number | null
-          pending_changes_submitted_at?: string | null
-          profit_margin?: number | null
-          province?: string | null
-          region?: string | null
-          rejection_reason?: string | null
-          seller_email?: never
-          seller_id?: string | null
-          seller_name?: never
-          seller_phone?: never
-          slug?: string | null
-          status?: string | null
-          title?: string | null
-          updated_at?: string | null
-          views_count?: number | null
-          year_established?: number | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       apply_pending_changes: {
