@@ -2,6 +2,9 @@ import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Check, Crown, Sparkles, Zap, MessageSquare, Eye, Star, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface PremiumUpgradeModalProps {
   open: boolean;
@@ -17,10 +20,49 @@ export const PremiumUpgradeModal = ({
   minutesRemaining 
 }: PremiumUpgradeModalProps) => {
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
 
-  const handleUpgrade = () => {
-    navigate("/dashboard?tab=premium");
-    onOpenChange(false);
+  const handleUpgrade = async () => {
+    setLoading(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        toast({
+          variant: "destructive",
+          title: "Connexion requise",
+          description: "Vous devez être connecté pour vous abonner au Club Select.",
+        });
+        navigate("/auth");
+        return;
+      }
+
+      const { data, error } = await supabase.functions.invoke('create-premium-checkout', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      if (data?.url) {
+        // Ouvrir Stripe Checkout dans un nouvel onglet
+        window.open(data.url, '_blank');
+        onOpenChange(false);
+      }
+    } catch (error: any) {
+      console.error("Error creating checkout:", error);
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: "Impossible de créer la session de paiement. Veuillez réessayer.",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -132,11 +174,14 @@ export const PremiumUpgradeModal = ({
             <div className="flex flex-col gap-2">
               <Button
                 onClick={handleUpgrade}
+                disabled={loading}
                 className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-semibold py-4 text-base shadow-lg shadow-amber-500/20 group relative overflow-hidden"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000"></div>
                 <Crown className="w-4 h-4 mr-2 relative z-10" />
-                <span className="relative z-10">Devenir Membre Select</span>
+                <span className="relative z-10">
+                  {loading ? "Redirection..." : "Devenir Membre Select"}
+                </span>
               </Button>
 
               <Button
