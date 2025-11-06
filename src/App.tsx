@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { Layout } from "@/components/Layout";
+import { EmailVerificationGuard } from "@/components/EmailVerificationGuard";
 import { lazy, Suspense } from "react";
 
 // Critical pages loaded immediately
@@ -56,29 +57,16 @@ const App = () => (
           <Layout>
             <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
               <Routes>
+                {/* Pages publiques sans vérification email */}
                 <Route path="/" element={<Home />} />
                 <Route path="/entreprises" element={<Businesses />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/email-confirmed" element={<EmailConfirmed />} />
-                <Route path="/sell" element={<Sell />} />
-                <Route path="/list-business" element={<ListBusiness />} />
-                <Route path="/list-franchise" element={<ListFranchise />} />
-                <Route path="/list-property" element={<ListProperty />} />
-                <Route path="/immeubles-commerciaux" element={<PropertyListings />} />
-                <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/entreprise/:slug" element={<BusinessDetails />} />
-                <Route path="/map" element={<Map />} />
-                <Route path="/admin" element={<Admin />} />
-                <Route path="/admin/security" element={<AdminSecurity />} />
-                <Route path="/admin/compliance" element={<SecurityCompliance />} />
-                <Route path="/settings" element={<Settings />} />
-                <Route path="/favorites" element={<Favorites />} />
-                <Route path="/messages" element={<Messages />} />
-                <Route path="/profile/:userId" element={<Profile />} />
                 <Route path="/logout-success" element={<LogoutSuccess />} />
                 
-                {/* SEO Pages */}
+                {/* SEO Pages publiques */}
                 <Route path="/a-propos" element={<About />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/blog" element={<Blog />} />
@@ -87,13 +75,29 @@ const App = () => (
                 <Route path="/ressources" element={<Resources />} />
                 <Route path="/faq" element={<FAQ />} />
                 <Route path="/marche" element={<Market />} />
+                <Route path="/immeubles-commerciaux" element={<PropertyListings />} />
                 
-                {/* City Pages - Static routes for SEO */}
+                {/* City Pages publiques */}
                 <Route path="/entreprises-a-vendre-montreal" element={<CityPage />} />
                 <Route path="/entreprises-a-vendre-quebec" element={<CityPage />} />
                 <Route path="/entreprises-a-vendre-laval" element={<CityPage />} />
                 <Route path="/entreprises-a-vendre-gatineau" element={<CityPage />} />
                 <Route path="/entreprises-a-vendre-sherbrooke" element={<CityPage />} />
+                
+                {/* Pages nécessitant email confirmé */}
+                <Route path="/sell" element={<EmailVerificationGuard><Sell /></EmailVerificationGuard>} />
+                <Route path="/list-business" element={<EmailVerificationGuard><ListBusiness /></EmailVerificationGuard>} />
+                <Route path="/list-franchise" element={<EmailVerificationGuard><ListFranchise /></EmailVerificationGuard>} />
+                <Route path="/list-property" element={<EmailVerificationGuard><ListProperty /></EmailVerificationGuard>} />
+                <Route path="/dashboard" element={<EmailVerificationGuard><Dashboard /></EmailVerificationGuard>} />
+                <Route path="/map" element={<EmailVerificationGuard><Map /></EmailVerificationGuard>} />
+                <Route path="/admin" element={<EmailVerificationGuard><Admin /></EmailVerificationGuard>} />
+                <Route path="/admin/security" element={<EmailVerificationGuard><AdminSecurity /></EmailVerificationGuard>} />
+                <Route path="/admin/compliance" element={<EmailVerificationGuard><SecurityCompliance /></EmailVerificationGuard>} />
+                <Route path="/settings" element={<EmailVerificationGuard><Settings /></EmailVerificationGuard>} />
+                <Route path="/favorites" element={<EmailVerificationGuard><Favorites /></EmailVerificationGuard>} />
+                <Route path="/messages" element={<EmailVerificationGuard><Messages /></EmailVerificationGuard>} />
+                <Route path="/profile/:userId" element={<EmailVerificationGuard><Profile /></EmailVerificationGuard>} />
                 
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
