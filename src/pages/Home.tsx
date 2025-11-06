@@ -7,8 +7,7 @@ import { ArrowRight, TrendingUp, Shield, Clock, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { SEO } from "@/components/SEO";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import heroImage from "@/assets/hero-business-pro.jpg";
-import { AnimatedSearchBar } from "@/components/AnimatedSearchBar";
+import { TypewriterAnimation } from "@/components/AnimatedSearchBar";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -99,61 +98,45 @@ const Home = () => {
       />
       
       {/* Hero Section */}
-      <section className="relative min-h-[75vh] sm:min-h-[85vh] flex items-center overflow-hidden" aria-label="Section principale">
-        <div className="absolute inset-0">
-          <img 
-            src={heroImage} 
-            alt="Espace de travail professionnel moderne" 
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/80 to-background/60" />
-        </div>
-        
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-40 -right-40 w-[300px] sm:w-[600px] h-[300px] sm:h-[600px] bg-gradient-to-br from-secondary/20 via-primary/15 to-transparent rounded-full blur-3xl animate-float" />
-          <div className="absolute -bottom-40 -left-40 w-[300px] sm:w-[600px] h-[300px] sm:h-[600px] bg-gradient-to-tr from-accent/20 via-primary/15 to-transparent rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
-        </div>
-        
-        <div className="relative container mx-auto px-4 py-12 sm:py-20">
-          <div className="max-w-4xl mx-auto text-center space-y-6 sm:space-y-10 animate-slide-up">
-            <div className="inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 rounded-full bg-gradient-to-r from-secondary/10 via-primary/10 to-accent/10 border border-secondary/20 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-secondary/20 hover:border-secondary/40 cursor-pointer group">
-              <Sparkles className="w-4 sm:w-5 h-4 sm:h-5 text-secondary animate-glow group-hover:rotate-12 transition-transform duration-300" />
-              <span className="text-foreground text-xs sm:text-sm font-semibold tracking-wide group-hover:text-secondary transition-colors duration-300">
-                Plateforme de confiance pour vos transactions
-              </span>
-            </div>
-            
-            <h1 className="text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-display font-bold leading-[1.1] tracking-tight text-foreground px-2">
-              Trouvez l'entreprise
-              <br />
-              <span className="text-secondary">de vos rêves au Québec</span>
-            </h1>
-            
-            <p className="text-base sm:text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed px-4">
-              Plateforme intelligente qui facilite la connexion entre acquéreurs et propriétaires. Explorez un vaste répertoire d'occasions commerciales dans tous les domaines : restauration, hôtellerie, commerce de détail, services et secteur industriel.
-            </p>
-
-            {/* Animated Search Bar */}
-            <div className="pt-6 sm:pt-8">
-              <AnimatedSearchBar />
-            </div>
-            
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center pt-4 sm:pt-6 px-4">
-              <Button 
-                size="lg" 
-                className="bg-gradient-to-r from-secondary to-primary hover:from-secondary/90 hover:to-primary/90 text-white h-12 sm:h-16 px-8 sm:px-12 text-base sm:text-lg font-semibold shadow-xl hover:shadow-2xl transition-all hover:scale-105 btn-premium group w-full sm:w-auto"
-                onClick={() => document.getElementById('featured')?.scrollIntoView({ behavior: 'smooth' })}
-              >
-                Explorer les opportunités
-                <ArrowRight className="ml-2 w-4 sm:w-5 h-4 sm:h-5 group-hover:translate-x-1 transition-transform" />
-              </Button>
-              <Button 
-                size="lg" 
-                className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white h-12 sm:h-16 px-8 sm:px-12 text-base sm:text-lg font-semibold shadow-xl hover:shadow-2xl transition-all hover:scale-105 w-full sm:w-auto"
-                onClick={() => navigate("/sell")}
-              >
-                Vendre mon entreprise
-              </Button>
+      <section className="relative min-h-[85vh] flex items-center bg-background" aria-label="Section principale">
+        <div className="container mx-auto px-4 py-20">
+          <div className="max-w-6xl mx-auto">
+            <div className="space-y-8 animate-slide-up">
+              <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-secondary/5 border border-secondary/10">
+                <Sparkles className="w-4 h-4 text-secondary" />
+                <span className="text-foreground/80 text-sm font-medium">
+                  Plateforme de confiance pour vos transactions
+                </span>
+              </div>
+              
+              <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-display font-bold leading-[1.1] tracking-tight text-foreground">
+                Votre plateforme de confiance pour{" "}
+                <TypewriterAnimation />
+                {" "}<span className="text-secondary">rentable et vérifiée.</span>
+              </h1>
+              
+              <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl leading-relaxed">
+                Plateforme intelligente qui facilite la connexion entre acquéreurs et propriétaires. Chaque projet publié sur Vente.Club est analysé et vérifié. <span className="font-semibold text-foreground">Vous investissez avec clarté, vous reprenez avec confiance.</span>
+              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                <Button 
+                  size="lg" 
+                  className="bg-secondary hover:bg-secondary/90 text-white h-14 px-10 text-base font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all group"
+                  onClick={() => document.getElementById('featured')?.scrollIntoView({ behavior: 'smooth' })}
+                >
+                  Voir les projets validés
+                  <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </Button>
+                <Button 
+                  size="lg" 
+                  variant="outline"
+                  className="h-14 px-10 text-base font-semibold rounded-xl border-2 hover:bg-muted/50"
+                  onClick={() => navigate("/sell")}
+                >
+                  Estimer mon entreprise
+                </Button>
+              </div>
             </div>
           </div>
         </div>
