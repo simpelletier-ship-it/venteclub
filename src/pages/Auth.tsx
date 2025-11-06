@@ -66,7 +66,9 @@ const Auth = () => {
       // Valider les données
       const validatedData = loginSchema.parse({ email, password });
 
+      // ⚠️ RECAPTCHA TEMPORAIREMENT DÉSACTIVÉ - À RÉACTIVER ⚠️
       // Vérifier reCAPTCHA
+      /* TEMPORAIREMENT DÉSACTIVÉ POUR DÉPANNAGE
       if (!recaptchaToken) {
         toast({
           variant: "destructive",
@@ -93,6 +95,7 @@ const Auth = () => {
         setLoading(false);
         return;
       }
+      */
 
       // Vérifier rate limiting
       const { data: rateLimitCheck } = await supabase.functions.invoke('check-rate-limit', {
@@ -202,7 +205,9 @@ const Auth = () => {
       // Valider les données
       const validatedData = signupSchema.parse({ email, password });
 
+      // ⚠️ RECAPTCHA TEMPORAIREMENT DÉSACTIVÉ - À RÉACTIVER ⚠️
       // Vérifier reCAPTCHA
+      /* TEMPORAIREMENT DÉSACTIVÉ POUR DÉPANNAGE
       if (!recaptchaToken) {
         toast({
           variant: "destructive",
@@ -229,6 +234,7 @@ const Auth = () => {
         setLoading(false);
         return;
       }
+      */
 
       // Vérifier le fingerprint pour détecter les comptes multiples
       if (fingerprint) {
@@ -525,20 +531,22 @@ const Auth = () => {
                     />
                   </div>
                   
-                  {/* reCAPTCHA */}
-                  <div className="flex justify-center">
+                  {/* reCAPTCHA - TEMPORAIREMENT DÉSACTIVÉ */}
+                  {/* <div className="flex justify-center">
                     <ReCAPTCHA
                       ref={recaptchaRef}
                       sitekey={RECAPTCHA_SITE_KEY}
                       onChange={(token) => setRecaptchaToken(token)}
                       onExpired={() => setRecaptchaToken(null)}
                     />
-                  </div>
+                  </div> */}
                   
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <Shield className="h-4 w-4" />
-                    <span>Connexion sécurisée avec protection anti-robot</span>
-                  </div>
+                  <Alert className="bg-orange-500/10 border-orange-500/50">
+                    <AlertTriangle className="h-4 w-4 text-orange-500" />
+                    <AlertDescription className="text-orange-700 dark:text-orange-400">
+                      ⚠️ ReCAPTCHA temporairement désactivé pour dépannage. Réactiver dès que possible.
+                    </AlertDescription>
+                  </Alert>
                   
                   <Button
                     type="button"
@@ -550,7 +558,7 @@ const Auth = () => {
                   </Button>
                   <Button 
                     type="submit" 
-                    disabled={loading || !recaptchaToken || fpLoading} 
+                    disabled={loading || fpLoading} 
                     className="w-full"
                   >
                     {loading ? "Connexion..." : "Se connecter"}
@@ -682,20 +690,22 @@ const Auth = () => {
                     />
                   </div>
                   
-                  {/* reCAPTCHA */}
-                  <div className="flex justify-center">
+                  {/* reCAPTCHA - TEMPORAIREMENT DÉSACTIVÉ */}
+                  {/* <div className="flex justify-center">
                     <ReCAPTCHA
                       ref={recaptchaRef}
                       sitekey={RECAPTCHA_SITE_KEY}
                       onChange={(token) => setRecaptchaToken(token)}
                       onExpired={() => setRecaptchaToken(null)}
                     />
-                  </div>
+                  </div> */}
                   
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <Shield className="h-4 w-4" />
-                    <span>Protection avancée contre les comptes multiples et les robots</span>
-                  </div>
+                  <Alert className="bg-orange-500/10 border-orange-500/50">
+                    <AlertTriangle className="h-4 w-4 text-orange-500" />
+                    <AlertDescription className="text-orange-700 dark:text-orange-400">
+                      ⚠️ ReCAPTCHA temporairement désactivé pour dépannage. Réactiver dès que possible.
+                    </AlertDescription>
+                  </Alert>
                   
                   <div className="space-y-3">
                     <div className="flex items-start space-x-3 p-4 bg-muted/50 border border-border rounded-lg">
@@ -729,7 +739,7 @@ const Auth = () => {
 
                   <Button 
                     type="submit" 
-                    disabled={loading || !acceptedTerms || !recaptchaToken || fpLoading} 
+                    disabled={loading || !acceptedTerms || fpLoading} 
                     className="w-full"
                   >
                     {loading ? "Envoi du code..." : "Recevoir le code de vérification"}
