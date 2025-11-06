@@ -445,7 +445,7 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
             <Button
               variant="ghost"
               size="sm"
-              className="h-auto p-0 text-xs sm:text-sm font-medium text-muted-foreground hover:text-primary transition-colors justify-start"
+              className="h-auto p-0 ml-6 text-xs sm:text-sm font-medium text-muted-foreground hover:text-primary transition-colors justify-start"
               onClick={handleViewProfile}
             >
               <User className="mr-1.5 h-3.5 sm:h-4 w-3.5 sm:w-4" />

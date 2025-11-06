@@ -378,7 +378,8 @@ const BusinessDetails = () => {
     
     try {
       const { data, error } = await supabase.rpc('can_start_conversation', {
-        p_user_id: userId
+        p_user_id: userId,
+        p_business_id: businessId
       });
       
       if (error) {
@@ -388,9 +389,11 @@ const BusinessDetails = () => {
       
       if (data && typeof data === 'object') {
         const conversationData = data as { 
+          can_start?: boolean;
           conversations_remaining?: number;
           hours_until_reset?: number;
           minutes_until_reset?: number;
+          message?: string;
         };
         setConversationsRemaining(conversationData.conversations_remaining || 0);
         setHoursUntilReset(conversationData.hours_until_reset || 0);
@@ -441,6 +444,16 @@ const BusinessDetails = () => {
   const handleUnlockChat = async () => {
     if (!user || !businessId || !business) return;
     
+    // VÉRIFICATION CRITIQUE : L'email doit être confirmé
+    if (!user.email_confirmed_at) {
+      toast({
+        variant: "destructive",
+        title: "Email non confirmé",
+        description: "Vous devez confirmer votre email avant de pouvoir déverrouiller un chat. Vérifiez votre boîte de réception.",
+      });
+      return;
+    }
+    
     // Vérifier si l'utilisateur a déjà déverrouillé cette annonce spécifique
     const { data: existingAccess } = await supabase
       .from('contact_access')
@@ -458,12 +471,28 @@ const BusinessDetails = () => {
       return;
     }
     
-    // Vérifier si l'utilisateur a des conversations restantes
-    if (conversationsRemaining <= 0 && !hasPremium) {
+    // Vérifier les limites avec la nouvelle fonction
+    const { data: limitCheck, error: limitError } = await supabase.rpc('can_start_conversation', {
+      p_user_id: user.id,
+      p_business_id: businessId
+    });
+    
+    if (limitError) {
+      console.error('Error checking limits:', limitError);
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: "Impossible de vérifier vos limites.",
+      });
+      return;
+    }
+    
+    const limitData = limitCheck as any;
+    if (limitData && !limitData.can_start) {
       toast({
         variant: "destructive",
         title: "Limite atteinte",
-        description: "Vous avez atteint votre limite quotidienne. Rejoignez le Club Select pour un accès illimité.",
+        description: limitData.message || "Vous avez atteint votre limite quotidienne. Rejoignez le Club Select (19,99$/mois) pour un accès illimité.",
       });
       return;
     }
@@ -484,21 +513,7 @@ const BusinessDetails = () => {
         throw accessError;
       }
       
-      // 2. Créer un message initial pour déclencher le compteur de conversations
-      const { error: messageError } = await supabase
-        .from('messages')
-        .insert({
-          business_id: businessId,
-          sender_id: user.id,
-          receiver_id: business.seller_id,
-          content: "Bonjour, je suis intéressé par votre annonce.",
-          read: false
-        });
-      
-      if (messageError) {
-        console.error('Error creating initial message:', messageError);
-        throw messageError;
-      }
+      // 2. PAS DE MESSAGE AUTOMATIQUE - l'utilisateur choisira un message template
       
       // 3. Marquer comme déverrouillé localement
       setHasUnlockedChat(true);
@@ -519,7 +534,7 @@ const BusinessDetails = () => {
       
       toast({
         title: "Chat déverrouillé",
-        description: "Vous pouvez maintenant échanger avec le vendeur sans limite!",
+        description: "Vous pouvez maintenant échanger avec le vendeur. Choisissez un message à envoyer pour commencer la conversation!",
       });
     } catch (error: any) {
       console.error('Error unlocking chat:', error);
