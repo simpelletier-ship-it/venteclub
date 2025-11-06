@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Mail, Save, RotateCcw, Eye } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { EmailTemplateEditor } from "@/components/EmailTemplateEditor";
 
 interface EmailTemplate {
   id: string;
@@ -426,14 +427,14 @@ export const EmailTemplateManager = () => {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="preview-html-content">Contenu HTML</Label>
-                <Textarea
-                  id="preview-html-content"
+                <Label htmlFor="preview-html-content">Contenu de l'email (Éditeur Visuel)</Label>
+                <EmailTemplateEditor
                   value={htmlContent}
-                  onChange={(e) => setHtmlContent(e.target.value)}
-                  className="font-mono text-xs min-h-[400px]"
-                  placeholder="Contenu HTML de l'email"
+                  onChange={setHtmlContent}
                 />
+                <p className="text-xs text-muted-foreground mt-2">
+                  💡 Utilisez l'éditeur visuel ci-dessus pour formater votre email. Le HTML est généré automatiquement.
+                </p>
               </div>
             </TabsContent>
           </Tabs>

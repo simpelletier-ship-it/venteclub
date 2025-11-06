@@ -19,11 +19,22 @@ const handler = async (req: Request): Promise<Response> => {
     const { email, token }: VerificationEmailRequest = await req.json();
     const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 
+    console.log("[VERIFICATION-EMAIL] ===== START =====");
+    console.log("[VERIFICATION-EMAIL] Email destination:", email);
+    console.log("[VERIFICATION-EMAIL] Token fourni:", token ? "OUI" : "NON");
+    console.log("[VERIFICATION-EMAIL] RESEND_API_KEY configurée:", RESEND_API_KEY ? "OUI (longueur: " + RESEND_API_KEY.length + ")" : "NON");
+
     if (!RESEND_API_KEY) {
+      console.error("[VERIFICATION-EMAIL] ❌ RESEND_API_KEY manquante !");
       throw new Error("RESEND_API_KEY is not configured");
     }
 
-    console.log("Sending verification code to:", email);
+    if (!email || !token) {
+      console.error("[VERIFICATION-EMAIL] ❌ Email ou token manquant !");
+      throw new Error("Email and token are required");
+    }
+
+    console.log("[VERIFICATION-EMAIL] Préparation de l'email...");
 
     const emailHtml = `
       <!DOCTYPE html>
@@ -89,6 +100,7 @@ const handler = async (req: Request): Promise<Response> => {
     `;
 
     // Utiliser l'API Resend directement avec fetch
+    console.log("[VERIFICATION-EMAIL] Envoi de la requête à Resend...");
     const resendResponse = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
@@ -103,14 +115,20 @@ const handler = async (req: Request): Promise<Response> => {
       }),
     });
 
+    console.log("[VERIFICATION-EMAIL] Réponse Resend - Status:", resendResponse.status);
+    console.log("[VERIFICATION-EMAIL] Réponse Resend - Status Text:", resendResponse.statusText);
+
     if (!resendResponse.ok) {
       const errorText = await resendResponse.text();
-      console.error("Resend API error:", errorText);
+      console.error("[VERIFICATION-EMAIL] ❌ Erreur Resend API:", errorText);
+      console.error("[VERIFICATION-EMAIL] ❌ Status:", resendResponse.status);
       throw new Error(`Failed to send email: ${errorText}`);
     }
 
     const emailResponse = await resendResponse.json();
-    console.log("Verification email sent successfully:", emailResponse);
+    console.log("[VERIFICATION-EMAIL] ✅ Email envoyé avec succès!");
+    console.log("[VERIFICATION-EMAIL] ID Resend:", emailResponse.id);
+    console.log("[VERIFICATION-EMAIL] ===== END =====");
 
     return new Response(JSON.stringify(emailResponse), {
       status: 200,
@@ -120,9 +138,14 @@ const handler = async (req: Request): Promise<Response> => {
       },
     });
   } catch (error: any) {
-    console.error("Error in send-verification-code function:", error);
+    console.error("[VERIFICATION-EMAIL] ❌ EXCEPTION:", error);
+    console.error("[VERIFICATION-EMAIL] Message:", error.message);
+    console.error("[VERIFICATION-EMAIL] Stack:", error.stack);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message,
+        details: "Vérifiez les logs de la fonction pour plus d'informations"
+      }),
       {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },

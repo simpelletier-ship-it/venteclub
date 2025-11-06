@@ -1,0 +1,56 @@
+.email-editor-wrapper {
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.email-editor-wrapper .ql-toolbar {
+  background: hsl(var(--muted));
+  border: 1px solid hsl(var(--border));
+  border-bottom: none;
+}
+
+.email-editor-wrapper .ql-container {
+  border: 1px solid hsl(var(--border));
+  font-size: 14px;
+  min-height: 400px;
+}
+
+.email-editor-wrapper .ql-editor {
+  min-height: 400px;
+  color: hsl(var(--foreground));
+}
+
+.email-editor-wrapper .ql-editor.ql-blank::before {
+  color: hsl(var(--muted-foreground));
+  font-style: normal;
+}
+
+.email-editor-wrapper .ql-snow .ql-stroke {
+  stroke: hsl(var(--foreground));
+}
+
+.email-editor-wrapper .ql-snow .ql-fill {
+  fill: hsl(var(--foreground));
+}
+
+.email-editor-wrapper .ql-snow .ql-picker-label {
+  color: hsl(var(--foreground));
+}
+
+.email-editor-wrapper .ql-toolbar button:hover,
+.email-editor-wrapper .ql-toolbar button:focus {
+  background: hsl(var(--accent));
+}
+
+.email-editor-wrapper .ql-toolbar button.ql-active {
+  background: hsl(var(--primary));
+}
+
+.email-editor-wrapper .ql-toolbar button.ql-active .ql-stroke {
+  stroke: hsl(var(--primary-foreground));
+}
+
+.email-editor-wrapper .ql-toolbar button.ql-active .ql-fill {
+  fill: hsl(var(--primary-foreground));
+}
