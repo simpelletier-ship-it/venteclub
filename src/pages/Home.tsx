@@ -110,13 +110,13 @@ const Home = () => {
               </div>
               
               <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-display font-bold leading-[1.1] tracking-tight text-foreground">
-                Vente.Club : votre plateforme pour acheter{" "}
+                Le club à rejoindre pour acheter{" "}
                 <TypewriterAnimation />
-                {" "}rentable.
+                {" "}au Québec.
               </h1>
               
               <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl leading-relaxed">
-                Plateforme intelligente qui facilite la connexion entre acquéreurs et propriétaires. Chaque projet publié est analysé. <span className="font-semibold text-foreground">Vous investissez avec clarté, vous reprenez avec confiance.</span>
+                Plateforme intelligente qui connecte acquéreurs et propriétaires d'entreprises. Chaque opportunité publiée est rigoureusement analysée pour garantir votre sécurité. <span className="font-semibold text-foreground">Investissez en toute confiance, reprenez en toute sérénité.</span>
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
