@@ -110,11 +110,9 @@ const Home = () => {
               </div>
               
               <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-display font-bold leading-[1.1] tracking-tight text-foreground">
-                Le club incontournable pour acheter
+                Le club incontournable pour acheter <TypewriterAnimation />
                 <br />
-                <span className="whitespace-nowrap">
-                  <TypewriterAnimation /> au Québec.
-                </span>
+                au Québec.
               </h1>
               
               <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl leading-relaxed">
