@@ -177,7 +177,7 @@ const Home = () => {
           </div>
           
           {/* Floating Animation - Positioned Absolutely */}
-          <div className="hidden xl:block absolute right-[-120px] top-[68%] -translate-y-1/2 w-[300px] pointer-events-none">
+          <div className="hidden xl:block absolute left-[55%] top-[68%] -translate-y-1/2 w-[300px] pointer-events-none">
             <FloatingOpportunities />
           </div>
         </div>
