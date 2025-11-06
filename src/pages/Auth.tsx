@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -10,10 +10,20 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { DisclaimerAlert } from "@/components/DisclaimerAlert";
+import ReCAPTCHA from "react-google-recaptcha";
+import { useFingerprint } from "@/hooks/useFingerprint";
+import { Shield, AlertTriangle } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+
+// Clé publique reCAPTCHA (v3 pour une expérience invisible)
+const RECAPTCHA_SITE_KEY = "6LfYourSiteKeyHere"; // À remplacer par votre vraie clé
 
 const Auth = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { fingerprint, loading: fpLoading } = useFingerprint();
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
+  
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -22,6 +32,8 @@ const Auth = () => {
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [verificationStep, setVerificationStep] = useState(false);
   const [verificationCode, setVerificationCode] = useState("");
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
+  const [securityWarning, setSecurityWarning] = useState<string | null>(null);
 
   useEffect(() => {
     // Vérifier la session existante
@@ -48,83 +60,92 @@ const Auth = () => {
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setSecurityWarning(null);
 
     try {
-      // Utiliser loginSchema pour la connexion (pas de validation stricte de longueur)
+      // Valider les données
       const validatedData = loginSchema.parse({ email, password });
 
-      // Vérifier si le compte est verrouillé
-      const { data: attemptCheck } = await supabase.functions.invoke('check-login-attempt', {
-        body: {
-          email: validatedData.email,
-          success: false,
-          ip_address: 'web',
-          user_agent: navigator.userAgent
-        }
-      });
-
-      if (attemptCheck?.locked) {
+      // Vérifier reCAPTCHA
+      if (!recaptchaToken) {
         toast({
           variant: "destructive",
-          title: "Compte temporairement verrouillé",
-          description: attemptCheck.message,
-          duration: 10000,
+          title: "Vérification requise",
+          description: "Veuillez compléter la vérification de sécurité.",
         });
+        setLoading(false);
         return;
       }
 
+      // Vérifier le reCAPTCHA côté serveur
+      const { data: recaptchaResult } = await supabase.functions.invoke('verify-recaptcha', {
+        body: { token: recaptchaToken }
+      });
+
+      if (!recaptchaResult?.success) {
+        toast({
+          variant: "destructive",
+          title: "Vérification échouée",
+          description: "La vérification de sécurité a échoué. Veuillez réessayer.",
+        });
+        recaptchaRef.current?.reset();
+        setRecaptchaToken(null);
+        setLoading(false);
+        return;
+      }
+
+      // Vérifier rate limiting
+      const { data: rateLimitCheck } = await supabase.functions.invoke('check-rate-limit', {
+        body: {
+          identifier: validatedData.email,
+          identifierType: 'email',
+          actionType: 'login'
+        }
+      });
+
+      if (rateLimitCheck && !rateLimitCheck.allowed) {
+        toast({
+          variant: "destructive",
+          title: "Trop de tentatives",
+          description: `Vous avez dépassé la limite de tentatives. Veuillez réessayer dans ${rateLimitCheck.minutesRemaining || 15} minutes.`,
+          duration: 10000,
+        });
+        setLoading(false);
+        return;
+      }
+
+      // Tenter la connexion
       const { error } = await supabase.auth.signInWithPassword({
         email: validatedData.email,
         password: validatedData.password,
       });
 
       if (error) {
-        // Enregistrer l'échec et récupérer le nombre de tentatives restantes
-        const { data: failureCheck } = await supabase.functions.invoke('check-login-attempt', {
-          body: {
-            email: validatedData.email,
-            success: false,
-            failure_reason: error.message,
-            ip_address: 'web',
-            user_agent: navigator.userAgent
-          }
+        toast({
+          variant: "destructive",
+          title: "Erreur de connexion",
+          description: "Email ou mot de passe incorrect.",
         });
-
-        // Afficher le nombre de tentatives restantes seulement en cas d'échec
-        if (failureCheck?.remaining_attempts !== undefined && failureCheck.remaining_attempts < 3) {
-          toast({
-            variant: "destructive",
-            title: "Attention",
-            description: failureCheck.message,
-            duration: 5000,
-          });
-        } else if (error.message.includes('Invalid login credentials')) {
-          toast({
-            variant: "destructive",
-            title: "Erreur de connexion",
-            description: "Email ou mot de passe incorrect.",
-          });
-        } else if (error.message.includes('Email not confirmed')) {
-          toast({
-            variant: "destructive",
-            title: "Email non confirmé",
-            description: "Veuillez vérifier votre boîte de réception pour confirmer votre email.",
-          });
-        } else {
-          throw error;
-        }
+        recaptchaRef.current?.reset();
+        setRecaptchaToken(null);
+        setLoading(false);
         return;
       }
 
-      // Enregistrer le succès
-      await supabase.functions.invoke('check-login-attempt', {
-        body: {
-          email: validatedData.email,
-          success: true,
-          ip_address: 'web',
-          user_agent: navigator.userAgent
-        }
-      });
+      // Enregistrer le fingerprint après connexion réussie
+      if (fingerprint) {
+        await supabase.functions.invoke('register-fingerprint', {
+          body: {
+            fingerprintHash: fingerprint.hash,
+            ipAddress: null, // L'edge function le récupérera
+            userAgent: fingerprint.components.userAgent,
+            screenResolution: fingerprint.components.screenResolution,
+            timezone: fingerprint.components.timezone,
+            language: fingerprint.components.language,
+            platform: fingerprint.components.platform
+          }
+        });
+      }
 
       toast({
         title: "Connexion réussie !",
@@ -155,6 +176,7 @@ const Auth = () => {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setSecurityWarning(null);
 
     try {
       if (!acceptedTerms) {
@@ -177,10 +199,92 @@ const Auth = () => {
         return;
       }
 
-      // Utiliser signupSchema pour l'inscription (validation stricte avec 8 caractères)
+      // Valider les données
       const validatedData = signupSchema.parse({ email, password });
 
-      // Appeler l'edge function pour créer et envoyer le code
+      // Vérifier reCAPTCHA
+      if (!recaptchaToken) {
+        toast({
+          variant: "destructive",
+          title: "Vérification requise",
+          description: "Veuillez compléter la vérification de sécurité.",
+        });
+        setLoading(false);
+        return;
+      }
+
+      // Vérifier le reCAPTCHA côté serveur
+      const { data: recaptchaResult } = await supabase.functions.invoke('verify-recaptcha', {
+        body: { token: recaptchaToken }
+      });
+
+      if (!recaptchaResult?.success) {
+        toast({
+          variant: "destructive",
+          title: "Vérification échouée",
+          description: "La vérification de sécurité a échoué. Veuillez réessayer.",
+        });
+        recaptchaRef.current?.reset();
+        setRecaptchaToken(null);
+        setLoading(false);
+        return;
+      }
+
+      // Vérifier le fingerprint pour détecter les comptes multiples
+      if (fingerprint) {
+        const { data: fingerprintCheck } = await supabase.functions.invoke('check-fingerprint', {
+          body: {
+            fingerprintHash: fingerprint.hash,
+            ipAddress: null,
+            userAgent: fingerprint.components.userAgent,
+            screenResolution: fingerprint.components.screenResolution,
+            timezone: fingerprint.components.timezone,
+            language: fingerprint.components.language,
+            platform: fingerprint.components.platform,
+            email: validatedData.email
+          }
+        });
+
+        if (fingerprintCheck && fingerprintCheck.suspicious) {
+          setSecurityWarning(
+            `Activité suspecte détectée: ${fingerprintCheck.suspicionReasons.join(', ')}. Vérification supplémentaire requise.`
+          );
+          
+          // Si très suspect, bloquer
+          if (fingerprintCheck.suspicionReasons.length > 1) {
+            toast({
+              variant: "destructive",
+              title: "Création de compte bloquée",
+              description: "Activité suspecte détectée. Veuillez contacter le support.",
+              duration: 10000,
+            });
+            setLoading(false);
+            return;
+          }
+        }
+      }
+
+      // Vérifier rate limiting
+      const { data: rateLimitCheck } = await supabase.functions.invoke('check-rate-limit', {
+        body: {
+          identifier: validatedData.email,
+          identifierType: 'email',
+          actionType: 'signup'
+        }
+      });
+
+      if (rateLimitCheck && !rateLimitCheck.allowed) {
+        toast({
+          variant: "destructive",
+          title: "Trop de tentatives",
+          description: `Limite de création de comptes atteinte. Veuillez réessayer dans ${rateLimitCheck.minutesRemaining || 60} minutes.`,
+          duration: 10000,
+        });
+        setLoading(false);
+        return;
+      }
+
+      // Créer le code de vérification
       const { error } = await supabase.functions.invoke('create-verification-code', {
         body: { email: validatedData.email }
       });
@@ -189,7 +293,6 @@ const Auth = () => {
         throw error;
       }
 
-      // Passer à l'étape de vérification
       setVerificationStep(true);
       toast({
         title: "Code envoyé !",
@@ -252,6 +355,21 @@ const Auth = () => {
 
       if (signInError) {
         throw signInError;
+      }
+
+      // Enregistrer le fingerprint après signup réussi
+      if (fingerprint) {
+        await supabase.functions.invoke('register-fingerprint', {
+          body: {
+            fingerprintHash: fingerprint.hash,
+            ipAddress: null,
+            userAgent: fingerprint.components.userAgent,
+            screenResolution: fingerprint.components.screenResolution,
+            timezone: fingerprint.components.timezone,
+            language: fingerprint.components.language,
+            platform: fingerprint.components.platform
+          }
+        });
       }
 
       toast({
@@ -374,6 +492,13 @@ const Auth = () => {
               </TabsList>
               
               <TabsContent value="login">
+                {securityWarning && (
+                  <Alert variant="destructive" className="mb-4">
+                    <AlertTriangle className="h-4 w-4" />
+                    <AlertDescription>{securityWarning}</AlertDescription>
+                  </Alert>
+                )}
+                
                 <form onSubmit={handleSignIn} className="space-y-4">
                   <div>
                     <Label htmlFor="login-email">Email</Label>
@@ -399,6 +524,22 @@ const Auth = () => {
                       className="w-full mt-2"
                     />
                   </div>
+                  
+                  {/* reCAPTCHA */}
+                  <div className="flex justify-center">
+                    <ReCAPTCHA
+                      ref={recaptchaRef}
+                      sitekey={RECAPTCHA_SITE_KEY}
+                      onChange={(token) => setRecaptchaToken(token)}
+                      onExpired={() => setRecaptchaToken(null)}
+                    />
+                  </div>
+                  
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Shield className="h-4 w-4" />
+                    <span>Connexion sécurisée avec protection anti-robot</span>
+                  </div>
+                  
                   <Button
                     type="button"
                     variant="link"
@@ -407,7 +548,11 @@ const Auth = () => {
                   >
                     Mot de passe oublié ?
                   </Button>
-                  <Button type="submit" disabled={loading} className="w-full">
+                  <Button 
+                    type="submit" 
+                    disabled={loading || !recaptchaToken || fpLoading} 
+                    className="w-full"
+                  >
                     {loading ? "Connexion..." : "Se connecter"}
                   </Button>
                   
@@ -488,6 +633,12 @@ const Auth = () => {
                   </form>
                 ) : (
                   <form onSubmit={handleSignUp} className="space-y-4">
+                  {securityWarning && (
+                    <Alert variant="destructive" className="mb-4">
+                      <AlertTriangle className="h-4 w-4" />
+                      <AlertDescription>{securityWarning}</AlertDescription>
+                    </Alert>
+                  )}
                   <DisclaimerAlert />
                   <div>
                     <Label htmlFor="signup-email">Email</Label>
@@ -531,6 +682,21 @@ const Auth = () => {
                     />
                   </div>
                   
+                  {/* reCAPTCHA */}
+                  <div className="flex justify-center">
+                    <ReCAPTCHA
+                      ref={recaptchaRef}
+                      sitekey={RECAPTCHA_SITE_KEY}
+                      onChange={(token) => setRecaptchaToken(token)}
+                      onExpired={() => setRecaptchaToken(null)}
+                    />
+                  </div>
+                  
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Shield className="h-4 w-4" />
+                    <span>Protection avancée contre les comptes multiples et les robots</span>
+                  </div>
+                  
                   <div className="space-y-3">
                     <div className="flex items-start space-x-3 p-4 bg-muted/50 border border-border rounded-lg">
                       <Checkbox
@@ -561,7 +727,11 @@ const Auth = () => {
                     </div>
                   </div>
 
-                  <Button type="submit" disabled={loading || !acceptedTerms} className="w-full">
+                  <Button 
+                    type="submit" 
+                    disabled={loading || !acceptedTerms || !recaptchaToken || fpLoading} 
+                    className="w-full"
+                  >
                     {loading ? "Envoi du code..." : "Recevoir le code de vérification"}
                   </Button>
                   

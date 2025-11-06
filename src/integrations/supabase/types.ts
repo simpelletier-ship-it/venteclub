@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      blocked_ips: {
+        Row: {
+          blocked_at: string | null
+          blocked_until: string | null
+          failed_attempts: number | null
+          id: string
+          ip_address: unknown
+          permanent: boolean | null
+          reason: string
+        }
+        Insert: {
+          blocked_at?: string | null
+          blocked_until?: string | null
+          failed_attempts?: number | null
+          id?: string
+          ip_address: unknown
+          permanent?: boolean | null
+          reason: string
+        }
+        Update: {
+          blocked_at?: string | null
+          blocked_until?: string | null
+          failed_attempts?: number | null
+          id?: string
+          ip_address?: unknown
+          permanent?: boolean | null
+          reason?: string
+        }
+        Relationships: []
+      }
       blog_posts: {
         Row: {
           category: string
@@ -494,6 +524,51 @@ export type Database = {
           },
         ]
       }
+      device_fingerprints: {
+        Row: {
+          created_at: string | null
+          fingerprint_hash: string
+          id: string
+          ip_address: unknown
+          language: string | null
+          last_seen_at: string | null
+          platform: string | null
+          screen_resolution: string | null
+          times_seen: number | null
+          timezone: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          fingerprint_hash: string
+          id?: string
+          ip_address?: unknown
+          language?: string | null
+          last_seen_at?: string | null
+          platform?: string | null
+          screen_resolution?: string | null
+          times_seen?: number | null
+          timezone?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          fingerprint_hash?: string
+          id?: string
+          ip_address?: unknown
+          language?: string | null
+          last_seen_at?: string | null
+          platform?: string | null
+          screen_resolution?: string | null
+          times_seen?: number | null
+          timezone?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       email_verification_codes: {
         Row: {
           code: string
@@ -565,8 +640,10 @@ export type Database = {
       login_attempts: {
         Row: {
           attempted_at: string | null
+          captcha_verified: boolean | null
           email: string
           failure_reason: string | null
+          fingerprint_hash: string | null
           id: string
           ip_address: string | null
           success: boolean | null
@@ -574,8 +651,10 @@ export type Database = {
         }
         Insert: {
           attempted_at?: string | null
+          captcha_verified?: boolean | null
           email: string
           failure_reason?: string | null
+          fingerprint_hash?: string | null
           id?: string
           ip_address?: string | null
           success?: boolean | null
@@ -583,8 +662,10 @@ export type Database = {
         }
         Update: {
           attempted_at?: string | null
+          captcha_verified?: boolean | null
           email?: string
           failure_reason?: string | null
+          fingerprint_hash?: string | null
           id?: string
           ip_address?: string | null
           success?: boolean | null
@@ -844,6 +925,39 @@ export type Database = {
           street_address?: string | null
           updated_at?: string | null
           website?: string | null
+        }
+        Relationships: []
+      }
+      rate_limits: {
+        Row: {
+          action_type: string
+          attempts: number | null
+          blocked_until: string | null
+          created_at: string | null
+          id: string
+          identifier: string
+          identifier_type: string
+          window_start: string | null
+        }
+        Insert: {
+          action_type: string
+          attempts?: number | null
+          blocked_until?: string | null
+          created_at?: string | null
+          id?: string
+          identifier: string
+          identifier_type: string
+          window_start?: string | null
+        }
+        Update: {
+          action_type?: string
+          attempts?: number | null
+          blocked_until?: string | null
+          created_at?: string | null
+          id?: string
+          identifier?: string
+          identifier_type?: string
+          window_start?: string | null
         }
         Relationships: []
       }
