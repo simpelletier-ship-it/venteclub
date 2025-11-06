@@ -44,7 +44,7 @@ serve(async (req) => {
         },
       ],
       mode: "subscription",
-      success_url: `${req.headers.get("origin")}/?premium_success=true`,
+      success_url: `${req.headers.get("origin")}/premium-success`,
       cancel_url: `${req.headers.get("origin")}/?premium_cancel=true`,
     });
 

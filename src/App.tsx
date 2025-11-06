@@ -40,6 +40,7 @@ const Resources = lazy(() => import("./pages/Resources"));
 const FAQ = lazy(() => import("./pages/FAQ"));
 const Market = lazy(() => import("./pages/Market"));
 const EmailConfirmed = lazy(() => import("./pages/EmailConfirmed"));
+const PremiumSuccess = lazy(() => import("./pages/PremiumSuccess"));
 
 const queryClient = new QueryClient();
 
@@ -62,6 +63,7 @@ const App = () => (
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/email-confirmed" element={<EmailConfirmed />} />
                 <Route path="/logout-success" element={<LogoutSuccess />} />
+                <Route path="/premium-success" element={<PremiumSuccess />} />
                 
                 {/* Pages publiques SEO (mais nécessitent email confirmé si connecté) */}
                 <Route path="/" element={<EmailVerificationGuard><Home /></EmailVerificationGuard>} />
