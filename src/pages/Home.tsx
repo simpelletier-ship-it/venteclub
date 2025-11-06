@@ -90,8 +90,8 @@ const Home = () => {
   return (
     <>
       <SEO 
-        title="Achat et Vente d'Entreprises au Québec | Prix Médian 375K$ | Vente.Club" 
-        description="Plateforme intelligente qui connecte acheteurs et vendeurs d'entreprises au Québec. Restaurants, commerces, industries - Trouvez l'opportunité qui correspond à vos compétences et moyens. Optimisé par IA."
+        title="Achat et Vente d'Entreprises au Québec - Plateforme #1 pour Trouver Votre Opportunité" 
+        description="Découvrez des centaines d'entreprises à vendre au Québec : restaurants, commerces, franchises. Connexion directe avec les propriétaires. Recherche optimisée par IA. Transactions sécurisées. Rejoignez plus de 10 000 entrepreneurs québécois."
         keywords="achat entreprise Québec, vente entreprise, PME à vendre, commerce à vendre, opportunité affaires, reprise commerce Montréal, cession entreprise, prix entreprise 2025"
         canonical="/" 
         structuredData={structuredData} 
@@ -161,7 +161,7 @@ const Home = () => {
               <TrendingUp className="w-3 sm:w-4 h-3 sm:h-4" />
               Opportunités du moment
             </div>
-            <h2 className="text-2xl sm:text-4xl md:text-5xl font-display font-bold text-foreground mb-2 sm:mb-3 px-4">
+            <h2 id="featured-heading" className="text-2xl sm:text-4xl md:text-5xl font-display font-bold text-foreground mb-2 sm:mb-3 px-4">
               Opportunités en vedette
             </h2>
             <p className="text-sm sm:text-lg text-muted-foreground max-w-2xl mx-auto px-4">
@@ -191,12 +191,12 @@ const Home = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-12 sm:py-16 bg-background">
+      <section className="py-12 sm:py-16 bg-background" aria-labelledby="features-heading">
         <div className="container mx-auto px-4">
           <div className="text-center mb-10 max-w-3xl mx-auto">
-            <h2 className="text-3xl sm:text-4xl font-display font-bold mb-4">Pour tous les entrepreneurs</h2>
+            <h2 id="features-heading" className="text-3xl sm:text-4xl font-display font-bold mb-4">Pour tous les entrepreneurs</h2>
             <p className="text-base sm:text-lg text-muted-foreground">
-              Quel que soit votre secteur d'activité, découvrez un large éventail d'opportunités adaptées à vos compétences et à votre budget. Notre plateforme vous permet d'acquérir une entreprise selon différentes modalités : immobilisation complète incluant bâtiment et équipements, acquisition d'actions pour devenir actionnaire, ou rachat de fonds de commerce pour reprendre l'activité existante.
+              Quel que soit votre secteur d'activité, découvrez un large éventail d'opportunités adaptées à vos compétences et à votre budget. Notre <a href="/ressources" className="text-secondary hover:underline font-semibold">plateforme intelligente</a> vous permet d'acquérir une entreprise selon différentes modalités : immobilisation complète incluant bâtiment et équipements, acquisition d'actions pour devenir actionnaire, ou <a href="/blog" className="text-secondary hover:underline font-semibold">rachat de fonds de commerce</a> pour reprendre l'activité existante.
             </p>
           </div>
           
@@ -217,32 +217,72 @@ const Home = () => {
               <p className="text-xs sm:text-sm text-muted-foreground">Navigation intuitive et gestion facile de vos annonces grâce à notre technologie avancée</p>
             </div>
           </div>
+          
+          {/* Popular Categories - Internal Links */}
+          <div className="max-w-5xl mx-auto mt-12">
+            <h3 className="text-2xl font-bold text-center mb-6">Catégories populaires au Québec</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <a href="/entreprises-a-vendre-montreal" className="text-center p-4 rounded-lg bg-muted/50 hover:bg-muted transition-colors border border-border hover:border-secondary">
+                <p className="font-semibold text-foreground">Montréal</p>
+                <p className="text-xs text-muted-foreground mt-1">Entreprises à vendre</p>
+              </a>
+              <a href="/entreprises-a-vendre-quebec" className="text-center p-4 rounded-lg bg-muted/50 hover:bg-muted transition-colors border border-border hover:border-secondary">
+                <p className="font-semibold text-foreground">Québec</p>
+                <p className="text-xs text-muted-foreground mt-1">Opportunités</p>
+              </a>
+              <a href="/entreprises-a-vendre-laval" className="text-center p-4 rounded-lg bg-muted/50 hover:bg-muted transition-colors border border-border hover:border-secondary">
+                <p className="font-semibold text-foreground">Laval</p>
+                <p className="text-xs text-muted-foreground mt-1">Commerces</p>
+              </a>
+              <a href="/immeubles-commerciaux" className="text-center p-4 rounded-lg bg-muted/50 hover:bg-muted transition-colors border border-border hover:border-secondary">
+                <p className="font-semibold text-foreground">Immeubles</p>
+                <p className="text-xs text-muted-foreground mt-1">Commerciaux</p>
+              </a>
+            </div>
+          </div>
+
+          {/* Resources Links */}
+          <div className="max-w-5xl mx-auto mt-12 text-center">
+            <p className="text-muted-foreground">
+              Besoin d'aide pour <a href="/sell" className="text-secondary hover:underline font-semibold">vendre votre entreprise</a> ? 
+              Consultez nos <a href="/ressources" className="text-secondary hover:underline font-semibold">ressources</a> et notre 
+              <a href="/faq" className="text-secondary hover:underline font-semibold ml-1">FAQ</a> ou 
+              <a href="/contact" className="text-secondary hover:underline font-semibold ml-1">contactez-nous</a> pour un accompagnement personnalisé.
+            </p>
+          </div>
         </div>
       </section>
 
       {/* FAQ Section */}
-      <section className="py-12 bg-muted/30">
+      <section className="py-12 bg-muted/30" aria-labelledby="faq-heading">
         <div className="container mx-auto px-4 max-w-4xl">
           <div className="text-center mb-8">
-            <h2 className="text-4xl font-display font-bold">Questions fréquentes</h2>
+            <h2 id="faq-heading" className="text-4xl font-display font-bold">Questions fréquentes</h2>
+            <p className="text-muted-foreground mt-2">Tout ce que vous devez savoir sur l'achat et la vente d'entreprises</p>
           </div>
           <Accordion type="single" collapsible className="w-full mb-8">
             <AccordionItem value="item-1">
               <AccordionTrigger>Comment acheter une entreprise au Québec?</AccordionTrigger>
               <AccordionContent>
-                L'achat d'une entreprise commence par l'identification d'opportunités sur Vente.club. Contactez les vendeurs, effectuez une due diligence, négociez le prix et finalisez avec des professionnels.
+                L'achat d'une entreprise commence par l'identification d'opportunités sur notre plateforme. <a href="/entreprises" className="text-secondary hover:underline font-semibold">Explorez les annonces</a>, contactez les vendeurs directement, effectuez une due diligence complète, négociez le prix et finalisez la transaction avec des professionnels. Consultez notre <a href="/blog" className="text-secondary hover:underline font-semibold">guide complet</a> pour plus de détails.
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="item-2">
               <AccordionTrigger>Comment vendre mon entreprise?</AccordionTrigger>
               <AccordionContent>
-                Créez un compte gratuit, soumettez votre annonce avec les détails de votre entreprise. Notre équipe l'approuvera après avoir vérifié que l'annonce est conforme à nos règlements.
+                <a href="/auth" className="text-secondary hover:underline font-semibold">Créez un compte gratuit</a>, puis <a href="/sell" className="text-secondary hover:underline font-semibold">soumettez votre annonce</a> avec tous les détails de votre entreprise. Notre équipe l'approuvera après vérification. Profitez de notre réseau de plus de 10 000 acheteurs potentiels au Québec.
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="item-3">
               <AccordionTrigger>À quoi sert le Club Select?</AccordionTrigger>
               <AccordionContent>
-                Le Club Select à 19,99$/mois vous offre un accès illimité à tous les vendeurs, des conversations sans limite, et la possibilité de contacter autant d'entreprises que vous le souhaitez chaque jour. C'est l'outil idéal pour les acheteurs sérieux qui recherchent activement la perle rare.
+                Le Club Select à 19,99$/mois vous offre un accès illimité à tous les vendeurs, des conversations sans limite, et la possibilité de contacter autant d'entreprises que vous le souhaitez chaque jour. Découvrez tous les <a href="/a-propos" className="text-secondary hover:underline font-semibold">avantages du Club Select</a> pour les acheteurs sérieux.
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-4">
+              <AccordionTrigger>Quels types d'entreprises puis-je trouver?</AccordionTrigger>
+              <AccordionContent>
+                Restaurants, cafés, boutiques, garages, salons de beauté, franchises, immeubles commerciaux et bien plus. Découvrez toutes les <a href="/marche" className="text-secondary hover:underline font-semibold">catégories disponibles</a> et trouvez l'opportunité qui correspond à vos compétences.
               </AccordionContent>
             </AccordionItem>
           </Accordion>
@@ -261,7 +301,7 @@ const Home = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="relative py-20 overflow-hidden bg-gradient-to-br from-white via-muted to-white">
+      <section className="relative py-20 overflow-hidden bg-gradient-to-br from-white via-muted to-white" aria-labelledby="cta-heading">
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-gradient-to-br from-secondary/30 via-primary/20 to-transparent rounded-full blur-3xl animate-float" />
           <div className="absolute -bottom-40 -left-40 w-[600px] h-[600px] bg-gradient-to-tr from-accent/30 via-primary/20 to-transparent rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
@@ -269,7 +309,7 @@ const Home = () => {
         
         <div className="relative container mx-auto px-4">
           <div className="max-w-3xl mx-auto space-y-8 text-center animate-slide-up">
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-foreground leading-tight">
+            <h2 id="cta-heading" className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-foreground leading-tight">
               Prêt à trouver <span className="text-secondary">votre prochaine opportunité ?</span>
             </h2>
             <p className="text-xl md:text-2xl text-muted-foreground">
