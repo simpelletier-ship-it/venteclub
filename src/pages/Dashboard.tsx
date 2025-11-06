@@ -11,7 +11,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import BusinessCard from "@/components/BusinessCard";
 import { WithdrawBusinessDialog } from "@/components/WithdrawBusinessDialog";
 import { PremiumSubscription } from "@/components/PremiumSubscription";
-import { MessagesList } from "@/components/MessagesList";
 import { BusinessStatistics } from "@/components/BusinessStatistics";
 
 const Dashboard = () => {
@@ -31,6 +30,12 @@ const Dashboard = () => {
   const defaultTab = searchParams.get('tab') || 'businesses';
 
   useEffect(() => {
+    // Redirect to /messages if user selected messages tab
+    if (defaultTab === 'messages') {
+      navigate('/messages');
+      return;
+    }
+
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (!session) {
         navigate("/auth");
@@ -47,7 +52,7 @@ const Dashboard = () => {
         setIsAdmin(!!hasAdminRole);
       }
     });
-  }, [navigate]);
+  }, [navigate, defaultTab]);
 
   useEffect(() => {
     const verifyFeaturedPayment = async (sessionId: string) => {
@@ -466,7 +471,7 @@ const Dashboard = () => {
           </TabsContent>
 
           <TabsContent value="messages">
-            {user && <MessagesList userId={user.id} />}
+            {/* This tab redirects to /messages page via useEffect */}
           </TabsContent>
         </Tabs>
       </div>
