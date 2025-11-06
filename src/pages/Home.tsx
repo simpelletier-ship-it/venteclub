@@ -309,70 +309,70 @@ const Home = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-16 sm:py-20 bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50 border-y border-primary/20" aria-labelledby="features-heading">
+      <section className="py-16 sm:py-20 bg-gradient-to-br from-[#1e1b4b] via-[#312e81] to-[#1e3a8a] border-y border-primary/20" aria-labelledby="features-heading">
         <div className="container mx-auto px-4">
           <div className="text-center mb-10 max-w-3xl mx-auto">
-            <h2 id="features-heading" className="text-3xl sm:text-4xl font-display font-bold mb-4">Pour tous les entrepreneurs</h2>
-            <p className="text-base sm:text-lg text-muted-foreground">
+            <h2 id="features-heading" className="text-3xl sm:text-4xl font-display font-bold mb-4 text-white">Pour tous les entrepreneurs</h2>
+            <p className="text-base sm:text-lg text-white/80">
               Quel que soit votre secteur d'activité, découvrez un large éventail d'opportunités adaptées à vos compétences et à votre budget. Notre <a href="/ressources" className="text-secondary hover:underline font-semibold">plateforme intelligente</a> vous permet d'acquérir une entreprise selon différentes modalités : immobilisation complète incluant bâtiment et équipements, acquisition d'actions pour devenir actionnaire, ou <a href="/blog" className="text-secondary hover:underline font-semibold">rachat de fonds de commerce</a> pour reprendre l'activité existante.
             </p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 max-w-5xl mx-auto mb-12">
-            <div className="text-center p-5 sm:p-6 rounded-xl bg-card border border-border hover:shadow-lg transition-shadow">
-              <TrendingUp className="w-8 sm:w-10 h-8 sm:h-10 mx-auto mb-2 sm:mb-3 text-secondary" />
-              <h3 className="text-base sm:text-lg font-bold mb-1.5 sm:mb-2">Recherche optimisée par IA</h3>
-              <p className="text-xs sm:text-sm text-muted-foreground">Trouvez rapidement les opportunités qui correspondent à votre profil grâce à notre intelligence artificielle</p>
+            <div className="text-center p-5 sm:p-6 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:shadow-lg transition-all backdrop-blur-sm">
+              <TrendingUp className="w-8 sm:w-10 h-8 sm:h-10 mx-auto mb-2 sm:mb-3 text-[#818cf8]" />
+              <h3 className="text-base sm:text-lg font-bold mb-1.5 sm:mb-2 text-white">Recherche optimisée par IA</h3>
+              <p className="text-xs sm:text-sm text-white/70">Trouvez rapidement les opportunités qui correspondent à votre profil grâce à notre intelligence artificielle</p>
             </div>
-            <div className="text-center p-5 sm:p-6 rounded-xl bg-card border border-border hover:shadow-lg transition-shadow">
-              <Shield className="w-8 sm:w-10 h-8 sm:h-10 mx-auto mb-2 sm:mb-3 text-secondary" />
-              <h3 className="text-base sm:text-lg font-bold mb-1.5 sm:mb-2">Transactions sécurisées</h3>
-              <p className="text-xs sm:text-sm text-muted-foreground">Plateforme fiable et sécurisée pour toutes vos négociations d'achat ou de vente</p>
+            <div className="text-center p-5 sm:p-6 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:shadow-lg transition-all backdrop-blur-sm">
+              <Shield className="w-8 sm:w-10 h-8 sm:h-10 mx-auto mb-2 sm:mb-3 text-[#818cf8]" />
+              <h3 className="text-base sm:text-lg font-bold mb-1.5 sm:mb-2 text-white">Transactions sécurisées</h3>
+              <p className="text-xs sm:text-sm text-white/70">Plateforme fiable et sécurisée pour toutes vos négociations d'achat ou de vente</p>
             </div>
-            <div className="text-center p-5 sm:p-6 rounded-xl bg-card border border-border hover:shadow-lg transition-shadow">
-              <Clock className="w-8 sm:w-10 h-8 sm:h-10 mx-auto mb-2 sm:mb-3 text-secondary" />
-              <h3 className="text-base sm:text-lg font-bold mb-1.5 sm:mb-2">Interface simplifiée</h3>
-              <p className="text-xs sm:text-sm text-muted-foreground">Navigation intuitive et gestion facile de vos annonces grâce à notre technologie avancée</p>
+            <div className="text-center p-5 sm:p-6 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:shadow-lg transition-all backdrop-blur-sm">
+              <Clock className="w-8 sm:w-10 h-8 sm:h-10 mx-auto mb-2 sm:mb-3 text-[#818cf8]" />
+              <h3 className="text-base sm:text-lg font-bold mb-1.5 sm:mb-2 text-white">Interface simplifiée</h3>
+              <p className="text-xs sm:text-sm text-white/70">Navigation intuitive et gestion facile de vos annonces grâce à notre technologie avancée</p>
             </div>
           </div>
           
           {/* Popular Categories - Internal Links */}
           <div className="max-w-5xl mx-auto mt-12">
-            <h3 className="text-2xl font-bold text-center mb-6">Catégories populaires au Québec</h3>
+            <h3 className="text-2xl font-bold text-center mb-6 text-white">Catégories populaires au Québec</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <a href="/entreprises-a-vendre-montreal" className="text-center p-4 rounded-lg bg-muted/50 hover:bg-muted transition-colors border border-border hover:border-secondary">
-                <p className="font-semibold text-foreground">Montréal</p>
-                <p className="text-xs text-muted-foreground mt-1">Entreprises à vendre</p>
+              <a href="/entreprises-a-vendre-montreal" className="text-center p-4 rounded-lg bg-white/5 hover:bg-white/10 transition-colors border border-white/10 hover:border-[#818cf8]">
+                <p className="font-semibold text-white">Montréal</p>
+                <p className="text-xs text-white/70 mt-1">Entreprises à vendre</p>
               </a>
-              <a href="/entreprises-a-vendre-quebec" className="text-center p-4 rounded-lg bg-muted/50 hover:bg-muted transition-colors border border-border hover:border-secondary">
-                <p className="font-semibold text-foreground">Québec</p>
-                <p className="text-xs text-muted-foreground mt-1">Opportunités</p>
+              <a href="/entreprises-a-vendre-quebec" className="text-center p-4 rounded-lg bg-white/5 hover:bg-white/10 transition-colors border border-white/10 hover:border-[#818cf8]">
+                <p className="font-semibold text-white">Québec</p>
+                <p className="text-xs text-white/70 mt-1">Opportunités</p>
               </a>
-              <a href="/entreprises-a-vendre-laval" className="text-center p-4 rounded-lg bg-muted/50 hover:bg-muted transition-colors border border-border hover:border-secondary">
-                <p className="font-semibold text-foreground">Laval</p>
-                <p className="text-xs text-muted-foreground mt-1">Commerces</p>
+              <a href="/entreprises-a-vendre-laval" className="text-center p-4 rounded-lg bg-white/5 hover:bg-white/10 transition-colors border border-white/10 hover:border-[#818cf8]">
+                <p className="font-semibold text-white">Laval</p>
+                <p className="text-xs text-white/70 mt-1">Commerces</p>
               </a>
-              <a href="/immeubles-commerciaux" className="text-center p-4 rounded-lg bg-muted/50 hover:bg-muted transition-colors border border-border hover:border-secondary">
-                <p className="font-semibold text-foreground">Immeubles</p>
-                <p className="text-xs text-muted-foreground mt-1">Commerciaux</p>
+              <a href="/immeubles-commerciaux" className="text-center p-4 rounded-lg bg-white/5 hover:bg-white/10 transition-colors border border-white/10 hover:border-[#818cf8]">
+                <p className="font-semibold text-white">Immeubles</p>
+                <p className="text-xs text-white/70 mt-1">Commerciaux</p>
               </a>
             </div>
           </div>
 
           {/* Resources Links */}
           <div className="max-w-5xl mx-auto mt-12 text-center">
-            <p className="text-muted-foreground">
-              Besoin d'aide pour <a href="/sell" className="text-secondary hover:underline font-semibold">vendre votre entreprise</a> ? 
-              Consultez nos <a href="/ressources" className="text-secondary hover:underline font-semibold">ressources</a> et notre 
-              <a href="/faq" className="text-secondary hover:underline font-semibold ml-1">FAQ</a> ou 
-              <a href="/contact" className="text-secondary hover:underline font-semibold ml-1">contactez-nous</a> pour un accompagnement personnalisé.
+            <p className="text-white/80">
+              Besoin d'aide pour <a href="/sell" className="text-[#818cf8] hover:underline font-semibold">vendre votre entreprise</a> ? 
+              Consultez nos <a href="/ressources" className="text-[#818cf8] hover:underline font-semibold">ressources</a> et notre 
+              <a href="/faq" className="text-[#818cf8] hover:underline font-semibold ml-1">FAQ</a> ou 
+              <a href="/contact" className="text-[#818cf8] hover:underline font-semibold ml-1">contactez-nous</a> pour un accompagnement personnalisé.
             </p>
           </div>
         </div>
       </section>
 
       {/* FAQ Section */}
-      <section className="py-16 sm:py-20 bg-white" aria-labelledby="faq-heading">
+      <section className="py-16 sm:py-20 bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50" aria-labelledby="faq-heading">
         <div className="container mx-auto px-4 max-w-4xl">
           <div className="text-center mb-8">
             <h2 id="faq-heading" className="text-4xl font-display font-bold">Questions fréquentes</h2>
