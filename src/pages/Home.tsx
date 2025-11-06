@@ -117,7 +117,7 @@ const Home = () => {
                 partout au Québec
               </h1>
               
-              <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl leading-relaxed">
+              <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl leading-relaxed text-justify">
                 Plateforme intelligente qui connecte acquéreurs et propriétaires d'entreprises. Chaque opportunité publiée est rigoureusement analysée pour garantir votre sécurité. <span className="font-semibold text-foreground">Investissez en toute confiance, reprenez en toute sérénité.</span>
               </p>
               
