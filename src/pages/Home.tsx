@@ -130,58 +130,55 @@ const Home = () => {
         </div>
         
         <div className="container mx-auto px-4 py-20 relative z-10">
-          <div className="max-w-7xl mx-auto">
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
-              {/* Left Content */}
-              <div 
-                className="space-y-8 animate-slide-up transition-transform duration-100" 
-                style={{ 
-                  transform: `translateY(${scrollY * 0.05}px)` 
-                }}
-              >
-                <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-primary/10 border border-primary/20 backdrop-blur-sm">
-                  <Sparkles className="w-4 h-4 text-primary" />
-                  <span className="text-foreground/90 text-sm font-medium">
-                    Plateforme de confiance pour vos transactions
-                  </span>
-                </div>
-                
-                <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-bold leading-[1.1] tracking-tight text-foreground">
-                  Le Club de Référence
-                  <br />
-                  pour acheter <TypewriterAnimation />
-                  <br />
-                  partout au Québec
-                </h1>
-                
-                <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl leading-relaxed text-justify">
-                  Plateforme intelligente qui connecte acquéreurs et propriétaires d'entreprises. Chaque opportunité publiée est rigoureusement analysée pour garantir votre sécurité. <span className="font-semibold text-foreground">Investissez en toute confiance, reprenez en toute sérénité.</span>
-                </p>
-                
-                <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                  <Button 
-                    size="lg" 
-                    className="bg-primary hover:bg-primary/90 text-white h-14 px-10 text-base font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all group"
-                    onClick={() => document.getElementById('featured')?.scrollIntoView({ behavior: 'smooth' })}
-                  >
-                    Explorer les opportunités
-                    <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                  </Button>
-                  <Button 
-                    size="lg" 
-                    className="h-14 px-10 text-base font-semibold rounded-xl bg-accent hover:bg-accent/90 text-white shadow-lg hover:shadow-xl transition-all"
-                    onClick={() => navigate("/sell")}
-                  >
-                    Vendre mon entreprise
-                  </Button>
-                </div>
+          <div className="max-w-6xl mx-auto">
+            <div 
+              className="space-y-8 animate-slide-up transition-transform duration-100" 
+              style={{ 
+                transform: `translateY(${scrollY * 0.05}px)` 
+              }}
+            >
+              <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-primary/10 border border-primary/20 backdrop-blur-sm">
+                <Sparkles className="w-4 h-4 text-primary" />
+                <span className="text-foreground/90 text-sm font-medium">
+                  Plateforme de confiance pour vos transactions
+                </span>
               </div>
-
-              {/* Right Animation */}
-              <div className="hidden lg:block animate-slide-up" style={{ animationDelay: "200ms" }}>
-                <FloatingOpportunities />
+              
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-bold leading-[1.1] tracking-tight text-foreground">
+                Le Club de Référence
+                <br />
+                pour acheter <TypewriterAnimation />
+                <br />
+                partout au Québec
+              </h1>
+              
+              <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl leading-relaxed text-justify">
+                Plateforme intelligente qui connecte acquéreurs et propriétaires d'entreprises. Chaque opportunité publiée est rigoureusement analysée pour garantir votre sécurité. <span className="font-semibold text-foreground">Investissez en toute confiance, reprenez en toute sérénité.</span>
+              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                <Button 
+                  size="lg" 
+                  className="bg-primary hover:bg-primary/90 text-white h-14 px-10 text-base font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all group"
+                  onClick={() => document.getElementById('featured')?.scrollIntoView({ behavior: 'smooth' })}
+                >
+                  Explorer les opportunités
+                  <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </Button>
+                <Button 
+                  size="lg" 
+                  className="h-14 px-10 text-base font-semibold rounded-xl bg-accent hover:bg-accent/90 text-white shadow-lg hover:shadow-xl transition-all"
+                  onClick={() => navigate("/sell")}
+                >
+                  Vendre mon entreprise
+                </Button>
               </div>
             </div>
+          </div>
+          
+          {/* Floating Animation - Positioned Absolutely */}
+          <div className="hidden xl:block absolute right-8 top-1/2 -translate-y-1/2 w-[320px] pointer-events-none">
+            <FloatingOpportunities />
           </div>
         </div>
         
