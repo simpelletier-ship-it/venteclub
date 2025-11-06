@@ -219,7 +219,7 @@ const Auth = () => {
       }
 
       // Créer le compte avec Supabase
-      const redirectUrl = `${window.location.origin}/`;
+      const redirectUrl = `${window.location.origin}/email-confirmed`;
       const { data, error } = await supabase.auth.signUp({
         email: validatedData.email,
         password: validatedData.password,

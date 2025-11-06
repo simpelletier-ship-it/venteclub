@@ -1,5 +1,8 @@
 project_id = "xmwsrvaricrfxovimffm"
 
+[functions.send-confirmation-email]
+verify_jwt = false
+
 [functions.admin-update-business]
 verify_jwt = true
 

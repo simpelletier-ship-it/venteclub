@@ -38,6 +38,7 @@ const Profile = lazy(() => import("./pages/Profile"));
 const Resources = lazy(() => import("./pages/Resources"));
 const FAQ = lazy(() => import("./pages/FAQ"));
 const Market = lazy(() => import("./pages/Market"));
+const EmailConfirmed = lazy(() => import("./pages/EmailConfirmed"));
 
 const queryClient = new QueryClient();
 
@@ -59,6 +60,7 @@ const App = () => (
                 <Route path="/entreprises" element={<Businesses />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
+                <Route path="/email-confirmed" element={<EmailConfirmed />} />
                 <Route path="/sell" element={<Sell />} />
                 <Route path="/list-business" element={<ListBusiness />} />
                 <Route path="/list-franchise" element={<ListFranchise />} />
