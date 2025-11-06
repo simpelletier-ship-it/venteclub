@@ -151,18 +151,18 @@ const Home = () => {
       />
       
       {/* Hero Section */}
-      <section className="relative min-h-[85vh] flex items-center bg-gradient-to-br from-[#1e1b4b] via-[#312e81] to-[#1e3a8a] overflow-hidden" aria-label="Section principale">
+      <section className="relative min-h-[85vh] flex items-center bg-gradient-to-br from-[hsl(var(--secondary))] via-[hsl(var(--primary))] to-[hsl(var(--secondary))] overflow-hidden" aria-label="Section principale">
         {/* Animated Background Elements with Parallax */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div 
-            className="absolute top-20 -right-20 w-96 h-96 bg-[#6366f1]/20 rounded-full blur-3xl animate-pulse transition-transform duration-100" 
+            className="absolute top-20 -right-20 w-96 h-96 bg-primary/20 rounded-full blur-3xl animate-pulse transition-transform duration-100" 
             style={{ 
               animationDuration: '8s',
               transform: `translate(${scrollY * 0.15}px, ${scrollY * 0.1}px)`
             }} 
           />
           <div 
-            className="absolute bottom-20 -left-20 w-96 h-96 bg-[#818cf8]/20 rounded-full blur-3xl animate-pulse transition-transform duration-100" 
+            className="absolute bottom-20 -left-20 w-96 h-96 bg-primary/20 rounded-full blur-3xl animate-pulse transition-transform duration-100" 
             style={{ 
               animationDuration: '10s', 
               animationDelay: '2s',
@@ -170,7 +170,7 @@ const Home = () => {
             }} 
           />
           <div 
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#4f46e5]/10 rounded-full blur-3xl animate-pulse transition-transform duration-100" 
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[hsl(var(--secondary))]/10 rounded-full blur-3xl animate-pulse transition-transform duration-100" 
             style={{ 
               animationDuration: '12s', 
               animationDelay: '4s',
@@ -188,7 +188,7 @@ const Home = () => {
               }}
             >
               <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-bold leading-[1.1] tracking-tight text-white">
-                <span className="text-[#818cf8] font-extrabold">Le Club</span> de Référence
+                <span className="text-primary font-extrabold">Le Club</span> de Référence
                 <br />
                 pour acheter <TypewriterAnimation />
                 <br />
@@ -202,7 +202,7 @@ const Home = () => {
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
                 <Button 
                   size="lg" 
-                  className="bg-[#6366f1] hover:bg-[#4f46e5] text-white h-14 px-10 text-base font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all group"
+                  className="bg-[hsl(var(--secondary))] hover:bg-[hsl(var(--secondary))]/90 text-secondary-foreground h-14 px-10 text-base font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all group"
                   onClick={() => document.getElementById('featured')?.scrollIntoView({ behavior: 'smooth' })}
                 >
                   Explorer les opportunités
@@ -228,12 +228,12 @@ const Home = () => {
       </section>
 
       {/* Statistics Section */}
-      <section className="py-12 sm:py-16 bg-[#1e1b4b]" aria-label="Statistiques de la plateforme">
+      <section className="py-12 sm:py-16 bg-[hsl(var(--secondary))]" aria-label="Statistiques de la plateforme">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 max-w-5xl mx-auto">
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#818cf8]/20 mb-3">
-                <Building2 className="w-6 h-6 text-[#818cf8]" />
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/20 mb-3">
+                <Building2 className="w-6 h-6 text-primary" />
               </div>
               <div className="text-3xl sm:text-4xl font-bold text-white mb-2">
                 {stats.totalBusinesses}+
@@ -241,8 +241,8 @@ const Home = () => {
               <div className="text-sm sm:text-base text-white/70">entreprises actives</div>
             </div>
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#818cf8]/20 mb-3">
-                <Eye className="w-6 h-6 text-[#818cf8]" />
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/20 mb-3">
+                <Eye className="w-6 h-6 text-primary" />
               </div>
               <div className="text-3xl sm:text-4xl font-bold text-white mb-2">
                 {stats.totalViews >= 1000 ? `${Math.floor(stats.totalViews / 1000)}k+` : `${stats.totalViews}+`}
@@ -250,8 +250,8 @@ const Home = () => {
               <div className="text-sm sm:text-base text-white/70">vues totales</div>
             </div>
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#818cf8]/20 mb-3">
-                <Users className="w-6 h-6 text-[#818cf8]" />
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/20 mb-3">
+                <Users className="w-6 h-6 text-primary" />
               </div>
               <div className="text-3xl sm:text-4xl font-bold text-white mb-2">
                 {stats.totalUsers}+
@@ -259,8 +259,8 @@ const Home = () => {
               <div className="text-sm sm:text-base text-white/70">entrepreneurs inscrits</div>
             </div>
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#818cf8]/20 mb-3">
-                <DollarSign className="w-6 h-6 text-[#818cf8]" />
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/20 mb-3">
+                <DollarSign className="w-6 h-6 text-primary" />
               </div>
               <div className="text-3xl sm:text-4xl font-bold text-white mb-2">
                 {stats.totalValue >= 1000000 
@@ -320,17 +320,17 @@ const Home = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 max-w-5xl mx-auto mb-12">
             <div className="text-center p-5 sm:p-6 rounded-xl bg-card border border-border hover:shadow-lg transition-shadow">
-              <TrendingUp className="w-8 sm:w-10 h-8 sm:h-10 mx-auto mb-2 sm:mb-3 text-secondary" />
+              <TrendingUp className="w-8 sm:w-10 h-8 sm:h-10 mx-auto mb-2 sm:mb-3 text-[hsl(var(--secondary))]" />
               <h3 className="text-base sm:text-lg font-bold mb-1.5 sm:mb-2">Recherche optimisée par IA</h3>
               <p className="text-xs sm:text-sm text-muted-foreground">Trouvez rapidement les opportunités qui correspondent à votre profil grâce à notre intelligence artificielle</p>
             </div>
             <div className="text-center p-5 sm:p-6 rounded-xl bg-card border border-border hover:shadow-lg transition-shadow">
-              <Shield className="w-8 sm:w-10 h-8 sm:h-10 mx-auto mb-2 sm:mb-3 text-secondary" />
+              <Shield className="w-8 sm:w-10 h-8 sm:h-10 mx-auto mb-2 sm:mb-3 text-[hsl(var(--secondary))]" />
               <h3 className="text-base sm:text-lg font-bold mb-1.5 sm:mb-2">Transactions sécurisées</h3>
               <p className="text-xs sm:text-sm text-muted-foreground">Plateforme fiable et sécurisée pour toutes vos négociations d'achat ou de vente</p>
             </div>
             <div className="text-center p-5 sm:p-6 rounded-xl bg-card border border-border hover:shadow-lg transition-shadow">
-              <Clock className="w-8 sm:w-10 h-8 sm:h-10 mx-auto mb-2 sm:mb-3 text-secondary" />
+              <Clock className="w-8 sm:w-10 h-8 sm:h-10 mx-auto mb-2 sm:mb-3 text-[hsl(var(--secondary))]" />
               <h3 className="text-base sm:text-lg font-bold mb-1.5 sm:mb-2">Interface simplifiée</h3>
               <p className="text-xs sm:text-sm text-muted-foreground">Navigation intuitive et gestion facile de vos annonces grâce à notre technologie avancée</p>
             </div>
@@ -340,19 +340,19 @@ const Home = () => {
           <div className="max-w-5xl mx-auto mt-12">
             <h3 className="text-2xl font-bold text-center mb-6">Catégories populaires au Québec</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <a href="/entreprises-a-vendre-montreal" className="text-center p-4 rounded-lg bg-muted/50 hover:bg-muted transition-colors border border-border hover:border-secondary">
+              <a href="/entreprises-a-vendre-montreal" className="text-center p-4 rounded-lg bg-muted/50 hover:bg-muted transition-colors border border-border hover:border-[hsl(var(--secondary))]">
                 <p className="font-semibold text-foreground">Montréal</p>
                 <p className="text-xs text-muted-foreground mt-1">Entreprises à vendre</p>
               </a>
-              <a href="/entreprises-a-vendre-quebec" className="text-center p-4 rounded-lg bg-muted/50 hover:bg-muted transition-colors border border-border hover:border-secondary">
+              <a href="/entreprises-a-vendre-quebec" className="text-center p-4 rounded-lg bg-muted/50 hover:bg-muted transition-colors border border-border hover:border-[hsl(var(--secondary))]">
                 <p className="font-semibold text-foreground">Québec</p>
                 <p className="text-xs text-muted-foreground mt-1">Opportunités</p>
               </a>
-              <a href="/entreprises-a-vendre-laval" className="text-center p-4 rounded-lg bg-muted/50 hover:bg-muted transition-colors border border-border hover:border-secondary">
+              <a href="/entreprises-a-vendre-laval" className="text-center p-4 rounded-lg bg-muted/50 hover:bg-muted transition-colors border border-border hover:border-[hsl(var(--secondary))]">
                 <p className="font-semibold text-foreground">Laval</p>
                 <p className="text-xs text-muted-foreground mt-1">Commerces</p>
               </a>
-              <a href="/immeubles-commerciaux" className="text-center p-4 rounded-lg bg-muted/50 hover:bg-muted transition-colors border border-border hover:border-secondary">
+              <a href="/immeubles-commerciaux" className="text-center p-4 rounded-lg bg-muted/50 hover:bg-muted transition-colors border border-border hover:border-[hsl(var(--secondary))]">
                 <p className="font-semibold text-foreground">Immeubles</p>
                 <p className="text-xs text-muted-foreground mt-1">Commerciaux</p>
               </a>
@@ -362,10 +362,10 @@ const Home = () => {
           {/* Resources Links */}
           <div className="max-w-5xl mx-auto mt-12 text-center">
             <p className="text-muted-foreground">
-              Besoin d'aide pour <a href="/sell" className="text-secondary hover:underline font-semibold">vendre votre entreprise</a> ? 
-              Consultez nos <a href="/ressources" className="text-secondary hover:underline font-semibold">ressources</a> et notre 
-              <a href="/faq" className="text-secondary hover:underline font-semibold ml-1">FAQ</a> ou 
-              <a href="/contact" className="text-secondary hover:underline font-semibold ml-1">contactez-nous</a> pour un accompagnement personnalisé.
+              Besoin d'aide pour <a href="/sell" className="text-[hsl(var(--secondary))] hover:underline font-semibold">vendre votre entreprise</a> ? 
+              Consultez nos <a href="/ressources" className="text-[hsl(var(--secondary))] hover:underline font-semibold">ressources</a> et notre 
+              <a href="/faq" className="text-[hsl(var(--secondary))] hover:underline font-semibold ml-1">FAQ</a> ou 
+              <a href="/contact" className="text-[hsl(var(--secondary))] hover:underline font-semibold ml-1">contactez-nous</a> pour un accompagnement personnalisé.
             </p>
           </div>
         </div>
@@ -382,25 +382,25 @@ const Home = () => {
             <AccordionItem value="item-1">
               <AccordionTrigger>Comment acheter une entreprise au Québec?</AccordionTrigger>
               <AccordionContent>
-                L'achat d'une entreprise commence par l'identification d'opportunités sur notre plateforme. <a href="/entreprises" className="text-secondary hover:underline font-semibold">Explorez les annonces</a>, contactez les vendeurs directement, effectuez une due diligence complète, négociez le prix et finalisez la transaction avec des professionnels. Consultez notre <a href="/blog" className="text-secondary hover:underline font-semibold">guide complet</a> pour plus de détails.
+                L'achat d'une entreprise commence par l'identification d'opportunités sur notre plateforme. <a href="/entreprises" className="text-[hsl(var(--secondary))] hover:underline font-semibold">Explorez les annonces</a>, contactez les vendeurs directement, effectuez une due diligence complète, négociez le prix et finalisez la transaction avec des professionnels. Consultez notre <a href="/blog" className="text-[hsl(var(--secondary))] hover:underline font-semibold">guide complet</a> pour plus de détails.
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="item-2">
               <AccordionTrigger>Comment vendre mon entreprise?</AccordionTrigger>
               <AccordionContent>
-                <a href="/auth" className="text-secondary hover:underline font-semibold">Créez un compte gratuit</a>, puis <a href="/sell" className="text-secondary hover:underline font-semibold">soumettez votre annonce</a> avec tous les détails de votre entreprise. Notre équipe l'approuvera après vérification. Profitez de notre réseau de plus de 10 000 acheteurs potentiels au Québec.
+                <a href="/auth" className="text-[hsl(var(--secondary))] hover:underline font-semibold">Créez un compte gratuit</a>, puis <a href="/sell" className="text-[hsl(var(--secondary))] hover:underline font-semibold">soumettez votre annonce</a> avec tous les détails de votre entreprise. Notre équipe l'approuvera après vérification. Profitez de notre réseau de plus de 10 000 acheteurs potentiels au Québec.
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="item-3">
               <AccordionTrigger>À quoi sert le Club Select?</AccordionTrigger>
               <AccordionContent>
-                Le Club Select à 19,99$/mois vous offre un accès illimité à tous les vendeurs, des conversations sans limite, et la possibilité de contacter autant d'entreprises que vous le souhaitez chaque jour. Découvrez tous les <a href="/a-propos" className="text-secondary hover:underline font-semibold">avantages du Club Select</a> pour les acheteurs sérieux.
+                Le Club Select à 19,99$/mois vous offre un accès illimité à tous les vendeurs, des conversations sans limite, et la possibilité de contacter autant d'entreprises que vous le souhaitez chaque jour. Découvrez tous les <a href="/a-propos" className="text-[hsl(var(--secondary))] hover:underline font-semibold">avantages du Club Select</a> pour les acheteurs sérieux.
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="item-4">
               <AccordionTrigger>Quels types d'entreprises puis-je trouver?</AccordionTrigger>
               <AccordionContent>
-                Restaurants, cafés, boutiques, garages, salons de beauté, franchises, immeubles commerciaux et bien plus. Découvrez toutes les <a href="/marche" className="text-secondary hover:underline font-semibold">catégories disponibles</a> et trouvez l'opportunité qui correspond à vos compétences.
+                Restaurants, cafés, boutiques, garages, salons de beauté, franchises, immeubles commerciaux et bien plus. Découvrez toutes les <a href="/marche" className="text-[hsl(var(--secondary))] hover:underline font-semibold">catégories disponibles</a> et trouvez l'opportunité qui correspond à vos compétences.
               </AccordionContent>
             </AccordionItem>
           </Accordion>
@@ -421,14 +421,14 @@ const Home = () => {
       {/* CTA Section */}
       <section className="relative py-24 overflow-hidden bg-gradient-to-br from-primary/25 via-accent/15 to-primary/20 border-t border-primary/30" aria-labelledby="cta-heading">
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-gradient-to-br from-secondary/30 via-primary/20 to-transparent rounded-full blur-3xl animate-float" />
+          <div className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-gradient-to-br from-[hsl(var(--secondary))]/30 via-primary/20 to-transparent rounded-full blur-3xl animate-float" />
           <div className="absolute -bottom-40 -left-40 w-[600px] h-[600px] bg-gradient-to-tr from-accent/30 via-primary/20 to-transparent rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
         </div>
         
         <div className="relative container mx-auto px-4">
           <div className="max-w-3xl mx-auto space-y-8 text-center animate-slide-up">
             <h2 id="cta-heading" className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-foreground leading-tight">
-              Prêt à trouver <span className="text-secondary">votre prochaine opportunité ?</span>
+              Prêt à trouver <span className="text-[hsl(var(--secondary))]">votre prochaine opportunité ?</span>
             </h2>
             <p className="text-xl md:text-2xl text-muted-foreground">
               Commencez dès maintenant votre recherche ou déposez votre annonce gratuitement
@@ -436,7 +436,7 @@ const Home = () => {
             <div className="flex justify-center">
               <Button 
                 size="lg" 
-                className="bg-secondary hover:bg-secondary/90 text-secondary-foreground h-14 px-12 text-lg font-semibold shadow-lg hover:shadow-xl transition-all hover:scale-105 group"
+                className="bg-[hsl(var(--secondary))] hover:bg-[hsl(var(--secondary))]/90 text-secondary-foreground h-14 px-12 text-lg font-semibold shadow-lg hover:shadow-xl transition-all hover:scale-105 group"
                 onClick={() => navigate("/entreprises")}
               >
                 Commencer gratuitement

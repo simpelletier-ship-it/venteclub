@@ -18,14 +18,14 @@ export const Footer = () => {
           <div>
             <h3 className="font-bold text-lg mb-4">Navigation</h3>
             <ul className="space-y-2">
-              <li><Link to="/" className="text-sm text-muted-foreground hover:text-accent transition-colors">Accueil</Link></li>
-              <li><Link to="/entreprises" className="text-sm text-muted-foreground hover:text-accent transition-colors">Entreprises à vendre</Link></li>
-              <li><Link to="/map" className="text-sm text-muted-foreground hover:text-accent transition-colors">Carte interactive</Link></li>
-              <li><Link to="/marche" className="text-sm text-muted-foreground hover:text-accent transition-colors">Marché 2025</Link></li>
-              <li><Link to="/faq" className="text-sm text-muted-foreground hover:text-accent transition-colors">FAQ</Link></li>
-              <li><Link to="/a-propos" className="text-sm text-muted-foreground hover:text-accent transition-colors">À propos</Link></li>
-              <li><Link to="/blog" className="text-sm text-muted-foreground hover:text-accent transition-colors">Blog</Link></li>
-              <li><Link to="/ressources" className="text-sm text-muted-foreground hover:text-accent transition-colors">Ressources</Link></li>
+              <li><Link to="/" className="text-sm text-muted-foreground hover:text-primary transition-colors">Accueil</Link></li>
+              <li><Link to="/entreprises" className="text-sm text-muted-foreground hover:text-primary transition-colors">Entreprises à vendre</Link></li>
+              <li><Link to="/map" className="text-sm text-muted-foreground hover:text-primary transition-colors">Carte interactive</Link></li>
+              <li><Link to="/marche" className="text-sm text-muted-foreground hover:text-primary transition-colors">Marché 2025</Link></li>
+              <li><Link to="/faq" className="text-sm text-muted-foreground hover:text-primary transition-colors">FAQ</Link></li>
+              <li><Link to="/a-propos" className="text-sm text-muted-foreground hover:text-primary transition-colors">À propos</Link></li>
+              <li><Link to="/blog" className="text-sm text-muted-foreground hover:text-primary transition-colors">Blog</Link></li>
+              <li><Link to="/ressources" className="text-sm text-muted-foreground hover:text-primary transition-colors">Ressources</Link></li>
             </ul>
           </div>
 
@@ -33,12 +33,12 @@ export const Footer = () => {
           <div>
             <h3 className="font-bold text-lg mb-4">Régions & Services</h3>
             <ul className="space-y-2">
-              <li><Link to="/entreprises-a-vendre-montreal" className="text-sm text-muted-foreground hover:text-accent transition-colors">Entreprises Montréal</Link></li>
-              <li><Link to="/entreprises-a-vendre-quebec" className="text-sm text-muted-foreground hover:text-accent transition-colors">Entreprises Québec</Link></li>
-              <li><Link to="/entreprises-a-vendre-laval" className="text-sm text-muted-foreground hover:text-accent transition-colors">Entreprises Laval</Link></li>
-              <li><Link to="/list-business" className="text-sm text-muted-foreground hover:text-accent transition-colors">Vendre une entreprise</Link></li>
-              <li><Link to="/list-franchise" className="text-sm text-muted-foreground hover:text-accent transition-colors">Vendre une franchise</Link></li>
-              <li><Link to="/list-property" className="text-sm text-muted-foreground hover:text-accent transition-colors">Vendre un immeuble</Link></li>
+              <li><Link to="/entreprises-a-vendre-montreal" className="text-sm text-muted-foreground hover:text-primary transition-colors">Entreprises Montréal</Link></li>
+              <li><Link to="/entreprises-a-vendre-quebec" className="text-sm text-muted-foreground hover:text-primary transition-colors">Entreprises Québec</Link></li>
+              <li><Link to="/entreprises-a-vendre-laval" className="text-sm text-muted-foreground hover:text-primary transition-colors">Entreprises Laval</Link></li>
+              <li><Link to="/list-business" className="text-sm text-muted-foreground hover:text-primary transition-colors">Vendre une entreprise</Link></li>
+              <li><Link to="/list-franchise" className="text-sm text-muted-foreground hover:text-primary transition-colors">Vendre une franchise</Link></li>
+              <li><Link to="/list-property" className="text-sm text-muted-foreground hover:text-primary transition-colors">Vendre un immeuble</Link></li>
             </ul>
           </div>
 
@@ -50,8 +50,8 @@ export const Footer = () => {
             </p>
             <div className="space-y-3">
               <div className="flex items-center gap-2">
-                <Mail className="w-5 h-5 text-accent flex-shrink-0" />
-                <a href="mailto:info@vente.club" className="text-sm text-muted-foreground hover:text-accent transition-colors">
+                <Mail className="w-5 h-5 text-primary flex-shrink-0" />
+                <a href="mailto:info@vente.club" className="text-sm text-muted-foreground hover:text-primary transition-colors">
                   info@vente.club
                 </a>
               </div>
@@ -79,10 +79,10 @@ export const Footer = () => {
               </Link>
             </div>
             <div className="flex gap-6">
-              <Link to="/confidentialite" className="text-sm text-muted-foreground hover:text-accent transition-colors">
+              <Link to="/confidentialite" className="text-sm text-muted-foreground hover:text-primary transition-colors">
                 Politique de confidentialité
               </Link>
-              <Link to="/conditions" className="text-sm text-muted-foreground hover:text-accent transition-colors">
+              <Link to="/conditions" className="text-sm text-muted-foreground hover:text-primary transition-colors">
                 Conditions d'utilisation
               </Link>
             </div>
