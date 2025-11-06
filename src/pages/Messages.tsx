@@ -51,23 +51,27 @@ const Messages = () => {
       }
       setUser(session.user);
       await fetchConversations(session.user.id);
-      
-      // Check if we have a conversation param to open
-      const conversationParam = searchParams.get('conversation');
-      if (conversationParam) {
-        const [businessId, otherUserId] = conversationParam.split('-');
-        // Find and select this conversation
-        const conv = conversations.find(c => 
-          c.business_id === businessId && c.other_user_id === otherUserId
-        );
-        if (conv) {
-          setSelectedConversation(conv);
-        }
-      }
     };
 
     initialize();
-  }, [navigate, searchParams]);
+  }, [navigate]);
+
+  // Separate effect to handle conversation selection after conversations are loaded
+  useEffect(() => {
+    if (conversations.length === 0) return;
+    
+    const conversationParam = searchParams.get('conversation');
+    if (conversationParam) {
+      const [businessId, otherUserId] = conversationParam.split('-');
+      // Find and select this conversation
+      const conv = conversations.find(c => 
+        c.business_id === businessId && c.other_user_id === otherUserId
+      );
+      if (conv) {
+        setSelectedConversation(conv);
+      }
+    }
+  }, [conversations, searchParams]);
 
   useEffect(() => {
     if (!user) return;

@@ -19,6 +19,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { PriceHistory } from "@/components/PriceHistory";
 import { MakeOfferDialog } from "@/components/MakeOfferDialog";
 import { ConversationLimitAlert } from "@/components/ConversationLimitAlert";
+import { PremiumUpgradeModal } from "@/components/PremiumUpgradeModal";
 
 const BusinessDetails = () => {
   const { slug } = useParams();
@@ -444,61 +445,78 @@ const BusinessDetails = () => {
   const handleUnlockChat = async () => {
     if (!user || !businessId || !business) return;
     
-    // VÉRIFICATION CRITIQUE : L'email doit être confirmé
-    if (!user.email_confirmed_at) {
-      toast({
-        variant: "destructive",
-        title: "Email non confirmé",
-        description: "Vous devez confirmer votre email avant de pouvoir déverrouiller un chat. Vérifiez votre boîte de réception.",
-      });
-      return;
-    }
-    
-    // Vérifier si l'utilisateur a déjà déverrouillé cette annonce spécifique
-    const { data: existingAccess } = await supabase
-      .from('contact_access')
-      .select('id')
-      .eq('user_id', user.id)
-      .eq('business_id', businessId)
-      .limit(1);
-    
-    if (existingAccess && existingAccess.length > 0) {
-      toast({
-        title: "Déjà déverrouillé",
-        description: "Vous avez déjà déverrouillé le chat pour cette annonce.",
-      });
-      setHasUnlockedChat(true);
-      return;
-    }
-    
-    // Vérifier les limites avec la nouvelle fonction
-    const { data: limitCheck, error: limitError } = await supabase.rpc('can_start_conversation', {
-      p_user_id: user.id,
-      p_business_id: businessId
-    });
-    
-    if (limitError) {
-      console.error('Error checking limits:', limitError);
-      toast({
-        variant: "destructive",
-        title: "Erreur",
-        description: "Impossible de vérifier vos limites.",
-      });
-      return;
-    }
-    
-    const limitData = limitCheck as any;
-    if (limitData && !limitData.can_start) {
-      toast({
-        variant: "destructive",
-        title: "Limite atteinte",
-        description: limitData.message || "Vous avez atteint votre limite quotidienne. Rejoignez le Club Select (19,99$/mois) pour un accès illimité.",
-      });
-      return;
-    }
-    
     setIsUnlockingChat(true);
+    
     try {
+      // VÉRIFICATION CRITIQUE #1 : Recharger les infos utilisateur pour avoir email_confirmed_at à jour
+      const { data: { user: currentUser }, error: userError } = await supabase.auth.getUser();
+      
+      if (userError || !currentUser) {
+        toast({
+          variant: "destructive",
+          title: "Erreur d'authentification",
+          description: "Impossible de vérifier votre compte. Veuillez vous reconnecter.",
+        });
+        setIsUnlockingChat(false);
+        return;
+      }
+      
+      // VÉRIFICATION CRITIQUE #2 : L'email doit être confirmé
+      if (!currentUser.email_confirmed_at) {
+        toast({
+          variant: "destructive",
+          title: "Email non confirmé",
+          description: "Vous devez confirmer votre email avant de pouvoir déverrouiller un chat. Vérifiez votre boîte de réception.",
+        });
+        setIsUnlockingChat(false);
+        return;
+      }
+      
+      // Vérifier si l'utilisateur a déjà déverrouillé cette annonce spécifique
+      const { data: existingAccess } = await supabase
+        .from('contact_access')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('business_id', businessId)
+        .limit(1);
+      
+      if (existingAccess && existingAccess.length > 0) {
+        toast({
+          title: "Déjà déverrouillé",
+          description: "Vous avez déjà accès au chat pour cette annonce.",
+        });
+        setHasUnlockedChat(true);
+        setIsUnlockingChat(false);
+        return;
+      }
+      
+      // Vérifier les limites avec la nouvelle fonction
+      const { data: limitCheck, error: limitError } = await supabase.rpc('can_start_conversation', {
+        p_user_id: user.id,
+        p_business_id: businessId
+      });
+      
+      if (limitError) {
+        console.error('Error checking limits:', limitError);
+        toast({
+          variant: "destructive",
+          title: "Erreur",
+          description: "Impossible de vérifier vos limites.",
+        });
+        setIsUnlockingChat(false);
+        return;
+      }
+      
+      const limitData = limitCheck as any;
+      if (limitData && !limitData.can_start) {
+        // Afficher le modal premium au lieu d'un simple toast
+        setHoursUntilReset(limitData.hours_until_reset || 0);
+        setMinutesUntilReset(limitData.minutes_until_reset || 0);
+        setShowPremiumDialog(true);
+        setIsUnlockingChat(false);
+        return;
+      }
+      
       // 1. Créer une entrée dans contact_access pour cette annonce spécifique
       const { error: accessError } = await supabase
         .from('contact_access')
@@ -513,7 +531,21 @@ const BusinessDetails = () => {
         throw accessError;
       }
       
-      // 2. PAS DE MESSAGE AUTOMATIQUE - l'utilisateur choisira un message template
+      // 2. Créer un message initial pour établir la conversation
+      const { error: messageError } = await supabase
+        .from('messages')
+        .insert({
+          sender_id: user.id,
+          receiver_id: business.seller_id,
+          business_id: businessId,
+          content: '', // Message vide initial - l'utilisateur choisira un template ensuite
+          read: false
+        });
+      
+      if (messageError) {
+        console.error('Error creating initial message:', messageError);
+        // Continuer quand même si la création du message échoue
+      }
       
       // 3. Marquer comme déverrouillé localement
       setHasUnlockedChat(true);
@@ -532,9 +564,12 @@ const BusinessDetails = () => {
       // 5. Recharger les limites de conversation
       await checkConversationLimits(user.id);
       
+      // 6. Rediriger vers la messagerie avec cette conversation
+      navigate(`/messages?conversation=${businessId}-${business.seller_id}`);
+      
       toast({
         title: "Chat déverrouillé",
-        description: "Vous pouvez maintenant échanger avec le vendeur. Choisissez un message à envoyer pour commencer la conversation!",
+        description: "Choisissez un message pour commencer la conversation!",
       });
     } catch (error: any) {
       console.error('Error unlocking chat:', error);
@@ -545,7 +580,9 @@ const BusinessDetails = () => {
       });
       
       // Recharger l'état du chat en cas d'erreur
-      await checkChatUnlocked(user.id, businessId);
+      if (businessId) {
+        await checkChatUnlocked(user.id, businessId);
+      }
     } finally {
       setIsUnlockingChat(false);
     }
@@ -1484,73 +1521,6 @@ const BusinessDetails = () => {
         </div>
       </div>
 
-      {/* Dialog pour le Club Premium */}
-      <Dialog open={showPremiumDialog} onOpenChange={setShowPremiumDialog}>
-        <DialogContent className="max-w-lg p-0 overflow-hidden">
-          <div className="relative bg-gradient-to-br from-gray-900 via-black to-gray-900 border-2 border-yellow-500/30 p-8">
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-yellow-500/10 to-transparent animate-shimmer" />
-            
-            <div className="relative z-10">
-              <div className="mb-6 text-center">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-yellow-400 via-yellow-500 to-yellow-600 mb-4 shadow-lg">
-                  <svg className="w-8 h-8 text-black" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                  </svg>
-                </div>
-                
-                <h4 className="font-bold text-2xl mb-2 bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 bg-clip-text text-transparent">
-                  Club Select
-                </h4>
-                <div className="text-5xl font-extrabold text-white mb-2 tracking-tight">
-                  19,99$
-                </div>
-                <p className="text-sm text-gray-400 font-medium">par mois · annulez à tout moment</p>
-              </div>
-              
-              <div className="space-y-4 mb-6">
-                <div className="flex items-start gap-3 bg-white/5 backdrop-blur-sm rounded-lg p-3 border border-yellow-500/20">
-                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center">
-                    <svg className="w-4 h-4 text-black" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                  <span className="text-white font-semibold text-sm">Accès illimité à tous les vendeurs</span>
-                </div>
-                
-                <div className="flex items-start gap-3 bg-white/5 backdrop-blur-sm rounded-lg p-3 border border-yellow-500/20">
-                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center">
-                    <svg className="w-4 h-4 text-black" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                  <span className="text-white font-semibold text-sm">Conversations illimitées 24/7</span>
-                </div>
-                
-                <div className="flex items-start gap-3 bg-white/5 backdrop-blur-sm rounded-lg p-3 border border-yellow-500/20">
-                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center">
-                    <svg className="w-4 h-4 text-black" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                  <span className="text-white font-semibold text-sm">Emails et téléphones débloqués</span>
-                </div>
-              </div>
-              
-              <Button 
-                size="lg" 
-                className="w-full bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 hover:from-yellow-500 hover:via-yellow-600 hover:to-yellow-700 text-black font-bold text-base shadow-xl hover:shadow-2xl transition-all duration-300 border-0 hover:scale-105"
-                onClick={() => {
-                  setShowPremiumDialog(false);
-                  handlePremiumCheckout();
-                }}
-              >
-                Rejoindre le Club Select
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-
       <Dialog open={showUnlockDialog} onOpenChange={setShowUnlockDialog}>
         <DialogContent className="max-w-md">
           <DialogHeader>
@@ -1610,72 +1580,13 @@ const BusinessDetails = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Dialog Premium pour temps d'attente */}
-      <Dialog open={showPremiumDialog} onOpenChange={setShowPremiumDialog}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Accès limité atteint</DialogTitle>
-            <DialogDescription className="space-y-4 pt-4">
-              <div className="bg-red-50 dark:bg-red-950/30 border-2 border-red-200 dark:border-red-800 rounded-lg p-4">
-                <p className="font-semibold text-red-900 dark:text-red-100 flex items-center gap-2 mb-2">
-                  <span className="text-2xl">⏱️</span>
-                  Temps d'attente requis
-                </p>
-                {secondsRemaining && (
-                  <p className="text-sm text-red-800 dark:text-red-200">
-                    Vous devez attendre <strong>{formatTimeRemaining(secondsRemaining)}</strong> avant de pouvoir déverrouiller un autre vendeur gratuitement.
-                  </p>
-                )}
-              </div>
-
-              <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 dark:from-yellow-950/30 dark:to-yellow-900/30 border-2 border-yellow-500/30 rounded-lg p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="font-bold text-lg">Club Select</h3>
-                  <Badge className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-black font-bold">
-                    19,99$ CAD/mois
-                  </Badge>
-                </div>
-                <p className="text-sm mb-3">
-                  Obtenez un accès illimité aux coordonnées de tous les vendeurs sans aucune restriction !
-                </p>
-                <ul className="space-y-2 text-sm">
-                  <li className="flex items-center gap-2">
-                    <span className="text-green-500 font-bold">✓</span>
-                    Accès illimité à tous les vendeurs
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="text-green-500 font-bold">✓</span>
-                    Aucune limite de temps
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="text-green-500 font-bold">✓</span>
-                    Annulation facile à tout moment
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="text-green-500 font-bold">✓</span>
-                    Messagerie illimitée
-                  </li>
-                </ul>
-              </div>
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex gap-2 pt-4">
-            <Button 
-              variant="outline" 
-              onClick={() => setShowPremiumDialog(false)}
-              className="flex-1"
-            >
-              Attendre
-            </Button>
-            <Button 
-              onClick={handlePremiumCheckout}
-              className="flex-1 bg-gradient-to-r from-primary to-accent hover:opacity-90"
-            >
-              S'abonner à Premium
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {/* Premium Upgrade Modal */}
+      <PremiumUpgradeModal
+        open={showPremiumDialog}
+        onOpenChange={setShowPremiumDialog}
+        hoursRemaining={hoursUntilReset}
+        minutesRemaining={minutesUntilReset}
+      />
     </div>
   );
 };
