@@ -219,7 +219,16 @@ const Dashboard = () => {
             <TabsList className="grid w-full max-w-3xl grid-cols-3 h-auto">
               <TabsTrigger value="businesses" className="text-xs sm:text-sm py-2 sm:py-3">Mes annonces</TabsTrigger>
               <TabsTrigger value="statistics" className="text-xs sm:text-sm py-2 sm:py-3">Statistiques</TabsTrigger>
-              <TabsTrigger value="messages" className="text-xs sm:text-sm py-2 sm:py-3">Messages</TabsTrigger>
+              <TabsTrigger 
+                value="messages" 
+                className="text-xs sm:text-sm py-2 sm:py-3"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate('/messages');
+                }}
+              >
+                Messages
+              </TabsTrigger>
             </TabsList>
           </div>
 
