@@ -101,7 +101,7 @@ const Header = () => {
             onClick={() => navigate("/")}
           >
             <span className="text-3xl font-display font-bold transition-transform group-hover:scale-105">
-              Vente<span className="text-accent">.</span><span className="text-primary">Club</span>
+              Vente<span className="text-[#818cf8]">.club</span>
             </span>
           </div>
 
