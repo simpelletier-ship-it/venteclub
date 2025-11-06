@@ -145,7 +145,7 @@ const Home = () => {
               </div>
               
               <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-bold leading-[1.1] tracking-tight text-foreground">
-                Le Club de Référence
+                <span className="text-primary animate-pulse">Le Club</span> de Référence
                 <br />
                 pour acheter <TypewriterAnimation />
                 <br />
