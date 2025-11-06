@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { SEO } from "@/components/SEO";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import heroImage from "@/assets/hero-business-pro.jpg";
+import { AnimatedSearchBar } from "@/components/AnimatedSearchBar";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -131,6 +132,11 @@ const Home = () => {
             <p className="text-base sm:text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed px-4">
               Plateforme intelligente qui facilite la connexion entre acquéreurs et propriétaires. Explorez un vaste répertoire d'occasions commerciales dans tous les domaines : restauration, hôtellerie, commerce de détail, services et secteur industriel.
             </p>
+
+            {/* Animated Search Bar */}
+            <div className="pt-6 sm:pt-8">
+              <AnimatedSearchBar />
+            </div>
             
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center pt-4 sm:pt-6 px-4">
               <Button 
