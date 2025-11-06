@@ -12,7 +12,6 @@ import { FavoriteButton } from "@/components/FavoriteButton";
 import { ShareButton } from "@/components/ShareButton";
 import { ChatBox } from "@/components/ChatBox";
 import { SellerChatSection } from "@/components/SellerChatSection";
-import BusinessMap from "@/components/BusinessMap";
 import { ReportBusinessDialog } from "@/components/ReportBusinessDialog";
 import { SEO } from "@/components/SEO";
 import { FinancialCalculator } from "@/components/FinancialCalculator";
@@ -1010,18 +1009,6 @@ const BusinessDetails = () => {
                   </div>
                 )}
 
-                {/* Carte interactive - Affichée si coordonnées disponibles */}
-                {business.latitude && business.longitude && (
-                  <div className="rounded-xl overflow-hidden border-2 border-border/50 shadow-lg">
-                    <h2 className="text-xl font-semibold px-6 py-4 bg-card border-b border-border/50">
-                      <MapPin className="w-5 h-5 inline-block mr-2 text-primary" />
-                      Carte interactive
-                    </h2>
-                    <div className="h-[400px]">
-                      <BusinessMap />
-                    </div>
-                  </div>
-                )}
 
                 {/* Financial Information Grid - Only show for non-property businesses */}
                 {!business.property_type && (
