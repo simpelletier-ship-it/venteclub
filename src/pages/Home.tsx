@@ -110,11 +110,9 @@ const Home = () => {
               </div>
               
               <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-bold leading-[1.1] tracking-tight text-foreground">
-                Le Club de Référence.
+                Le Club de Référence
                 <br />
-                pour l'achat d'<TypewriterAnimation />
-                <br />
-                au Québec.
+                pour l'achat d'<TypewriterAnimation /> au Québec.
               </h1>
               
               <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl leading-relaxed">
