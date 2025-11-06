@@ -86,7 +86,7 @@ export const loginSchema = z.object({
     .max(100, 'Le mot de passe ne peut pas dépasser 100 caractères'),
 });
 
-// Schéma pour l'inscription - validation stricte avec 8 caractères minimum
+// Schéma pour l'inscription - validation stricte de sécurité professionnelle
 export const signupSchema = z.object({
   email: z.string()
     .trim()
@@ -94,7 +94,11 @@ export const signupSchema = z.object({
     .max(255, 'L\'email ne peut pas dépasser 255 caractères'),
   password: z.string()
     .min(8, 'Le mot de passe doit contenir au moins 8 caractères')
-    .max(100, 'Le mot de passe ne peut pas dépasser 100 caractères'),
+    .max(100, 'Le mot de passe ne peut pas dépasser 100 caractères')
+    .regex(/[A-Z]/, 'Le mot de passe doit contenir au moins une lettre majuscule')
+    .regex(/[a-z]/, 'Le mot de passe doit contenir au moins une lettre minuscule')
+    .regex(/[0-9]/, 'Le mot de passe doit contenir au moins un chiffre')
+    .regex(/[^A-Za-z0-9]/, 'Le mot de passe doit contenir au moins un caractère spécial (!@#$%^&*...)'),
 });
 
 // Pour la compatibilité - utiliser signupSchema par défaut

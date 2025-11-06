@@ -257,6 +257,30 @@ const Auth = () => {
         });
       }
 
+      // Envoyer l'email de confirmation manuellement
+      if (data.user && !data.user.email_confirmed_at) {
+        console.log('[SIGNUP] Sending confirmation email to:', validatedData.email);
+        
+        try {
+          const { error: emailError } = await supabase.functions.invoke('send-confirmation-email', {
+            body: {
+              email: validatedData.email,
+              confirmationUrl: redirectUrl
+            }
+          });
+          
+          if (emailError) {
+            console.error('[SIGNUP] Error sending confirmation email:', emailError);
+            // Ne pas bloquer le processus si l'email échoue
+          } else {
+            console.log('[SIGNUP] Confirmation email sent successfully');
+          }
+        } catch (emailError) {
+          console.error('[SIGNUP] Exception sending confirmation email:', emailError);
+          // Ne pas bloquer le processus si l'email échoue
+        }
+      }
+
       toast({
         title: "Compte créé !",
         description: "Un email de confirmation a été envoyé à votre adresse. Veuillez cliquer sur le lien dans l'email pour activer votre compte. Vérifiez vos pourriels si vous ne le voyez pas.",
@@ -506,16 +530,38 @@ const Auth = () => {
                     <Input
                       id="signup-password"
                       type="password"
-                      placeholder="Minimum 8 caractères"
+                      placeholder="Créez un mot de passe sécurisé"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
                       minLength={8}
                       className="w-full mt-2"
                     />
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Le mot de passe doit contenir au moins 8 caractères
-                    </p>
+                    <div className="mt-2 space-y-1 text-xs">
+                      <p className="font-medium text-muted-foreground">Le mot de passe doit contenir :</p>
+                      <div className="grid grid-cols-2 gap-1">
+                        <div className={`flex items-center gap-1 ${password.length >= 8 ? 'text-green-600' : 'text-muted-foreground'}`}>
+                          <span>{password.length >= 8 ? '✓' : '○'}</span>
+                          <span>8 caractères minimum</span>
+                        </div>
+                        <div className={`flex items-center gap-1 ${/[A-Z]/.test(password) ? 'text-green-600' : 'text-muted-foreground'}`}>
+                          <span>{/[A-Z]/.test(password) ? '✓' : '○'}</span>
+                          <span>Une majuscule</span>
+                        </div>
+                        <div className={`flex items-center gap-1 ${/[a-z]/.test(password) ? 'text-green-600' : 'text-muted-foreground'}`}>
+                          <span>{/[a-z]/.test(password) ? '✓' : '○'}</span>
+                          <span>Une minuscule</span>
+                        </div>
+                        <div className={`flex items-center gap-1 ${/[0-9]/.test(password) ? 'text-green-600' : 'text-muted-foreground'}`}>
+                          <span>{/[0-9]/.test(password) ? '✓' : '○'}</span>
+                          <span>Un chiffre</span>
+                        </div>
+                        <div className={`flex items-center gap-1 col-span-2 ${/[^A-Za-z0-9]/.test(password) ? 'text-green-600' : 'text-muted-foreground'}`}>
+                          <span>{/[^A-Za-z0-9]/.test(password) ? '✓' : '○'}</span>
+                          <span>Un caractère spécial (!@#$%^&*...)</span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                   <div>
                     <Label htmlFor="confirm-password">Confirmer le mot de passe</Label>
