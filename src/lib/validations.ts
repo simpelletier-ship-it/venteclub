@@ -88,6 +88,14 @@ export const loginSchema = z.object({
 
 // Schéma pour l'inscription - validation stricte de sécurité professionnelle
 export const signupSchema = z.object({
+  firstName: z.string()
+    .trim()
+    .min(2, 'Le prénom doit contenir au moins 2 caractères')
+    .max(50, 'Le prénom ne peut pas dépasser 50 caractères'),
+  lastName: z.string()
+    .trim()
+    .min(2, 'Le nom doit contenir au moins 2 caractères')
+    .max(50, 'Le nom ne peut pas dépasser 50 caractères'),
   email: z.string()
     .trim()
     .email('Veuillez entrer une adresse email valide')

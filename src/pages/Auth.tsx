@@ -20,6 +20,8 @@ const Auth = () => {
   const { fingerprint, loading: fpLoading } = useFingerprint();
   
   const [loading, setLoading] = useState(false);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -162,7 +164,7 @@ const Auth = () => {
       }
 
       // Valider les données
-      const validatedData = signupSchema.parse({ email, password });
+      const validatedData = signupSchema.parse({ firstName, lastName, email, password });
 
       // Vérifier le fingerprint pour détecter les comptes multiples
       if (fingerprint) {
@@ -224,7 +226,12 @@ const Auth = () => {
         email: validatedData.email,
         password: validatedData.password,
         options: {
-          emailRedirectTo: redirectUrl
+          emailRedirectTo: redirectUrl,
+          data: {
+            first_name: validatedData.firstName,
+            last_name: validatedData.lastName,
+            full_name: `${validatedData.firstName} ${validatedData.lastName}`
+          }
         }
       });
 
@@ -294,6 +301,8 @@ const Auth = () => {
       });
       
       // Réinitialiser le formulaire
+      setFirstName("");
+      setLastName("");
       setEmail("");
       setPassword("");
       setConfirmPassword("");
@@ -512,13 +521,39 @@ const Auth = () => {
               </TabsContent>
               
               <TabsContent value="signup">
-                <form onSubmit={handleSignUp} className="space-y-4">
                 {securityWarning && (
                   <Alert variant="destructive" className="mb-4">
                     <AlertTriangle className="h-4 w-4" />
                     <AlertDescription>{securityWarning}</AlertDescription>
                   </Alert>
                 )}
+                <form onSubmit={handleSignUp} className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="signup-firstname">Prénom</Label>
+                      <Input
+                        id="signup-firstname"
+                        type="text"
+                        placeholder="Jean"
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
+                        required
+                        className="w-full mt-2"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="signup-lastname">Nom</Label>
+                      <Input
+                        id="signup-lastname"
+                        type="text"
+                        placeholder="Tremblay"
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
+                        required
+                        className="w-full mt-2"
+                      />
+                    </div>
+                  </div>
                   <div>
                     <Label htmlFor="signup-email">Email</Label>
                     <Input
