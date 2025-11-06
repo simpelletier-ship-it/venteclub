@@ -1,6 +1,6 @@
 import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Check, Crown, Sparkles, Zap, MessageSquare, Eye, Star } from "lucide-react";
+import { Check, Crown, Sparkles, Zap, MessageSquare, Eye, Star, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface PremiumUpgradeModalProps {
@@ -29,8 +29,17 @@ export const PremiumUpgradeModal = ({
         {/* Animated background */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-500/5 via-transparent to-transparent"></div>
         
+        {/* Close button */}
+        <button
+          onClick={() => onOpenChange(false)}
+          className="absolute top-4 right-4 z-50 rounded-full p-1 bg-slate-800/50 hover:bg-slate-700/50 transition-colors group"
+          aria-label="Fermer"
+        >
+          <X className="w-4 h-4 text-slate-400 group-hover:text-slate-200" />
+        </button>
+        
         {/* Sparkle effects */}
-        <div className="absolute top-6 right-6 animate-pulse">
+        <div className="absolute top-6 right-14 animate-pulse">
           <Sparkles className="w-4 h-4 text-amber-400/40" />
         </div>
 
