@@ -381,25 +381,62 @@ export const EmailTemplateManager = () => {
         </Card>
       </div>
 
-      {/* Dialog de prévisualisation */}
+      {/* Dialog de prévisualisation avec édition */}
       <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
         <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Aperçu: {selectedTemplate.name}</DialogTitle>
+            <div className="flex items-center justify-between">
+              <DialogTitle>{selectedTemplate.name}</DialogTitle>
+              <Button
+                size="sm"
+                onClick={handleSave}
+                disabled={saving}
+              >
+                <Save className="w-4 h-4 mr-2" />
+                {saving ? "Sauvegarde..." : "Sauvegarder"}
+              </Button>
+            </div>
           </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <Label className="text-sm text-muted-foreground">Sujet</Label>
-              <p className="font-semibold">{subject}</p>
-            </div>
-            <div className="border rounded-lg p-4 bg-muted/50">
-              <iframe
-                srcDoc={htmlContent}
-                className="w-full h-[500px] border-0"
-                title="Email preview"
-              />
-            </div>
-          </div>
+          <Tabs defaultValue="preview" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="preview">Aperçu</TabsTrigger>
+              <TabsTrigger value="edit">Édition</TabsTrigger>
+            </TabsList>
+            <TabsContent value="preview" className="space-y-4 mt-4">
+              <div>
+                <Label className="text-sm text-muted-foreground">Sujet</Label>
+                <p className="font-semibold mt-1">{subject}</p>
+              </div>
+              <div className="border rounded-lg p-4 bg-muted/50">
+                <iframe
+                  srcDoc={htmlContent}
+                  className="w-full h-[500px] border-0"
+                  title="Email preview"
+                />
+              </div>
+            </TabsContent>
+            <TabsContent value="edit" className="space-y-4 mt-4">
+              <div className="space-y-2">
+                <Label htmlFor="preview-subject">Sujet de l'email</Label>
+                <Input
+                  id="preview-subject"
+                  value={subject}
+                  onChange={(e) => setSubject(e.target.value)}
+                  placeholder="Sujet de l'email"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="preview-html-content">Contenu HTML</Label>
+                <Textarea
+                  id="preview-html-content"
+                  value={htmlContent}
+                  onChange={(e) => setHtmlContent(e.target.value)}
+                  className="font-mono text-xs min-h-[400px]"
+                  placeholder="Contenu HTML de l'email"
+                />
+              </div>
+            </TabsContent>
+          </Tabs>
         </DialogContent>
       </Dialog>
     </div>
