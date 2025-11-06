@@ -137,13 +137,6 @@ const Home = () => {
                 transform: `translateY(${scrollY * 0.05}px)` 
               }}
             >
-              <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white/10 border border-white/20 backdrop-blur-sm">
-                <Sparkles className="w-4 h-4 text-[#818cf8]" />
-                <span className="text-white/90 text-sm font-medium">
-                  Plateforme de confiance pour vos transactions
-                </span>
-              </div>
-              
               <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-bold leading-[1.1] tracking-tight text-white">
                 <span className="text-[#818cf8] font-extrabold">Le Club</span> de Référence
                 <br />
@@ -182,12 +175,38 @@ const Home = () => {
           </div>
         </div>
         
-        {/* Smooth Gradient Transition */}
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-b from-transparent to-background pointer-events-none" />
+      </section>
+
+      {/* Statistics Section */}
+      <section className="py-12 sm:py-16 bg-[#1e1b4b]" aria-label="Statistiques de la plateforme">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-6 md:gap-0 max-w-7xl mx-auto">
+            <div className="text-center md:border-r md:border-white/20 px-4">
+              <div className="text-3xl sm:text-4xl font-bold text-white mb-2">500M+</div>
+              <div className="text-sm sm:text-base text-white/70">volume de transactions</div>
+            </div>
+            <div className="text-center md:border-r md:border-white/20 px-4">
+              <div className="text-3xl sm:text-4xl font-bold text-white mb-2">2000+</div>
+              <div className="text-sm sm:text-base text-white/70">entreprises vendues</div>
+            </div>
+            <div className="text-center md:border-r md:border-white/20 px-4">
+              <div className="text-3xl sm:text-4xl font-bold text-white mb-2">500k+</div>
+              <div className="text-sm sm:text-base text-white/70">entrepreneurs nous font confiance</div>
+            </div>
+            <div className="text-center md:border-r md:border-white/20 px-4">
+              <div className="text-3xl sm:text-4xl font-bold text-white mb-2">2B+</div>
+              <div className="text-sm sm:text-base text-white/70">en fonds d'acheteurs vérifiés</div>
+            </div>
+            <div className="text-center px-4">
+              <div className="text-3xl sm:text-4xl font-bold text-white mb-2">20+ ans</div>
+              <div className="text-sm sm:text-base text-white/70">d'expérience en transactions</div>
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* Featured Businesses Section */}
-      <section id="featured" className="py-16 sm:py-20 bg-white relative">
+      <section id="featured" className="py-16 sm:py-20 bg-background relative">
         {/* Decorative Top Border */}
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
         <div className="container mx-auto px-4">
