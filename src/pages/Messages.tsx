@@ -300,11 +300,11 @@ const Messages = () => {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:h-[calc(100vh-240px)]">
             {/* Liste des conversations Professional */}
-            <Card className="lg:col-span-1 border-border/60 shadow-xl overflow-hidden">
-              <CardContent className="p-4 sm:p-5 bg-card/50 backdrop-blur-sm">
-                <div className="flex items-center justify-between mb-5">
+            <Card className="lg:col-span-1 border-border/60 shadow-xl overflow-hidden flex flex-col">
+              <CardContent className="p-4 sm:p-5 bg-card/50 backdrop-blur-sm flex flex-col h-full">
+                <div className="flex items-center justify-between mb-5 flex-shrink-0">
                   <h2 className="font-bold text-lg flex items-center gap-2.5 text-foreground">
                     <div className="p-2 rounded-xl bg-gradient-to-br from-primary/10 to-secondary/10 shadow-sm">
                       <MessageSquare className="h-5 w-5 text-primary" />
@@ -317,7 +317,7 @@ const Messages = () => {
                 </div>
                 
                 {/* Search and filters */}
-                <div className="space-y-3 mb-4">
+                <div className="space-y-3 mb-4 flex-shrink-0">
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
@@ -353,7 +353,7 @@ const Messages = () => {
                   </div>
                 </div>
 
-                <ScrollArea className="h-[400px] sm:h-[500px] lg:h-[520px] pr-3">
+                <ScrollArea className="flex-1 pr-3">
                   <div className="space-y-2">
                     {filteredConversations.map((conv) => (
                       <div
@@ -484,8 +484,8 @@ const Messages = () => {
             </Card>
 
             {/* Zone de chat Professional */}
-            <Card className="lg:col-span-2 border-border/60 shadow-xl overflow-hidden">
-              <CardContent className="p-0 h-[500px] sm:h-[600px] lg:h-[690px] flex flex-col bg-card/30 backdrop-blur-sm">
+            <Card className="lg:col-span-2 border-border/60 shadow-xl overflow-hidden flex flex-col">
+              <CardContent className="p-0 h-[600px] lg:h-full flex flex-col bg-card/30 backdrop-blur-sm">
                 {selectedConversation ? (
                   <ChatBox
                     businessId={selectedConversation.business_id}
