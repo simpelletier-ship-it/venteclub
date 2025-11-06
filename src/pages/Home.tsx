@@ -8,12 +8,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { SEO } from "@/components/SEO";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { TypewriterAnimation } from "@/components/AnimatedSearchBar";
+import { useScrollParallax } from "@/hooks/useScrollParallax";
 
 const Home = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
   const [featuredBusinesses, setFeaturedBusinesses] = useState<any[]>([]);
+  const scrollY = useScrollParallax();
   
   useEffect(() => {
     fetchFeaturedBusinesses();
@@ -99,16 +101,41 @@ const Home = () => {
       
       {/* Hero Section */}
       <section className="relative min-h-[85vh] flex items-center bg-gradient-to-br from-primary/10 via-background to-accent/10 overflow-hidden" aria-label="Section principale">
-        {/* Animated Background Elements */}
+        {/* Animated Background Elements with Parallax */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-20 -right-20 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '8s' }} />
-          <div className="absolute bottom-20 -left-20 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '10s', animationDelay: '2s' }} />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '12s', animationDelay: '4s' }} />
+          <div 
+            className="absolute top-20 -right-20 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse transition-transform duration-100" 
+            style={{ 
+              animationDuration: '8s',
+              transform: `translate(${scrollY * 0.15}px, ${scrollY * 0.1}px)`
+            }} 
+          />
+          <div 
+            className="absolute bottom-20 -left-20 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse transition-transform duration-100" 
+            style={{ 
+              animationDuration: '10s', 
+              animationDelay: '2s',
+              transform: `translate(${-scrollY * 0.1}px, ${scrollY * 0.15}px)`
+            }} 
+          />
+          <div 
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-3xl animate-pulse transition-transform duration-100" 
+            style={{ 
+              animationDuration: '12s', 
+              animationDelay: '4s',
+              transform: `translate(-50%, -50%) scale(${1 + scrollY * 0.0005})`
+            }} 
+          />
         </div>
         
         <div className="container mx-auto px-4 py-20 relative z-10">
           <div className="max-w-6xl mx-auto">
-            <div className="space-y-8 animate-slide-up">
+            <div 
+              className="space-y-8 animate-slide-up transition-transform duration-100" 
+              style={{ 
+                transform: `translateY(${scrollY * 0.05}px)` 
+              }}
+            >
               <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-primary/10 border border-primary/20 backdrop-blur-sm">
                 <Sparkles className="w-4 h-4 text-primary" />
                 <span className="text-foreground/90 text-sm font-medium">
