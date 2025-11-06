@@ -98,7 +98,7 @@ const Home = () => {
       />
       
       {/* Hero Section */}
-      <section className="relative min-h-[85vh] flex items-center bg-muted/30" aria-label="Section principale">
+      <section className="relative min-h-[85vh] flex items-center bg-gradient-to-br from-primary/5 via-background to-accent/5" aria-label="Section principale">
         <div className="container mx-auto px-4 py-20">
           <div className="max-w-6xl mx-auto">
             <div className="space-y-8 animate-slide-up">
