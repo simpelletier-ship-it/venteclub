@@ -54,7 +54,7 @@ const handler = async (req: Request): Promise<Response> => {
     const accessTypeLabel = accessType === 'one_time' ? 'Accès unique' : 'Abonnement mensuel';
 
     const emailResponse = await resend.emails.send({
-      from: "Vente.club <info@vente.club>",
+      from: "Vente.club <onboarding@resend.dev>",
       to: [email],
       subject: `Facture #${invoiceId} - Accès déverrouillé sur Vente.club`,
       html: `

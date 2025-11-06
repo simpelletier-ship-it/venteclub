@@ -57,7 +57,7 @@ const handler = async (req: Request): Promise<Response> => {
     const userName = profile?.first_name || profile?.full_name || email.split('@')[0];
 
     const emailResponse = await resend.emails.send({
-      from: "Vente.club <info@vente.club>",
+      from: "Vente.club <onboarding@resend.dev>",
       to: [email],
       subject: "Réinitialisation de votre mot de passe - Vente.club",
       html: `

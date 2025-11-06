@@ -189,7 +189,7 @@ serve(async (req) => {
     `;
 
     const { data, error } = await resend.emails.send({
-      from: "Vente.Club Alertes <notifications@vente.club>",
+      from: "Vente.Club Alertes <onboarding@resend.dev>",
       to: [userEmail],
       subject: `${alertDescription}: ${businessTitle}`,
       html: emailHtml,

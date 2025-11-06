@@ -46,7 +46,7 @@ const handler = async (req: Request): Promise<Response> => {
     });
 
     const emailResponse = await resend.emails.send({
-      from: "Vente.club <info@vente.club>",
+      from: "Vente.club <onboarding@resend.dev>",
       to: [sellerEmail],
       subject: `Confirmation de vente - "${businessTitle}"`,
       html: `
