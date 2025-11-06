@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
-import { DisclaimerAlert } from "@/components/DisclaimerAlert";
+
 import { useFingerprint } from "@/hooks/useFingerprint";
 import { AlertTriangle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -560,7 +560,6 @@ const Auth = () => {
                       <AlertDescription>{securityWarning}</AlertDescription>
                     </Alert>
                   )}
-                  <DisclaimerAlert />
                   <div>
                     <Label htmlFor="signup-email">Email</Label>
                     <Input
