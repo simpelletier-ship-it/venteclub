@@ -41,6 +41,9 @@ const Market = lazy(() => import("./pages/Market"));
 
 const queryClient = new QueryClient();
 
+// Lazy load admin security page
+const AdminSecurity = lazy(() => import("./pages/AdminSecurity"));
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -64,6 +67,7 @@ const App = () => (
                 <Route path="/entreprise/:slug" element={<BusinessDetails />} />
                 <Route path="/map" element={<Map />} />
                 <Route path="/admin" element={<Admin />} />
+                <Route path="/admin/security" element={<AdminSecurity />} />
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/favorites" element={<Favorites />} />
                 <Route path="/messages" element={<Messages />} />

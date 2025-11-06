@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { CheckCircle, XCircle, Eye, ArrowLeft, Trash2, Star, Edit, Upload, UserX } from "lucide-react";
+import { CheckCircle, XCircle, Eye, ArrowLeft, Trash2, Star, Edit, Upload, UserX, Shield } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { z } from "zod";
@@ -870,6 +870,31 @@ const Admin = () => {
             Gérez les annonces et les propositions de modification
           </p>
         </div>
+
+        {/* Security Monitoring Card */}
+        <Card className="mb-6 border-orange-500/50 bg-gradient-to-r from-orange-500/10 to-red-500/10">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-full bg-orange-500/20">
+                  <Shield className="h-6 w-6 text-orange-500" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold mb-1">Surveillance de sécurité</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Moniteur en temps réel des tentatives de connexion, IPs bloquées et activités suspectes
+                  </p>
+                </div>
+              </div>
+              <Link to="/admin/security">
+                <Button size="lg" variant="outline" className="border-orange-500 hover:bg-orange-500/10">
+                  <Shield className="h-4 w-4 mr-2" />
+                  Accéder
+                </Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
 
         <Tabs defaultValue="businesses" className="w-full">
           <TabsList className="grid w-full max-w-6xl grid-cols-7 mb-6">
