@@ -48,6 +48,7 @@ const BusinessDetails = () => {
   const [isSeller, setIsSeller] = useState(false);
   const [hasUnlockedChat, setHasUnlockedChat] = useState(false);
   const [isUnlockingChat, setIsUnlockingChat] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
   const [imageZoom, setImageZoom] = useState(1);
 
   useEffect(() => {
@@ -1393,42 +1394,50 @@ const BusinessDetails = () => {
                   </div>
                 )}
 
-                {/* Messagerie - Bouton d'accès rapide */}
+                {/* Messagerie - Chat intégré */}
                 {user && business && (isSeller || hasPremium || hasUnlockedChat) && (
                   <div className="border-t pt-6 mt-6">
-                    <div className="bg-gradient-to-br from-primary/10 to-primary/5 border-2 border-primary/30 rounded-xl p-6">
-                      <div className="flex items-center gap-4 mb-4">
-                        <div className="p-3 bg-primary/20 rounded-full">
-                          <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                          </svg>
-                        </div>
-                        <div className="flex-1">
-                          <h3 className="text-lg font-semibold text-foreground">
-                            {isSeller ? "Vos conversations" : "Contacter le vendeur"}
-                          </h3>
-                          <p className="text-sm text-muted-foreground">
-                            {isSeller 
-                              ? "Gérez vos conversations avec les acheteurs intéressés" 
-                              : "Discutez directement avec le vendeur"}
-                          </p>
-                        </div>
-                      </div>
-                      <Button
-                        onClick={() => {
-                          // Rediriger vers la messagerie avec la conversation spécifique
-                          const conversationParam = business.seller_id ? `?conversation=${business.id}` : '';
-                          navigate(`/messages${conversationParam}`);
-                        }}
-                        className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-6 text-base"
-                        size="lg"
-                      >
-                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                        </svg>
-                        {isSeller ? "Voir mes conversations" : "Ouvrir le chat"}
-                      </Button>
-                    </div>
+                    <Collapsible open={isChatOpen} onOpenChange={setIsChatOpen}>
+                      <CollapsibleTrigger asChild>
+                        <button className="w-full bg-gradient-to-br from-primary/10 to-primary/5 border-2 border-primary/30 rounded-xl p-6 hover:border-primary/50 transition-all duration-200 group">
+                          <div className="flex items-center gap-4 mb-4">
+                            <div className="p-3 bg-primary/20 rounded-full group-hover:scale-110 transition-transform duration-200">
+                              <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                              </svg>
+                            </div>
+                            <div className="flex-1 text-left">
+                              <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
+                                {isSeller ? "Vos conversations" : "Contacter le vendeur"}
+                              </h3>
+                              <p className="text-sm text-muted-foreground">
+                                {isSeller 
+                                  ? "Gérez vos conversations avec les acheteurs intéressés" 
+                                  : isChatOpen ? "Cliquez pour fermer le chat" : "Cliquez pour ouvrir le chat"}
+                              </p>
+                            </div>
+                            <ChevronDown 
+                              className={`w-5 h-5 text-muted-foreground transition-transform duration-200 ${
+                                isChatOpen ? 'rotate-180' : ''
+                              }`}
+                            />
+                          </div>
+                        </button>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="mt-4">
+                        {business && user && (
+                          <div className="bg-card border-2 border-primary/20 rounded-xl overflow-hidden">
+                            <ChatBox
+                              businessId={business.id}
+                              currentUserId={user.id}
+                              otherUserId={isSeller ? '' : business.seller_id}
+                              otherUserName={isSeller ? 'Acheteur' : sellerProfile?.full_name || 'Vendeur'}
+                              businessTitle={business.title}
+                            />
+                          </div>
+                        )}
+                      </CollapsibleContent>
+                    </Collapsible>
                   </div>
                 )}
 
