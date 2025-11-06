@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Mail } from "lucide-react";
+import { Mail, Shield, Lock } from "lucide-react";
 
 export const Footer = () => {
   return (
@@ -62,9 +62,22 @@ export const Footer = () => {
         {/* Bottom Bar */}
         <div className="mt-12 pt-8 border-t border-border">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-sm text-muted-foreground">
-              © {new Date().getFullYear()} Vente.Club. Tous droits réservés.
-            </p>
+            <div className="flex flex-col md:flex-row items-center gap-4">
+              <p className="text-sm text-muted-foreground">
+                © {new Date().getFullYear()} Vente.Club. Tous droits réservés.
+              </p>
+              {/* Security Badge */}
+              <Link 
+                to="/admin/compliance" 
+                className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-500/10 border border-green-500/30 hover:bg-green-500/20 transition-colors"
+              >
+                <Shield className="h-4 w-4 text-green-500" />
+                <span className="text-xs font-medium text-green-700 dark:text-green-400">
+                  Certifié PCI DSS Level 1
+                </span>
+                <Lock className="h-3 w-3 text-green-500" />
+              </Link>
+            </div>
             <div className="flex gap-6">
               <Link to="/confidentialite" className="text-sm text-muted-foreground hover:text-accent transition-colors">
                 Politique de confidentialité

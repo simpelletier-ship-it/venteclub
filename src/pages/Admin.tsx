@@ -872,29 +872,55 @@ const Admin = () => {
         </div>
 
         {/* Security Monitoring Card */}
-        <Card className="mb-6 border-orange-500/50 bg-gradient-to-r from-orange-500/10 to-red-500/10">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="p-3 rounded-full bg-orange-500/20">
-                  <Shield className="h-6 w-6 text-orange-500" />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          <Card className="border-orange-500/50 bg-gradient-to-r from-orange-500/10 to-red-500/10">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 rounded-full bg-orange-500/20">
+                    <Shield className="h-6 w-6 text-orange-500" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold mb-1">Surveillance de sécurité</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Moniteur en temps réel des tentatives de connexion
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-lg font-semibold mb-1">Surveillance de sécurité</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Moniteur en temps réel des tentatives de connexion, IPs bloquées et activités suspectes
-                  </p>
-                </div>
+                <Link to="/admin/security">
+                  <Button size="lg" variant="outline" className="border-orange-500 hover:bg-orange-500/10">
+                    <Shield className="h-4 w-4 mr-2" />
+                    Accéder
+                  </Button>
+                </Link>
               </div>
-              <Link to="/admin/security">
-                <Button size="lg" variant="outline" className="border-orange-500 hover:bg-orange-500/10">
-                  <Shield className="h-4 w-4 mr-2" />
-                  Accéder
-                </Button>
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+
+          <Card className="border-green-500/50 bg-gradient-to-r from-green-500/10 to-emerald-500/10">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 rounded-full bg-green-500/20">
+                    <CheckCircle className="h-6 w-6 text-green-500" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold mb-1">Conformité PCI DSS</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Rapport de sécurité et certifications Level 1
+                    </p>
+                  </div>
+                </div>
+                <Link to="/admin/compliance">
+                  <Button size="lg" variant="outline" className="border-green-500 hover:bg-green-500/10">
+                    <CheckCircle className="h-4 w-4 mr-2" />
+                    Voir rapport
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
         <Tabs defaultValue="businesses" className="w-full">
           <TabsList className="grid w-full max-w-6xl grid-cols-7 mb-6">
