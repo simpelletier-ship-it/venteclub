@@ -43,6 +43,7 @@ const queryClient = new QueryClient();
 
 // Lazy load admin security page
 const AdminSecurity = lazy(() => import("./pages/AdminSecurity"));
+const SecurityCompliance = lazy(() => import("./pages/SecurityCompliance"));
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -68,6 +69,7 @@ const App = () => (
                 <Route path="/map" element={<Map />} />
                 <Route path="/admin" element={<Admin />} />
                 <Route path="/admin/security" element={<AdminSecurity />} />
+                <Route path="/admin/compliance" element={<SecurityCompliance />} />
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/favorites" element={<Favorites />} />
                 <Route path="/messages" element={<Messages />} />

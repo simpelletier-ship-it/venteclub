@@ -4,10 +4,19 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
     
+    <!-- Security Headers - PCI DSS & OWASP Compliant -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.google.com https://www.gstatic.com https://apis.google.com https://js.stripe.com https://xmwsrvaricrfxovimffm.supabase.co; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https: blob:; connect-src 'self' https://xmwsrvaricrfxovimffm.supabase.co https://api.stripe.com wss://xmwsrvaricrfxovimffm.supabase.co https://www.google.com https://api.mapbox.com; frame-src 'self' https://www.google.com https://js.stripe.com; object-src 'none'; base-uri 'self'; form-action 'self' https://checkout.stripe.com; frame-ancestors 'none'; upgrade-insecure-requests;" />
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+    <meta http-equiv="X-Frame-Options" content="DENY" />
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
+    <meta http-equiv="Permissions-Policy" content="geolocation=(self), microphone=(), camera=(), payment=(self 'https://js.stripe.com'), usb=()" />
+    <meta http-equiv="Strict-Transport-Security" content="max-age=31536000; includeSubDomains; preload" />
+    
     <!-- Primary Meta Tags -->
-    <title>Vente.club - Achat et Vente d'Entreprises au Québec | Plateforme Sécurisée</title>
+    <title>Vente.club - Achat et Vente d'Entreprises au Québec | Plateforme Sécurisée PCI DSS</title>
     <meta name="title" content="Vente.club - Achat et Vente d'Entreprises au Québec" />
-    <meta name="description" content="Plateforme québécoise #1 pour acheter et vendre des entreprises. Plus de 100 opportunités vérifiées : restaurants, commerces, franchises. Transactions sécurisées et contactez directement les vendeurs." />
+    <meta name="description" content="Plateforme québécoise #1 pour acheter et vendre des entreprises. Plus de 100 opportunités vérifiées : restaurants, commerces, franchises. Transactions sécurisées PCI DSS avec Stripe." />
     <meta name="keywords" content="vente entreprise Québec, achat commerce Montréal, vendre restaurant, acheter franchise, opportunité affaires, cession entreprise, reprise commerce, vente PME, acquisition entreprise" />
     <meta name="author" content="Vente.club" />
     <meta name="robots" content="index, follow" />
