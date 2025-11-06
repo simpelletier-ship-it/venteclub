@@ -29,12 +29,12 @@ export const FloatingOpportunities = () => {
         {/* Floating Cards */}
         <div className="absolute inset-0 flex items-center justify-center">
           {opportunities.map((opp, index) => (
-            <div
+              <div
               key={index}
               className={`absolute w-full transition-all duration-1000 ${
                 visibleCards.includes(index)
                   ? "opacity-100 translate-y-0 scale-100"
-                  : "opacity-0 -translate-y-20 scale-95 pointer-events-none"
+                  : "opacity-0 translate-y-20 scale-95 pointer-events-none"
               }`}
               style={{
                 transitionDelay: visibleCards.includes(index) ? "0ms" : "300ms",
