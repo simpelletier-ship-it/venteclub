@@ -358,7 +358,7 @@ const Messages = () => {
                     {filteredConversations.map((conv) => (
                        <div
                         key={`${conv.business_id}-${conv.other_user_id}`}
-                        className={`group p-3 rounded-lg transition-all duration-300 cursor-pointer overflow-hidden ${
+                        className={`group p-2.5 rounded-lg transition-all duration-300 cursor-pointer ${
                           selectedConversation?.business_id === conv.business_id &&
                           selectedConversation?.other_user_id === conv.other_user_id
                             ? 'bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border-2 border-primary/60 shadow-lg'
@@ -366,9 +366,10 @@ const Messages = () => {
                         }`}
                         onClick={() => handleConversationClick(conv)}
                       >
-                        <div className="flex items-start gap-2.5 max-w-full">
-                          {/* Avatar de la personne à gauche */}
-                          <div className="relative flex-shrink-0">
+                        {/* GRID LAYOUT AU LIEU DE FLEX */}
+                        <div className="grid grid-cols-[44px_1fr_44px] gap-2 items-start w-full">
+                          {/* Avatar - LARGEUR FIXE */}
+                          <div className="relative w-11 h-11">
                             <Avatar className="h-11 w-11 ring-2 ring-border/40">
                               <AvatarImage src={conv.other_user_avatar || undefined} alt={conv.other_user_name} />
                               <AvatarFallback className="bg-gradient-to-br from-primary/20 to-secondary/20 text-foreground font-semibold text-xs">
@@ -382,13 +383,13 @@ const Messages = () => {
                             )}
                           </div>
 
-                          {/* Contenu au milieu - DOIT ÊTRE CONTRAINT */}
-                          <div className="flex-1 min-w-0 max-w-full overflow-hidden">
-                            <div className="flex items-start justify-between gap-2 mb-1">
+                          {/* Contenu - PREND L'ESPACE RESTANT */}
+                          <div className="min-w-0 overflow-hidden">
+                            <div className="flex items-start justify-between gap-1 mb-0.5">
                               <h3 className="font-bold text-sm truncate group-hover:text-primary transition-colors flex-1 min-w-0">
                                 {conv.other_user_name}
                               </h3>
-                              <span className="text-[10px] font-semibold text-muted-foreground/70 whitespace-nowrap flex-shrink-0 ml-2">
+                              <span className="text-[9px] font-semibold text-muted-foreground/70 whitespace-nowrap flex-shrink-0">
                                 {new Date(conv.last_message_time).toLocaleDateString('fr-FR', {
                                   day: '2-digit',
                                   month: '2-digit',
@@ -396,76 +397,72 @@ const Messages = () => {
                               </span>
                             </div>
                             
-                            <p className="text-xs text-muted-foreground/60 mb-1 truncate font-medium w-full">
+                            <p className="text-[10px] text-muted-foreground/60 mb-0.5 truncate font-medium">
                               {conv.business_title}
                             </p>
                             
-                            <div className="flex items-center gap-1.5 max-w-full">
-                              <p className="text-xs text-foreground/70 truncate leading-tight flex-1 min-w-0">
+                            <div className="flex items-center gap-1">
+                              <p className="text-[10px] text-foreground/70 truncate leading-tight flex-1 min-w-0">
                                 {conv.last_message}
                               </p>
                               {conv.last_message_sender_id === user?.id && (
                                 <span className="flex-shrink-0">
                                   {conv.last_message_read ? (
-                                    <CheckCheck className="w-3.5 h-3.5 text-primary" />
+                                    <CheckCheck className="w-3 h-3 text-primary" />
                                   ) : (
-                                    <Check className="w-3.5 h-3.5 text-muted-foreground/50" />
+                                    <Check className="w-3 h-3 text-muted-foreground/50" />
                                   )}
                                 </span>
                               )}
                             </div>
                           </div>
 
-                          {/* Image annonce à droite */}
-                          <div className="flex-shrink-0">
-                            <div className="w-11 h-11 rounded-lg overflow-hidden bg-muted shadow-sm ring-1 ring-border/40">
-                              {conv.business_photo ? (
-                                <img 
-                                  src={conv.business_photo} 
-                                  alt={conv.business_title}
-                                  className="w-full h-full object-cover"
-                                />
-                              ) : (
-                                <div className="w-full h-full bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center">
-                                  <span className="text-sm">🏢</span>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-
-                          {/* Bouton supprimer - hover only */}
-                          <div className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <AlertDialog>
-                              <AlertDialogTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-7 w-7"
-                                  onClick={(e) => e.stopPropagation()}
-                                >
-                                  <Trash2 className="h-3.5 w-3.5 text-destructive" />
-                                </Button>
-                              </AlertDialogTrigger>
-                              <AlertDialogContent>
-                                <AlertDialogHeader>
-                                  <AlertDialogTitle>Supprimer la conversation</AlertDialogTitle>
-                                  <AlertDialogDescription>
-                                    Êtes-vous sûr de vouloir supprimer cette conversation avec {conv.other_user_name} ? Cette action est irréversible.
-                                  </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                  <AlertDialogCancel>Annuler</AlertDialogCancel>
-                                  <AlertDialogAction
-                                    onClick={() => handleDeleteConversation(conv)}
-                                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                                  >
-                                    Supprimer
-                                  </AlertDialogAction>
-                                </AlertDialogFooter>
-                              </AlertDialogContent>
-                            </AlertDialog>
+                          {/* Image - LARGEUR FIXE */}
+                          <div className="w-11 h-11 rounded-lg overflow-hidden bg-muted shadow-sm ring-1 ring-border/40">
+                            {conv.business_photo ? (
+                              <img 
+                                src={conv.business_photo} 
+                                alt={conv.business_title}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center">
+                                <span className="text-sm">🏢</span>
+                              </div>
+                            )}
                           </div>
                         </div>
+                        
+                        {/* Bouton supprimer - POSITION ABSOLUTE */}
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6 absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <Trash2 className="h-3 w-3 text-destructive" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Supprimer la conversation</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Êtes-vous sûr de vouloir supprimer cette conversation avec {conv.other_user_name} ? Cette action est irréversible.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Annuler</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => handleDeleteConversation(conv)}
+                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                              >
+                                Supprimer
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
                       </div>
                     ))}
                   </div>
