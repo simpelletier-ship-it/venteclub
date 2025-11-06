@@ -145,7 +145,7 @@ const Home = () => {
       </section>
 
       {/* Featured Businesses Section */}
-      <section id="featured" className="py-8 sm:py-12 bg-gradient-to-b from-muted/30 to-background">
+      <section id="featured" className="py-16 sm:py-20 bg-background border-t border-border">
         <div className="container mx-auto px-4">
           <div className="text-center mb-6 sm:mb-8 animate-slide-up">
             <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-secondary/10 text-secondary text-xs sm:text-sm font-semibold mb-3 sm:mb-4">
@@ -182,7 +182,7 @@ const Home = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-12 sm:py-16 bg-background" aria-labelledby="features-heading">
+      <section className="py-16 sm:py-20 bg-muted/30 border-t border-border" aria-labelledby="features-heading">
         <div className="container mx-auto px-4">
           <div className="text-center mb-10 max-w-3xl mx-auto">
             <h2 id="features-heading" className="text-3xl sm:text-4xl font-display font-bold mb-4">Pour tous les entrepreneurs</h2>
@@ -245,7 +245,7 @@ const Home = () => {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-12 bg-muted/30" aria-labelledby="faq-heading">
+      <section className="py-16 sm:py-20 bg-background border-t border-border" aria-labelledby="faq-heading">
         <div className="container mx-auto px-4 max-w-4xl">
           <div className="text-center mb-8">
             <h2 id="faq-heading" className="text-4xl font-display font-bold">Questions fréquentes</h2>
@@ -292,7 +292,7 @@ const Home = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="relative py-20 overflow-hidden bg-gradient-to-br from-white via-muted to-white" aria-labelledby="cta-heading">
+      <section className="relative py-24 overflow-hidden bg-gradient-to-br from-primary/8 via-background to-accent/8 border-t border-border" aria-labelledby="cta-heading">
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-gradient-to-br from-secondary/30 via-primary/20 to-transparent rounded-full blur-3xl animate-float" />
           <div className="absolute -bottom-40 -left-40 w-[600px] h-[600px] bg-gradient-to-tr from-accent/30 via-primary/20 to-transparent rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
