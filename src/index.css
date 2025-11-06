@@ -28,6 +28,15 @@ All colors MUST be HSL.
     --secondary: 244 60% 55%;
     --secondary-foreground: 0 0% 100%;
     
+    /* Success: Vert pour revenus */
+    --success: 158 100% 36%;
+    --success-foreground: 0 0% 100%;
+    --success-light: 158 100% 46%;
+    
+    /* Primary Pale: Mauve pâle pour BAIIA */
+    --primary-pale: 244 66% 90%;
+    --primary-pale-foreground: 244 60% 35%;
+    
     /* Muted: Gris très pâle (#F8FAFC) */
     --muted: 210 40% 98%;
     --muted-foreground: 220 26% 32%;
@@ -95,6 +104,13 @@ All colors MUST be HSL.
     
     --secondary: 244 60% 60%;
     --secondary-foreground: 0 0% 100%;
+    
+    --success: 158 100% 42%;
+    --success-foreground: 0 0% 100%;
+    --success-light: 158 100% 50%;
+    
+    --primary-pale: 244 66% 85%;
+    --primary-pale-foreground: 244 60% 45%;
     
     --muted: 220 20% 20%;
     --muted-foreground: 220 13% 75%;

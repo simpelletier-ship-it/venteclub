@@ -210,10 +210,20 @@ const BusinessCard = ({
             <div className="flex items-center gap-2 flex-wrap">
               {/* Badge En Vedette en premier */}
               {featured && (
-                <Badge className="relative bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 text-amber-950 border-2 border-amber-300/50 shadow-[0_0_20px_rgba(251,191,36,0.5)] font-bold tracking-wide">
-                  <Star className="w-3 h-3 fill-amber-950 mr-1 drop-shadow-sm" />
-                  EN VEDETTE
-                </Badge>
+                <TooltipProvider delayDuration={200}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div onClick={(e) => e.stopPropagation()}>
+                        <Badge className="relative bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 text-amber-950 border-2 border-amber-300/50 shadow-[0_0_20px_rgba(251,191,36,0.5)] cursor-help">
+                          <Star className="w-4 h-4 fill-amber-950 drop-shadow-sm" />
+                        </Badge>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent side="top" className="bg-popover border-border">
+                      <p className="font-semibold text-foreground">Annonce mise de l'avant</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               )}
               
               {/* Badge Type d'annonce */}
@@ -339,14 +349,14 @@ const BusinessCard = ({
             <>
               <div className="space-y-1">
                 <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Revenus</p>
-                <p className="text-lg font-bold text-foreground flex items-center gap-1">
-                  <TrendingUp className="w-4 h-4 text-accent" />
+                <p className="text-lg font-bold text-[hsl(var(--success))] flex items-center gap-1">
+                  <TrendingUp className="w-4 h-4 text-[hsl(var(--success-light))]" />
                   {displayRevenue}
                 </p>
               </div>
               <div className="space-y-1">
                 <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">BAIIA</p>
-                <p className="text-lg font-bold text-secondary">{displayBaiia}</p>
+                <p className="text-lg font-bold text-[hsl(var(--primary-pale-foreground))]">{displayBaiia}</p>
               </div>
             </>
           )}
@@ -367,12 +377,12 @@ const BusinessCard = ({
         <div className={`flex flex-col sm:flex-row items-start sm:items-end justify-between gap-3 pt-4 border-t border-border/50 ${status === 'sold' ? 'blur-[8px]' : ''}`}>
           <div className="space-y-1">
             <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Prix demandé</p>
-            <p className="text-2xl sm:text-3xl font-display font-bold text-primary">{displayPrice}</p>
+            <p className="text-2xl sm:text-3xl font-display font-bold text-[hsl(var(--secondary))]">{displayPrice}</p>
           </div>
           {status !== 'sold' && (
             <Button 
               size="lg"
-              className="btn-premium bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-lg w-full sm:w-auto"
+              className="btn-premium bg-[hsl(var(--secondary))] hover:bg-[hsl(var(--secondary))]/90 text-secondary-foreground font-semibold shadow-lg w-full sm:w-auto"
               onClick={(e) => {
                 e.stopPropagation();
                 handleClick();
