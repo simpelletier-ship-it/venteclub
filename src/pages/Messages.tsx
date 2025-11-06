@@ -366,7 +366,7 @@ const Messages = () => {
                         }`}
                         onClick={() => handleConversationClick(conv)}
                       >
-                        <div className="flex items-start gap-3">
+                        <div className="flex items-start gap-2.5 max-w-full">
                           {/* Avatar de la personne à gauche */}
                           <div className="relative flex-shrink-0">
                             <Avatar className="h-11 w-11 ring-2 ring-border/40">
@@ -382,26 +382,13 @@ const Messages = () => {
                             )}
                           </div>
 
-                          {/* Contenu au milieu */}
-                          <div className="flex-1 min-w-0 overflow-hidden">
+                          {/* Contenu au milieu - DOIT ÊTRE CONTRAINT */}
+                          <div className="flex-1 min-w-0 max-w-full overflow-hidden">
                             <div className="flex items-start justify-between gap-2 mb-1">
-                              <div className="flex items-center gap-1.5 flex-1 min-w-0">
-                                <h3 className="font-bold text-sm truncate group-hover:text-primary transition-colors">
-                                  {conv.other_user_name}
-                                </h3>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    navigate(`/profile/${conv.other_user_id}`);
-                                  }}
-                                >
-                                  <User className="h-3 w-3" />
-                                </Button>
-                              </div>
-                              <span className="text-[10px] font-semibold text-muted-foreground/70 whitespace-nowrap flex-shrink-0">
+                              <h3 className="font-bold text-sm truncate group-hover:text-primary transition-colors flex-1 min-w-0">
+                                {conv.other_user_name}
+                              </h3>
+                              <span className="text-[10px] font-semibold text-muted-foreground/70 whitespace-nowrap flex-shrink-0 ml-2">
                                 {new Date(conv.last_message_time).toLocaleDateString('fr-FR', {
                                   day: '2-digit',
                                   month: '2-digit',
@@ -409,11 +396,11 @@ const Messages = () => {
                               </span>
                             </div>
                             
-                            <p className="text-xs text-muted-foreground/60 mb-1 truncate font-medium">
+                            <p className="text-xs text-muted-foreground/60 mb-1 truncate font-medium w-full">
                               {conv.business_title}
                             </p>
                             
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1.5 max-w-full">
                               <p className="text-xs text-foreground/70 truncate leading-tight flex-1 min-w-0">
                                 {conv.last_message}
                               </p>
@@ -426,13 +413,12 @@ const Messages = () => {
                                   )}
                                 </span>
                               )}
-                              <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/50 group-hover:text-primary group-hover:translate-x-0.5 transition-all flex-shrink-0" />
                             </div>
                           </div>
 
-                          {/* Image annonce et actions à droite */}
-                          <div className="flex items-center gap-2 flex-shrink-0">
-                            <div className="w-12 h-12 rounded-lg overflow-hidden bg-muted shadow-sm ring-1 ring-border/40">
+                          {/* Image annonce à droite */}
+                          <div className="flex-shrink-0">
+                            <div className="w-11 h-11 rounded-lg overflow-hidden bg-muted shadow-sm ring-1 ring-border/40">
                               {conv.business_photo ? (
                                 <img 
                                   src={conv.business_photo} 
@@ -441,18 +427,20 @@ const Messages = () => {
                                 />
                               ) : (
                                 <div className="w-full h-full bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center">
-                                  <span className="text-base">🏢</span>
+                                  <span className="text-sm">🏢</span>
                                 </div>
                               )}
                             </div>
+                          </div>
 
-                            {/* Bouton supprimer */}
+                          {/* Bouton supprimer - hover only */}
+                          <div className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
                             <AlertDialog>
                               <AlertDialogTrigger asChild>
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
+                                  className="h-7 w-7"
                                   onClick={(e) => e.stopPropagation()}
                                 >
                                   <Trash2 className="h-3.5 w-3.5 text-destructive" />
