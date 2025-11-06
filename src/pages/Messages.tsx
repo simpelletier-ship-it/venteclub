@@ -348,7 +348,7 @@ const Messages = () => {
           </p>
         </div>
 
-        {conversations.length === 0 ? (
+        {conversations.length === 0 && !selectedConversation ? (
           <Card className="border-border/60 shadow-xl">
             <CardContent className="text-center py-16">
               <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center mx-auto mb-5 shadow-lg">
@@ -364,9 +364,10 @@ const Messages = () => {
           </Card>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:h-[calc(100vh-240px)]">
-            {/* Liste des conversations Professional */}
-            <Card className="lg:col-span-1 border-border/60 shadow-xl overflow-hidden flex flex-col">
-              <CardContent className="p-4 sm:p-5 bg-card/50 backdrop-blur-sm flex flex-col h-full">
+            {/* Liste des conversations Professional - Masquer si vide et conversation virtuelle active */}
+            {conversations.length > 0 && (
+              <Card className="lg:col-span-1 border-border/60 shadow-xl overflow-hidden flex flex-col">
+                <CardContent className="p-4 sm:p-5 bg-card/50 backdrop-blur-sm flex flex-col h-full">
                 <div className="flex items-center justify-between mb-5 flex-shrink-0">
                   <h2 className="font-bold text-lg flex items-center gap-2.5 text-foreground">
                     <div className="p-2 rounded-xl bg-gradient-to-br from-primary/10 to-secondary/10 shadow-sm">
@@ -532,9 +533,10 @@ const Messages = () => {
                 </ScrollArea>
               </CardContent>
             </Card>
+            )}
 
             {/* Zone de chat Professional */}
-            <Card className="lg:col-span-2 border-border/60 shadow-xl overflow-hidden flex flex-col">
+            <Card className={`${conversations.length > 0 ? 'lg:col-span-2' : 'lg:col-span-3'} border-border/60 shadow-xl overflow-hidden flex flex-col`}>
               <CardContent className="p-0 h-[600px] lg:h-full flex flex-col bg-card/30 backdrop-blur-sm">
                 {selectedConversation ? (
                   <ChatBox
