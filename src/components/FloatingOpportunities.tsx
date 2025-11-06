@@ -43,8 +43,8 @@ export const FloatingOpportunities = () => {
               <div className={`bg-gradient-to-br ${opp.gradient} backdrop-blur-xl border ${opp.border} rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all`}>
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
-                    <h3 className="font-bold text-foreground text-lg mb-1">{opp.title}</h3>
-                    <p className="text-xs text-muted-foreground">{opp.location}</p>
+                    <h3 className="font-bold text-white text-lg mb-1">{opp.title}</h3>
+                    <p className="text-xs text-white/70">{opp.location}</p>
                   </div>
                   <div className={`w-10 h-10 rounded-full ${opp.icon} flex items-center justify-center`}>
                     <TrendingUp className={`w-5 h-5 ${opp.iconColor}`} />
@@ -53,20 +53,20 @@ export const FloatingOpportunities = () => {
                 
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
-                    <span className="text-xs text-muted-foreground">Prix demandé</span>
-                    <span className="font-bold text-foreground text-lg">{opp.price}</span>
+                    <span className="text-xs text-white/70">Prix demandé</span>
+                    <span className="font-bold text-white text-lg">{opp.price}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-xs text-muted-foreground">Revenus annuels</span>
-                    <span className="font-semibold text-foreground">{opp.revenue}</span>
+                    <span className="text-xs text-white/70">Revenus annuels</span>
+                    <span className="font-semibold text-white">{opp.revenue}</span>
                   </div>
                   
-                  <div className="pt-3 border-t border-border">
+                  <div className="pt-3 border-t border-white/20">
                     <div className="flex gap-2 items-center">
-                      <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+                      <div className="flex-1 h-2 bg-white/30 rounded-full overflow-hidden">
                         <div className={`h-full ${opp.iconColor.replace('text-', 'bg-')} w-3/4`} />
                       </div>
-                      <span className="text-xs text-muted-foreground font-medium">75% ROI</span>
+                      <span className="text-xs text-white/70 font-medium">75% ROI</span>
                     </div>
                   </div>
                 </div>
