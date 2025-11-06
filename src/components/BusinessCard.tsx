@@ -133,7 +133,7 @@ const BusinessCard = ({
     }
     
     // Par défaut, c'est une entreprise
-    return { label: 'Entreprise', icon: Store, color: 'bg-blue-500' };
+    return { label: 'Entreprise', icon: Store, color: 'bg-primary' };
   };
 
   const businessType = getBusinessType();
@@ -146,9 +146,9 @@ const BusinessCard = ({
 
   return (
     <Card 
-      className={`group relative overflow-hidden card-premium border-border/50 h-full flex flex-col ${
-        status !== 'sold' ? 'hover:shadow-premium cursor-pointer' : 'cursor-default'
-      } ${featured ? 'ring-2 ring-accent/30' : ''}`}
+      className={`group relative overflow-hidden card-premium border-border/50 h-full flex flex-col transition-all duration-300 ${
+        status !== 'sold' ? 'hover:shadow-premium hover:border-primary/50 cursor-pointer' : 'cursor-default'
+      } ${featured ? 'ring-2 ring-primary/40' : ''}`}
       onClick={handleClick}
     >
       {/* Image principale */}
@@ -372,7 +372,7 @@ const BusinessCard = ({
           {status !== 'sold' && (
             <Button 
               size="lg"
-              className="btn-premium bg-accent hover:bg-accent/90 text-accent-foreground font-semibold shadow-soft w-full sm:w-auto"
+              className="btn-premium bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-lg w-full sm:w-auto"
               onClick={(e) => {
                 e.stopPropagation();
                 handleClick();

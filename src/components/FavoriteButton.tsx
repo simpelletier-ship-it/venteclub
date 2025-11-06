@@ -109,7 +109,7 @@ export const FavoriteButton = ({ businessId, userId }: FavoriteButtonProps) => {
       aria-label={isFavorite ? "Retirer des favoris" : "Ajouter aux favoris"}
     >
       <Heart 
-        className={`h-5 w-5 transition-all ${isFavorite ? 'fill-primary stroke-primary' : 'stroke-muted-foreground'} group-hover:fill-primary group-hover:stroke-primary`}
+        className={`h-5 w-5 transition-all ${isFavorite ? 'fill-primary stroke-primary' : 'stroke-muted-foreground'} group-hover:fill-primary/80 group-hover:stroke-primary/80`}
         strokeWidth={2}
       />
     </Button>
