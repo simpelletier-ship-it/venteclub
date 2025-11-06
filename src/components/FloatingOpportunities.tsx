@@ -90,7 +90,7 @@ export const FloatingOpportunities = () => {
           </div>
         </div>
 
-        <div className="absolute right-[10px] bottom-32 animate-float" style={{ animationDelay: "2s", animationDuration: "4.5s" }}>
+        <div className="absolute right-[50px] bottom-16 animate-float" style={{ animationDelay: "2s", animationDuration: "4.5s" }}>
           <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl px-4 py-2 shadow-lg">
             <div className="text-xs text-muted-foreground">Vendues</div>
             <div className="font-bold text-foreground">1.2K</div>
