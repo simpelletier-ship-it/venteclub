@@ -110,7 +110,7 @@ const Home = () => {
               </div>
               
               <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-display font-bold leading-[1.1] tracking-tight text-foreground">
-                Le club incontournable pour acheter <TypewriterAnimation />
+                Le Club de référence pour l'achat <TypewriterAnimation />
                 <br />
                 au Québec.
               </h1>
