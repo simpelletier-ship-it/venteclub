@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import BusinessCard from "@/components/BusinessCard";
-import { ArrowRight, TrendingUp, Shield, Clock, Sparkles } from "lucide-react";
+import { ArrowRight, TrendingUp, Shield, Clock, Sparkles, Building2, Users, Eye, DollarSign } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { SEO } from "@/components/SEO";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -16,10 +16,17 @@ const Home = () => {
   const { toast } = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
   const [featuredBusinesses, setFeaturedBusinesses] = useState<any[]>([]);
+  const [stats, setStats] = useState({
+    totalBusinesses: 0,
+    totalViews: 0,
+    totalUsers: 0,
+    totalValue: 0
+  });
   const scrollY = useScrollParallax();
   
   useEffect(() => {
     fetchFeaturedBusinesses();
+    fetchStats();
   }, []);
 
   useEffect(() => {
@@ -56,6 +63,49 @@ const Home = () => {
       }
     } catch (error) {
       console.error('[FETCH-FEATURED] Error:', error);
+    }
+  };
+
+  const fetchStats = async () => {
+    try {
+      // Nombre total d'entreprises actives et approuvées
+      const { count: businessCount } = await supabase
+        .from('businesses')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'active')
+        .eq('approval_status', 'approved');
+
+      // Nombre total de vues
+      const { data: viewsData } = await supabase
+        .from('businesses')
+        .select('views_count')
+        .eq('status', 'active')
+        .eq('approval_status', 'approved');
+      
+      const totalViews = viewsData?.reduce((sum, b) => sum + (b.views_count || 0), 0) || 0;
+
+      // Nombre total d'utilisateurs
+      const { count: userCount } = await supabase
+        .from('profiles')
+        .select('*', { count: 'exact', head: true });
+
+      // Valeur totale des entreprises
+      const { data: pricesData } = await supabase
+        .from('businesses')
+        .select('asking_price')
+        .eq('status', 'active')
+        .eq('approval_status', 'approved');
+      
+      const totalValue = pricesData?.reduce((sum, b) => sum + (b.asking_price || 0), 0) || 0;
+
+      setStats({
+        totalBusinesses: businessCount || 0,
+        totalViews: totalViews,
+        totalUsers: userCount || 0,
+        totalValue: totalValue
+      });
+    } catch (error) {
+      console.error('[FETCH-STATS] Error:', error);
     }
   };
 
@@ -180,26 +230,44 @@ const Home = () => {
       {/* Statistics Section */}
       <section className="py-12 sm:py-16 bg-[#1e1b4b]" aria-label="Statistiques de la plateforme">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-6 md:gap-0 max-w-7xl mx-auto">
-            <div className="text-center md:border-r md:border-white/20 px-4">
-              <div className="text-3xl sm:text-4xl font-bold text-white mb-2">500M+</div>
-              <div className="text-sm sm:text-base text-white/70">volume de transactions</div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 max-w-5xl mx-auto">
+            <div className="text-center">
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#818cf8]/20 mb-3">
+                <Building2 className="w-6 h-6 text-[#818cf8]" />
+              </div>
+              <div className="text-3xl sm:text-4xl font-bold text-white mb-2">
+                {stats.totalBusinesses}+
+              </div>
+              <div className="text-sm sm:text-base text-white/70">entreprises actives</div>
             </div>
-            <div className="text-center md:border-r md:border-white/20 px-4">
-              <div className="text-3xl sm:text-4xl font-bold text-white mb-2">2000+</div>
-              <div className="text-sm sm:text-base text-white/70">entreprises vendues</div>
+            <div className="text-center">
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#818cf8]/20 mb-3">
+                <Eye className="w-6 h-6 text-[#818cf8]" />
+              </div>
+              <div className="text-3xl sm:text-4xl font-bold text-white mb-2">
+                {stats.totalViews >= 1000 ? `${Math.floor(stats.totalViews / 1000)}k+` : `${stats.totalViews}+`}
+              </div>
+              <div className="text-sm sm:text-base text-white/70">vues totales</div>
             </div>
-            <div className="text-center md:border-r md:border-white/20 px-4">
-              <div className="text-3xl sm:text-4xl font-bold text-white mb-2">500k+</div>
-              <div className="text-sm sm:text-base text-white/70">entrepreneurs nous font confiance</div>
+            <div className="text-center">
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#818cf8]/20 mb-3">
+                <Users className="w-6 h-6 text-[#818cf8]" />
+              </div>
+              <div className="text-3xl sm:text-4xl font-bold text-white mb-2">
+                {stats.totalUsers}+
+              </div>
+              <div className="text-sm sm:text-base text-white/70">entrepreneurs inscrits</div>
             </div>
-            <div className="text-center md:border-r md:border-white/20 px-4">
-              <div className="text-3xl sm:text-4xl font-bold text-white mb-2">2B+</div>
-              <div className="text-sm sm:text-base text-white/70">en fonds d'acheteurs vérifiés</div>
-            </div>
-            <div className="text-center px-4">
-              <div className="text-3xl sm:text-4xl font-bold text-white mb-2">20+ ans</div>
-              <div className="text-sm sm:text-base text-white/70">d'expérience en transactions</div>
+            <div className="text-center">
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#818cf8]/20 mb-3">
+                <DollarSign className="w-6 h-6 text-[#818cf8]" />
+              </div>
+              <div className="text-3xl sm:text-4xl font-bold text-white mb-2">
+                {stats.totalValue >= 1000000 
+                  ? `${Math.floor(stats.totalValue / 1000000)}M+$` 
+                  : `${Math.floor(stats.totalValue / 1000)}k+$`}
+              </div>
+              <div className="text-sm sm:text-base text-white/70">valeur totale des annonces</div>
             </div>
           </div>
         </div>
