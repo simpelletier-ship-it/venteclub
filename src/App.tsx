@@ -57,32 +57,30 @@ const App = () => (
           <Layout>
             <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
               <Routes>
-                {/* Pages publiques sans vérification email */}
-                <Route path="/" element={<Home />} />
-                <Route path="/entreprises" element={<Businesses />} />
+                {/* Pages VRAIMENT publiques (accessibles sans compte) */}
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/email-confirmed" element={<EmailConfirmed />} />
-                <Route path="/entreprise/:slug" element={<BusinessDetails />} />
                 <Route path="/logout-success" element={<LogoutSuccess />} />
                 
-                {/* SEO Pages publiques */}
-                <Route path="/a-propos" element={<About />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="/blog" element={<Blog />} />
-                <Route path="/blog/:slug" element={<BlogPost />} />
-                <Route path="/terms" element={<Terms />} />
-                <Route path="/ressources" element={<Resources />} />
-                <Route path="/faq" element={<FAQ />} />
-                <Route path="/marche" element={<Market />} />
-                <Route path="/immeubles-commerciaux" element={<PropertyListings />} />
-                
-                {/* City Pages publiques */}
-                <Route path="/entreprises-a-vendre-montreal" element={<CityPage />} />
-                <Route path="/entreprises-a-vendre-quebec" element={<CityPage />} />
-                <Route path="/entreprises-a-vendre-laval" element={<CityPage />} />
-                <Route path="/entreprises-a-vendre-gatineau" element={<CityPage />} />
-                <Route path="/entreprises-a-vendre-sherbrooke" element={<CityPage />} />
+                {/* Pages publiques SEO (mais nécessitent email confirmé si connecté) */}
+                <Route path="/" element={<EmailVerificationGuard><Home /></EmailVerificationGuard>} />
+                <Route path="/entreprises" element={<EmailVerificationGuard><Businesses /></EmailVerificationGuard>} />
+                <Route path="/entreprise/:slug" element={<EmailVerificationGuard><BusinessDetails /></EmailVerificationGuard>} />
+                <Route path="/a-propos" element={<EmailVerificationGuard><About /></EmailVerificationGuard>} />
+                <Route path="/contact" element={<EmailVerificationGuard><Contact /></EmailVerificationGuard>} />
+                <Route path="/blog" element={<EmailVerificationGuard><Blog /></EmailVerificationGuard>} />
+                <Route path="/blog/:slug" element={<EmailVerificationGuard><BlogPost /></EmailVerificationGuard>} />
+                <Route path="/terms" element={<EmailVerificationGuard><Terms /></EmailVerificationGuard>} />
+                <Route path="/ressources" element={<EmailVerificationGuard><Resources /></EmailVerificationGuard>} />
+                <Route path="/faq" element={<EmailVerificationGuard><FAQ /></EmailVerificationGuard>} />
+                <Route path="/marche" element={<EmailVerificationGuard><Market /></EmailVerificationGuard>} />
+                <Route path="/immeubles-commerciaux" element={<EmailVerificationGuard><PropertyListings /></EmailVerificationGuard>} />
+                <Route path="/entreprises-a-vendre-montreal" element={<EmailVerificationGuard><CityPage /></EmailVerificationGuard>} />
+                <Route path="/entreprises-a-vendre-quebec" element={<EmailVerificationGuard><CityPage /></EmailVerificationGuard>} />
+                <Route path="/entreprises-a-vendre-laval" element={<EmailVerificationGuard><CityPage /></EmailVerificationGuard>} />
+                <Route path="/entreprises-a-vendre-gatineau" element={<EmailVerificationGuard><CityPage /></EmailVerificationGuard>} />
+                <Route path="/entreprises-a-vendre-sherbrooke" element={<EmailVerificationGuard><CityPage /></EmailVerificationGuard>} />
                 
                 {/* Pages nécessitant email confirmé */}
                 <Route path="/sell" element={<EmailVerificationGuard><Sell /></EmailVerificationGuard>} />

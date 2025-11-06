@@ -550,26 +550,10 @@ const BusinessDetails = () => {
         throw accessError;
       }
       
-      // 2. Créer un message initial pour établir la conversation
-      const { error: messageError } = await supabase
-        .from('messages')
-        .insert({
-          sender_id: user.id,
-          receiver_id: business.seller_id,
-          business_id: businessId,
-          content: '', // Message vide initial - l'utilisateur choisira un template ensuite
-          read: false
-        });
-      
-      if (messageError) {
-        console.error('Error creating initial message:', messageError);
-        // Continuer quand même si la création du message échoue
-      }
-      
-      // 3. Marquer comme déverrouillé localement
+      // 2. Marquer comme déverrouillé localement (PAS de message automatique !)
       setHasUnlockedChat(true);
       
-      // 4. Charger les coordonnées du vendeur
+      // 3. Charger les coordonnées du vendeur
       const { data: contact } = await supabase
         .from('seller_contacts')
         .select('email, phone')
@@ -580,15 +564,15 @@ const BusinessDetails = () => {
         setSellerContact(contact);
       }
       
-      // 5. Recharger les limites de conversation
+      // 4. Recharger les limites de conversation
       await checkConversationLimits(user.id);
       
-      // 6. Rediriger vers la messagerie avec cette conversation
+      // 5. Rediriger vers la messagerie avec cette conversation
       navigate(`/messages?conversation=${businessId}-${business.seller_id}`);
       
       toast({
-        title: "Chat déverrouillé",
-        description: "Choisissez un message pour commencer la conversation!",
+        title: "Chat déverrouillé avec succès",
+        description: "Vous pouvez maintenant discuter avec le vendeur. Envoyez votre premier message!",
       });
     } catch (error: any) {
       console.error('Error unlocking chat:', error);

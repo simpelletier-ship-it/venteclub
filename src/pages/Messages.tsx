@@ -58,20 +58,79 @@ const Messages = () => {
 
   // Separate effect to handle conversation selection after conversations are loaded
   useEffect(() => {
-    if (conversations.length === 0) return;
-    
-    const conversationParam = searchParams.get('conversation');
-    if (conversationParam) {
+    const handleConversationParam = async () => {
+      const conversationParam = searchParams.get('conversation');
+      if (!conversationParam || !user) return;
+      
       const [businessId, otherUserId] = conversationParam.split('-');
-      // Find and select this conversation
-      const conv = conversations.find(c => 
-        c.business_id === businessId && c.other_user_id === otherUserId
-      );
-      if (conv) {
-        setSelectedConversation(conv);
+      
+      // Try to find existing conversation
+      if (conversations.length > 0) {
+        const conv = conversations.find(c => 
+          c.business_id === businessId && c.other_user_id === otherUserId
+        );
+        if (conv) {
+          setSelectedConversation(conv);
+          return;
+        }
       }
-    }
-  }, [conversations, searchParams]);
+      
+      // No conversation found, but user might have unlocked the chat
+      // Create a virtual conversation to show the ChatBox
+      const { data: accessData } = await supabase
+        .from('contact_access')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('business_id', businessId)
+        .limit(1);
+      
+      if (accessData && accessData.length > 0) {
+        // User has access, fetch business and other user info
+        const { data: businessData } = await supabase
+          .from('businesses')
+          .select('id, title, seller_id')
+          .eq('id', businessId)
+          .maybeSingle();
+        
+        if (!businessData) return;
+        
+        const { data: otherUserData } = await supabase
+          .from('profiles')
+          .select('email, full_name, avatar_url')
+          .eq('id', otherUserId)
+          .maybeSingle();
+        
+        const { data: photoData } = await supabase
+          .from('business_photos')
+          .select('photo_url')
+          .eq('business_id', businessId)
+          .order('display_order', { ascending: true })
+          .limit(1)
+          .maybeSingle();
+        
+        // Create virtual conversation
+        const virtualConv: Conversation = {
+          business_id: businessId,
+          business_title: businessData.title,
+          business_photo: photoData?.photo_url || null,
+          other_user_id: otherUserId,
+          other_user_email: otherUserData?.email || 'Utilisateur',
+          other_user_name: otherUserData?.full_name || otherUserData?.email || 'Utilisateur',
+          other_user_avatar: otherUserData?.avatar_url || null,
+          last_message: 'Démarrez la conversation...',
+          last_message_time: new Date().toISOString(),
+          last_message_sender_id: user.id,
+          last_message_read: true,
+          unread_count: 0,
+          is_seller: businessData.seller_id === user.id,
+        };
+        
+        setSelectedConversation(virtualConv);
+      }
+    };
+    
+    handleConversationParam();
+  }, [conversations, searchParams, user]);
 
   useEffect(() => {
     if (!user) return;

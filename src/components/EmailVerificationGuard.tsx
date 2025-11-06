@@ -37,12 +37,7 @@ export const EmailVerificationGuard = ({ children }: { children: React.ReactNode
     return null;
   }
 
-  // Si l'utilisateur n'est pas connecté, afficher le contenu normalement
-  if (!user) {
-    return <>{children}</>;
-  }
-
-  // Si l'email n'est pas confirmé, bloquer l'accès
+  // Si l'utilisateur est connecté MAIS l'email n'est pas confirmé, bloquer TOUT accès
   if (user && !user.email_confirmed_at) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -99,5 +94,6 @@ export const EmailVerificationGuard = ({ children }: { children: React.ReactNode
     );
   }
 
+  // Email confirmé OU utilisateur non connecté : autoriser l'accès
   return <>{children}</>;
 };
