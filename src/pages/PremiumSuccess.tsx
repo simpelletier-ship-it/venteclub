@@ -73,26 +73,6 @@ const PremiumSuccess = () => {
       icon: "📞",
       title: "Accès aux coordonnées complètes",
       description: "Email et téléphone de tous les vendeurs instantanément"
-    },
-    {
-      icon: "📊",
-      title: "Analyses détaillées",
-      description: "Statistiques avancées sur vos recherches et favoris"
-    },
-    {
-      icon: "⚡",
-      title: "Support prioritaire",
-      description: "Assistance dédiée et réponse en moins de 2h"
-    },
-    {
-      icon: "🔔",
-      title: "Alertes personnalisées",
-      description: "Notifications instantanées pour les opportunités"
-    },
-    {
-      icon: "⭐",
-      title: "Badge Select exclusif",
-      description: "Démarquez-vous auprès des vendeurs"
     }
   ];
 
@@ -158,23 +138,23 @@ const PremiumSuccess = () => {
           </div>
 
           {/* Grille des avantages */}
-          <div className="grid md:grid-cols-2 gap-6 mb-10">
+          <div className="grid md:grid-cols-2 gap-6 mb-10 max-w-3xl mx-auto">
             {benefits.map((benefit, index) => (
               <div
                 key={index}
-                className="bg-gradient-to-br from-slate-700/30 to-slate-800/30 rounded-xl p-6 border border-amber-500/10 hover:border-amber-500/30 transition-all duration-300 hover:scale-105 group"
+                className="bg-gradient-to-br from-slate-700/30 to-slate-800/30 rounded-xl p-8 border border-amber-500/10 hover:border-amber-500/30 transition-all duration-300 hover:scale-105 group"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 <div className="flex items-start gap-4">
-                  <div className="text-3xl group-hover:scale-110 transition-transform duration-300">
+                  <div className="text-4xl group-hover:scale-110 transition-transform duration-300">
                     {benefit.icon}
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-white mb-2 flex items-center gap-2">
+                    <h3 className="text-xl font-semibold text-white mb-2 flex items-center gap-2">
                       {benefit.title}
-                      <Check className="w-4 h-4 text-amber-400" />
+                      <Check className="w-5 h-5 text-amber-400" />
                     </h3>
-                    <p className="text-sm text-slate-400">
+                    <p className="text-base text-slate-400">
                       {benefit.description}
                     </p>
                   </div>
@@ -193,7 +173,7 @@ const PremiumSuccess = () => {
           {/* Boutons d'action */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button
-              onClick={() => navigate('/businesses')}
+              onClick={() => navigate('/entreprises')}
               className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-semibold text-lg px-8 py-6 shadow-lg shadow-amber-500/20 group"
             >
               Explorer les opportunités
@@ -202,8 +182,7 @@ const PremiumSuccess = () => {
             
             <Button
               onClick={() => navigate('/dashboard')}
-              variant="outline"
-              className="border-amber-500/30 text-amber-200 hover:bg-amber-500/10 hover:border-amber-500/50 text-lg px-8 py-6"
+              className="bg-slate-800/80 hover:bg-slate-700/80 border-2 border-amber-500/30 text-white hover:border-amber-500/50 text-lg px-8 py-6 font-semibold"
             >
               Mon tableau de bord
             </Button>
