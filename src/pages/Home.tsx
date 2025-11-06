@@ -145,14 +145,7 @@ const Home = () => {
               </div>
               
               <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-bold leading-[1.1] tracking-tight text-foreground">
-                <span className="relative inline-block">
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent to-secondary animate-shimmer bg-[length:200%_auto] drop-shadow-[0_0_15px_rgba(0,112,243,0.5)]">
-                    Le Club
-                  </span>
-                  <span className="absolute inset-0 text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent to-secondary blur-sm opacity-50 animate-glow">
-                    Le Club
-                  </span>
-                </span> de Référence
+                <span className="text-secondary font-extrabold">Le Club</span> de Référence
                 <br />
                 pour acheter <TypewriterAnimation />
                 <br />
