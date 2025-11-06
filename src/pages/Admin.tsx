@@ -54,6 +54,7 @@ const Admin = () => {
   const [importLoading, setImportLoading] = useState(false);
   const [importedData, setImportedData] = useState<any>(null);
   const [generatingDemoImages, setGeneratingDemoImages] = useState(false);
+  const [forceDeleteEmail, setForceDeleteEmail] = useState("");
 
   useEffect(() => {
     checkAdminAccess();
@@ -1305,6 +1306,85 @@ const Admin = () => {
           </TabsContent>
 
           <TabsContent value="users">
+            {/* Force Delete Email Tool */}
+            <Card className="mb-6 border-orange-500/50 bg-gradient-to-r from-orange-500/5 to-red-500/5">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Shield className="h-5 w-5 text-orange-500" />
+                  Nettoyage forcé d'email
+                </CardTitle>
+                <CardDescription>
+                  Utilisez cet outil pour supprimer complètement toutes les traces d'un email spécifique. 
+                  <span className="font-semibold text-orange-600"> Note: En raison des limitations de Supabase Auth, il peut y avoir un délai de 24-48h avant que l'email soit complètement disponible.</span>
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex gap-4">
+                  <div className="flex-1">
+                    <Label htmlFor="force-delete-email">Email à nettoyer</Label>
+                    <Input 
+                      id="force-delete-email"
+                      type="email"
+                      placeholder="email@example.com"
+                      value={forceDeleteEmail}
+                      onChange={(e) => setForceDeleteEmail(e.target.value)}
+                      className="mt-2"
+                    />
+                  </div>
+                  <div className="flex items-end">
+                    <Button
+                      variant="destructive"
+                      onClick={async () => {
+                        if (!forceDeleteEmail) {
+                          toast({
+                            variant: "destructive",
+                            title: "Erreur",
+                            description: "Veuillez entrer un email",
+                          });
+                          return;
+                        }
+
+                        if (!confirm(`⚠️ ATTENTION: Vous êtes sur le point de forcer la suppression complète de toutes les données pour ${forceDeleteEmail}.\n\nCela supprimera:\n- L'utilisateur de auth.users\n- Toutes les données de profil\n- Tous les codes de vérification\n- Toutes les tentatives de connexion\n- Tous les fingerprints\n\nNote: Il peut y avoir un délai de 24-48h avant que l'email soit complètement disponible dans Supabase Auth.\n\nÊtes-vous sûr de vouloir continuer?`)) {
+                          return;
+                        }
+
+                        setLoading(true);
+                        try {
+                          const { data, error } = await supabase.functions.invoke('force-delete-user-email', {
+                            body: { email: forceDeleteEmail }
+                          });
+
+                          if (error) throw error;
+
+                          toast({
+                            title: "Nettoyage effectué",
+                            description: data?.message || `${data?.usersDeleted || 0} utilisateur(s) supprimé(s). Les tables ont été nettoyées.`,
+                            duration: 10000,
+                          });
+
+                          setForceDeleteEmail("");
+                          fetchUsers();
+                        } catch (error: any) {
+                          console.error('Error force deleting email:', error);
+                          toast({
+                            variant: "destructive",
+                            title: "Erreur",
+                            description: error.message || "Impossible de nettoyer l'email",
+                          });
+                        } finally {
+                          setLoading(false);
+                        }
+                      }}
+                      disabled={loading || !forceDeleteEmail}
+                    >
+                      <UserX className="mr-2 h-4 w-4" />
+                      Forcer le nettoyage
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
             <div className="grid gap-4">
               {users.map((user) => (
                 <Card key={user.id}>

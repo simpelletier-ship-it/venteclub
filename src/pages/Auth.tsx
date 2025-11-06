@@ -229,11 +229,17 @@ const Auth = () => {
       });
 
       if (error) {
-        if (error.message.includes('already registered')) {
+        // Gérer les différents cas d'email déjà utilisé
+        const errorMessage = error.message.toLowerCase();
+        if (errorMessage.includes('already registered') || 
+            errorMessage.includes('user already exists') ||
+            errorMessage.includes('email already in use') ||
+            errorMessage.includes('user_already_exists')) {
           toast({
             variant: "destructive",
-            title: "Compte existant",
-            description: "Un compte avec cet email existe déjà. Veuillez vous connecter.",
+            title: "Compte existant ou récemment supprimé",
+            description: "Cet email est déjà utilisé ou a été récemment supprimé. Si vous venez de supprimer votre compte, veuillez attendre 24-48 heures avant de le recréer, ou utilisez un autre email. Pour assistance, contactez le support.",
+            duration: 10000,
           });
         } else {
           throw error;
