@@ -102,8 +102,8 @@ const Home = () => {
         <div className="container mx-auto px-4 py-20">
           <div className="max-w-6xl mx-auto">
             <div className="space-y-8 animate-slide-up">
-              <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-secondary/10 border border-secondary/20">
-                <Sparkles className="w-4 h-4 text-secondary" />
+              <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-primary/10 border border-primary/20">
+                <Sparkles className="w-4 h-4 text-primary" />
                 <span className="text-foreground/90 text-sm font-medium">
                   Plateforme de confiance pour vos transactions
                 </span>
@@ -124,7 +124,7 @@ const Home = () => {
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
                 <Button 
                   size="lg" 
-                  className="bg-secondary hover:bg-secondary/90 text-white h-14 px-10 text-base font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all group"
+                  className="bg-primary hover:bg-primary/90 text-white h-14 px-10 text-base font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all group"
                   onClick={() => document.getElementById('featured')?.scrollIntoView({ behavior: 'smooth' })}
                 >
                   Explorer les opportunités
