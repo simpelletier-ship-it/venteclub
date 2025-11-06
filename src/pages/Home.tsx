@@ -112,8 +112,9 @@ const Home = () => {
               <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-display font-bold leading-[1.1] tracking-tight text-foreground">
                 Le club à rejoindre pour acheter
                 <br />
-                <TypewriterAnimation />
-                {" "}au Québec.
+                <span className="whitespace-nowrap">
+                  <TypewriterAnimation /> au Québec.
+                </span>
               </h1>
               
               <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl leading-relaxed">
