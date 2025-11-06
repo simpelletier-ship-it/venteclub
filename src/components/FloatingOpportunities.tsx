@@ -83,14 +83,14 @@ export const FloatingOpportunities = () => {
           </div>
         </div>
 
-        <div className="absolute -left-4 top-60 animate-float" style={{ animationDelay: "1s", animationDuration: "5s" }}>
+        <div className="absolute -left-12 bottom-16 animate-float" style={{ animationDelay: "1s", animationDuration: "5s" }}>
           <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl px-4 py-2 shadow-lg">
             <div className="text-xs text-muted-foreground">Actives</div>
             <div className="font-bold text-foreground">487</div>
           </div>
         </div>
 
-        <div className="absolute -right-8 bottom-32 animate-float" style={{ animationDelay: "2s", animationDuration: "4.5s" }}>
+        <div className="absolute right-[-20px] bottom-32 animate-float" style={{ animationDelay: "2s", animationDuration: "4.5s" }}>
           <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl px-4 py-2 shadow-lg">
             <div className="text-xs text-muted-foreground">Vendues</div>
             <div className="font-bold text-foreground">1.2K</div>
