@@ -98,11 +98,18 @@ const Home = () => {
       />
       
       {/* Hero Section */}
-      <section className="relative min-h-[85vh] flex items-center bg-gradient-to-br from-primary/10 via-background to-accent/10" aria-label="Section principale">
-        <div className="container mx-auto px-4 py-20">
+      <section className="relative min-h-[85vh] flex items-center bg-gradient-to-br from-primary/10 via-background to-accent/10 overflow-hidden" aria-label="Section principale">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-20 -right-20 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '8s' }} />
+          <div className="absolute bottom-20 -left-20 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '10s', animationDelay: '2s' }} />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '12s', animationDelay: '4s' }} />
+        </div>
+        
+        <div className="container mx-auto px-4 py-20 relative z-10">
           <div className="max-w-6xl mx-auto">
             <div className="space-y-8 animate-slide-up">
-              <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-primary/10 border border-primary/20">
+              <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-primary/10 border border-primary/20 backdrop-blur-sm">
                 <Sparkles className="w-4 h-4 text-primary" />
                 <span className="text-foreground/90 text-sm font-medium">
                   Plateforme de confiance pour vos transactions
@@ -143,17 +150,14 @@ const Home = () => {
           </div>
         </div>
         
-        {/* Transition Wave */}
-        <div className="absolute bottom-0 left-0 right-0 overflow-hidden leading-none">
-          <svg className="relative block w-full h-24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
-            <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" 
-                  className="fill-background"></path>
-          </svg>
-        </div>
+        {/* Smooth Gradient Transition */}
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-b from-transparent to-background pointer-events-none" />
       </section>
 
       {/* Featured Businesses Section */}
-      <section id="featured" className="py-16 sm:py-20 bg-background border-t border-border">
+      <section id="featured" className="py-16 sm:py-20 bg-background relative">
+        {/* Decorative Top Border */}
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
         <div className="container mx-auto px-4">
           <div className="text-center mb-6 sm:mb-8 animate-slide-up">
             <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-secondary/10 text-secondary text-xs sm:text-sm font-semibold mb-3 sm:mb-4">
