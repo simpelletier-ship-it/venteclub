@@ -25,8 +25,6 @@ const Auth = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showResetPassword, setShowResetPassword] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
-  const [verificationStep, setVerificationStep] = useState(false);
-  const [verificationCode, setVerificationCode] = useState("");
   const [securityWarning, setSecurityWarning] = useState<string | null>(null);
 
   useEffect(() => {
@@ -220,21 +218,56 @@ const Auth = () => {
         return;
       }
 
-      // Créer le code de vérification
-      const { error } = await supabase.functions.invoke('create-verification-code', {
-        body: { email: validatedData.email }
+      // Créer le compte avec Supabase
+      const redirectUrl = `${window.location.origin}/`;
+      const { data, error } = await supabase.auth.signUp({
+        email: validatedData.email,
+        password: validatedData.password,
+        options: {
+          emailRedirectTo: redirectUrl
+        }
       });
 
       if (error) {
-        throw error;
+        if (error.message.includes('already registered')) {
+          toast({
+            variant: "destructive",
+            title: "Compte existant",
+            description: "Un compte avec cet email existe déjà. Veuillez vous connecter.",
+          });
+        } else {
+          throw error;
+        }
+        setLoading(false);
+        return;
       }
 
-      setVerificationStep(true);
+      // Enregistrer le fingerprint après signup réussi
+      if (fingerprint && data.user) {
+        await supabase.functions.invoke('register-fingerprint', {
+          body: {
+            fingerprintHash: fingerprint.hash,
+            ipAddress: null,
+            userAgent: fingerprint.components.userAgent,
+            screenResolution: fingerprint.components.screenResolution,
+            timezone: fingerprint.components.timezone,
+            language: fingerprint.components.language,
+            platform: fingerprint.components.platform
+          }
+        });
+      }
+
       toast({
-        title: "Code envoyé !",
-        description: "Nous vous avons envoyé un code de vérification par courriel. Merci de consulter vos pourriels.",
-        duration: 8000,
+        title: "Compte créé !",
+        description: "Un email de confirmation a été envoyé à votre adresse. Veuillez cliquer sur le lien dans l'email pour activer votre compte. Vérifiez vos pourriels si vous ne le voyez pas.",
+        duration: 10000,
       });
+      
+      // Réinitialiser le formulaire
+      setEmail("");
+      setPassword("");
+      setConfirmPassword("");
+      setAcceptedTerms(false);
     } catch (error: any) {
       if (error.errors) {
         error.errors.forEach((err: any) => {
@@ -256,73 +289,6 @@ const Auth = () => {
     }
   };
 
-  const handleVerifyCode = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
-    try {
-      // Vérifier le code et créer le compte
-      const { data, error } = await supabase.functions.invoke('verify-code-and-signup', {
-        body: {
-          email,
-          code: verificationCode,
-          password
-        }
-      });
-
-      if (error) {
-        if (error.message.includes('invalide') || error.message.includes('expiré')) {
-          toast({
-            variant: "destructive",
-            title: "Code invalide",
-            description: "Le code que vous avez entré est invalide ou expiré. Veuillez réessayer.",
-          });
-        } else {
-          throw error;
-        }
-        return;
-      }
-
-      // Maintenant se connecter avec les credentials
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (signInError) {
-        throw signInError;
-      }
-
-      // Enregistrer le fingerprint après signup réussi
-      if (fingerprint) {
-        await supabase.functions.invoke('register-fingerprint', {
-          body: {
-            fingerprintHash: fingerprint.hash,
-            ipAddress: null,
-            userAgent: fingerprint.components.userAgent,
-            screenResolution: fingerprint.components.screenResolution,
-            timezone: fingerprint.components.timezone,
-            language: fingerprint.components.language,
-            platform: fingerprint.components.platform
-          }
-        });
-      }
-
-      toast({
-        title: "Compte vérifié avec succès !",
-        description: "Vous êtes maintenant connecté.",
-      });
-      navigate("/");
-    } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Erreur",
-        description: error.message,
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -516,50 +482,13 @@ const Auth = () => {
               </TabsContent>
               
               <TabsContent value="signup">
-                {verificationStep ? (
-                  <form onSubmit={handleVerifyCode} className="space-y-4">
-                    <div className="text-center mb-6">
-                      <h3 className="text-lg font-semibold mb-2">Code de vérification</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Nous vous avons envoyé un code de vérification par courriel. Merci de consulter vos pourriels.
-                      </p>
-                    </div>
-                    <div>
-                      <Label htmlFor="verification-code">Code de vérification</Label>
-                      <Input
-                        id="verification-code"
-                        type="text"
-                        placeholder="Entrez le code à 6 chiffres"
-                        value={verificationCode}
-                        onChange={(e) => setVerificationCode(e.target.value)}
-                        required
-                        maxLength={6}
-                        className="w-full mt-2 text-center text-2xl tracking-widest font-mono"
-                      />
-                    </div>
-                    <Button type="submit" disabled={loading || verificationCode.length !== 6} className="w-full">
-                      {loading ? "Vérification..." : "Vérifier le code"}
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      onClick={() => {
-                        setVerificationStep(false);
-                        setVerificationCode("");
-                      }}
-                      className="w-full"
-                    >
-                      Retour
-                    </Button>
-                  </form>
-                ) : (
-                  <form onSubmit={handleSignUp} className="space-y-4">
-                  {securityWarning && (
-                    <Alert variant="destructive" className="mb-4">
-                      <AlertTriangle className="h-4 w-4" />
-                      <AlertDescription>{securityWarning}</AlertDescription>
-                    </Alert>
-                  )}
+                <form onSubmit={handleSignUp} className="space-y-4">
+                {securityWarning && (
+                  <Alert variant="destructive" className="mb-4">
+                    <AlertTriangle className="h-4 w-4" />
+                    <AlertDescription>{securityWarning}</AlertDescription>
+                  </Alert>
+                )}
                   <div>
                     <Label htmlFor="signup-email">Email</Label>
                     <Input
@@ -637,7 +566,7 @@ const Auth = () => {
                     disabled={loading || !acceptedTerms || fpLoading} 
                     className="w-full"
                   >
-                    {loading ? "Envoi du code..." : "Recevoir le code de vérification"}
+                    {loading ? "Création..." : "Créer un compte"}
                   </Button>
                   
                   <div className="relative my-6">
@@ -676,7 +605,6 @@ const Auth = () => {
                     Google
                   </Button>
                 </form>
-                )}
               </TabsContent>
             </Tabs>
           </div>
