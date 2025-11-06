@@ -127,7 +127,7 @@ const Home = () => {
                   className="bg-secondary hover:bg-secondary/90 text-white h-14 px-10 text-base font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all group"
                   onClick={() => document.getElementById('featured')?.scrollIntoView({ behavior: 'smooth' })}
                 >
-                  Voir les projets validés
+                  Explorer les opportunités
                   <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
                 <Button 
