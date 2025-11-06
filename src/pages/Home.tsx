@@ -98,25 +98,25 @@ const Home = () => {
       />
       
       {/* Hero Section */}
-      <section className="relative min-h-[85vh] flex items-center bg-background" aria-label="Section principale">
+      <section className="relative min-h-[85vh] flex items-center bg-muted/30" aria-label="Section principale">
         <div className="container mx-auto px-4 py-20">
           <div className="max-w-6xl mx-auto">
             <div className="space-y-8 animate-slide-up">
-              <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-secondary/5 border border-secondary/10">
+              <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-secondary/10 border border-secondary/20">
                 <Sparkles className="w-4 h-4 text-secondary" />
-                <span className="text-foreground/80 text-sm font-medium">
+                <span className="text-foreground/90 text-sm font-medium">
                   Plateforme de confiance pour vos transactions
                 </span>
               </div>
               
               <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-display font-bold leading-[1.1] tracking-tight text-foreground">
-                Votre plateforme de confiance pour{" "}
+                Vente.Club : votre plateforme pour acheter{" "}
                 <TypewriterAnimation />
-                {" "}<span className="text-secondary">rentable et vérifiée.</span>
+                {" "}rentable.
               </h1>
               
               <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl leading-relaxed">
-                Plateforme intelligente qui facilite la connexion entre acquéreurs et propriétaires. Chaque projet publié sur Vente.Club est analysé et vérifié. <span className="font-semibold text-foreground">Vous investissez avec clarté, vous reprenez avec confiance.</span>
+                Plateforme intelligente qui facilite la connexion entre acquéreurs et propriétaires. Chaque projet publié est analysé. <span className="font-semibold text-foreground">Vous investissez avec clarté, vous reprenez avec confiance.</span>
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4 pt-4">

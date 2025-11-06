@@ -1,20 +1,32 @@
 import { useState, useEffect } from "react";
 
+interface Word {
+  text: string;
+  gender: "un" | "une";
+}
+
 export const TypewriterAnimation = () => {
   const [displayedText, setDisplayedText] = useState("");
   const [wordIndex, setWordIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
   
-  const words = ["entreprise", "franchise", "immeuble", "commerce", "restaurant", "café"];
-  const baseText = "Acheter une ";
+  const words: Word[] = [
+    { text: "entreprise", gender: "une" },
+    { text: "franchise", gender: "une" },
+    { text: "immeuble", gender: "un" },
+    { text: "commerce", gender: "un" },
+    { text: "restaurant", gender: "un" },
+    { text: "café", gender: "un" }
+  ];
+
+  const currentWord = words[wordIndex];
 
   useEffect(() => {
-    const currentWord = words[wordIndex];
     const updateText = () => {
       if (!isDeleting) {
         // Typing
-        if (displayedText.length < currentWord.length) {
-          setDisplayedText(currentWord.substring(0, displayedText.length + 1));
+        if (displayedText.length < currentWord.text.length) {
+          setDisplayedText(currentWord.text.substring(0, displayedText.length + 1));
         } else {
           // Wait before deleting
           setTimeout(() => setIsDeleting(true), 2000);
@@ -22,7 +34,7 @@ export const TypewriterAnimation = () => {
       } else {
         // Deleting
         if (displayedText.length > 0) {
-          setDisplayedText(currentWord.substring(0, displayedText.length - 1));
+          setDisplayedText(currentWord.text.substring(0, displayedText.length - 1));
         } else {
           setIsDeleting(false);
           setWordIndex((prev) => (prev + 1) % words.length);
@@ -38,9 +50,8 @@ export const TypewriterAnimation = () => {
 
   return (
     <span className="inline-block">
-      {baseText}
       <span className="text-secondary font-bold">
-        {displayedText}
+        {currentWord.gender} {displayedText}
         <span className="animate-pulse">|</span>
       </span>
     </span>
