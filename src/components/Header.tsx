@@ -92,7 +92,7 @@ const Header = () => {
   };
 
   return (
-    <nav className="border-b border-white/10 bg-gradient-to-r from-[#1e1b4b] to-[#312e81] sticky top-0 z-50 backdrop-blur-xl">
+    <nav className="border-b border-border bg-background/95 backdrop-blur-xl sticky top-0 z-50 shadow-sm">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
@@ -100,7 +100,7 @@ const Header = () => {
             className="flex items-center cursor-pointer group" 
             onClick={() => navigate("/")}
           >
-            <span className="text-3xl font-display font-bold transition-transform group-hover:scale-105">
+            <span className="text-3xl font-display font-bold text-foreground transition-transform group-hover:scale-105">
               Vente<span className="text-[#818cf8]">.Club</span>
             </span>
           </div>
@@ -109,28 +109,28 @@ const Header = () => {
           <div className="hidden md:flex items-center gap-8">
             <button 
               onClick={() => navigate("/")} 
-              className="text-white/80 hover:text-white transition-colors font-medium relative group"
+              className="text-muted-foreground hover:text-foreground transition-colors font-medium relative group"
             >
               Accueil
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#818cf8] transition-all group-hover:w-full" />
             </button>
             <button 
               onClick={() => navigate("/entreprises")} 
-              className="text-white/80 hover:text-white transition-colors font-medium relative group"
+              className="text-muted-foreground hover:text-foreground transition-colors font-medium relative group"
             >
               Entreprises
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#818cf8] transition-all group-hover:w-full" />
             </button>
             <button 
               onClick={() => navigate("/immeubles-commerciaux")} 
-              className="text-white/80 hover:text-white transition-colors font-medium relative group"
+              className="text-muted-foreground hover:text-foreground transition-colors font-medium relative group"
             >
               Immeubles
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#818cf8] transition-all group-hover:w-full" />
             </button>
             <button 
               onClick={() => navigate("/map")} 
-              className="text-white/80 hover:text-white transition-colors font-medium relative group"
+              className="text-muted-foreground hover:text-foreground transition-colors font-medium relative group"
             >
               Carte
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#818cf8] transition-all group-hover:w-full" />
@@ -139,7 +139,7 @@ const Header = () => {
               <>
                 <button 
                   onClick={() => navigate("/dashboard")} 
-                  className="text-white/80 hover:text-white transition-colors font-medium flex items-center gap-2 relative group"
+                  className="text-muted-foreground hover:text-foreground transition-colors font-medium flex items-center gap-2 relative group"
                 >
                   <LayoutDashboard className="w-4 h-4" />
                   Tableau de bord
@@ -147,7 +147,7 @@ const Header = () => {
                 </button>
                 <button 
                   onClick={() => navigate("/favorites")} 
-                  className="text-white/80 hover:text-white transition-colors font-medium flex items-center gap-2 relative group"
+                  className="text-muted-foreground hover:text-foreground transition-colors font-medium flex items-center gap-2 relative group"
                 >
                   <Heart className="w-4 h-4" />
                   Favoris
@@ -166,7 +166,7 @@ const Header = () => {
                 onClick={() => navigate("/admin")}
                 variant="outline"
                 size="sm"
-                className="hidden md:flex items-center gap-2 border-[#818cf8] text-[#818cf8] hover:bg-[#818cf8] hover:text-white"
+                className="hidden md:flex items-center gap-2"
               >
                 <Sparkles className="w-4 h-4" />
                 Admin
@@ -177,7 +177,7 @@ const Header = () => {
               <>
                 <Button
                   onClick={() => navigate("/sell")}
-                  className="hidden md:flex btn-premium bg-[#6366f1] hover:bg-[#4f46e5] text-white font-semibold shadow-lg"
+                  className="hidden md:flex bg-[#6366f1] hover:bg-[#4f46e5] text-white font-semibold shadow-lg"
                 >
                   Je vends
                 </Button>
@@ -185,7 +185,7 @@ const Header = () => {
                   <DropdownMenuTrigger asChild>
                     <Button 
                       variant="ghost" 
-                      className="relative h-10 w-10 rounded-full hover:bg-white/10"
+                      className="relative h-10 w-10 rounded-full"
                       aria-label="Menu du profil utilisateur"
                     >
                       <Avatar className="h-10 w-10 border-2 border-[#818cf8]/40 hover:border-[#818cf8] transition-colors">
@@ -224,13 +224,13 @@ const Header = () => {
                 <Button
                   variant="ghost"
                   onClick={() => navigate("/auth")}
-                  className="hidden md:inline-flex font-semibold text-white hover:bg-white/10"
+                  className="hidden md:inline-flex font-semibold"
                 >
                   Connexion
                 </Button>
                 <Button
                   onClick={() => navigate("/sell")}
-                  className="hidden md:inline-flex btn-premium bg-[#6366f1] hover:bg-[#4f46e5] text-white font-semibold"
+                  className="hidden md:inline-flex bg-[#6366f1] hover:bg-[#4f46e5] text-white font-semibold"
                 >
                   Je vends
                 </Button>
@@ -252,13 +252,13 @@ const Header = () => {
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden mt-4 pb-4 space-y-2 border-t border-white/10 pt-4 animate-slide-up">
+          <div className="md:hidden mt-4 pb-4 space-y-2 border-t border-border pt-4 animate-slide-up">
             <button
               onClick={() => {
                 navigate("/");
                 setMobileMenuOpen(false);
               }}
-              className="w-full text-left px-4 py-2 rounded-lg hover:bg-white/10 transition-colors text-white"
+              className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors"
             >
               Accueil
             </button>
@@ -267,7 +267,7 @@ const Header = () => {
                 navigate("/entreprises");
                 setMobileMenuOpen(false);
               }}
-              className="w-full text-left px-4 py-2 rounded-lg hover:bg-white/10 transition-colors text-white"
+              className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors"
             >
               Entreprises
             </button>
@@ -276,7 +276,7 @@ const Header = () => {
                 navigate("/immeubles-commerciaux");
                 setMobileMenuOpen(false);
               }}
-              className="w-full text-left px-4 py-2 rounded-lg hover:bg-white/10 transition-colors text-white"
+              className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors"
             >
               Immeubles
             </button>
@@ -285,7 +285,7 @@ const Header = () => {
                 navigate("/map");
                 setMobileMenuOpen(false);
               }}
-              className="w-full text-left px-4 py-2 rounded-lg hover:bg-white/10 transition-colors text-white"
+              className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors"
             >
               Carte
             </button>
@@ -294,7 +294,7 @@ const Header = () => {
                 navigate("/ressources");
                 setMobileMenuOpen(false);
               }}
-              className="w-full text-left px-4 py-2 rounded-lg hover:bg-white/10 transition-colors text-white"
+              className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors"
             >
               Ressources
             </button>
@@ -305,7 +305,7 @@ const Header = () => {
                     navigate("/dashboard");
                     setMobileMenuOpen(false);
                   }}
-                  className="w-full text-left px-4 py-2 rounded-lg hover:bg-white/10 transition-colors flex items-center gap-2 text-white"
+                  className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors flex items-center gap-2"
                 >
                   <LayoutDashboard className="w-4 h-4" />
                   Tableau de bord
@@ -315,7 +315,7 @@ const Header = () => {
                     navigate("/favorites");
                     setMobileMenuOpen(false);
                   }}
-                  className="w-full text-left px-4 py-2 rounded-lg hover:bg-white/10 transition-colors flex items-center gap-2 text-white"
+                  className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors flex items-center gap-2"
                 >
                   <Heart className="w-4 h-4" />
                   Favoris
@@ -328,7 +328,7 @@ const Header = () => {
                   navigate("/admin");
                   setMobileMenuOpen(false);
                 }}
-                className="w-full text-left px-4 py-2 rounded-lg hover:bg-white/10 transition-colors flex items-center gap-2 text-[#818cf8]"
+                className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors flex items-center gap-2 text-[#818cf8]"
               >
                 <Sparkles className="w-4 h-4" />
                 Admin
@@ -339,7 +339,7 @@ const Header = () => {
                 navigate("/sell");
                 setMobileMenuOpen(false);
               }}
-              className="w-full btn-premium bg-[#6366f1] hover:bg-[#4f46e5] text-white font-semibold mt-4"
+              className="w-full bg-[#6366f1] hover:bg-[#4f46e5] text-white font-semibold mt-4"
             >
               Je vends
             </Button>
