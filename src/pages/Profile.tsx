@@ -8,7 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Mail, Phone, MapPin, Briefcase, Globe, Linkedin, Calendar, User } from "lucide-react";
+import { ArrowLeft, Mail, Phone, MapPin, Briefcase, Globe, Linkedin, Calendar, User, Lock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface Profile {
@@ -37,6 +37,7 @@ export default function Profile() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [hasPremium, setHasPremium] = useState(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -45,6 +46,10 @@ export default function Profile() {
         const { data: { session } } = await supabase.auth.getSession();
         if (session?.user) {
           setCurrentUserId(session.user.id);
+          
+          // Check premium status
+          const { data: premiumData } = await supabase.functions.invoke('check-premium-subscription');
+          setHasPremium(premiumData?.subscribed || false);
         }
 
         // Fetch profile
@@ -186,56 +191,69 @@ export default function Profile() {
                 </div>
               )}
 
-              {/* Contact Information */}
-              <div>
-                <h3 className="text-sm font-semibold text-muted-foreground mb-3">Coordonnées</h3>
-                <div className="space-y-3">
-                  {profile.email && (
-                    <div className="flex items-center gap-3 text-foreground">
-                      <div className="p-2 rounded-lg bg-muted">
-                        <Mail className="h-4 w-4 text-muted-foreground" />
+              {/* Contact Information - Only visible for Club Select members or own profile */}
+              {(isOwnProfile || hasPremium) ? (
+                <div>
+                  <h3 className="text-sm font-semibold text-muted-foreground mb-3">Coordonnées</h3>
+                  <div className="space-y-3">
+                    {profile.email && (
+                      <div className="flex items-center gap-3 text-foreground">
+                        <div className="p-2 rounded-lg bg-muted">
+                          <Mail className="h-4 w-4 text-muted-foreground" />
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground">Email</p>
+                          <a href={`mailto:${profile.email}`} className="hover:text-primary transition-colors">
+                            {profile.email}
+                          </a>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-xs text-muted-foreground">Email</p>
-                        <a href={`mailto:${profile.email}`} className="hover:text-primary transition-colors">
-                          {profile.email}
-                        </a>
-                      </div>
-                    </div>
-                  )}
+                    )}
 
-                  {profile.phone && (
-                    <div className="flex items-center gap-3 text-foreground">
-                      <div className="p-2 rounded-lg bg-muted">
-                        <Phone className="h-4 w-4 text-muted-foreground" />
+                    {profile.phone && (
+                      <div className="flex items-center gap-3 text-foreground">
+                        <div className="p-2 rounded-lg bg-muted">
+                          <Phone className="h-4 w-4 text-muted-foreground" />
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground">Téléphone</p>
+                          <a href={`tel:${profile.phone}`} className="hover:text-primary transition-colors">
+                            {profile.phone}
+                          </a>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-xs text-muted-foreground">Téléphone</p>
-                        <a href={`tel:${profile.phone}`} className="hover:text-primary transition-colors">
-                          {profile.phone}
-                        </a>
-                      </div>
-                    </div>
-                  )}
+                    )}
 
-                  {(profile.street_address || profile.city || profile.province) && (
-                    <div className="flex items-center gap-3 text-foreground">
-                      <div className="p-2 rounded-lg bg-muted">
-                        <MapPin className="h-4 w-4 text-muted-foreground" />
+                    {(profile.street_address || profile.city || profile.province) && (
+                      <div className="flex items-center gap-3 text-foreground">
+                        <div className="p-2 rounded-lg bg-muted">
+                          <MapPin className="h-4 w-4 text-muted-foreground" />
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground">Adresse</p>
+                          <p>
+                            {profile.street_address && <span>{profile.street_address}<br /></span>}
+                            {profile.city && <span>{profile.city}, </span>}
+                            {profile.province && <span>{profile.province} </span>}
+                            {profile.postal_code}
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-xs text-muted-foreground">Adresse</p>
-                        <p>
-                          {profile.street_address && <span>{profile.street_address}<br /></span>}
-                          {profile.city && <span>{profile.city}, </span>}
-                          {profile.province && <span>{profile.province} </span>}
-                          {profile.postal_code}
-                        </p>
-                      </div>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="bg-muted/50 rounded-lg p-6 text-center">
+                  <Lock className="h-8 w-8 mx-auto mb-3 text-muted-foreground" />
+                  <p className="font-semibold mb-2">Coordonnées réservées aux membres Club Select</p>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Rejoignez le Club Select pour accéder aux coordonnées des utilisateurs
+                  </p>
+                  <Button onClick={() => navigate('/profile?tab=premium')} size="sm">
+                    Rejoindre le Club Select
+                  </Button>
+                </div>
+              )}
 
               {/* Links */}
               {(profile.website || profile.linkedin_url) && (

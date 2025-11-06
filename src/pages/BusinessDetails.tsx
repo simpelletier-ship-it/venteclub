@@ -175,10 +175,10 @@ const BusinessDetails = () => {
     }
   }, [hasPremium, user?.id]);
 
-  // Charger les coordonnées du vendeur si chat déverrouillé ou premium
+  // Charger les coordonnées du vendeur UNIQUEMENT si premium
   useEffect(() => {
-    if (user && business && (hasUnlockedChat || hasPremium) && !sellerContact) {
-      console.log('[SELLER CONTACT] Loading seller contact info...');
+    if (user && business && hasPremium && !sellerContact) {
+      console.log('[SELLER CONTACT] Loading seller contact info for premium user...');
       supabase
         .from('seller_contacts')
         .select('email, phone')
@@ -191,7 +191,7 @@ const BusinessDetails = () => {
           }
         });
     }
-  }, [hasUnlockedChat, hasPremium, business, user]);
+  }, [hasPremium, business, user]);
 
   // Navigation clavier pour la galerie
   useEffect(() => {
@@ -1373,8 +1373,8 @@ const BusinessDetails = () => {
                   </div>
                 )}
 
-                {/* Informations du vendeur - Affichées APRÈS le chat si l'utilisateur a accès */}
-                {!isSeller && user && (hasPremium || hasUnlockedChat) && sellerContact && (
+                {/* Informations du vendeur - Affichées UNIQUEMENT pour les membres Club Select */}
+                {!isSeller && user && hasPremium && sellerContact && (
                   <div className="border-t pt-6 mt-6">
                     <div className="bg-gradient-to-br from-primary/5 to-secondary/5 border-2 border-primary/20 rounded-xl p-6 max-w-md mx-auto">
                       <div className="text-center mb-4">

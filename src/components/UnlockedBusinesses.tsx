@@ -10,11 +10,22 @@ interface UnlockedBusinessesProps {
 export const UnlockedBusinesses = ({ userId }: UnlockedBusinessesProps) => {
   const [purchasedBusinesses, setPurchasedBusinesses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [hasPremium, setHasPremium] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
-    fetchPurchasedBusinesses();
+    checkPremiumAndFetch();
   }, [userId]);
+
+  const checkPremiumAndFetch = async () => {
+    try {
+      const { data: premiumData } = await supabase.functions.invoke('check-premium-subscription');
+      setHasPremium(premiumData?.subscribed || false);
+    } catch (error) {
+      console.error('Error checking premium:', error);
+    }
+    await fetchPurchasedBusinesses();
+  };
 
   const fetchPurchasedBusinesses = async () => {
     try {
@@ -110,7 +121,7 @@ export const UnlockedBusinesses = ({ userId }: UnlockedBusinessesProps) => {
                   year: 'numeric'
                 })}</span>
               </div>
-              {business.seller_contact && (
+              {hasPremium && business.seller_contact && (
                 <div className="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20 p-3 rounded-md border border-blue-200 dark:border-blue-800">
                   <p className="text-xs font-semibold text-blue-900 dark:text-blue-100 mb-2">
                     📞 Coordonnées du vendeur
