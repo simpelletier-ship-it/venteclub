@@ -57,7 +57,12 @@ const BusinessDetails = () => {
       setUser(session?.user ?? null);
       
       const businessData = await fetchBusiness();
-      await fetchPhotos();
+      
+      // CRITIQUE: Attendre que businessData soit disponible avant de charger les photos
+      if (businessData?.id) {
+        console.log('[INIT] Business loaded, now fetching photos for:', businessData.id);
+        await fetchPhotos(businessData.id);
+      }
 
       // Track view analytics ONCE at initialization only
       if (businessData?.id) {
@@ -157,7 +162,7 @@ const BusinessDetails = () => {
         },
         () => {
           console.log('[REALTIME] Photos changed, refreshing...');
-          fetchPhotos();
+          fetchPhotos(businessId);
         }
       )
       .subscribe();
@@ -219,17 +224,31 @@ const BusinessDetails = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedPhotoIndex, photos.length, imageZoom]);
 
-  const fetchPhotos = async () => {
-    if (!businessId) return;
+  const fetchPhotos = async (businessId?: string) => {
+    const idToUse = businessId || businessId;
+    if (!idToUse) {
+      console.log('[PHOTOS] No business ID available yet');
+      return;
+    }
     
-    const { data } = await supabase
+    console.log('[PHOTOS] Fetching photos for business:', idToUse);
+    const { data, error } = await supabase
       .from('business_photos')
       .select('*')
-      .eq('business_id', businessId)
+      .eq('business_id', idToUse)
       .order('display_order');
     
+    if (error) {
+      console.error('[PHOTOS] Error fetching photos:', error);
+      return;
+    }
+    
     if (data) {
+      console.log('[PHOTOS] Found', data.length, 'photos');
       setPhotos(data);
+    } else {
+      console.log('[PHOTOS] No photos found');
+      setPhotos([]);
     }
   };
 

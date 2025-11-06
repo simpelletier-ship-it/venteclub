@@ -31,23 +31,87 @@ const BusinessMap = () => {
 
     const initMap = async () => {
       try {
-        const { data: tokenData } = await supabase.functions.invoke('get-mapbox-token');
-        if (!tokenData?.token) return;
+        // Récupérer le token Mapbox
+        console.log('[MAP] Fetching Mapbox token...');
+        const { data: tokenData, error: tokenError } = await supabase.functions.invoke('get-mapbox-token');
+        
+        if (tokenError) {
+          console.error('[MAP] Error fetching token:', tokenError);
+          return;
+        }
+        
+        if (!tokenData?.token) {
+          console.error('[MAP] No token received');
+          return;
+        }
 
+        console.log('[MAP] Token received, initializing map...');
         mapboxgl.accessToken = tokenData.token;
 
+        // Créer la carte avec le style streets (VRAIE CARTE RÉELLE)
         map.current = new mapboxgl.Map({
           container: mapContainer.current!,
-          style: 'mapbox://styles/mapbox/streets-v12',
-          center: [-71.2082, 46.8139],
+          style: 'mapbox://styles/mapbox/streets-v12', // Style avec rues et bâtiments
+          center: [-71.2082, 46.8139], // Centre sur le Québec
           zoom: 6.5,
-          pitch: 0,
+          pitch: 0, // Vue de dessus pour voir les détails
+          antialias: true // Meilleure qualité visuelle
         });
 
-        console.log('[MAP] Map instance created');
+        console.log('[MAP] Map instance created with streets style');
 
         map.current.on('load', async () => {
-          console.log('[MAP] ✅ Map loaded successfully!');
+          console.log('[MAP] ✅ Map loaded successfully with terrain and buildings!');
+          
+          // Ajouter le relief 3D pour mieux voir la géographie
+          map.current!.addSource('mapbox-dem', {
+            'type': 'raster-dem',
+            'url': 'mapbox://mapbox.terrain-rgb',
+            'tileSize': 512,
+            'maxzoom': 14
+          });
+          
+          map.current!.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.5 });
+          
+          // Ajouter les bâtiments 3D
+          const layers = map.current!.getStyle().layers;
+          const labelLayerId = layers.find(
+            (layer) => layer.type === 'symbol' && layer.layout && layer.layout['text-field']
+          )?.id;
+
+          map.current!.addLayer(
+            {
+              'id': 'add-3d-buildings',
+              'source': 'composite',
+              'source-layer': 'building',
+              'filter': ['==', 'extrude', 'true'],
+              'type': 'fill-extrusion',
+              'minzoom': 15,
+              'paint': {
+                'fill-extrusion-color': '#aaa',
+                'fill-extrusion-height': [
+                  'interpolate',
+                  ['linear'],
+                  ['zoom'],
+                  15,
+                  0,
+                  15.05,
+                  ['get', 'height']
+                ],
+                'fill-extrusion-base': [
+                  'interpolate',
+                  ['linear'],
+                  ['zoom'],
+                  15,
+                  0,
+                  15.05,
+                  ['get', 'min_height']
+                ],
+                'fill-extrusion-opacity': 0.6
+              }
+            },
+            labelLayerId
+          );
           
           // Add controls
           map.current!.addControl(new mapboxgl.NavigationControl(), 'top-right');
