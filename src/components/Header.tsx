@@ -183,7 +183,11 @@ const Header = () => {
                 </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                    <Button 
+                      variant="ghost" 
+                      className="relative h-10 w-10 rounded-full"
+                      aria-label="Menu du profil utilisateur"
+                    >
                       <Avatar className="h-10 w-10 border-2 border-primary/20 hover:border-primary/40 transition-colors">
                         {profile?.avatar_url && (
                           <AvatarImage src={profile.avatar_url} alt={profile?.full_name || "Photo de profil"} />
@@ -239,6 +243,7 @@ const Header = () => {
               size="icon"
               className="md:hidden"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label={mobileMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
             >
               <Menu className="h-6 w-6" />
             </Button>

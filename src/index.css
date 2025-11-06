@@ -30,7 +30,7 @@ All colors MUST be HSL.
     
     /* Muted: Gris très pâle (#F8FAFC) */
     --muted: 210 40% 98%;
-    --muted-foreground: 220 26% 40%;
+    --muted-foreground: 220 26% 32%;
     
     /* Accent: Bleu royal (#0056FF) */
     --accent: 219 100% 50%;
@@ -97,7 +97,7 @@ All colors MUST be HSL.
     --secondary-foreground: 0 0% 100%;
     
     --muted: 220 20% 20%;
-    --muted-foreground: 220 13% 70%;
+    --muted-foreground: 220 13% 75%;
     
     --accent: 219 100% 58%;
     --accent-foreground: 0 0% 100%;

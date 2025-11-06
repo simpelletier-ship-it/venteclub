@@ -106,6 +106,7 @@ export const FavoriteButton = ({ businessId, userId }: FavoriteButtonProps) => {
       onClick={toggleFavorite}
       disabled={loading}
       className="hover:bg-transparent group"
+      aria-label={isFavorite ? "Retirer des favoris" : "Ajouter aux favoris"}
     >
       <Heart 
         className={`h-5 w-5 transition-all ${isFavorite ? 'fill-primary stroke-primary' : 'stroke-muted-foreground'} group-hover:fill-primary group-hover:stroke-primary`}

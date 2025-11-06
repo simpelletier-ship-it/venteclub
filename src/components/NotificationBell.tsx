@@ -142,7 +142,12 @@ export const NotificationBell = ({ userId }: NotificationBellProps) => {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative">
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="relative"
+          aria-label={`Notifications${(unreadCount + unreadMessagesCount) > 0 ? ` (${unreadCount + unreadMessagesCount} non lues)` : ''}`}
+        >
           <Bell className="h-5 w-5" />
           {(unreadCount + unreadMessagesCount) > 0 && (
             <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center">
@@ -230,6 +235,7 @@ export const NotificationBell = ({ userId }: NotificationBellProps) => {
                           size="icon"
                           className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-destructive/10"
                           onClick={(e) => deleteNotification(notification.id, e)}
+                          aria-label="Supprimer la notification"
                         >
                           <X className="h-4 w-4 text-destructive" />
                         </Button>
