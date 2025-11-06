@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import { TrendingUp } from "lucide-react";
 
 const opportunities = [
-  { title: "Restaurant Italien", price: "425K$", revenue: "650K$", location: "Montréal", color: "from-blue-500/20 to-cyan-500/20" },
-  { title: "Café Bistro", price: "185K$", revenue: "280K$", location: "Québec", color: "from-green-500/20 to-emerald-500/20" },
-  { title: "Boutique Mode", price: "320K$", revenue: "480K$", location: "Laval", color: "from-purple-500/20 to-pink-500/20" },
-  { title: "Garage Mécanique", price: "550K$", revenue: "820K$", location: "Gatineau", color: "from-orange-500/20 to-red-500/20" },
-  { title: "Salon Coiffure", price: "145K$", revenue: "220K$", location: "Sherbrooke", color: "from-indigo-500/20 to-blue-500/20" },
+  { title: "Restaurant Italien", price: "425K$", revenue: "650K$", location: "Montréal" },
+  { title: "Café Bistro", price: "185K$", revenue: "280K$", location: "Québec" },
+  { title: "Boutique Mode", price: "320K$", revenue: "480K$", location: "Laval" },
+  { title: "Garage Mécanique", price: "550K$", revenue: "820K$", location: "Gatineau" },
+  { title: "Salon Coiffure", price: "145K$", revenue: "220K$", location: "Sherbrooke" },
 ];
 
 export const FloatingOpportunities = () => {
@@ -40,14 +40,14 @@ export const FloatingOpportunities = () => {
                 transitionDelay: visibleCards.includes(index) ? "0ms" : "300ms",
               }}
             >
-              <div className={`bg-gradient-to-br ${opp.color} backdrop-blur-xl border border-white/20 rounded-2xl p-6 shadow-2xl`}>
+              <div className="bg-card/95 backdrop-blur-xl border border-border rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
                     <h3 className="font-bold text-foreground text-lg mb-1">{opp.title}</h3>
                     <p className="text-xs text-muted-foreground">{opp.location}</p>
                   </div>
-                  <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                    <TrendingUp className="w-5 h-5 text-green-500" />
+                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                    <TrendingUp className="w-5 h-5 text-primary" />
                   </div>
                 </div>
                 
@@ -61,12 +61,12 @@ export const FloatingOpportunities = () => {
                     <span className="font-semibold text-foreground">{opp.revenue}</span>
                   </div>
                   
-                  <div className="pt-3 border-t border-white/10">
-                    <div className="flex gap-2">
-                      <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-green-500 to-emerald-500 w-3/4 animate-pulse" />
+                  <div className="pt-3 border-t border-border">
+                    <div className="flex gap-2 items-center">
+                      <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+                        <div className="h-full bg-primary w-3/4" />
                       </div>
-                      <span className="text-xs text-muted-foreground">75% ROI</span>
+                      <span className="text-xs text-muted-foreground font-medium">75% ROI</span>
                     </div>
                   </div>
                 </div>
@@ -77,9 +77,9 @@ export const FloatingOpportunities = () => {
 
         {/* Floating Stats */}
         <div className="absolute -right-4 top-20 animate-float" style={{ animationDelay: "0s", animationDuration: "4s" }}>
-          <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl px-4 py-2 shadow-lg">
+          <div className="bg-card/95 backdrop-blur-xl border border-border rounded-xl px-4 py-2 shadow-lg">
             <div className="text-xs text-muted-foreground">Nouveau</div>
-            <div className="font-bold text-foreground">+12</div>
+            <div className="font-bold text-primary">+12</div>
           </div>
         </div>
       </div>
