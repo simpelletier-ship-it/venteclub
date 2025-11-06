@@ -136,7 +136,7 @@ const Home = () => {
                   className="h-14 px-10 text-base font-semibold rounded-xl border-2 hover:bg-muted/50"
                   onClick={() => navigate("/sell")}
                 >
-                  Estimer mon entreprise
+                  Vendre mon entreprise
                 </Button>
               </div>
             </div>
