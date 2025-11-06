@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import { TrendingUp } from "lucide-react";
 
 const opportunities = [
-  { title: "Restaurant Italien", price: "425K$", revenue: "650K$", location: "Montréal" },
-  { title: "Café Bistro", price: "185K$", revenue: "280K$", location: "Québec" },
-  { title: "Boutique Mode", price: "320K$", revenue: "480K$", location: "Laval" },
-  { title: "Garage Mécanique", price: "550K$", revenue: "820K$", location: "Gatineau" },
-  { title: "Salon Coiffure", price: "145K$", revenue: "220K$", location: "Sherbrooke" },
+  { title: "Restaurant Italien", price: "425K$", revenue: "650K$", location: "Montréal", gradient: "from-primary/5 to-primary/10", border: "border-primary/20", icon: "bg-primary/10", iconColor: "text-primary" },
+  { title: "Café Bistro", price: "185K$", revenue: "280K$", location: "Québec", gradient: "from-secondary/5 to-secondary/10", border: "border-secondary/20", icon: "bg-secondary/10", iconColor: "text-secondary" },
+  { title: "Boutique Mode", price: "320K$", revenue: "480K$", location: "Laval", gradient: "from-accent/5 to-accent/10", border: "border-accent/20", icon: "bg-accent/10", iconColor: "text-accent" },
+  { title: "Garage Mécanique", price: "550K$", revenue: "820K$", location: "Gatineau", gradient: "from-primary/5 to-secondary/10", border: "border-primary/20", icon: "bg-primary/10", iconColor: "text-primary" },
+  { title: "Salon Coiffure", price: "145K$", revenue: "220K$", location: "Sherbrooke", gradient: "from-accent/5 to-primary/10", border: "border-accent/20", icon: "bg-accent/10", iconColor: "text-accent" },
 ];
 
 export const FloatingOpportunities = () => {
@@ -40,14 +40,14 @@ export const FloatingOpportunities = () => {
                 transitionDelay: visibleCards.includes(index) ? "0ms" : "300ms",
               }}
             >
-              <div className="bg-card/95 backdrop-blur-xl border border-border rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow">
+              <div className={`bg-gradient-to-br ${opp.gradient} backdrop-blur-xl border ${opp.border} rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all`}>
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
                     <h3 className="font-bold text-foreground text-lg mb-1">{opp.title}</h3>
                     <p className="text-xs text-muted-foreground">{opp.location}</p>
                   </div>
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                    <TrendingUp className="w-5 h-5 text-primary" />
+                  <div className={`w-10 h-10 rounded-full ${opp.icon} flex items-center justify-center`}>
+                    <TrendingUp className={`w-5 h-5 ${opp.iconColor}`} />
                   </div>
                 </div>
                 
@@ -61,10 +61,10 @@ export const FloatingOpportunities = () => {
                     <span className="font-semibold text-foreground">{opp.revenue}</span>
                   </div>
                   
-                  <div className="pt-3 border-t border-border">
+                  <div className="pt-3 border-t border-border/50">
                     <div className="flex gap-2 items-center">
-                      <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
-                        <div className="h-full bg-primary w-3/4" />
+                      <div className="flex-1 h-2 bg-muted/30 rounded-full overflow-hidden">
+                        <div className={`h-full ${opp.iconColor.replace('text-', 'bg-')} w-3/4`} />
                       </div>
                       <span className="text-xs text-muted-foreground font-medium">75% ROI</span>
                     </div>
