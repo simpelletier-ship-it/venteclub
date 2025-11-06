@@ -47,6 +47,7 @@ interface BusinessMapProps {
 }
 
 const BusinessMap = ({ filters }: BusinessMapProps) => {
+  console.log('[MAP] *** BusinessMap component rendering ***');
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const draw = useRef<MapboxDraw | null>(null);
@@ -55,7 +56,10 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
   const [showSidebar, setShowSidebar] = useState(false);
   const [isMapLoading, setIsMapLoading] = useState(true);
   const [mapError, setMapError] = useState<string | null>(null);
+  const [mapInitialized, setMapInitialized] = useState(false);
   const navigate = useNavigate();
+  
+  console.log('[MAP] Component state:', { isMapLoading, mapError, mapInitialized, businessCount: businesses.length });
   
   // Filtres locaux
   const [localFilters, setLocalFilters] = useState({
@@ -66,7 +70,9 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
   });
   const [displayedBusinesses, setDisplayedBusinesses] = useState<Business[]>([]);
 
+  // Fetch businesses on mount
   useEffect(() => {
+    console.log('[MAP] Component mounted, fetching businesses');
     fetchBusinesses();
 
     const channel = supabase
@@ -310,30 +316,35 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
     };
   }, [businesses]);
 
-  // Initialize map
+  // Initialize map - SEPARATED FROM MOUNT LOGIC
   useEffect(() => {
-    if (!mapContainer.current || map.current) return;
+    // Don't initialize if already initialized or container not ready
+    if (mapInitialized || !mapContainer.current) {
+      console.log('[MAP] Skipping init:', { mapInitialized, hasContainer: !!mapContainer.current });
+      return;
+    }
+
+    console.log('[MAP] Starting initialization...');
 
     const initMap = async () => {
       try {
         setIsMapLoading(true);
         setMapError(null);
         
-        // Récupérer le token Mapbox depuis l'edge function
         console.log('[MAP] Fetching Mapbox token...');
         const { data: tokenData, error: tokenError } = await supabase.functions.invoke('get-mapbox-token');
         
         if (tokenError || !tokenData?.token) {
-          console.error('[MAP] Failed to get Mapbox token:', tokenError);
+          console.error('[MAP] Token error:', tokenError);
           setMapError('Impossible de charger la carte. Veuillez réessayer plus tard.');
           setIsMapLoading(false);
           return;
         }
 
-        console.log('[MAP] Mapbox token retrieved successfully');
+        console.log('[MAP] Token OK, initializing Mapbox...');
         mapboxgl.accessToken = tokenData.token;
 
-        console.log('[MAP] Initializing map...');
+        console.log('[MAP] Creating Mapbox instance...');
         map.current = new mapboxgl.Map({
           container: mapContainer.current!,
           style: 'mapbox://styles/mapbox/outdoors-v12',
@@ -341,7 +352,7 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
           zoom: 6,
         });
 
-        console.log('[MAP] Map instance created');
+        console.log('[MAP] Map created, setting up events...');
 
         map.current.on('error', (e) => {
           console.error('[MAP] Mapbox error:', e);
@@ -350,10 +361,12 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
         });
 
         map.current.on('load', () => {
-          console.log('[MAP] Map style loaded successfully');
+          console.log('[MAP] Map loaded successfully!');
           setIsMapLoading(false);
+          setMapInitialized(true);
         });
 
+        console.log('[MAP] Adding controls...');
         draw.current = new MapboxDraw({
           displayControlsDefault: false,
           controls: {
@@ -411,8 +424,10 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
           setFilteredBusinesses([]);
           setShowSidebar(false);
         });
+        
+        console.log('[MAP] Initialization complete!');
       } catch (error) {
-        console.error('[MAP] Error initializing map:', error);
+        console.error('[MAP] Init error:', error);
         setMapError('Erreur lors de l\'initialisation de la carte.');
         setIsMapLoading(false);
       }
@@ -421,12 +436,14 @@ const BusinessMap = ({ filters }: BusinessMapProps) => {
     initMap();
 
     return () => {
+      console.log('[MAP] Cleaning up...');
       if (map.current) {
         map.current.remove();
         map.current = null;
       }
+      setMapInitialized(false);
     };
-  }, []);
+  }, [mapInitialized]);
 
   // Update markers
   useEffect(() => {
