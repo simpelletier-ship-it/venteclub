@@ -15,8 +15,8 @@ import { useFingerprint } from "@/hooks/useFingerprint";
 import { Shield, AlertTriangle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
-// Clé publique reCAPTCHA (v3 pour une expérience invisible)
-const RECAPTCHA_SITE_KEY = "6LfYourSiteKeyHere"; // À remplacer par votre vraie clé
+// Clé publique reCAPTCHA v2
+const RECAPTCHA_SITE_KEY = "6Lf93wMsAAAAAKlX6GeEsPfLuM7fTmgbBRlh4HcT";
 
 const Auth = () => {
   const navigate = useNavigate();
