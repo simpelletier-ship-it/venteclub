@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import { TrendingUp } from "lucide-react";
 
 const opportunities = [
-  { title: "Restaurant Italien", price: "425K$", revenue: "650K$", location: "Montréal", gradient: "from-primary/5 to-primary/10", border: "border-primary/20", icon: "bg-primary/10", iconColor: "text-primary" },
-  { title: "Café Bistro", price: "185K$", revenue: "280K$", location: "Québec", gradient: "from-secondary/5 to-secondary/10", border: "border-secondary/20", icon: "bg-secondary/10", iconColor: "text-secondary" },
-  { title: "Boutique Mode", price: "320K$", revenue: "480K$", location: "Laval", gradient: "from-accent/5 to-accent/10", border: "border-accent/20", icon: "bg-accent/10", iconColor: "text-accent" },
-  { title: "Garage Mécanique", price: "550K$", revenue: "820K$", location: "Gatineau", gradient: "from-primary/5 to-secondary/10", border: "border-primary/20", icon: "bg-primary/10", iconColor: "text-primary" },
-  { title: "Salon Coiffure", price: "145K$", revenue: "220K$", location: "Sherbrooke", gradient: "from-accent/5 to-primary/10", border: "border-accent/20", icon: "bg-accent/10", iconColor: "text-accent" },
+  { title: "Restaurant Italien", price: "425K$", revenue: "650K$", location: "Montréal", gradient: "from-[#c7d2fe]/30 to-[#ddd6fe]/30", border: "border-white/30", icon: "bg-white/20", iconColor: "text-[#818cf8]" },
+  { title: "Café Bistro", price: "185K$", revenue: "280K$", location: "Québec", gradient: "from-[#e0e7ff]/30 to-[#c7d2fe]/30", border: "border-white/30", icon: "bg-white/20", iconColor: "text-[#6366f1]" },
+  { title: "Boutique Mode", price: "320K$", revenue: "480K$", location: "Laval", gradient: "from-[#ddd6fe]/30 to-[#e0e7ff]/30", border: "border-white/30", icon: "bg-white/20", iconColor: "text-[#a78bfa]" },
+  { title: "Garage Mécanique", price: "550K$", revenue: "820K$", location: "Gatineau", gradient: "from-[#c7d2fe]/30 to-[#e0e7ff]/30", border: "border-white/30", icon: "bg-white/20", iconColor: "text-[#818cf8]" },
+  { title: "Salon Coiffure", price: "145K$", revenue: "220K$", location: "Sherbrooke", gradient: "from-[#e0e7ff]/30 to-[#ddd6fe]/30", border: "border-white/30", icon: "bg-white/20", iconColor: "text-[#6366f1]" },
 ];
 
 export const FloatingOpportunities = () => {
@@ -43,8 +43,8 @@ export const FloatingOpportunities = () => {
               <div className={`bg-gradient-to-br ${opp.gradient} backdrop-blur-xl border ${opp.border} rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all`}>
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
-                    <h3 className="font-bold text-foreground text-lg mb-1">{opp.title}</h3>
-                    <p className="text-xs text-muted-foreground">{opp.location}</p>
+                    <h3 className="font-bold text-[#1e1b4b] text-lg mb-1">{opp.title}</h3>
+                    <p className="text-xs text-[#1e1b4b]/60">{opp.location}</p>
                   </div>
                   <div className={`w-10 h-10 rounded-full ${opp.icon} flex items-center justify-center`}>
                     <TrendingUp className={`w-5 h-5 ${opp.iconColor}`} />
@@ -53,20 +53,20 @@ export const FloatingOpportunities = () => {
                 
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
-                    <span className="text-xs text-muted-foreground">Prix demandé</span>
-                    <span className="font-bold text-foreground text-lg">{opp.price}</span>
+                    <span className="text-xs text-[#1e1b4b]/60">Prix demandé</span>
+                    <span className="font-bold text-[#1e1b4b] text-lg">{opp.price}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-xs text-muted-foreground">Revenus annuels</span>
-                    <span className="font-semibold text-foreground">{opp.revenue}</span>
+                    <span className="text-xs text-[#1e1b4b]/60">Revenus annuels</span>
+                    <span className="font-semibold text-[#1e1b4b]">{opp.revenue}</span>
                   </div>
                   
-                  <div className="pt-3 border-t border-border/50">
+                  <div className="pt-3 border-t border-[#1e1b4b]/10">
                     <div className="flex gap-2 items-center">
-                      <div className="flex-1 h-2 bg-muted/30 rounded-full overflow-hidden">
+                      <div className="flex-1 h-2 bg-white/30 rounded-full overflow-hidden">
                         <div className={`h-full ${opp.iconColor.replace('text-', 'bg-')} w-3/4`} />
                       </div>
-                      <span className="text-xs text-muted-foreground font-medium">75% ROI</span>
+                      <span className="text-xs text-[#1e1b4b]/60 font-medium">75% ROI</span>
                     </div>
                   </div>
                 </div>
@@ -77,9 +77,9 @@ export const FloatingOpportunities = () => {
 
         {/* Floating Stats */}
         <div className="absolute -right-4 top-20 animate-float" style={{ animationDelay: "0s", animationDuration: "4s" }}>
-          <div className="bg-card/95 backdrop-blur-xl border border-border rounded-xl px-4 py-2 shadow-lg">
-            <div className="text-xs text-muted-foreground">Nouveau</div>
-            <div className="font-bold text-primary">+12</div>
+          <div className="bg-[#e0e7ff]/90 backdrop-blur-xl border border-white/30 rounded-xl px-4 py-2 shadow-lg">
+            <div className="text-xs text-[#1e1b4b]/60">Nouveau</div>
+            <div className="font-bold text-[#6366f1]">+12</div>
           </div>
         </div>
       </div>

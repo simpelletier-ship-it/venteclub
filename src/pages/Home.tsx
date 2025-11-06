@@ -101,18 +101,18 @@ const Home = () => {
       />
       
       {/* Hero Section */}
-      <section className="relative min-h-[85vh] flex items-center bg-gradient-to-br from-primary/20 via-primary/10 to-accent/20 overflow-hidden" aria-label="Section principale">
+      <section className="relative min-h-[85vh] flex items-center bg-gradient-to-br from-[#1e1b4b] via-[#312e81] to-[#1e3a8a] overflow-hidden" aria-label="Section principale">
         {/* Animated Background Elements with Parallax */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div 
-            className="absolute top-20 -right-20 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse transition-transform duration-100" 
+            className="absolute top-20 -right-20 w-96 h-96 bg-[#6366f1]/20 rounded-full blur-3xl animate-pulse transition-transform duration-100" 
             style={{ 
               animationDuration: '8s',
               transform: `translate(${scrollY * 0.15}px, ${scrollY * 0.1}px)`
             }} 
           />
           <div 
-            className="absolute bottom-20 -left-20 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse transition-transform duration-100" 
+            className="absolute bottom-20 -left-20 w-96 h-96 bg-[#818cf8]/20 rounded-full blur-3xl animate-pulse transition-transform duration-100" 
             style={{ 
               animationDuration: '10s', 
               animationDelay: '2s',
@@ -120,7 +120,7 @@ const Home = () => {
             }} 
           />
           <div 
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-3xl animate-pulse transition-transform duration-100" 
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#4f46e5]/10 rounded-full blur-3xl animate-pulse transition-transform duration-100" 
             style={{ 
               animationDuration: '12s', 
               animationDelay: '4s',
@@ -137,29 +137,29 @@ const Home = () => {
                 transform: `translateY(${scrollY * 0.05}px)` 
               }}
             >
-              <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-primary/10 border border-primary/20 backdrop-blur-sm">
-                <Sparkles className="w-4 h-4 text-primary" />
-                <span className="text-foreground/90 text-sm font-medium">
+              <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white/10 border border-white/20 backdrop-blur-sm">
+                <Sparkles className="w-4 h-4 text-[#818cf8]" />
+                <span className="text-white/90 text-sm font-medium">
                   Plateforme de confiance pour vos transactions
                 </span>
               </div>
               
-              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-bold leading-[1.1] tracking-tight text-foreground">
-                <span className="text-secondary font-extrabold">Le Club</span> de Référence
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-bold leading-[1.1] tracking-tight text-white">
+                <span className="text-[#818cf8] font-extrabold">Le Club</span> de Référence
                 <br />
                 pour acheter <TypewriterAnimation />
                 <br />
                 partout au Québec
               </h1>
               
-              <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl leading-relaxed text-justify">
-                Plateforme intelligente qui connecte acquéreurs et propriétaires d'entreprises. Chaque opportunité publiée est rigoureusement analysée pour garantir votre sécurité. <span className="font-semibold text-foreground">Investissez en toute confiance, reprenez en toute sérénité.</span>
+              <p className="text-lg sm:text-xl text-white/80 max-w-3xl leading-relaxed text-justify">
+                Plateforme intelligente qui connecte acquéreurs et propriétaires d'entreprises. Chaque opportunité publiée est rigoureusement analysée pour garantir votre sécurité. <span className="font-semibold text-white">Investissez en toute confiance, reprenez en toute sérénité.</span>
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
                 <Button 
                   size="lg" 
-                  className="bg-primary hover:bg-primary/90 text-white h-14 px-10 text-base font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all group"
+                  className="bg-[#6366f1] hover:bg-[#4f46e5] text-white h-14 px-10 text-base font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all group"
                   onClick={() => document.getElementById('featured')?.scrollIntoView({ behavior: 'smooth' })}
                 >
                   Explorer les opportunités
@@ -167,7 +167,7 @@ const Home = () => {
                 </Button>
                 <Button 
                   size="lg" 
-                  className="h-14 px-10 text-base font-semibold rounded-xl bg-accent hover:bg-accent/90 text-white shadow-lg hover:shadow-xl transition-all"
+                  className="h-14 px-10 text-base font-semibold rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/20 shadow-lg hover:shadow-xl transition-all backdrop-blur-sm"
                   onClick={() => navigate("/sell")}
                 >
                   Vendre mon entreprise
