@@ -65,7 +65,7 @@ export const BusinessHero = ({ business, businessId, userId, isSeller, mainPhoto
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-          className="flex items-center justify-between gap-4 px-6 lg:px-16 pt-8 pb-4"
+          className="flex items-center justify-between gap-4 px-6 lg:px-16 pt-8 pb-2"
         >
           <div className="flex items-center gap-3 flex-shrink min-w-0">
             {business.created_at && (
@@ -80,7 +80,7 @@ export const BusinessHero = ({ business, businessId, userId, isSeller, mainPhoto
             )}
           </div>
           
-          <div className="flex items-center gap-4 flex-shrink-0">
+          <div className="flex items-center gap-8 flex-shrink-0">
             {businessId && (
               <>
                 <div className="bg-white/8 hover:bg-white/15 backdrop-blur-xl rounded-full p-2 transition-all duration-300 border border-white/10">
