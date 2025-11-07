@@ -805,15 +805,38 @@ const Admin = () => {
   const handleGenerateDemoImages = async () => {
     setGeneratingDemoImages(true);
     try {
-      const { data, error } = await supabase.functions.invoke('generate-demo-images', {
+      // Étape 1: Uploader les images réalistes dans le storage
+      toast({
+        title: "Upload en cours",
+        description: "Upload des images professionnelles...",
+      });
+      
+      const { data: uploadData, error: uploadError } = await supabase.functions.invoke('upload-demo-images', {
         body: {},
       });
 
-      if (error) throw error;
+      if (uploadError) throw uploadError;
+
+      toast({
+        title: "Upload réussi",
+        description: `${uploadData.successful}/${uploadData.total} images uploadées`,
+      });
+
+      // Étape 2: Assigner les images aux annonces démo
+      toast({
+        title: "Attribution en cours",
+        description: "Attribution des images aux annonces démo...",
+      });
+
+      const { data: assignData, error: assignError } = await supabase.functions.invoke('generate-demo-business-photos', {
+        body: {},
+      });
+
+      if (assignError) throw assignError;
 
       toast({
         title: "Succès",
-        description: `Images générées: ${data.successfulGenerations}/${data.totalProcessed}`,
+        description: `${assignData.successful}/${assignData.processed} photos assignées aux annonces démo`,
       });
 
       // Rafraîchir les annonces pour voir les nouvelles images
@@ -1184,20 +1207,21 @@ const Admin = () => {
               <CardHeader>
                 <CardTitle>Outils de démonstration</CardTitle>
                 <CardDescription>
-                  Génération automatique d'images pour les annonces démo
+                  Régénération des images réalistes pour les annonces démo
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Cliquez sur ce bouton pour générer automatiquement des images pour toutes les annonces marquées comme "démo".
-                  Ce processus peut prendre quelques minutes.
+                  Cliquez sur ce bouton pour assigner des images professionnelles réalistes (depuis Unsplash) 
+                  à toutes les annonces marquées comme "démo". Les images générées par IA seront remplacées 
+                  par des photos authentiques de commerces. Ce processus peut prendre quelques minutes.
                 </p>
                 <Button
                   onClick={handleGenerateDemoImages}
                   disabled={generatingDemoImages}
                   className="w-full sm:w-auto"
                 >
-                  {generatingDemoImages ? "Génération en cours..." : "Générer les images démo"}
+                  {generatingDemoImages ? "Attribution en cours..." : "Régénérer avec images réalistes"}
                 </Button>
               </CardContent>
             </Card>
