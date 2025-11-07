@@ -5,13 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Star, XCircle, Edit, TrendingUp, Eye, Building, MessageSquare, Crown, FileText, CheckCircle } from "lucide-react";
+import { Plus, Star, XCircle, Edit, TrendingUp, Eye, Building, MessageSquare, Crown, FileText, CheckCircle, UserCircle } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import BusinessCard from "@/components/BusinessCard";
 import { WithdrawBusinessDialog } from "@/components/WithdrawBusinessDialog";
 import { PremiumSubscription } from "@/components/PremiumSubscription";
 import { BusinessStatistics } from "@/components/BusinessStatistics";
+import { ProfileForm } from "@/components/ProfileForm";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -270,7 +271,7 @@ const Dashboard = () => {
         </div>
 
         <Tabs defaultValue={defaultTab} className="w-full">
-          <TabsList className="grid w-full max-w-2xl grid-cols-3 h-auto mb-8 gap-4 p-2">
+          <TabsList className="grid w-full max-w-3xl grid-cols-4 h-auto mb-8 gap-4 p-2">
             <TabsTrigger value="businesses" className="text-xs sm:text-sm py-3 sm:py-4 gap-2 px-4">
               <Building className="h-4 w-4" />
               <span>Mes annonces</span>
@@ -278,7 +279,11 @@ const Dashboard = () => {
             <TabsTrigger value="statistics" className="text-xs sm:text-sm py-3 sm:py-4 gap-2 px-4">
               <TrendingUp className="h-4 w-4" />
               <span className="hidden sm:inline">Statistiques avancées</span>
-              <span className="sm:hidden">Stats avancées</span>
+              <span className="sm:hidden">Stats</span>
+            </TabsTrigger>
+            <TabsTrigger value="profile" className="text-xs sm:text-sm py-3 sm:py-4 gap-2 px-4">
+              <UserCircle className="h-4 w-4" />
+              <span>Mon profil</span>
             </TabsTrigger>
             <TabsTrigger value="premium" className="text-xs sm:text-sm py-3 sm:py-4 gap-2 px-4">
               <Crown className="h-4 w-4" />
@@ -531,6 +536,12 @@ const Dashboard = () => {
 
           <TabsContent value="statistics">
             {user && <BusinessStatistics userId={user.id} />}
+          </TabsContent>
+
+          <TabsContent value="profile" className="space-y-6">
+            <div className="max-w-4xl mx-auto">
+              <ProfileForm />
+            </div>
           </TabsContent>
 
           <TabsContent value="premium">
