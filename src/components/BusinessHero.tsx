@@ -107,7 +107,7 @@ export const BusinessHero = ({ business, businessId, userId, isSeller, mainPhoto
         </motion.div>
 
         {/* Contenu principal */}
-        <div className="px-6 lg:px-16 py-12 lg:py-20">
+        <div className="px-6 lg:px-16 py-6 lg:py-8 pb-12 lg:pb-20">
           <div className="max-w-6xl">
             {/* Badges minimalistes */}
             <motion.div 
