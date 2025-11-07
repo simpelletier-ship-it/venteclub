@@ -28,6 +28,7 @@ const Auth = () => {
   const [showResetPassword, setShowResetPassword] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [securityWarning, setSecurityWarning] = useState<string | null>(null);
+  const recaptchaRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Vérifier la session existante
@@ -57,6 +58,33 @@ const Auth = () => {
     setSecurityWarning(null);
 
     try {
+      // Vérifier reCAPTCHA
+      const recaptchaToken = await executeRecaptcha('LOGIN');
+      if (!recaptchaToken) {
+        toast({
+          variant: "destructive",
+          title: "Erreur de vérification",
+          description: "Veuillez compléter la vérification reCAPTCHA.",
+        });
+        setLoading(false);
+        return;
+      }
+
+      // Vérifier le token reCAPTCHA avec le backend
+      const { data: recaptchaVerification, error: recaptchaError } = await supabase.functions.invoke('verify-recaptcha', {
+        body: { token: recaptchaToken, action: 'LOGIN' }
+      });
+
+      if (recaptchaError || !recaptchaVerification?.success) {
+        toast({
+          variant: "destructive",
+          title: "Vérification échouée",
+          description: "La vérification anti-bot a échoué. Veuillez réessayer.",
+        });
+        setLoading(false);
+        return;
+      }
+
       // Valider les données
       const validatedData = loginSchema.parse({ email, password });
 
@@ -143,6 +171,33 @@ const Auth = () => {
     setSecurityWarning(null);
 
     try {
+      // Vérifier reCAPTCHA
+      const recaptchaToken = await executeRecaptcha('SIGNUP');
+      if (!recaptchaToken) {
+        toast({
+          variant: "destructive",
+          title: "Erreur de vérification",
+          description: "Veuillez compléter la vérification reCAPTCHA.",
+        });
+        setLoading(false);
+        return;
+      }
+
+      // Vérifier le token reCAPTCHA avec le backend
+      const { data: recaptchaVerification, error: recaptchaError } = await supabase.functions.invoke('verify-recaptcha', {
+        body: { token: recaptchaToken, action: 'SIGNUP' }
+      });
+
+      if (recaptchaError || !recaptchaVerification?.success) {
+        toast({
+          variant: "destructive",
+          title: "Vérification échouée",
+          description: "La vérification anti-bot a échoué. Veuillez réessayer.",
+        });
+        setLoading(false);
+        return;
+      }
+
       if (!acceptedTerms) {
         toast({
           variant: "destructive",
@@ -361,6 +416,31 @@ const Auth = () => {
     }
   };
 
+  const executeRecaptcha = async (action: string): Promise<string | null> => {
+    const siteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
+    if (!siteKey) {
+      console.error('reCAPTCHA site key not configured');
+      return null;
+    }
+
+    return new Promise((resolve) => {
+      if (typeof (window as any).grecaptcha === 'undefined') {
+        console.error('reCAPTCHA not loaded');
+        resolve(null);
+        return;
+      }
+
+      (window as any).grecaptcha.enterprise.ready(() => {
+        (window as any).grecaptcha.enterprise.execute(siteKey, { action }).then((token: string) => {
+          resolve(token);
+        }).catch((error: any) => {
+          console.error('reCAPTCHA execution error:', error);
+          resolve(null);
+        });
+      });
+    });
+  };
+
   const handleGoogleSignIn = async () => {
     try {
       const { error } = await supabase.auth.signInWithOAuth({
@@ -474,6 +554,9 @@ const Auth = () => {
                   >
                     Mot de passe oublié ?
                   </Button>
+                  
+                  <div ref={recaptchaRef} className="g-recaptcha" data-sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY} data-action="LOGIN"></div>
+                  
                   <Button 
                     type="submit" 
                     disabled={loading || fpLoading} 
@@ -648,6 +731,8 @@ const Auth = () => {
                       </div>
                     </div>
                   </div>
+
+                  <div ref={recaptchaRef} className="g-recaptcha" data-sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY} data-action="SIGNUP"></div>
 
                   <Button 
                     type="submit" 
