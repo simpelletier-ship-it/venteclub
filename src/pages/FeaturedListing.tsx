@@ -218,7 +218,7 @@ const FeaturedListing = () => {
                   >
                     <CardHeader className="text-center pb-3 pt-8 flex-1">
                       <CardTitle className="text-5xl font-bold text-white mb-2">
-                        {option.price.toFixed(0)}$
+                        {option.price.toFixed(0)} $
                       </CardTitle>
                       <CardDescription className="text-lg font-semibold text-white/70 min-h-[3.5rem] flex items-center justify-center">
                         {option.label}
@@ -236,7 +236,7 @@ const FeaturedListing = () => {
                     </CardHeader>
                     <CardContent className="text-center pb-6">
                       <p className="text-xs text-white/40">
-                        {(option.price / (option.duration / 30)).toFixed(2)}$ / mois
+                        {(option.price / (option.duration / 30)).toFixed(2)} $ / mois
                       </p>
                     </CardContent>
                   </Card>
@@ -250,7 +250,7 @@ const FeaturedListing = () => {
               onClick={() => handleFeatured(selectedDuration)}
               disabled={isLoading}
             >
-              {isLoading ? "Chargement..." : `Mettre en vedette - ${pricingOptions.find(o => o.duration === selectedDuration)?.price.toFixed(0)}$`}
+              {isLoading ? "Chargement..." : `Mettre en vedette - ${pricingOptions.find(o => o.duration === selectedDuration)?.price.toFixed(0)} $`}
             </Button>
             <p className="text-white/50 text-sm">
               Activation immédiate après paiement
@@ -408,7 +408,7 @@ const FeaturedListing = () => {
               onClick={() => handleFeatured(selectedDuration)}
               disabled={isLoading}
             >
-              {isLoading ? "Chargement..." : `Mettre en vedette - ${pricingOptions.find(o => o.duration === selectedDuration)?.price.toFixed(0)}$`}
+              {isLoading ? "Chargement..." : `Mettre en vedette - ${pricingOptions.find(o => o.duration === selectedDuration)?.price.toFixed(0)} $`}
             </Button>
             
             <p className="text-white/50 text-sm">
