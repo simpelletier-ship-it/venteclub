@@ -150,18 +150,18 @@ const Header = () => {
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-56 bg-card/95 backdrop-blur-xl border-border/50 shadow-premium">
-                <DropdownMenuItem onClick={() => navigate("/entreprises")} className="cursor-pointer hover:bg-muted/50 flex items-center gap-2">
+                <DropdownMenuItem onClick={() => navigate("/entreprises")} className="cursor-pointer hover:bg-muted/50 flex items-center gap-2 group">
                   <Store className="w-4 h-4" />
                   <div>
                     <p className="font-medium">Entreprises</p>
-                    <p className="text-xs text-muted-foreground">Commerces et PME</p>
+                    <p className="text-xs text-muted-foreground group-hover:text-white transition-colors">Commerces et PME</p>
                   </div>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate("/immeubles-commerciaux")} className="cursor-pointer hover:bg-muted/50 flex items-center gap-2">
+                <DropdownMenuItem onClick={() => navigate("/immeubles-commerciaux")} className="cursor-pointer hover:bg-muted/50 flex items-center gap-2 group">
                   <Building2 className="w-4 h-4" />
                   <div>
                     <p className="font-medium">Immobilier</p>
-                    <p className="text-xs text-muted-foreground">Commercial et résidentiel</p>
+                    <p className="text-xs text-muted-foreground group-hover:text-white transition-colors">Commercial et résidentiel</p>
                   </div>
                 </DropdownMenuItem>
               </DropdownMenuContent>
