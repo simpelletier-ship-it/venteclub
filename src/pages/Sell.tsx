@@ -123,7 +123,7 @@ const Sell = () => {
                 <div className="mx-auto w-20 h-20 rounded-full bg-success/10 flex items-center justify-center group-hover:bg-success/20 transition-colors">
                   <Home className="w-10 h-10 text-success" />
                 </div>
-                <CardTitle className="text-2xl">Immeuble</CardTitle>
+                <CardTitle className="text-2xl">Immobilier</CardTitle>
                 <CardDescription className="text-base min-h-[48px]">
                   Vendez votre propriété commerciale ou industrielle
                 </CardDescription>
@@ -156,7 +156,7 @@ const Sell = () => {
                   className="w-full"
                   onClick={() => navigate("/list-property")}
                 >
-                  Vendre un Immeuble
+                  Vendre un Immobilier
                 </Button>
               </CardContent>
             </Card>
