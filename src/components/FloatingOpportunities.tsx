@@ -47,7 +47,7 @@ export const FloatingOpportunities = () => {
                     <p className="text-xs text-white/70">{opp.location}</p>
                   </div>
                   <div className={`w-10 h-10 rounded-full ${opp.icon} flex items-center justify-center`}>
-                    <TrendingUp className="w-5 h-5 text-[#4c1d95]" />
+                    <TrendingUp className="w-5 h-5 text-[#1e1b4b]" />
                   </div>
                 </div>
                 
@@ -64,7 +64,7 @@ export const FloatingOpportunities = () => {
                   <div className="pt-3 border-t border-white/20">
                     <div className="flex gap-2 items-center">
                       <div className="flex-1 h-2 bg-white/30 rounded-full overflow-hidden">
-                        <div className="h-full bg-[#4c1d95] w-3/4" />
+                        <div className="h-full bg-[#1e1b4b] w-3/4" />
                       </div>
                       <span className="text-xs text-white/70 font-medium">75% ROI</span>
                     </div>
