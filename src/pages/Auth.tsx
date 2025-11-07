@@ -59,31 +59,20 @@ const Auth = () => {
     setSecurityWarning(null);
 
     try {
-      // Vérifier reCAPTCHA
+      // Vérifier reCAPTCHA (optionnel)
       const recaptchaToken = await executeRecaptcha('LOGIN');
-      if (!recaptchaToken) {
-        toast({
-          variant: "destructive",
-          title: "Erreur de vérification",
-          description: "Veuillez compléter la vérification reCAPTCHA.",
+      
+      if (recaptchaToken) {
+        // Vérifier le token reCAPTCHA avec le backend
+        const { data: recaptchaVerification, error: recaptchaError } = await supabase.functions.invoke('verify-recaptcha', {
+          body: { token: recaptchaToken, action: 'LOGIN' }
         });
-        setLoading(false);
-        return;
-      }
 
-      // Vérifier le token reCAPTCHA avec le backend
-      const { data: recaptchaVerification, error: recaptchaError } = await supabase.functions.invoke('verify-recaptcha', {
-        body: { token: recaptchaToken, action: 'LOGIN' }
-      });
-
-      if (recaptchaError || !recaptchaVerification?.success) {
-        toast({
-          variant: "destructive",
-          title: "Vérification échouée",
-          description: "La vérification anti-bot a échoué. Veuillez réessayer.",
-        });
-        setLoading(false);
-        return;
+        if (recaptchaError || !recaptchaVerification?.success) {
+          console.warn('reCAPTCHA verification failed, but continuing with login');
+        }
+      } else {
+        console.warn('reCAPTCHA token not available, continuing without verification');
       }
 
       // Valider les données
@@ -130,7 +119,7 @@ const Auth = () => {
         await supabase.functions.invoke('register-fingerprint', {
           body: {
             fingerprintHash: fingerprint.hash,
-            ipAddress: null, // L'edge function le récupérera
+            ipAddress: null,
             userAgent: fingerprint.components.userAgent,
             screenResolution: fingerprint.components.screenResolution,
             timezone: fingerprint.components.timezone,
@@ -172,31 +161,20 @@ const Auth = () => {
     setSecurityWarning(null);
 
     try {
-      // Vérifier reCAPTCHA
+      // Vérifier reCAPTCHA (optionnel)
       const recaptchaToken = await executeRecaptcha('SIGNUP');
-      if (!recaptchaToken) {
-        toast({
-          variant: "destructive",
-          title: "Erreur de vérification",
-          description: "Veuillez compléter la vérification reCAPTCHA.",
+      
+      if (recaptchaToken) {
+        // Vérifier le token reCAPTCHA avec le backend
+        const { data: recaptchaVerification, error: recaptchaError } = await supabase.functions.invoke('verify-recaptcha', {
+          body: { token: recaptchaToken, action: 'SIGNUP' }
         });
-        setLoading(false);
-        return;
-      }
 
-      // Vérifier le token reCAPTCHA avec le backend
-      const { data: recaptchaVerification, error: recaptchaError } = await supabase.functions.invoke('verify-recaptcha', {
-        body: { token: recaptchaToken, action: 'SIGNUP' }
-      });
-
-      if (recaptchaError || !recaptchaVerification?.success) {
-        toast({
-          variant: "destructive",
-          title: "Vérification échouée",
-          description: "La vérification anti-bot a échoué. Veuillez réessayer.",
-        });
-        setLoading(false);
-        return;
+        if (recaptchaError || !recaptchaVerification?.success) {
+          console.warn('reCAPTCHA verification failed, but continuing with signup');
+        }
+      } else {
+        console.warn('reCAPTCHA token not available, continuing without verification');
       }
 
       if (!acceptedTerms) {
