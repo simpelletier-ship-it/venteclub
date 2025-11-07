@@ -5,9 +5,11 @@ import { Button } from "@/components/ui/button";
 import BusinessCard from "@/components/BusinessCard";
 import BusinessListItem from "@/components/BusinessListItem";
 import FilterBar from "@/components/FilterBar";
-import { ArrowRight, Grid3x3, List, TrendingUp } from "lucide-react";
+import { ArrowRight, Grid3x3, List, TrendingUp, Sparkles, Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { SEO } from "@/components/SEO";
+import { CircuitBackground } from "@/components/CircuitBackground";
+import { useScrollParallax } from "@/hooks/useScrollParallax";
 
 const Businesses = () => {
   const navigate = useNavigate();
@@ -16,6 +18,7 @@ const Businesses = () => {
   const [allBusinesses, setAllBusinesses] = useState<any[]>([]);
   const [filteredBusinesses, setFilteredBusinesses] = useState<any[]>([]);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
+  const scrollY = useScrollParallax();
   
   useEffect(() => {
     fetchBusinesses();
@@ -112,23 +115,63 @@ const Businesses = () => {
       />
       
       {/* Hero Section */}
-      <section className="relative min-h-[50vh] flex items-center overflow-hidden bg-gradient-to-br from-white via-muted to-white" aria-label="Section principale">
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-gradient-to-br from-secondary/30 via-primary/20 to-transparent rounded-full blur-3xl animate-float" />
-          <div className="absolute -bottom-40 -left-40 w-[600px] h-[600px] bg-gradient-to-tr from-accent/30 via-primary/20 to-transparent rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
+      <section className="relative min-h-[70vh] flex items-center overflow-hidden bg-gradient-to-br from-[#1a1a2e] via-[#16213e] to-[#0f0f1e]" aria-label="Section principale">
+        {/* Circuit Background Animation */}
+        <CircuitBackground />
+        
+        {/* Gradient Orbs */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div 
+            className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-gradient-to-br from-primary/30 via-accent/20 to-transparent rounded-full blur-3xl animate-pulse"
+            style={{ transform: `translateY(${scrollY * 0.5}px)` }}
+          />
+          <div 
+            className="absolute -bottom-40 -left-40 w-[600px] h-[600px] bg-gradient-to-tr from-secondary/30 via-primary/20 to-transparent rounded-full blur-3xl animate-pulse"
+            style={{ animationDelay: '2s', transform: `translateY(${scrollY * 0.3}px)` }}
+          />
         </div>
         
-        <div className="relative container mx-auto px-4 py-16">
-          <div className="max-w-4xl mx-auto text-center space-y-6 animate-slide-up">
-            <h1 className="text-2xl sm:text-4xl md:text-6xl lg:text-7xl font-display font-bold leading-[1.1] tracking-tight text-foreground px-4">
-              Toutes les entreprises
+        <div className="relative container mx-auto px-4 py-20">
+          <div className="max-w-5xl mx-auto text-center space-y-8 animate-fade-in">
+            {/* Badge */}
+            <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white text-sm font-semibold animate-scale-in">
+              <Sparkles className="w-4 h-4 text-primary" />
+              {allBusinesses.length + featuredBusinesses.length}+ opportunités disponibles
+            </div>
+            
+            {/* Main Heading */}
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-bold leading-[1.1] tracking-tight">
+              <span className="text-white">Toutes les entreprises</span>
               <br />
-              <span className="text-primary">à vendre au Québec</span>
+              <span className="bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent">
+                à vendre au Québec
+              </span>
             </h1>
             
-            <p className="text-sm sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
-              Explorez {allBusinesses.length + featuredBusinesses.length} opportunités d'affaires
+            <p className="text-lg sm:text-xl text-white/70 max-w-3xl mx-auto leading-relaxed">
+              Explorez notre catalogue complet d'entreprises, commerces et franchises vérifiés. 
+              Filtrez par secteur, ville et budget pour trouver l'opportunité parfaite.
             </p>
+            
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+              <Button 
+                size="lg" 
+                className="bg-gradient-to-r from-primary to-accent hover:opacity-90 text-white h-14 px-10 text-base font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all group"
+                onClick={() => document.getElementById('all-businesses')?.scrollIntoView({ behavior: 'smooth' })}
+              >
+                <Search className="mr-2 w-5 h-5" />
+                Parcourir les annonces
+                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </Button>
+              <Button 
+                size="lg" 
+                className="h-14 px-10 text-base font-semibold rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/20 shadow-lg hover:shadow-xl transition-all backdrop-blur-sm"
+                onClick={() => navigate("/sell")}
+              >
+                Vendre mon entreprise
+              </Button>
+            </div>
           </div>
         </div>
       </section>
