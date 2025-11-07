@@ -15,6 +15,7 @@ import { SellerChatSection } from "@/components/SellerChatSection";
 import { ReportBusinessDialog } from "@/components/ReportBusinessDialog";
 import { SEO } from "@/components/SEO";
 import { BusinessHero } from "@/components/BusinessHero";
+import { PremiumPhotoGallery } from "@/components/PremiumPhotoGallery";
 import { FinancialCalculator } from "@/components/FinancialCalculator";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { PriceHistory } from "@/components/PriceHistory";
@@ -943,32 +944,14 @@ const BusinessDetails = () => {
                 )}
 
               <div className="space-y-6">
-                {/* Photo Gallery - Affichée en premier */}
+                {/* Photo Gallery Premium */}
                 {photos.length > 0 && (
-                  <div>
-                    <h2 className="text-xl font-semibold mb-4">Photos de l'annonce</h2>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                       {photos.map((photo, index) => (
-                        <div 
-                          key={photo.id} 
-                          className="aspect-video rounded-lg overflow-hidden cursor-pointer hover:opacity-90 transition-opacity shadow-md hover:shadow-lg border-2 border-primary/20"
-                          onClick={() => setSelectedPhotoIndex(index)}
-                        >
-                           <img
-                            src={photo.photo_url}
-                            alt={`Photo ${index + 1} de ${business.title} - ${business.industry} à ${business.city}`}
-                            className="w-full h-full object-cover"
-                            loading="lazy"
-                            onError={(e) => {
-                              const target = e.target as HTMLImageElement;
-                              target.onerror = null; // Éviter la boucle infinie
-                              target.src = 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&auto=format&fit=crop';
-                            }}
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                  <PremiumPhotoGallery 
+                    photos={photos}
+                    businessTitle={business.title}
+                    businessIndustry={business.industry}
+                    businessCity={business.city}
+                  />
                 )}
 
                 <div>
