@@ -2,7 +2,7 @@ import { SEO } from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { HelpCircle, BookOpen } from "lucide-react";
 
 const FAQ = () => {
@@ -77,12 +77,11 @@ const FAQ = () => {
                   <p className="mb-4">
                     C'est l'outil idéal pour les acheteurs actifs recherchant plusieurs opportunités et souhaitant être pris au sérieux par les vendeurs.
                   </p>
-                  <Button 
-                    onClick={() => navigate('/club-select')}
-                    className="w-full sm:w-auto"
-                  >
-                    Découvrez tous les avantages du Club Select
-                  </Button>
+                  <Link to="/club-select">
+                    <Button className="w-full sm:w-auto">
+                      Découvrez tous les avantages du Club Select
+                    </Button>
+                  </Link>
                 </AccordionContent>
               </AccordionItem>
 
