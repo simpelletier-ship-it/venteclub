@@ -1514,9 +1514,6 @@ const BusinessDetails = () => {
                         >
                           {isUnlockingChat ? 'Déverrouillage...' : 'Débloquer maintenant'}
                         </Button>
-                        <p className="text-xs text-muted-foreground mt-4 font-medium">
-                          1 accès gratuit disponible par jour
-                        </p>
                       </div>
                     )}
                   </CardContent>
