@@ -270,17 +270,17 @@ const Dashboard = () => {
         </div>
 
         <Tabs defaultValue={defaultTab} className="w-full">
-          <TabsList className="grid w-full max-w-md grid-cols-3 h-auto mb-8">
-            <TabsTrigger value="businesses" className="text-xs sm:text-sm py-2 sm:py-3 gap-2">
+          <TabsList className="grid w-full max-w-2xl grid-cols-3 h-auto mb-8 gap-4 p-2">
+            <TabsTrigger value="businesses" className="text-xs sm:text-sm py-3 sm:py-4 gap-2 px-4">
               <Building className="h-4 w-4" />
-              <span>Annonces</span>
+              <span>Mes annonces</span>
             </TabsTrigger>
-            <TabsTrigger value="statistics" className="text-xs sm:text-sm py-2 sm:py-3 gap-2">
+            <TabsTrigger value="statistics" className="text-xs sm:text-sm py-3 sm:py-4 gap-2 px-4">
               <TrendingUp className="h-4 w-4" />
               <span className="hidden sm:inline">Statistiques avancées</span>
               <span className="sm:hidden">Stats avancées</span>
             </TabsTrigger>
-            <TabsTrigger value="premium" className="text-xs sm:text-sm py-2 sm:py-3 gap-2">
+            <TabsTrigger value="premium" className="text-xs sm:text-sm py-3 sm:py-4 gap-2 px-4">
               <Crown className="h-4 w-4" />
               <span>Club Select</span>
             </TabsTrigger>
