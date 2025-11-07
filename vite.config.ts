@@ -30,5 +30,9 @@ export default defineConfig(({ mode }) => ({
         },
       },
     },
+    copyPublicDir: true,
+    assetsInlineLimit: 0,
   },
+  publicDir: 'public',
+  assetsInclude: ['**/*.xml', '**/*.txt'],
 }));
