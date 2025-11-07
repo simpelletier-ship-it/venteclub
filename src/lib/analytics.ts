@@ -11,7 +11,7 @@ declare global {
  */
 export const trackPageView = (url: string, title?: string) => {
   if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('config', 'G-XXXXXXXXXX', {
+    window.gtag('config', 'G-362DNT7Q72', {
       page_path: url,
       page_title: title,
     });
