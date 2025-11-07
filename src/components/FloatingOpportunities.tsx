@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import { TrendingUp } from "lucide-react";
 
 const opportunities = [
-  { title: "Restaurant Italien", price: "425K$", revenue: "650K$", location: "Montréal", gradient: "from-[#c7d2fe]/30 to-[#ddd6fe]/30", border: "border-white/30", icon: "bg-white/20", iconColor: "text-[#818cf8]" },
-  { title: "Café Bistro", price: "185K$", revenue: "280K$", location: "Québec", gradient: "from-[#e0e7ff]/30 to-[#c7d2fe]/30", border: "border-white/30", icon: "bg-white/20", iconColor: "text-[#6366f1]" },
-  { title: "Boutique Mode", price: "320K$", revenue: "480K$", location: "Laval", gradient: "from-[#ddd6fe]/30 to-[#e0e7ff]/30", border: "border-white/30", icon: "bg-white/20", iconColor: "text-[#a78bfa]" },
-  { title: "Garage Mécanique", price: "550K$", revenue: "820K$", location: "Gatineau", gradient: "from-[#c7d2fe]/30 to-[#e0e7ff]/30", border: "border-white/30", icon: "bg-white/20", iconColor: "text-[#818cf8]" },
-  { title: "Salon Coiffure", price: "145K$", revenue: "220K$", location: "Sherbrooke", gradient: "from-[#e0e7ff]/30 to-[#ddd6fe]/30", border: "border-white/30", icon: "bg-white/20", iconColor: "text-[#6366f1]" },
+  { title: "Restaurant Italien", price: "425K$", revenue: "650K$", location: "Montréal", gradient: "from-[#c7d2fe]/30 to-[#ddd6fe]/30", border: "border-white/30", icon: "bg-white/20" },
+  { title: "Café Bistro", price: "185K$", revenue: "280K$", location: "Québec", gradient: "from-[#e0e7ff]/30 to-[#c7d2fe]/30", border: "border-white/30", icon: "bg-white/20" },
+  { title: "Boutique Mode", price: "320K$", revenue: "480K$", location: "Laval", gradient: "from-[#ddd6fe]/30 to-[#e0e7ff]/30", border: "border-white/30", icon: "bg-white/20" },
+  { title: "Garage Mécanique", price: "550K$", revenue: "820K$", location: "Gatineau", gradient: "from-[#c7d2fe]/30 to-[#e0e7ff]/30", border: "border-white/30", icon: "bg-white/20" },
+  { title: "Salon Coiffure", price: "145K$", revenue: "220K$", location: "Sherbrooke", gradient: "from-[#e0e7ff]/30 to-[#ddd6fe]/30", border: "border-white/30", icon: "bg-white/20" },
 ];
 
 export const FloatingOpportunities = () => {
@@ -47,7 +47,7 @@ export const FloatingOpportunities = () => {
                     <p className="text-xs text-white/70">{opp.location}</p>
                   </div>
                   <div className={`w-10 h-10 rounded-full ${opp.icon} flex items-center justify-center`}>
-                    <TrendingUp className={`w-5 h-5 ${opp.iconColor}`} />
+                    <TrendingUp className="w-5 h-5 text-[#4c1d95]" />
                   </div>
                 </div>
                 
@@ -64,7 +64,7 @@ export const FloatingOpportunities = () => {
                   <div className="pt-3 border-t border-white/20">
                     <div className="flex gap-2 items-center">
                       <div className="flex-1 h-2 bg-white/30 rounded-full overflow-hidden">
-                        <div className={`h-full ${opp.iconColor.replace('text-', 'bg-')} w-3/4`} />
+                        <div className="h-full bg-[#4c1d95] w-3/4" />
                       </div>
                       <span className="text-xs text-white/70 font-medium">75% ROI</span>
                     </div>
