@@ -6,11 +6,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, User, Mail, Phone, MapPin, Building, Globe, Linkedin, Save } from "lucide-react";
+import { Loader2, User, Mail, Phone, MapPin, Building, Globe, Linkedin, Save, Upload } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface ProfileFormData {
-  full_name: string;
+  first_name: string;
+  last_name: string;
   email: string;
   phone: string;
   street_address: string;
@@ -30,8 +31,11 @@ export function ProfileForm() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
   const [formData, setFormData] = useState<ProfileFormData>({
-    full_name: "",
+    first_name: "",
+    last_name: "",
     email: "",
     phone: "",
     street_address: "",
@@ -56,6 +60,8 @@ export function ProfileForm() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
+      setUserId(user.id);
+
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
@@ -66,7 +72,8 @@ export function ProfileForm() {
 
       if (data) {
         setFormData({
-          full_name: data.full_name || "",
+          first_name: data.first_name || "",
+          last_name: data.last_name || "",
           email: data.email || "",
           phone: data.phone || "",
           street_address: data.street_address || "",
@@ -94,6 +101,70 @@ export function ProfileForm() {
     }
   };
 
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    try {
+      if (!e.target.files || e.target.files.length === 0) return;
+      if (!userId) return;
+
+      const file = e.target.files[0];
+      
+      // Vérifier la taille du fichier (max 2Mo)
+      if (file.size > 2 * 1024 * 1024) {
+        toast({
+          variant: "destructive",
+          title: "Fichier trop volumineux",
+          description: "La photo de profil doit faire moins de 2Mo",
+        });
+        return;
+      }
+
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${userId}/${Math.random()}.${fileExt}`;
+
+      setUploading(true);
+
+      // Supprimer l'ancienne photo si elle existe
+      if (formData.avatar_url) {
+        const oldPath = formData.avatar_url.split('/').slice(-2).join('/');
+        await supabase.storage.from('avatars').remove([oldPath]);
+      }
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(fileName, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(fileName);
+
+      setFormData({ ...formData, avatar_url: publicUrl });
+
+      // Sauvegarder l'avatar dans la base de données immédiatement
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: publicUrl })
+        .eq('id', userId);
+
+      if (updateError) throw updateError;
+
+      toast({
+        title: "Photo de profil mise à jour",
+        description: "Votre photo de profil a été enregistrée avec succès",
+      });
+    } catch (error: any) {
+      console.error("Error uploading avatar:", error);
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: error.message || "Impossible de télécharger la photo",
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
@@ -102,10 +173,15 @@ export function ProfileForm() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Non authentifié");
 
+      // Générer le full_name à partir de first_name et last_name
+      const full_name = `${formData.first_name} ${formData.last_name}`.trim();
+
       const { error } = await supabase
         .from("profiles")
         .update({
-          full_name: formData.full_name,
+          first_name: formData.first_name,
+          last_name: formData.last_name,
+          full_name: full_name,
           phone: formData.phone,
           street_address: formData.street_address,
           city: formData.city,
@@ -139,8 +215,10 @@ export function ProfileForm() {
     }
   };
 
-  const getInitials = (name: string) => {
-    return name
+  const getInitials = () => {
+    const initials = `${formData.first_name} ${formData.last_name}`.trim();
+    if (!initials) return formData.email.substring(0, 2).toUpperCase();
+    return initials
       .split(" ")
       .map((n) => n[0])
       .join("")
@@ -169,25 +247,68 @@ export function ProfileForm() {
             Votre photo de profil sera visible par les autres utilisateurs
           </CardDescription>
         </CardHeader>
-        <CardContent className="flex items-center gap-6">
-          <Avatar className="h-24 w-24 ring-4 ring-border/40">
-            <AvatarImage src={formData.avatar_url || undefined} alt={formData.full_name} />
-            <AvatarFallback className="bg-gradient-to-br from-primary/20 to-secondary/20 text-foreground font-bold text-2xl">
-              {getInitials(formData.full_name || formData.email)}
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex-1 space-y-2">
-            <Label htmlFor="avatar_url">URL de la photo</Label>
-            <Input
-              id="avatar_url"
-              type="url"
-              placeholder="https://exemple.com/photo.jpg"
-              value={formData.avatar_url}
-              onChange={(e) =>
-                setFormData({ ...formData, avatar_url: e.target.value })
-              }
-            />
+        <CardContent className="space-y-4">
+          <div className="flex items-center gap-6">
+            <Avatar className="h-24 w-24 ring-4 ring-border/40">
+              <AvatarImage src={formData.avatar_url || undefined} alt={`${formData.first_name} ${formData.last_name}`} />
+              <AvatarFallback className="bg-gradient-to-br from-primary/20 to-secondary/20 text-foreground font-bold text-2xl">
+                {getInitials()}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1">
+              <Label htmlFor="avatar_file" className="cursor-pointer">
+                <div className="flex items-center gap-2 text-sm font-medium mb-2">
+                  <Upload className="h-4 w-4" />
+                  <span>{formData.avatar_url ? "Modifier la photo" : "Télécharger une photo"}</span>
+                </div>
+                <Input
+                  id="avatar_file"
+                  type="file"
+                  accept="image/png,image/jpeg,image/gif,image/webp"
+                  onChange={handleAvatarUpload}
+                  disabled={uploading}
+                  className="hidden"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={uploading}
+                  className="w-full"
+                  onClick={() => document.getElementById('avatar_file')?.click()}
+                >
+                  {uploading ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      Upload en cours...
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="h-4 w-4 mr-2" />
+                      Choisir un fichier
+                    </>
+                  )}
+                </Button>
+              </Label>
+              <p className="text-xs text-muted-foreground mt-2">
+                PNG, JPG, GIF, WEBP (Max 2Mo)
+              </p>
+            </div>
           </div>
+          {formData.avatar_url && (
+            <div className="pt-4 border-t">
+              <Label htmlFor="avatar_url">Ou saisir une URL</Label>
+              <Input
+                id="avatar_url"
+                type="url"
+                placeholder="https://exemple.com/photo.jpg"
+                value={formData.avatar_url}
+                onChange={(e) =>
+                  setFormData({ ...formData, avatar_url: e.target.value })
+                }
+                className="mt-2"
+              />
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -200,18 +321,33 @@ export function ProfileForm() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="full_name">Nom complet *</Label>
-            <Input
-              id="full_name"
-              type="text"
-              placeholder="Jean Dupont"
-              required
-              value={formData.full_name}
-              onChange={(e) =>
-                setFormData({ ...formData, full_name: e.target.value })
-              }
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="first_name">Prénom *</Label>
+              <Input
+                id="first_name"
+                type="text"
+                placeholder="Jean"
+                required
+                value={formData.first_name}
+                onChange={(e) =>
+                  setFormData({ ...formData, first_name: e.target.value })
+                }
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="last_name">Nom de famille *</Label>
+              <Input
+                id="last_name"
+                type="text"
+                placeholder="Dupont"
+                required
+                value={formData.last_name}
+                onChange={(e) =>
+                  setFormData({ ...formData, last_name: e.target.value })
+                }
+              />
+            </div>
           </div>
 
           <div className="space-y-2">

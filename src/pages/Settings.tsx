@@ -90,12 +90,16 @@ const Settings = () => {
     try {
       if (!user) return;
 
+      // Générer le full_name à partir de first_name et last_name
+      const full_name = `${profile.first_name} ${profile.last_name}`.trim();
+
       const { error } = await supabase
         .from('profiles')
         .upsert({
           id: user.id,
           first_name: profile.first_name,
           last_name: profile.last_name,
+          full_name: full_name,
           phone: profile.phone,
           email: profile.email,
           avatar_url: profile.avatar_url,
