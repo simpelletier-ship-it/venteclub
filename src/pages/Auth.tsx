@@ -28,6 +28,7 @@ const Auth = () => {
   const [showResetPassword, setShowResetPassword] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [securityWarning, setSecurityWarning] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState("login");
   const recaptchaRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -299,10 +300,17 @@ const Auth = () => {
             errorMessage.includes('user_already_exists')) {
           toast({
             variant: "destructive",
-            title: "Compte existant ou récemment supprimé",
-            description: "Cet email est déjà utilisé ou a été récemment supprimé. Si vous venez de supprimer votre compte, veuillez attendre 24-48 heures avant de le recréer, ou utilisez un autre email. Pour assistance, contactez le support.",
-            duration: 10000,
+            title: "Compte existant",
+            description: "Un compte avec cet email existe déjà. Vous allez être redirigé vers la page de connexion.",
+            duration: 5000,
           });
+          
+          // Basculer automatiquement vers l'onglet login après 2 secondes
+          setTimeout(() => {
+            setActiveTab("login");
+            setPassword(""); // Réinitialiser le mot de passe pour la sécurité
+            setConfirmPassword("");
+          }, 2000);
         } else {
           throw error;
         }
@@ -351,17 +359,21 @@ const Auth = () => {
 
       toast({
         title: "Compte créé !",
-        description: "Un email de confirmation a été envoyé à votre adresse. Veuillez cliquer sur le lien dans l'email pour activer votre compte. Vérifiez vos pourriels si vous ne le voyez pas.",
-        duration: 10000,
+        description: "Un email de confirmation a été envoyé à votre adresse. Veuillez cliquer sur le lien dans l'email pour activer votre compte. Vous pouvez maintenant vous connecter.",
+        duration: 8000,
       });
       
       // Réinitialiser le formulaire
       setFirstName("");
       setLastName("");
-      setEmail("");
       setPassword("");
       setConfirmPassword("");
       setAcceptedTerms(false);
+      
+      // Basculer automatiquement vers l'onglet login après 2 secondes
+      setTimeout(() => {
+        setActiveTab("login");
+      }, 2000);
     } catch (error: any) {
       if (error.errors) {
         error.errors.forEach((err: any) => {
@@ -506,7 +518,7 @@ const Auth = () => {
           </div>
         ) : (
           <div className="bg-card p-8 rounded-2xl shadow-elegant border border-border/50">
-            <Tabs defaultValue="login" className="w-full">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="grid w-full grid-cols-2 mb-6">
                 <TabsTrigger value="login">Connexion</TabsTrigger>
                 <TabsTrigger value="signup">Créer un compte</TabsTrigger>
