@@ -425,24 +425,24 @@ const Home = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="relative py-24 overflow-hidden bg-gradient-to-br from-primary/25 via-accent/15 to-primary/20 border-t border-primary/30" aria-labelledby="cta-heading">
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-gradient-to-br from-secondary/30 via-primary/20 to-transparent rounded-full blur-3xl animate-float" />
-          <div className="absolute -bottom-40 -left-40 w-[600px] h-[600px] bg-gradient-to-tr from-accent/30 via-primary/20 to-transparent rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
+      <section className="relative py-20 sm:py-24 overflow-hidden bg-gradient-to-br from-[#1e1b4b] via-[#312e81] to-[#1e3a8a]" aria-labelledby="cta-heading">
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-20 -right-20 w-96 h-96 bg-[#6366f1]/20 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '8s' }} />
+          <div className="absolute bottom-20 -left-20 w-96 h-96 bg-[#818cf8]/20 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '10s', animationDelay: '2s' }} />
         </div>
         
         <div className="relative container mx-auto px-4">
-          <div className="max-w-3xl mx-auto space-y-8 text-center animate-slide-up">
-            <h2 id="cta-heading" className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-foreground leading-tight">
-              Prêt à trouver <span className="text-secondary">votre prochaine opportunité ?</span>
+          <div className="max-w-4xl mx-auto space-y-8 text-center animate-slide-up">
+            <h2 id="cta-heading" className="text-4xl sm:text-5xl md:text-6xl font-display font-bold text-white leading-tight">
+              Prêt à trouver <span className="text-white">votre<br />prochaine opportunité ?</span>
             </h2>
-            <p className="text-xl md:text-2xl text-muted-foreground">
+            <p className="text-lg sm:text-xl md:text-2xl text-white/90">
               Commencez dès maintenant votre recherche ou déposez votre annonce gratuitement
             </p>
-            <div className="flex justify-center">
+            <div className="flex justify-center pt-4">
               <Button 
                 size="lg" 
-                className="bg-secondary hover:bg-secondary/90 text-secondary-foreground h-14 px-12 text-lg font-semibold shadow-lg hover:shadow-xl transition-all hover:scale-105 group"
+                className="bg-white hover:bg-white/90 text-[#1e1b4b] h-14 sm:h-16 px-10 sm:px-12 text-base sm:text-lg font-bold shadow-2xl hover:shadow-xl transition-all hover:scale-105 group"
                 onClick={() => navigate("/entreprises")}
               >
                 Commencer gratuitement
