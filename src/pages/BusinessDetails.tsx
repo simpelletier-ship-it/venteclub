@@ -811,12 +811,12 @@ const BusinessDetails = () => {
           />
 
           {/* Main Content Container with Background */}
-          <div className="bg-slate-100 dark:bg-slate-900/80">
+          <div className="bg-white dark:bg-slate-950">
             <div className="max-w-7xl mx-auto">
               {/* Main Content Grid */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 px-4 py-12">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 px-4 py-16">
             {/* Left Column - Main Content */}
-            <div className="lg:col-span-2 space-y-8">
+            <div className="lg:col-span-2 space-y-6">
 
                 {/* Photo Lightbox avec Zoom et Navigation */}
                 {selectedPhotoIndex !== null && (
@@ -957,15 +957,17 @@ const BusinessDetails = () => {
                   />
                 )}
 
-                <div>
-                  <h2 className="text-xl font-semibold mb-3">Description</h2>
-                  <p className="text-muted-foreground leading-relaxed">
-                    {business.description}
-                  </p>
+                <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-800 overflow-hidden">
+                  <div className="p-8">
+                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-3">Description</h2>
+                    <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-base">
+                      {business.description}
+                    </p>
+                  </div>
                   
                   {/* Notice Démo */}
                   {business.is_demo && (
-                    <div className="mt-6 p-4 bg-purple-50 dark:bg-purple-950/30 border-2 border-purple-200 dark:border-purple-800 rounded-lg">
+                    <div className="mx-8 mb-8 p-5 bg-purple-50 dark:bg-purple-950/30 border-2 border-purple-200 dark:border-purple-800 rounded-xl">
                       <p className="font-semibold text-purple-900 dark:text-purple-100 mb-2">
                         📢 Annonce fictive à titre démonstratif
                       </p>
@@ -981,16 +983,16 @@ const BusinessDetails = () => {
 
                 {/* Property Characteristics - For Real Estate Only */}
                 {business.property_type && (
-                  <div className="border border-border/50 rounded-xl p-6 bg-gradient-to-br from-secondary/5 to-secondary/10">
-                    <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-800 p-8">
+                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
                       🏢 Caractéristiques de la propriété
                     </h2>
                     
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                       {/* Type de propriété */}
-                      <div className="bg-background/50 p-4 rounded-lg">
-                        <div className="text-sm text-muted-foreground mb-1">Type de propriété</div>
-                        <div className="text-lg font-semibold text-foreground">
+                      <div className="bg-slate-50 dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700">
+                        <div className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2">Type de propriété</div>
+                        <div className="text-lg font-bold text-slate-900 dark:text-white">
                           {business.property_type === 'bureau' && 'Bureau commercial'}
                           {business.property_type === 'commerce' && 'Espace commercial'}
                           {business.property_type === 'industriel' && 'Bâtiment industriel'}
@@ -1003,9 +1005,9 @@ const BusinessDetails = () => {
 
                       {/* Date de création de l'annonce */}
                       {business.created_at && (
-                        <div className="bg-background/50 p-4 rounded-lg">
-                          <div className="text-sm text-muted-foreground mb-1">Date de publication</div>
-                          <div className="text-lg font-semibold text-foreground">
+                        <div className="bg-slate-50 dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700">
+                          <div className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2">Date de publication</div>
+                          <div className="text-lg font-bold text-slate-900 dark:text-white">
                             {new Date(business.created_at).toLocaleDateString('fr-CA', { 
                               year: 'numeric', 
                               month: 'long', 
@@ -1017,27 +1019,27 @@ const BusinessDetails = () => {
 
                       {/* Superficie */}
                       {business.square_footage && (
-                        <div className="bg-background/50 p-4 rounded-lg">
-                          <div className="text-sm text-muted-foreground mb-1">Superficie</div>
-                          <div className="text-lg font-semibold text-foreground">
+                        <div className="bg-slate-50 dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700">
+                          <div className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2">Superficie</div>
+                          <div className="text-lg font-bold text-slate-900 dark:text-white">
                             {Number(business.square_footage).toLocaleString('fr-CA')} pi²
                           </div>
                         </div>
                       )}
 
                       {/* Année de construction */}
-                      <div className="bg-background/50 p-4 rounded-lg">
-                        <div className="text-sm text-muted-foreground mb-1">Année de construction</div>
-                        <div className="text-lg font-semibold text-foreground">
+                      <div className="bg-slate-50 dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700">
+                        <div className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2">Année de construction</div>
+                        <div className="text-lg font-bold text-slate-900 dark:text-white">
                           {business.year_built || 'Non spécifiée'}
                         </div>
                       </div>
 
                       {/* Type de propriété locative */}
                       {business.is_rental_property && (
-                        <div className="bg-background/50 p-4 rounded-lg">
-                          <div className="text-sm text-muted-foreground mb-1">Type</div>
-                          <div className="text-lg font-semibold text-secondary">
+                        <div className="bg-slate-50 dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700">
+                          <div className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2">Type</div>
+                          <div className="text-lg font-bold text-secondary">
                             🏠 Propriété locative
                           </div>
                         </div>
@@ -1046,10 +1048,10 @@ const BusinessDetails = () => {
 
                     {/* Adresse complète */}
                     {business.address && (
-                      <div className="mt-4 bg-background/50 p-4 rounded-lg">
-                        <div className="text-sm text-muted-foreground mb-1">Adresse</div>
-                        <div className="text-base font-medium text-foreground flex items-center gap-2">
-                          <MapPin className="w-4 h-4 text-secondary" />
+                      <div className="mt-6 bg-slate-50 dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700">
+                        <div className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2">Adresse</div>
+                        <div className="text-base font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+                          <MapPin className="w-5 h-5 text-secondary" />
                           {business.address}
                         </div>
                       </div>
@@ -1094,12 +1096,12 @@ const BusinessDetails = () => {
 
                 {/* Location Information */}
                 {!business.property_type && (business.city || business.region) && (
-                  <div className="bg-gradient-to-r from-primary/5 to-accent/5 p-5 rounded-xl border border-border/50">
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-800 p-6">
                     <div className="flex items-start gap-3">
-                      <MapPin className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+                      <MapPin className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
                       <div>
-                        <h3 className="font-semibold text-foreground mb-1">Localisation</h3>
-                        <p className="text-sm text-muted-foreground">
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">Localisation</h3>
+                        <p className="text-base text-slate-600 dark:text-slate-300">
                           {business.city && business.region 
                             ? `${business.city}, ${business.region}, ${business.province || 'Québec'}` 
                             : business.location}
@@ -1112,25 +1114,25 @@ const BusinessDetails = () => {
 
                 {/* Financial Information Grid - Only show for non-property businesses */}
                 {!business.property_type && (
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-2 gap-4">
                     {business.employees_count && (
-                      <div className="bg-muted/30 p-4 rounded-lg">
-                        <div className="flex items-center gap-2 text-muted-foreground mb-1">
-                          <Users className="w-4 h-4" />
-                          <span className="text-sm">Employés</span>
+                      <div className="bg-white dark:bg-slate-900 rounded-xl shadow-md border border-slate-200 dark:border-slate-800 p-6">
+                        <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 mb-3">
+                          <Users className="w-5 h-5" />
+                          <span className="text-sm font-medium">Employés</span>
                         </div>
-                        <div className="text-xl font-semibold">
+                        <div className="text-3xl font-bold text-slate-900 dark:text-white">
                           {business.employees_count}
                         </div>
                       </div>
                     )}
                     {business.year_established && (
-                      <div className="bg-muted/30 p-4 rounded-lg">
-                        <div className="flex items-center gap-2 text-muted-foreground mb-1">
-                          <Calendar className="w-4 h-4" />
-                          <span className="text-sm">Année</span>
+                      <div className="bg-white dark:bg-slate-900 rounded-xl shadow-md border border-slate-200 dark:border-slate-800 p-6">
+                        <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 mb-3">
+                          <Calendar className="w-5 h-5" />
+                          <span className="text-sm font-medium">Année</span>
                         </div>
-                        <div className="text-xl font-semibold">
+                        <div className="text-3xl font-bold text-slate-900 dark:text-white">
                           {business.year_established}
                         </div>
                       </div>
@@ -1140,26 +1142,22 @@ const BusinessDetails = () => {
 
                 {/* Portrait Financier Premium - Only show for non-property businesses */}
                 {!business.property_type && (business.annual_revenue || business.baiia || business.net_profit) && (
-                  <div className="relative overflow-hidden rounded-2xl p-8 bg-gradient-to-br from-background/80 via-muted/30 to-background/60 backdrop-blur-xl border border-border/50 shadow-lg">
-                    {/* Gradient overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
-                    
-                    <div className="relative z-10">
-                      <h2 className="text-2xl font-bold text-foreground mb-2 tracking-tight">Portrait financier</h2>
-                      <p className="text-sm text-muted-foreground mb-8">Aperçu des performances financières de l'entreprise</p>
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-800 overflow-hidden">
+                    <div className="p-8">
+                      <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">Portrait financier</h2>
+                      <p className="text-sm text-slate-600 dark:text-slate-400 mb-8">Aperçu des performances financières de l'entreprise</p>
                       
                       {/* Résultats - Premium Cards */}
                       {(business.annual_revenue || business.baiia || business.net_profit) && (
                         <div className="mb-6">
-                          <h3 className="text-base font-semibold text-foreground/70 uppercase tracking-wider mb-4 text-xs">Résultats</h3>
+                          <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-5">Résultats</h3>
                           
-                          <div className="grid gap-3">
+                          <div className="space-y-4">
                             {business.annual_revenue && (
-                              <div className="group relative overflow-hidden rounded-xl p-5 bg-gradient-to-br from-background/90 to-muted/40 backdrop-blur-sm border border-border/50 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] hover:border-primary/30 hover:bg-gradient-to-br hover:from-primary/5 hover:to-background/90">
-                                <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/5 to-primary/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                                <div className="relative flex justify-between items-center">
-                                  <span className="text-foreground/80 font-medium text-sm">Revenu annuel</span>
-                                  <span className="font-bold text-xl text-primary transition-transform duration-300 group-hover:scale-110">
+                              <div className="group bg-slate-50 dark:bg-slate-800 rounded-xl p-6 border-2 border-slate-200 dark:border-slate-700 transition-all duration-300 hover:shadow-xl hover:border-blue-400 dark:hover:border-blue-600 hover:-translate-y-1">
+                                <div className="flex justify-between items-center">
+                                  <span className="text-slate-600 dark:text-slate-400 font-semibold text-base">Revenu annuel</span>
+                                  <span className="font-bold text-2xl text-blue-600 dark:text-blue-400 transition-transform duration-300 group-hover:scale-110">
                                     {new Intl.NumberFormat('fr-CA', {
                                       style: 'currency',
                                       currency: business.currency || 'CAD',
@@ -1172,11 +1170,10 @@ const BusinessDetails = () => {
                             )}
                             
                             {business.baiia && (
-                              <div className="group relative overflow-hidden rounded-xl p-5 bg-gradient-to-br from-background/90 to-muted/40 backdrop-blur-sm border border-border/50 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] hover:border-primary/30 hover:bg-gradient-to-br hover:from-primary/5 hover:to-background/90">
-                                <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/5 to-primary/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                                <div className="relative flex justify-between items-center">
-                                  <span className="text-foreground/80 font-medium text-sm">BAIIA</span>
-                                  <span className="font-bold text-xl text-primary transition-transform duration-300 group-hover:scale-110">
+                              <div className="group bg-slate-50 dark:bg-slate-800 rounded-xl p-6 border-2 border-slate-200 dark:border-slate-700 transition-all duration-300 hover:shadow-xl hover:border-purple-400 dark:hover:border-purple-600 hover:-translate-y-1">
+                                <div className="flex justify-between items-center">
+                                  <span className="text-slate-600 dark:text-slate-400 font-semibold text-base">BAIIA</span>
+                                  <span className="font-bold text-2xl text-purple-600 dark:text-purple-400 transition-transform duration-300 group-hover:scale-110">
                                     {new Intl.NumberFormat('fr-CA', {
                                       style: 'currency',
                                       currency: business.currency || 'CAD',
@@ -1189,11 +1186,10 @@ const BusinessDetails = () => {
                             )}
                             
                             {business.net_profit && (
-                              <div className="group relative overflow-hidden rounded-xl p-5 bg-gradient-to-br from-background/90 to-muted/40 backdrop-blur-sm border border-border/50 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] hover:border-success/30 hover:bg-gradient-to-br hover:from-success/5 hover:to-background/90">
-                                <div className="absolute inset-0 bg-gradient-to-r from-success/0 via-success/5 to-success/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                                <div className="relative flex justify-between items-center">
-                                  <span className="text-foreground/80 font-medium text-sm">Bénéfice net</span>
-                                  <span className="font-bold text-xl text-success transition-transform duration-300 group-hover:scale-110">
+                              <div className="group bg-slate-50 dark:bg-slate-800 rounded-xl p-6 border-2 border-slate-200 dark:border-slate-700 transition-all duration-300 hover:shadow-xl hover:border-green-400 dark:hover:border-green-600 hover:-translate-y-1">
+                                <div className="flex justify-between items-center">
+                                  <span className="text-slate-600 dark:text-slate-400 font-semibold text-base">Bénéfice net</span>
+                                  <span className="font-bold text-2xl text-green-600 dark:text-green-400 transition-transform duration-300 group-hover:scale-110">
                                     {new Intl.NumberFormat('fr-CA', {
                                       style: 'currency',
                                       currency: business.currency || 'CAD',
@@ -1206,21 +1202,19 @@ const BusinessDetails = () => {
                             )}
                             
                             {business.net_profit_margin && (
-                              <div className="group relative overflow-hidden rounded-xl p-5 bg-gradient-to-br from-accent/10 to-background/60 backdrop-blur-sm border border-accent/20 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] hover:border-accent/40">
-                                <div className="absolute inset-0 bg-gradient-to-r from-accent/0 via-accent/10 to-accent/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                                <div className="relative flex justify-between items-center">
-                                  <span className="text-foreground/80 font-medium text-sm">Marge bénéficiaire nette</span>
-                                  <span className="font-bold text-xl text-accent transition-transform duration-300 group-hover:scale-110">{business.net_profit_margin}%</span>
+                              <div className="group bg-amber-50 dark:bg-amber-950/30 rounded-xl p-6 border-2 border-amber-200 dark:border-amber-800 transition-all duration-300 hover:shadow-xl hover:border-amber-400 dark:hover:border-amber-600 hover:-translate-y-1">
+                                <div className="flex justify-between items-center">
+                                  <span className="text-slate-600 dark:text-slate-400 font-semibold text-base">Marge bénéficiaire nette</span>
+                                  <span className="font-bold text-2xl text-amber-600 dark:text-amber-400 transition-transform duration-300 group-hover:scale-110">{business.net_profit_margin}%</span>
                                 </div>
                               </div>
                             )}
 
                             {business.profit_margin && (
-                              <div className="group relative overflow-hidden rounded-xl p-5 bg-gradient-to-br from-accent/10 to-background/60 backdrop-blur-sm border border-accent/20 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] hover:border-accent/40">
-                                <div className="absolute inset-0 bg-gradient-to-r from-accent/0 via-accent/10 to-accent/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                                <div className="relative flex justify-between items-center">
-                                  <span className="text-foreground/80 font-medium text-sm">Marge de profit</span>
-                                  <span className="font-bold text-xl text-accent transition-transform duration-300 group-hover:scale-110">{business.profit_margin}%</span>
+                              <div className="group bg-amber-50 dark:bg-amber-950/30 rounded-xl p-6 border-2 border-amber-200 dark:border-amber-800 transition-all duration-300 hover:shadow-xl hover:border-amber-400 dark:hover:border-amber-600 hover:-translate-y-1">
+                                <div className="flex justify-between items-center">
+                                  <span className="text-slate-600 dark:text-slate-400 font-semibold text-base">Marge de profit</span>
+                                  <span className="font-bold text-2xl text-amber-600 dark:text-amber-400 transition-transform duration-300 group-hover:scale-110">{business.profit_margin}%</span>
                                 </div>
                               </div>
                             )}
