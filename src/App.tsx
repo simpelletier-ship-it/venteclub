@@ -40,6 +40,7 @@ const Resources = lazy(() => import("./pages/Resources"));
 const FAQ = lazy(() => import("./pages/FAQ"));
 const Market = lazy(() => import("./pages/Market"));
 const ClubSelect = lazy(() => import("./pages/ClubSelect"));
+const FeaturedListing = lazy(() => import("./pages/FeaturedListing"));
 const EmailConfirmed = lazy(() => import("./pages/EmailConfirmed"));
 const PremiumSuccess = lazy(() => import("./pages/PremiumSuccess"));
 const TestEmail = lazy(() => import("./pages/TestEmail"));
@@ -80,6 +81,7 @@ const App = () => (
                 <Route path="/faq" element={<EmailVerificationGuard><FAQ /></EmailVerificationGuard>} />
                 <Route path="/marche" element={<EmailVerificationGuard><Market /></EmailVerificationGuard>} />
                 <Route path="/club-select" element={<EmailVerificationGuard><ClubSelect /></EmailVerificationGuard>} />
+                <Route path="/featured-listing" element={<EmailVerificationGuard><FeaturedListing /></EmailVerificationGuard>} />
                 <Route path="/immeubles-commerciaux" element={<EmailVerificationGuard><PropertyListings /></EmailVerificationGuard>} />
                 <Route path="/entreprises-a-vendre-montreal" element={<EmailVerificationGuard><CityPage /></EmailVerificationGuard>} />
                 <Route path="/entreprises-a-vendre-quebec" element={<EmailVerificationGuard><CityPage /></EmailVerificationGuard>} />

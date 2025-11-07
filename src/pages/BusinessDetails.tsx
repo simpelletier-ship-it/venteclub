@@ -1415,7 +1415,7 @@ const BusinessDetails = () => {
                         <span className="text-sm text-muted-foreground">/ 7 jours</span>
                       </div>
                       <Button 
-                        onClick={() => navigate('/dashboard?tab=businesses')}
+                        onClick={() => navigate(`/featured-listing?businessId=${businessId}`)}
                         size="lg"
                         className="w-full bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-600 hover:to-amber-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
                       >

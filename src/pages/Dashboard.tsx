@@ -474,7 +474,7 @@ const Dashboard = () => {
                             <Button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                handleFeatureClick(business);
+                                navigate(`/featured-listing?businessId=${business.id}`);
                               }}
                               size="sm"
                               variant="outline"
