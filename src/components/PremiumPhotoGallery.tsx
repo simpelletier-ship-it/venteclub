@@ -43,19 +43,22 @@ export const PremiumPhotoGallery = ({ photos, businessTitle, businessIndustry, b
 
   const variants = {
     enter: (direction: number) => ({
-      x: direction > 0 ? 1000 : -1000,
+      x: direction > 0 ? 300 : -300,
       opacity: 0,
-      scale: 0.8,
+      scale: 0.95,
+      filter: "blur(4px)",
     }),
     center: {
       x: 0,
       opacity: 1,
       scale: 1,
+      filter: "blur(0px)",
     },
     exit: (direction: number) => ({
-      x: direction < 0 ? 1000 : -1000,
+      x: direction < 0 ? 300 : -300,
       opacity: 0,
-      scale: 0.8,
+      scale: 0.95,
+      filter: "blur(4px)",
     }),
   };
 
@@ -74,9 +77,10 @@ export const PremiumPhotoGallery = ({ photos, businessTitle, businessIndustry, b
             animate="center"
             exit="exit"
             transition={{
-              x: { type: "spring", stiffness: 300, damping: 30 },
-              opacity: { duration: 0.3 },
-              scale: { duration: 0.3 },
+              x: { type: "spring", stiffness: 200, damping: 25 },
+              opacity: { duration: 0.4, ease: "easeInOut" },
+              scale: { duration: 0.4, ease: "easeInOut" },
+              filter: { duration: 0.4, ease: "easeInOut" },
             }}
             drag="x"
             dragConstraints={{ left: 0, right: 0 }}
@@ -160,19 +164,24 @@ export const PremiumPhotoGallery = ({ photos, businessTitle, businessIndustry, b
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <div 
-                className={`w-24 h-16 rounded-lg overflow-hidden transition-all duration-300 ${
+              <motion.div 
+                className={`w-24 h-16 rounded-lg overflow-hidden ${
                   index === currentIndex 
                     ? 'ring-2 ring-white shadow-lg' 
                     : 'opacity-50 hover:opacity-75'
                 }`}
+                animate={{
+                  scale: index === currentIndex ? 1 : 0.95,
+                  opacity: index === currentIndex ? 1 : 0.5,
+                }}
+                transition={{ duration: 0.3, ease: "easeInOut" }}
               >
                 <img
                   src={photo.photo_url}
                   alt={`Miniature ${index + 1}`}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover transition-transform duration-300"
                 />
-              </div>
+              </motion.div>
             </motion.button>
           ))}
         </div>
@@ -203,16 +212,24 @@ export const PremiumPhotoGallery = ({ photos, businessTitle, businessIndustry, b
               </Button>
 
               {/* Image plein écran */}
-              <motion.img
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.9, opacity: 0 }}
-                transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                src={photos[currentIndex].photo_url}
-                alt={`Photo ${currentIndex + 1} en plein écran`}
-                className="max-w-full max-h-full object-contain"
-                onClick={(e) => e.stopPropagation()}
-              />
+              <AnimatePresence mode="wait" custom={direction}>
+                <motion.img
+                  key={currentIndex}
+                  custom={direction}
+                  initial={{ scale: 0.95, opacity: 0, filter: "blur(4px)" }}
+                  animate={{ scale: 1, opacity: 1, filter: "blur(0px)" }}
+                  exit={{ scale: 0.95, opacity: 0, filter: "blur(4px)" }}
+                  transition={{ 
+                    duration: 0.4, 
+                    ease: "easeInOut",
+                    filter: { duration: 0.4 }
+                  }}
+                  src={photos[currentIndex].photo_url}
+                  alt={`Photo ${currentIndex + 1} en plein écran`}
+                  className="max-w-full max-h-full object-contain"
+                  onClick={(e) => e.stopPropagation()}
+                />
+              </AnimatePresence>
 
               {/* Contrôles navigation plein écran */}
               {photos.length > 1 && (
