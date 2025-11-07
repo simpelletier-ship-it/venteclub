@@ -21,13 +21,9 @@ const Dashboard = () => {
   const [user, setUser] = useState<any>(null);
   const [businesses, setBusinesses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [featuredDialogOpen, setFeaturedDialogOpen] = useState(false);
-  const [selectedBusiness, setSelectedBusiness] = useState<any>(null);
-  const [processingPayment, setProcessingPayment] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [withdrawDialogOpen, setWithdrawDialogOpen] = useState(false);
   const [businessToWithdraw, setBusinessToWithdraw] = useState<any>(null);
-  const [selectedDuration, setSelectedDuration] = useState<7 | 14 | 30>(7);
   const [stats, setStats] = useState({
     published: 0,
     draft: 0,
@@ -81,55 +77,15 @@ const Dashboard = () => {
   }, [navigate, defaultTab]);
 
   useEffect(() => {
-    const verifyFeaturedPayment = async (sessionId: string) => {
-      try {
-        console.log('[DASHBOARD] Verifying featured payment with session:', sessionId);
-        const { error } = await supabase.functions.invoke('verify-featured-payment', {
-          body: { sessionId }
-        });
-        
-        if (error) throw error;
-        
-        toast({
-          title: "Paiement réussi!",
-          description: "Votre annonce est maintenant mise en avant.",
-        });
-        
-        // Recharger les businesses
-        if (user?.id) {
-          fetchUserBusinesses(user.id);
-        }
-      } catch (error: any) {
-        console.error('[DASHBOARD] Error verifying payment:', error);
-        toast({
-          variant: "destructive",
-          title: "Erreur",
-          description: "Le paiement a réussi mais la mise en avant a échoué. Contactez le support.",
-        });
-      } finally {
-        setSearchParams({});
-      }
-    };
-
-    // Check for payment success/cancel
-    const sessionId = searchParams.get('session_id');
-    if (searchParams.get('featured_success') === 'true' && sessionId) {
-      verifyFeaturedPayment(sessionId);
-    } else if (searchParams.get('featured_cancel') === 'true') {
-      toast({
-        variant: "destructive",
-        title: "Paiement annulé",
-        description: "Le paiement a été annulé.",
-      });
-      setSearchParams({});
-    } else if (searchParams.get('payment_verified') === 'true') {
+    // Check for payment verified
+    if (searchParams.get('payment_verified') === 'true') {
       toast({
         title: "Accès débloqué!",
         description: "Vous pouvez maintenant contacter le vendeur.",
       });
       setSearchParams({});
     }
-  }, [searchParams, setSearchParams, toast, user]);
+  }, [searchParams, setSearchParams, toast]);
 
   const fetchUserBusinesses = async (userId: string) => {
     console.log('[DASHBOARD] Fetching businesses for user:', userId);
@@ -199,49 +155,7 @@ const Dashboard = () => {
   };
 
   const handleFeatureClick = (business: any) => {
-    setSelectedBusiness(business);
-    setFeaturedDialogOpen(true);
-  };
-
-  const handleFeaturePayment = async () => {
-    if (!selectedBusiness) return;
-
-    setProcessingPayment(true);
-    console.log('[FEATURED] Starting payment for business:', selectedBusiness.id, 'duration:', selectedDuration);
-    
-    try {
-      const { data, error } = await supabase.functions.invoke('create-featured-checkout', {
-        body: { 
-          businessId: selectedBusiness.id,
-          duration: selectedDuration
-        }
-      });
-
-      console.log('[FEATURED] Checkout response:', { data, error });
-
-      if (error) throw error;
-
-      if (data?.url) {
-        console.log('[FEATURED] Opening Stripe checkout in new tab');
-        window.open(data.url, '_blank');
-        setFeaturedDialogOpen(false);
-        setSelectedBusiness(null);
-        toast({
-          title: "Redirection vers le paiement",
-          description: "Une nouvelle fenêtre s'est ouverte pour finaliser votre paiement.",
-        });
-      }
-    } catch (error: any) {
-      console.error('[FEATURED] Error creating checkout session:', error);
-      toast({
-        variant: "destructive",
-        title: "Erreur",
-        description: error.message || "Impossible de créer la session de paiement",
-      });
-    } finally {
-      console.log('[FEATURED] Payment flow completed, resetting state');
-      setProcessingPayment(false);
-    }
+    navigate(`/featured-listing?businessId=${business.id}`);
   };
 
   return (
@@ -471,18 +385,6 @@ const Dashboard = () => {
                               <Edit className="mr-1 h-3 w-3" />
                               Modifier
                             </Button>
-                            <Button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                navigate(`/featured-listing?businessId=${business.id}`);
-                              }}
-                              size="sm"
-                              variant="outline"
-                              className="flex-1 border-yellow-500/30 text-yellow-600 hover:bg-yellow-500/10 hover:text-yellow-700"
-                            >
-                              <Star className="mr-1 h-3 w-3 fill-yellow-500" />
-                              Mettre en avant
-                            </Button>
                           </>
                         )}
                         {business.status === 'archived' && (
@@ -577,200 +479,6 @@ const Dashboard = () => {
         </Tabs>
       </div>
 
-      <Dialog open={featuredDialogOpen} onOpenChange={setFeaturedDialogOpen}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader className="space-y-2 pb-3 border-b">
-            <DialogTitle className="text-2xl font-bold flex items-center gap-2">
-              <Star className="h-6 w-6 fill-primary text-primary" />
-              Mettre votre annonce en avant
-            </DialogTitle>
-            <DialogDescription className="text-base">
-              Augmentez votre visibilité et attirez plus d'acheteurs potentiels
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="space-y-4 py-4">
-            <div className="bg-gradient-to-br from-primary/5 to-primary/10 p-4 rounded-xl border border-primary/20">
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                  <Star className="h-5 w-5 text-primary" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-bold text-base mb-1">{selectedBusiness?.title}</h3>
-                  <p className="text-sm text-muted-foreground">Cette annonce sera mise en avant</p>
-                </div>
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* Bronze Package */}
-              <Card 
-                className={`cursor-pointer transition-all hover:shadow-lg relative overflow-hidden ${
-                  selectedDuration === 7 ? 'ring-2 ring-amber-600 shadow-lg scale-105' : 'hover:scale-102'
-                }`}
-                onClick={() => setSelectedDuration(7)}
-              >
-                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-amber-600/20 to-transparent rounded-bl-full" />
-                <CardContent className="p-5 relative">
-                  <Badge className="mb-3 bg-amber-600/20 text-amber-700 border-amber-600/30 font-semibold text-xs">
-                    BRONZE
-                  </Badge>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-center">
-                      <Star className="h-10 w-10 fill-amber-600 text-amber-600" />
-                    </div>
-                    <div className="text-center space-y-1">
-                      <h4 className="font-bold text-2xl text-foreground">7,5 $</h4>
-                      <p className="text-sm font-medium text-muted-foreground"><span className="font-bold">7 jours</span> de mise en avant</p>
-                    </div>
-                    <div className="pt-3 border-t space-y-1.5">
-                      <div className="flex items-center gap-2 text-xs">
-                        <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                        <span>Visibilité prioritaire</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-xs">
-                        <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                        <span>Badge étoile dorée</span>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Platinum Package */}
-              <Card 
-                className={`cursor-pointer transition-all hover:shadow-xl relative overflow-hidden ${
-                  selectedDuration === 14 ? 'ring-2 ring-slate-500 shadow-xl scale-105' : 'hover:scale-102'
-                }`}
-                onClick={() => setSelectedDuration(14)}
-              >
-                <div className="absolute top-0 left-0 right-0">
-                  <Badge className="w-full rounded-t-lg rounded-b-none bg-slate-500/90 text-white border-0 py-1">
-                    ⭐ POPULAIRE
-                  </Badge>
-                </div>
-                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-slate-400/20 to-transparent rounded-bl-full" />
-                <CardContent className="p-5 pt-10 relative">
-                  <Badge className="mb-3 bg-slate-400/20 text-slate-700 border-slate-400/30 font-semibold text-xs">
-                    PLATINE
-                  </Badge>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-center">
-                      <Star className="h-10 w-10 fill-slate-400 text-slate-400" />
-                    </div>
-                    <div className="text-center space-y-1">
-                      <h4 className="font-bold text-2xl text-foreground">10 $</h4>
-                      <p className="text-sm font-medium text-muted-foreground"><span className="font-bold">14 jours</span> de mise en avant</p>
-                    </div>
-                    <div className="pt-3 border-t space-y-1.5">
-                      <div className="flex items-center gap-2 text-xs">
-                        <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                        <span>Visibilité prioritaire</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-xs">
-                        <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                        <span>Badge étoile argentée</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-xs">
-                        <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                        <span>Économie de 33%</span>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Gold Package */}
-              <Card 
-                className={`cursor-pointer transition-all hover:shadow-xl relative overflow-hidden ${
-                  selectedDuration === 30 ? 'ring-2 ring-yellow-500 shadow-xl scale-105' : 'hover:scale-102'
-                }`}
-                onClick={() => setSelectedDuration(30)}
-              >
-                <div className="absolute top-0 left-0 right-0">
-                  <Badge className="w-full rounded-t-lg rounded-b-none bg-green-600/90 text-white border-0 py-1">
-                    💎 MEILLEURE VALEUR
-                  </Badge>
-                </div>
-                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-yellow-500/20 to-transparent rounded-bl-full" />
-                <CardContent className="p-5 pt-10 relative">
-                  <Badge className="mb-3 bg-yellow-500/20 text-yellow-700 border-yellow-500/30 font-semibold text-xs">
-                    OR
-                  </Badge>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-center">
-                      <Star className="h-10 w-10 fill-yellow-500 text-yellow-500" />
-                    </div>
-                    <div className="text-center space-y-1">
-                      <h4 className="font-bold text-2xl text-foreground">11,50 $</h4>
-                      <p className="text-sm font-medium text-muted-foreground"><span className="font-bold">30 jours</span> de mise en avant</p>
-                    </div>
-                    <div className="pt-3 border-t space-y-1.5">
-                      <div className="flex items-center gap-2 text-xs">
-                        <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                        <span>Visibilité prioritaire</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-xs">
-                        <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                        <span>Badge étoile dorée</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-xs">
-                        <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                        <span>Économie de 66%</span>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            <div className="bg-gradient-to-r from-muted/50 to-muted/30 p-4 rounded-xl border">
-              <h4 className="font-semibold mb-3 flex items-center gap-2 text-sm">
-                <span>✨</span>
-                Ce qui est inclus dans tous les forfaits
-              </h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                <div className="flex items-start gap-2">
-                  <span className="text-primary mt-0.5 text-xs">✓</span>
-                  <span className="text-xs">Position en tête de liste sur la page principale</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <span className="text-primary mt-0.5 text-xs">✓</span>
-                  <span className="text-xs">Badge étoile visible sur votre annonce</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <span className="text-primary mt-0.5 text-xs">✓</span>
-                  <span className="text-xs">Durée garantie selon votre forfait</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <span className="text-primary mt-0.5 text-xs">✓</span>
-                  <span className="text-xs">Augmentation moyenne de visibilité</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <div className="flex gap-3 pt-3 border-t">
-            <Button 
-              onClick={handleFeaturePayment} 
-              disabled={processingPayment}
-              className="flex-1 h-11 text-sm font-semibold"
-              size="lg"
-            >
-              {processingPayment ? "Traitement en cours..." : `Confirmer le paiement de ${selectedDuration === 7 ? '7,50' : selectedDuration === 14 ? '10' : '11,50'} $ CAD`}
-            </Button>
-            <Button 
-              variant="outline" 
-              onClick={() => setFeaturedDialogOpen(false)}
-              disabled={processingPayment}
-              className="h-11"
-              size="lg"
-            >
-              Annuler
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
 
       {businessToWithdraw && (
         <WithdrawBusinessDialog
