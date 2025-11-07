@@ -188,7 +188,34 @@ export const getListingApprovedEmail = (businessTitle: string, businessUrl: stri
   return getEmailLayout(content, "Votre annonce est en ligne");
 };
 
-// Template 6: Rappel / Suivi
+// Template 6: Email de bienvenue post-signup
+export const getPostSignupWelcomeEmail = (userName: string) => {
+  const content = `
+    <h1>Bienvenue sur ${BRAND_NAME}</h1>
+    <p>Bonjour ${userName},</p>
+    <p>Nous sommes heureux de vous accueillir sur ${BRAND_NAME}, votre plateforme pour acheter et vendre des entreprises au Québec.</p>
+    <div style="border: 1px solid #e8e8e8; border-radius: 8px; padding: 24px; margin: 24px 0; background-color: #fafafa;">
+      <h2 style="font-size: 16px; font-weight: 600; margin-bottom: 16px; color: #1a1a1a;">Ce que vous pouvez faire dès maintenant :</h2>
+      <p style="margin-bottom: 8px;">• Parcourir des centaines d'entreprises à vendre</p>
+      <p style="margin-bottom: 8px;">• Contacter directement les vendeurs</p>
+      <p style="margin-bottom: 8px;">• Créer des alertes personnalisées</p>
+      <p style="margin-bottom: 8px;">• Mettre vos annonces en vedette</p>
+      <p style="margin-bottom: 0;">• Accéder à des outils d'évaluation</p>
+    </div>
+    <table width="100%" cellpadding="0" cellspacing="0">
+      <tr>
+        <td align="center">
+          <a href="https://vente.club/entreprises" class="button">Explorer les opportunités</a>
+        </td>
+      </tr>
+    </table>
+    <p>Besoin d'aide ? Notre équipe est à votre disposition pour répondre à toutes vos questions.</p>
+    <p style="font-size: 14px; color: #666666;">Cordialement,<br>L'équipe ${BRAND_NAME}</p>
+  `;
+  return getEmailLayout(content, "Bienvenue sur Vente.Club");
+};
+
+// Template 7: Rappel / Suivi
 export const getReminderEmail = (userName: string, reminderType: 'trial_ending' | 'inactive' | 'follow_up', daysLeft?: number) => {
   let content = '';
   let preheader = '';
@@ -243,7 +270,7 @@ export const getReminderEmail = (userName: string, reminderType: 'trial_ending' 
   return getEmailLayout(content, preheader);
 };
 
-// Template 7: Achat d'accès contact réussi
+// Template 8: Achat d'accès contact réussi
 export const getContactAccessPurchasedEmail = (businessTitle: string, sellerEmail: string, sellerPhone: string) => {
   const content = `
     <h1>Accès débloqué avec succès</h1>
@@ -262,7 +289,7 @@ export const getContactAccessPurchasedEmail = (businessTitle: string, sellerEmai
   return getEmailLayout(content, "Coordonnées du vendeur débloquées");
 };
 
-// Template 8: Notification vendeur - acheteur intéressé
+// Template 9: Notification vendeur - acheteur intéressé
 export const getSellerNotificationEmail = (buyerName: string, businessTitle: string, conversationUrl: string) => {
   const content = `
     <h1>Un acheteur a débloqué vos coordonnées</h1>
