@@ -121,13 +121,6 @@ const Header = () => {
               Immeubles
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full" />
             </button>
-            <button 
-              onClick={() => navigate("/map")} 
-              className="text-muted-foreground hover:text-foreground transition-colors font-medium relative group"
-            >
-              Carte
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full" />
-            </button>
             {user && (
               <>
                 <button 
@@ -217,9 +210,9 @@ const Header = () => {
                 <Button
                   variant="ghost"
                   onClick={() => navigate("/auth")}
-                  className="hidden md:inline-flex font-semibold"
+                  className="hidden md:inline-flex font-semibold border border-black"
                 >
-                  Connexion
+                  Connexion / Inscription
                 </Button>
                 <Button
                   onClick={() => navigate("/sell")}
@@ -263,15 +256,6 @@ const Header = () => {
               className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors"
             >
               Immeubles
-            </button>
-            <button
-              onClick={() => {
-                navigate("/map");
-                setMobileMenuOpen(false);
-              }}
-              className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors"
-            >
-              Carte
             </button>
             <button
               onClick={() => {

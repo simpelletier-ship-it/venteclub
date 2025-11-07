@@ -92,7 +92,6 @@ const App = () => (
                 <Route path="/list-franchise" element={<EmailVerificationGuard><ListFranchise /></EmailVerificationGuard>} />
                 <Route path="/list-property" element={<EmailVerificationGuard><ListProperty /></EmailVerificationGuard>} />
                 <Route path="/dashboard" element={<EmailVerificationGuard><Dashboard /></EmailVerificationGuard>} />
-                <Route path="/map" element={<EmailVerificationGuard><Map /></EmailVerificationGuard>} />
                 <Route path="/admin" element={<EmailVerificationGuard><Admin /></EmailVerificationGuard>} />
                 <Route path="/admin/security" element={<EmailVerificationGuard><AdminSecurity /></EmailVerificationGuard>} />
                 <Route path="/admin/compliance" element={<EmailVerificationGuard><SecurityCompliance /></EmailVerificationGuard>} />
