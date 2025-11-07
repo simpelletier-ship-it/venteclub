@@ -8,7 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Mail, Phone, MapPin, Briefcase, Globe, Linkedin, Calendar, User, Lock } from "lucide-react";
+import { ArrowLeft, Mail, Phone, MapPin, Briefcase, Globe, Linkedin, Calendar, User, Lock, Crown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface Profile {
@@ -38,6 +38,7 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [hasPremium, setHasPremium] = useState(false);
+  const [profileHasPremium, setProfileHasPremium] = useState(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -71,6 +72,17 @@ export default function Profile() {
         }
 
         setProfile(data);
+        
+        // Check if the profile user has Club Select
+        const { data: premiumStatus } = await supabase
+          .from('premium_subscriptions')
+          .select('status, current_period_end')
+          .eq('user_id', userId)
+          .single();
+        
+        if (premiumStatus && premiumStatus.status === 'active' && new Date(premiumStatus.current_period_end) > new Date()) {
+          setProfileHasPremium(true);
+        }
       } catch (error) {
         console.error('Error:', error);
         toast({
@@ -159,7 +171,18 @@ export default function Profile() {
                 <div className="flex-1">
                   <div className="flex items-start justify-between gap-4 flex-wrap">
                     <div>
-                      <CardTitle className="text-2xl mb-2">{profile.full_name || 'Utilisateur'}</CardTitle>
+                      <div className="flex items-center gap-2 mb-2 flex-wrap">
+                        <CardTitle className="text-2xl">{profile.full_name || 'Utilisateur'}</CardTitle>
+                        {profileHasPremium && (
+                          <Badge 
+                            variant="default" 
+                            className="bg-gradient-to-r from-primary to-accent text-white border-0 gap-1"
+                          >
+                            <Crown className="h-3 w-3" />
+                            Membre Club Select
+                          </Badge>
+                        )}
+                      </div>
                       {profile.job_title && profile.company_name && (
                         <p className="text-muted-foreground flex items-center gap-2 mb-2">
                           <Briefcase className="h-4 w-4" />
