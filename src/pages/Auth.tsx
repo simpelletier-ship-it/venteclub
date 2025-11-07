@@ -58,18 +58,43 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      // Connexion simple sans vérifications supplémentaires
-      const { error } = await supabase.auth.signInWithPassword({
+      // Connexion avec vérification de l'email confirmé
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) {
+        // Vérifier si c'est une erreur de confirmation d'email
+        if (error.message.includes('Email not confirmed') || 
+            error.message.includes('email_not_confirmed')) {
+          toast({
+            variant: "destructive",
+            title: "Email non confirmé",
+            description: "Vous devez confirmer votre email avant de vous connecter. Vérifiez votre boîte de réception.",
+            duration: 7000,
+          });
+        } else {
+          toast({
+            variant: "destructive",
+            title: "Erreur de connexion",
+            description: "Email ou mot de passe incorrect.",
+          });
+        }
+        setLoading(false);
+        return;
+      }
+
+      // Vérification supplémentaire si l'email est confirmé
+      if (data.user && !data.user.email_confirmed_at) {
         toast({
           variant: "destructive",
-          title: "Erreur de connexion",
-          description: "Email ou mot de passe incorrect.",
+          title: "Email non confirmé",
+          description: "Vous devez confirmer votre email avant de vous connecter. Vérifiez votre boîte de réception.",
+          duration: 7000,
         });
+        // Déconnecter l'utilisateur
+        await supabase.auth.signOut();
         setLoading(false);
         return;
       }
@@ -172,8 +197,8 @@ const Auth = () => {
       console.log('[SIGNUP] Compte créé avec succès');
       toast({
         title: "Compte créé !",
-        description: "Vous pouvez maintenant vous connecter.",
-        duration: 5000,
+        description: "Un email de confirmation a été envoyé à votre adresse. Vous devez cliquer sur le lien d'activation avant de pouvoir vous connecter.",
+        duration: 8000,
       });
       
       // Réinitialiser le formulaire
