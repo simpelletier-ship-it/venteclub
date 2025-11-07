@@ -65,13 +65,13 @@ export const BusinessHero = ({ business, businessId, userId, isSeller, mainPhoto
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-          className="flex items-center justify-between px-6 lg:px-16 pt-8 pb-4"
+          className="flex items-center justify-between gap-4 px-6 lg:px-16 pt-8 pb-4"
         >
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-shrink min-w-0">
             {business.created_at && (
               <div className="flex items-center gap-2.5 text-[13px] text-white/40 font-light tracking-wide">
-                <Calendar className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">{new Date(business.created_at).toLocaleDateString('fr-CA', { 
+                <Calendar className="w-3.5 h-3.5 flex-shrink-0" />
+                <span className="hidden sm:inline truncate">{new Date(business.created_at).toLocaleDateString('fr-CA', { 
                   year: 'numeric', 
                   month: 'long', 
                   day: 'numeric' 
@@ -80,22 +80,28 @@ export const BusinessHero = ({ business, businessId, userId, isSeller, mainPhoto
             )}
           </div>
           
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4 flex-shrink-0">
             {businessId && (
               <>
-                <FavoriteButton businessId={businessId} userId={userId} />
-                <ShareButton 
-                  title={business.title} 
-                  slug={business.slug} 
-                  description={business.description}
-                  variant="ghost"
-                  size="icon"
-                  className="hover:bg-white/10 text-white/60 hover:text-white transition-all duration-300"
-                />
+                <div className="bg-white/8 hover:bg-white/15 backdrop-blur-xl rounded-full p-2 transition-all duration-300 border border-white/10">
+                  <FavoriteButton businessId={businessId} userId={userId} />
+                </div>
+                <div className="bg-white/8 hover:bg-white/15 backdrop-blur-xl rounded-full transition-all duration-300 border border-white/10">
+                  <ShareButton 
+                    title={business.title} 
+                    slug={business.slug} 
+                    description={business.description}
+                    variant="ghost"
+                    size="icon"
+                    className="text-white/70 hover:text-white hover:bg-transparent"
+                  />
+                </div>
               </>
             )}
             {!isSeller && businessId && (
-              <ReportBusinessDialog businessId={businessId} businessTitle={business.title} />
+              <div className="bg-white/8 hover:bg-white/15 backdrop-blur-xl rounded-full transition-all duration-300 border border-white/10">
+                <ReportBusinessDialog businessId={businessId} businessTitle={business.title} />
+              </div>
             )}
           </div>
         </motion.div>
