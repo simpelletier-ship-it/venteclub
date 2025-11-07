@@ -416,6 +416,7 @@ const ListBusiness = () => {
     setGeneratingImage(true);
 
     try {
+      console.log("[IMAGE-GEN] Début génération image...");
       const { data, error } = await supabase.functions.invoke('generate-business-image', {
         body: {
           title: imagePrompt || formData.title,
@@ -424,12 +425,19 @@ const ListBusiness = () => {
         }
       });
 
-      if (error) throw error;
+      console.log("[IMAGE-GEN] Réponse:", { data, error });
+
+      if (error) {
+        console.error("[IMAGE-GEN] Erreur fonction:", error);
+        throw error;
+      }
 
       if (!data?.imageUrl) {
+        console.error("[IMAGE-GEN] Pas d'URL image dans la réponse");
         throw new Error("Aucune image générée");
       }
 
+      console.log("[IMAGE-GEN] Téléchargement de l'image...");
       const response = await fetch(data.imageUrl);
       const blob = await response.blob();
       const file = new File([blob], `ai-generated-${Date.now()}.png`, { type: 'image/png' });
@@ -444,11 +452,24 @@ const ListBusiness = () => {
       
       setImagePrompt("");
     } catch (error: any) {
-      console.error("Erreur génération image:", error);
+      console.error("[IMAGE-GEN] Exception:", error);
+      
+      let errorMessage = "Une erreur est survenue lors de la génération de l'image.";
+      
+      if (error.message?.includes("Failed to fetch")) {
+        errorMessage = "Impossible de se connecter au serveur. Vérifiez votre connexion internet.";
+      } else if (error.message?.includes("429")) {
+        errorMessage = "Trop de requêtes. Veuillez réessayer dans quelques instants.";
+      } else if (error.message?.includes("402")) {
+        errorMessage = "Crédits insuffisants pour générer l'image.";
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       toast({
         variant: "destructive",
         title: "Erreur",
-        description: error.message || "Impossible de générer l'image. Veuillez réessayer.",
+        description: errorMessage,
       });
     } finally {
       setGeneratingImage(false);
