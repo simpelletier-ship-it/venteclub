@@ -810,8 +810,10 @@ const BusinessDetails = () => {
             mainPhoto={photos[0]?.photo_url}
           />
 
-          {/* Main Content Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 px-4 py-12">
+          {/* Main Content Container with Background */}
+          <div className="bg-muted/20 backdrop-blur-sm">
+            {/* Main Content Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 px-4 py-12 max-w-7xl mx-auto">
             {/* Left Column - Main Content */}
             <div className="lg:col-span-2 space-y-8">
 
@@ -1445,6 +1447,7 @@ const BusinessDetails = () => {
                   </CardContent>
                 </Card>
               )}
+            </div>
             </div>
           </div>
         </div>
