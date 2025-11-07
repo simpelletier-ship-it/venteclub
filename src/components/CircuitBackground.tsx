@@ -188,6 +188,26 @@ export const CircuitBackground = () => {
           />
         </g>
 
+        {/* Ligne courbe 7 - Bas droite supplémentaire */}
+        <g>
+          <path 
+            d="M 100%,calc(100% - 60px) Q calc(100% - 150px),calc(100% - 90px) calc(100% - 300px),calc(100% - 50px) T calc(100% - 600px),calc(100% - 80px)" 
+            stroke="#818cf8" 
+            strokeWidth="1.5" 
+            fill="none" 
+            opacity="0.4"
+            strokeLinecap="round"
+          />
+          <path 
+            d="M 100%,calc(100% - 60px) Q calc(100% - 150px),calc(100% - 90px) calc(100% - 300px),calc(100% - 50px) T calc(100% - 600px),calc(100% - 80px)" 
+            stroke="url(#pulse1)" 
+            strokeWidth="3" 
+            fill="none"
+            filter="url(#glow)"
+            strokeLinecap="round"
+          />
+        </g>
+
         {/* Points lumineux aux extrémités et intersections */}
         <g filter="url(#glow)">
           <circle cx="250" cy="120" r="3" fill="#c7d2fe" opacity="0.6">
