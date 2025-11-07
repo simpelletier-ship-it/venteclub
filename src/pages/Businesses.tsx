@@ -149,7 +149,7 @@ const Businesses = () => {
             </h1>
             
             <p className="text-lg sm:text-xl text-white/70 max-w-3xl mx-auto leading-relaxed">
-              Explorez notre catalogue complet d'entreprises, commerces et franchises vérifiés. 
+              Explorez notre catalogue complet d'entreprises, commerces et franchises approuvés. 
               Filtrez par secteur, ville et budget pour trouver l'opportunité parfaite.
             </p>
           </div>

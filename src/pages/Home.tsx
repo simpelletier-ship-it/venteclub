@@ -268,7 +268,7 @@ const Home = () => {
               Opportunités d'affaires en vedette
             </h2>
             <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
-              Découvrez notre sélection des meilleures entreprises à vendre, rigoureusement vérifiées et prêtes à être acquises
+              Découvrez notre sélection des meilleures entreprises à vendre, approuvées par notre équipe et prêtes à être acquises
             </p>
           </div>
           
@@ -375,7 +375,7 @@ const Home = () => {
             <AccordionItem value="item-2">
               <AccordionTrigger>Comment vendre mon entreprise?</AccordionTrigger>
               <AccordionContent>
-                <a href="/auth" className="text-secondary hover:underline font-semibold">Créez un compte gratuit</a>, puis <a href="/sell" className="text-secondary hover:underline font-semibold">soumettez votre annonce</a> avec tous les détails de votre entreprise. Notre équipe l'approuvera après vérification. Profitez de notre réseau de plus de 10 000 acheteurs potentiels au Québec.
+                <a href="/auth" className="text-secondary hover:underline font-semibold">Créez un compte gratuit</a>, puis <a href="/sell" className="text-secondary hover:underline font-semibold">soumettez votre annonce</a> avec tous les détails de votre entreprise. Notre équipe approuvera votre annonce pour s'assurer qu'elle respecte nos standards de publication. Profitez de notre réseau de plus de 10 000 acheteurs potentiels au Québec.
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="item-3">

@@ -125,9 +125,9 @@ const About = () => {
                 </p>
               </div>
               <div className="border-l-4 border-accent pl-6">
-                <h3 className="text-xl font-bold mb-2">Vérification Rigoureuse</h3>
+                <h3 className="text-xl font-bold mb-2">Modération de Qualité</h3>
                 <p className="text-muted-foreground">
-                  Chaque annonce est vérifiée pour garantir l'authenticité et la qualité des opportunités proposées.
+                  Chaque annonce est approuvée par notre équipe pour s'assurer qu'elle respecte nos standards et n'est pas du spam.
                 </p>
               </div>
               <div className="border-l-4 border-accent pl-6">
