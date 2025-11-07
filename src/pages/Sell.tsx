@@ -152,7 +152,8 @@ const Sell = () => {
                   </li>
                 </ul>
                 <Button 
-                  className="w-full bg-success hover:bg-success/90"
+                  variant="success"
+                  className="w-full"
                   onClick={() => navigate("/list-property")}
                 >
                   Vendre un Immeuble
