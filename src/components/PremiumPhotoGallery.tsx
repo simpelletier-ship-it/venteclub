@@ -68,38 +68,16 @@ export const PremiumPhotoGallery = ({ photos, businessTitle, businessIndustry, b
     <div className="space-y-6">
       {/* Carrousel principal */}
       <div className="relative aspect-[16/9] lg:aspect-[21/9] bg-slate-950 rounded-2xl overflow-hidden group">
-        <AnimatePresence initial={false} custom={direction} mode="wait">
-          <motion.div
-            key={currentIndex}
-            custom={direction}
-            variants={variants}
-            initial="enter"
-            animate="center"
-            exit="exit"
-            transition={{
-              x: { type: "spring", stiffness: 200, damping: 25 },
-              opacity: { duration: 0.4, ease: "easeInOut" },
-              scale: { duration: 0.4, ease: "easeInOut" },
-              filter: { duration: 0.4, ease: "easeInOut" },
-            }}
-            drag="x"
-            dragConstraints={{ left: 0, right: 0 }}
-            dragElastic={0.7}
-            onDragEnd={handleDragEnd}
-            style={{ x: dragX }}
-            className="absolute inset-0 cursor-grab active:cursor-grabbing"
-          >
-            <img
-              src={photos[currentIndex].photo_url}
-              alt={`Photo ${currentIndex + 1} de ${businessTitle} - ${businessIndustry} à ${businessCity}`}
-              className="w-full h-full object-cover"
-              draggable={false}
-            />
-            
-            {/* Overlay gradient subtil */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none" />
-          </motion.div>
-        </AnimatePresence>
+        <div className="absolute inset-0">
+          <img
+            src={photos[currentIndex].photo_url}
+            alt={`Photo ${currentIndex + 1} de ${businessTitle} - ${businessIndustry} à ${businessCity}`}
+            className="w-full h-full object-cover"
+          />
+          
+          {/* Overlay gradient subtil */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none" />
+        </div>
 
         {/* Contrôles navigation */}
         {photos.length > 1 && (
@@ -140,13 +118,9 @@ export const PremiumPhotoGallery = ({ photos, businessTitle, businessIndustry, b
 
         {/* Indicateur photo courante */}
         {photos.length > 1 && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="absolute bottom-4 left-4 px-4 py-2 rounded-full bg-black/40 backdrop-blur-xl border border-white/10 text-white text-sm font-light"
-          >
+          <div className="absolute bottom-4 left-4 px-4 py-2 rounded-full bg-black/40 backdrop-blur-xl border border-white/10 text-white text-sm font-light">
             {currentIndex + 1} / {photos.length}
-          </motion.div>
+          </div>
         )}
       </div>
 
@@ -154,35 +128,28 @@ export const PremiumPhotoGallery = ({ photos, businessTitle, businessIndustry, b
       {photos.length > 1 && (
         <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
           {photos.map((photo, index) => (
-            <motion.button
+            <button
               key={photo.id}
               onClick={() => {
                 setDirection(index > currentIndex ? 1 : -1);
                 setCurrentIndex(index);
               }}
-              className="relative flex-shrink-0"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              className="relative flex-shrink-0 transition-transform hover:scale-105"
             >
-              <motion.div 
-                className={`w-24 h-16 rounded-lg overflow-hidden ${
+              <div 
+                className={`w-24 h-16 rounded-lg overflow-hidden transition-all duration-200 ${
                   index === currentIndex 
                     ? 'ring-2 ring-white shadow-lg' 
                     : 'opacity-50 hover:opacity-75'
                 }`}
-                animate={{
-                  scale: index === currentIndex ? 1 : 0.95,
-                  opacity: index === currentIndex ? 1 : 0.5,
-                }}
-                transition={{ duration: 0.3, ease: "easeInOut" }}
               >
                 <img
                   src={photo.photo_url}
                   alt={`Miniature ${index + 1}`}
-                  className="w-full h-full object-cover transition-transform duration-300"
+                  className="w-full h-full object-cover"
                 />
-              </motion.div>
-            </motion.button>
+              </div>
+            </button>
           ))}
         </div>
       )}
@@ -212,24 +179,12 @@ export const PremiumPhotoGallery = ({ photos, businessTitle, businessIndustry, b
               </Button>
 
               {/* Image plein écran */}
-              <AnimatePresence mode="wait" custom={direction}>
-                <motion.img
-                  key={currentIndex}
-                  custom={direction}
-                  initial={{ scale: 0.95, opacity: 0, filter: "blur(4px)" }}
-                  animate={{ scale: 1, opacity: 1, filter: "blur(0px)" }}
-                  exit={{ scale: 0.95, opacity: 0, filter: "blur(4px)" }}
-                  transition={{ 
-                    duration: 0.4, 
-                    ease: "easeInOut",
-                    filter: { duration: 0.4 }
-                  }}
-                  src={photos[currentIndex].photo_url}
-                  alt={`Photo ${currentIndex + 1} en plein écran`}
-                  className="max-w-full max-h-full object-contain"
-                  onClick={(e) => e.stopPropagation()}
-                />
-              </AnimatePresence>
+              <img
+                src={photos[currentIndex].photo_url}
+                alt={`Photo ${currentIndex + 1} en plein écran`}
+                className="max-w-full max-h-full object-contain"
+                onClick={(e) => e.stopPropagation()}
+              />
 
               {/* Contrôles navigation plein écran */}
               {photos.length > 1 && (
