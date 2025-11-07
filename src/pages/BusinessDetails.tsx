@@ -571,6 +571,17 @@ const BusinessDetails = () => {
       // 5. Ouvrir le chat dans la page au lieu de rediriger
       setIsChatOpen(true);
       
+      // 6. Attendre un peu puis scroller vers le chat avec une animation
+      setTimeout(() => {
+        const chatElement = document.querySelector('[data-chat-section]');
+        if (chatElement) {
+          chatElement.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center' 
+          });
+        }
+      }, 100);
+      
       toast({
         title: "Chat déverrouillé avec succès",
         description: "Vous pouvez maintenant discuter avec le vendeur. Envoyez votre premier message!",
@@ -1396,12 +1407,14 @@ const BusinessDetails = () => {
 
                 {/* Messagerie - Chat intégré */}
                 {user && business && (isSeller || hasPremium || hasUnlockedChat) && (
-                  <div className="border-t pt-6 mt-6">
+                  <div className="border-t pt-6 mt-6" data-chat-section>
                     <Collapsible open={isChatOpen} onOpenChange={setIsChatOpen}>
                       <CollapsibleTrigger asChild>
                         <button className="w-full bg-gradient-to-br from-primary/10 to-primary/5 border-2 border-primary/30 rounded-xl p-6 hover:border-primary/50 transition-all duration-200 group">
                           <div className="flex items-center gap-4 mb-4">
-                            <div className="p-3 bg-primary/20 rounded-full group-hover:scale-110 transition-transform duration-200">
+                            <div className={`p-3 bg-primary/20 rounded-full transition-all duration-300 ${
+                              isChatOpen ? 'scale-110 bg-primary/30' : 'group-hover:scale-110'
+                            }`}>
                               <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                               </svg>
@@ -1424,9 +1437,9 @@ const BusinessDetails = () => {
                           </div>
                         </button>
                       </CollapsibleTrigger>
-                      <CollapsibleContent className="mt-4">
+                      <CollapsibleContent className="mt-4 animate-fade-in">
                         {business && user && (
-                          <div className="bg-card border-2 border-primary/20 rounded-xl overflow-hidden">
+                          <div className="bg-card border-2 border-primary/20 rounded-xl overflow-hidden animate-scale-in shadow-lg">
                             <ChatBox
                               businessId={business.id}
                               currentUserId={user.id}
