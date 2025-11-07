@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { getAvatarUrl } from "@/lib/avatarUtils";
 import { Heart, LayoutDashboard, Settings, LogOut, Menu, Sparkles } from "lucide-react";
 import { NotificationBell } from "./NotificationBell";
 
@@ -184,9 +185,10 @@ const Header = () => {
                       aria-label="Menu du profil utilisateur"
                     >
                       <Avatar className="h-10 w-10 border-2 border-secondary/40 hover:border-secondary transition-colors">
-                        {profile?.avatar_url && (
-                          <AvatarImage src={profile.avatar_url} alt={profile?.full_name || "Photo de profil"} />
-                        )}
+                        <AvatarImage 
+                          src={getAvatarUrl(profile?.avatar_url, profile?.full_name, user.email)} 
+                          alt={profile?.full_name || "Photo de profil"} 
+                        />
                         <AvatarFallback className="bg-secondary text-white font-semibold">
                           {profile?.full_name?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || "U"}
                         </AvatarFallback>

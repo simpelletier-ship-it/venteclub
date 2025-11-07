@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { getAvatarUrl } from "@/lib/avatarUtils";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { MessageSquare, ArrowLeft, ChevronRight, Search, Trash2, SortDesc, User, CheckCheck, Check } from "lucide-react";
 import { ChatBox } from "@/components/ChatBox";
@@ -16,6 +17,7 @@ interface Conversation {
   business_title: string;
   business_photo: string | null;
   other_user_id: string;
+  other_user_email: string;
   other_user_name: string;
   other_user_avatar: string | null;
   last_message: string;
@@ -131,6 +133,7 @@ export const MessagesList = ({ userId }: MessagesListProps) => {
             business_title: (msg.businesses as any).title,
             business_photo: photoData?.photo_url || null,
             other_user_id: otherUserId,
+            other_user_email: otherUserData?.email || '',
             other_user_name: otherUserData?.full_name || otherUserData?.email || 'Acheteur',
             other_user_avatar: otherUserData?.avatar_url || null,
             last_message: msg.content,
@@ -318,7 +321,7 @@ export const MessagesList = ({ userId }: MessagesListProps) => {
                   onClick={() => setSelectedConversation(conv)}
                 >
                   <Avatar className="h-14 w-14 ring-2 ring-border/40">
-                    <AvatarImage src={conv.other_user_avatar || undefined} alt={conv.other_user_name} />
+                    <AvatarImage src={getAvatarUrl(conv.other_user_avatar, conv.other_user_name, conv.other_user_email)} alt={conv.other_user_name} />
                     <AvatarFallback className="bg-gradient-to-br from-primary/20 to-secondary/20 text-foreground font-semibold">
                       {getInitials(conv.other_user_name)}
                     </AvatarFallback>

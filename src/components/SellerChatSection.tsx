@@ -4,6 +4,7 @@ import { ChatBox } from "./ChatBox";
 import { Card, CardContent } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { getAvatarUrl } from "@/lib/avatarUtils";
 import { Users, ChevronRight, User } from "lucide-react";
 
 interface Buyer {
@@ -166,7 +167,7 @@ export const SellerChatSection = ({ businessId, sellerId }: SellerChatSectionPro
                   {/* Avatar */}
                   <div className="relative flex-shrink-0">
                     <Avatar className="h-12 w-12 ring-2 ring-border/40 shadow-md">
-                      <AvatarImage src={buyer.avatar_url || undefined} />
+                      <AvatarImage src={getAvatarUrl(buyer.avatar_url, buyer.user_name, buyer.user_email)} />
                       <AvatarFallback className="bg-gradient-to-br from-primary/15 to-secondary/15 text-primary font-semibold text-sm">
                         {getInitials(buyer.user_name)}
                       </AvatarFallback>

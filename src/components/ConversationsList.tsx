@@ -6,6 +6,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { getAvatarUrl } from "@/lib/avatarUtils";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { MessageSquare, ChevronRight, Search, Trash2, SortDesc, User, CheckCheck, Check } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -287,7 +288,7 @@ export const ConversationsList = ({ userId }: ConversationsListProps) => {
                   onClick={() => handleConversationClick(conv)}
                 >
                   <Avatar className="h-14 w-14 ring-2 ring-border/40">
-                    <AvatarImage src={conv.other_user_avatar || undefined} alt={conv.other_user_name} />
+                    <AvatarImage src={getAvatarUrl(conv.other_user_avatar, conv.other_user_name, conv.other_user_email)} alt={conv.other_user_name} />
                     <AvatarFallback className="bg-gradient-to-br from-primary/20 to-secondary/20 text-foreground font-semibold">
                       {getInitials(conv.other_user_name)}
                     </AvatarFallback>

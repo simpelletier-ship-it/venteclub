@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { getAvatarUrl } from "@/lib/avatarUtils";
 import { Send, Paperclip, X, Download, FileText, Image as ImageIcon, ExternalLink, User, Crown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -416,7 +417,7 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
         <div className="flex items-center gap-3 sm:gap-4">
           <div className="relative group">
             <Avatar className="h-11 sm:h-12 w-11 sm:w-12 ring-2 ring-primary/30 shadow-md transition-all group-hover:ring-primary/50">
-              <AvatarImage src={otherUserProfile?.avatar_url} />
+              <AvatarImage src={getAvatarUrl(otherUserProfile?.avatar_url, otherUserProfile?.full_name, otherUserProfile?.email)} />
               <AvatarFallback className="bg-gradient-to-br from-primary/30 to-secondary/30 text-primary font-bold text-base sm:text-lg">
                 {getInitials(otherUserProfile?.full_name || otherUserName)}
               </AvatarFallback>
@@ -500,7 +501,7 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
                   >
                     {!isCurrentUser && (
                       <Avatar className="h-8 sm:h-9 w-8 sm:w-9 mb-0.5 ring-2 ring-border shadow-md flex-shrink-0">
-                        <AvatarImage src={otherUserProfile?.avatar_url} />
+                        <AvatarImage src={getAvatarUrl(otherUserProfile?.avatar_url, otherUserProfile?.full_name, otherUserProfile?.email)} />
                         <AvatarFallback className="bg-gradient-to-br from-primary/15 to-secondary/15 text-primary font-semibold text-xs">
                           {getInitials(otherUserProfile?.full_name || otherUserName)}
                         </AvatarFallback>
@@ -573,7 +574,7 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
                     
                     {isCurrentUser && (
                       <Avatar className="h-8 sm:h-9 w-8 sm:w-9 mb-0.5 ring-2 ring-border shadow-md flex-shrink-0">
-                        <AvatarImage src={currentUserProfile?.avatar_url} />
+                        <AvatarImage src={getAvatarUrl(currentUserProfile?.avatar_url, currentUserProfile?.full_name, currentUserProfile?.email)} />
                         <AvatarFallback className="bg-gradient-to-br from-primary/15 to-secondary/15 text-primary font-semibold text-xs">
                           {getInitials(currentUserProfile?.full_name)}
                         </AvatarFallback>
