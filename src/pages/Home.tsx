@@ -200,7 +200,7 @@ const Home = () => {
               </h1>
               
               <p className="text-lg sm:text-xl text-white/80 max-w-3xl leading-relaxed text-justify">
-                Plateforme intelligente qui connecte acquéreurs et propriétaires d'entreprises. Chaque opportunité publiée est rigoureusement analysée pour garantir votre sécurité. <span className="font-semibold text-white">Investissez en toute confiance, reprenez en toute sérénité.</span>
+                Plateforme intelligente qui rapproche acquéreurs et propriétaires d'entreprises. Nous favorisons la transparence et la fiabilité pour que vos transactions se déroulent en toute confiance.
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
