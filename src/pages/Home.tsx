@@ -26,11 +26,11 @@ const Home = () => {
   });
   const scrollY = useScrollParallax();
   
-  // Compteurs animés pour les statistiques
-  const businessesCount = useCountUp({ end: stats.totalBusinesses, duration: 2000, delay: 200 });
-  const viewsCount = useCountUp({ end: Math.floor(stats.totalViews / 1000), duration: 2000, delay: 400 });
-  const usersCount = useCountUp({ end: stats.totalUsers, duration: 2000, delay: 600 });
-  const valueCount = useCountUp({ end: Math.floor(stats.totalValue / 1000000), duration: 2000, delay: 800 });
+  // Compteurs animés pour les statistiques - animation rapide
+  const businessesCount = useCountUp({ end: stats.totalBusinesses, duration: 1200, delay: 100 });
+  const viewsCount = useCountUp({ end: Math.floor(stats.totalViews / 1000), duration: 1200, delay: 200 });
+  const usersCount = useCountUp({ end: stats.totalUsers, duration: 1200, delay: 300 });
+  const valueCount = useCountUp({ end: Math.floor(stats.totalValue / 1000000), duration: 1200, delay: 400 });
   
   useEffect(() => {
     fetchFeaturedBusinesses();
