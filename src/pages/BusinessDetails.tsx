@@ -873,69 +873,6 @@ const BusinessDetails = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Left Column - Main Content */}
             <div className="lg:col-span-2 space-y-8">
-                    </h1>
-                    {businessId && (
-                      <div className="flex items-center gap-2">
-                        <FavoriteButton businessId={businessId} userId={user?.id} />
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex flex-wrap gap-3 items-center">
-                    {business.property_type ? (
-                      <>
-                        <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/40 hover:bg-blue-500/30">
-                          Immobilier
-                        </Badge>
-                        <Badge variant="outline" className="border-slate-600 text-slate-300">
-                          {business.property_type === 'bureau' && 'Bureau commercial'}
-                          {business.property_type === 'commerce' && 'Espace commercial'}
-                          {business.property_type === 'industriel' && 'Bâtiment industriel'}
-                          {business.property_type === 'terrain' && 'Terrain commercial'}
-                          {business.property_type === 'immeuble_logement' && 'Immeuble à logement'}
-                          {business.property_type === 'mixte' && 'Propriété mixte'}
-                        </Badge>
-                      </>
-                    ) : business.is_franchise ? (
-                      <Badge className="bg-purple-500/20 text-purple-300 border-purple-500/40">
-                        Franchise
-                      </Badge>
-                    ) : (
-                      <Badge className="bg-primary/20 text-primary-foreground border-primary/40">Entreprise</Badge>
-                    )}
-                    <span className="flex items-center gap-2 text-slate-300">
-                      <MapPin className="w-4 h-4" />
-                      {business.city || business.location}
-                      {business.region && <span className="text-slate-400">, {business.region}</span>}
-                    </span>
-                    {business.created_at && (
-                      <span className="flex items-center gap-2 text-slate-400 text-sm">
-                        <Calendar className="w-4 h-4" />
-                        {new Date(business.created_at).toLocaleDateString('fr-CA')}
-                      </span>
-                    )}
-                  </div>
-                </div>
-                <div className="text-right ml-6">
-                  <div className="text-4xl font-bold text-emerald-400 mb-1">
-                    {business.asking_price === 0 ? 'À discuter' : `${business.asking_price.toLocaleString()} $`}
-                  </div>
-                  <div className="text-sm text-slate-400">Prix demandé</div>
-                  {business.sale_type && (
-                    <Badge variant="outline" className="mt-2 border-slate-600 text-slate-300">
-                      {business.sale_type === 'assets' && 'Vente d\'actifs'}
-                      {business.sale_type === 'shares' && 'Vente d\'actions'}
-                      {business.sale_type === 'both' && 'Flexible'}
-                    </Badge>
-                  )}
-                </div>
-              </div>
-              {!isSeller && businessId && (
-                <div className="flex justify-end">
-                  <ReportBusinessDialog businessId={businessId} businessTitle={business.title} />
-                </div>
-              )}
-            </div>
-          </div>
 
                 {/* Photo Lightbox avec Zoom et Navigation */}
                 {selectedPhotoIndex !== null && (
