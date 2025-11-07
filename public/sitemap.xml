@@ -5,7 +5,7 @@
   <!-- Homepage -->
   <url>
     <loc>https://vente.club/</loc>
-    <lastmod>2025-01-29</lastmod>
+    <lastmod>2025-11-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
@@ -13,64 +13,71 @@
   <!-- Main Pages -->
   <url>
     <loc>https://vente.club/entreprises</loc>
-    <lastmod>2025-01-29</lastmod>
+    <lastmod>2025-11-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.95</priority>
   </url>
   
   <url>
     <loc>https://vente.club/immeubles-commerciaux</loc>
-    <lastmod>2025-01-29</lastmod>
+    <lastmod>2025-11-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   
   <url>
     <loc>https://vente.club/sell</loc>
-    <lastmod>2025-01-29</lastmod>
+    <lastmod>2025-11-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   
   <url>
     <loc>https://vente.club/map</loc>
-    <lastmod>2025-01-29</lastmod>
+    <lastmod>2025-11-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>https://vente.club/club-select</loc>
+    <lastmod>2025-11-06</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
   </url>
   
   <!-- Information Pages -->
   <url>
     <loc>https://vente.club/a-propos</loc>
-    <lastmod>2025-01-29</lastmod>
+    <lastmod>2025-11-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   
   <url>
     <loc>https://vente.club/contact</loc>
-    <lastmod>2025-01-29</lastmod>
+    <lastmod>2025-11-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   
   <url>
     <loc>https://vente.club/ressources</loc>
-    <lastmod>2025-01-29</lastmod>
+    <lastmod>2025-11-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   
   <url>
     <loc>https://vente.club/faq</loc>
-    <lastmod>2025-01-29</lastmod>
+    <lastmod>2025-11-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   
   <url>
     <loc>https://vente.club/marche</loc>
-    <lastmod>2025-01-29</lastmod>
+    <lastmod>2025-11-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -78,7 +85,7 @@
   <!-- Blog -->
   <url>
     <loc>https://vente.club/blog</loc>
-    <lastmod>2025-01-29</lastmod>
+    <lastmod>2025-11-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -86,43 +93,85 @@
   <!-- City Pages - Major Cities -->
   <url>
     <loc>https://vente.club/entreprises-a-vendre-montreal</loc>
-    <lastmod>2025-01-29</lastmod>
+    <lastmod>2025-11-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.95</priority>
   </url>
   
   <url>
     <loc>https://vente.club/entreprises-a-vendre-quebec</loc>
-    <lastmod>2025-01-29</lastmod>
+    <lastmod>2025-11-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.95</priority>
   </url>
   
   <url>
     <loc>https://vente.club/entreprises-a-vendre-laval</loc>
-    <lastmod>2025-01-29</lastmod>
+    <lastmod>2025-11-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   
   <url>
     <loc>https://vente.club/entreprises-a-vendre-gatineau</loc>
-    <lastmod>2025-01-29</lastmod>
+    <lastmod>2025-11-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   
   <url>
     <loc>https://vente.club/entreprises-a-vendre-sherbrooke</loc>
-    <lastmod>2025-01-29</lastmod>
+    <lastmod>2025-11-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
+  </url>
+  
+  <url>
+    <loc>https://vente.club/entreprises-a-vendre-longueuil</loc>
+    <lastmod>2025-11-06</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.85</priority>
+  </url>
+  
+  <url>
+    <loc>https://vente.club/entreprises-a-vendre-saguenay</loc>
+    <lastmod>2025-11-06</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.85</priority>
+  </url>
+  
+  <url>
+    <loc>https://vente.club/entreprises-a-vendre-levis</loc>
+    <lastmod>2025-11-06</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.85</priority>
+  </url>
+  
+  <url>
+    <loc>https://vente.club/entreprises-a-vendre-trois-rivieres</loc>
+    <lastmod>2025-11-06</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.85</priority>
+  </url>
+  
+  <url>
+    <loc>https://vente.club/entreprises-a-vendre-terrebonne</loc>
+    <lastmod>2025-11-06</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
   </url>
   
   <!-- Legal Pages -->
   <url>
     <loc>https://vente.club/terms</loc>
-    <lastmod>2025-01-29</lastmod>
+    <lastmod>2025-11-06</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  
+  <url>
+    <loc>https://vente.club/security</loc>
+    <lastmod>2025-11-06</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
