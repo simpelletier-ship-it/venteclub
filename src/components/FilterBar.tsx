@@ -255,14 +255,16 @@ const FilterBar = ({ onFilter, accentColor = 'purple' }: FilterBarProps) => {
           <label className="text-sm font-medium text-foreground">
             Fourchette de prix
           </label>
-          <Slider
-            value={priceRange}
-            onValueChange={setPriceRange}
-            min={0}
-            max={10000000}
-            step={50000}
-            className="w-full"
-          />
+          <div className={accentColor === 'blue' ? 'slider-blue' : ''}>
+            <Slider
+              value={priceRange}
+              onValueChange={setPriceRange}
+              min={0}
+              max={10000000}
+              step={50000}
+              className="w-full"
+            />
+          </div>
           <div className="flex justify-between text-sm text-muted-foreground mt-2">
             <span>{formatPrice(priceRange[0])}</span>
             <span>{formatPrice(priceRange[1])}</span>

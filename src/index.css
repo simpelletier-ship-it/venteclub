@@ -300,4 +300,13 @@ All colors MUST be HSL.
   .blog-content td {
     @apply p-4 border border-border;
   }
+  
+  /* Blue slider variant for property pages */
+  .slider-blue [role="slider"] {
+    @apply border-blue-600;
+  }
+  
+  .slider-blue .bg-accent {
+    @apply bg-blue-600;
+  }
 }
