@@ -478,6 +478,7 @@ const Auth = () => {
                     type="submit" 
                     disabled={loading || fpLoading} 
                     className="w-full"
+                    variant="secondary"
                   >
                     {loading ? "Connexion..." : "Se connecter"}
                   </Button>
@@ -652,6 +653,7 @@ const Auth = () => {
                     type="submit" 
                     disabled={loading || !acceptedTerms || fpLoading} 
                     className="w-full"
+                    variant="secondary"
                   >
                     {loading ? "Création..." : "Créer un compte"}
                   </Button>
