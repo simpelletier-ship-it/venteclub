@@ -78,8 +78,8 @@ export const FloatingOpportunities = () => {
         {/* Floating Stats */}
         <div className="absolute -right-4 top-20 animate-float" style={{ animationDelay: "0s", animationDuration: "4s" }}>
           <div className="bg-card/90 backdrop-blur-xl border border-border rounded-xl px-4 py-2 shadow-lg">
-            <div className="text-xs text-muted-foreground">Nouveau</div>
-            <div className="font-bold text-primary">+12</div>
+            <div className="text-xs text-muted-foreground">Nouveaux messages</div>
+            <div className="font-bold text-[#1e1b4b]">+12</div>
           </div>
         </div>
       </div>
