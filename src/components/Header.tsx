@@ -126,27 +126,27 @@ const Header = () => {
 
   return (
     <nav className="border-b border-border bg-background/95 backdrop-blur-xl sticky top-0 z-50 shadow-sm">
-      <div className="container mx-auto px-4 py-4">
+      <div className="container mx-auto px-6 py-5">
         <div className="flex items-center justify-between">
           {/* Logo */}
           <div 
             className="flex items-center cursor-pointer group" 
             onClick={() => navigate("/")}
           >
-            <span className="text-3xl font-display font-bold text-foreground transition-transform group-hover:scale-105">
+            <span className="text-4xl font-display font-bold text-foreground transition-transform group-hover:scale-105">
               Vente<span className="text-secondary">.Club</span>
             </span>
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-6">
+          <div className="hidden md:flex items-center gap-8">
             {/* Menu Acheter */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="text-muted-foreground hover:text-foreground transition-colors font-medium relative group flex items-center gap-1">
-                  <ShoppingBag className="w-4 h-4" />
+                <button className="text-muted-foreground hover:text-foreground transition-colors font-semibold text-base relative group flex items-center gap-2">
+                  <ShoppingBag className="w-5 h-5" />
                   Acheter
-                  <ChevronDown className="w-3.5 h-3.5" />
+                  <ChevronDown className="w-4 h-4" />
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-56 bg-card/95 backdrop-blur-xl border-border/50 shadow-premium">
@@ -170,9 +170,9 @@ const Header = () => {
             {/* Lien Vendre */}
             <button 
               onClick={() => navigate("/sell")} 
-              className="text-muted-foreground hover:text-foreground transition-colors font-medium relative group flex items-center gap-1"
+              className="text-muted-foreground hover:text-foreground transition-colors font-semibold text-base relative group flex items-center gap-2"
             >
-              <Store className="w-4 h-4" />
+              <Store className="w-5 h-5" />
               Vendre
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full" />
             </button>
@@ -180,7 +180,7 @@ const Header = () => {
             {!user && (
               <button 
                 onClick={() => navigate("/faq")} 
-                className="text-muted-foreground hover:text-foreground transition-colors font-medium relative group"
+                className="text-muted-foreground hover:text-foreground transition-colors font-semibold text-base relative group"
               >
                 FAQ
                 <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full" />
@@ -191,10 +191,10 @@ const Header = () => {
               <>
                 <button 
                   onClick={() => navigate("/messages")} 
-                  className="text-muted-foreground hover:text-foreground transition-colors font-medium flex items-center gap-2 relative group"
+                  className="text-muted-foreground hover:text-foreground transition-colors font-semibold text-base flex items-center gap-2 relative group"
                 >
                   <div className="relative">
-                    <MessageSquare className="w-4 h-4" />
+                    <MessageSquare className="w-5 h-5" />
                     {unreadMessagesCount > 0 && (
                       <span className="absolute -top-2 -right-2 h-4 w-4 rounded-full bg-red-500 text-white text-[10px] flex items-center justify-center font-bold">
                         {unreadMessagesCount > 9 ? '9+' : unreadMessagesCount}
@@ -206,9 +206,9 @@ const Header = () => {
                 </button>
                 <button 
                   onClick={() => navigate("/favorites")} 
-                  className="text-muted-foreground hover:text-foreground transition-colors font-medium flex items-center gap-2 relative group"
+                  className="text-muted-foreground hover:text-foreground transition-colors font-semibold text-base flex items-center gap-2 relative group"
                 >
-                  <Heart className="w-4 h-4" />
+                  <Heart className="w-5 h-5" />
                   Favoris
                   <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full" />
                 </button>
@@ -217,7 +217,7 @@ const Header = () => {
           </div>
 
           {/* Right Side Actions */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-5">
             {user && <NotificationBell userId={user.id} />}
             
             {isAdmin && (
@@ -236,9 +236,9 @@ const Header = () => {
               <>
                 <Button
                   onClick={() => navigate("/dashboard")}
-                  className="hidden md:flex bg-[#6366f1] hover:bg-[#4f46e5] text-white font-semibold shadow-lg"
+                  className="hidden md:flex bg-[#6366f1] hover:bg-[#4f46e5] text-white font-semibold shadow-lg px-5 py-2.5 text-base h-11"
                 >
-                  <LayoutDashboard className="w-4 h-4 mr-2" />
+                  <LayoutDashboard className="w-5 h-5 mr-2" />
                   Tableau de bord
                 </Button>
                 <DropdownMenu>
@@ -284,7 +284,7 @@ const Header = () => {
               <Button
                 variant="ghost"
                 onClick={() => navigate("/auth")}
-                className="hidden md:inline-flex font-semibold border border-black"
+                className="hidden md:inline-flex font-semibold border border-black px-6 py-2.5 text-base h-11"
               >
                 Connexion
               </Button>
