@@ -20,6 +20,20 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const { email, code, password }: VerifyCodeRequest = await req.json();
 
+    // Valider le format du code (doit être 6 chiffres)
+    if (!code || !/^\d{6}$/.test(code)) {
+      return new Response(
+        JSON.stringify({ error: "Le code doit être composé de 6 chiffres" }),
+        {
+          status: 400,
+          headers: {
+            "Content-Type": "application/json",
+            ...corsHeaders,
+          },
+        }
+      );
+    }
+
     // Initialize Supabase client
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
