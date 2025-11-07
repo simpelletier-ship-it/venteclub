@@ -1,20 +1,34 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const RECAPTCHA_SECRET_KEY = Deno.env.get('RECAPTCHA_SECRET_KEY');
-const RECAPTCHA_VERIFY_URL = 'https://www.google.com/recaptcha/api/siteverify';
+const RECAPTCHA_PROJECT_ID = 'vente-club';
+const RECAPTCHA_VERIFY_URL = `https://recaptchaenterprise.googleapis.com/v1/projects/${RECAPTCHA_PROJECT_ID}/assessments?key=${RECAPTCHA_SECRET_KEY}`;
 
 interface RecaptchaRequest {
   token: string;
   action?: string;
 }
 
-interface RecaptchaResponse {
-  success: boolean;
-  score?: number;
-  action?: string;
-  challenge_ts?: string;
-  hostname?: string;
-  'error-codes'?: string[];
+interface RecaptchaEnterpriseResponse {
+  tokenProperties?: {
+    valid: boolean;
+    invalidReason?: string;
+    hostname?: string;
+    action?: string;
+    createTime?: string;
+  };
+  riskAnalysis?: {
+    score: number;
+    reasons?: string[];
+  };
+  event?: {
+    token: string;
+    siteKey: string;
+    userAgent?: string;
+    userIpAddress?: string;
+    expectedAction?: string;
+  };
+  name?: string;
 }
 
 serve(async (req: Request) => {
@@ -46,25 +60,35 @@ serve(async (req: Request) => {
       );
     }
 
-    // Verify the reCAPTCHA token with Google
+    console.log('[RECAPTCHA] Verifying token for action:', action);
+
+    // Verify the reCAPTCHA token with Google Enterprise API
+    const requestBody = {
+      event: {
+        token: token,
+        expectedAction: action || 'USER_ACTION',
+        siteKey: '6Lf93wMsAAAAAKIX6GeEsPfLuM7fTmgbBRlh4HcT'
+      }
+    };
+
+    console.log('[RECAPTCHA] Sending request to:', RECAPTCHA_VERIFY_URL);
+
     const verifyResponse = await fetch(RECAPTCHA_VERIFY_URL, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Type': 'application/json',
       },
-      body: `secret=${RECAPTCHA_SECRET_KEY}&response=${token}`,
+      body: JSON.stringify(requestBody),
     });
 
-    const result = await verifyResponse.json() as RecaptchaResponse;
-
-    // Check if verification was successful
-    if (!result.success) {
-      console.error('reCAPTCHA verification failed:', result['error-codes']);
+    if (!verifyResponse.ok) {
+      const errorText = await verifyResponse.text();
+      console.error('[RECAPTCHA] API error:', verifyResponse.status, errorText);
       return new Response(
         JSON.stringify({ 
           success: false, 
-          error: 'reCAPTCHA verification failed',
-          errorCodes: result['error-codes']
+          error: 'reCAPTCHA API error',
+          details: errorText
         }),
         { 
           status: 400,
@@ -73,16 +97,37 @@ serve(async (req: Request) => {
       );
     }
 
-    // Check the score (for reCAPTCHA v3/Enterprise)
-    // Score ranges from 0.0 (likely bot) to 1.0 (likely human)
+    const result = await verifyResponse.json() as RecaptchaEnterpriseResponse;
+    console.log('[RECAPTCHA] Response:', JSON.stringify(result, null, 2));
+
+    // Check if token is valid
+    if (!result.tokenProperties?.valid) {
+      console.error('[RECAPTCHA] Token invalid:', result.tokenProperties?.invalidReason);
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: 'Invalid token',
+          reason: result.tokenProperties?.invalidReason
+        }),
+        { 
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
+
+    // Check the risk score (0.0 = likely bot, 1.0 = likely human)
     const minimumScore = 0.5;
-    if (result.score !== undefined && result.score < minimumScore) {
-      console.warn('reCAPTCHA score too low:', result.score);
+    const score = result.riskAnalysis?.score ?? 0;
+    
+    if (score < minimumScore) {
+      console.warn('[RECAPTCHA] Score too low:', score);
       return new Response(
         JSON.stringify({ 
           success: false, 
           error: 'Score too low',
-          score: result.score
+          score: score,
+          reasons: result.riskAnalysis?.reasons
         }),
         { 
           status: 400,
@@ -92,12 +137,14 @@ serve(async (req: Request) => {
     }
 
     // Verify the action matches (if provided)
-    if (action && result.action !== action) {
-      console.warn('Action mismatch. Expected:', action, 'Got:', result.action);
+    if (action && result.tokenProperties?.action !== action) {
+      console.warn('[RECAPTCHA] Action mismatch. Expected:', action, 'Got:', result.tokenProperties?.action);
       return new Response(
         JSON.stringify({ 
           success: false, 
-          error: 'Action mismatch'
+          error: 'Action mismatch',
+          expected: action,
+          received: result.tokenProperties?.action
         }),
         { 
           status: 400,
@@ -107,12 +154,14 @@ serve(async (req: Request) => {
     }
 
     // Success!
+    console.log('[RECAPTCHA] Verification successful. Score:', score);
     return new Response(
       JSON.stringify({ 
         success: true,
-        score: result.score,
-        action: result.action,
-        hostname: result.hostname
+        score: score,
+        action: result.tokenProperties?.action,
+        hostname: result.tokenProperties?.hostname,
+        reasons: result.riskAnalysis?.reasons
       }),
       { 
         status: 200,
