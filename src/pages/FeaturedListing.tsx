@@ -22,7 +22,7 @@ const FeaturedListing = () => {
   const [searchParams] = useSearchParams();
   const businessId = searchParams.get("businessId");
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedDuration, setSelectedDuration] = useState(7);
+  const [selectedDuration, setSelectedDuration] = useState(30);
 
   useEffect(() => {
     if (!businessId) {
@@ -100,24 +100,24 @@ const FeaturedListing = () => {
 
   const pricingOptions = [
     {
-      duration: 7,
-      price: 7.50,
-      label: "7 jours",
+      duration: 30,
+      price: 299.00,
+      label: "1 mois",
       popular: false
     },
     {
-      duration: 14,
-      price: 10.00,
-      label: "14 jours",
+      duration: 60,
+      price: 399.00,
+      label: "2 mois",
       popular: true,
       savings: "Économisez 33%"
     },
     {
-      duration: 30,
-      price: 11.50,
-      label: "30 jours",
+      duration: 90,
+      price: 449.00,
+      label: "3 mois",
       popular: false,
-      savings: "Économisez 62%"
+      savings: "Économisez 50%"
     }
   ];
 
@@ -150,7 +150,7 @@ const FeaturedListing = () => {
     {
       feature: "Temps de vente moyen",
       standard: "3-6 mois",
-      featured: "1-2 mois"
+      featured: "1-3 mois"
     }
   ];
 
@@ -217,7 +217,7 @@ const FeaturedListing = () => {
                   </CardHeader>
                   <CardContent className="text-center pb-6">
                     <p className="text-xs text-muted-foreground">
-                      {(option.price / option.duration).toFixed(2)}$ / jour
+                      {(option.price / (option.duration / 30)).toFixed(2)}$ / mois
                     </p>
                   </CardContent>
                 </Card>
@@ -231,7 +231,7 @@ const FeaturedListing = () => {
               onClick={() => handleFeatured(selectedDuration)}
               disabled={isLoading}
             >
-              {isLoading ? "Chargement..." : `Mettre en vedette - ${pricingOptions.find(o => o.duration === selectedDuration)?.price.toFixed(2)}$`}
+              {isLoading ? "Chargement..." : `Mettre en vedette - ${pricingOptions.find(o => o.duration === selectedDuration)?.price.toFixed(0)}$`}
             </Button>
             <p className="text-white/70 mt-4 text-sm">
               Paiement sécurisé par Stripe • Activation immédiate
@@ -420,7 +420,7 @@ const FeaturedListing = () => {
               onClick={() => handleFeatured(selectedDuration)}
               disabled={isLoading}
             >
-              {isLoading ? "Chargement..." : `Mettre en vedette maintenant - ${pricingOptions.find(o => o.duration === selectedDuration)?.price.toFixed(2)}$`}
+              {isLoading ? "Chargement..." : `Mettre en vedette maintenant - ${pricingOptions.find(o => o.duration === selectedDuration)?.price.toFixed(0)}$`}
             </Button>
             <p className="text-white/70 mt-4 text-sm">
               Activation immédiate • Paiement sécurisé

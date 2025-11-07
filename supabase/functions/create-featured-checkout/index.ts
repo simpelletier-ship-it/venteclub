@@ -24,9 +24,9 @@ serve(async (req) => {
     const user = data.user;
     if (!user?.email) throw new Error("User not authenticated");
 
-    const { businessId, duration = 7 } = await req.json();
+    const { businessId, duration = 30 } = await req.json();
     if (!businessId) throw new Error("Business ID required");
-    if (![7, 14, 30].includes(duration)) throw new Error("Invalid duration");
+    if (![30, 60, 90].includes(duration)) throw new Error("Invalid duration");
 
     // Verify user owns this business
     const { data: business, error: businessError } = await supabaseClient
@@ -50,13 +50,6 @@ serve(async (req) => {
       customerId = customers.data[0].id;
     }
 
-    // Déterminer le price_id en fonction de la durée
-    const priceMap: Record<number, string> = {
-      7: "price_1SNOYwARiAO4VbXUWgbYsQgZ",  // 75$ pour 7 jours
-      14: "price_1SNOYwARiAO4VbXUWgbYsQgZ", // 100$ pour 14 jours (à remplacer)
-      30: "price_1SNOYwARiAO4VbXUWgbYsQgZ", // 110$ pour 30 jours (à remplacer)
-    };
-
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       customer_email: customerId ? undefined : user.email,
@@ -68,7 +61,7 @@ serve(async (req) => {
               name: `Mise en avant - ${duration} jours`,
               description: `Mettez votre annonce en vedette pendant ${duration} jours`,
             },
-            unit_amount: duration === 7 ? 750 : duration === 14 ? 1000 : 1150,
+            unit_amount: duration === 30 ? 29900 : duration === 60 ? 39900 : 44900,
           },
           quantity: 1,
         },

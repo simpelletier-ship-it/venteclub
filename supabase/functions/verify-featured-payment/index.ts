@@ -38,16 +38,16 @@ serve(async (req) => {
     }
 
     const businessId = session.metadata?.business_id;
-    const duration = parseInt(session.metadata?.duration || '7');
+    const duration = parseInt(session.metadata?.duration || '30');
     if (!businessId) throw new Error("Business ID not found in session");
 
     // Determine amount based on duration
     const amountMap: Record<number, number> = {
-      7: 7.50,
-      14: 10.00,
-      30: 11.50,
+      30: 299.00,
+      60: 399.00,
+      90: 449.00,
     };
-    const amount = amountMap[duration] || 7.50;
+    const amount = amountMap[duration] || 299.00;
 
     // Check if there's an existing active featured period
     const { data: existingPayment } = await supabaseClient

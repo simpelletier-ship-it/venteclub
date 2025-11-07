@@ -1411,8 +1411,8 @@ const BusinessDetails = () => {
                     </div>
                     <div className="pt-3 border-t">
                       <div className="flex items-baseline gap-1 mb-3">
-                        <span className="text-2xl font-bold text-foreground">À partir de 7,50 $</span>
-                        <span className="text-sm text-muted-foreground">/ 7 jours</span>
+                        <span className="text-2xl font-bold text-foreground">À partir de 299 $</span>
+                        <span className="text-sm text-muted-foreground">/ mois</span>
                       </div>
                       <Button 
                         onClick={() => navigate(`/featured-listing?businessId=${businessId}`)}
