@@ -31,6 +31,16 @@ const Auth = () => {
   const [securityWarning, setSecurityWarning] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("login");
   const recaptchaRef = useRef<HTMLDivElement>(null);
+  
+  // États pour la vérification par code
+  const [showVerificationCode, setShowVerificationCode] = useState(false);
+  const [verificationCode, setVerificationCode] = useState("");
+  const [pendingSignupData, setPendingSignupData] = useState<{
+    email: string;
+    password: string;
+    firstName: string;
+    lastName: string;
+  } | null>(null);
 
   useEffect(() => {
     // Vérifier la session existante
@@ -146,26 +156,15 @@ const Auth = () => {
         return;
       }
 
-      console.log('[SIGNUP] Appel Supabase signUp avec:', { email, firstName, lastName });
+      console.log('[SIGNUP] Création du code de vérification pour:', email);
       
-      // Créer le compte avec Supabase - version simplifiée
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/`,
-          data: {
-            first_name: firstName,
-            last_name: lastName,
-            full_name: `${firstName} ${lastName}`
-          }
-        }
+      // Créer un code de vérification au lieu de créer le compte directement
+      const { error } = await supabase.functions.invoke('create-verification-code', {
+        body: { email }
       });
 
-      console.log('[SIGNUP] Réponse Supabase:', { data, error });
-
       if (error) {
-        console.error('[SIGNUP] Erreur Supabase:', error);
+        console.error('[SIGNUP] Erreur création code:', error);
         toast({
           variant: "destructive",
           title: "Erreur d'inscription",
@@ -174,45 +173,24 @@ const Auth = () => {
         setLoading(false);
         return;
       }
-      
-      // Vérifier si c'est un utilisateur existant
-      if (data?.user && data.user.identities && data.user.identities.length === 0) {
-        console.log('[SIGNUP] Compte existant détecté');
-        toast({
-          variant: "destructive",
-          title: "Compte existant",
-          description: "Un compte avec cet email existe déjà. Voulez-vous vous connecter ?",
-          duration: 5000,
-        });
-        
-        setTimeout(() => {
-          setActiveTab("login");
-          setPassword("");
-          setConfirmPassword("");
-        }, 2000);
-        
-        setLoading(false);
-        return;
-      }
 
-      console.log('[SIGNUP] Compte créé avec succès');
+      // Sauvegarder les données pour la vérification
+      setPendingSignupData({
+        email,
+        password,
+        firstName,
+        lastName
+      });
+
+      console.log('[SIGNUP] Code envoyé avec succès');
       toast({
-        title: "Compte créé !",
-        description: "Un email de confirmation a été envoyé à votre adresse. Vous devez cliquer sur le lien d'activation avant de pouvoir vous connecter.",
+        title: "Code envoyé !",
+        description: "Un code de vérification a été envoyé à votre adresse email. Vérifiez votre boîte de réception.",
         duration: 8000,
       });
       
-      // Réinitialiser le formulaire
-      setFirstName("");
-      setLastName("");
-      setPassword("");
-      setConfirmPassword("");
-      setAcceptedTerms(false);
-      
-      // Basculer vers l'onglet login
-      setTimeout(() => {
-        setActiveTab("login");
-      }, 2000);
+      // Afficher le formulaire de vérification
+      setShowVerificationCode(true);
     } catch (error: any) {
       console.error('[SIGNUP] Exception:', error);
       toast({
@@ -222,6 +200,103 @@ const Auth = () => {
       });
     } finally {
       console.log('[SIGNUP] Finally - arrêt du loading');
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyCode = async (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log('[VERIFY] Démarrage vérification');
+    setLoading(true);
+
+    try {
+      if (!pendingSignupData) {
+        toast({
+          variant: "destructive",
+          title: "Erreur",
+          description: "Données d'inscription manquantes.",
+        });
+        setLoading(false);
+        return;
+      }
+
+      console.log('[VERIFY] Appel verify-code-and-signup');
+      const { error } = await supabase.functions.invoke('verify-code-and-signup', {
+        body: {
+          email: pendingSignupData.email,
+          code: verificationCode,
+          password: pendingSignupData.password
+        }
+      });
+
+      if (error) {
+        console.error('[VERIFY] Erreur:', error);
+        toast({
+          variant: "destructive",
+          title: "Code invalide",
+          description: "Le code de vérification est incorrect ou expiré.",
+        });
+        setLoading(false);
+        return;
+      }
+
+      console.log('[VERIFY] Compte créé avec succès');
+      toast({
+        title: "Compte créé !",
+        description: "Votre compte a été créé avec succès. Vous pouvez maintenant vous connecter.",
+        duration: 5000,
+      });
+      
+      // Réinitialiser tout
+      setShowVerificationCode(false);
+      setVerificationCode("");
+      setPendingSignupData(null);
+      setFirstName("");
+      setLastName("");
+      setEmail("");
+      setPassword("");
+      setConfirmPassword("");
+      setAcceptedTerms(false);
+      
+      // Basculer vers l'onglet login avec l'email pré-rempli
+      setTimeout(() => {
+        setActiveTab("login");
+        setEmail(pendingSignupData.email);
+      }, 1000);
+    } catch (error: any) {
+      console.error('[VERIFY] Exception:', error);
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: error.message || "Une erreur est survenue lors de la vérification.",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResendCode = async () => {
+    if (!pendingSignupData) return;
+    
+    setLoading(true);
+    try {
+      const { error } = await supabase.functions.invoke('create-verification-code', {
+        body: { email: pendingSignupData.email }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Code renvoyé !",
+        description: "Un nouveau code de vérification a été envoyé à votre email.",
+      });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: "Impossible de renvoyer le code. Veuillez réessayer.",
+      });
+    } finally {
       setLoading(false);
     }
   };
@@ -454,174 +529,239 @@ const Auth = () => {
                     <AlertDescription>{securityWarning}</AlertDescription>
                   </Alert>
                 )}
-                <form onSubmit={handleSignUp} className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
+                
+                {showVerificationCode ? (
+                  // Formulaire de vérification du code
+                  <form onSubmit={handleVerifyCode} className="space-y-4">
+                    <div className="text-center mb-6">
+                      <h3 className="text-lg font-semibold mb-2">Vérifiez votre email</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Un code de vérification a été envoyé à <strong>{pendingSignupData?.email}</strong>
+                      </p>
+                    </div>
+                    
                     <div>
-                      <Label htmlFor="signup-firstname">Prénom</Label>
+                      <Label htmlFor="verification-code">Code de vérification</Label>
                       <Input
-                        id="signup-firstname"
+                        id="verification-code"
                         type="text"
-                        placeholder="Julie"
-                        value={firstName}
-                        onChange={(e) => setFirstName(e.target.value)}
+                        maxLength={6}
+                        placeholder="000000"
+                        value={verificationCode}
+                        onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, ''))}
+                        required
+                        className="w-full mt-2 text-center text-2xl tracking-widest font-mono"
+                      />
+                      <p className="text-xs text-muted-foreground mt-2 text-center">
+                        Entrez le code à 6 chiffres reçu par email
+                      </p>
+                    </div>
+
+                    <Button 
+                      type="submit" 
+                      disabled={loading || verificationCode.length !== 6} 
+                      className="w-full"
+                      variant="secondary"
+                    >
+                      {loading ? "Vérification..." : "Vérifier et créer le compte"}
+                    </Button>
+
+                    <div className="text-center space-y-2">
+                      <Button
+                        type="button"
+                        variant="link"
+                        onClick={handleResendCode}
+                        disabled={loading}
+                        className="text-sm"
+                      >
+                        Renvoyer le code
+                      </Button>
+                      
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        onClick={() => {
+                          setShowVerificationCode(false);
+                          setVerificationCode("");
+                          setPendingSignupData(null);
+                        }}
+                        className="w-full text-sm"
+                      >
+                        Retour
+                      </Button>
+                    </div>
+                  </form>
+                ) : (
+                  // Formulaire d'inscription
+                  <form onSubmit={handleSignUp} className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="signup-firstname">Prénom</Label>
+                        <Input
+                          id="signup-firstname"
+                          type="text"
+                          placeholder="Julie"
+                          value={firstName}
+                          onChange={(e) => setFirstName(e.target.value)}
+                          required
+                          className="w-full mt-2"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="signup-lastname">Nom</Label>
+                        <Input
+                          id="signup-lastname"
+                          type="text"
+                          placeholder="Tremblay"
+                          value={lastName}
+                          onChange={(e) => setLastName(e.target.value)}
+                          required
+                          className="w-full mt-2"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <Label htmlFor="signup-email">Email</Label>
+                      <Input
+                        id="signup-email"
+                        type="email"
+                        placeholder="votre@email.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                         required
                         className="w-full mt-2"
                       />
                     </div>
                     <div>
-                      <Label htmlFor="signup-lastname">Nom</Label>
+                      <Label htmlFor="signup-password">Mot de passe</Label>
                       <Input
-                        id="signup-lastname"
-                        type="text"
-                        placeholder="Tremblay"
-                        value={lastName}
-                        onChange={(e) => setLastName(e.target.value)}
+                        id="signup-password"
+                        type="password"
+                        placeholder="Créez un mot de passe sécurisé"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
                         required
+                        minLength={8}
                         className="w-full mt-2"
                       />
-                    </div>
-                  </div>
-                  <div>
-                    <Label htmlFor="signup-email">Email</Label>
-                    <Input
-                      id="signup-email"
-                      type="email"
-                      placeholder="votre@email.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                      className="w-full mt-2"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="signup-password">Mot de passe</Label>
-                    <Input
-                      id="signup-password"
-                      type="password"
-                      placeholder="Créez un mot de passe sécurisé"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                      minLength={8}
-                      className="w-full mt-2"
-                    />
-                    <div className="mt-2 space-y-1 text-xs">
-                      <p className="font-medium text-muted-foreground">Le mot de passe doit contenir :</p>
-                      <div className="grid grid-cols-2 gap-1">
-                        <div className={`flex items-center gap-1 ${password.length >= 8 ? 'text-green-600' : 'text-muted-foreground'}`}>
-                          <span>{password.length >= 8 ? '✓' : '○'}</span>
-                          <span>8 caractères minimum</span>
-                        </div>
-                        <div className={`flex items-center gap-1 ${/[A-Z]/.test(password) ? 'text-green-600' : 'text-muted-foreground'}`}>
-                          <span>{/[A-Z]/.test(password) ? '✓' : '○'}</span>
-                          <span>Une majuscule</span>
-                        </div>
-                        <div className={`flex items-center gap-1 ${/[a-z]/.test(password) ? 'text-green-600' : 'text-muted-foreground'}`}>
-                          <span>{/[a-z]/.test(password) ? '✓' : '○'}</span>
-                          <span>Une minuscule</span>
-                        </div>
-                        <div className={`flex items-center gap-1 ${/[0-9]/.test(password) ? 'text-green-600' : 'text-muted-foreground'}`}>
-                          <span>{/[0-9]/.test(password) ? '✓' : '○'}</span>
-                          <span>Un chiffre</span>
-                        </div>
-                        <div className={`flex items-center gap-1 col-span-2 ${/[^A-Za-z0-9]/.test(password) ? 'text-green-600' : 'text-muted-foreground'}`}>
-                          <span>{/[^A-Za-z0-9]/.test(password) ? '✓' : '○'}</span>
-                          <span>Un caractère spécial (!@#$%^&*...)</span>
+                      <div className="mt-2 space-y-1 text-xs">
+                        <p className="font-medium text-muted-foreground">Le mot de passe doit contenir :</p>
+                        <div className="grid grid-cols-2 gap-1">
+                          <div className={`flex items-center gap-1 ${password.length >= 8 ? 'text-green-600' : 'text-muted-foreground'}`}>
+                            <span>{password.length >= 8 ? '✓' : '○'}</span>
+                            <span>8 caractères minimum</span>
+                          </div>
+                          <div className={`flex items-center gap-1 ${/[A-Z]/.test(password) ? 'text-green-600' : 'text-muted-foreground'}`}>
+                            <span>{/[A-Z]/.test(password) ? '✓' : '○'}</span>
+                            <span>Une majuscule</span>
+                          </div>
+                          <div className={`flex items-center gap-1 ${/[a-z]/.test(password) ? 'text-green-600' : 'text-muted-foreground'}`}>
+                            <span>{/[a-z]/.test(password) ? '✓' : '○'}</span>
+                            <span>Une minuscule</span>
+                          </div>
+                          <div className={`flex items-center gap-1 ${/[0-9]/.test(password) ? 'text-green-600' : 'text-muted-foreground'}`}>
+                            <span>{/[0-9]/.test(password) ? '✓' : '○'}</span>
+                            <span>Un chiffre</span>
+                          </div>
+                          <div className={`flex items-center gap-1 col-span-2 ${/[^A-Za-z0-9]/.test(password) ? 'text-green-600' : 'text-muted-foreground'}`}>
+                            <span>{/[^A-Za-z0-9]/.test(password) ? '✓' : '○'}</span>
+                            <span>Un caractère spécial (!@#$%^&*...)</span>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                  <div>
-                    <Label htmlFor="confirm-password">Confirmer le mot de passe</Label>
-                    <Input
-                      id="confirm-password"
-                      type="password"
-                      placeholder="Confirmez votre mot de passe"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      required
-                      minLength={8}
-                      className="w-full mt-2"
-                    />
-                  </div>
-                  
-                  <div className="space-y-3">
-                    <div className="flex items-start space-x-3 p-4 bg-muted/50 border border-border rounded-lg">
-                      <Checkbox
-                        id="terms"
-                        checked={acceptedTerms}
-                        onCheckedChange={(checked) => setAcceptedTerms(checked as boolean)}
-                        className="mt-1"
+                    <div>
+                      <Label htmlFor="confirm-password">Confirmer le mot de passe</Label>
+                      <Input
+                        id="confirm-password"
+                        type="password"
+                        placeholder="Confirmez votre mot de passe"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        required
+                        minLength={8}
+                        className="w-full mt-2"
                       />
-                      <div className="flex-1">
-                        <Label
-                          htmlFor="terms"
-                          className="text-sm leading-relaxed cursor-pointer"
-                        >
-                          J'ai lu et j'accepte les{" "}
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              window.open('/terms', '_blank');
-                            }}
-                            className="text-primary font-medium underline hover:text-primary/80"
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <div className="flex items-start space-x-3 p-4 bg-muted/50 border border-border rounded-lg">
+                        <Checkbox
+                          id="terms"
+                          checked={acceptedTerms}
+                          onCheckedChange={(checked) => setAcceptedTerms(checked as boolean)}
+                          className="mt-1"
+                        />
+                        <div className="flex-1">
+                          <Label
+                            htmlFor="terms"
+                            className="text-sm leading-relaxed cursor-pointer"
                           >
-                            conditions d'utilisation
-                          </button>
-                          {" "}et je reconnais que Vente.Club n'est aucunement responsable des annonces publiées sur la plateforme.
-                        </Label>
+                            J'ai lu et j'accepte les{" "}
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                window.open('/terms', '_blank');
+                              }}
+                              className="text-primary font-medium underline hover:text-primary/80"
+                            >
+                              conditions d'utilisation
+                            </button>
+                            {" "}et je reconnais que Vente.Club n'est aucunement responsable des annonces publiées sur la plateforme.
+                          </Label>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <div ref={recaptchaRef} className="g-recaptcha" data-sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY} data-action="SIGNUP"></div>
+                    <div ref={recaptchaRef} className="g-recaptcha" data-sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY} data-action="SIGNUP"></div>
 
-                  <Button 
-                    type="submit" 
-                    disabled={loading || !acceptedTerms || fpLoading} 
-                    className="w-full"
-                    variant="secondary"
-                  >
-                    {loading ? "Création..." : "Créer un compte"}
-                  </Button>
-                  
-                  <div className="relative my-6">
-                    <div className="absolute inset-0 flex items-center">
-                      <Separator />
+                    <Button 
+                      type="submit" 
+                      disabled={loading || !acceptedTerms || fpLoading} 
+                      className="w-full"
+                      variant="secondary"
+                    >
+                      {loading ? "Envoi du code..." : "Créer un compte"}
+                    </Button>
+                    
+                    <div className="relative my-6">
+                      <div className="absolute inset-0 flex items-center">
+                        <Separator />
+                      </div>
+                      <div className="relative flex justify-center text-xs uppercase">
+                        <span className="bg-card px-2 text-muted-foreground">Ou continuer avec</span>
+                      </div>
                     </div>
-                    <div className="relative flex justify-center text-xs uppercase">
-                      <span className="bg-card px-2 text-muted-foreground">Ou continuer avec</span>
-                    </div>
-                  </div>
 
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleGoogleSignIn}
-                    className="w-full"
-                  >
-                    <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
-                      <path
-                        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                        fill="#4285F4"
-                      />
-                      <path
-                        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                        fill="#34A853"
-                      />
-                      <path
-                        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                        fill="#FBBC05"
-                      />
-                      <path
-                        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                        fill="#EA4335"
-                      />
-                    </svg>
-                    Google
-                  </Button>
-                </form>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleGoogleSignIn}
+                      className="w-full"
+                    >
+                      <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
+                        <path
+                          d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                          fill="#4285F4"
+                        />
+                        <path
+                          d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                          fill="#34A853"
+                        />
+                        <path
+                          d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                          fill="#FBBC05"
+                        />
+                        <path
+                          d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                          fill="#EA4335"
+                        />
+                      </svg>
+                      Google
+                    </Button>
+                  </form>
+                )}
               </TabsContent>
             </Tabs>
           </div>
