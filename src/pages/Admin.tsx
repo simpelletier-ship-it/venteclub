@@ -532,7 +532,18 @@ const Admin = () => {
 
       if (error) throw error;
 
-      setUsers(usersData || []);
+      // Récupérer les informations de vérification d'email depuis auth.users
+      const usersWithVerification = await Promise.all(
+        (usersData || []).map(async (user) => {
+          const { data: authUser } = await supabase.auth.admin.getUserById(user.id);
+          return {
+            ...user,
+            email_confirmed_at: authUser?.user?.email_confirmed_at || null
+          };
+        })
+      );
+
+      setUsers(usersWithVerification);
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -1422,6 +1433,19 @@ const Admin = () => {
                           </CardDescription>
                         )}
                       </div>
+                      <Badge variant={user.email_confirmed_at ? "default" : "secondary"}>
+                        {user.email_confirmed_at ? (
+                          <>
+                            <CheckCircle className="mr-1 h-3 w-3" />
+                            Compte vérifié
+                          </>
+                        ) : (
+                          <>
+                            <XCircle className="mr-1 h-3 w-3" />
+                            Non vérifié
+                          </>
+                        )}
+                      </Badge>
                     </div>
                   </CardHeader>
                   <CardContent>
@@ -1435,6 +1459,12 @@ const Admin = () => {
                         <span className="font-semibold">Inscrit le:</span>{" "}
                         {new Date(user.created_at).toLocaleDateString('fr-CA')}
                       </div>
+                      {user.email_confirmed_at && (
+                        <div>
+                          <span className="font-semibold">Email confirmé le:</span>{" "}
+                          {new Date(user.email_confirmed_at).toLocaleDateString('fr-CA')}
+                        </div>
+                      )}
                     </div>
                     <Button
                       variant="destructive"
