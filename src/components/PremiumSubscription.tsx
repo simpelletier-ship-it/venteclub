@@ -116,46 +116,63 @@ export const PremiumSubscription = ({ userId }: PremiumSubscriptionProps) => {
   return (
     <div className="space-y-6">
       {isSubscribed ? (
-        <Card className="border-2 border-yellow-500/50 shadow-2xl">
-          <CardHeader className="bg-gradient-to-r from-yellow-400/10 via-yellow-500/10 to-yellow-600/10">
+        <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-[#1a1a2e] via-[#16213e] to-[#0f0f23] shadow-2xl">
+          {/* Decorative gradient orbs */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-yellow-500/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 left-0 w-64 h-64 bg-yellow-600/10 rounded-full blur-3xl" />
+          
+          <CardHeader className="relative z-10">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Crown className="h-6 w-6 text-yellow-600" />
-                <CardTitle className="bg-gradient-to-r from-yellow-600 to-yellow-500 bg-clip-text text-transparent">Abonnement Club Select Actif</CardTitle>
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-gradient-to-br from-yellow-400 to-yellow-600">
+                  <Crown className="h-6 w-6 text-white" />
+                </div>
+                <CardTitle className="text-2xl font-bold bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 bg-clip-text text-transparent">
+                  Membre Club Select
+                </CardTitle>
               </div>
-              <Badge className="bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 text-black font-bold border-0">
-                ⭐ CLUB SELECT
+              <Badge className="bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 text-black font-bold border-0 px-4 py-1">
+                ⭐ ACTIF
               </Badge>
             </div>
-            <CardDescription>
+            <CardDescription className="text-gray-300 mt-2">
               Vous bénéficiez d'un accès illimité aux contacts des vendeurs
             </CardDescription>
           </CardHeader>
-          <CardContent className="pt-6 space-y-4">
+          
+          <CardContent className="relative z-10 pt-6 space-y-6">
             <div className="space-y-3">
-              <div className="flex items-center gap-2 text-sm">
-                <Check className="h-4 w-4 text-green-500" />
+              <div className="flex items-center gap-3 text-sm text-white">
+                <div className="p-1 rounded-full bg-green-500/20">
+                  <Check className="h-4 w-4 text-green-400" />
+                </div>
                 <span>✨ Accès illimité aux coordonnées de TOUS les vendeurs</span>
               </div>
-              <div className="flex items-center gap-2 text-sm">
-                <Check className="h-4 w-4 text-green-500" />
+              <div className="flex items-center gap-3 text-sm text-white">
+                <div className="p-1 rounded-full bg-green-500/20">
+                  <Check className="h-4 w-4 text-green-400" />
+                </div>
                 <span>💬 Chat illimité avec tous les vendeurs</span>
               </div>
-              <div className="flex items-center gap-2 text-sm">
-                <Check className="h-4 w-4 text-green-500" />
+              <div className="flex items-center gap-3 text-sm text-white">
+                <div className="p-1 rounded-full bg-green-500/20">
+                  <Check className="h-4 w-4 text-green-400" />
+                </div>
                 <span>🚀 Aucune limitation mensuelle</span>
               </div>
-              <div className="flex items-center gap-2 text-sm">
-                <Check className="h-4 w-4 text-green-500" />
+              <div className="flex items-center gap-3 text-sm text-white">
+                <div className="p-1 rounded-full bg-green-500/20">
+                  <Check className="h-4 w-4 text-green-400" />
+                </div>
                 <span>⏱️ Valide pendant 1 mois, renouvelable automatiquement</span>
               </div>
             </div>
 
             {subscriptionEnd && (
-              <div className="bg-muted p-3 rounded-lg space-y-2">
-                <p className="text-sm text-muted-foreground">
+              <div className="bg-white/5 backdrop-blur-sm p-4 rounded-xl border border-white/10 space-y-2">
+                <p className="text-sm text-gray-300">
                   Renouvellement le{' '}
-                  <span className="font-semibold text-foreground">
+                  <span className="font-semibold text-white">
                     {new Date(subscriptionEnd).toLocaleDateString('fr-CA', {
                       day: 'numeric',
                       month: 'long',
@@ -163,7 +180,7 @@ export const PremiumSubscription = ({ userId }: PremiumSubscriptionProps) => {
                     })}
                   </span>
                 </p>
-                <div className="text-sm font-semibold text-primary">
+                <div className="text-sm font-semibold bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent">
                   ⏱️ Temps restant: {(() => {
                     const now = new Date();
                     const end = new Date(subscriptionEnd);
@@ -183,74 +200,96 @@ export const PremiumSubscription = ({ userId }: PremiumSubscriptionProps) => {
               </div>
             )}
 
-            <Button
-              onClick={handleManageSubscription}
-              disabled={processing}
-              variant="destructive"
-              className="w-full mb-2"
-            >
-              {processing ? "Chargement..." : "Gérer mon abonnement"}
-            </Button>
-            <p className="text-xs text-muted-foreground text-center mb-2">
-              Vous pouvez annuler le renouvellement à tout moment. Votre accès restera actif jusqu&apos;à la fin de la période déjà payée.
+            <div className="flex flex-col gap-3">
+              <Button
+                onClick={handleManageSubscription}
+                disabled={processing}
+                className="w-full bg-white/10 hover:bg-white/20 text-white border border-white/20"
+              >
+                {processing ? "Chargement..." : "Gérer mon abonnement"}
+              </Button>
+              
+              <Button
+                onClick={checkSubscription}
+                disabled={processing || loading}
+                variant="ghost"
+                className="w-full text-gray-300 hover:text-white hover:bg-white/5"
+              >
+                {loading ? "Actualisation..." : "Actualiser le statut"}
+              </Button>
+            </div>
+            
+            <p className="text-xs text-gray-400 text-center">
+              Vous pouvez annuler le renouvellement à tout moment. Votre accès restera actif jusqu'à la fin de la période déjà payée.
             </p>
-            <Button
-              onClick={checkSubscription}
-              disabled={processing || loading}
-              variant="outline"
-              className="w-full"
-            >
-              {loading ? "Actualisation..." : "Actualiser le statut"}
-            </Button>
           </CardContent>
         </Card>
       ) : (
-        <Card className="border-2 border-yellow-500/30 shadow-xl">
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <Crown className="h-6 w-6 text-yellow-600" />
-              <CardTitle className="bg-gradient-to-r from-yellow-600 to-yellow-500 bg-clip-text text-transparent">Rejoindre le Club Select</CardTitle>
+        <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-[#1a1a2e] via-[#16213e] to-[#0f0f23] shadow-2xl">
+          {/* Decorative gradient orbs */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-yellow-500/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 left-0 w-64 h-64 bg-yellow-600/10 rounded-full blur-3xl" />
+          
+          <CardHeader className="relative z-10">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-gradient-to-br from-yellow-400 to-yellow-600">
+                <Crown className="h-6 w-6 text-white" />
+              </div>
+              <CardTitle className="text-2xl font-bold bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 bg-clip-text text-transparent">
+                Rejoindre le Club Select
+              </CardTitle>
             </div>
-            <CardDescription>
+            <CardDescription className="text-gray-300 mt-2">
               Débloquez un accès illimité aux contacts des vendeurs
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="bg-gradient-to-br from-yellow-400/10 via-yellow-500/10 to-yellow-600/10 border-2 border-yellow-500/30 rounded-lg p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-2xl font-bold bg-gradient-to-r from-yellow-600 to-yellow-500 bg-clip-text text-transparent">Club Select</h3>
+          
+          <CardContent className="relative z-10 space-y-6">
+            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-2xl font-bold bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent">
+                  Club Select
+                </h3>
                 <div className="text-right">
-                  <p className="text-3xl font-bold text-yellow-600">19,99$</p>
-                  <p className="text-sm text-muted-foreground">CAD / mois</p>
+                  <p className="text-3xl font-bold text-white">19,99$</p>
+                  <p className="text-sm text-gray-400">CAD / mois</p>
                 </div>
               </div>
 
               <ul className="space-y-3">
-                <li className="flex items-center gap-2">
-                  <Check className="h-5 w-5 text-green-500 flex-shrink-0" />
-                  <span className="text-sm">Accès illimité aux coordonnées de TOUS les vendeurs</span>
+                <li className="flex items-center gap-3">
+                  <div className="p-1 rounded-full bg-green-500/20">
+                    <Check className="h-5 w-5 text-green-400 flex-shrink-0" />
+                  </div>
+                  <span className="text-sm text-white">Accès illimité aux coordonnées de TOUS les vendeurs</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <Check className="h-5 w-5 text-green-500 flex-shrink-0" />
-                  <span className="text-sm">Chat illimité avec tous les vendeurs</span>
+                <li className="flex items-center gap-3">
+                  <div className="p-1 rounded-full bg-green-500/20">
+                    <Check className="h-5 w-5 text-green-400 flex-shrink-0" />
+                  </div>
+                  <span className="text-sm text-white">Chat illimité avec tous les vendeurs</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <Check className="h-5 w-5 text-green-500 flex-shrink-0" />
-                  <span className="text-sm">Pas de limitation mensuelle</span>
+                <li className="flex items-center gap-3">
+                  <div className="p-1 rounded-full bg-green-500/20">
+                    <Check className="h-5 w-5 text-green-400 flex-shrink-0" />
+                  </div>
+                  <span className="text-sm text-white">Pas de limitation mensuelle</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <Check className="h-5 w-5 text-green-500 flex-shrink-0" />
-                  <span className="text-sm">Annulation facile à tout moment</span>
+                <li className="flex items-center gap-3">
+                  <div className="p-1 rounded-full bg-green-500/20">
+                    <Check className="h-5 w-5 text-green-400 flex-shrink-0" />
+                  </div>
+                  <span className="text-sm text-white">Annulation facile à tout moment</span>
                 </li>
               </ul>
             </div>
 
-            <div className="bg-muted p-4 rounded-lg border border-border/50">
-              <h4 className="font-semibold mb-2 flex items-center gap-2">
-                <X className="h-4 w-4 text-muted-foreground" />
+            <div className="bg-white/5 backdrop-blur-sm p-4 rounded-xl border border-white/10">
+              <h4 className="font-semibold mb-3 flex items-center gap-2 text-white">
+                <X className="h-4 w-4 text-gray-400" />
                 Plan Gratuit (actuel)
               </h4>
-              <ul className="space-y-1 text-sm text-muted-foreground">
+              <ul className="space-y-2 text-sm text-gray-400">
                 <li>• 1 conversation par jour seulement</li>
                 <li>• Accès aux coordonnées limité</li>
                 <li>• Fonctionnalités restreintes</li>
@@ -263,10 +302,10 @@ export const PremiumSubscription = ({ userId }: PremiumSubscriptionProps) => {
               className="w-full bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 hover:from-yellow-500 hover:via-yellow-600 hover:to-yellow-700 text-black font-bold shadow-lg hover:shadow-xl transition-all hover:scale-105"
               size="lg"
             >
-              {processing ? "Chargement..." : "⭐ Rejoindre le Club Select"}
+              {processing ? "Chargement..." : "⭐ Rejoindre le Club Select - 19,99$/mois"}
             </Button>
 
-            <p className="text-xs text-muted-foreground text-center">
+            <p className="text-xs text-gray-400 text-center">
               Paiement sécurisé par Stripe • Annulation en un clic
             </p>
           </CardContent>
