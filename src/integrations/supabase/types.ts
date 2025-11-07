@@ -1302,6 +1302,15 @@ export type Database = {
       create_sample_businesses: { Args: never; Returns: undefined }
       generate_slug: { Args: { title: string }; Returns: string }
       get_next_access_time: { Args: { user_uuid: string }; Returns: Json }
+      get_public_stats: {
+        Args: never
+        Returns: {
+          total_businesses: number
+          total_users: number
+          total_value: number
+          total_views: number
+        }[]
+      }
       get_safe_profile: {
         Args: { profile_id: string }
         Returns: {

@@ -69,42 +69,23 @@ const Home = () => {
 
   const fetchStats = async () => {
     try {
-      // Nombre total d'entreprises actives et approuvées
-      const { count: businessCount } = await supabase
-        .from('businesses')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'active')
-        .eq('approval_status', 'approved');
-
-      // Nombre total de vues
-      const { data: viewsData } = await supabase
-        .from('businesses')
-        .select('views_count')
-        .eq('status', 'active')
-        .eq('approval_status', 'approved');
+      // Utiliser la fonction publique sécurisée pour obtenir toutes les stats
+      const { data, error } = await supabase.rpc('get_public_stats');
       
-      const totalViews = viewsData?.reduce((sum, b) => sum + (b.views_count || 0), 0) || 0;
+      if (error) {
+        console.error('[FETCH-STATS] Error:', error);
+        return;
+      }
 
-      // Nombre total d'utilisateurs
-      const { count: userCount } = await supabase
-        .from('profiles')
-        .select('*', { count: 'exact', head: true });
-
-      // Valeur totale des entreprises
-      const { data: pricesData } = await supabase
-        .from('businesses')
-        .select('asking_price')
-        .eq('status', 'active')
-        .eq('approval_status', 'approved');
-      
-      const totalValue = pricesData?.reduce((sum, b) => sum + (b.asking_price || 0), 0) || 0;
-
-      setStats({
-        totalBusinesses: businessCount || 0,
-        totalViews: totalViews,
-        totalUsers: userCount || 0,
-        totalValue: totalValue
-      });
+      if (data && data.length > 0) {
+        const stats = data[0];
+        setStats({
+          totalBusinesses: Number(stats.total_businesses) || 0,
+          totalViews: Number(stats.total_views) || 0,
+          totalUsers: Number(stats.total_users) || 0,
+          totalValue: Number(stats.total_value) || 0
+        });
+      }
     } catch (error) {
       console.error('[FETCH-STATS] Error:', error);
     }
