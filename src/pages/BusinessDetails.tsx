@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Lock, MapPin, TrendingUp, Users, Calendar, Eye, Calculator, Phone, Mail, UserCircle, ChevronLeft, ChevronRight, ZoomIn, ZoomOut, X, ChevronDown, MessageSquare } from "lucide-react";
+import { ArrowLeft, Lock, MapPin, TrendingUp, Users, Calendar, Eye, Calculator, Phone, Mail, UserCircle, ChevronLeft, ChevronRight, ZoomIn, ZoomOut, X, ChevronDown, MessageSquare, Share2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { FavoriteButton } from "@/components/FavoriteButton";
@@ -805,10 +805,6 @@ const BusinessDetails = () => {
             <div className="bg-slate-950/50 border-b border-slate-700/50 px-6 py-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-2 text-sm text-slate-300">
-                    <Eye className="w-4 h-4" />
-                    <span>{business.views_count || 0} vues</span>
-                  </div>
                   {business.created_at && (
                     <div className="flex items-center gap-2 text-sm text-slate-400">
                       <Calendar className="w-4 h-4" />
@@ -816,7 +812,7 @@ const BusinessDetails = () => {
                     </div>
                   )}
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                   {businessId && (
                     <>
                       <FavoriteButton businessId={businessId} userId={user?.id} />
@@ -824,6 +820,9 @@ const BusinessDetails = () => {
                         title={business.title} 
                         slug={business.slug} 
                         description={business.description}
+                        variant="outline"
+                        size="default"
+                        className="bg-slate-800/50 hover:bg-slate-700 border-slate-600 text-slate-200"
                       />
                     </>
                   )}
@@ -845,7 +844,7 @@ const BusinessDetails = () => {
                     {business.property_type ? (
                       <>
                         <Badge className="bg-blue-500/30 text-blue-100 border-blue-400/50 hover:bg-blue-500/40 px-4 py-1.5 text-sm font-semibold">
-                          🏢 Immobilier
+                          Immobilier
                         </Badge>
                         <Badge variant="outline" className="border-slate-500 text-slate-100 hover:bg-slate-800 px-4 py-1.5 text-sm">
                           {business.property_type === 'bureau' && 'Bureau commercial'}
@@ -858,11 +857,11 @@ const BusinessDetails = () => {
                       </>
                     ) : business.is_franchise ? (
                       <Badge className="bg-purple-500/30 text-purple-100 border-purple-400/50 px-4 py-1.5 text-sm font-semibold">
-                        👑 Franchise
+                        Franchise
                       </Badge>
                     ) : (
                       <Badge className="bg-primary/30 text-primary-foreground border-primary/50 px-4 py-1.5 text-sm font-semibold">
-                        💼 Entreprise
+                        Entreprise
                       </Badge>
                     )}
                     <span className="flex items-center gap-2 text-slate-100 px-3 py-1.5 bg-slate-800/50 rounded-full text-sm">
@@ -872,13 +871,13 @@ const BusinessDetails = () => {
                     </span>
                   </div>
                 </div>
-                <div className="text-right bg-gradient-to-br from-emerald-500/20 to-emerald-600/20 backdrop-blur-sm border border-emerald-400/30 rounded-2xl p-6 min-w-[280px]">
-                  <div className="text-5xl md:text-6xl font-bold text-emerald-300 mb-2">
+                <div className="text-right bg-gradient-to-br from-emerald-500/10 to-emerald-600/10 backdrop-blur-sm border border-emerald-400/20 rounded-xl p-6 min-w-[280px]">
+                  <div className="text-sm text-slate-400 font-medium uppercase tracking-wider mb-2">Prix demandé</div>
+                  <div className="text-4xl md:text-5xl font-bold text-white mb-3">
                     {business.asking_price === 0 ? 'À discuter' : `${business.asking_price.toLocaleString()} $`}
                   </div>
-                  <div className="text-sm text-slate-300 font-medium">Prix demandé</div>
                   {business.sale_type && (
-                    <Badge variant="outline" className="mt-4 border-emerald-500/50 text-emerald-200 bg-emerald-950/30">
+                    <Badge variant="outline" className="border-emerald-500/40 text-emerald-200 bg-emerald-950/20 text-xs">
                       {business.sale_type === 'assets' && 'Vente d\'actifs'}
                       {business.sale_type === 'shares' && 'Vente d\'actions'}
                       {business.sale_type === 'both' && 'Flexible'}
@@ -1552,50 +1551,11 @@ const BusinessDetails = () => {
               </div>
             </div>
 
-            {/* Right Sidebar - Actions rapides et Chat */}
-            <div className="lg:col-span-1 space-y-6">
-              {/* Carte d'actions rapides */}
-              <Card className="border-primary/20 bg-gradient-to-br from-card to-card/50 shadow-lg sticky top-24">
-                <CardHeader>
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <TrendingUp className="w-5 h-5 text-primary" />
-                    Statistiques
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Eye className="w-4 h-4" />
-                        <span>Vues</span>
-                      </div>
-                      <span className="font-bold text-lg">{business.views_count || 0}</span>
-                    </div>
-                    {business.employees_count && !business.property_type && (
-                      <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <Users className="w-4 h-4" />
-                          <span>Employés</span>
-                        </div>
-                        <span className="font-bold text-lg">{business.employees_count}</span>
-                      </div>
-                    )}
-                    {business.year_established && !business.property_type && (
-                      <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <Calendar className="w-4 h-4" />
-                          <span>Fondée en</span>
-                        </div>
-                        <span className="font-bold text-lg">{business.year_established}</span>
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Chat Section */}
+            {/* Right Sidebar - Chat Section qui suit le scroll */}
+            <div className="lg:col-span-1">
+              {/* Chat Section Sticky */}
               {!isSeller && businessId && user && (
-                <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5 shadow-lg">
+                <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5 shadow-lg sticky top-24">
                   <CardHeader>
                     <CardTitle className="text-lg flex items-center gap-2">
                       <MessageSquare className="w-5 h-5 text-primary" />
@@ -1614,7 +1574,6 @@ const BusinessDetails = () => {
                     ) : (
                       <div className="space-y-4">
                         <div className="bg-gradient-to-br from-emerald-500/10 to-emerald-600/10 border-2 border-emerald-500/30 rounded-xl p-6 text-center">
-                          <div className="text-4xl mb-3">🎁</div>
                           <h3 className="font-bold text-lg mb-2">Accès Gratuit</h3>
                           <p className="text-sm text-muted-foreground mb-4">
                             Débloquez gratuitement le chat avec ce vendeur pour 24h
@@ -1631,7 +1590,7 @@ const BusinessDetails = () => {
                           </p>
                         </div>
                         <div className="bg-gradient-to-br from-purple-500/10 to-purple-600/10 border border-purple-500/30 rounded-lg p-4 text-center">
-                          <p className="text-sm font-medium mb-2">💎 Besoin de plus d'accès ?</p>
+                          <p className="text-sm font-medium mb-2">Besoin de plus d'accès ?</p>
                           <Button 
                             onClick={() => navigate('/club-select')}
                             variant="outline"

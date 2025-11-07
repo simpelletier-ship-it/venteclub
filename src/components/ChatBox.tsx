@@ -442,15 +442,14 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
               </Button>
             )}
 
-            {/* Bouton pour voir le profil - Accessible uniquement aux membres Club Select */}
+            {/* Bouton pour voir informations du vendeur - Call to action important */}
             <Button
-              variant="ghost"
-              size="sm"
-              className="h-auto p-0 ml-6 text-xs sm:text-sm font-medium text-muted-foreground hover:text-primary transition-colors justify-start"
+              size="default"
+              className="mt-3 w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 animate-pulse"
               onClick={handleViewProfile}
             >
-              <User className="mr-1.5 h-3.5 sm:h-4 w-3.5 sm:w-4" />
-              <span>Voir le profil</span>
+              <Crown className="mr-2 h-5 w-5" />
+              <span>Voir informations du vendeur</span>
             </Button>
           </div>
         </div>
