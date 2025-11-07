@@ -811,9 +811,10 @@ const BusinessDetails = () => {
           />
 
           {/* Main Content Container with Background */}
-          <div className="bg-muted/20 backdrop-blur-sm">
-            {/* Main Content Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 px-4 py-12 max-w-7xl mx-auto">
+          <div className="bg-slate-50/80 dark:bg-slate-900/50">
+            <div className="max-w-7xl mx-auto">
+              {/* Main Content Grid */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 px-4 py-12">
             {/* Left Column - Main Content */}
             <div className="lg:col-span-2 space-y-8">
 
@@ -1468,6 +1469,7 @@ const BusinessDetails = () => {
                 </Card>
               )}
             </div>
+              </div>
             </div>
           </div>
         </div>
