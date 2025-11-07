@@ -315,28 +315,30 @@ const Home = () => {
       {/* Features Section */}
       <section className="py-16 sm:py-20 bg-gradient-to-br from-[#1e1b4b] via-[#312e81] to-[#1e3a8a] border-y border-primary/20" aria-labelledby="features-heading">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-10 max-w-3xl mx-auto">
-            <h2 id="features-heading" className="text-3xl sm:text-4xl font-display font-bold mb-4 text-white">Pour tous les entrepreneurs</h2>
-            <p className="text-base sm:text-lg text-white/80">
-              Quel que soit votre secteur d'activité, découvrez un large éventail d'opportunités adaptées à vos compétences et à votre budget. Notre <a href="/ressources" className="text-secondary hover:underline font-semibold">plateforme intelligente</a> vous permet d'acquérir une entreprise selon différentes modalités : immobilisation complète incluant bâtiment et équipements, acquisition d'actions pour devenir actionnaire, ou <a href="/blog" className="text-secondary hover:underline font-semibold">rachat de fonds de commerce</a> pour reprendre l'activité existante.
+          <div className="text-center mb-10 max-w-4xl mx-auto">
+            <h2 id="features-heading" className="text-3xl sm:text-4xl md:text-5xl font-display font-bold mb-6 text-white">
+              Des solutions adaptées à chaque entrepreneur
+            </h2>
+            <p className="text-base sm:text-lg md:text-xl text-white/90 leading-relaxed text-justify px-4">
+              Quel que soit votre secteur d'activité, découvrez un large éventail d'opportunités adaptées à vos compétences et à votre budget. Notre <a href="/ressources" className="text-white hover:text-secondary underline font-semibold transition-colors">plateforme intelligente</a> vous permet d'acquérir une entreprise selon différentes modalités : immobilisation complète incluant bâtiment et équipements, acquisition d'actions pour devenir actionnaire, ou <a href="/blog" className="text-white hover:text-secondary underline font-semibold transition-colors">rachat de fonds de commerce</a> pour reprendre l'activité existante.
             </p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 max-w-5xl mx-auto mb-12">
-            <div className="text-center p-5 sm:p-6 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:shadow-lg transition-all backdrop-blur-sm">
-              <TrendingUp className="w-8 sm:w-10 h-8 sm:h-10 mx-auto mb-2 sm:mb-3 text-[#818cf8]" />
-              <h3 className="text-base sm:text-lg font-bold mb-1.5 sm:mb-2 text-white">Recherche optimisée par IA</h3>
-              <p className="text-xs sm:text-sm text-white/70">Trouvez rapidement les opportunités qui correspondent à votre profil grâce à notre intelligence artificielle</p>
+            <div className="text-center p-6 sm:p-8 rounded-xl bg-white/10 border border-white/20 hover:bg-white/15 hover:shadow-2xl hover:scale-105 transition-all duration-300 backdrop-blur-sm">
+              <TrendingUp className="w-10 sm:w-12 h-10 sm:h-12 mx-auto mb-3 sm:mb-4 text-white" />
+              <h3 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3 text-white">Recherche optimisée par IA</h3>
+              <p className="text-sm sm:text-base text-white/80 leading-relaxed">Trouvez rapidement les opportunités qui correspondent à votre profil grâce à notre intelligence artificielle</p>
             </div>
-            <div className="text-center p-5 sm:p-6 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:shadow-lg transition-all backdrop-blur-sm">
-              <Shield className="w-8 sm:w-10 h-8 sm:h-10 mx-auto mb-2 sm:mb-3 text-[#818cf8]" />
-              <h3 className="text-base sm:text-lg font-bold mb-1.5 sm:mb-2 text-white">Transactions sécurisées</h3>
-              <p className="text-xs sm:text-sm text-white/70">Plateforme fiable et sécurisée pour toutes vos négociations d'achat ou de vente</p>
+            <div className="text-center p-6 sm:p-8 rounded-xl bg-white/10 border border-white/20 hover:bg-white/15 hover:shadow-2xl hover:scale-105 transition-all duration-300 backdrop-blur-sm">
+              <Shield className="w-10 sm:w-12 h-10 sm:h-12 mx-auto mb-3 sm:mb-4 text-white" />
+              <h3 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3 text-white">Transactions sécurisées</h3>
+              <p className="text-sm sm:text-base text-white/80 leading-relaxed">Plateforme fiable et sécurisée pour toutes vos négociations d'achat ou de vente</p>
             </div>
-            <div className="text-center p-5 sm:p-6 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:shadow-lg transition-all backdrop-blur-sm">
-              <Clock className="w-8 sm:w-10 h-8 sm:h-10 mx-auto mb-2 sm:mb-3 text-[#818cf8]" />
-              <h3 className="text-base sm:text-lg font-bold mb-1.5 sm:mb-2 text-white">Interface simplifiée</h3>
-              <p className="text-xs sm:text-sm text-white/70">Navigation intuitive et gestion facile de vos annonces grâce à notre technologie avancée</p>
+            <div className="text-center p-6 sm:p-8 rounded-xl bg-white/10 border border-white/20 hover:bg-white/15 hover:shadow-2xl hover:scale-105 transition-all duration-300 backdrop-blur-sm">
+              <Clock className="w-10 sm:w-12 h-10 sm:h-12 mx-auto mb-3 sm:mb-4 text-white" />
+              <h3 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3 text-white">Interface simplifiée</h3>
+              <p className="text-sm sm:text-base text-white/80 leading-relaxed">Navigation intuitive et gestion facile de vos annonces grâce à notre technologie avancée</p>
             </div>
           </div>
           
