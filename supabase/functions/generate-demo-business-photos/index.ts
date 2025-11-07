@@ -48,69 +48,81 @@ Deno.serve(async (req) => {
           continue;
         }
 
-        // Générer un prompt basé sur le type d'entreprise
-        let prompt = '';
+        // Mapper les industries aux images réalistes
+        const industryImages: Record<string, string> = {
+          'restaurant': 'restaurant-real.jpg',
+          'beaute_esthetique': 'salon-real.jpg',
+          'garage_mecanique_concessionnaire': 'garage-real.jpg',
+          'boutique_commerce_detail': 'boutique-real.jpg',
+          'communications_informatique': 'agence-real.jpg',
+          'bar_bistro_discotheque': 'cafe-real.jpg',
+          'epicerie_depanneur': 'depanneur-real.jpg',
+          'entreprise_service': 'entretien-real.jpg',
+          'education_garderie': 'garderie-real.jpg',
+          'boulangerie_patisserie': 'boulangerie-real.jpg'
+        };
+
+        // Déterminer quelle image utiliser
+        let imageName = '';
         if (business.property_type) {
-          prompt = `Professional high-quality real estate photo of a ${business.property_type} commercial property in Quebec. Modern, well-maintained building exterior shot. Clean, professional, inviting. Ultra high resolution. 16:9 aspect ratio.`;
+          // Pour les propriétés immobilières, utiliser l'image de bureau par défaut
+          imageName = 'agence-real.jpg';
         } else if (business.is_franchise) {
-          prompt = `Professional franchise business storefront photo for ${business.title}. Clean, modern, inviting retail environment. High-quality commercial photography. Ultra high resolution. 16:9 aspect ratio.`;
+          // Pour les franchises, utiliser l'image appropriée selon l'industrie
+          imageName = industryImages[business.industry] || 'boutique-real.jpg';
         } else {
-          // Prompts basés sur l'industrie
-          const industryPrompts: Record<string, string> = {
-            'restaurant': 'Professional interior photo of upscale restaurant dining room. Elegant tables, ambient lighting, inviting atmosphere. High-quality commercial photography. Ultra high resolution. 16:9 aspect ratio.',
-            'beaute_esthetique': 'Professional interior photo of modern beauty salon. Clean, bright, welcoming spa environment with styling stations. High-quality commercial photography. Ultra high resolution. 16:9 aspect ratio.',
-            'garage_mecanique_concessionnaire': 'Professional photo of modern auto repair shop. Clean garage with car lifts, professional equipment. High-quality commercial photography. Ultra high resolution. 16:9 aspect ratio.',
-            'boutique_commerce_detail': 'Professional interior photo of upscale retail boutique. Well-merchandised displays, elegant lighting, inviting shopping environment. High-quality commercial photography. Ultra high resolution. 16:9 aspect ratio.',
-            'communications_informatique': 'Professional modern office workspace photo. Clean desks, computers, collaborative environment. High-quality commercial photography. Ultra high resolution. 16:9 aspect ratio.',
-            'bar_bistro_discotheque': 'Professional interior photo of trendy cafe bistro. Cozy seating, warm lighting, inviting atmosphere. High-quality commercial photography. Ultra high resolution. 16:9 aspect ratio.',
-            'epicerie_depanneur': 'Professional interior photo of convenience store. Well-stocked shelves, clean aisles, modern retail environment. High-quality commercial photography. Ultra high resolution. 16:9 aspect ratio.',
-            'entreprise_service': 'Professional office photo of service business. Clean, organized workspace with team collaboration. High-quality commercial photography. Ultra high resolution. 16:9 aspect ratio.',
-            'education_garderie': 'Professional photo of bright, colorful daycare center. Safe play areas, educational materials, welcoming environment for children. High-quality commercial photography. Ultra high resolution. 16:9 aspect ratio.'
-          };
+          imageName = industryImages[business.industry] || 'agence-real.jpg';
+        }
+
+        console.log(`Using realistic image ${imageName} for ${business.title}`);
+
+        // Récupérer l'image depuis le dossier public
+        const imageUrl = `${Deno.env.get('SUPABASE_URL')}/storage/v1/object/public/business-photos/demo-photos/${imageName}`;
+        
+        // Télécharger l'image depuis public/demo-photos
+        const imageResponse = await fetch(`https://xmwsrvaricrfxovimffm.supabase.co/storage/v1/object/public/business-photos/demo-photos/${imageName}`);
+        
+        if (!imageResponse.ok) {
+          // Fallback: essayer de récupérer depuis l'ancien emplacement
+          const fallbackUrl = `/demo-photos/${imageName}`;
+          console.log(`Image not found in storage, trying to copy from public folder: ${fallbackUrl}`);
           
-          prompt = industryPrompts[business.industry] || 'Professional commercial business interior photo. Clean, modern, professional environment. High-quality commercial photography. Ultra high resolution. 16:9 aspect ratio.';
-        }
+          // Pour l'instant, on utilise une URL publique directe
+          const publicImageUrl = `https://xmwsrvaricrfxovimffm.supabase.co/storage/v1/object/public/business-photos/demo-photos/${imageName}`;
+          
+          // Insérer directement l'URL publique
+          const { error: insertError } = await supabaseClient
+            .from('business_photos')
+            .insert({
+              business_id: business.id,
+              photo_url: publicImageUrl,
+              display_order: 0
+            });
 
-        console.log(`Generating image for ${business.title} with prompt: ${prompt}`);
+          if (insertError) {
+            console.error(`Insert error for ${business.id}:`, insertError);
+            continue;
+          }
 
-        // Générer l'image avec l'API Lovable AI
-        const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${Deno.env.get('LOVABLE_API_KEY')}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            model: 'google/gemini-2.5-flash-image-preview',
-            messages: [{
-              role: 'user',
-              content: prompt
-            }],
-            modalities: ['image', 'text']
-          })
-        });
+          results.push({
+            business_id: business.id,
+            title: business.title,
+            photo_url: publicImageUrl,
+            success: true
+          });
 
-        if (!response.ok) {
-          throw new Error(`AI API failed: ${response.statusText}`);
-        }
-
-        const aiData = await response.json();
-        const imageUrl = aiData.choices?.[0]?.message?.images?.[0]?.image_url?.url;
-
-        if (!imageUrl) {
-          console.error('No image URL returned from AI');
+          console.log(`Successfully assigned photo for ${business.title}`);
           continue;
         }
 
-        // Convertir base64 en blob
-        const base64Data = imageUrl.split(',')[1];
-        const binaryData = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
+        const imageBlob = await imageResponse.blob();
+        const imageBuffer = await imageBlob.arrayBuffer();
         
         // Upload vers le bucket business-photos
         const fileName = `${business.id}/main-photo.jpg`;
         const { error: uploadError } = await supabaseClient.storage
           .from('business-photos')
-          .upload(fileName, binaryData, {
+          .upload(fileName, imageBuffer, {
             contentType: 'image/jpeg',
             upsert: true
           });
