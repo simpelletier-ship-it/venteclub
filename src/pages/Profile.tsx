@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Layout } from "@/components/Layout";
 import { SEO } from "@/components/SEO";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -111,37 +110,33 @@ export default function Profile() {
 
   if (loading) {
     return (
-      <Layout>
-        <div className="min-h-screen flex items-center justify-center bg-background">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-muted-foreground">Chargement du profil...</p>
-          </div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Chargement du profil...</p>
         </div>
-      </Layout>
+      </div>
     );
   }
 
   if (!profile) {
     return (
-      <Layout>
-        <div className="min-h-screen flex items-center justify-center bg-background">
-          <Card>
-            <CardContent className="py-12 text-center">
-              <User className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-              <p className="text-lg font-bold text-foreground mb-2">Profil introuvable</p>
-              <Button onClick={() => navigate(-1)}>Retour</Button>
-            </CardContent>
-          </Card>
-        </div>
-      </Layout>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Card>
+          <CardContent className="py-12 text-center">
+            <User className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+            <p className="text-lg font-bold text-foreground mb-2">Profil introuvable</p>
+            <Button onClick={() => navigate(-1)}>Retour</Button>
+          </CardContent>
+        </Card>
+      </div>
     );
   }
 
   const isOwnProfile = currentUserId === profile.id;
 
   return (
-    <Layout>
+    <>
       <SEO 
         title={`Profil de ${profile.full_name || 'Utilisateur'}`}
         description={profile.bio || `Voir le profil de ${profile.full_name || 'cet utilisateur'}`}
@@ -334,6 +329,6 @@ export default function Profile() {
           </Card>
         </div>
       </div>
-    </Layout>
+    </>
   );
 }

@@ -456,7 +456,7 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
                 onClick={handleViewProfile}
               >
                 <Crown className="mr-2 h-5 w-5" />
-                <span>Voir informations du vendeur</span>
+                <span>{isSeller ? 'Voir informations de l\'acheteur' : 'Voir informations du vendeur'}</span>
               </Button>
               
               {!isSeller && businessAskingPrice > 0 && (
