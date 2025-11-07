@@ -13,6 +13,7 @@ import { Separator } from "@/components/ui/separator";
 import { useFingerprint } from "@/hooks/useFingerprint";
 import { AlertTriangle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { translateAuthError } from "@/lib/authErrors";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -78,7 +79,7 @@ const Auth = () => {
           toast({
             variant: "destructive",
             title: "Erreur de connexion",
-            description: "Email ou mot de passe incorrect.",
+            description: translateAuthError(error.message),
           });
         }
         setLoading(false);
@@ -108,7 +109,7 @@ const Auth = () => {
       toast({
         variant: "destructive",
         title: "Erreur",
-        description: error.message || "Une erreur est survenue lors de la connexion.",
+        description: translateAuthError(error.message) || "Une erreur est survenue lors de la connexion.",
       });
     } finally {
       setLoading(false);
@@ -167,8 +168,8 @@ const Auth = () => {
         console.error('[SIGNUP] Erreur Supabase:', error);
         toast({
           variant: "destructive",
-          title: "Erreur",
-          description: error.message,
+          title: "Erreur d'inscription",
+          description: translateAuthError(error.message),
         });
         setLoading(false);
         return;
@@ -217,7 +218,7 @@ const Auth = () => {
       toast({
         variant: "destructive",
         title: "Erreur",
-        description: error.message || "Une erreur est survenue lors de l'inscription.",
+        description: translateAuthError(error.message) || "Une erreur est survenue lors de l'inscription.",
       });
     } finally {
       console.log('[SIGNUP] Finally - arrêt du loading');
@@ -251,7 +252,7 @@ const Auth = () => {
       toast({
         variant: "destructive",
         title: "Erreur",
-        description: error.message,
+        description: translateAuthError(error.message),
       });
     } finally {
       setLoading(false);
@@ -296,8 +297,8 @@ const Auth = () => {
     } catch (error: any) {
       toast({
         variant: "destructive",
-        title: "Erreur",
-        description: error.message,
+        title: "Erreur de connexion Google",
+        description: translateAuthError(error.message),
       });
     }
   };
