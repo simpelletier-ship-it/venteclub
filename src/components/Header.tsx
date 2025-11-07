@@ -167,32 +167,15 @@ const Header = () => {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {/* Menu Vendre */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="text-muted-foreground hover:text-foreground transition-colors font-medium relative group flex items-center gap-1">
-                  <Store className="w-4 h-4" />
-                  Vendre
-                  <ChevronDown className="w-3.5 h-3.5" />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-56 bg-card/95 backdrop-blur-xl border-border/50 shadow-premium">
-                <DropdownMenuItem onClick={() => navigate("/sell")} className="cursor-pointer hover:bg-muted/50">
-                  <Store className="mr-2 h-4 w-4" />
-                  <div>
-                    <p className="font-medium">Mon entreprise</p>
-                    <p className="text-xs text-muted-foreground">Commerce, PME, franchise</p>
-                  </div>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate("/sell?type=property")} className="cursor-pointer hover:bg-muted/50">
-                  <Building2 className="mr-2 h-4 w-4" />
-                  <div>
-                    <p className="font-medium">Mon immeuble</p>
-                    <p className="text-xs text-muted-foreground">Commercial, résidentiel</p>
-                  </div>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {/* Lien Vendre */}
+            <button 
+              onClick={() => navigate("/sell")} 
+              className="text-muted-foreground hover:text-foreground transition-colors font-medium relative group flex items-center gap-1"
+            >
+              <Store className="w-4 h-4" />
+              Vendre
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full" />
+            </button>
 
             {!user && (
               <button 
