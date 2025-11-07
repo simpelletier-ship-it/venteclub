@@ -42,6 +42,7 @@ const Market = lazy(() => import("./pages/Market"));
 const ClubSelect = lazy(() => import("./pages/ClubSelect"));
 const EmailConfirmed = lazy(() => import("./pages/EmailConfirmed"));
 const PremiumSuccess = lazy(() => import("./pages/PremiumSuccess"));
+const TestEmail = lazy(() => import("./pages/TestEmail"));
 
 const queryClient = new QueryClient();
 
@@ -99,6 +100,7 @@ const App = () => (
                 <Route path="/favorites" element={<EmailVerificationGuard><Favorites /></EmailVerificationGuard>} />
                 <Route path="/messages" element={<EmailVerificationGuard><Messages /></EmailVerificationGuard>} />
                 <Route path="/profile/:userId" element={<EmailVerificationGuard><Profile /></EmailVerificationGuard>} />
+                <Route path="/test-email" element={<EmailVerificationGuard><TestEmail /></EmailVerificationGuard>} />
                 
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
