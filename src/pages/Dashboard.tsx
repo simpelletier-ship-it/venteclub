@@ -3,9 +3,9 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, LogOut, Star, XCircle, Edit } from "lucide-react";
+import { Plus, Star, XCircle, Edit, TrendingUp, Eye, Building, MessageSquare, Crown } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import BusinessCard from "@/components/BusinessCard";
@@ -27,15 +27,15 @@ const Dashboard = () => {
   const [withdrawDialogOpen, setWithdrawDialogOpen] = useState(false);
   const [businessToWithdraw, setBusinessToWithdraw] = useState<any>(null);
   const [selectedDuration, setSelectedDuration] = useState<7 | 14 | 30>(7);
+  const [stats, setStats] = useState({
+    totalBusinesses: 0,
+    activeBusinesses: 0,
+    totalViews: 0,
+    pendingApproval: 0
+  });
   const defaultTab = searchParams.get('tab') || 'businesses';
 
   useEffect(() => {
-    // Redirect to /messages if user selected messages tab
-    if (defaultTab === 'messages') {
-      navigate('/messages');
-      return;
-    }
-
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (!session) {
         navigate("/auth");
@@ -137,6 +137,19 @@ const Dashboard = () => {
 
       console.log('[DASHBOARD] Businesses loaded:', businessesWithFeatured.length);
       setBusinesses(businessesWithFeatured);
+      
+      // Calculate stats
+      const totalBusinesses = businessesWithFeatured.length;
+      const activeBusinesses = businessesWithFeatured.filter(b => b.status === 'active' && b.approval_status === 'approved').length;
+      const totalViews = businessesWithFeatured.reduce((sum, b) => sum + (b.views_count || 0), 0);
+      const pendingApproval = businessesWithFeatured.filter(b => b.approval_status === 'pending').length;
+      
+      setStats({
+        totalBusinesses,
+        activeBusinesses,
+        totalViews,
+        pendingApproval
+      });
     } catch (error: any) {
       console.error('[DASHBOARD] Error fetching businesses:', error);
       toast({
@@ -206,31 +219,96 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-secondary/10">
-      <div className="container mx-auto px-4 py-12">
-        <Tabs defaultValue={defaultTab} className="w-full">
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold text-foreground mb-2">
-              Tableau de bord
-            </h1>
-            <p className="text-muted-foreground mb-6">
-              Gérez vos annonces et vos conversations
-            </p>
-            <TabsList className="grid w-full max-w-3xl grid-cols-3 h-auto">
-              <TabsTrigger value="businesses" className="text-xs sm:text-sm py-2 sm:py-3">Mes annonces</TabsTrigger>
-              <TabsTrigger value="statistics" className="text-xs sm:text-sm py-2 sm:py-3">Statistiques</TabsTrigger>
-              <TabsTrigger 
-                value="messages" 
-                className="text-xs sm:text-sm py-2 sm:py-3"
-                onClick={(e) => {
-                  e.preventDefault();
-                  navigate('/messages');
-                }}
-              >
-                Messages
-              </TabsTrigger>
-            </TabsList>
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/5">
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">
+                Tableau de bord
+              </h1>
+              <p className="text-muted-foreground">
+                Gérez et suivez vos annonces
+              </p>
+            </div>
+            <Button 
+              onClick={() => navigate('/messages')} 
+              variant="outline"
+              className="gap-2"
+            >
+              <MessageSquare className="h-4 w-4" />
+              <span className="hidden sm:inline">Messagerie</span>
+            </Button>
           </div>
+
+          {/* Stats Cards */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <Card className="border-2 hover:shadow-lg transition-all">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                  <Building className="h-4 w-4" />
+                  Total annonces
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold">{stats.totalBusinesses}</div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-2 border-green-200 dark:border-green-800 bg-green-50/50 dark:bg-green-950/20 hover:shadow-lg transition-all">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-green-700 dark:text-green-400 flex items-center gap-2">
+                  <TrendingUp className="h-4 w-4" />
+                  Actives
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-green-700 dark:text-green-400">{stats.activeBusinesses}</div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-2 border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-950/20 hover:shadow-lg transition-all">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-blue-700 dark:text-blue-400 flex items-center gap-2">
+                  <Eye className="h-4 w-4" />
+                  Vues totales
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-blue-700 dark:text-blue-400">{stats.totalViews}</div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-2 border-yellow-200 dark:border-yellow-800 bg-yellow-50/50 dark:bg-yellow-950/20 hover:shadow-lg transition-all">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-yellow-700 dark:text-yellow-400 flex items-center gap-2">
+                  <Star className="h-4 w-4" />
+                  En attente
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-yellow-700 dark:text-yellow-400">{stats.pendingApproval}</div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        <Tabs defaultValue={defaultTab} className="w-full">
+          <TabsList className="grid w-full max-w-md grid-cols-3 h-auto mb-8">
+            <TabsTrigger value="businesses" className="text-xs sm:text-sm py-2 sm:py-3 gap-2">
+              <Building className="h-4 w-4" />
+              <span>Annonces</span>
+            </TabsTrigger>
+            <TabsTrigger value="statistics" className="text-xs sm:text-sm py-2 sm:py-3 gap-2">
+              <TrendingUp className="h-4 w-4" />
+              <span>Stats</span>
+            </TabsTrigger>
+            <TabsTrigger value="premium" className="text-xs sm:text-sm py-2 sm:py-3 gap-2">
+              <Crown className="h-4 w-4" />
+              <span>Club Select</span>
+            </TabsTrigger>
+          </TabsList>
 
           <TabsContent value="businesses" className="space-y-6">
             {loading ? (
@@ -479,8 +557,10 @@ const Dashboard = () => {
             {user && <BusinessStatistics userId={user.id} />}
           </TabsContent>
 
-          <TabsContent value="messages">
-            {/* This tab redirects to /messages page via useEffect */}
+          <TabsContent value="premium">
+            <div className="max-w-4xl mx-auto">
+              {user && <PremiumSubscription userId={user.id} />}
+            </div>
           </TabsContent>
         </Tabs>
       </div>
