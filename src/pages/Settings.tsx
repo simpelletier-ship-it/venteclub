@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
-import { User, CreditCard, Bell, Mail, Save, Upload, Shield } from "lucide-react";
+import { User, CreditCard, Bell, Mail, Save, Upload, Shield, MapPin, Globe } from "lucide-react";
 import { AlertsManager } from "@/components/AlertsManager";
 import { TwoFactorAuth } from "@/components/TwoFactorAuth";
 import { PaymentHistory } from "@/components/PaymentHistory";
@@ -35,6 +35,12 @@ const Settings = () => {
     linkedin_url: "",
     company_name: "",
     job_title: "",
+    street_address: "",
+    city: "",
+    province: "",
+    postal_code: "",
+    country: "Canada",
+    website: "",
   });
   const [uploading, setUploading] = useState(false);
   const [activeTab, setActiveTab] = useState("personal");
@@ -76,6 +82,12 @@ const Settings = () => {
           linkedin_url: profileData.linkedin_url || "",
           company_name: profileData.company_name || "",
           job_title: profileData.job_title || "",
+          street_address: profileData.street_address || "",
+          city: profileData.city || "",
+          province: profileData.province || "",
+          postal_code: profileData.postal_code || "",
+          country: profileData.country || "Canada",
+          website: profileData.website || "",
         });
       }
     } catch (error: any) {
@@ -111,6 +123,12 @@ const Settings = () => {
           linkedin_url: profile.linkedin_url,
           company_name: profile.company_name,
           job_title: profile.job_title,
+          street_address: profile.street_address,
+          city: profile.city,
+          province: profile.province,
+          postal_code: profile.postal_code,
+          country: profile.country,
+          website: profile.website,
           updated_at: new Date().toISOString(),
         });
 
@@ -367,6 +385,129 @@ const Settings = () => {
                         className="mt-2"
                       />
                     </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="bio">Biographie</Label>
+                    <Textarea
+                      id="bio"
+                      value={profile.bio}
+                      onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
+                      placeholder="Parlez de vous, de votre expérience..."
+                      className="mt-2"
+                      rows={4}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-primary">
+                    <MapPin className="h-5 w-5" />
+                    Adresse
+                  </CardTitle>
+                  <CardDescription>
+                    Vos coordonnées postales
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <Label htmlFor="street_address">Rue</Label>
+                    <Input
+                      id="street_address"
+                      type="text"
+                      value={profile.street_address}
+                      onChange={(e) => setProfile({ ...profile, street_address: e.target.value })}
+                      placeholder="123 Rue Principale"
+                      className="mt-2"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="city">Ville</Label>
+                      <Input
+                        id="city"
+                        type="text"
+                        value={profile.city}
+                        onChange={(e) => setProfile({ ...profile, city: e.target.value })}
+                        placeholder="Montréal"
+                        className="mt-2"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="province">Province</Label>
+                      <Input
+                        id="province"
+                        type="text"
+                        value={profile.province}
+                        onChange={(e) => setProfile({ ...profile, province: e.target.value })}
+                        placeholder="Québec"
+                        className="mt-2"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="postal_code">Code postal</Label>
+                      <Input
+                        id="postal_code"
+                        type="text"
+                        value={profile.postal_code}
+                        onChange={(e) => setProfile({ ...profile, postal_code: e.target.value })}
+                        placeholder="H1A 1A1"
+                        className="mt-2"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="country">Pays</Label>
+                      <Input
+                        id="country"
+                        type="text"
+                        value={profile.country}
+                        onChange={(e) => setProfile({ ...profile, country: e.target.value })}
+                        placeholder="Canada"
+                        className="mt-2"
+                      />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-primary">
+                    <Globe className="h-5 w-5" />
+                    Liens
+                  </CardTitle>
+                  <CardDescription>
+                    Vos liens web et réseaux sociaux
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <Label htmlFor="website">Site web</Label>
+                    <Input
+                      id="website"
+                      type="url"
+                      value={profile.website}
+                      onChange={(e) => setProfile({ ...profile, website: e.target.value })}
+                      placeholder="https://monsite.com"
+                      className="mt-2"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="linkedin_url_links">LinkedIn</Label>
+                    <Input
+                      id="linkedin_url_links"
+                      type="url"
+                      value={profile.linkedin_url}
+                      onChange={(e) => setProfile({ ...profile, linkedin_url: e.target.value })}
+                      placeholder="https://linkedin.com/in/votre-profil"
+                      className="mt-2"
+                    />
                   </div>
                 </CardContent>
               </Card>

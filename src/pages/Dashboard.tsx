@@ -399,6 +399,17 @@ const Dashboard = () => {
                   return (
                     <div key={business.id} className="flex flex-col space-y-2">
                       <div className="space-y-2">
+                        {business.status === 'active' && business.approval_status === 'approved' && (
+                          <div className="bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/30 rounded-lg p-3 flex items-center gap-2">
+                            <CheckCircle className="h-4 w-4 text-green-600 flex-shrink-0" />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-semibold text-foreground">Annonce publiée</p>
+                              <p className="text-xs text-muted-foreground">
+                                Votre annonce est active et visible sur le site
+                              </p>
+                            </div>
+                          </div>
+                        )}
                         {isActiveFeatured && (
                           <div className="bg-gradient-to-r from-yellow-500/20 to-amber-500/20 border border-yellow-500/30 rounded-lg p-3 flex items-center gap-2">
                             <Star className="h-4 w-4 fill-yellow-500 text-yellow-500 flex-shrink-0" />
