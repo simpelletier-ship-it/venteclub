@@ -103,20 +103,20 @@ const FeaturedListing = () => {
     {
       duration: 30,
       price: 299.00,
-      label: "1 mois",
+      label: "1 mois de mise en avant",
       popular: false
     },
     {
       duration: 60,
       price: 399.00,
-      label: "2 mois",
+      label: "2 mois de mise en avant",
       popular: true,
       savings: "Économisez 33%"
     },
     {
       duration: 90,
       price: 449.00,
-      label: "3 mois",
+      label: "3 mois de mise en avant",
       popular: false,
       savings: "Économisez 50%"
     }
@@ -210,26 +210,28 @@ const FeaturedListing = () => {
                   )}
                   
                   <Card 
-                    className={`bg-white/5 backdrop-blur-md border transition-all duration-300 ${
+                    className={`bg-white/5 backdrop-blur-md border transition-all duration-300 h-full flex flex-col ${
                       selectedDuration === option.duration 
                         ? 'border-white/30 shadow-lg' 
                         : 'border-white/10 hover:border-white/20'
                     }`}
                   >
-                    <CardHeader className="text-center pb-3 pt-8">
+                    <CardHeader className="text-center pb-3 pt-8 flex-1">
                       <CardTitle className="text-5xl font-bold text-white mb-2">
                         {option.price.toFixed(0)}$
                       </CardTitle>
-                      <CardDescription className="text-lg font-semibold text-white/70">
+                      <CardDescription className="text-lg font-semibold text-white/70 min-h-[3.5rem] flex items-center justify-center">
                         {option.label}
                       </CardDescription>
                       <p className="text-sm text-white/50 mt-2">
                         Paiement unique • Publicité incluse
                       </p>
-                      {option.savings && (
+                      {option.savings ? (
                         <Badge variant="secondary" className="mt-3 bg-[#00b894] text-white border-0 text-xs px-2 py-1">
                           {option.savings}
                         </Badge>
+                      ) : (
+                        <div className="mt-3 h-6"></div>
                       )}
                     </CardHeader>
                     <CardContent className="text-center pb-6">
@@ -288,50 +290,6 @@ const FeaturedListing = () => {
         </div>
       </section>
 
-      {/* Comparison Table - Style minimaliste */}
-      <section className="py-20 bg-muted/30">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl sm:text-4xl font-display font-bold text-foreground mb-4">
-                Standard vs En Vedette
-              </h2>
-            </div>
-
-            <Card className="border border-border shadow-md overflow-hidden">
-              <CardContent className="p-0">
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-border">
-                        <th className="text-left p-4 font-semibold text-foreground text-sm">Fonctionnalité</th>
-                        <th className="text-center p-4 font-semibold text-muted-foreground text-sm bg-muted/30">Standard</th>
-                        <th className="text-center p-4 font-semibold text-foreground text-sm">
-                          En Vedette
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {comparisonData.map((row, index) => (
-                        <tr key={index} className="border-b border-border last:border-b-0">
-                          <td className="p-4 text-sm text-foreground">{row.feature}</td>
-                          <td className="p-4 text-center text-sm text-muted-foreground bg-muted/30">{row.standard}</td>
-                          <td className="p-4 text-center">
-                            <div className="flex items-center justify-center gap-1 text-primary font-medium text-sm">
-                              <CheckCircle2 className="w-4 h-4" />
-                              {row.featured}
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
 
       {/* How it Works Section - Style minimaliste */}
       <section className="py-20 bg-background">
