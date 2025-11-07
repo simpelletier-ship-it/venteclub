@@ -1,8 +1,93 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { Resend } from "https://esm.sh/resend@4.0.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
+const resend = new Resend(Deno.env.get("RESEND_API_KEY") as string);
+
+// Template professionnel pour le code de vérification
+const getVerificationCodeEmail = (code: string) => {
+  return `
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="x-apple-disable-message-reformatting">
+  <title>Vente.Club</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; line-height: 1.6; color: #1a1a1a; background-color: #f7f7f7; }
+    .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }
+    .header { padding: 32px 40px; text-align: center; border-bottom: 1px solid #e8e8e8; }
+    .logo { font-size: 24px; font-weight: 600; color: #1a1a1a; text-decoration: none; }
+    .content { padding: 40px 40px; }
+    .footer { padding: 32px 40px; background-color: #fafafa; border-top: 1px solid #e8e8e8; text-align: center; }
+    .footer-text { font-size: 13px; color: #666666; line-height: 1.8; }
+    .footer-links { margin-top: 16px; }
+    .footer-link { color: #666666; text-decoration: none; margin: 0 8px; font-size: 13px; }
+    .footer-link:hover { color: #007AFF; }
+    h1 { font-size: 24px; font-weight: 600; color: #1a1a1a; margin-bottom: 16px; line-height: 1.3; }
+    p { font-size: 15px; color: #4a4a4a; margin-bottom: 16px; line-height: 1.6; }
+    .code-box { background-color: #f5f5f5; border-left: 3px solid #007AFF; padding: 20px; margin: 24px 0; border-radius: 4px; text-align: center; }
+    .code { font-size: 32px; font-weight: 700; color: #007AFF; letter-spacing: 8px; font-family: 'Courier New', monospace; }
+    .info-box { background-color: #f5f5f5; border-left: 3px solid #007AFF; padding: 16px 20px; margin: 24px 0; border-radius: 4px; }
+    .info-box p { margin-bottom: 0; font-size: 14px; color: #4a4a4a; }
+    @media only screen and (max-width: 600px) {
+      .container { width: 100% !important; }
+      .content, .header, .footer { padding: 24px 20px !important; }
+      h1 { font-size: 22px !important; }
+      .code { font-size: 28px !important; letter-spacing: 6px !important; }
+    }
+  </style>
+</head>
+<body>
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f7f7f7; padding: 40px 0;">
+    <tr>
+      <td align="center">
+        <table class="container" width="600" cellpadding="0" cellspacing="0">
+          <tr>
+            <td class="header">
+              <a href="https://vente.club" class="logo">Vente.Club</a>
+            </td>
+          </tr>
+          <tr>
+            <td class="content">
+              <h1>Confirmez votre compte</h1>
+              <p>Bienvenue sur Vente.Club ! Pour activer votre compte, veuillez utiliser le code de vérification suivant :</p>
+              <div class="code-box">
+                <div class="code">${code}</div>
+              </div>
+              <p style="font-size: 14px; color: #666666;">Ce code est valide pendant 60 minutes. Si vous n'avez pas créé de compte, vous pouvez ignorer ce message en toute sécurité.</p>
+              <div class="info-box">
+                <p><strong>Conseils de sécurité :</strong></p>
+                <p>• Ne partagez jamais ce code avec personne</p>
+                <p>• Vente.Club ne vous demandera jamais ce code par téléphone</p>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="footer">
+              <p class="footer-text">
+                Vente.Club - Votre partenaire pour l'achat et la vente d'entreprises au Québec
+              </p>
+              <div class="footer-links">
+                <a href="https://vente.club" class="footer-link">Accueil</a>
+                <a href="https://vente.club/contact" class="footer-link">Contact</a>
+                <a href="https://vente.club/terms" class="footer-link">Politique de confidentialité</a>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+  `;
 };
 
 interface VerificationEmailRequest {
@@ -36,107 +121,30 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log("[VERIFICATION-EMAIL] Préparation de l'email...");
 
-    const emailHtml = `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <meta charset="utf-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        </head>
-        <body style="margin: 0; padding: 0; background-color: #f5f5f5; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
-          <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 0; padding: 0;">
-            <tr>
-              <td style="padding: 40px 20px;">
-                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-                  <tr>
-                    <td style="padding: 40px 40px 20px; text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px 12px 0 0;">
-                      <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 700;">Vente.Club</h1>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style="padding: 40px;">
-                      <h2 style="margin: 0 0 20px; color: #1a1a1a; font-size: 24px; font-weight: 600;">Code de vérification</h2>
-                      <p style="margin: 0 0 30px; color: #4a4a4a; font-size: 16px; line-height: 1.6;">
-                        Bienvenue sur Vente.Club ! Pour finaliser la création de votre compte, veuillez utiliser le code de vérification suivant :
-                      </p>
-                      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-                        <tr>
-                          <td style="padding: 30px; background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); border-radius: 8px; text-align: center; border: 2px dashed #667eea;">
-                            <div style="font-size: 36px; font-weight: 700; color: #667eea; letter-spacing: 8px; font-family: 'Courier New', monospace;">
-                              ${token}
-                            </div>
-                          </td>
-                        </tr>
-                      </table>
-                      <p style="margin: 30px 0 0; color: #4a4a4a; font-size: 14px; line-height: 1.6;">
-                        Ce code est valide pendant <strong>60 minutes</strong>. Si vous n'avez pas demandé ce code, vous pouvez ignorer cet email en toute sécurité.
-                      </p>
-                      <div style="margin-top: 30px; padding-top: 30px; border-top: 1px solid #e5e5e5;">
-                        <p style="margin: 0; color: #999999; font-size: 12px; line-height: 1.6;">
-                          <strong>Conseils de sécurité :</strong><br>
-                          • Ne partagez jamais ce code avec personne<br>
-                          • Vente.Club ne vous demandera jamais ce code par téléphone<br>
-                          • Consultez vos courriels indésirables si vous ne voyez pas cet email
-                        </p>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style="padding: 30px 40px; background-color: #f8f8f8; border-radius: 0 0 12px 12px; text-align: center;">
-                      <p style="margin: 0 0 10px; color: #999999; font-size: 13px;">
-                        © 2025 Vente.Club - Plateforme d'achat et vente d'entreprises au Québec
-                      </p>
-                      <p style="margin: 0; color: #999999; font-size: 12px;">
-                        Des questions ? Contactez-nous à <a href="mailto:info@vente.club" style="color: #667eea; text-decoration: none;">info@vente.club</a>
-                      </p>
-                    </td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-          </table>
-        </body>
-      </html>
-    `;
+    const html = getVerificationCodeEmail(token);
 
-    // Utiliser l'API Resend directement avec fetch
-    console.log("[VERIFICATION-EMAIL] Envoi de la requête à Resend...");
-    const resendResponse = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${RESEND_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        from: "Vente.Club <onboarding@resend.dev>",
-        to: [email],
-        subject: "Code de vérification Vente.Club",
-        html: emailHtml,
-      }),
+    console.log("[VERIFICATION-EMAIL] Envoi de l'email via Resend...");
+    const { error: emailError } = await resend.emails.send({
+      from: "Vente.Club <info@vente.club>",
+      to: [email],
+      subject: "Confirmez votre compte Vente.Club",
+      html,
     });
 
-    console.log("[VERIFICATION-EMAIL] Réponse Resend - Status:", resendResponse.status);
-    console.log("[VERIFICATION-EMAIL] Réponse Resend - Status Text:", resendResponse.statusText);
-
-    if (!resendResponse.ok) {
-      const errorText = await resendResponse.text();
-      console.error("[VERIFICATION-EMAIL] ❌ Erreur Resend API:", errorText);
-      console.error("[VERIFICATION-EMAIL] ❌ Status:", resendResponse.status);
-      throw new Error(`Failed to send email: ${errorText}`);
+    if (emailError) {
+      console.error("[VERIFICATION-EMAIL] ❌ Erreur Resend:", emailError);
+      throw emailError;
     }
-
-    const emailResponse = await resendResponse.json();
     console.log("[VERIFICATION-EMAIL] ✅ Email envoyé avec succès!");
-    console.log("[VERIFICATION-EMAIL] ID Resend:", emailResponse.id);
     console.log("[VERIFICATION-EMAIL] ===== END =====");
 
-    return new Response(JSON.stringify(emailResponse), {
-      status: 200,
-      headers: {
-        "Content-Type": "application/json",
-        ...corsHeaders,
-      },
-    });
+    return new Response(
+      JSON.stringify({ success: true, message: "Email envoyé" }),
+      {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      }
+    );
   } catch (error: any) {
     console.error("[VERIFICATION-EMAIL] ❌ EXCEPTION:", error);
     console.error("[VERIFICATION-EMAIL] Message:", error.message);
