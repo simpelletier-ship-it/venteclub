@@ -13,9 +13,7 @@ import {
   Clock, 
   Shield, 
   CheckCircle2, 
-  Star,
-  Zap,
-  TrendingUp
+  Zap
 } from "lucide-react";
 
 const ClubSelect = () => {
@@ -75,19 +73,9 @@ const ClubSelect = () => {
       description: "Démontrez votre sérieux avec votre badge Club Select visible par les vendeurs"
     },
     {
-      icon: Star,
-      title: "Alertes premium",
-      description: "Recevez les nouvelles opportunités 24h avant les utilisateurs gratuits"
-    },
-    {
       icon: Zap,
       title: "Support prioritaire",
       description: "Assistance rapide et dédiée pour toutes vos questions"
-    },
-    {
-      icon: TrendingUp,
-      title: "Outils d'analyse avancés",
-      description: "Accédez à des statistiques détaillées et des comparaisons de marché"
     }
   ];
 
@@ -157,7 +145,7 @@ const ClubSelect = () => {
               <CardHeader className="text-center pb-4">
                 <div className="flex justify-center mb-4">
                   <Badge variant="default" className="text-lg px-6 py-2">
-                    <Star className="w-4 h-4 mr-2" />
+                    <Crown className="w-4 h-4 mr-2" />
                     Le plus populaire
                   </Badge>
                 </div>
@@ -331,7 +319,7 @@ const ClubSelect = () => {
                 <div className="flex gap-4">
                   <div className="flex-shrink-0">
                     <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                      <TrendingUp className="w-5 h-5 text-primary" />
+                      <Zap className="w-5 h-5 text-primary" />
                     </div>
                   </div>
                   <div>
