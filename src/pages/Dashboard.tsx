@@ -52,6 +52,31 @@ const Dashboard = () => {
         setIsAdmin(!!hasAdminRole);
       }
     });
+
+    // Souscrire aux changements en temps réel pour mettre à jour les stats automatiquement
+    const businessesChannel = supabase
+      .channel('businesses-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'businesses'
+        },
+        () => {
+          // Recharger les annonces quand il y a un changement
+          supabase.auth.getSession().then(({ data: { session } }) => {
+            if (session) {
+              fetchUserBusinesses(session.user.id);
+            }
+          });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      businessesChannel.unsubscribe();
+    };
   }, [navigate, defaultTab]);
 
   useEffect(() => {

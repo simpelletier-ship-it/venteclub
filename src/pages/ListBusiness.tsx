@@ -181,11 +181,25 @@ const ListBusiness = () => {
       } else {
         setUser(session.user);
         
+        // Charger le profil de l'utilisateur pour pré-remplir les coordonnées
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('email, phone')
+          .eq('id', session.user.id)
+          .single();
+        
         // Charger l'annonce existante si on est en mode édition
         if (editingBusinessId) {
           await loadBusinessForEdit(editingBusinessId, session.user.id);
         } else {
-          // Charger le brouillon s'il existe
+          // Pré-remplir avec les données du profil
+          setFormData(prev => ({
+            ...prev,
+            seller_email: profile?.email || session.user.email || prev.seller_email,
+            seller_phone: profile?.phone || prev.seller_phone,
+          }));
+          
+          // Charger le brouillon s'il existe (qui pourrait écraser les coordonnées)
           const draftData = await loadDraft();
           if (draftData) {
             setFormData(prev => ({ ...prev, ...draftData }));
@@ -1537,7 +1551,7 @@ const ListBusiness = () => {
                     </Button>
                     <Button 
                       type="button" 
-                      variant="secondary"
+                      variant="outline"
                       onClick={(e) => handleSubmit(e, true)} 
                       disabled={loading} 
                       className="flex-1"
