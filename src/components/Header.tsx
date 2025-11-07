@@ -108,13 +108,6 @@ const Header = () => {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
             <button 
-              onClick={() => navigate("/")} 
-              className="text-muted-foreground hover:text-foreground transition-colors font-medium relative group"
-            >
-              Accueil
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#818cf8] transition-all group-hover:w-full" />
-            </button>
-            <button 
               onClick={() => navigate("/entreprises")} 
               className="text-muted-foreground hover:text-foreground transition-colors font-medium relative group"
             >
@@ -253,15 +246,6 @@ const Header = () => {
         {/* Mobile Menu */}
         {mobileMenuOpen && (
           <div className="md:hidden mt-4 pb-4 space-y-2 border-t border-border pt-4 animate-slide-up">
-            <button
-              onClick={() => {
-                navigate("/");
-                setMobileMenuOpen(false);
-              }}
-              className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors"
-            >
-              Accueil
-            </button>
             <button
               onClick={() => {
                 navigate("/entreprises");
