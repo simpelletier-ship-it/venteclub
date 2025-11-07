@@ -65,34 +65,22 @@
     <!-- Google reCAPTCHA -->
     <script src="https://www.google.com/recaptcha/enterprise.js" async defer></script>
     
-    <!-- Google tag (gtag.js) -->
+    <!-- Google tag (gtag.js) - Unified for Google Ads & Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=AW-974642760"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
 
+      // Configuration Google Ads
       gtag('config', 'AW-974642760');
-    </script>
-    
-    <!-- Google Analytics 4 -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-362DNT7Q72"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
       
-      // Configuration GA4
+      // Configuration Google Analytics 4
       gtag('config', 'G-362DNT7Q72', {
         'send_page_view': true,
         'anonymize_ip': true,
         'cookie_flags': 'SameSite=None;Secure'
       });
-    </script>
-    
-    <!-- Event snippet for Website traffic conversion page -->
-    <script>
-      gtag('event', 'conversion', {'send_to': 'AW-974642760/z7Q0CLnYktUDEMi839AD'});
     </script>
   </head>
 
