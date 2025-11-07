@@ -256,7 +256,7 @@ const Header = () => {
                   className="hidden md:flex bg-[#6366f1] hover:bg-[#4f46e5] text-white font-semibold shadow-lg"
                 >
                   <LayoutDashboard className="w-4 h-4 mr-2" />
-                  Dashboard
+                  Tableau de bord
                 </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -298,22 +298,13 @@ const Header = () => {
                 </DropdownMenu>
               </>
             ) : (
-              <>
-                <Button
-                  variant="ghost"
-                  onClick={() => navigate("/auth")}
-                  className="hidden md:inline-flex font-semibold border border-black"
-                >
-                  Connexion
-                </Button>
-                <Button
-                  onClick={() => navigate("/dashboard")}
-                  className="hidden md:inline-flex bg-[#6366f1] hover:bg-[#4f46e5] text-white font-semibold shadow-lg"
-                >
-                  <LayoutDashboard className="w-4 h-4 mr-2" />
-                  Dashboard
-                </Button>
-              </>
+              <Button
+                variant="ghost"
+                onClick={() => navigate("/auth")}
+                className="hidden md:inline-flex font-semibold border border-black"
+              >
+                Connexion
+              </Button>
             )}
 
             {/* Mobile Menu Button */}
