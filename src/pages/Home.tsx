@@ -11,6 +11,7 @@ import { TypewriterAnimation } from "@/components/AnimatedSearchBar";
 import { useScrollParallax } from "@/hooks/useScrollParallax";
 import { FloatingOpportunities } from "@/components/FloatingOpportunities";
 import { CircuitBackground } from "@/components/CircuitBackground";
+import { useCountUp } from "@/hooks/useCountUp";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -24,6 +25,12 @@ const Home = () => {
     totalValue: 0
   });
   const scrollY = useScrollParallax();
+  
+  // Compteurs animés pour les statistiques
+  const businessesCount = useCountUp({ end: stats.totalBusinesses, duration: 2000, delay: 200 });
+  const viewsCount = useCountUp({ end: Math.floor(stats.totalViews / 1000), duration: 2000, delay: 400 });
+  const usersCount = useCountUp({ end: stats.totalUsers, duration: 2000, delay: 600 });
+  const valueCount = useCountUp({ end: Math.floor(stats.totalValue / 1000000), duration: 2000, delay: 800 });
   
   useEffect(() => {
     fetchFeaturedBusinesses();
@@ -220,8 +227,8 @@ const Home = () => {
               <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#818cf8]/20 mb-3">
                 <Building2 className="w-6 h-6 text-[#818cf8]" />
               </div>
-              <div className="text-3xl sm:text-4xl font-bold text-white mb-2">
-                {stats.totalBusinesses}+
+              <div ref={businessesCount.ref} className="text-3xl sm:text-4xl font-bold text-white mb-2 tabular-nums">
+                {businessesCount.count}+
               </div>
               <div className="text-sm sm:text-base text-white/70">entreprises actives</div>
             </div>
@@ -229,8 +236,8 @@ const Home = () => {
               <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#818cf8]/20 mb-3">
                 <Eye className="w-6 h-6 text-[#818cf8]" />
               </div>
-              <div className="text-3xl sm:text-4xl font-bold text-white mb-2">
-                {stats.totalViews >= 1000 ? `${Math.floor(stats.totalViews / 1000)}k+` : `${stats.totalViews}+`}
+              <div ref={viewsCount.ref} className="text-3xl sm:text-4xl font-bold text-white mb-2 tabular-nums">
+                {viewsCount.count}k+
               </div>
               <div className="text-sm sm:text-base text-white/70">vues totales</div>
             </div>
@@ -238,8 +245,8 @@ const Home = () => {
               <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#818cf8]/20 mb-3">
                 <Users className="w-6 h-6 text-[#818cf8]" />
               </div>
-              <div className="text-3xl sm:text-4xl font-bold text-white mb-2">
-                {stats.totalUsers}+
+              <div ref={usersCount.ref} className="text-3xl sm:text-4xl font-bold text-white mb-2 tabular-nums">
+                {usersCount.count}+
               </div>
               <div className="text-sm sm:text-base text-white/70">entrepreneurs inscrits</div>
             </div>
@@ -247,10 +254,8 @@ const Home = () => {
               <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#818cf8]/20 mb-3">
                 <DollarSign className="w-6 h-6 text-[#818cf8]" />
               </div>
-              <div className="text-3xl sm:text-4xl font-bold text-white mb-2">
-                {stats.totalValue >= 1000000 
-                  ? `${Math.floor(stats.totalValue / 1000000)}M+$` 
-                  : `${Math.floor(stats.totalValue / 1000)}k+$`}
+              <div ref={valueCount.ref} className="text-3xl sm:text-4xl font-bold text-white mb-2 tabular-nums">
+                {valueCount.count}M+$
               </div>
               <div className="text-sm sm:text-base text-white/70">valeur totale des annonces</div>
             </div>
