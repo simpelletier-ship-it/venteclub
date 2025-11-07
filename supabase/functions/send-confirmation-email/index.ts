@@ -150,7 +150,7 @@ serve(async (req) => {
 
     // Envoyer l'email via Resend
     const { error: emailError } = await resend.emails.send({
-      from: "Vente.Club <onboarding@resend.dev>",
+      from: "Vente.Club <info@vente.club>",
       to: [email],
       subject: "🎉 Bienvenue au Club ! Confirmez votre compte",
       html,
