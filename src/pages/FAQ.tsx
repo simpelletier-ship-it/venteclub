@@ -74,9 +74,15 @@ const FAQ = () => {
                   <p className="mb-3">
                     <strong>Pourquoi un abonnement payant ?</strong> Le Club Select garantit des acheteurs sérieux et engagés, ce qui permet aux vendeurs de recevoir des demandes de qualité. Cela filtre le spam, les robots automatiques et réduit au maximum les courtiers opportunistes.
                   </p>
-                  <p>
+                  <p className="mb-4">
                     C'est l'outil idéal pour les acheteurs actifs recherchant plusieurs opportunités et souhaitant être pris au sérieux par les vendeurs.
                   </p>
+                  <Button 
+                    onClick={() => navigate('/club-select')}
+                    className="w-full sm:w-auto"
+                  >
+                    Découvrez tous les avantages du Club Select
+                  </Button>
                 </AccordionContent>
               </AccordionItem>
 
