@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getAvatarUrl } from "@/lib/avatarUtils";
-import { Heart, LayoutDashboard, Settings, LogOut, Menu, Sparkles } from "lucide-react";
+import { Heart, LayoutDashboard, Settings, LogOut, Menu, Sparkles, MessageSquare } from "lucide-react";
 import { NotificationBell } from "./NotificationBell";
 
 const Header = () => {
@@ -139,6 +139,14 @@ const Header = () => {
                 >
                   <LayoutDashboard className="w-4 h-4" />
                   Tableau de bord
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full" />
+                </button>
+                <button 
+                  onClick={() => navigate("/messages")} 
+                  className="text-muted-foreground hover:text-foreground transition-colors font-medium flex items-center gap-2 relative group"
+                >
+                  <MessageSquare className="w-4 h-4" />
+                  Messagerie
                   <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full" />
                 </button>
                 <button 
@@ -299,6 +307,16 @@ const Header = () => {
                 >
                   <LayoutDashboard className="w-4 h-4" />
                   Tableau de bord
+                </button>
+                <button
+                  onClick={() => {
+                    navigate("/messages");
+                    setMobileMenuOpen(false);
+                  }}
+                  className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors flex items-center gap-2"
+                >
+                  <MessageSquare className="w-4 h-4" />
+                  Messagerie
                 </button>
                 <button
                   onClick={() => {

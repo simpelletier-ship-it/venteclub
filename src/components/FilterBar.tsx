@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/popover";
 import { QUEBEC_INDUSTRIES, LISTING_TYPES } from "@/lib/constants";
 import { QUEBEC_REGIONS, getCitiesFromRegions } from "@/lib/quebecRegions";
+import { formatPrice } from "@/lib/priceFormat";
 import { ChevronDown, X } from "lucide-react";
 
 interface FilterBarProps {
@@ -261,36 +262,46 @@ const FilterBar = ({ onFilter }: FilterBarProps) => {
             step={50000}
             className="w-full"
           />
+          <div className="flex justify-between text-sm text-muted-foreground mt-2">
+            <span>{formatPrice(priceRange[0])}</span>
+            <span>{formatPrice(priceRange[1])}</span>
+          </div>
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-4">
             <div className="flex-1">
               <label className="text-xs text-muted-foreground mb-1 block">Prix minimum</label>
-              <Input
-                type="number"
-                value={priceRange[0]}
-                onChange={(e) => {
-                  const value = Math.max(0, Math.min(Number(e.target.value), priceRange[1]));
-                  setPriceRange([value, priceRange[1]]);
-                }}
-                min={0}
-                max={priceRange[1]}
-                step={50000}
-                className="h-10"
-              />
+              <div className="relative">
+                <Input
+                  type="number"
+                  value={priceRange[0]}
+                  onChange={(e) => {
+                    const value = Math.max(0, Math.min(Number(e.target.value), priceRange[1]));
+                    setPriceRange([value, priceRange[1]]);
+                  }}
+                  min={0}
+                  max={priceRange[1]}
+                  step={50000}
+                  className="h-10 pr-8"
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">$</span>
+              </div>
             </div>
             <div className="flex-1">
               <label className="text-xs text-muted-foreground mb-1 block">Prix maximum</label>
-              <Input
-                type="number"
-                value={priceRange[1]}
-                onChange={(e) => {
-                  const value = Math.min(10000000, Math.max(Number(e.target.value), priceRange[0]));
-                  setPriceRange([priceRange[0], value]);
-                }}
-                min={priceRange[0]}
-                max={10000000}
-                step={50000}
-                className="h-10"
-              />
+              <div className="relative">
+                <Input
+                  type="number"
+                  value={priceRange[1]}
+                  onChange={(e) => {
+                    const value = Math.min(10000000, Math.max(Number(e.target.value), priceRange[0]));
+                    setPriceRange([priceRange[0], value]);
+                  }}
+                  min={priceRange[0]}
+                  max={10000000}
+                  step={50000}
+                  className="h-10 pr-8"
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">$</span>
+              </div>
             </div>
           </div>
         </div>
