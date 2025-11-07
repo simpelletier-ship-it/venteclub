@@ -10,6 +10,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { TypewriterAnimation } from "@/components/AnimatedSearchBar";
 import { useScrollParallax } from "@/hooks/useScrollParallax";
 import { FloatingOpportunities } from "@/components/FloatingOpportunities";
+import { CircuitBackground } from "@/components/CircuitBackground";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -152,6 +153,9 @@ const Home = () => {
       
       {/* Hero Section */}
       <section className="relative min-h-[85vh] flex items-center bg-gradient-to-br from-[#1e1b4b] via-[#312e81] to-[#1e3a8a] overflow-hidden" aria-label="Section principale">
+        {/* Circuit Background */}
+        <CircuitBackground />
+        
         {/* Animated Background Elements with Parallax */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div 
