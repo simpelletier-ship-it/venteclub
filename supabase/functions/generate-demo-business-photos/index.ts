@@ -74,7 +74,10 @@ Deno.serve(async (req) => {
           'boulangerie_patisserie': ['boulangerie-real.jpg', 'boulangerie.jpg']
         };
 
-        // Déterminer quelles images utiliser (4-5 images par annonce)
+        // Images complémentaires génériques pour éviter les doublons
+        const genericImages = ['agence-real.jpg', 'boutique-real.jpg', 'entretien-real.jpg', 'cafe-real.jpg'];
+
+        // Déterminer quelles images utiliser (4-5 images par annonce, sans doublons)
         let imageNames: string[] = [];
         if (business.property_type) {
           // Pour les propriétés immobilières
@@ -83,20 +86,28 @@ Deno.serve(async (req) => {
           // Pour les franchises
           const baseImages = industryImageSets[business.industry] || ['boutique-real.jpg', 'boutique.jpg'];
           imageNames = [...baseImages];
-          // Ajouter des images complémentaires pour avoir 4-5 images
-          while (imageNames.length < 4) {
-            imageNames.push(baseImages[0]);
+          
+          // Ajouter des images génériques uniques pour avoir 4-5 images
+          for (const genericImage of genericImages) {
+            if (imageNames.length >= 4) break;
+            if (!imageNames.includes(genericImage)) {
+              imageNames.push(genericImage);
+            }
           }
         } else {
           const baseImages = industryImageSets[business.industry] || ['agence-real.jpg', 'agence.jpg'];
           imageNames = [...baseImages];
-          // Ajouter des images complémentaires
-          while (imageNames.length < 4) {
-            imageNames.push(baseImages[0]);
+          
+          // Ajouter des images génériques uniques
+          for (const genericImage of genericImages) {
+            if (imageNames.length >= 4) break;
+            if (!imageNames.includes(genericImage)) {
+              imageNames.push(genericImage);
+            }
           }
         }
 
-        console.log(`Using ${imageNames.length} realistic images for ${business.title}`);
+        console.log(`Using ${imageNames.length} unique realistic images for ${business.title}`);
 
         // Générer et uploader chaque image
         const uploadedPhotos = [];

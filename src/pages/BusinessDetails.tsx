@@ -1403,7 +1403,7 @@ const BusinessDetails = () => {
 
             {/* Right Sidebar - Chat Section qui suit le scroll */}
             <div className="lg:col-span-1">
-              <div className="sticky top-20 space-y-4">
+              <div className="sticky top-24 space-y-4">
               {/* Chat Section Sticky */}
               {!isSeller && businessId && user && (
                 <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5 shadow-lg">
