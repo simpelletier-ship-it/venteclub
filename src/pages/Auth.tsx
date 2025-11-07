@@ -56,52 +56,12 @@ const Auth = () => {
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setSecurityWarning(null);
 
     try {
-      // Vérifier reCAPTCHA (optionnel)
-      const recaptchaToken = await executeRecaptcha('LOGIN');
-      
-      if (recaptchaToken) {
-        // Vérifier le token reCAPTCHA avec le backend
-        const { data: recaptchaVerification, error: recaptchaError } = await supabase.functions.invoke('verify-recaptcha', {
-          body: { token: recaptchaToken, action: 'LOGIN' }
-        });
-
-        if (recaptchaError || !recaptchaVerification?.success) {
-          console.warn('reCAPTCHA verification failed, but continuing with login');
-        }
-      } else {
-        console.warn('reCAPTCHA token not available, continuing without verification');
-      }
-
-      // Valider les données
-      const validatedData = loginSchema.parse({ email, password });
-
-      // Vérifier rate limiting
-      const { data: rateLimitCheck } = await supabase.functions.invoke('check-rate-limit', {
-        body: {
-          identifier: validatedData.email,
-          identifierType: 'email',
-          actionType: 'login'
-        }
-      });
-
-      if (rateLimitCheck && !rateLimitCheck.allowed) {
-        toast({
-          variant: "destructive",
-          title: "Trop de tentatives",
-          description: `Vous avez dépassé la limite de tentatives. Veuillez réessayer dans ${rateLimitCheck.minutesRemaining || 15} minutes.`,
-          duration: 10000,
-        });
-        setLoading(false);
-        return;
-      }
-
-      // Tenter la connexion
+      // Connexion simple sans vérifications supplémentaires
       const { error } = await supabase.auth.signInWithPassword({
-        email: validatedData.email,
-        password: validatedData.password,
+        email,
+        password,
       });
 
       if (error) {
@@ -114,42 +74,17 @@ const Auth = () => {
         return;
       }
 
-      // Enregistrer le fingerprint après connexion réussie
-      if (fingerprint) {
-        await supabase.functions.invoke('register-fingerprint', {
-          body: {
-            fingerprintHash: fingerprint.hash,
-            ipAddress: null,
-            userAgent: fingerprint.components.userAgent,
-            screenResolution: fingerprint.components.screenResolution,
-            timezone: fingerprint.components.timezone,
-            language: fingerprint.components.language,
-            platform: fingerprint.components.platform
-          }
-        });
-      }
-
       toast({
         title: "Connexion réussie !",
         description: "Bienvenue sur Vente.Club",
       });
       navigate("/");
     } catch (error: any) {
-      if (error.errors) {
-        error.errors.forEach((err: any) => {
-          toast({
-            variant: "destructive",
-            title: "Erreur de validation",
-            description: err.message,
-          });
-        });
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Erreur",
-          description: error.message,
-        });
-      }
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: error.message || "Une erreur est survenue lors de la connexion.",
+      });
     } finally {
       setLoading(false);
     }
@@ -158,25 +93,8 @@ const Auth = () => {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setSecurityWarning(null);
 
     try {
-      // Vérifier reCAPTCHA (optionnel)
-      const recaptchaToken = await executeRecaptcha('SIGNUP');
-      
-      if (recaptchaToken) {
-        // Vérifier le token reCAPTCHA avec le backend
-        const { data: recaptchaVerification, error: recaptchaError } = await supabase.functions.invoke('verify-recaptcha', {
-          body: { token: recaptchaToken, action: 'SIGNUP' }
-        });
-
-        if (recaptchaError || !recaptchaVerification?.success) {
-          console.warn('reCAPTCHA verification failed, but continuing with signup');
-        }
-      } else {
-        console.warn('reCAPTCHA token not available, continuing without verification');
-      }
-
       if (!acceptedTerms) {
         toast({
           variant: "destructive",
@@ -197,74 +115,16 @@ const Auth = () => {
         return;
       }
 
-      // Valider les données
-      const validatedData = signupSchema.parse({ firstName, lastName, email, password });
-
-      // Vérifier le fingerprint pour détecter les comptes multiples
-      if (fingerprint) {
-        const { data: fingerprintCheck } = await supabase.functions.invoke('check-fingerprint', {
-          body: {
-            fingerprintHash: fingerprint.hash,
-            ipAddress: null,
-            userAgent: fingerprint.components.userAgent,
-            screenResolution: fingerprint.components.screenResolution,
-            timezone: fingerprint.components.timezone,
-            language: fingerprint.components.language,
-            platform: fingerprint.components.platform,
-            email: validatedData.email
-          }
-        });
-
-        if (fingerprintCheck && fingerprintCheck.suspicious) {
-          setSecurityWarning(
-            `Activité suspecte détectée: ${fingerprintCheck.suspicionReasons.join(', ')}. Vérification supplémentaire requise.`
-          );
-          
-          // Si très suspect, bloquer
-          if (fingerprintCheck.suspicionReasons.length > 1) {
-            toast({
-              variant: "destructive",
-              title: "Création de compte bloquée",
-              description: "Activité suspecte détectée. Veuillez contacter le support.",
-              duration: 10000,
-            });
-            setLoading(false);
-            return;
-          }
-        }
-      }
-
-      // Vérifier rate limiting
-      const { data: rateLimitCheck } = await supabase.functions.invoke('check-rate-limit', {
-        body: {
-          identifier: validatedData.email,
-          identifierType: 'email',
-          actionType: 'signup'
-        }
-      });
-
-      if (rateLimitCheck && !rateLimitCheck.allowed) {
-        toast({
-          variant: "destructive",
-          title: "Trop de tentatives",
-          description: `Limite de création de comptes atteinte. Veuillez réessayer dans ${rateLimitCheck.minutesRemaining || 60} minutes.`,
-          duration: 10000,
-        });
-        setLoading(false);
-        return;
-      }
-
-      // Créer le compte avec Supabase
-      const redirectUrl = `${window.location.origin}/email-confirmed`;
+      // Créer le compte avec Supabase - version simplifiée
       const { data, error } = await supabase.auth.signUp({
-        email: validatedData.email,
-        password: validatedData.password,
+        email,
+        password,
         options: {
-          emailRedirectTo: redirectUrl,
+          emailRedirectTo: `${window.location.origin}/`,
           data: {
-            first_name: validatedData.firstName,
-            last_name: validatedData.lastName,
-            full_name: `${validatedData.firstName} ${validatedData.lastName}`
+            first_name: firstName,
+            last_name: lastName,
+            full_name: `${firstName} ${lastName}`
           }
         }
       });
@@ -283,20 +143,23 @@ const Auth = () => {
             duration: 5000,
           });
           
-          // Basculer automatiquement vers l'onglet login après 2 secondes
           setTimeout(() => {
             setActiveTab("login");
-            setPassword(""); // Réinitialiser le mot de passe pour la sécurité
+            setPassword("");
             setConfirmPassword("");
           }, 2000);
         } else {
-          throw error;
+          toast({
+            variant: "destructive",
+            title: "Erreur",
+            description: error.message,
+          });
         }
         setLoading(false);
         return;
       }
       
-      // Vérifier si c'est un utilisateur existant (identities vide = email déjà utilisé)
+      // Vérifier si c'est un utilisateur existant
       if (data?.user && data.user.identities && data.user.identities.length === 0) {
         toast({
           variant: "destructive",
@@ -315,49 +178,10 @@ const Auth = () => {
         return;
       }
 
-      // Enregistrer le fingerprint après signup réussi
-      if (fingerprint && data.user) {
-        await supabase.functions.invoke('register-fingerprint', {
-          body: {
-            fingerprintHash: fingerprint.hash,
-            ipAddress: null,
-            userAgent: fingerprint.components.userAgent,
-            screenResolution: fingerprint.components.screenResolution,
-            timezone: fingerprint.components.timezone,
-            language: fingerprint.components.language,
-            platform: fingerprint.components.platform
-          }
-        });
-      }
-
-      // Envoyer l'email de confirmation manuellement
-      if (data.user && !data.user.email_confirmed_at) {
-        console.log('[SIGNUP] Sending confirmation email to:', validatedData.email);
-        
-        try {
-          const { error: emailError } = await supabase.functions.invoke('send-confirmation-email', {
-            body: {
-              email: validatedData.email,
-              confirmationUrl: redirectUrl
-            }
-          });
-          
-          if (emailError) {
-            console.error('[SIGNUP] Error sending confirmation email:', emailError);
-            // Ne pas bloquer le processus si l'email échoue
-          } else {
-            console.log('[SIGNUP] Confirmation email sent successfully');
-          }
-        } catch (emailError) {
-          console.error('[SIGNUP] Exception sending confirmation email:', emailError);
-          // Ne pas bloquer le processus si l'email échoue
-        }
-      }
-
       toast({
         title: "Compte créé !",
-        description: "Un email de confirmation a été envoyé à votre adresse. Veuillez cliquer sur le lien dans l'email pour activer votre compte. Vous pouvez maintenant vous connecter.",
-        duration: 8000,
+        description: "Vous pouvez maintenant vous connecter avec votre email et mot de passe.",
+        duration: 5000,
       });
       
       // Réinitialiser le formulaire
@@ -367,26 +191,16 @@ const Auth = () => {
       setConfirmPassword("");
       setAcceptedTerms(false);
       
-      // Basculer automatiquement vers l'onglet login après 2 secondes
+      // Basculer vers l'onglet login
       setTimeout(() => {
         setActiveTab("login");
       }, 2000);
     } catch (error: any) {
-      if (error.errors) {
-        error.errors.forEach((err: any) => {
-          toast({
-            variant: "destructive",
-            title: "Erreur de validation",
-            description: err.message,
-          });
-        });
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Erreur",
-          description: error.message,
-        });
-      }
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: error.message || "Une erreur est survenue lors de l'inscription.",
+      });
     } finally {
       setLoading(false);
     }
