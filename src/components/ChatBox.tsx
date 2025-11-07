@@ -5,12 +5,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { getAvatarUrl } from "@/lib/avatarUtils";
-import { Send, Paperclip, X, Download, FileText, Image as ImageIcon, ExternalLink, User, Crown } from "lucide-react";
+import { Send, Paperclip, X, Download, FileText, Image as ImageIcon, ExternalLink, User, Crown, HandCoins } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { QuickMessageTemplates } from "@/components/QuickMessageTemplates";
 import { ProfileCompletionAlert } from "@/components/ProfileCompletionAlert";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { MakeOfferDialog } from "@/components/MakeOfferDialog";
 
 interface Message {
   id: string;
@@ -48,6 +49,7 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
   const [otherUserProfile, setOtherUserProfile] = useState<any>(null);
   const [sellerContact, setSellerContact] = useState<any>(null);
   const [businessSlug, setBusinessSlug] = useState<string | null>(null);
+  const [businessAskingPrice, setBusinessAskingPrice] = useState<number>(0);
   const [currentUserProfile, setCurrentUserProfile] = useState<any>(null);
   const [isSeller, setIsSeller] = useState(false);
   const [showPremiumDialog, setShowPremiumDialog] = useState(false);
@@ -96,7 +98,7 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
   const fetchBusinessSlug = async () => {
     const { data } = await supabase
       .from('businesses')
-      .select('slug, seller_id')
+      .select('slug, seller_id, asking_price')
       .eq('id', businessId)
       .maybeSingle();
     
@@ -105,6 +107,9 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
     }
     if (data?.seller_id) {
       setIsSeller(data.seller_id === currentUserId);
+    }
+    if (data?.asking_price) {
+      setBusinessAskingPrice(data.asking_price);
     }
   };
 
@@ -442,15 +447,25 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
               </Button>
             )}
 
-            {/* Bouton pour voir informations du vendeur - Call to action important */}
-            <Button
-              size="default"
-              className="mt-3 w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 animate-pulse"
-              onClick={handleViewProfile}
-            >
-              <Crown className="mr-2 h-5 w-5" />
-              <span>Voir informations du vendeur</span>
-            </Button>
+            {/* Boutons actions */}
+            <div className="space-y-2">
+              <Button
+                size="default"
+                className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                onClick={handleViewProfile}
+              >
+                <Crown className="mr-2 h-5 w-5" />
+                <span>Voir informations du vendeur</span>
+              </Button>
+              
+              {!isSeller && businessAskingPrice > 0 && (
+                <MakeOfferDialog
+                  businessId={businessId}
+                  businessTitle={businessTitle || "cette entreprise"}
+                  askingPrice={businessAskingPrice}
+                />
+              )}
+            </div>
           </div>
         </div>
       </div>
