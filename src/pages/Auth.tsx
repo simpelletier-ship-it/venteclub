@@ -291,6 +291,26 @@ const Auth = () => {
         }
       });
 
+      // Vérifier si l'email existe déjà (Supabase retourne parfois data.user avec identities vide)
+      if (data?.user && (!data.user.identities || data.user.identities.length === 0)) {
+        toast({
+          variant: "destructive",
+          title: "Compte existant",
+          description: "Un compte avec cet email existe déjà. Vous allez être redirigé vers la page de connexion.",
+          duration: 5000,
+        });
+        
+        // Basculer automatiquement vers l'onglet login après 2 secondes
+        setTimeout(() => {
+          setActiveTab("login");
+          setPassword(""); // Réinitialiser le mot de passe pour la sécurité
+          setConfirmPassword("");
+        }, 2000);
+        
+        setLoading(false);
+        return;
+      }
+
       if (error) {
         // Gérer les différents cas d'email déjà utilisé
         const errorMessage = error.message.toLowerCase();
