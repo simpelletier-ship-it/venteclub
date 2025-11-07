@@ -1,93 +1,205 @@
 export const CircuitBackground = () => {
   return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-30">
+    <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-20">
       <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
         <defs>
-          {/* Gradient pour les impulsions lumineuses */}
-          <linearGradient id="pulse1" x1="0%" y1="0%" x2="100%" y2="0%">
+          {/* Gradients pour les impulsions lumineuses */}
+          <linearGradient id="pulse1">
             <stop offset="0%" stopColor="#818cf8" stopOpacity="0">
-              <animate attributeName="offset" values="0;1;0" dur="4s" repeatCount="indefinite" />
+              <animate attributeName="offset" values="-0.5;1.5" dur="3s" repeatCount="indefinite" />
             </stop>
-            <stop offset="50%" stopColor="#818cf8" stopOpacity="1">
-              <animate attributeName="offset" values="0.5;1.5;0.5" dur="4s" repeatCount="indefinite" />
+            <stop offset="30%" stopColor="#818cf8" stopOpacity="0.8">
+              <animate attributeName="offset" values="-0.2;1.8" dur="3s" repeatCount="indefinite" />
+            </stop>
+            <stop offset="50%" stopColor="#c7d2fe" stopOpacity="1">
+              <animate attributeName="offset" values="0;2" dur="3s" repeatCount="indefinite" />
+            </stop>
+            <stop offset="70%" stopColor="#818cf8" stopOpacity="0.8">
+              <animate attributeName="offset" values="0.2;2.2" dur="3s" repeatCount="indefinite" />
             </stop>
             <stop offset="100%" stopColor="#818cf8" stopOpacity="0">
-              <animate attributeName="offset" values="1;2;1" dur="4s" repeatCount="indefinite" />
+              <animate attributeName="offset" values="0.5;2.5" dur="3s" repeatCount="indefinite" />
             </stop>
           </linearGradient>
 
-          <linearGradient id="pulse2" x1="0%" y1="0%" x2="100%" y2="0%">
+          <linearGradient id="pulse2">
             <stop offset="0%" stopColor="#6366f1" stopOpacity="0">
-              <animate attributeName="offset" values="0;1;0" dur="5s" repeatCount="indefinite" begin="1s" />
+              <animate attributeName="offset" values="-0.5;1.5" dur="4s" repeatCount="indefinite" begin="1s" />
             </stop>
-            <stop offset="50%" stopColor="#6366f1" stopOpacity="1">
-              <animate attributeName="offset" values="0.5;1.5;0.5" dur="5s" repeatCount="indefinite" begin="1s" />
+            <stop offset="30%" stopColor="#6366f1" stopOpacity="0.8">
+              <animate attributeName="offset" values="-0.2;1.8" dur="4s" repeatCount="indefinite" begin="1s" />
+            </stop>
+            <stop offset="50%" stopColor="#a5b4fc" stopOpacity="1">
+              <animate attributeName="offset" values="0;2" dur="4s" repeatCount="indefinite" begin="1s" />
+            </stop>
+            <stop offset="70%" stopColor="#6366f1" stopOpacity="0.8">
+              <animate attributeName="offset" values="0.2;2.2" dur="4s" repeatCount="indefinite" begin="1s" />
             </stop>
             <stop offset="100%" stopColor="#6366f1" stopOpacity="0">
-              <animate attributeName="offset" values="1;2;1" dur="5s" repeatCount="indefinite" begin="1s" />
+              <animate attributeName="offset" values="0.5;2.5" dur="4s" repeatCount="indefinite" begin="1s" />
             </stop>
           </linearGradient>
 
-          <linearGradient id="pulse3" x1="0%" y1="0%" x2="0%" y2="100%">
+          <linearGradient id="pulse3">
             <stop offset="0%" stopColor="#a78bfa" stopOpacity="0">
-              <animate attributeName="offset" values="0;1;0" dur="6s" repeatCount="indefinite" begin="2s" />
+              <animate attributeName="offset" values="-0.5;1.5" dur="5s" repeatCount="indefinite" begin="0.5s" />
             </stop>
-            <stop offset="50%" stopColor="#a78bfa" stopOpacity="1">
-              <animate attributeName="offset" values="0.5;1.5;0.5" dur="6s" repeatCount="indefinite" begin="2s" />
+            <stop offset="30%" stopColor="#a78bfa" stopOpacity="0.8">
+              <animate attributeName="offset" values="-0.2;1.8" dur="5s" repeatCount="indefinite" begin="0.5s" />
+            </stop>
+            <stop offset="50%" stopColor="#ddd6fe" stopOpacity="1">
+              <animate attributeName="offset" values="0;2" dur="5s" repeatCount="indefinite" begin="0.5s" />
+            </stop>
+            <stop offset="70%" stopColor="#a78bfa" stopOpacity="0.8">
+              <animate attributeName="offset" values="0.2;2.2" dur="5s" repeatCount="indefinite" begin="0.5s" />
             </stop>
             <stop offset="100%" stopColor="#a78bfa" stopOpacity="0">
-              <animate attributeName="offset" values="1;2;1" dur="6s" repeatCount="indefinite" begin="2s" />
+              <animate attributeName="offset" values="0.5;2.5" dur="5s" repeatCount="indefinite" begin="0.5s" />
             </stop>
           </linearGradient>
+
+          {/* Filtres pour effet de lueur */}
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+            <feMerge>
+              <feMergeNode in="coloredBlur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
         </defs>
 
-        {/* Circuit ligne 1 - Haut gauche */}
-        <g stroke="#818cf8" strokeWidth="2" fill="none" opacity="0.3">
-          <path d="M 0,80 L 200,80 L 200,180 L 400,180" />
-          <circle cx="200" cy="80" r="4" fill="#818cf8" />
-          <circle cx="200" cy="180" r="4" fill="#818cf8" />
+        {/* Ligne courbe 1 - Haut gauche avec courbe fluide */}
+        <g>
+          <path 
+            d="M -50,100 Q 150,80 250,120 T 500,100" 
+            stroke="#818cf8" 
+            strokeWidth="1.5" 
+            fill="none" 
+            opacity="0.4"
+            strokeLinecap="round"
+          />
+          <path 
+            d="M -50,100 Q 150,80 250,120 T 500,100" 
+            stroke="url(#pulse1)" 
+            strokeWidth="3" 
+            fill="none"
+            filter="url(#glow)"
+            strokeLinecap="round"
+          />
         </g>
-        <path d="M 0,80 L 200,80 L 200,180 L 400,180" stroke="url(#pulse1)" strokeWidth="3" fill="none" />
 
-        {/* Circuit ligne 2 - Haut droite */}
-        <g stroke="#6366f1" strokeWidth="2" fill="none" opacity="0.3">
-          <path d="M 100%,120 L calc(100% - 250px),120 L calc(100% - 250px),250 L calc(100% - 450px),250" />
-          <circle cx="calc(100% - 250px)" cy="120" r="4" fill="#6366f1" />
-          <circle cx="calc(100% - 250px)" cy="250" r="4" fill="#6366f1" />
+        {/* Ligne courbe 2 - Haut droite avec courbe en S */}
+        <g>
+          <path 
+            d="M 100%,150 Q calc(100% - 200px),130 calc(100% - 300px),180 T calc(100% - 600px),160" 
+            stroke="#6366f1" 
+            strokeWidth="1.5" 
+            fill="none" 
+            opacity="0.4"
+            strokeLinecap="round"
+          />
+          <path 
+            d="M 100%,150 Q calc(100% - 200px),130 calc(100% - 300px),180 T calc(100% - 600px),160" 
+            stroke="url(#pulse2)" 
+            strokeWidth="3" 
+            fill="none"
+            filter="url(#glow)"
+            strokeLinecap="round"
+          />
         </g>
-        <path d="M 100%,120 L calc(100% - 250px),120 L calc(100% - 250px),250 L calc(100% - 450px),250" stroke="url(#pulse2)" strokeWidth="3" fill="none" />
 
-        {/* Circuit ligne 3 - Milieu gauche */}
-        <g stroke="#818cf8" strokeWidth="2" fill="none" opacity="0.3">
-          <path d="M 0,50% L 150,50% L 150,calc(50% + 120px) L 350,calc(50% + 120px)" />
-          <circle cx="150" cy="50%" r="4" fill="#818cf8" />
-          <circle cx="150" cy="calc(50% + 120px)" r="4" fill="#818cf8" />
+        {/* Ligne courbe 3 - Milieu avec vague */}
+        <g>
+          <path 
+            d="M -50,45% Q 200,calc(45% - 40px) 400,45% T 700,calc(45% + 20px)" 
+            stroke="#a78bfa" 
+            strokeWidth="1.5" 
+            fill="none" 
+            opacity="0.4"
+            strokeLinecap="round"
+          />
+          <path 
+            d="M -50,45% Q 200,calc(45% - 40px) 400,45% T 700,calc(45% + 20px)" 
+            stroke="url(#pulse3)" 
+            strokeWidth="3" 
+            fill="none"
+            filter="url(#glow)"
+            strokeLinecap="round"
+          />
         </g>
-        <path d="M 0,50% L 150,50% L 150,calc(50% + 120px) L 350,calc(50% + 120px)" stroke="url(#pulse3)" strokeWidth="3" fill="none" />
 
-        {/* Circuit ligne 4 - Milieu droite */}
-        <g stroke="#a78bfa" strokeWidth="2" fill="none" opacity="0.3">
-          <path d="M 100%,calc(50% - 80px) L calc(100% - 180px),calc(50% - 80px) L calc(100% - 180px),calc(50% + 80px) L calc(100% - 380px),calc(50% + 80px)" />
-          <circle cx="calc(100% - 180px)" cy="calc(50% - 80px)" r="4" fill="#a78bfa" />
-          <circle cx="calc(100% - 180px)" cy="calc(50% + 80px)" r="4" fill="#a78bfa" />
+        {/* Ligne courbe 4 - Milieu droite ondulante */}
+        <g>
+          <path 
+            d="M 100%,55% Q calc(100% - 250px),calc(55% + 50px) calc(100% - 450px),55% T calc(100% - 800px),calc(55% - 30px)" 
+            stroke="#818cf8" 
+            strokeWidth="1.5" 
+            fill="none" 
+            opacity="0.4"
+            strokeLinecap="round"
+          />
+          <path 
+            d="M 100%,55% Q calc(100% - 250px),calc(55% + 50px) calc(100% - 450px),55% T calc(100% - 800px),calc(55% - 30px)" 
+            stroke="url(#pulse1)" 
+            strokeWidth="3" 
+            fill="none"
+            filter="url(#glow)"
+            strokeLinecap="round"
+          />
         </g>
-        <path d="M 100%,calc(50% - 80px) L calc(100% - 180px),calc(50% - 80px) L calc(100% - 180px),calc(50% + 80px) L calc(100% - 380px),calc(50% + 80px)" stroke="url(#pulse1)" strokeWidth="3" fill="none" />
 
-        {/* Circuit ligne 5 - Bas gauche */}
-        <g stroke="#6366f1" strokeWidth="2" fill="none" opacity="0.3">
-          <path d="M 0,calc(100% - 150px) L 220,calc(100% - 150px) L 220,calc(100% - 50px) L 420,calc(100% - 50px)" />
-          <circle cx="220" cy="calc(100% - 150px)" r="4" fill="#6366f1" />
-          <circle cx="220" cy="calc(100% - 50px)" r="4" fill="#6366f1" />
+        {/* Ligne courbe 5 - Bas gauche élégante */}
+        <g>
+          <path 
+            d="M -50,calc(100% - 180px) Q 180,calc(100% - 220px) 350,calc(100% - 160px) T 650,calc(100% - 200px)" 
+            stroke="#6366f1" 
+            strokeWidth="1.5" 
+            fill="none" 
+            opacity="0.4"
+            strokeLinecap="round"
+          />
+          <path 
+            d="M -50,calc(100% - 180px) Q 180,calc(100% - 220px) 350,calc(100% - 160px) T 650,calc(100% - 200px)" 
+            stroke="url(#pulse2)" 
+            strokeWidth="3" 
+            fill="none"
+            filter="url(#glow)"
+            strokeLinecap="round"
+          />
         </g>
-        <path d="M 0,calc(100% - 150px) L 220,calc(100% - 150px) L 220,calc(100% - 50px) L 420,calc(100% - 50px)" stroke="url(#pulse2)" strokeWidth="3" fill="none" />
 
-        {/* Circuit ligne 6 - Bas droite */}
-        <g stroke="#818cf8" strokeWidth="2" fill="none" opacity="0.3">
-          <path d="M 100%,calc(100% - 100px) L calc(100% - 200px),calc(100% - 100px) L calc(100% - 200px),calc(100% - 200px) L calc(100% - 400px),calc(100% - 200px)" />
-          <circle cx="calc(100% - 200px)" cy="calc(100% - 100px)" r="4" fill="#818cf8" />
-          <circle cx="calc(100% - 200px)" cy="calc(100% - 200px)" r="4" fill="#818cf8" />
+        {/* Ligne courbe 6 - Bas droite sinueuse */}
+        <g>
+          <path 
+            d="M 100%,calc(100% - 120px) Q calc(100% - 220px),calc(100% - 80px) calc(100% - 400px),calc(100% - 140px) T calc(100% - 750px),calc(100% - 100px)" 
+            stroke="#a78bfa" 
+            strokeWidth="1.5" 
+            fill="none" 
+            opacity="0.4"
+            strokeLinecap="round"
+          />
+          <path 
+            d="M 100%,calc(100% - 120px) Q calc(100% - 220px),calc(100% - 80px) calc(100% - 400px),calc(100% - 140px) T calc(100% - 750px),calc(100% - 100px)" 
+            stroke="url(#pulse3)" 
+            strokeWidth="3" 
+            fill="none"
+            filter="url(#glow)"
+            strokeLinecap="round"
+          />
         </g>
-        <path d="M 100%,calc(100% - 100px) L calc(100% - 200px),calc(100% - 100px) L calc(100% - 200px),calc(100% - 200px) L calc(100% - 400px),calc(100% - 200px)" stroke="url(#pulse3)" strokeWidth="3" fill="none" />
+
+        {/* Points lumineux aux extrémités et intersections */}
+        <g filter="url(#glow)">
+          <circle cx="250" cy="120" r="3" fill="#c7d2fe" opacity="0.6">
+            <animate attributeName="opacity" values="0.3;0.8;0.3" dur="2s" repeatCount="indefinite" />
+          </circle>
+          <circle cx="400" cy="45%" r="3" fill="#ddd6fe" opacity="0.6">
+            <animate attributeName="opacity" values="0.3;0.8;0.3" dur="3s" repeatCount="indefinite" begin="0.5s" />
+          </circle>
+          <circle cx="350" cy="calc(100% - 160px)" r="3" fill="#a5b4fc" opacity="0.6">
+            <animate attributeName="opacity" values="0.3;0.8;0.3" dur="2.5s" repeatCount="indefinite" begin="1s" />
+          </circle>
+        </g>
       </svg>
     </div>
   );
