@@ -107,22 +107,22 @@ const Header = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
-            <button 
-              onClick={() => navigate("/entreprises")} 
-              className="text-muted-foreground hover:text-foreground transition-colors font-medium relative group"
-            >
-              Entreprises
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full" />
-            </button>
-            <button 
-              onClick={() => navigate("/immeubles-commerciaux")} 
-              className="text-muted-foreground hover:text-foreground transition-colors font-medium relative group"
-            >
-              Immeubles
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full" />
-            </button>
-            {user && (
+            {user ? (
               <>
+                <button 
+                  onClick={() => navigate("/entreprises")} 
+                  className="text-muted-foreground hover:text-foreground transition-colors font-medium relative group"
+                >
+                  Entreprises
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full" />
+                </button>
+                <button 
+                  onClick={() => navigate("/immeubles-commerciaux")} 
+                  className="text-muted-foreground hover:text-foreground transition-colors font-medium relative group"
+                >
+                  Immeubles
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full" />
+                </button>
                 <button 
                   onClick={() => navigate("/dashboard")} 
                   className="text-muted-foreground hover:text-foreground transition-colors font-medium flex items-center gap-2 relative group"
@@ -140,6 +140,14 @@ const Header = () => {
                   <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full" />
                 </button>
               </>
+            ) : (
+              <button 
+                onClick={() => navigate("/faq")} 
+                className="text-muted-foreground hover:text-foreground transition-colors font-medium relative group"
+              >
+                FAQ
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full" />
+              </button>
             )}
           </div>
 
@@ -239,35 +247,35 @@ const Header = () => {
         {/* Mobile Menu */}
         {mobileMenuOpen && (
           <div className="md:hidden mt-4 pb-4 space-y-2 border-t border-border pt-4 animate-slide-up">
-            <button
-              onClick={() => {
-                navigate("/entreprises");
-                setMobileMenuOpen(false);
-              }}
-              className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors"
-            >
-              Entreprises
-            </button>
-            <button
-              onClick={() => {
-                navigate("/immeubles-commerciaux");
-                setMobileMenuOpen(false);
-              }}
-              className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors"
-            >
-              Immeubles
-            </button>
-            <button
-              onClick={() => {
-                navigate("/ressources");
-                setMobileMenuOpen(false);
-              }}
-              className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors"
-            >
-              Ressources
-            </button>
-            {user && (
+            {user ? (
               <>
+                <button
+                  onClick={() => {
+                    navigate("/entreprises");
+                    setMobileMenuOpen(false);
+                  }}
+                  className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors"
+                >
+                  Entreprises
+                </button>
+                <button
+                  onClick={() => {
+                    navigate("/immeubles-commerciaux");
+                    setMobileMenuOpen(false);
+                  }}
+                  className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors"
+                >
+                  Immeubles
+                </button>
+                <button
+                  onClick={() => {
+                    navigate("/ressources");
+                    setMobileMenuOpen(false);
+                  }}
+                  className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors"
+                >
+                  Ressources
+                </button>
                 <button
                   onClick={() => {
                     navigate("/dashboard");
@@ -289,6 +297,16 @@ const Header = () => {
                   Favoris
                 </button>
               </>
+            ) : (
+              <button
+                onClick={() => {
+                  navigate("/faq");
+                  setMobileMenuOpen(false);
+                }}
+                className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors"
+              >
+                FAQ
+              </button>
             )}
             {isAdmin && (
               <button
