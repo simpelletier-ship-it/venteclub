@@ -9,6 +9,8 @@ import { FavoriteButton } from "./FavoriteButton";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
+import { formatPrice } from "@/lib/priceFormatter";
+
 interface BusinessCardProps {
   id?: string;
   slug?: string;
@@ -21,6 +23,7 @@ interface BusinessCardProps {
   annual_revenue?: number;
   price?: string;
   asking_price?: number;
+  asking_price_max?: number;
   profit?: string;
   profit_margin?: number;
   baiia?: number;
@@ -51,6 +54,7 @@ const BusinessCard = ({
   region,
   annual_revenue,
   asking_price,
+  asking_price_max,
   baiia,
   description,
   featured = false,
@@ -112,7 +116,7 @@ const BusinessCard = ({
   }, [id]);
   
   const displayRevenue = annual_revenue ? `${annual_revenue.toLocaleString('fr-CA')} $` : 'N/A';
-  const displayPrice = asking_price === 0 ? 'À discuter' : asking_price ? `${asking_price.toLocaleString('fr-CA')} $` : 'N/A';
+  const displayPrice = formatPrice(asking_price, asking_price_max);
   const displayBaiia = baiia ? `${baiia.toLocaleString('fr-CA')} $` : 'N/D';
 
   // Déterminer le type d'annonce - check sale_type, property_type, and keywords

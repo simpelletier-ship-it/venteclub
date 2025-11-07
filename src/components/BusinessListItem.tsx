@@ -8,6 +8,8 @@ import { FavoriteButton } from "./FavoriteButton";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
+import { formatPrice } from "@/lib/priceFormatter";
+
 interface BusinessListItemProps {
   id?: string;
   slug?: string;
@@ -20,6 +22,7 @@ interface BusinessListItemProps {
   annual_revenue?: number;
   price?: string;
   asking_price?: number;
+  asking_price_max?: number;
   profit?: string;
   profit_margin?: number;
   baiia?: number;
@@ -44,6 +47,7 @@ const BusinessListItem = ({
   annual_revenue,
   price,
   asking_price,
+  asking_price_max,
   profit,
   profit_margin,
   baiia,
@@ -96,7 +100,7 @@ const BusinessListItem = ({
   }, [id]);
   
   const displayRevenue = revenue || (annual_revenue ? `${annual_revenue.toLocaleString('fr-CA', { useGrouping: true }).replace(/\$/g, '')} $` : 'N/A');
-  const displayPrice = price || (asking_price === 0 ? 'À discuter' : asking_price ? `${asking_price.toLocaleString('fr-CA', { useGrouping: true }).replace(/\$/g, '')} $` : 'N/A');
+  const displayPrice = price || formatPrice(asking_price, asking_price_max);
   const displayProfit = profit || (profit_margin ? `${profit_margin} %` : 'N/A');
   const displayBaiia = baiia ? `${baiia.toLocaleString('fr-CA', { useGrouping: true }).replace(/\$/g, '')} $` : 'N/D';
 

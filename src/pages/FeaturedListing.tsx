@@ -179,9 +179,13 @@ const FeaturedListing = () => {
               Mettez votre annonce en vedette
             </h1>
             
-            <p className="text-xl md:text-2xl text-white/90 mb-8 max-w-2xl mx-auto">
+            <p className="text-xl md:text-2xl text-white/90 mb-4 max-w-2xl mx-auto">
               Apparaissez en premier et vendez jusqu'à 5x plus rapidement
             </p>
+            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-6 py-2 rounded-full border border-white/20">
+              <CheckCircle2 className="w-5 h-5 text-white" />
+              <span className="text-white font-semibold">Paiement unique • Sans engagement • Aucun renouvellement automatique</span>
+            </div>
 
             {/* Pricing Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto mb-8">

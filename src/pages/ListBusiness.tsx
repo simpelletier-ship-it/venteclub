@@ -85,6 +85,7 @@ const ListBusiness = () => {
     postal_code: "",
     annual_revenue: "",
     asking_price: "",
+    asking_price_max: "",
     profit_margin: "",
     baiia: "",
     net_profit: "",
@@ -273,6 +274,7 @@ const ListBusiness = () => {
         postal_code: "",
         annual_revenue: business.annual_revenue?.toString() || "",
         asking_price: business.asking_price?.toString() || "",
+        asking_price_max: business.asking_price_max?.toString() || "",
         profit_margin: business.profit_margin?.toString() || "",
         baiia: business.baiia?.toString() || "",
         net_profit: business.net_profit?.toString() || "",
@@ -579,6 +581,7 @@ const ListBusiness = () => {
             province: formData.province,
             annual_revenue: validatedData.annual_revenue,
             asking_price: validatedData.asking_price,
+            asking_price_max: formData.asking_price_max && formData.asking_price_max.trim() !== "" ? parseFloat(formData.asking_price_max) : null,
             profit_margin: validatedData.profit_margin,
             baiia: validatedData.baiia,
             net_profit: formData.net_profit && !isNaN(parseFloat(formData.net_profit)) ? parseFloat(formData.net_profit) : null,
@@ -622,6 +625,7 @@ const ListBusiness = () => {
               province: formData.province,
               annual_revenue: validatedData.annual_revenue,
               asking_price: validatedData.asking_price,
+              asking_price_max: formData.asking_price_max && formData.asking_price_max.trim() !== "" ? parseFloat(formData.asking_price_max) : null,
               profit_margin: validatedData.profit_margin,
               baiia: validatedData.baiia,
               net_profit: formData.net_profit && !isNaN(parseFloat(formData.net_profit)) ? parseFloat(formData.net_profit) : null,
@@ -690,6 +694,7 @@ const ListBusiness = () => {
           province: formData.province,
           annual_revenue: validatedData.annual_revenue,
           asking_price: validatedData.asking_price,
+          asking_price_max: formData.asking_price_max && formData.asking_price_max.trim() !== "" ? parseFloat(formData.asking_price_max) : null,
           profit_margin: validatedData.profit_margin,
           baiia: validatedData.baiia,
           net_profit: formData.net_profit && !isNaN(parseFloat(formData.net_profit)) ? parseFloat(formData.net_profit) : null,
@@ -1308,7 +1313,7 @@ const ListBusiness = () => {
                             onCheckedChange={(checked) => {
                               setPriceNegotiable(checked as boolean);
                               if (checked) {
-                                setFormData({ ...formData, asking_price: "" });
+                                setFormData({ ...formData, asking_price: "", asking_price_max: "" });
                               }
                             }}
                           />
@@ -1318,6 +1323,23 @@ const ListBusiness = () => {
                         </div>
                       </div>
 
+                      <div>
+                        <Label htmlFor="asking_price_max">
+                          Prix maximum (optionnel)
+                        </Label>
+                        <Input
+                          id="asking_price_max"
+                          type="number"
+                          value={formData.asking_price_max}
+                          onChange={(e) => setFormData({ ...formData, asking_price_max: e.target.value })}
+                          disabled={priceNegotiable}
+                          placeholder="Ex: 150 000"
+                          min={formData.asking_price || "0"}
+                        />
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Pour afficher une fourchette de prix (ex: 100 000 $ - 150 000 $)
+                        </p>
+                      </div>
                       <div>
                         <Label htmlFor="sale_type">Type de vente</Label>
                         <Select

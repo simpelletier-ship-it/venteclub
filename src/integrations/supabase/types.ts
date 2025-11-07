@@ -327,6 +327,7 @@ export type Database = {
           annual_revenue: number | null
           approval_status: string | null
           asking_price: number
+          asking_price_max: number | null
           baiia: number | null
           baiia_margin: number | null
           city: string | null
@@ -383,6 +384,7 @@ export type Database = {
           annual_revenue?: number | null
           approval_status?: string | null
           asking_price: number
+          asking_price_max?: number | null
           baiia?: number | null
           baiia_margin?: number | null
           city?: string | null
@@ -439,6 +441,7 @@ export type Database = {
           annual_revenue?: number | null
           approval_status?: string | null
           asking_price?: number
+          asking_price_max?: number | null
           baiia?: number | null
           baiia_margin?: number | null
           city?: string | null
