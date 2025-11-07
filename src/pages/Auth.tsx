@@ -240,12 +240,33 @@ const Auth = () => {
         return;
       }
 
-      console.log('[VERIFY] Compte créé avec succès');
-      toast({
-        title: "Compte créé !",
-        description: "Votre compte a été créé avec succès. Vous pouvez maintenant vous connecter.",
-        duration: 5000,
+      console.log('[VERIFY] Compte créé avec succès, connexion automatique...');
+      
+      // Connexion automatique après la création du compte
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: pendingSignupData.email,
+        password: pendingSignupData.password,
       });
+
+      if (signInError) {
+        console.error('[VERIFY] Erreur connexion auto:', signInError);
+        toast({
+          title: "Compte créé !",
+          description: "Votre compte a été créé. Veuillez vous connecter.",
+        });
+        setActiveTab("login");
+        setEmail(pendingSignupData.email);
+      } else {
+        console.log('[VERIFY] Connexion automatique réussie');
+        toast({
+          title: "Bienvenue sur Vente.Club !",
+          description: "Votre compte a été créé et vous êtes maintenant connecté.",
+          duration: 5000,
+        });
+        
+        // Rediriger vers la page d'accueil
+        navigate("/");
+      }
       
       // Réinitialiser tout
       setShowVerificationCode(false);
@@ -257,12 +278,6 @@ const Auth = () => {
       setPassword("");
       setConfirmPassword("");
       setAcceptedTerms(false);
-      
-      // Basculer vers l'onglet login avec l'email pré-rempli
-      setTimeout(() => {
-        setActiveTab("login");
-        setEmail(pendingSignupData.email);
-      }, 1000);
     } catch (error: any) {
       console.error('[VERIFY] Exception:', error);
       toast({
