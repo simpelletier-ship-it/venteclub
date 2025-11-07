@@ -697,6 +697,16 @@ const BusinessDetails = () => {
         window.open(data.url, '_blank');
         setShowUnlockDialog(false);
         
+        // Événement de conversion Google Ads - Achat de coordonnées
+        if (typeof window !== 'undefined' && (window as any).gtag) {
+          (window as any).gtag('event', 'conversion', {
+            'send_to': 'AW-974642760/z7Q0CLnYktUDEMi839AD',
+            'value': 15.0,
+            'currency': 'CAD',
+            'transaction_id': Date.now().toString()
+          });
+        }
+        
         toast({
           title: "Redirection vers le paiement",
           description: "Vous allez être redirigé vers la page de paiement sécurisée.",

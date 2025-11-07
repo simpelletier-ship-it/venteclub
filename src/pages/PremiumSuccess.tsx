@@ -59,6 +59,16 @@ const PremiumSuccess = () => {
     };
 
     fetchUser();
+    
+    // Événement de conversion Google Ads - Abonnement premium
+    if (typeof window !== 'undefined' && (window as any).gtag) {
+      (window as any).gtag('event', 'conversion', {
+        'send_to': 'AW-974642760/z7Q0CLnYktUDEMi839AD',
+        'value': 99.0,
+        'currency': 'CAD',
+        'transaction_id': Date.now().toString()
+      });
+    }
 
     return () => clearInterval(interval);
   }, []);

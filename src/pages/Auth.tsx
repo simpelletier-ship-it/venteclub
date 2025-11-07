@@ -258,6 +258,16 @@ const Auth = () => {
         setEmail(pendingSignupData.email);
       } else {
         console.log('[VERIFY] Connexion automatique réussie');
+        
+        // Événement de conversion Google Ads - Inscription réussie
+        if (typeof window !== 'undefined' && (window as any).gtag) {
+          (window as any).gtag('event', 'conversion', {
+            'send_to': 'AW-974642760/z7Q0CLnYktUDEMi839AD',
+            'value': 1.0,
+            'currency': 'CAD'
+          });
+        }
+        
         toast({
           title: "Bienvenue sur Vente.Club !",
           description: "Votre compte a été créé et vous êtes maintenant connecté.",

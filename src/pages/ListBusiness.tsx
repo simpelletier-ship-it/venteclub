@@ -776,6 +776,15 @@ const ListBusiness = () => {
           : "Votre annonce a été soumise et est en attente d'approbation. Vous recevrez un email de confirmation.",
       });
       
+      // Événement de conversion Google Ads - Annonce publiée (non brouillon)
+      if (!isDraft && typeof window !== 'undefined' && (window as any).gtag) {
+        (window as any).gtag('event', 'conversion', {
+          'send_to': 'AW-974642760/z7Q0CLnYktUDEMi839AD',
+          'value': 1.0,
+          'currency': 'CAD'
+        });
+      }
+      
       // Supprimer le brouillon si l'annonce est publiée avec succès
       if (!isDraft) {
         await deleteDraft();
