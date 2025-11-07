@@ -92,10 +92,13 @@ const Auth = () => {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('[SIGNUP] Démarrage de l\'inscription');
     setLoading(true);
 
     try {
+      console.log('[SIGNUP] Vérification des conditions');
       if (!acceptedTerms) {
+        console.log('[SIGNUP] Conditions non acceptées');
         toast({
           variant: "destructive",
           title: "Conditions non acceptées",
@@ -105,7 +108,9 @@ const Auth = () => {
         return;
       }
 
+      console.log('[SIGNUP] Vérification des mots de passe');
       if (password !== confirmPassword) {
+        console.log('[SIGNUP] Mots de passe non correspondants');
         toast({
           variant: "destructive",
           title: "Erreur",
@@ -115,6 +120,8 @@ const Auth = () => {
         return;
       }
 
+      console.log('[SIGNUP] Appel Supabase signUp avec:', { email, firstName, lastName });
+      
       // Créer le compte avec Supabase - version simplifiée
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -129,38 +136,22 @@ const Auth = () => {
         }
       });
 
+      console.log('[SIGNUP] Réponse Supabase:', { data, error });
+
       if (error) {
-        // Gérer les différents cas d'email déjà utilisé
-        const errorMessage = error.message.toLowerCase();
-        if (errorMessage.includes('already registered') || 
-            errorMessage.includes('user already exists') ||
-            errorMessage.includes('email already in use') ||
-            errorMessage.includes('user_already_exists')) {
-          toast({
-            variant: "destructive",
-            title: "Compte existant",
-            description: "Un compte avec cet email existe déjà. Voulez-vous vous connecter ?",
-            duration: 5000,
-          });
-          
-          setTimeout(() => {
-            setActiveTab("login");
-            setPassword("");
-            setConfirmPassword("");
-          }, 2000);
-        } else {
-          toast({
-            variant: "destructive",
-            title: "Erreur",
-            description: error.message,
-          });
-        }
+        console.error('[SIGNUP] Erreur Supabase:', error);
+        toast({
+          variant: "destructive",
+          title: "Erreur",
+          description: error.message,
+        });
         setLoading(false);
         return;
       }
       
       // Vérifier si c'est un utilisateur existant
       if (data?.user && data.user.identities && data.user.identities.length === 0) {
+        console.log('[SIGNUP] Compte existant détecté');
         toast({
           variant: "destructive",
           title: "Compte existant",
@@ -178,9 +169,10 @@ const Auth = () => {
         return;
       }
 
+      console.log('[SIGNUP] Compte créé avec succès');
       toast({
         title: "Compte créé !",
-        description: "Vous pouvez maintenant vous connecter avec votre email et mot de passe.",
+        description: "Vous pouvez maintenant vous connecter.",
         duration: 5000,
       });
       
@@ -196,12 +188,14 @@ const Auth = () => {
         setActiveTab("login");
       }, 2000);
     } catch (error: any) {
+      console.error('[SIGNUP] Exception:', error);
       toast({
         variant: "destructive",
         title: "Erreur",
         description: error.message || "Une erreur est survenue lors de l'inscription.",
       });
     } finally {
+      console.log('[SIGNUP] Finally - arrêt du loading');
       setLoading(false);
     }
   };
