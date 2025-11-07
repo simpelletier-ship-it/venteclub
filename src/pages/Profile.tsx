@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Mail, Phone, MapPin, Briefcase, Globe, Linkedin, Calendar, User, Lock, Crown } from "lucide-react";
+import { ArrowLeft, Mail, Phone, MapPin, Briefcase, Globe, Linkedin, Calendar, User, Lock, Crown, BadgeCheck } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface Profile {
@@ -108,6 +108,22 @@ export default function Profile() {
       .slice(0, 2);
   };
 
+  const isProfileComplete = (profile: Profile) => {
+    return !!(
+      profile.full_name &&
+      profile.email &&
+      profile.phone &&
+      profile.street_address &&
+      profile.city &&
+      profile.province &&
+      profile.postal_code &&
+      profile.country &&
+      profile.bio &&
+      profile.company_name &&
+      profile.job_title
+    );
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -168,6 +184,15 @@ export default function Profile() {
                     <div>
                       <div className="flex items-center gap-2 mb-2 flex-wrap">
                         <CardTitle className="text-2xl">{profile.full_name || 'Utilisateur'}</CardTitle>
+                        {isProfileComplete(profile) && (
+                          <Badge 
+                            variant="default" 
+                            className="bg-gradient-to-r from-green-500 to-emerald-600 text-white border-0 gap-1"
+                          >
+                            <BadgeCheck className="h-3 w-3" />
+                            Profil vérifié
+                          </Badge>
+                        )}
                         {profileHasPremium && (
                           <Badge 
                             variant="default" 
