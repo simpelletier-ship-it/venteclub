@@ -168,22 +168,51 @@ export const getNewListingEmail = (businessTitle: string, businessPrice: string,
 };
 
 // Template 5: Validation d'annonce
-export const getListingApprovedEmail = (businessTitle: string, businessUrl: string) => {
+export const getListingApprovedEmail = (
+  sellerName: string,
+  businessTitle: string, 
+  businessPrice: string,
+  businessLocation: string,
+  businessUrl: string
+) => {
   const content = `
-    <h1>Votre annonce est approuvée</h1>
-    <p>Excellente nouvelle : votre annonce a été validée et est maintenant visible par tous les acheteurs potentiels.</p>
-    <div class="info-box">
-      <p><strong>${businessTitle}</strong></p>
+    <h1>✅ Votre annonce est approuvée</h1>
+    <p>Bonjour ${sellerName},</p>
+    <p>Excellente nouvelle : votre annonce a été validée par notre équipe et est maintenant visible par tous les acheteurs potentiels.</p>
+    
+    <div style="border: 1px solid #e8e8e8; border-radius: 8px; padding: 24px; margin: 24px 0; background-color: #fafafa;">
+      <h2 style="font-size: 18px; font-weight: 600; margin-bottom: 16px; color: #1a1a1a;">${businessTitle}</h2>
+      <p style="margin-bottom: 8px; color: #4a4a4a;"><strong>Prix demandé :</strong> ${businessPrice}</p>
+      <p style="margin-bottom: 8px; color: #4a4a4a;"><strong>Localisation :</strong> ${businessLocation}</p>
+      <p style="margin-bottom: 0; color: #22c55e; font-weight: 500;"><strong>Statut :</strong> ✓ En ligne</p>
     </div>
+
     <p>Votre annonce est maintenant en ligne et accessible aux milliers d'acheteurs qui visitent ${BRAND_NAME} chaque jour.</p>
+    
     <table width="100%" cellpadding="0" cellspacing="0">
       <tr>
         <td align="center">
-          <a href="${businessUrl}" class="button">Voir mon annonce</a>
+          <a href="${businessUrl}" class="button">Voir mon annonce en ligne</a>
         </td>
       </tr>
     </table>
-    <p style="font-size: 14px; color: #666666;">Assurez-vous de répondre rapidement aux messages que vous recevrez.</p>
+
+    <hr class="divider">
+
+    <div style="background-color: #fef3c7; border-left: 3px solid #f59e0b; padding: 16px 20px; margin: 24px 0; border-radius: 4px;">
+      <p style="margin-bottom: 12px; font-weight: 600; color: #92400e;">💡 Conseils pour maximiser vos chances de vente :</p>
+      <p style="margin-bottom: 8px; font-size: 14px; color: #92400e;">• Répondez rapidement aux messages des acheteurs intéressés</p>
+      <p style="margin-bottom: 8px; font-size: 14px; color: #92400e;">• Soyez transparent sur les informations financières</p>
+      <p style="margin-bottom: 8px; font-size: 14px; color: #92400e;">• Mettez à jour votre annonce si nécessaire</p>
+      <p style="margin-bottom: 0; font-size: 14px; color: #92400e;">• Consultez régulièrement vos notifications</p>
+    </div>
+
+    <div class="info-box">
+      <p><strong>Option disponible :</strong> Mettez votre annonce en vedette pour apparaître en haut des résultats et augmenter sa visibilité de 300%.</p>
+    </div>
+
+    <p style="margin-top: 24px;">Nous vous souhaitons une vente réussie. Notre équipe reste à votre disposition pour toute question.</p>
+    <p style="font-size: 14px; color: #666666; margin-top: 16px;">Cordialement,<br><strong>L'équipe ${BRAND_NAME}</strong></p>
   `;
   return getEmailLayout(content, "Votre annonce est en ligne");
 };
