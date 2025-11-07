@@ -568,8 +568,8 @@ const BusinessDetails = () => {
       // 4. Recharger les limites de conversation
       await checkConversationLimits(user.id);
       
-      // 5. Rediriger vers la messagerie avec cette conversation
-      navigate(`/messages?conversation=${businessId}-${business.seller_id}`);
+      // 5. Ouvrir le chat dans la page au lieu de rediriger
+      setIsChatOpen(true);
       
       toast({
         title: "Chat déverrouillé avec succès",
