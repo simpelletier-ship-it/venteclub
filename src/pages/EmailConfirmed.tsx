@@ -17,12 +17,28 @@ export default function EmailConfirmed() {
       
       if (session) {
         setLoading(false);
+        
+        // Déclencher l'événement de conversion Google Ads
+        if (typeof window !== 'undefined' && window.gtag) {
+          window.gtag('event', 'conversion', {
+            'send_to': 'AW-974642760/z7Q0CLnYktUDEMi839AD'
+          });
+          console.log('[Google Ads] Conversion "Website traffic" déclenchée');
+        }
       } else {
         // Attendre un peu pour voir si la session va se charger
         setTimeout(async () => {
           const { data: { session: retrySession } } = await supabase.auth.getSession();
           if (retrySession) {
             setLoading(false);
+            
+            // Déclencher l'événement de conversion Google Ads
+            if (typeof window !== 'undefined' && window.gtag) {
+              window.gtag('event', 'conversion', {
+                'send_to': 'AW-974642760/z7Q0CLnYktUDEMi839AD'
+              });
+              console.log('[Google Ads] Conversion "Website traffic" déclenchée');
+            }
           } else {
             setError(true);
             setLoading(false);
