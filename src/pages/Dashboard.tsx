@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Star, XCircle, Edit, TrendingUp, Eye, Building, MessageSquare, Crown } from "lucide-react";
+import { Plus, Star, XCircle, Edit, TrendingUp, Eye, Building, MessageSquare, Crown, FileText, CheckCircle } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import BusinessCard from "@/components/BusinessCard";
@@ -28,10 +28,10 @@ const Dashboard = () => {
   const [businessToWithdraw, setBusinessToWithdraw] = useState<any>(null);
   const [selectedDuration, setSelectedDuration] = useState<7 | 14 | 30>(7);
   const [stats, setStats] = useState({
-    totalBusinesses: 0,
-    activeBusinesses: 0,
-    totalViews: 0,
-    pendingApproval: 0
+    published: 0,
+    draft: 0,
+    approved: 0,
+    sold: 0
   });
   const defaultTab = searchParams.get('tab') || 'businesses';
 
@@ -139,16 +139,16 @@ const Dashboard = () => {
       setBusinesses(businessesWithFeatured);
       
       // Calculate stats
-      const totalBusinesses = businessesWithFeatured.length;
-      const activeBusinesses = businessesWithFeatured.filter(b => b.status === 'active' && b.approval_status === 'approved').length;
-      const totalViews = businessesWithFeatured.reduce((sum, b) => sum + (b.views_count || 0), 0);
-      const pendingApproval = businessesWithFeatured.filter(b => b.approval_status === 'pending').length;
+      const published = businessesWithFeatured.filter(b => b.status === 'active' && b.approval_status === 'approved').length;
+      const draft = businessesWithFeatured.filter(b => b.status === 'inactive').length;
+      const approved = businessesWithFeatured.filter(b => b.approval_status === 'approved').length;
+      const sold = businessesWithFeatured.filter(b => b.status === 'sold').length;
       
       setStats({
-        totalBusinesses,
-        activeBusinesses,
-        totalViews,
-        pendingApproval
+        published,
+        draft,
+        approved,
+        sold
       });
     } catch (error: any) {
       console.error('[DASHBOARD] Error fetching businesses:', error);
@@ -244,51 +244,51 @@ const Dashboard = () => {
 
           {/* Stats Cards */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            <Card className="border-2 hover:shadow-lg transition-all">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                  <Building className="h-4 w-4" />
-                  Total annonces
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold">{stats.totalBusinesses}</div>
-              </CardContent>
-            </Card>
-
             <Card className="border-2 border-green-200 dark:border-green-800 bg-green-50/50 dark:bg-green-950/20 hover:shadow-lg transition-all">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-green-700 dark:text-green-400 flex items-center gap-2">
                   <TrendingUp className="h-4 w-4" />
-                  Actives
+                  Publiées
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold text-green-700 dark:text-green-400">{stats.activeBusinesses}</div>
+                <div className="text-3xl font-bold text-green-700 dark:text-green-400">{stats.published}</div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-2 hover:shadow-lg transition-all">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  Brouillon
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold">{stats.draft}</div>
               </CardContent>
             </Card>
 
             <Card className="border-2 border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-950/20 hover:shadow-lg transition-all">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-blue-700 dark:text-blue-400 flex items-center gap-2">
-                  <Eye className="h-4 w-4" />
-                  Vues totales
+                  <Star className="h-4 w-4" />
+                  Approuvées
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold text-blue-700 dark:text-blue-400">{stats.totalViews}</div>
+                <div className="text-3xl font-bold text-blue-700 dark:text-blue-400">{stats.approved}</div>
               </CardContent>
             </Card>
 
-            <Card className="border-2 border-yellow-200 dark:border-yellow-800 bg-yellow-50/50 dark:bg-yellow-950/20 hover:shadow-lg transition-all">
+            <Card className="border-2 border-orange-200 dark:border-orange-800 bg-orange-50/50 dark:bg-orange-950/20 hover:shadow-lg transition-all">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-yellow-700 dark:text-yellow-400 flex items-center gap-2">
-                  <Star className="h-4 w-4" />
-                  En attente
+                <CardTitle className="text-sm font-medium text-orange-700 dark:text-orange-400 flex items-center gap-2">
+                  <CheckCircle className="h-4 w-4" />
+                  Vendues
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold text-yellow-700 dark:text-yellow-400">{stats.pendingApproval}</div>
+                <div className="text-3xl font-bold text-orange-700 dark:text-orange-400">{stats.sold}</div>
               </CardContent>
             </Card>
           </div>
