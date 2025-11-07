@@ -45,7 +45,16 @@ const EmailConfirmed = lazy(() => import("./pages/EmailConfirmed"));
 const PremiumSuccess = lazy(() => import("./pages/PremiumSuccess"));
 const TestEmail = lazy(() => import("./pages/TestEmail"));
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      gcTime: 10 * 60 * 1000, // 10 minutes
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 // Lazy load admin security page
 const AdminSecurity = lazy(() => import("./pages/AdminSecurity"));

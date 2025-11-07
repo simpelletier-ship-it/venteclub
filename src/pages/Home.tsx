@@ -140,7 +140,7 @@ const Home = () => {
       />
       
       {/* Hero Section */}
-      <section className="relative min-h-[85vh] flex items-center bg-gradient-to-br from-[#1e1b4b] via-[#312e81] to-[#1e3a8a] overflow-hidden" aria-label="Section principale">
+      <section className="relative min-h-[70vh] sm:min-h-[80vh] lg:min-h-[85vh] flex items-center bg-gradient-to-br from-[#1e1b4b] via-[#312e81] to-[#1e3a8a] overflow-hidden" aria-label="Section principale">
         {/* Circuit Background */}
         <CircuitBackground />
         
@@ -171,15 +171,15 @@ const Home = () => {
           />
         </div>
         
-        <div className="container mx-auto px-4 py-20 relative z-10">
+        <div className="container mx-auto px-4 py-10 sm:py-16 lg:py-20 relative z-10">
           <div className="max-w-6xl mx-auto">
             <div 
-              className="space-y-8 animate-slide-up transition-transform duration-100" 
+              className="space-y-6 sm:space-y-8 animate-slide-up transition-transform duration-100"
               style={{ 
                 transform: `translateY(${scrollY * 0.05}px)` 
               }}
             >
-              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-bold leading-[1.1] tracking-tight text-white">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-display font-bold leading-[1.15] tracking-tight text-white">
                 <span className="text-[#818cf8] font-extrabold">Le Club</span> de Référence
                 <br />
                 pour acheter <TypewriterAnimation />
@@ -187,22 +187,22 @@ const Home = () => {
                 partout au Québec
               </h1>
               
-              <p className="text-lg sm:text-xl text-white/80 max-w-3xl leading-relaxed text-justify">
+              <p className="text-base sm:text-lg lg:text-xl text-white/80 max-w-3xl leading-relaxed">
                 Plateforme intelligente qui rapproche acquéreurs et propriétaires d'entreprises. Nous favorisons la transparence et la fiabilité pour que vos transactions se déroulent en toute confiance.
               </p>
               
-              <div className="flex flex-col sm:flex-row gap-4 pt-4">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-2 sm:pt-4">
                 <Button 
                   size="lg" 
-                  className="bg-[#6366f1] hover:bg-[#4f46e5] text-white h-14 px-10 text-base font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all group"
+                  className="bg-[#6366f1] hover:bg-[#4f46e5] text-white h-12 sm:h-14 px-6 sm:px-10 text-sm sm:text-base font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all group w-full sm:w-auto"
                   onClick={() => document.getElementById('featured')?.scrollIntoView({ behavior: 'smooth' })}
                 >
                   Explorer les opportunités
-                  <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="ml-2 w-4 sm:w-5 h-4 sm:h-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
                 <Button 
                   size="lg" 
-                  className="h-14 px-10 text-base font-semibold rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/20 shadow-lg hover:shadow-xl transition-all backdrop-blur-sm"
+                  className="h-12 sm:h-14 px-6 sm:px-10 text-sm sm:text-base font-semibold rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/20 shadow-lg hover:shadow-xl transition-all backdrop-blur-sm w-full sm:w-auto"
                   onClick={() => navigate("/sell")}
                 >
                   Vendre mon entreprise

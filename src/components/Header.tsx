@@ -126,25 +126,25 @@ const Header = () => {
 
   return (
     <nav className="border-b border-border bg-background/95 backdrop-blur-xl sticky top-0 z-50 shadow-sm">
-      <div className="container mx-auto px-8 py-6">
+      <div className="container mx-auto px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-6">
         <div className="flex items-center justify-between">
           {/* Logo */}
           <div 
             className="flex items-center cursor-pointer group" 
             onClick={() => navigate("/")}
           >
-            <span className="text-5xl font-display font-bold text-foreground transition-transform group-hover:scale-105">
+            <span className="text-3xl sm:text-4xl md:text-5xl font-display font-bold text-foreground transition-transform group-hover:scale-105">
               Vente<span className="text-secondary">.Club</span>
             </span>
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-10">
+          <div className="hidden lg:flex items-center gap-6 xl:gap-10">
             {/* Menu Acheter */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="text-muted-foreground hover:text-foreground transition-colors font-semibold text-lg relative group flex items-center gap-2.5">
-                  <ShoppingBag className="w-6 h-6" />
+                <button className="text-muted-foreground hover:text-foreground transition-colors font-semibold text-base lg:text-lg relative group flex items-center gap-2">
+                  <ShoppingBag className="w-5 h-5" />
                   Acheter
                   <ChevronDown className="w-5 h-5" />
                 </button>
@@ -170,9 +170,9 @@ const Header = () => {
             {/* Lien Vendre */}
             <button 
               onClick={() => navigate("/sell")} 
-              className="text-muted-foreground hover:text-foreground transition-colors font-semibold text-lg relative group flex items-center gap-2.5"
+              className="text-muted-foreground hover:text-foreground transition-colors font-semibold text-base lg:text-lg relative group flex items-center gap-2"
             >
-              <Store className="w-6 h-6" />
+              <Store className="w-5 h-5" />
               Vendre
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full" />
             </button>
@@ -180,7 +180,7 @@ const Header = () => {
             {!user && (
               <button 
                 onClick={() => navigate("/faq")} 
-                className="text-muted-foreground hover:text-foreground transition-colors font-semibold text-lg relative group"
+                className="text-muted-foreground hover:text-foreground transition-colors font-semibold text-base lg:text-lg relative group"
               >
                 FAQ
                 <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full" />
@@ -191,10 +191,10 @@ const Header = () => {
               <>
                 <button 
                   onClick={() => navigate("/messages")} 
-                  className="text-muted-foreground hover:text-foreground transition-colors font-semibold text-lg flex items-center gap-2.5 relative group"
+                  className="text-muted-foreground hover:text-foreground transition-colors font-semibold text-base lg:text-lg flex items-center gap-2 relative group"
                 >
                   <div className="relative">
-                    <MessageSquare className="w-6 h-6" />
+                    <MessageSquare className="w-5 h-5" />
                     {unreadMessagesCount > 0 && (
                       <span className="absolute -top-2 -right-2 h-5 w-5 rounded-full bg-red-500 text-white text-[11px] flex items-center justify-center font-bold">
                         {unreadMessagesCount > 9 ? '9+' : unreadMessagesCount}
@@ -206,9 +206,9 @@ const Header = () => {
                 </button>
                 <button 
                   onClick={() => navigate("/favorites")} 
-                  className="text-muted-foreground hover:text-foreground transition-colors font-semibold text-lg flex items-center gap-2.5 relative group"
+                  className="text-muted-foreground hover:text-foreground transition-colors font-semibold text-base lg:text-lg flex items-center gap-2 relative group"
                 >
-                  <Heart className="w-6 h-6" />
+                  <Heart className="w-5 h-5" />
                   Favoris
                   <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full" />
                 </button>
@@ -217,7 +217,7 @@ const Header = () => {
           </div>
 
           {/* Right Side Actions */}
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-3 sm:gap-4 md:gap-6">
             {user && <NotificationBell userId={user.id} />}
             
             {isAdmin && (
@@ -236,10 +236,10 @@ const Header = () => {
               <>
                 <Button
                   onClick={() => navigate("/dashboard")}
-                  className="hidden md:flex bg-[#6366f1] hover:bg-[#4f46e5] text-white font-semibold shadow-lg px-6 py-3 text-lg h-12"
+                  className="hidden lg:flex bg-[#6366f1] hover:bg-[#4f46e5] text-white font-semibold shadow-lg px-4 lg:px-6 py-2 lg:py-3 text-sm lg:text-base h-10 lg:h-12"
                 >
-                  <LayoutDashboard className="w-6 h-6 mr-2.5" />
-                  Tableau de bord
+                  <LayoutDashboard className="w-5 h-5 lg:mr-2" />
+                  <span className="hidden xl:inline">Tableau de bord</span>
                 </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -284,7 +284,7 @@ const Header = () => {
               <Button
                 variant="ghost"
                 onClick={() => navigate("/auth")}
-                className="hidden md:inline-flex font-semibold border border-black px-7 py-3 text-lg h-12"
+                className="hidden lg:inline-flex font-semibold border border-black px-4 lg:px-6 py-2 lg:py-3 text-sm lg:text-base h-10 lg:h-12"
               >
                 Connexion
               </Button>
@@ -294,7 +294,7 @@ const Header = () => {
             <Button
               variant="ghost"
               size="icon"
-              className="md:hidden"
+              className="lg:hidden"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label={mobileMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
             >
@@ -305,7 +305,7 @@ const Header = () => {
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden mt-4 pb-4 space-y-2 border-t border-border pt-4 animate-slide-up">
+          <div className="lg:hidden mt-4 pb-4 space-y-2 border-t border-border pt-4 animate-slide-up">
             <div className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
               Acheter
             </div>
