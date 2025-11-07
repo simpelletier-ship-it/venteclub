@@ -16,7 +16,7 @@ const Sell = () => {
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="container max-w-5xl">
           <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-display font-bold mb-4 text-gradient">
+            <h1 className="text-4xl md:text-5xl font-display font-bold mb-4 text-secondary">
               Que souhaitez-vous vendre ?
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
@@ -116,12 +116,12 @@ const Sell = () => {
             </Card>
 
             <Card 
-              className="group cursor-pointer hover:shadow-premium transition-all duration-300 hover:scale-105 border-2 hover:border-secondary flex flex-col"
+              className="group cursor-pointer hover:shadow-premium transition-all duration-300 hover:scale-105 border-2 hover:border-success flex flex-col"
               onClick={() => navigate("/list-property")}
             >
               <CardHeader className="text-center space-y-4 pb-6">
-                <div className="mx-auto w-20 h-20 rounded-full bg-secondary/10 flex items-center justify-center group-hover:bg-secondary/20 transition-colors">
-                  <Home className="w-10 h-10 text-secondary" />
+                <div className="mx-auto w-20 h-20 rounded-full bg-success/10 flex items-center justify-center group-hover:bg-success/20 transition-colors">
+                  <Home className="w-10 h-10 text-success" />
                 </div>
                 <CardTitle className="text-2xl">Immeuble</CardTitle>
                 <CardDescription className="text-base min-h-[48px]">
@@ -131,28 +131,28 @@ const Sell = () => {
               <CardContent className="flex-1 flex flex-col justify-between text-sm text-muted-foreground">
                 <ul className="space-y-2 mb-4">
                   <li className="flex items-start gap-2">
-                    <span className="text-secondary mt-0.5">•</span>
+                    <span className="text-success mt-0.5">•</span>
                     <span>Bureaux commerciaux</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-secondary mt-0.5">•</span>
+                    <span className="text-success mt-0.5">•</span>
                     <span>Espaces de vente au détail</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-secondary mt-0.5">•</span>
+                    <span className="text-success mt-0.5">•</span>
                     <span>Bâtiments industriels</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-secondary mt-0.5">•</span>
+                    <span className="text-success mt-0.5">•</span>
                     <span>Terrains commerciaux</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-secondary mt-0.5">•</span>
+                    <span className="text-success mt-0.5">•</span>
                     <span>Propriétés mixtes</span>
                   </li>
                 </ul>
                 <Button 
-                  className="w-full bg-secondary hover:bg-secondary/90" 
+                  className="w-full bg-success hover:bg-success/90"
                   onClick={() => navigate("/list-property")}
                 >
                   Vendre un Immeuble
