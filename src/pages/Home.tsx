@@ -202,6 +202,24 @@ const Home = () => {
               <p className="text-lg sm:text-xl text-white/80 max-w-3xl leading-relaxed text-justify">
                 Plateforme intelligente qui rapproche acquéreurs et propriétaires d'entreprises. Nous favorisons la transparence et la fiabilité pour que vos transactions se déroulent en toute confiance.
               </p>
+              
+              <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                <Button 
+                  size="lg" 
+                  className="bg-[#6366f1] hover:bg-[#4f46e5] text-white h-14 px-10 text-base font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all group"
+                  onClick={() => document.getElementById('featured')?.scrollIntoView({ behavior: 'smooth' })}
+                >
+                  Explorer les opportunités
+                  <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </Button>
+                <Button 
+                  size="lg" 
+                  className="h-14 px-10 text-base font-semibold rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/20 shadow-lg hover:shadow-xl transition-all backdrop-blur-sm"
+                  onClick={() => navigate("/sell")}
+                >
+                  Vendre mon entreprise
+                </Button>
+              </div>
             </div>
           </div>
           

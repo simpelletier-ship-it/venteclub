@@ -152,26 +152,6 @@ const Businesses = () => {
               Explorez notre catalogue complet d'entreprises, commerces et franchises vérifiés. 
               Filtrez par secteur, ville et budget pour trouver l'opportunité parfaite.
             </p>
-            
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-              <Button 
-                size="lg" 
-                className="bg-gradient-to-r from-primary to-accent hover:opacity-90 text-white h-14 px-10 text-base font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all group"
-                onClick={() => document.getElementById('all-businesses')?.scrollIntoView({ behavior: 'smooth' })}
-              >
-                <Search className="mr-2 w-5 h-5" />
-                Parcourir les annonces
-                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </Button>
-              <Button 
-                size="lg" 
-                className="h-14 px-10 text-base font-semibold rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/20 shadow-lg hover:shadow-xl transition-all backdrop-blur-sm"
-                onClick={() => navigate("/sell")}
-              >
-                Vendre mon entreprise
-              </Button>
-            </div>
           </div>
         </div>
       </section>
