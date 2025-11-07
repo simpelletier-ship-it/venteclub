@@ -152,6 +152,14 @@ const Home = () => {
       
       {/* Hero Section */}
       <section className="relative min-h-[85vh] flex items-center bg-gradient-to-br from-[#1e1b4b] via-[#312e81] to-[#1e3a8a] overflow-hidden" aria-label="Section principale">
+        {/* Pulse Lines */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-1/4 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-[#818cf8]/40 to-transparent animate-pulse" style={{ animationDuration: '3s' }} />
+          <div className="absolute top-1/3 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#6366f1]/30 to-transparent animate-pulse" style={{ animationDuration: '4s', animationDelay: '0.5s' }} />
+          <div className="absolute top-2/3 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-[#818cf8]/40 to-transparent animate-pulse" style={{ animationDuration: '3.5s', animationDelay: '1s' }} />
+          <div className="absolute bottom-1/4 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#6366f1]/30 to-transparent animate-pulse" style={{ animationDuration: '4.5s', animationDelay: '1.5s' }} />
+        </div>
+        
         {/* Animated Background Elements with Parallax */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div 
