@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Lock, MapPin, TrendingUp, Users, Calendar, Eye, Calculator, Phone, Mail, UserCircle, ChevronLeft, ChevronRight, ZoomIn, ZoomOut, X, ChevronDown, MessageSquare, Share2, Star } from "lucide-react";
+import { ArrowLeft, Lock, MapPin, TrendingUp, Users, Calendar, Eye, Calculator, Phone, Mail, UserCircle, ChevronLeft, ChevronRight, ZoomIn, ZoomOut, X, ChevronDown, MessageSquare, Share2, Star, User, Briefcase, Globe, Linkedin } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { FavoriteButton } from "@/components/FavoriteButton";
@@ -184,21 +184,34 @@ const BusinessDetails = () => {
     }
   }, [hasPremium, user?.id]);
 
-  // Charger les coordonnées du vendeur UNIQUEMENT si premium
+  // Charger les coordonnées et le profil complet du vendeur UNIQUEMENT si premium
   useEffect(() => {
     if (user && business && hasPremium && !sellerContact) {
-      console.log('[SELLER CONTACT] Loading seller contact info for premium user...');
-      supabase
-        .from('seller_contacts')
-        .select('email, phone')
-        .eq('seller_id', business.seller_id)
-        .maybeSingle()
-        .then(({ data }) => {
-          if (data) {
-            setSellerContact(data);
-            console.log('[SELLER CONTACT] Contact loaded successfully');
-          }
-        });
+      console.log('[SELLER CONTACT] Loading seller contact info and profile for premium user...');
+      
+      // Récupérer à la fois les contacts et le profil complet
+      Promise.all([
+        supabase
+          .from('seller_contacts')
+          .select('email, phone')
+          .eq('seller_id', business.seller_id)
+          .maybeSingle(),
+        supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', business.seller_id)
+          .single()
+      ]).then(([contactResult, profileResult]) => {
+        const combinedData = {
+          ...(contactResult.data || {}),
+          ...(profileResult.data || {})
+        };
+        
+        if (Object.keys(combinedData).length > 0) {
+          setSellerContact(combinedData);
+          console.log('[SELLER CONTACT] Complete profile loaded successfully');
+        }
+      });
     }
   }, [hasPremium, business, user]);
 
@@ -355,19 +368,32 @@ const BusinessDetails = () => {
         console.log('[ACCESS CHECK] Business seller_id:', businessData?.seller_id);
 
         if (businessData?.seller_id) {
-          const { data: contact, error: contactError } = await supabase
-            .from('seller_contacts')
-            .select('email, phone')
-            .eq('seller_id', businessData.seller_id)
-            .maybeSingle();
+          const [contactResult, profileResult] = await Promise.all([
+            supabase
+              .from('seller_contacts')
+              .select('email, phone')
+              .eq('seller_id', businessData.seller_id)
+              .maybeSingle(),
+            supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', businessData.seller_id)
+              .single()
+          ]);
           
-          console.log('[ACCESS CHECK] Seller contact:', { contact, contactError });
+          console.log('[ACCESS CHECK] Seller contact:', contactResult);
+          console.log('[ACCESS CHECK] Seller profile:', profileResult);
           
-          if (contact) {
-            setSellerContact(contact);
-            console.log('[ACCESS CHECK] Seller contact set successfully');
+          const combinedData = {
+            ...(contactResult.data || {}),
+            ...(profileResult.data || {})
+          };
+          
+          if (Object.keys(combinedData).length > 0) {
+            setSellerContact(combinedData);
+            console.log('[ACCESS CHECK] Complete seller info set successfully');
           } else {
-            console.log('[ACCESS CHECK] No seller contact found');
+            console.log('[ACCESS CHECK] No seller information found');
           }
         }
       } else {
@@ -556,15 +582,27 @@ const BusinessDetails = () => {
       // 2. Marquer comme déverrouillé localement (PAS de message automatique !)
       setHasUnlockedChat(true);
       
-      // 3. Charger les coordonnées du vendeur
-      const { data: contact } = await supabase
-        .from('seller_contacts')
-        .select('email, phone')
-        .eq('seller_id', business.seller_id)
-        .maybeSingle();
+      // 3. Charger les coordonnées et profil complet du vendeur
+      const [contactResult, profileResult] = await Promise.all([
+        supabase
+          .from('seller_contacts')
+          .select('email, phone')
+          .eq('seller_id', business.seller_id)
+          .maybeSingle(),
+        supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', business.seller_id)
+          .single()
+      ]);
       
-      if (contact) {
-        setSellerContact(contact);
+      const combinedData = {
+        ...(contactResult.data || {}),
+        ...(profileResult.data || {})
+      };
+      
+      if (Object.keys(combinedData).length > 0) {
+        setSellerContact(combinedData);
       }
       
       // 4. Recharger les limites de conversation
@@ -1299,14 +1337,27 @@ const BusinessDetails = () => {
                 {/* Informations du vendeur - Affichées UNIQUEMENT pour les membres Club Select */}
                 {!isSeller && user && hasPremium && sellerContact && (
                   <div className="border-t pt-6 mt-6">
-                    <div className="bg-gradient-to-br from-primary/5 to-secondary/5 border-2 border-primary/20 rounded-xl p-6 max-w-md mx-auto">
-                      <div className="text-center mb-4">
+                    <div className="bg-gradient-to-br from-primary/5 to-secondary/5 border-2 border-primary/20 rounded-xl p-6">
+                      <div className="text-center mb-6">
                         <h3 className="text-xl font-bold text-foreground mb-2 flex items-center gap-2 justify-center">
-                          <UserCircle className="w-5 h-5" /> Coordonnées du vendeur
+                          <UserCircle className="w-5 h-5" /> Informations complètes du vendeur
                         </h3>
+                        <p className="text-sm text-muted-foreground">Coordonnées et profil détaillé</p>
                       </div>
                       
-                      <div className="space-y-3">
+                      <div className="space-y-4">
+                        {/* Nom complet */}
+                        {sellerContact.full_name && (
+                          <div className="flex items-start gap-3">
+                            <User className="w-5 h-5 text-primary mt-1" />
+                            <div className="flex-1">
+                              <div className="text-sm text-muted-foreground mb-1">Nom</div>
+                              <p className="text-base font-semibold text-foreground">{sellerContact.full_name}</p>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Email */}
                         {sellerContact.email && (
                           <div className="flex items-start gap-3">
                             <Mail className="w-5 h-5 text-primary mt-1" />
@@ -1322,6 +1373,7 @@ const BusinessDetails = () => {
                           </div>
                         )}
                         
+                        {/* Téléphone */}
                         {sellerContact.phone && (
                           <div className="flex items-start gap-3">
                             <Phone className="w-5 h-5 text-primary mt-1" />
@@ -1334,6 +1386,97 @@ const BusinessDetails = () => {
                                 {sellerContact.phone}
                               </a>
                             </div>
+                          </div>
+                        )}
+
+                        {/* Informations professionnelles */}
+                        {(sellerContact.company_name || sellerContact.job_title) && (
+                          <div className="pt-3 border-t border-border/50">
+                            {sellerContact.company_name && (
+                              <div className="flex items-start gap-3 mb-3">
+                                <Briefcase className="w-5 h-5 text-primary mt-1" />
+                                <div className="flex-1">
+                                  <div className="text-sm text-muted-foreground mb-1">Entreprise</div>
+                                  <p className="text-base font-medium text-foreground">{sellerContact.company_name}</p>
+                                </div>
+                              </div>
+                            )}
+                            {sellerContact.job_title && (
+                              <div className="flex items-start gap-3">
+                                <Briefcase className="w-5 h-5 text-primary mt-1" />
+                                <div className="flex-1">
+                                  <div className="text-sm text-muted-foreground mb-1">Poste</div>
+                                  <p className="text-base font-medium text-foreground">{sellerContact.job_title}</p>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Adresse complète */}
+                        {(sellerContact.street_address || sellerContact.city || sellerContact.province || sellerContact.postal_code || sellerContact.country) && (
+                          <div className="flex items-start gap-3 pt-3 border-t border-border/50">
+                            <MapPin className="w-5 h-5 text-primary mt-1" />
+                            <div className="flex-1">
+                              <div className="text-sm text-muted-foreground mb-1">Adresse complète</div>
+                              <div className="text-base font-medium text-foreground">
+                                {sellerContact.street_address && <p>{sellerContact.street_address}</p>}
+                                {(sellerContact.city || sellerContact.province || sellerContact.postal_code) && (
+                                  <p>
+                                    {sellerContact.city && <span>{sellerContact.city}, </span>}
+                                    {sellerContact.province && <span>{sellerContact.province} </span>}
+                                    {sellerContact.postal_code}
+                                  </p>
+                                )}
+                                {sellerContact.country && <p>{sellerContact.country}</p>}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Liens professionnels */}
+                        {(sellerContact.website || sellerContact.linkedin_url) && (
+                          <div className="pt-3 border-t border-border/50">
+                            {sellerContact.website && (
+                              <div className="flex items-start gap-3 mb-3">
+                                <Globe className="w-5 h-5 text-primary mt-1" />
+                                <div className="flex-1">
+                                  <div className="text-sm text-muted-foreground mb-1">Site web</div>
+                                  <a 
+                                    href={sellerContact.website} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="text-base font-medium text-primary hover:underline break-all"
+                                  >
+                                    {sellerContact.website}
+                                  </a>
+                                </div>
+                              </div>
+                            )}
+                            {sellerContact.linkedin_url && (
+                              <div className="flex items-start gap-3">
+                                <Linkedin className="w-5 h-5 text-primary mt-1" />
+                                <div className="flex-1">
+                                  <div className="text-sm text-muted-foreground mb-1">LinkedIn</div>
+                                  <a 
+                                    href={sellerContact.linkedin_url} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="text-base font-medium text-primary hover:underline"
+                                  >
+                                    Voir le profil LinkedIn
+                                  </a>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Bio */}
+                        {sellerContact.bio && (
+                          <div className="pt-3 border-t border-border/50">
+                            <div className="text-sm text-muted-foreground mb-2">À propos</div>
+                            <p className="text-sm text-foreground leading-relaxed">{sellerContact.bio}</p>
                           </div>
                         )}
                       </div>

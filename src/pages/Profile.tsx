@@ -209,10 +209,42 @@ export default function Profile() {
                 </div>
               )}
 
+              {/* Professional Information - Always visible */}
+              {(profile.company_name || profile.job_title) && (
+                <div>
+                  <h3 className="text-sm font-semibold text-muted-foreground mb-3">Informations professionnelles</h3>
+                  <div className="space-y-3">
+                    {profile.company_name && (
+                      <div className="flex items-center gap-3 text-foreground">
+                        <div className="p-2 rounded-lg bg-muted">
+                          <Briefcase className="h-4 w-4 text-muted-foreground" />
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground">Entreprise</p>
+                          <p className="font-medium">{profile.company_name}</p>
+                        </div>
+                      </div>
+                    )}
+
+                    {profile.job_title && (
+                      <div className="flex items-center gap-3 text-foreground">
+                        <div className="p-2 rounded-lg bg-muted">
+                          <User className="h-4 w-4 text-muted-foreground" />
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground">Poste</p>
+                          <p className="font-medium">{profile.job_title}</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {/* Contact Information - Only visible for Club Select members or own profile */}
               {(isOwnProfile || hasPremium) ? (
                 <div>
-                  <h3 className="text-sm font-semibold text-muted-foreground mb-3">Coordonnées</h3>
+                  <h3 className="text-sm font-semibold text-muted-foreground mb-3">Coordonnées complètes</h3>
                   <div className="space-y-3">
                     {profile.email && (
                       <div className="flex items-center gap-3 text-foreground">
@@ -221,7 +253,7 @@ export default function Profile() {
                         </div>
                         <div>
                           <p className="text-xs text-muted-foreground">Email</p>
-                          <a href={`mailto:${profile.email}`} className="hover:text-primary transition-colors">
+                          <a href={`mailto:${profile.email}`} className="hover:text-primary transition-colors font-medium">
                             {profile.email}
                           </a>
                         </div>
@@ -235,26 +267,31 @@ export default function Profile() {
                         </div>
                         <div>
                           <p className="text-xs text-muted-foreground">Téléphone</p>
-                          <a href={`tel:${profile.phone}`} className="hover:text-primary transition-colors">
+                          <a href={`tel:${profile.phone}`} className="hover:text-primary transition-colors font-medium">
                             {profile.phone}
                           </a>
                         </div>
                       </div>
                     )}
 
-                    {(profile.street_address || profile.city || profile.province) && (
-                      <div className="flex items-center gap-3 text-foreground">
+                    {(profile.street_address || profile.city || profile.province || profile.postal_code || profile.country) && (
+                      <div className="flex items-start gap-3 text-foreground">
                         <div className="p-2 rounded-lg bg-muted">
                           <MapPin className="h-4 w-4 text-muted-foreground" />
                         </div>
                         <div>
-                          <p className="text-xs text-muted-foreground">Adresse</p>
-                          <p>
-                            {profile.street_address && <span>{profile.street_address}<br /></span>}
-                            {profile.city && <span>{profile.city}, </span>}
-                            {profile.province && <span>{profile.province} </span>}
-                            {profile.postal_code}
-                          </p>
+                          <p className="text-xs text-muted-foreground mb-1">Adresse complète</p>
+                          <div className="font-medium">
+                            {profile.street_address && <p>{profile.street_address}</p>}
+                            {(profile.city || profile.province || profile.postal_code) && (
+                              <p>
+                                {profile.city && <span>{profile.city}, </span>}
+                                {profile.province && <span>{profile.province} </span>}
+                                {profile.postal_code}
+                              </p>
+                            )}
+                            {profile.country && <p>{profile.country}</p>}
+                          </div>
                         </div>
                       </div>
                     )}
@@ -265,7 +302,7 @@ export default function Profile() {
                   <Lock className="h-8 w-8 mx-auto mb-3 text-muted-foreground" />
                   <p className="font-semibold mb-2">Coordonnées réservées aux membres Club Select</p>
                   <p className="text-sm text-muted-foreground mb-4">
-                    Rejoignez le Club Select pour accéder aux coordonnées des utilisateurs
+                    Rejoignez le Club Select pour accéder aux coordonnées complètes des utilisateurs
                   </p>
                   <Button onClick={() => navigate('/profile?tab=premium')} size="sm">
                     Rejoindre le Club Select
