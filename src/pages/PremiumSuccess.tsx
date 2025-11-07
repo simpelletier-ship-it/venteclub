@@ -68,6 +68,19 @@ const PremiumSuccess = () => {
         'currency': 'CAD',
         'transaction_id': Date.now().toString()
       });
+      
+      // Google Analytics 4 - Achat premium
+      (window as any).gtag('event', 'purchase', {
+        'transaction_id': Date.now().toString(),
+        'value': 99.0,
+        'currency': 'CAD',
+        'items': [{
+          'item_id': 'premium_subscription',
+          'item_name': 'Club Select Premium',
+          'price': 99.0,
+          'quantity': 1
+        }]
+      });
     }
 
     return () => clearInterval(interval);

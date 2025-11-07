@@ -266,6 +266,11 @@ const Auth = () => {
             'value': 1.0,
             'currency': 'CAD'
           });
+          
+          // Google Analytics 4 - Inscription
+          (window as any).gtag('event', 'sign_up', {
+            'method': 'email'
+          });
         }
         
         toast({

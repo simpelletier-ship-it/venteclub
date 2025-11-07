@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
     
     <!-- Security Headers - PCI DSS & OWASP Compliant -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.google.com https://www.gstatic.com https://apis.google.com https://www.googletagmanager.com https://googleadservices.com https://js.stripe.com https://xmwsrvaricrfxovimffm.supabase.co; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https: blob:; connect-src 'self' https://xmwsrvaricrfxovimffm.supabase.co https://api.stripe.com wss://xmwsrvaricrfxovimffm.supabase.co https://www.google.com https://www.googletagmanager.com https://googleadservices.com https://api.mapbox.com; frame-src 'self' https://www.google.com https://js.stripe.com; object-src 'none'; base-uri 'self'; form-action 'self' https://checkout.stripe.com; frame-ancestors 'none'; upgrade-insecure-requests;" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.google.com https://www.gstatic.com https://apis.google.com https://www.googletagmanager.com https://googleadservices.com https://www.google-analytics.com https://ssl.google-analytics.com https://js.stripe.com https://xmwsrvaricrfxovimffm.supabase.co; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https: blob:; connect-src 'self' https://xmwsrvaricrfxovimffm.supabase.co https://api.stripe.com wss://xmwsrvaricrfxovimffm.supabase.co https://www.google.com https://www.googletagmanager.com https://googleadservices.com https://www.google-analytics.com https://analytics.google.com https://api.mapbox.com; frame-src 'self' https://www.google.com https://js.stripe.com; object-src 'none'; base-uri 'self'; form-action 'self' https://checkout.stripe.com; frame-ancestors 'none'; upgrade-insecure-requests;" />
     <meta http-equiv="X-Content-Type-Options" content="nosniff" />
     <meta http-equiv="X-Frame-Options" content="DENY" />
     <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
@@ -73,6 +73,21 @@
       gtag('js', new Date());
 
       gtag('config', 'AW-974642760');
+    </script>
+    
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      
+      // Configuration GA4
+      gtag('config', 'G-XXXXXXXXXX', {
+        'send_page_view': true,
+        'anonymize_ip': true,
+        'cookie_flags': 'SameSite=None;Secure'
+      });
     </script>
     
     <!-- Event snippet for Website traffic conversion page -->
