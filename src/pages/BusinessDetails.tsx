@@ -1572,36 +1572,22 @@ const BusinessDetails = () => {
                         businessTitle={business.title}
                       />
                     ) : (
-                      <div className="space-y-4">
-                        <div className="bg-gradient-to-br from-emerald-500/10 to-emerald-600/10 border-2 border-emerald-500/30 rounded-xl p-6 text-center">
-                          <h3 className="font-bold text-lg mb-2">Accès Gratuit</h3>
-                          <p className="text-sm text-muted-foreground mb-4">
-                            Débloquez gratuitement le chat avec ce vendeur pour 24h
-                          </p>
-                          <Button 
-                            onClick={handleUnlockChat} 
-                            disabled={isUnlockingChat}
-                            className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-semibold shadow-lg"
-                          >
-                            {isUnlockingChat ? 'Déverrouillage...' : 'Déverrouiller gratuitement'}
-                          </Button>
-                          <p className="text-xs text-muted-foreground mt-3">
-                            1 accès gratuit par jour
-                          </p>
-                        </div>
-                        <div className="bg-gradient-to-br from-purple-500/10 to-purple-600/10 border border-purple-500/30 rounded-lg p-4 text-center">
-                          <p className="text-sm font-medium mb-2">Besoin de plus d'accès ?</p>
-                          <Button 
-                            onClick={() => navigate('/club-select')}
-                            variant="outline"
-                            className="w-full border-purple-500/50 hover:bg-purple-500/10"
-                          >
-                            Club Select - 19,99$/mois
-                          </Button>
-                          <p className="text-xs text-muted-foreground mt-2">
-                            Accès illimité à tous les vendeurs
-                          </p>
-                        </div>
+                      <div className="bg-gradient-to-br from-primary/5 to-accent/5 border border-primary/20 rounded-xl p-6 text-center">
+                        <h3 className="font-bold text-xl mb-3 text-foreground">Accès Gratuit</h3>
+                        <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
+                          Débloquez gratuitement le chat avec ce vendeur pour 24h
+                        </p>
+                        <Button 
+                          onClick={handleUnlockChat} 
+                          disabled={isUnlockingChat}
+                          size="lg"
+                          className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+                        >
+                          {isUnlockingChat ? 'Déverrouillage...' : 'Débloquer maintenant'}
+                        </Button>
+                        <p className="text-xs text-muted-foreground mt-4 font-medium">
+                          1 accès gratuit disponible par jour
+                        </p>
                       </div>
                     )}
                   </CardContent>
