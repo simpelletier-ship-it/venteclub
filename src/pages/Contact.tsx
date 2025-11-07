@@ -2,7 +2,7 @@ import { SEO } from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { MapPin, Phone, Mail, Clock } from "lucide-react";
+import { Mail, Clock } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -143,38 +143,6 @@ const Contact = () => {
 
           {/* Contact Information */}
           <div className="space-y-6">
-            {/* Address */}
-            <div className="bg-card border border-border rounded-xl p-6">
-              <div className="flex items-start gap-4 mb-4">
-                <div className="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <MapPin className="w-6 h-6 text-accent" />
-                </div>
-                <div>
-                  <h3 className="font-bold mb-2">Adresse</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Vente.Club Inc.<br />
-                    1250 Rue René-Lévesque O<br />
-                    Montréal, QC H3B 4W8
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Phone */}
-            <div className="bg-card border border-border rounded-xl p-6">
-              <div className="flex items-start gap-4 mb-4">
-                <div className="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Phone className="w-6 h-6 text-accent" />
-                </div>
-                <div>
-                  <h3 className="font-bold mb-2">Téléphone</h3>
-                  <a href="tel:+15148501234" className="text-sm text-accent hover:underline">
-                    (514) 850-1234
-                  </a>
-                </div>
-              </div>
-            </div>
-
             {/* Email */}
             <div className="bg-card border border-border rounded-xl p-6">
               <div className="flex items-start gap-4 mb-4">
