@@ -302,7 +302,8 @@ const Dashboard = () => {
             </TabsTrigger>
             <TabsTrigger value="statistics" className="text-xs sm:text-sm py-2 sm:py-3 gap-2">
               <TrendingUp className="h-4 w-4" />
-              <span>Stats</span>
+              <span className="hidden sm:inline">Statistiques avancées</span>
+              <span className="sm:hidden">Stats avancées</span>
             </TabsTrigger>
             <TabsTrigger value="premium" className="text-xs sm:text-sm py-2 sm:py-3 gap-2">
               <Crown className="h-4 w-4" />
