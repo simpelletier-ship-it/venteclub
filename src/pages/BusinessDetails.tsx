@@ -1154,10 +1154,10 @@ const BusinessDetails = () => {
                           
                           <div className="space-y-4">
                             {business.annual_revenue && (
-                              <div className="group bg-slate-50 dark:bg-slate-800 rounded-xl p-6 border-2 border-slate-200 dark:border-slate-700 transition-all duration-300 hover:shadow-xl hover:border-blue-400 dark:hover:border-blue-600 hover:-translate-y-1">
+                              <div className="group bg-slate-50 dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700 transition-all duration-200 hover:shadow-md">
                                 <div className="flex justify-between items-center">
-                                  <span className="text-slate-600 dark:text-slate-400 font-semibold text-base">Revenu annuel</span>
-                                  <span className="font-bold text-2xl text-blue-600 dark:text-blue-400 transition-transform duration-300 group-hover:scale-110">
+                                  <span className="text-slate-600 dark:text-slate-400 font-medium text-base">Revenu annuel</span>
+                                  <span className="font-bold text-2xl text-slate-900 dark:text-white">
                                     {new Intl.NumberFormat('fr-CA', {
                                       style: 'currency',
                                       currency: business.currency || 'CAD',
@@ -1170,10 +1170,10 @@ const BusinessDetails = () => {
                             )}
                             
                             {business.baiia && (
-                              <div className="group bg-slate-50 dark:bg-slate-800 rounded-xl p-6 border-2 border-slate-200 dark:border-slate-700 transition-all duration-300 hover:shadow-xl hover:border-purple-400 dark:hover:border-purple-600 hover:-translate-y-1">
+                              <div className="group bg-slate-50 dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700 transition-all duration-200 hover:shadow-md">
                                 <div className="flex justify-between items-center">
-                                  <span className="text-slate-600 dark:text-slate-400 font-semibold text-base">BAIIA</span>
-                                  <span className="font-bold text-2xl text-purple-600 dark:text-purple-400 transition-transform duration-300 group-hover:scale-110">
+                                  <span className="text-slate-600 dark:text-slate-400 font-medium text-base">BAIIA</span>
+                                  <span className="font-bold text-2xl text-slate-900 dark:text-white">
                                     {new Intl.NumberFormat('fr-CA', {
                                       style: 'currency',
                                       currency: business.currency || 'CAD',
@@ -1186,10 +1186,10 @@ const BusinessDetails = () => {
                             )}
                             
                             {business.net_profit && (
-                              <div className="group bg-slate-50 dark:bg-slate-800 rounded-xl p-6 border-2 border-slate-200 dark:border-slate-700 transition-all duration-300 hover:shadow-xl hover:border-green-400 dark:hover:border-green-600 hover:-translate-y-1">
+                              <div className="group bg-slate-50 dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700 transition-all duration-200 hover:shadow-md">
                                 <div className="flex justify-between items-center">
-                                  <span className="text-slate-600 dark:text-slate-400 font-semibold text-base">Bénéfice net</span>
-                                  <span className="font-bold text-2xl text-green-600 dark:text-green-400 transition-transform duration-300 group-hover:scale-110">
+                                  <span className="text-slate-600 dark:text-slate-400 font-medium text-base">Bénéfice net</span>
+                                  <span className="font-bold text-2xl text-slate-900 dark:text-white">
                                     {new Intl.NumberFormat('fr-CA', {
                                       style: 'currency',
                                       currency: business.currency || 'CAD',
@@ -1211,10 +1211,10 @@ const BusinessDetails = () => {
                             )}
 
                             {business.profit_margin && (
-                              <div className="group bg-amber-50 dark:bg-amber-950/30 rounded-xl p-6 border-2 border-amber-200 dark:border-amber-800 transition-all duration-300 hover:shadow-xl hover:border-amber-400 dark:hover:border-amber-600 hover:-translate-y-1">
+                              <div className="group bg-slate-50 dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700 transition-all duration-200 hover:shadow-md">
                                 <div className="flex justify-between items-center">
-                                  <span className="text-slate-600 dark:text-slate-400 font-semibold text-base">Marge de profit</span>
-                                  <span className="font-bold text-2xl text-amber-600 dark:text-amber-400 transition-transform duration-300 group-hover:scale-110">{business.profit_margin}%</span>
+                                  <span className="text-slate-600 dark:text-slate-400 font-medium text-base">Marge de profit</span>
+                                  <span className="font-bold text-2xl text-slate-900 dark:text-white">{business.profit_margin}%</span>
                                 </div>
                               </div>
                             )}
