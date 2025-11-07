@@ -20,6 +20,7 @@ const Header = () => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [profile, setProfile] = useState<any>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -62,11 +63,26 @@ const Header = () => {
     setProfile(data);
   };
 
+  const fetchUnreadMessages = async () => {
+    if (!user) return;
+    
+    const { count } = await supabase
+      .from('messages')
+      .select('*', { count: 'exact', head: true })
+      .eq('receiver_id', user.id)
+      .eq('read', false);
+
+    setUnreadMessagesCount(count || 0);
+  };
+
   useEffect(() => {
     if (!user) return;
 
+    // Fetch initial unread messages count
+    fetchUnreadMessages();
+
     // Écouter les changements de profil en temps réel
-    const channel = supabase
+    const profileChannel = supabase
       .channel('profile-changes')
       .on(
         'postgres_changes',
@@ -82,8 +98,24 @@ const Header = () => {
       )
       .subscribe();
 
+    // Écouter les changements de messages en temps réel
+    const messagesChannel = supabase
+      .channel('header-unread-messages')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'messages',
+          filter: `receiver_id=eq.${user.id}`
+        },
+        () => fetchUnreadMessages()
+      )
+      .subscribe();
+
     return () => {
-      supabase.removeChannel(channel);
+      supabase.removeChannel(profileChannel);
+      supabase.removeChannel(messagesChannel);
     };
   }, [user?.id]);
 
@@ -145,7 +177,14 @@ const Header = () => {
                   onClick={() => navigate("/messages")} 
                   className="text-muted-foreground hover:text-foreground transition-colors font-medium flex items-center gap-2 relative group"
                 >
-                  <MessageSquare className="w-4 h-4" />
+                  <div className="relative">
+                    <MessageSquare className="w-4 h-4" />
+                    {unreadMessagesCount > 0 && (
+                      <span className="absolute -top-2 -right-2 h-4 w-4 rounded-full bg-red-500 text-white text-[10px] flex items-center justify-center font-bold">
+                        {unreadMessagesCount > 9 ? '9+' : unreadMessagesCount}
+                      </span>
+                    )}
+                  </div>
                   Messagerie
                   <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full" />
                 </button>
@@ -315,7 +354,14 @@ const Header = () => {
                   }}
                   className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors flex items-center gap-2"
                 >
-                  <MessageSquare className="w-4 h-4" />
+                  <div className="relative">
+                    <MessageSquare className="w-4 h-4" />
+                    {unreadMessagesCount > 0 && (
+                      <span className="absolute -top-2 -right-2 h-4 w-4 rounded-full bg-red-500 text-white text-[10px] flex items-center justify-center font-bold">
+                        {unreadMessagesCount > 9 ? '9+' : unreadMessagesCount}
+                      </span>
+                    )}
+                  </div>
                   Messagerie
                 </button>
                 <button
