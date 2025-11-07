@@ -60,117 +60,122 @@ Deno.serve(async (req) => {
           console.log(`Deleted existing photos for ${business.title}`);
         }
 
-        // Mapper les industries aux images réalistes
-        const industryImages: Record<string, string> = {
-          'restaurant': 'restaurant-real.jpg',
-          'beaute_esthetique': 'salon-real.jpg',
-          'garage_mecanique_concessionnaire': 'garage-real.jpg',
-          'boutique_commerce_detail': 'boutique-real.jpg',
-          'communications_informatique': 'agence-real.jpg',
-          'bar_bistro_discotheque': 'cafe-real.jpg',
-          'epicerie_depanneur': 'depanneur-real.jpg',
-          'entreprise_service': 'entretien-real.jpg',
-          'education_garderie': 'garderie-real.jpg',
-          'boulangerie_patisserie': 'boulangerie-real.jpg'
+        // Mapper les industries aux images réalistes - maintenant avec plusieurs images par type
+        const industryImageSets: Record<string, string[]> = {
+          'restaurant': ['restaurant-real.jpg', 'trattoria.jpg', 'cafe-real.jpg'],
+          'beaute_esthetique': ['salon-real.jpg', 'salon.jpg'],
+          'garage_mecanique_concessionnaire': ['garage-real.jpg', 'garage.jpg'],
+          'boutique_commerce_detail': ['boutique-real.jpg', 'boutique.jpg'],
+          'communications_informatique': ['agence-real.jpg', 'agence.jpg'],
+          'bar_bistro_discotheque': ['cafe-real.jpg', 'cafe.jpg'],
+          'epicerie_depanneur': ['depanneur-real.jpg', 'depanneur.jpg'],
+          'entreprise_service': ['entretien-real.jpg', 'entretien.jpg'],
+          'education_garderie': ['garderie-real.jpg', 'garderie.jpg'],
+          'boulangerie_patisserie': ['boulangerie-real.jpg', 'boulangerie.jpg']
         };
 
-        // Déterminer quelle image utiliser
-        let imageName = '';
+        // Déterminer quelles images utiliser (4-5 images par annonce)
+        let imageNames: string[] = [];
         if (business.property_type) {
-          // Pour les propriétés immobilières, utiliser l'image de bureau par défaut
-          imageName = 'agence-real.jpg';
+          // Pour les propriétés immobilières
+          imageNames = ['agence-real.jpg', 'agence.jpg', 'boutique-real.jpg', 'entretien-real.jpg'];
         } else if (business.is_franchise) {
-          // Pour les franchises, utiliser l'image appropriée selon l'industrie
-          imageName = industryImages[business.industry] || 'boutique-real.jpg';
+          // Pour les franchises
+          const baseImages = industryImageSets[business.industry] || ['boutique-real.jpg', 'boutique.jpg'];
+          imageNames = [...baseImages];
+          // Ajouter des images complémentaires pour avoir 4-5 images
+          while (imageNames.length < 4) {
+            imageNames.push(baseImages[0]);
+          }
         } else {
-          imageName = industryImages[business.industry] || 'agence-real.jpg';
+          const baseImages = industryImageSets[business.industry] || ['agence-real.jpg', 'agence.jpg'];
+          imageNames = [...baseImages];
+          // Ajouter des images complémentaires
+          while (imageNames.length < 4) {
+            imageNames.push(baseImages[0]);
+          }
         }
 
-        console.log(`Using realistic image ${imageName} for ${business.title}`);
+        console.log(`Using ${imageNames.length} realistic images for ${business.title}`);
 
-        // Récupérer l'image depuis le dossier public
-        const imageUrl = `${Deno.env.get('SUPABASE_URL')}/storage/v1/object/public/business-photos/demo-photos/${imageName}`;
-        
-        // Télécharger l'image depuis public/demo-photos
-        const imageResponse = await fetch(`https://xmwsrvaricrfxovimffm.supabase.co/storage/v1/object/public/business-photos/demo-photos/${imageName}`);
-        
-        if (!imageResponse.ok) {
-          // Fallback: essayer de récupérer depuis l'ancien emplacement
-          const fallbackUrl = `/demo-photos/${imageName}`;
-          console.log(`Image not found in storage, trying to copy from public folder: ${fallbackUrl}`);
-          
-          // Pour l'instant, on utilise une URL publique directe
-          const publicImageUrl = `https://xmwsrvaricrfxovimffm.supabase.co/storage/v1/object/public/business-photos/demo-photos/${imageName}`;
-          
-          // Insérer directement l'URL publique
-          const { error: insertError } = await supabaseClient
-            .from('business_photos')
-            .insert({
-              business_id: business.id,
-              photo_url: publicImageUrl,
-              display_order: 0
+        // Générer et uploader chaque image
+        const uploadedPhotos = [];
+        for (let i = 0; i < imageNames.length; i++) {
+          const imageName = imageNames[i];
+          const displayOrder = i;
+
+          try {
+            // URL publique de l'image
+            const publicImageUrl = `https://xmwsrvaricrfxovimffm.supabase.co/storage/v1/object/public/business-photos/demo-photos/${imageName}`;
+            
+            // Télécharger l'image
+            const imageResponse = await fetch(publicImageUrl);
+            
+            if (!imageResponse.ok) {
+              console.log(`Image not found: ${imageName}, skipping`);
+              continue;
+            }
+
+            const imageBlob = await imageResponse.blob();
+            const imageBuffer = await imageBlob.arrayBuffer();
+            
+            // Upload vers le bucket business-photos avec un nom unique
+            const fileName = `${business.id}/photo-${i + 1}.jpg`;
+            const { error: uploadError } = await supabaseClient.storage
+              .from('business-photos')
+              .upload(fileName, imageBuffer, {
+                contentType: 'image/jpeg',
+                upsert: true
+              });
+
+            if (uploadError) {
+              console.error(`Upload error for ${business.id} photo ${i + 1}:`, uploadError);
+              continue;
+            }
+
+            // Obtenir l'URL publique
+            const { data: { publicUrl } } = supabaseClient.storage
+              .from('business-photos')
+              .getPublicUrl(fileName);
+
+            // Insérer dans business_photos
+            const { error: insertError } = await supabaseClient
+              .from('business_photos')
+              .insert({
+                business_id: business.id,
+                photo_url: publicUrl,
+                display_order: displayOrder
+              });
+
+            if (insertError) {
+              console.error(`Insert error for ${business.id} photo ${i + 1}:`, insertError);
+              continue;
+            }
+
+            uploadedPhotos.push({
+              photo_url: publicUrl,
+              display_order: displayOrder
             });
 
-          if (insertError) {
-            console.error(`Insert error for ${business.id}:`, insertError);
-            continue;
+            console.log(`Successfully uploaded photo ${i + 1}/${imageNames.length} for ${business.title}`);
+            
+            // Attendre un peu entre chaque upload
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+          } catch (photoError) {
+            console.error(`Error processing photo ${i + 1} for ${business.id}:`, photoError);
           }
-
-          results.push({
-            business_id: business.id,
-            title: business.title,
-            photo_url: publicImageUrl,
-            success: true
-          });
-
-          console.log(`Successfully assigned photo for ${business.title}`);
-          continue;
-        }
-
-        const imageBlob = await imageResponse.blob();
-        const imageBuffer = await imageBlob.arrayBuffer();
-        
-        // Upload vers le bucket business-photos
-        const fileName = `${business.id}/main-photo.jpg`;
-        const { error: uploadError } = await supabaseClient.storage
-          .from('business-photos')
-          .upload(fileName, imageBuffer, {
-            contentType: 'image/jpeg',
-            upsert: true
-          });
-
-        if (uploadError) {
-          console.error(`Upload error for ${business.id}:`, uploadError);
-          continue;
-        }
-
-        // Obtenir l'URL publique
-        const { data: { publicUrl } } = supabaseClient.storage
-          .from('business-photos')
-          .getPublicUrl(fileName);
-
-        // Insérer dans business_photos
-        const { error: insertError } = await supabaseClient
-          .from('business_photos')
-          .insert({
-            business_id: business.id,
-            photo_url: publicUrl,
-            display_order: 0
-          });
-
-        if (insertError) {
-          console.error(`Insert error for ${business.id}:`, insertError);
-          continue;
         }
 
         results.push({
           business_id: business.id,
           title: business.title,
-          photo_url: publicUrl,
-          success: true
+          photos_count: uploadedPhotos.length,
+          photos: uploadedPhotos,
+          success: uploadedPhotos.length > 0
         });
 
-        console.log(`Successfully generated and uploaded photo for ${business.title}`);
+        console.log(`Successfully generated and uploaded ${uploadedPhotos.length} photos for ${business.title}`);
 
         // Attendre un peu entre chaque génération pour éviter le rate limiting
         await new Promise(resolve => setTimeout(resolve, 2000));
