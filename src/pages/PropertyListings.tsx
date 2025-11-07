@@ -5,9 +5,11 @@ import { Button } from "@/components/ui/button";
 import BusinessCard from "@/components/BusinessCard";
 import BusinessListItem from "@/components/BusinessListItem";
 import FilterBar from "@/components/FilterBar";
-import { ArrowRight, Grid3x3, List, Building2 } from "lucide-react";
+import { ArrowRight, Grid3x3, List, TrendingUp, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { SEO } from "@/components/SEO";
+import { CircuitBackground } from "@/components/CircuitBackground";
+import { useScrollParallax } from "@/hooks/useScrollParallax";
 
 const PropertyListings = () => {
   const navigate = useNavigate();
@@ -16,6 +18,7 @@ const PropertyListings = () => {
   const [allProperties, setAllProperties] = useState<any[]>([]);
   const [filteredProperties, setFilteredProperties] = useState<any[]>([]);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
+  const scrollY = useScrollParallax();
   
   useEffect(() => {
     fetchProperties();
@@ -23,11 +26,9 @@ const PropertyListings = () => {
 
   const fetchProperties = async () => {
     try {
-      // Fetch properties by checking if is_franchise is false and sale_type is not 'shares' or 'assets'
-      // This is a workaround until we add 'property' to the sale_type enum
       const { data: allData } = await supabase
         .from('businesses')
-        .select('*')
+        .select('id, slug, title, industry, city, region, annual_revenue, asking_price, baiia, description, featured, status, approval_status, is_franchise, sale_type, property_type, year_built, square_footage, is_rental_property, rental_units, is_demo, created_at')
         .in('status', ['active', 'sold'])
         .eq('approval_status', 'approved')
         .order('created_at', { ascending: false });
@@ -39,7 +40,7 @@ const PropertyListings = () => {
       ) || [];
 
       if (properties) {
-        const featured = properties.filter(p => p.featured && p.status === 'active').slice(0, 3);
+        const featured = properties.filter(p => p.featured && p.status === 'active');
         const regular = properties.filter(p => !p.featured || p.status === 'sold');
         setFeaturedProperties(featured);
         setAllProperties(regular);
@@ -85,132 +86,83 @@ const PropertyListings = () => {
     "@type": "ItemList",
     "name": "Immobilier à Vendre au Québec",
     "description": "Découvrez des propriétés immobilières, bureaux et espaces commerciaux à vendre au Québec",
-    "numberOfItems": allProperties.length,
-    "itemListElement": featuredProperties.map((property, index) => ({
-      "@type": "ListItem",
-      "position": index + 1,
-      "item": {
-        "@type": "RealEstateListing",
-        "name": property.title,
-        "description": property.description,
-        "price": property.asking_price,
-        "priceCurrency": property.currency || "CAD",
-        "address": {
-          "@type": "PostalAddress",
-          "addressLocality": property.city,
-          "addressRegion": property.province
-        }
-      }
-    }))
+    "numberOfItems": allProperties.length + featuredProperties.length
   };
 
   return (
     <>
       <SEO 
-        title="Immobilier à Vendre au Québec | Vente.club" 
-        description="Découvrez des propriétés immobilières, bureaux, espaces commerciaux et bâtiments industriels à vendre au Québec. Contactez directement les propriétaires." 
-        keywords="immobilier Québec, bureau à vendre Montréal, propriété commerciale, espace commercial, bâtiment industriel, terrain commercial" 
+        title="Tous les Immeubles à Vendre au Québec | Vente.club" 
+        description="Explorez tous les immeubles commerciaux, propriétés et espaces commerciaux à vendre au Québec. Filtrez par type, ville et prix." 
+        keywords="immobilier Québec, bureau à vendre, propriété commerciale, espace commercial, bâtiment industriel" 
         canonical="/immeubles-commerciaux" 
         structuredData={structuredData} 
       />
       
-      {/* Hero Section */}
-      <section className="relative min-h-[70vh] flex items-center overflow-hidden bg-gradient-to-br from-white via-muted to-white" aria-label="Section principale">
-        {/* Animated Background Elements */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-gradient-to-br from-secondary/30 via-primary/20 to-transparent rounded-full blur-3xl animate-float" />
-          <div className="absolute -bottom-40 -left-40 w-[600px] h-[600px] bg-gradient-to-tr from-accent/30 via-primary/20 to-transparent rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
-          
-          {/* Grid pattern overlay */}
-          <div className="absolute inset-0 opacity-[0.02]" style={{
-            backgroundImage: 'radial-gradient(circle at 1px 1px, rgb(0 0 0) 1px, transparent 0)',
-            backgroundSize: '40px 40px'
-          }} />
+      {/* Hero Section - Bleu riche */}
+      <section className="relative min-h-[70vh] flex items-center overflow-hidden bg-gradient-to-br from-[#1a2332] via-[#1e3a5f] to-[#0f1821]" aria-label="Section principale">
+        {/* Circuit Background Animation */}
+        <CircuitBackground />
+        
+        {/* Gradient Orbs - Bleu */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div 
+            className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-gradient-to-br from-blue-500/30 via-blue-600/20 to-transparent rounded-full blur-3xl animate-pulse"
+            style={{ transform: `translateY(${scrollY * 0.5}px)` }}
+          />
+          <div 
+            className="absolute -bottom-40 -left-40 w-[600px] h-[600px] bg-gradient-to-tr from-cyan-500/30 via-blue-500/20 to-transparent rounded-full blur-3xl animate-pulse"
+            style={{ animationDelay: '2s', transform: `translateY(${scrollY * 0.3}px)` }}
+          />
         </div>
         
         <div className="relative container mx-auto px-4 py-20">
-          <div className="max-w-5xl mx-auto text-center space-y-8 animate-slide-up">
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-secondary/10 via-primary/10 to-accent/10 border border-secondary/20 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-secondary/20 hover:border-secondary/40 cursor-pointer group">
-              <Building2 className="w-5 h-5 text-secondary animate-glow group-hover:rotate-12 transition-transform duration-300" />
-              <span className="text-foreground text-sm font-semibold tracking-wide group-hover:text-secondary transition-colors duration-300">
-                Immobilier et Propriétés d'Affaires
-              </span>
+          <div className="max-w-5xl mx-auto text-center space-y-8 animate-fade-in">
+            {/* Badge - Bleu */}
+            <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white text-sm font-semibold animate-scale-in">
+              <Sparkles className="w-4 h-4 text-blue-400" />
+              {allProperties.length + featuredProperties.length}+ propriétés disponibles
             </div>
             
             {/* Main Heading */}
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-display font-bold leading-[1.1] tracking-tight text-foreground">
-              Immobilier
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-bold leading-[1.1] tracking-tight">
+              <span className="bg-gradient-to-r from-blue-400 via-blue-500 to-cyan-400 bg-clip-text text-transparent">Immeubles</span>
               <br />
-              <span className="text-secondary">à Vendre au Québec</span>
+              <span className="text-white">
+                à vendre au Québec
+              </span>
             </h1>
             
-            {/* Subtitle */}
-            <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              Découvrez des opportunités d'investissement immobilier au Québec
+            <p className="text-lg sm:text-xl text-white/70 max-w-3xl mx-auto leading-relaxed">
+              Explorez notre catalogue complet de propriétés commerciales, bureaux et espaces industriels. 
+              Filtrez par type, ville et budget pour trouver l'opportunité parfaite.
             </p>
-            
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-6">
-              <Button 
-                size="lg" 
-                className="bg-gradient-to-r from-secondary to-primary hover:from-secondary/90 hover:to-primary/90 text-white h-16 px-12 text-lg font-semibold shadow-xl hover:shadow-2xl transition-all hover:scale-105 btn-premium group"
-                onClick={() => document.getElementById('featured')?.scrollIntoView({ behavior: 'smooth' })}
-              >
-                Explorer les propriétés
-                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </Button>
-              <Button 
-                size="lg" 
-                variant="outline" 
-                className="h-16 px-12 text-lg font-semibold border-2 border-foreground/20 hover:bg-foreground hover:text-white transition-all"
-                onClick={() => navigate("/list-property")}
-              >
-                Vendre ma propriété
-              </Button>
-            </div>
           </div>
         </div>
       </section>
 
-      {/* Featured Properties */}
+      {/* Featured Properties - Bleu */}
       {featuredProperties.length > 0 && (
-        <section id="featured" className="py-12 bg-gradient-to-b from-muted/30 to-background">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-8 animate-slide-up">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/10 text-secondary text-sm font-semibold mb-6">
-              <Building2 className="w-4 h-4" />
-              Propriétés en vedette
+        <section className="py-12 bg-gradient-to-b from-muted/30 to-background">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-8 animate-slide-up">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 text-sm font-semibold mb-6">
+                <TrendingUp className="w-4 h-4" />
+                Propriétés en vedette
+              </div>
+              <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-4">
+                Opportunités mises de l'avant
+              </h2>
             </div>
-            <h2 className="text-4xl md:text-5xl font-display font-bold text-foreground mb-4">
-              Découvrez nos meilleures opportunités
-            </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Propriétés immobilières, bureaux et espaces commerciaux sélectionnés
-            </p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {featuredProperties.length > 0 ? (
-              featuredProperties.map((property, index) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {featuredProperties.map((property, index) => (
                 <div key={property.id} className="animate-slide-up" style={{ animationDelay: `${index * 100}ms` }}>
                   <BusinessCard {...property} />
                 </div>
-              ))
-            ) : (
-              <div className="col-span-full text-center py-16">
-                <Building2 className="w-16 h-16 mx-auto mb-4 text-muted-foreground/50" />
-                <h3 className="text-xl font-semibold mb-2">Fonctionnalité à venir</h3>
-                <p className="text-lg text-muted-foreground mb-6">
-                  La section immobilier sera bientôt disponible.
-                </p>
-                <Button onClick={() => navigate("/list-property")} className="bg-secondary hover:bg-secondary/90">
-                  Inscrivez votre propriété dès maintenant
-                </Button>
-              </div>
-            )}
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
       )}
 
       {/* Filter Section */}
@@ -233,38 +185,24 @@ const PropertyListings = () => {
                 variant={viewMode === 'grid' ? 'default' : 'ghost'} 
                 size="sm" 
                 onClick={() => setViewMode('grid')} 
-                className="gap-2 rounded-lg"
+                className="gap-1 sm:gap-2 rounded-lg text-xs sm:text-sm px-2 sm:px-3"
               >
-                <Grid3x3 className="h-4 w-4" />
-                Grille
+                <Grid3x3 className="h-3 sm:h-4 w-3 sm:w-4" />
+                <span className="hidden sm:inline">Grille</span>
               </Button>
               <Button 
                 variant={viewMode === 'list' ? 'default' : 'ghost'} 
                 size="sm" 
                 onClick={() => setViewMode('list')} 
-                className="gap-2 rounded-lg"
+                className="gap-1 sm:gap-2 rounded-lg text-xs sm:text-sm px-2 sm:px-3"
               >
-                <List className="h-4 w-4" />
-                Liste
+                <List className="h-3 sm:h-4 w-3 sm:w-4" />
+                <span className="hidden sm:inline">Liste</span>
               </Button>
             </div>
           </div>
 
           <div className={viewMode === 'grid' ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8" : "space-y-3 sm:space-y-4"}>
-            {allProperties.length === 0 && (
-              <div className={viewMode === 'grid' ? "col-span-full text-center py-16" : "text-center py-16"}>
-                <Building2 className="w-16 h-16 mx-auto mb-4 text-muted-foreground/50" />
-                <h3 className="text-xl font-semibold mb-2">Fonctionnalité à venir</h3>
-                <p className="text-lg text-muted-foreground mb-6">
-                  La section immobilier sera bientôt disponible.
-                  <br />
-                  En attendant, vous pouvez dès maintenant inscrire votre propriété.
-                </p>
-                <Button onClick={() => navigate("/list-property")} className="bg-secondary hover:bg-secondary/90">
-                  Inscrire ma propriété
-                </Button>
-              </div>
-            )}
             {filteredProperties.length > 0 ? (
               filteredProperties.map((property) => 
                 viewMode === 'grid' ? (
@@ -273,41 +211,35 @@ const PropertyListings = () => {
                   <BusinessListItem key={property.id} {...property} />
                 )
               )
-            ) : allProperties.length > 0 ? (
+            ) : (
               <div className={viewMode === 'grid' ? "col-span-full text-center py-16" : "text-center py-16"}>
                 <p className="text-lg text-muted-foreground">Aucune propriété ne correspond à vos critères de recherche</p>
               </div>
-            ) : null}
+            )}
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="relative py-20 overflow-hidden bg-gradient-to-br from-white via-muted to-white">
+      {/* CTA Section - Bleu */}
+      <section className="relative py-16 overflow-hidden bg-gradient-to-br from-white via-muted to-white">
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-gradient-to-br from-secondary/30 via-primary/20 to-transparent rounded-full blur-3xl animate-float" />
-          <div className="absolute -bottom-40 -left-40 w-[600px] h-[600px] bg-gradient-to-tr from-accent/30 via-primary/20 to-transparent rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
-          
-          <div className="absolute inset-0 opacity-[0.02]" style={{
-            backgroundImage: 'radial-gradient(circle at 1px 1px, rgb(0 0 0) 1px, transparent 0)',
-            backgroundSize: '40px 40px'
-          }} />
+          <div className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-gradient-to-br from-blue-500/30 via-cyan-500/20 to-transparent rounded-full blur-3xl animate-float" />
         </div>
         
         <div className="relative container mx-auto px-4 text-center">
-          <div className="max-w-3xl mx-auto space-y-8 animate-slide-up">
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-foreground leading-tight">
-              Prêt à Investir dans <span className="text-secondary whitespace-nowrap">l'Immobilier ?</span>
+          <div className="max-w-3xl mx-auto space-y-6 animate-slide-up">
+            <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground">
+              Vous avez une propriété à vendre ?
             </h2>
-            <p className="text-xl md:text-2xl text-muted-foreground">
-              Rejoignez des investisseurs qui font confiance à Vente.club
+            <p className="text-lg text-muted-foreground">
+              Publiez votre annonce gratuitement et trouvez des acheteurs qualifiés
             </p>
             <Button 
               size="lg" 
-              className="bg-secondary hover:bg-secondary/90 text-secondary-foreground h-14 px-12 text-lg font-semibold shadow-lg hover:shadow-xl transition-all hover:scale-105 group"
+              className="bg-blue-600 hover:bg-blue-700 text-white h-14 px-12 text-lg font-semibold shadow-lg hover:shadow-xl transition-all hover:scale-105 group"
               onClick={() => navigate("/list-property")}
             >
-              Commencer gratuitement
+              Vendre ma propriété
               <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Button>
           </div>
