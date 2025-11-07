@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Lock, MapPin, TrendingUp, Users, Calendar, Eye, Calculator, Phone, Mail, UserCircle, ChevronLeft, ChevronRight, ZoomIn, ZoomOut, X, ChevronDown, MessageSquare, Share2 } from "lucide-react";
+import { ArrowLeft, Lock, MapPin, TrendingUp, Users, Calendar, Eye, Calculator, Phone, Mail, UserCircle, ChevronLeft, ChevronRight, ZoomIn, ZoomOut, X, ChevronDown, MessageSquare, Share2, Star } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { FavoriteButton } from "@/components/FavoriteButton";
@@ -1382,6 +1382,51 @@ const BusinessDetails = () => {
             {/* Right Sidebar - Chat Section qui suit le scroll */}
             <div className="lg:col-span-1">
               <div className="sticky top-24 space-y-4">
+              {/* Seller Featured Ad Section */}
+              {isSeller && businessId && (
+                <Card className="border-yellow-500/30 bg-gradient-to-br from-yellow-500/10 to-amber-500/10 shadow-lg">
+                  <CardHeader>
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
+                      Mettre en avant mon annonce
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <p className="text-sm text-muted-foreground">
+                      Augmentez votre visibilité et attirez plus d'acheteurs potentiels
+                    </p>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                        <span>Position en tête de liste</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                        <span>Badge étoile visible</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                        <span>Augmentation de visibilité</span>
+                      </div>
+                    </div>
+                    <div className="pt-3 border-t">
+                      <div className="flex items-baseline gap-1 mb-3">
+                        <span className="text-2xl font-bold text-foreground">À partir de 7,50 $</span>
+                        <span className="text-sm text-muted-foreground">/ 7 jours</span>
+                      </div>
+                      <Button 
+                        onClick={() => navigate('/dashboard?tab=businesses')}
+                        size="lg"
+                        className="w-full bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-600 hover:to-amber-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+                      >
+                        <Star className="w-4 h-4 mr-2 fill-white" />
+                        Mettre en avant
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+              
               {/* Chat Section Sticky */}
               {!isSeller && businessId && user && (
                 <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5 shadow-lg">
