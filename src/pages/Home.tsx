@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import BusinessCard from "@/components/BusinessCard";
@@ -400,7 +400,7 @@ const Home = () => {
             <AccordionItem value="item-3">
               <AccordionTrigger>À quoi sert le Club Select?</AccordionTrigger>
               <AccordionContent>
-                Le Club Select à 19,99$/mois vous offre un accès illimité à tous les vendeurs, des conversations sans limite, et la possibilité de contacter autant d'entreprises que vous le souhaitez chaque jour. Découvrez tous les <a href="/a-propos" className="text-secondary hover:underline font-semibold">avantages du Club Select</a> pour les acheteurs sérieux.
+                Le Club Select à 19,99$/mois vous offre un accès illimité à tous les vendeurs, des conversations sans limite, et la possibilité de contacter autant d'entreprises que vous le souhaitez chaque jour. Découvrez tous les <Link to="/club-select" className="text-secondary hover:underline font-semibold">avantages du Club Select</Link> pour les acheteurs sérieux.
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="item-4">
