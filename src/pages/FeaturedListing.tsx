@@ -259,38 +259,6 @@ const FeaturedListing = () => {
         </div>
       </section>
 
-      {/* Benefits Section - Style minimaliste */}
-      <section className="py-20 bg-background">
-        <div className="container mx-auto px-4">
-          <div className="max-w-5xl mx-auto">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl sm:text-4xl font-display font-bold text-foreground mb-4">
-                Tous les avantages
-              </h2>
-              <p className="text-lg text-muted-foreground">
-                Donnez à votre annonce la visibilité qu'elle mérite
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {benefits.map((benefit, index) => (
-                <div 
-                  key={index} 
-                  className="text-center p-6 rounded-xl bg-card border border-border hover:shadow-lg transition-all duration-300"
-                >
-                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                    <benefit.icon className="w-6 h-6 text-primary" />
-                  </div>
-                  <h3 className="text-lg font-semibold text-foreground mb-2">{benefit.title}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{benefit.description}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-
       {/* How it Works Section - Style minimaliste */}
       <section className="py-20 bg-background">
         <div className="container mx-auto px-4">
@@ -316,7 +284,7 @@ const FeaturedListing = () => {
                     <div>
                       <h3 className="font-semibold text-foreground mb-2">Investissement publicitaire inclus</h3>
                       <p className="text-sm text-muted-foreground leading-relaxed">
-                        Une portion importante de votre paiement est directement investie dans des campagnes publicitaires 
+                        Une portion de votre paiement est directement investie dans des campagnes publicitaires 
                         ciblées (Google Ads, Facebook, réseaux sociaux) pour promouvoir votre annonce et attirer des acheteurs 
                         qualifiés vers votre opportunité d'affaires.
                       </p>
@@ -381,6 +349,37 @@ const FeaturedListing = () => {
                   </div>
                 </CardContent>
               </Card>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Benefits Section - Style minimaliste */}
+      <section className="py-20 bg-background">
+        <div className="container mx-auto px-4">
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl sm:text-4xl font-display font-bold text-foreground mb-4">
+                Tous les avantages
+              </h2>
+              <p className="text-lg text-muted-foreground">
+                Donnez à votre annonce la visibilité qu'elle mérite
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {benefits.map((benefit, index) => (
+                <div 
+                  key={index} 
+                  className="text-center p-6 rounded-xl bg-card border border-border hover:shadow-lg transition-all duration-300"
+                >
+                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                    <benefit.icon className="w-6 h-6 text-primary" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-foreground mb-2">{benefit.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{benefit.description}</p>
+                </div>
+              ))}
             </div>
           </div>
         </div>
