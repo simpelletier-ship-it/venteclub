@@ -12,6 +12,7 @@ import { QuickMessageTemplates } from "@/components/QuickMessageTemplates";
 import { ProfileCompletionAlert } from "@/components/ProfileCompletionAlert";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { MakeOfferDialog } from "@/components/MakeOfferDialog";
+import { PremiumUpgradeModal } from "@/components/PremiumUpgradeModal";
 
 interface Message {
   id: string;
@@ -686,52 +687,12 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
       </div>
 
       {/* Dialog Premium Membership */}
-      <Dialog open={showPremiumDialog} onOpenChange={setShowPremiumDialog}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Crown className="h-5 w-5 text-yellow-500" />
-              Abonnement Club Select requis
-            </DialogTitle>
-            <DialogDescription className="text-left space-y-3 pt-4">
-              <p>
-                Pour voir les profils complets des utilisateurs, vous devez être membre du <strong>Club Select</strong>.
-              </p>
-              <div className="bg-gradient-to-br from-yellow-500/10 to-amber-500/10 border border-yellow-500/20 rounded-lg p-4 space-y-2">
-                <h4 className="font-semibold text-sm flex items-center gap-2">
-                  <Crown className="h-4 w-4 text-yellow-500" />
-                  Avantages Club Select :
-                </h4>
-                <ul className="text-sm space-y-1 ml-4">
-                  <li>• Accès illimité aux profils complets</li>
-                  <li>• Coordonnées des vendeurs</li>
-                  <li>• Support prioritaire</li>
-                  <li>• Badge exclusif</li>
-                </ul>
-              </div>
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex gap-3 mt-4">
-            <Button
-              variant="outline"
-              onClick={() => setShowPremiumDialog(false)}
-              className="flex-1"
-            >
-              Plus tard
-            </Button>
-            <Button
-              onClick={() => {
-                setShowPremiumDialog(false);
-                navigate('/profile?tab=premium');
-              }}
-              className="flex-1 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-600 hover:to-amber-600"
-            >
-              <Crown className="mr-2 h-4 w-4" />
-              S'abonner
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <PremiumUpgradeModal 
+        open={showPremiumDialog} 
+        onOpenChange={setShowPremiumDialog}
+        hoursRemaining={0}
+        minutesRemaining={0}
+      />
     </div>
   );
 };
