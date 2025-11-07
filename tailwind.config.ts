@@ -49,6 +49,11 @@ export default {
           DEFAULT: "hsl(var(--franchise))",
           foreground: "hsl(var(--franchise-foreground))",
         },
+        success: {
+          DEFAULT: "hsl(var(--success))",
+          foreground: "hsl(var(--success-foreground))",
+          light: "hsl(var(--success-light))",
+        },
         popover: {
           DEFAULT: "hsl(var(--popover))",
           foreground: "hsl(var(--popover-foreground))",
