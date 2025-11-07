@@ -176,7 +176,7 @@ export const getListingApprovedEmail = (
   businessUrl: string
 ) => {
   const content = `
-    <h1>✅ Votre annonce est approuvée</h1>
+    <h1>Votre annonce est approuvée</h1>
     <p>Bonjour ${sellerName},</p>
     <p>Excellente nouvelle : votre annonce a été validée par notre équipe et est maintenant visible par tous les acheteurs potentiels.</p>
     
@@ -184,7 +184,7 @@ export const getListingApprovedEmail = (
       <h2 style="font-size: 18px; font-weight: 600; margin-bottom: 16px; color: #1a1a1a;">${businessTitle}</h2>
       <p style="margin-bottom: 8px; color: #4a4a4a;"><strong>Prix demandé :</strong> ${businessPrice}</p>
       <p style="margin-bottom: 8px; color: #4a4a4a;"><strong>Localisation :</strong> ${businessLocation}</p>
-      <p style="margin-bottom: 0; color: #22c55e; font-weight: 500;"><strong>Statut :</strong> ✓ En ligne</p>
+      <p style="margin-bottom: 0; color: #22c55e; font-weight: 500;"><strong>Statut :</strong> En ligne</p>
     </div>
 
     <p>Votre annonce est maintenant en ligne et accessible aux milliers d'acheteurs qui visitent ${BRAND_NAME} chaque jour.</p>
@@ -200,7 +200,7 @@ export const getListingApprovedEmail = (
     <hr class="divider">
 
     <div style="background-color: #fef3c7; border-left: 3px solid #f59e0b; padding: 16px 20px; margin: 24px 0; border-radius: 4px;">
-      <p style="margin-bottom: 12px; font-weight: 600; color: #92400e;">💡 Conseils pour maximiser vos chances de vente :</p>
+      <p style="margin-bottom: 12px; font-weight: 600; color: #92400e;">Conseils pour maximiser vos chances de vente :</p>
       <p style="margin-bottom: 8px; font-size: 14px; color: #92400e;">• Répondez rapidement aux messages des acheteurs intéressés</p>
       <p style="margin-bottom: 8px; font-size: 14px; color: #92400e;">• Soyez transparent sur les informations financières</p>
       <p style="margin-bottom: 8px; font-size: 14px; color: #92400e;">• Mettez à jour votre annonce si nécessaire</p>
