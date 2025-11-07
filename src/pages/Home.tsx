@@ -332,8 +332,8 @@ const Home = () => {
             </div>
             <div className="text-center p-6 sm:p-8 rounded-xl bg-white/10 border border-white/20 hover:bg-white/15 hover:shadow-2xl hover:scale-105 transition-all duration-300 backdrop-blur-sm">
               <Shield className="w-10 sm:w-12 h-10 sm:h-12 mx-auto mb-3 sm:mb-4 text-white" />
-              <h3 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3 text-white">Transactions sécurisées</h3>
-              <p className="text-sm sm:text-base text-white/80 leading-relaxed">Plateforme fiable et sécurisée pour toutes vos négociations d'achat ou de vente</p>
+              <h3 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3 text-white">Paiements sécurisés</h3>
+              <p className="text-sm sm:text-base text-white/80 leading-relaxed">Abonnements et achats protégés par une infrastructure de paiement certifiée et conforme aux normes bancaires</p>
             </div>
             <div className="text-center p-6 sm:p-8 rounded-xl bg-white/10 border border-white/20 hover:bg-white/15 hover:shadow-2xl hover:scale-105 transition-all duration-300 backdrop-blur-sm">
               <Clock className="w-10 sm:w-12 h-10 sm:h-12 mx-auto mb-3 sm:mb-4 text-white" />
