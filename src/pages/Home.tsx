@@ -229,53 +229,6 @@ const Home = () => {
           </div>
         </div>
         
-        {/* Decorative curve in bottom right */}
-        <div className="absolute bottom-0 right-0 w-[600px] h-[200px] pointer-events-none overflow-hidden opacity-30">
-          <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 200">
-            <defs>
-              <linearGradient id="curveGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#818cf8" stopOpacity="0">
-                  <animate attributeName="offset" values="-0.5;1.5" dur="4s" repeatCount="indefinite" />
-                </stop>
-                <stop offset="30%" stopColor="#818cf8" stopOpacity="0.9">
-                  <animate attributeName="offset" values="-0.2;1.8" dur="4s" repeatCount="indefinite" />
-                </stop>
-                <stop offset="50%" stopColor="#c7d2fe" stopOpacity="1">
-                  <animate attributeName="offset" values="0;2" dur="4s" repeatCount="indefinite" />
-                </stop>
-                <stop offset="70%" stopColor="#818cf8" stopOpacity="0.9">
-                  <animate attributeName="offset" values="0.2;2.2" dur="4s" repeatCount="indefinite" />
-                </stop>
-                <stop offset="100%" stopColor="#818cf8" stopOpacity="0">
-                  <animate attributeName="offset" values="0.5;2.5" dur="4s" repeatCount="indefinite" />
-                </stop>
-              </linearGradient>
-              <filter id="curveGlow">
-                <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-                <feMerge>
-                  <feMergeNode in="coloredBlur"/>
-                  <feMergeNode in="SourceGraphic"/>
-                </feMerge>
-              </filter>
-            </defs>
-            <path 
-              d="M 600,120 Q 450,80 300,110 T 0,90" 
-              stroke="#6366f1" 
-              strokeWidth="1.5" 
-              fill="none" 
-              opacity="0.5"
-              strokeLinecap="round"
-            />
-            <path 
-              d="M 600,120 Q 450,80 300,110 T 0,90" 
-              stroke="url(#curveGradient)" 
-              strokeWidth="3" 
-              fill="none"
-              filter="url(#curveGlow)"
-              strokeLinecap="round"
-            />
-          </svg>
-        </div>
       </section>
 
       {/* Statistics Section */}
