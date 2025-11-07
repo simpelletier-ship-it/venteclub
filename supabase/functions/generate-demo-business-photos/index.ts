@@ -16,18 +16,28 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Récupérer toutes les annonces demo sans photos
+    // Récupérer toutes les annonces demo
     const { data: businesses, error: fetchError } = await supabaseClient
       .from('businesses')
       .select('id, title, industry, is_franchise, sale_type, property_type')
       .eq('is_demo', true)
       .eq('approval_status', 'approved');
 
-    if (fetchError) throw fetchError;
+    if (fetchError) {
+      console.error('Fetch error:', fetchError);
+      throw fetchError;
+    }
+
+    console.log(`Found ${businesses?.length || 0} demo businesses`);
 
     if (!businesses || businesses.length === 0) {
       return new Response(
-        JSON.stringify({ message: 'No demo businesses found' }),
+        JSON.stringify({ 
+          message: 'No demo businesses found',
+          processed: 0,
+          successful: 0,
+          results: []
+        }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -36,16 +46,18 @@ Deno.serve(async (req) => {
 
     for (const business of businesses) {
       try {
-        // Vérifier si cette annonce a déjà des photos
-        const { data: existingPhotos } = await supabaseClient
+        console.log(`Processing business: ${business.title} (${business.id})`);
+        
+        // Supprimer les anciennes photos pour cette annonce démo
+        const { error: deleteError } = await supabaseClient
           .from('business_photos')
-          .select('id')
-          .eq('business_id', business.id)
-          .limit(1);
+          .delete()
+          .eq('business_id', business.id);
 
-        if (existingPhotos && existingPhotos.length > 0) {
-          console.log(`Business ${business.id} already has photos, skipping...`);
-          continue;
+        if (deleteError) {
+          console.error(`Delete error for ${business.id}:`, deleteError);
+        } else {
+          console.log(`Deleted existing photos for ${business.title}`);
         }
 
         // Mapper les industries aux images réalistes
