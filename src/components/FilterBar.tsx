@@ -23,9 +23,10 @@ interface FilterBarProps {
     minPrice?: number;
     maxPrice?: number;
   }) => void;
+  accentColor?: 'purple' | 'blue';
 }
 
-const FilterBar = ({ onFilter }: FilterBarProps) => {
+const FilterBar = ({ onFilter, accentColor = 'purple' }: FilterBarProps) => {
   const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
   const [selectedIndustries, setSelectedIndustries] = useState<string[]>([]);
   const [selectedListingTypes, setSelectedListingTypes] = useState<string[]>([]);
@@ -309,7 +310,11 @@ const FilterBar = ({ onFilter }: FilterBarProps) => {
         <div className="flex flex-col sm:flex-row gap-2 sm:gap-2">
           <Button 
             onClick={handleFilter}
-            className="flex-1 h-10 sm:h-12 bg-accent hover:bg-accent/90 text-accent-foreground font-semibold text-sm sm:text-base"
+            className={`flex-1 h-10 sm:h-12 font-semibold text-sm sm:text-base ${
+              accentColor === 'blue' 
+                ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+                : 'bg-accent hover:bg-accent/90 text-accent-foreground'
+            }`}
           >
             Filtrer
           </Button>

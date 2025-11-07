@@ -146,10 +146,10 @@ const PropertyListings = () => {
         <section className="py-12 bg-gradient-to-b from-muted/30 to-background">
           <div className="container mx-auto px-4">
             <div className="text-center mb-8 animate-slide-up">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 text-sm font-semibold mb-6">
-                <TrendingUp className="w-4 h-4" />
-                Propriétés en vedette
-              </div>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-600/10 text-blue-600 dark:text-blue-400 text-sm font-semibold mb-6">
+              <TrendingUp className="w-4 h-4" />
+              Propriétés en vedette
+            </div>
               <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-4">
                 Opportunités mises de l'avant
               </h2>
@@ -168,7 +168,7 @@ const PropertyListings = () => {
       {/* Filter Section */}
       <section className="py-8 bg-background border-b border-border">
         <div className="container mx-auto px-4">
-          <FilterBar onFilter={handleFilter} />
+          <FilterBar onFilter={handleFilter} accentColor="blue" />
         </div>
       </section>
 
@@ -180,21 +180,29 @@ const PropertyListings = () => {
               Toutes les propriétés ({filteredProperties.length})
             </h2>
             
-            <div className="inline-flex rounded-xl border border-border bg-card p-1.5 shadow-soft">
+            <div className="inline-flex rounded-xl border border-blue-600/20 bg-card p-1.5 shadow-soft">
               <Button 
-                variant={viewMode === 'grid' ? 'default' : 'ghost'} 
+                variant="ghost"
                 size="sm" 
                 onClick={() => setViewMode('grid')} 
-                className="gap-1 sm:gap-2 rounded-lg text-xs sm:text-sm px-2 sm:px-3"
+                className={`gap-1 sm:gap-2 rounded-lg text-xs sm:text-sm px-2 sm:px-3 ${
+                  viewMode === 'grid' 
+                    ? 'bg-blue-600 text-white hover:bg-blue-700' 
+                    : 'hover:bg-blue-600/10'
+                }`}
               >
                 <Grid3x3 className="h-3 sm:h-4 w-3 sm:w-4" />
                 <span className="hidden sm:inline">Grille</span>
               </Button>
               <Button 
-                variant={viewMode === 'list' ? 'default' : 'ghost'} 
+                variant="ghost"
                 size="sm" 
                 onClick={() => setViewMode('list')} 
-                className="gap-1 sm:gap-2 rounded-lg text-xs sm:text-sm px-2 sm:px-3"
+                className={`gap-1 sm:gap-2 rounded-lg text-xs sm:text-sm px-2 sm:px-3 ${
+                  viewMode === 'list' 
+                    ? 'bg-blue-600 text-white hover:bg-blue-700' 
+                    : 'hover:bg-blue-600/10'
+                }`}
               >
                 <List className="h-3 sm:h-4 w-3 sm:w-4" />
                 <span className="hidden sm:inline">Liste</span>
