@@ -37,18 +37,36 @@ const BusinessMap = () => {
         
         if (tokenError) {
           console.error('[MAP] Error fetching token:', tokenError);
+          alert('Erreur de récupération du token Mapbox. Vérifiez la console pour plus de détails.');
           return;
         }
         
         if (!tokenData?.token) {
-          console.error('[MAP] No token received');
+          console.error('[MAP] No token received from edge function');
+          alert('Aucun token Mapbox reçu. Vérifiez la configuration dans les secrets.');
           return;
         }
 
-        console.log('[MAP] Token received, initializing map...');
+        console.log('[MAP] Token received:', tokenData.token.substring(0, 15) + '...');
         mapboxgl.accessToken = tokenData.token;
 
+        // Test du token avant d'initialiser la carte
+        try {
+          const testResponse = await fetch(`https://api.mapbox.com/styles/v1/mapbox/light-v11.html?access_token=${tokenData.token}`);
+          if (!testResponse.ok) {
+            console.error('[MAP] Token validation failed:', testResponse.status, testResponse.statusText);
+            alert(`Token Mapbox invalide (${testResponse.status}). Veuillez mettre à jour votre token dans les secrets.`);
+            return;
+          }
+          console.log('[MAP] ✅ Token validated successfully');
+        } catch (testError) {
+          console.error('[MAP] Token validation error:', testError);
+          alert('Impossible de valider le token Mapbox. Vérifiez votre connexion internet.');
+          return;
+        }
+
         // Créer la carte avec le style streets (VRAIE CARTE RÉELLE)
+        console.log('[MAP] Creating map instance...');
         map.current = new mapboxgl.Map({
           container: mapContainer.current!,
           style: 'mapbox://styles/mapbox/light-v11', // Style clair avec bonne lisibilité
@@ -59,7 +77,7 @@ const BusinessMap = () => {
           antialias: true
         });
 
-        console.log('[MAP] Map instance created with streets style');
+        console.log('[MAP] Map instance created with light-v11 style');
 
         map.current.on('load', async () => {
           console.log('[MAP] ✅ Map loaded successfully!');
