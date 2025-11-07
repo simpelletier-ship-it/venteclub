@@ -323,7 +323,7 @@ const Dashboard = () => {
             ) : (
               <>
                 <div className="flex justify-end mb-4">
-                  <Button onClick={() => navigate("/sell")}>
+                  <Button onClick={() => navigate("/sell")} variant="secondary">
                     <Plus className="mr-2 h-4 w-4" />
                     Créer une nouvelle annonce
                   </Button>
