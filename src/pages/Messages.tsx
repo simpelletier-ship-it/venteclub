@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,6 +11,7 @@ import { MessageSquare, ArrowLeft, ChevronRight, Search, Trash2, SortDesc, User,
 import { ChatBox } from "@/components/ChatBox";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { useNotificationSound } from "@/hooks/useNotificationSound";
 
 interface Conversation {
   business_id: string;
@@ -41,6 +42,8 @@ const Messages = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortType, setSortType] = useState<SortType>('recent');
   const { toast } = useToast();
+  const { playNotificationSound } = useNotificationSound();
+  const previousMessageCountRef = useRef<number>(0);
 
   useEffect(() => {
     const initialize = async () => {
@@ -141,7 +144,22 @@ const Messages = () => {
       .on(
         'postgres_changes',
         {
-          event: '*',
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+        },
+        (payload) => {
+          // Jouer le son uniquement si le message n'est pas envoyé par l'utilisateur actuel
+          if (payload.new && payload.new.sender_id !== user.id) {
+            playNotificationSound();
+          }
+          fetchConversations(user.id);
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
           schema: 'public',
           table: 'messages',
         },
@@ -154,7 +172,7 @@ const Messages = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user]);
+  }, [user, playNotificationSound]);
 
   const fetchConversations = async (userId: string) => {
     setLoading(true);
