@@ -267,56 +267,6 @@ const Dashboard = () => {
             </Button>
           </div>
 
-          {/* Stats Cards */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            <Card className="border-2 border-green-200 dark:border-green-800 bg-green-50/50 dark:bg-green-950/20 hover:shadow-lg transition-all">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-green-700 dark:text-green-400 flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4" />
-                  Publiées
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold text-green-700 dark:text-green-400">{stats.published}</div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-2 hover:shadow-lg transition-all">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                  <FileText className="h-4 w-4" />
-                  Brouillon
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold">{stats.draft}</div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-2 border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-950/20 hover:shadow-lg transition-all">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-blue-700 dark:text-blue-400 flex items-center gap-2">
-                  <Star className="h-4 w-4" />
-                  Approuvées
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold text-blue-700 dark:text-blue-400">{stats.approved}</div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-2 border-orange-200 dark:border-orange-800 bg-orange-50/50 dark:bg-orange-950/20 hover:shadow-lg transition-all">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-orange-700 dark:text-orange-400 flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4" />
-                  Vendues
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold text-orange-700 dark:text-orange-400">{stats.sold}</div>
-              </CardContent>
-            </Card>
-          </div>
         </div>
 
         <Tabs defaultValue={defaultTab} className="w-full">
