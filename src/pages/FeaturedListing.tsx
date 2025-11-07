@@ -77,6 +77,12 @@ const FeaturedListing = () => {
       highlight: true
     },
     {
+      icon: Zap,
+      title: "Campagnes publicitaires incluses",
+      description: "Une partie du forfait finance des publicités ciblées sur Google et Facebook pour promouvoir votre annonce",
+      highlight: true
+    },
+    {
       icon: TrendingUp,
       title: "Jusqu'à 5x plus de vues",
       description: "Les annonces mises en avant reçoivent en moyenne 5 fois plus de consultations"
@@ -87,14 +93,9 @@ const FeaturedListing = () => {
       description: "Votre annonce est présentée aux acheteurs les plus actifs et qualifiés"
     },
     {
-      icon: Zap,
-      title: "Résultats rapides",
-      description: "Vendez plus rapidement grâce à une visibilité accrue immédiate"
-    },
-    {
       icon: Clock,
       title: "Activation instantanée",
-      description: "Votre mise en avant débute immédiatement après le paiement"
+      description: "Votre mise en avant débute immédiatement après le paiement unique"
     }
   ];
 
@@ -204,11 +205,14 @@ const FeaturedListing = () => {
                   )}
                   <CardHeader className="text-center pb-2 pt-6">
                     <CardTitle className="text-2xl font-bold">
-                      {option.price.toFixed(2)}$
+                      {option.price.toFixed(0)}$
                     </CardTitle>
                     <CardDescription className="text-base font-semibold text-foreground">
                       {option.label}
                     </CardDescription>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Paiement unique • Publicité incluse
+                    </p>
                     {option.savings && (
                       <Badge variant="secondary" className="mt-2">
                         {option.savings}
@@ -234,7 +238,7 @@ const FeaturedListing = () => {
               {isLoading ? "Chargement..." : `Mettre en vedette - ${pricingOptions.find(o => o.duration === selectedDuration)?.price.toFixed(0)}$`}
             </Button>
             <p className="text-white/70 mt-4 text-sm">
-              Paiement sécurisé par Stripe • Activation immédiate
+              Paiement unique • Sans abonnement • Activation immédiate
             </p>
           </div>
         </div>
@@ -348,10 +352,22 @@ const FeaturedListing = () => {
             <Card className="border-2 border-primary/20">
               <CardHeader>
                 <CardTitle className="text-3xl">
-                  Pourquoi mettre mon annonce en vedette ?
+                  Comment fonctionne la mise en vedette ?
                 </CardTitle>
+                <CardDescription className="text-base mt-2">
+                  Un investissement unique pour maximiser vos chances de vente
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
+                <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 mb-6">
+                  <p className="text-sm font-semibold text-primary mb-2">💡 Investissement publicitaire inclus</p>
+                  <p className="text-sm text-muted-foreground">
+                    Une portion importante de votre paiement est directement investie dans des campagnes publicitaires 
+                    ciblées (Google Ads, Facebook, réseaux sociaux) pour promouvoir votre annonce et attirer des acheteurs 
+                    qualifiés vers votre opportunité d'affaires.
+                  </p>
+                </div>
+
                 <div className="flex gap-4">
                   <div className="flex-shrink-0">
                     <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
@@ -359,10 +375,10 @@ const FeaturedListing = () => {
                     </div>
                   </div>
                   <div>
-                    <h3 className="font-semibold text-lg mb-2">Vendez plus rapidement</h3>
+                    <h3 className="font-semibold text-lg mb-2">Paiement unique, pas d'abonnement</h3>
                     <p className="text-muted-foreground">
-                      Les annonces en vedette se vendent en moyenne 3 fois plus rapidement grâce à leur 
-                      visibilité accrue et leur positionnement prioritaire dans les résultats de recherche.
+                      Payez une seule fois pour la durée choisie. Aucun frais caché, aucun renouvellement automatique. 
+                      Votre annonce reste en vedette pendant toute la période sélectionnée.
                     </p>
                   </div>
                 </div>
@@ -374,10 +390,11 @@ const FeaturedListing = () => {
                     </div>
                   </div>
                   <div>
-                    <h3 className="font-semibold text-lg mb-2">Maximisez votre visibilité</h3>
+                    <h3 className="font-semibold text-lg mb-2">Publicité ciblée pour votre annonce</h3>
                     <p className="text-muted-foreground">
-                      Apparaissez en premier dans toutes les recherches pertinentes et sur la page d'accueil. 
-                      Votre annonce sera vue par tous les acheteurs actifs de votre secteur.
+                      Nous utilisons une partie de votre investissement pour diffuser des publicités ciblées sur Google, 
+                      Facebook et autres plateformes, augmentant ainsi le trafic qualifié vers votre annonce et vos chances 
+                      de trouver le bon acheteur rapidement.
                     </p>
                   </div>
                 </div>
@@ -391,8 +408,8 @@ const FeaturedListing = () => {
                   <div>
                     <h3 className="font-semibold text-lg mb-2">Attirez les meilleurs acheteurs</h3>
                     <p className="text-muted-foreground">
-                      Le badge "En vedette" attire l'attention des acheteurs sérieux et qualifiés qui recherchent 
-                      activement des opportunités dans votre domaine.
+                      Le badge "En vedette" combiné à nos campagnes publicitaires attire l'attention des acheteurs sérieux 
+                      et qualifiés qui recherchent activement des opportunités dans votre domaine.
                     </p>
                   </div>
                 </div>
