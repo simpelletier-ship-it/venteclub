@@ -14,6 +14,7 @@ import { ChatBox } from "@/components/ChatBox";
 import { SellerChatSection } from "@/components/SellerChatSection";
 import { ReportBusinessDialog } from "@/components/ReportBusinessDialog";
 import { SEO } from "@/components/SEO";
+import { BusinessHero } from "@/components/BusinessHero";
 import { FinancialCalculator } from "@/components/FinancialCalculator";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { PriceHistory } from "@/components/PriceHistory";
@@ -797,99 +798,19 @@ const BusinessDetails = () => {
         type="product"
         structuredData={businessStructuredData}
       />
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto">
         <div className="max-w-7xl mx-auto">
-          {/* Hero Section - Header Premium avec outils */}
-          <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 text-white rounded-2xl shadow-2xl border border-slate-700/50 overflow-hidden mb-8">
-            {/* Barre d'outils supérieure */}
-            <div className="bg-slate-950/50 border-b border-slate-700/50 px-6 py-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  {business.created_at && (
-                    <div className="flex items-center gap-2 text-sm text-slate-400">
-                      <Calendar className="w-4 h-4" />
-                      <span>Publié le {new Date(business.created_at).toLocaleDateString('fr-CA')}</span>
-                    </div>
-                  )}
-                </div>
-                <div className="flex items-center gap-3">
-                  {businessId && (
-                    <>
-                      <FavoriteButton businessId={businessId} userId={user?.id} />
-                      <ShareButton 
-                        title={business.title} 
-                        slug={business.slug} 
-                        description={business.description}
-                        variant="outline"
-                        size="default"
-                        className="bg-slate-800/50 hover:bg-slate-700 border-slate-600 text-slate-200"
-                      />
-                    </>
-                  )}
-                  {!isSeller && businessId && (
-                    <ReportBusinessDialog businessId={businessId} businessTitle={business.title} />
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Contenu principal du header */}
-            <div className="p-8 md:p-10">
-              <div className="flex flex-col md:flex-row items-start justify-between gap-6">
-                <div className="flex-1">
-                  <h1 className="text-3xl md:text-5xl font-bold mb-6 leading-tight">
-                    {business.title}
-                  </h1>
-                  <div className="flex flex-wrap gap-3 items-center">
-                    {business.property_type ? (
-                      <>
-                        <Badge className="bg-blue-500/30 text-blue-100 border-blue-400/50 hover:bg-blue-500/40 px-4 py-1.5 text-sm font-semibold">
-                          Immobilier
-                        </Badge>
-                        <Badge variant="outline" className="border-slate-500 text-slate-100 hover:bg-slate-800 px-4 py-1.5 text-sm">
-                          {business.property_type === 'bureau' && 'Bureau commercial'}
-                          {business.property_type === 'commerce' && 'Espace commercial'}
-                          {business.property_type === 'industriel' && 'Bâtiment industriel'}
-                          {business.property_type === 'terrain' && 'Terrain commercial'}
-                          {business.property_type === 'immeuble_logement' && 'Immeuble à logement'}
-                          {business.property_type === 'mixte' && 'Propriété mixte'}
-                        </Badge>
-                      </>
-                    ) : business.is_franchise ? (
-                      <Badge className="bg-purple-500/30 text-purple-100 border-purple-400/50 px-4 py-1.5 text-sm font-semibold">
-                        Franchise
-                      </Badge>
-                    ) : (
-                      <Badge className="bg-primary/30 text-primary-foreground border-primary/50 px-4 py-1.5 text-sm font-semibold">
-                        Entreprise
-                      </Badge>
-                    )}
-                    <span className="flex items-center gap-2 text-slate-100 px-3 py-1.5 bg-slate-800/50 rounded-full text-sm">
-                      <MapPin className="w-4 h-4" />
-                      {business.city || business.location}
-                      {business.region && <span className="text-slate-300">, {business.region}</span>}
-                    </span>
-                  </div>
-                </div>
-                <div className="text-right bg-gradient-to-br from-emerald-500/10 to-emerald-600/10 backdrop-blur-sm border border-emerald-400/20 rounded-xl p-6 min-w-[280px]">
-                  <div className="text-sm text-slate-400 font-medium uppercase tracking-wider mb-2">Prix demandé</div>
-                  <div className="text-4xl md:text-5xl font-bold text-white mb-3">
-                    {business.asking_price === 0 ? 'À discuter' : `${business.asking_price.toLocaleString()} $`}
-                  </div>
-                  {business.sale_type && (
-                    <Badge variant="outline" className="border-emerald-500/40 text-emerald-200 bg-emerald-950/20 text-xs">
-                      {business.sale_type === 'assets' && 'Vente d\'actifs'}
-                      {business.sale_type === 'shares' && 'Vente d\'actions'}
-                      {business.sale_type === 'both' && 'Flexible'}
-                    </Badge>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
+          {/* Hero Section Premium */}
+          <BusinessHero 
+            business={business}
+            businessId={businessId}
+            userId={user?.id}
+            isSeller={isSeller}
+            mainPhoto={photos[0]?.photo_url}
+          />
 
           {/* Main Content Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 px-4 py-12">
             {/* Left Column - Main Content */}
             <div className="lg:col-span-2 space-y-8">
 
