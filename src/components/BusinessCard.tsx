@@ -180,7 +180,7 @@ const BusinessCard = ({
         
         {/* Image carousel */}
         <div className="relative w-full h-56 sm:h-64 overflow-hidden bg-muted group/image">
-          {!imageLoading && allImages.length > 0 && !is_demo && (
+          {!imageLoading && allImages.length > 0 && (
             <>
               <OptimizedImage
                 src={allImages[currentImageIndex]}
@@ -189,8 +189,8 @@ const BusinessCard = ({
                 aspectRatio="16/9"
               />
               
-              {/* Navigation arrows - style YouTube */}
-              {allImages.length > 1 && (
+              {/* Navigation arrows - style YouTube - only for non-demo with multiple images */}
+              {!is_demo && allImages.length > 1 && (
                 <>
                   <button
                     onClick={handlePrevImage}
@@ -209,15 +209,15 @@ const BusinessCard = ({
                 </>
               )}
               
-              {/* Image counter - style YouTube */}
-              {allImages.length > 1 && (
+              {/* Image counter - style YouTube - only for non-demo with multiple images */}
+              {!is_demo && allImages.length > 1 && (
                 <div className="absolute top-3 right-3 bg-black/80 text-white text-xs font-semibold px-2.5 py-1 rounded-md z-10">
                   {currentImageIndex + 1} / {allImages.length}
                 </div>
               )}
               
-              {/* Pagination dots */}
-              {allImages.length > 1 && (
+              {/* Pagination dots - only for non-demo with multiple images */}
+              {!is_demo && allImages.length > 1 && (
                 <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
                   {allImages.map((_, idx) => (
                     <button
