@@ -97,7 +97,22 @@ export const BusinessStatistics = ({ userId }: BusinessStatisticsProps) => {
     { name: 'Leads', value: totalLeads, color: COLORS[4] }
   ].filter(item => item.value > 0);
 
-  // Group by date for timeline
+  // Group by date for timeline - ensure all dates in range are present
+  const generateDateRange = () => {
+    const dates = [];
+    const daysInRange = timeRange === 'all' ? 90 : parseInt(timeRange);
+    const today = new Date();
+    
+    for (let i = daysInRange - 1; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(date.getDate() - i);
+      dates.push(date.toLocaleDateString('fr-CA'));
+    }
+    return dates;
+  };
+
+  const dateRange = timeRange === 'all' ? [] : generateDateRange();
+  
   const timelineData = analytics.reduce((acc: any[], curr) => {
     const date = new Date(curr.created_at).toLocaleDateString('fr-CA');
     const existing = acc.find(item => item.date === date);
@@ -113,6 +128,21 @@ export const BusinessStatistics = ({ userId }: BusinessStatisticsProps) => {
     }
     return acc;
   }, []);
+
+  // Add missing dates with 0 values for selected time range
+  if (dateRange.length > 0) {
+    dateRange.forEach(date => {
+      if (!timelineData.find(item => item.date === date)) {
+        timelineData.push({
+          date,
+          total: 0
+        });
+      }
+    });
+  }
+
+  // Sort by date
+  timelineData.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
   // Group by city
   const cityData = analytics
