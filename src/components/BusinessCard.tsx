@@ -169,11 +169,12 @@ const BusinessCard = ({
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-[1]" />
         
         {/* Image principale */}
-        <div className="relative w-full h-48 overflow-hidden bg-muted">
+        <div className="relative w-full h-56 sm:h-64 overflow-hidden bg-muted">
           {!imageLoading && mainImageUrl && (
             <motion.div
-              whileHover={{ scale: 1.1 }}
-              transition={{ duration: 0.4 }}
+              whileHover={{ scale: 1.08 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+              className="h-full"
             >
               <OptimizedImage
                 src={mainImageUrl}
@@ -185,7 +186,10 @@ const BusinessCard = ({
           )}
           
           {/* Shimmer effect on image */}
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out pointer-events-none" />
+          
+          {/* Gradient overlay bottom */}
+          <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-black/60 via-black/20 to-transparent pointer-events-none" />
         </div>
 
       {/* Sold Diagonal Banner */}
@@ -207,10 +211,10 @@ const BusinessCard = ({
         </>
       )}
 
-      <CardContent className="p-6 space-y-4 flex flex-col flex-1">
+      <CardContent className="p-5 space-y-3 flex flex-col flex-1">
         <div className="flex items-start justify-between gap-2">
-          <div className="space-y-3 flex-1">
-            <div className="flex items-center gap-2 flex-wrap">
+          <div className="space-y-2 flex-1">
+            <div className="flex items-center gap-1.5 flex-wrap">
               {/* Badge En Vedette en premier */}
               {featured && (
                 <TooltipProvider delayDuration={200}>
@@ -280,17 +284,17 @@ const BusinessCard = ({
               )}
             </div>
             <motion.h3 
-              className={`text-lg sm:text-2xl font-display font-bold text-foreground transition-colors line-clamp-2 ${status === 'sold' ? 'blur-[0.5px]' : ''}`}
-              whileHover={{ x: 5 }}
+              className={`text-xl sm:text-2xl font-display font-bold text-foreground transition-colors line-clamp-2 leading-tight ${status === 'sold' ? 'blur-[0.5px]' : ''}`}
+              whileHover={{ x: 3 }}
               transition={{ type: "spring", stiffness: 300 }}
             >
               <span className="relative group-hover:text-primary transition-colors duration-300">
                 {title}
               </span>
             </motion.h3>
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <MapPin className="w-4 h-4" />
-              <span className="font-medium">
+            <div className="flex items-center gap-1.5 text-muted-foreground text-sm">
+              <MapPin className="w-3.5 h-3.5" />
+              <span className="font-semibold">
                 {city}{region && `, ${region}`}
               </span>
             </div>
@@ -299,16 +303,16 @@ const BusinessCard = ({
         </div>
 
         <div>
-          <p className={`text-muted-foreground leading-relaxed ${status === 'sold' ? 'blur-[1px]' : ''} ${showFullDescription ? '' : 'line-clamp-3'}`}>
+          <p className={`text-muted-foreground text-sm leading-relaxed ${status === 'sold' ? 'blur-[1px]' : ''} ${showFullDescription ? '' : 'line-clamp-2'}`}>
             {description}
           </p>
-          {description.length > 150 && status !== 'sold' && (
+          {description.length > 120 && status !== 'sold' && (
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 setShowFullDescription(!showFullDescription);
               }}
-              className="text-sm text-primary hover:text-primary/80 font-medium mt-2 transition-colors"
+              className="text-xs text-primary hover:text-primary/80 font-semibold mt-1 transition-colors"
             >
               {showFullDescription ? 'Voir moins' : 'Voir plus'}
             </button>
@@ -317,25 +321,25 @@ const BusinessCard = ({
 
         <div className="flex-1" />
 
-        <div className={`grid grid-cols-2 gap-4 pt-4 border-t border-border/50 ${status === 'sold' ? 'blur-[8px]' : ''}`}>
+        <div className={`grid grid-cols-2 gap-3 pt-3 border-t border-border/50 ${status === 'sold' ? 'blur-[8px]' : ''}`}>
           {/* Check if it's a property listing */}
           {(sale_type === 'property' || property_type) && (
             <>
               {year_built && (
-                <div className="space-y-1">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Année construction</p>
-                  <p className="text-lg font-bold text-foreground">{year_built}</p>
+                <div className="bg-muted/30 p-2.5 rounded-lg border border-border/30">
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold mb-0.5">Année</p>
+                  <p className="text-base font-bold text-foreground">{year_built}</p>
                 </div>
               )}
               {square_footage && (
-                <div className="space-y-1">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Superficie</p>
-                  <p className="text-lg font-bold text-secondary">{square_footage.toLocaleString('fr-CA')} pi²</p>
+                <div className="bg-muted/30 p-2.5 rounded-lg border border-border/30">
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold mb-0.5">Superficie</p>
+                  <p className="text-base font-bold text-secondary">{square_footage.toLocaleString('fr-CA')} pi²</p>
                 </div>
               )}
               {property_type && (
-                <div className="space-y-1">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Type</p>
+                <div className="col-span-2 bg-muted/30 p-2.5 rounded-lg border border-border/30">
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold mb-0.5">Type de propriété</p>
                   <p className="text-sm font-bold text-foreground">
                     {property_type === 'bureau' && 'Bureau commercial'}
                     {property_type === 'commerce' && 'Espace commercial'}
@@ -367,42 +371,42 @@ const BusinessCard = ({
           {/* Regular business listing */}
           {!sale_type && !property_type && !is_franchise && (
             <>
-              <div className="space-y-1">
-                <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Revenus</p>
-                <p className="text-lg font-bold text-[hsl(var(--success))] flex items-center gap-1">
-                  <TrendingUp className="w-4 h-4 text-[hsl(var(--success-light))]" />
+              <div className="bg-muted/30 p-2.5 rounded-lg border border-border/30">
+                <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold mb-0.5">Revenus</p>
+                <p className="text-base font-bold text-[hsl(var(--success))] flex items-center gap-1">
+                  <TrendingUp className="w-3.5 h-3.5 text-[hsl(var(--success-light))]" />
                   {displayRevenue}
                 </p>
               </div>
-              <div className="space-y-1">
-                <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">BAIIA</p>
-                <p className="text-lg font-bold text-[hsl(var(--primary-pale-foreground))]">{displayBaiia}</p>
+              <div className="bg-muted/30 p-2.5 rounded-lg border border-border/30">
+                <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold mb-0.5">BAIIA</p>
+                <p className="text-base font-bold text-[hsl(var(--primary-pale-foreground))]">{displayBaiia}</p>
               </div>
             </>
           )}
           {is_franchise && (
             <>
-              <div className="space-y-1">
-                <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Type</p>
-                <p className="text-lg font-bold text-foreground">Opportunité Franchise</p>
+              <div className="col-span-2 bg-muted/30 p-2.5 rounded-lg border border-border/30">
+                <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold mb-0.5">Type</p>
+                <p className="text-base font-bold text-foreground">Opportunité Franchise</p>
               </div>
-              <div className="space-y-1">
-                <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Droit d'entrée</p>
-                <p className="text-lg font-bold text-[#FF6B00]">{displayPrice}</p>
+              <div className="col-span-2 bg-muted/30 p-2.5 rounded-lg border border-border/30">
+                <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold mb-0.5">Droit d'entrée</p>
+                <p className="text-base font-bold text-[#FF6B00]">{displayPrice}</p>
               </div>
             </>
           )}
         </div>
 
-        <div className={`flex flex-col sm:flex-row items-start sm:items-end justify-between gap-3 pt-4 border-t border-border/50 ${status === 'sold' ? 'blur-[8px]' : ''}`}>
-          <div className="space-y-1">
-            <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Prix demandé</p>
-            <p className="text-2xl sm:text-3xl font-display font-bold text-[hsl(var(--secondary))]">{displayPrice}</p>
+        <div className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-3 border-t border-border/50 ${status === 'sold' ? 'blur-[8px]' : ''}`}>
+          <div className="bg-gradient-to-br from-secondary/10 via-secondary/5 to-transparent p-3 rounded-lg border border-secondary/20 flex-1 w-full sm:w-auto">
+            <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold mb-1">Prix demandé</p>
+            <p className="text-2xl sm:text-3xl font-display font-bold text-[hsl(var(--secondary))] leading-none">{displayPrice}</p>
           </div>
           {status !== 'sold' && (
             <Button 
               size="lg"
-              className="btn-premium bg-[hsl(var(--secondary))] hover:bg-[hsl(var(--secondary))]/90 text-secondary-foreground font-semibold shadow-lg w-full sm:w-auto"
+              className="btn-premium bg-[hsl(var(--secondary))] hover:bg-[hsl(var(--secondary))]/90 text-secondary-foreground font-semibold shadow-lg hover:shadow-xl transition-all duration-300 w-full sm:w-auto px-6"
               onClick={(e) => {
                 e.stopPropagation();
                 handleClick();
