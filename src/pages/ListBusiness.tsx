@@ -16,7 +16,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useAutosaveDraft } from "@/hooks/useAutosaveDraft";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
-import { SimpleRichTextEditor } from "@/components/SimpleRichTextEditor";
+import { VisualRichTextEditor } from "@/components/VisualRichTextEditor";
 import {
   Command,
   CommandEmpty,
@@ -943,7 +943,7 @@ const ListBusiness = () => {
                           </Button>
                         )}
                       </div>
-                      <SimpleRichTextEditor
+                      <VisualRichTextEditor
                         content={formData.description}
                         onChange={(content) => setFormData({ ...formData, description: content })}
                         placeholder="Décrivez votre entreprise en détail : historique, activités, équipements, clientèle, avantages concurrentiels..."
