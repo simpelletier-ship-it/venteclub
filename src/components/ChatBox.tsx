@@ -440,11 +440,11 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
               <Button
                 variant="link"
                 size="sm"
-                className="h-auto p-0 text-xs sm:text-sm font-medium text-muted-foreground hover:text-primary mb-1 transition-colors"
+                className="h-auto p-0 text-xs sm:text-sm font-medium text-muted-foreground hover:text-primary mb-1 transition-colors max-w-full justify-start"
                 onClick={() => navigate(`/entreprise/${businessSlug}`)}
               >
-                <ExternalLink className="mr-1.5 h-3 sm:h-3.5 w-3 sm:w-3.5" />
-                <span className="truncate">{businessTitle}</span>
+                <ExternalLink className="mr-1.5 h-3 sm:h-3.5 w-3 sm:w-3.5 flex-shrink-0" />
+                <span className="truncate block">{businessTitle}</span>
               </Button>
             )}
 
