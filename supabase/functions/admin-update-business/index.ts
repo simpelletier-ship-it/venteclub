@@ -45,15 +45,19 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    const token = authHeader.replace("Bearer ", "");
-
-    // Initialize Supabase client with service role
+    // Initialize Supabase client with the user's token for auth check
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+    const supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
+      global: {
+        headers: {
+          Authorization: authHeader
+        }
+      }
+    });
 
-    // Verify JWT token using service role (can verify any token)
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    // Verify user with the token in headers
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
 
     if (authError || !user) {
       console.error("Auth error:", authError?.message || "No user found");
@@ -65,8 +69,8 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log("User authenticated:", user.id);
 
-    // Check admin role
-    const { data: hasAdminRole, error: roleError } = await supabase
+    // Check admin role using the authenticated client
+    const { data: hasAdminRole, error: roleError } = await supabaseClient
       .rpc('has_role', { 
         _user_id: user.id, 
         _role: 'admin' 
@@ -97,10 +101,14 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
+    // Use service role for the actual update to bypass RLS
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabaseService = createClient(supabaseUrl, supabaseServiceKey);
+
     // Update business with validated data
     const { business_id, photo_url, ...updateData } = validated;
     
-    const { error: updateError } = await supabase
+    const { error: updateError } = await supabaseService
       .from('businesses')
       .update({
         ...updateData,
@@ -117,7 +125,7 @@ const handler = async (req: Request): Promise<Response> => {
     // Handle photo update if provided
     if (photo_url) {
       // Get current photos to determine next display_order
-      const { data: existingPhotos } = await supabase
+      const { data: existingPhotos } = await supabaseService
         .from('business_photos')
         .select('display_order')
         .eq('business_id', business_id)
@@ -129,7 +137,7 @@ const handler = async (req: Request): Promise<Response> => {
         : 1;
 
       // Insert new photo
-      const { error: photoError } = await supabase
+      const { error: photoError } = await supabaseService
         .from('business_photos')
         .insert({
           business_id: business_id,
