@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -36,51 +36,70 @@ export const VisualRichTextEditor = ({
 }: VisualRichTextEditorProps) => {
   const editorRef = useRef<HTMLDivElement>(null);
   const [activeFormats, setActiveFormats] = useState<Set<string>>(new Set());
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   useEffect(() => {
     if (editorRef.current && editorRef.current.innerHTML !== content) {
       editorRef.current.innerHTML = content || "";
     }
-  }, []);
+  }, [content]);
 
-  const updateActiveFormats = () => {
-    const formats = new Set<string>();
+  const updateActiveFormats = useCallback(() => {
+    if (typeof document === 'undefined' || !isClient) return;
     
-    if (document.queryCommandState("bold")) formats.add("bold");
-    if (document.queryCommandState("italic")) formats.add("italic");
-    if (document.queryCommandState("underline")) formats.add("underline");
-    if (document.queryCommandState("insertUnorderedList")) formats.add("bulletList");
-    if (document.queryCommandState("insertOrderedList")) formats.add("orderedList");
-    if (document.queryCommandState("justifyLeft")) formats.add("justifyLeft");
-    if (document.queryCommandState("justifyCenter")) formats.add("justifyCenter");
-    if (document.queryCommandState("justifyRight")) formats.add("justifyRight");
-    if (document.queryCommandState("justifyFull")) formats.add("justifyFull");
-    
-    setActiveFormats(formats);
-  };
+    try {
+      const formats = new Set<string>();
+      
+      if (document.queryCommandState("bold")) formats.add("bold");
+      if (document.queryCommandState("italic")) formats.add("italic");
+      if (document.queryCommandState("underline")) formats.add("underline");
+      if (document.queryCommandState("insertUnorderedList")) formats.add("bulletList");
+      if (document.queryCommandState("insertOrderedList")) formats.add("orderedList");
+      if (document.queryCommandState("justifyLeft")) formats.add("justifyLeft");
+      if (document.queryCommandState("justifyCenter")) formats.add("justifyCenter");
+      if (document.queryCommandState("justifyRight")) formats.add("justifyRight");
+      if (document.queryCommandState("justifyFull")) formats.add("justifyFull");
+      
+      setActiveFormats(formats);
+    } catch (error) {
+      console.error('[Editor] Error updating formats:', error);
+    }
+  }, [isClient]);
 
-  const handleInput = () => {
+  const handleInput = useCallback(() => {
     if (editorRef.current) {
       onChange(editorRef.current.innerHTML);
     }
     updateActiveFormats();
-  };
+  }, [onChange, updateActiveFormats]);
 
-  const handleSelectionChange = () => {
+  const handleSelectionChange = useCallback(() => {
     updateActiveFormats();
-  };
+  }, [updateActiveFormats]);
 
   useEffect(() => {
+    if (!isClient || typeof document === 'undefined') return;
+    
     document.addEventListener("selectionchange", handleSelectionChange);
     return () => {
       document.removeEventListener("selectionchange", handleSelectionChange);
     };
-  }, []);
+  }, [isClient, handleSelectionChange]);
 
   const executeCommand = (command: string, value?: string) => {
-    document.execCommand(command, false, value);
-    editorRef.current?.focus();
-    handleInput();
+    if (typeof document === 'undefined' || !isClient) return;
+    
+    try {
+      document.execCommand(command, false, value);
+      editorRef.current?.focus();
+      handleInput();
+    } catch (error) {
+      console.error('[Editor] Error executing command:', error);
+    }
   };
 
   const applyHighlight = (color: string) => {
@@ -96,11 +115,29 @@ export const VisualRichTextEditor = ({
   };
 
   const insertImage = () => {
-    const url = prompt("Entrez l'URL de l'image:");
-    if (url) {
-      executeCommand("insertImage", url);
+    if (typeof window === 'undefined') return;
+    
+    try {
+      const url = window.prompt("Entrez l'URL de l'image:");
+      if (url) {
+        executeCommand("insertImage", url);
+      }
+    } catch (error) {
+      console.error('[Editor] Error inserting image:', error);
     }
   };
+
+  if (!isClient) {
+    return (
+      <div className="border border-input rounded-lg overflow-hidden bg-background">
+        <div className="border-b border-input bg-muted/30 p-2 h-12 animate-pulse" />
+        <div className="min-h-[300px] p-4 animate-pulse">
+          <div className="h-4 bg-muted rounded w-3/4 mb-4" />
+          <div className="h-4 bg-muted rounded w-1/2 mb-4" />
+        </div>
+      </div>
+    );
+  }
 
   const formatButtons = [
     {
