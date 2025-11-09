@@ -41,7 +41,7 @@ export const trackGoogleAdsConversion = (
 };
 
 /**
- * Envoie un événement de page vue à Google Ads
+ * Envoie un événement de page vue à Google Ads avec conversion de trafic
  */
 export const trackPageView = () => {
   if (typeof window === 'undefined' || !(window as any).gtag) {
@@ -51,9 +51,11 @@ export const trackPageView = () => {
   const gtag = (window as any).gtag;
 
   try {
-    gtag('event', 'page_view', {
-      send_to: 'AW-974642760',
+    // Événement de conversion pour le trafic du site
+    gtag('event', 'conversion', {
+      'send_to': 'AW-974642760/z7Q0CLnYktUDEMi839AD'
     });
+    console.log('Google Ads website traffic conversion sent');
   } catch (error) {
     console.error('Error tracking page view:', error);
   }
