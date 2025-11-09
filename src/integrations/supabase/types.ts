@@ -350,7 +350,7 @@ export type Database = {
           is_premium: boolean | null
           is_rental_property: boolean | null
           latitude: number | null
-          location: string
+          location: string | null
           longitude: number | null
           marketing_fee: number | null
           net_profit: number | null
@@ -412,7 +412,7 @@ export type Database = {
           is_premium?: boolean | null
           is_rental_property?: boolean | null
           latitude?: number | null
-          location: string
+          location?: string | null
           longitude?: number | null
           marketing_fee?: number | null
           net_profit?: number | null
@@ -474,7 +474,7 @@ export type Database = {
           is_premium?: boolean | null
           is_rental_property?: boolean | null
           latitude?: number | null
-          location?: string
+          location?: string | null
           longitude?: number | null
           marketing_fee?: number | null
           net_profit?: number | null
