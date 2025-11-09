@@ -285,9 +285,9 @@ const Header = () => {
                 {/* Bouton Connexion visible sur mobile */}
                 <Button
                   onClick={() => navigate("/auth")}
-                  className="lg:hidden bg-[#6366f1] hover:bg-[#4f46e5] text-white font-semibold px-4 py-2 h-9 text-sm shadow-lg"
+                  className="lg:hidden bg-[#6366f1] hover:bg-[#4f46e5] text-white font-semibold px-3 py-2 h-9 text-xs shadow-lg whitespace-nowrap"
                 >
-                  Connexion
+                  Connexion / Créer un compte
                 </Button>
                 {/* Bouton Connexion desktop */}
                 <Button
@@ -295,7 +295,7 @@ const Header = () => {
                   onClick={() => navigate("/auth")}
                   className="hidden lg:inline-flex font-semibold border border-foreground/20 hover:border-foreground/40 hover:bg-accent px-4 lg:px-6 py-2 lg:py-3 text-sm lg:text-base h-10 lg:h-12"
                 >
-                  Connexion
+                  Connexion / Créer un compte
                 </Button>
               </>
             )}
