@@ -3,6 +3,7 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
 import { VitePWA } from 'vite-plugin-pwa';
+import viteCompression from 'vite-plugin-compression';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
@@ -13,6 +14,16 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
     mode === "development" && componentTagger(),
+    viteCompression({
+      algorithm: 'brotliCompress',
+      ext: '.br',
+      threshold: 1024,
+    }),
+    viteCompression({
+      algorithm: 'gzip',
+      ext: '.gz',
+      threshold: 1024,
+    }),
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon-vente.png', 'logo.png', 'og-image.jpg'],
@@ -104,21 +115,70 @@ export default defineConfig(({ mode }) => ({
   },
   build: {
     target: 'es2020',
-    minify: 'esbuild',
+    minify: 'terser',
     sourcemap: false,
     chunkSizeWarningLimit: 1000,
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true,
+        pure_funcs: ['console.log', 'console.info'],
+      },
+    },
     rollupOptions: {
       output: {
-        manualChunks: {
-          'vendor': ['react', 'react-dom', 'react-router-dom'],
-          'ui': ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-popover'],
-          'supabase': ['@supabase/supabase-js'],
-          'charts': ['recharts'],
+        manualChunks: (id) => {
+          if (id.includes('node_modules')) {
+            // Core React
+            if (id.includes('react/') || id.includes('react-dom/')) {
+              return 'react-core';
+            }
+            // React Router
+            if (id.includes('react-router')) {
+              return 'react-router';
+            }
+            // UI Components
+            if (id.includes('@radix-ui')) {
+              return 'radix-ui';
+            }
+            // Supabase
+            if (id.includes('@supabase')) {
+              return 'supabase';
+            }
+            // Charts
+            if (id.includes('recharts') || id.includes('d3-')) {
+              return 'charts';
+            }
+            // React Query
+            if (id.includes('@tanstack/react-query')) {
+              return 'react-query';
+            }
+            // Icons
+            if (id.includes('lucide-react')) {
+              return 'icons';
+            }
+            // Form libraries
+            if (id.includes('react-hook-form') || id.includes('zod')) {
+              return 'forms';
+            }
+            // Map libraries
+            if (id.includes('mapbox')) {
+              return 'maps';
+            }
+            // Animation libraries
+            if (id.includes('framer-motion')) {
+              return 'animations';
+            }
+            return 'vendor';
+          }
         },
+        chunkFileNames: 'assets/[name]-[hash].js',
+        entryFileNames: 'assets/[name]-[hash].js',
+        assetFileNames: 'assets/[name]-[hash].[ext]',
       },
     },
     copyPublicDir: true,
-    assetsInlineLimit: 0,
+    assetsInlineLimit: 4096,
   },
   publicDir: 'public',
   assetsInclude: ['**/*.xml', '**/*.txt'],

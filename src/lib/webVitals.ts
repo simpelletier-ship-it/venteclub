@@ -6,14 +6,23 @@
 import { onCLS, onLCP, onFCP, onTTFB, onINP, type Metric } from 'web-vitals';
 
 const sendToAnalytics = (metric: Metric) => {
-  // Envoi à Google Analytics
-  if (typeof window !== 'undefined' && (window as any).gtag) {
-    (window as any).gtag('event', metric.name, {
-      event_category: 'Web Vitals',
-      value: Math.round(metric.name === 'CLS' ? metric.value * 1000 : metric.value),
-      event_label: metric.id,
-      non_interaction: true,
-    });
+  // Envoi à Google Analytics avec requestIdleCallback pour éviter de bloquer le thread principal
+  const sendMetric = () => {
+    if (typeof window !== 'undefined' && (window as any).gtag) {
+      (window as any).gtag('event', metric.name, {
+        event_category: 'Web Vitals',
+        value: Math.round(metric.name === 'CLS' ? metric.value * 1000 : metric.value),
+        event_label: metric.id,
+        non_interaction: true,
+      });
+    }
+  };
+
+  // Utiliser requestIdleCallback si disponible, sinon setTimeout
+  if ('requestIdleCallback' in window) {
+    (window as any).requestIdleCallback(sendMetric);
+  } else {
+    setTimeout(sendMetric, 0);
   }
 
   // Log en développement

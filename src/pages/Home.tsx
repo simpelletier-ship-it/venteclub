@@ -8,10 +8,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { SEO } from "@/components/SEO";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { TypewriterAnimation } from "@/components/AnimatedSearchBar";
-import { useScrollParallax } from "@/hooks/useScrollParallax";
-import { FloatingOpportunities } from "@/components/FloatingOpportunities";
-import { CircuitBackground } from "@/components/CircuitBackground";
 import { useCountUp } from "@/hooks/useCountUp";
+import { lazy, Suspense } from "react";
+
+// Lazy load heavy components
+const FloatingOpportunities = lazy(() => import("@/components/FloatingOpportunities").then(m => ({ default: m.FloatingOpportunities })));
+const CircuitBackground = lazy(() => import("@/components/CircuitBackground").then(m => ({ default: m.CircuitBackground })));
 import { trackPageView } from "@/lib/googleAds";
 
 const Home = () => {
@@ -25,7 +27,6 @@ const Home = () => {
     totalUsers: 0,
     totalValue: 0
   });
-  const scrollY = useScrollParallax();
   
   // Compteurs animés pour les statistiques - animation rapide
   const businessesCount = useCountUp({ end: stats.totalBusinesses, duration: 1200, delay: 100 });
@@ -146,43 +147,20 @@ const Home = () => {
       {/* Hero Section */}
       <section className="relative min-h-[65vh] sm:min-h-[75vh] lg:min-h-[85vh] flex items-center bg-gradient-to-br from-[#1e1b4b] via-[#312e81] to-[#1e3a8a] overflow-hidden" aria-label="Section principale">
         {/* Circuit Background */}
-        <CircuitBackground />
+        <Suspense fallback={<div className="absolute inset-0 bg-gradient-to-br from-[#1e1b4b] via-[#312e81] to-[#1e3a8a]" />}>
+          <CircuitBackground />
+        </Suspense>
         
-        {/* Animated Background Elements with Parallax */}
+        {/* Simplified Background Elements - removed parallax for performance */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div 
-            className="absolute top-20 -right-20 w-96 h-96 bg-[#6366f1]/20 rounded-full blur-3xl animate-pulse transition-transform duration-100" 
-            style={{ 
-              animationDuration: '8s',
-              transform: `translate(${scrollY * 0.15}px, ${scrollY * 0.1}px)`
-            }} 
-          />
-          <div 
-            className="absolute bottom-20 -left-20 w-96 h-96 bg-[#818cf8]/20 rounded-full blur-3xl animate-pulse transition-transform duration-100" 
-            style={{ 
-              animationDuration: '10s', 
-              animationDelay: '2s',
-              transform: `translate(${-scrollY * 0.1}px, ${scrollY * 0.15}px)`
-            }} 
-          />
-          <div 
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#4f46e5]/10 rounded-full blur-3xl animate-pulse transition-transform duration-100" 
-            style={{ 
-              animationDuration: '12s', 
-              animationDelay: '4s',
-              transform: `translate(-50%, -50%) scale(${1 + scrollY * 0.0005})`
-            }} 
-          />
+          <div className="absolute top-20 -right-20 w-96 h-96 bg-[#6366f1]/20 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '8s' }} />
+          <div className="absolute bottom-20 -left-20 w-96 h-96 bg-[#818cf8]/20 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '10s', animationDelay: '2s' }} />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#4f46e5]/10 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '12s', animationDelay: '4s' }} />
         </div>
         
         <div className="container mx-auto px-4 py-8 sm:py-12 lg:py-20 relative z-10">
           <div className="max-w-6xl mx-auto">
-            <div 
-              className="space-y-4 sm:space-y-6 lg:space-y-8 animate-slide-up transition-transform duration-100"
-              style={{ 
-                transform: `translateY(${scrollY * 0.05}px)` 
-              }}
-            >
+            <div className="space-y-4 sm:space-y-6 lg:space-y-8 animate-slide-up">
               <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-display font-bold leading-[1.2] sm:leading-[1.15] tracking-tight text-white">
                 <span className="text-[#818cf8] font-extrabold">Le Club</span> de Référence
                 <br />
@@ -217,7 +195,9 @@ const Home = () => {
           
           {/* Floating Animation - Positioned Absolutely */}
           <div className="hidden xl:block absolute left-[66%] top-[68%] -translate-y-1/2 w-[300px] pointer-events-none">
-            <FloatingOpportunities />
+            <Suspense fallback={null}>
+              <FloatingOpportunities />
+            </Suspense>
           </div>
         </div>
         
