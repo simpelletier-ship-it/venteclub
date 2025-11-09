@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { CheckCircle, XCircle, Eye, ArrowLeft, Trash2, Star, Edit, Upload, UserX, Shield, X, ChevronUp, ChevronDown } from "lucide-react";
+import { CheckCircle, XCircle, Eye, ArrowLeft, Trash2, Star, Edit, Upload, UserX, Shield, X, ChevronUp, ChevronDown, ImageIcon } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { VisualRichTextEditor } from "@/components/VisualRichTextEditor";
@@ -456,33 +456,6 @@ const Admin = () => {
     source_url: z.string().url("URL invalide").optional().or(z.literal('')),
   });
 
-  const handleImageUpload = async (businessId: string): Promise<string | null> => {
-    if (!imageFile) return null;
-
-    try {
-      const fileExt = imageFile.name.split('.').pop();
-      const fileName = `${businessId}-${Date.now()}.${fileExt}`;
-      const filePath = `${fileName}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('business-photos')
-        .upload(filePath, imageFile, {
-          cacheControl: '3600',
-          upsert: true
-        });
-
-      if (uploadError) throw uploadError;
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('business-photos')
-        .getPublicUrl(filePath);
-
-      return publicUrl;
-    } catch (error: any) {
-      console.error('Error uploading image:', error);
-      throw error;
-    }
-  };
 
   const handleEditSave = async () => {
     try {
@@ -490,12 +463,6 @@ const Admin = () => {
       
       // Validate form data client-side first for immediate feedback
       const validated = editBusinessSchema.parse(editFormData);
-
-      // Upload image if provided
-      let photoUrl = null;
-      if (imageFile) {
-        photoUrl = await handleImageUpload(selectedBusiness?.id);
-      }
 
       // Update directement avec RLS admin - simple et efficace !
       const updateData = {
@@ -526,31 +493,9 @@ const Admin = () => {
 
       if (error) throw error;
 
-      // Ajouter la photo si fournie
-      if (photoUrl) {
-        const { data: existingPhotos } = await supabase
-          .from('business_photos')
-          .select('display_order')
-          .eq('business_id', selectedBusiness?.id)
-          .order('display_order', { ascending: false })
-          .limit(1);
-
-        const nextOrder = existingPhotos && existingPhotos.length > 0 
-          ? (existingPhotos[0].display_order || 0) + 1 
-          : 1;
-
-        await supabase
-          .from('business_photos')
-          .insert({
-            business_id: selectedBusiness?.id,
-            photo_url: photoUrl,
-            display_order: nextOrder
-          });
-      }
-
       toast({
         title: "Succès",
-        description: "L'annonce a été mise à jour.",
+        description: "L'annonce a été mise à jour. Utilisez le gestionnaire de photos pour gérer les images.",
       });
 
       fetchBusinesses();
@@ -916,6 +861,84 @@ const Admin = () => {
     }
   };
 
+  const handleCleanupDuplicatePhotos = async () => {
+    if (!confirm('⚠️ Cette action va supprimer TOUTES les photos dupliquées de chaque annonce, en gardant seulement la première photo (display_order = 0). Êtes-vous sûr de vouloir continuer?')) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      toast({
+        title: "Nettoyage en cours",
+        description: "Suppression des photos dupliquées...",
+      });
+
+      // Récupérer toutes les photos groupées par business_id
+      const { data: allPhotos, error: fetchError } = await supabase
+        .from('business_photos')
+        .select('*')
+        .order('business_id')
+        .order('display_order');
+
+      if (fetchError) throw fetchError;
+
+      // Grouper les photos par business_id
+      const photosByBusiness = (allPhotos || []).reduce((acc, photo) => {
+        if (!acc[photo.business_id]) {
+          acc[photo.business_id] = [];
+        }
+        acc[photo.business_id].push(photo);
+        return acc;
+      }, {} as Record<string, any[]>);
+
+      let totalDeleted = 0;
+
+      // Pour chaque business, garder seulement la première photo
+      for (const [businessId, photos] of Object.entries(photosByBusiness)) {
+        if (photos.length > 1) {
+          // Trier par display_order pour s'assurer qu'on garde la première
+          photos.sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
+          
+          // Supprimer toutes les photos sauf la première
+          const photosToDelete = photos.slice(1).map(p => p.id);
+          
+          const { error: deleteError } = await supabase
+            .from('business_photos')
+            .delete()
+            .in('id', photosToDelete);
+
+          if (deleteError) {
+            console.error(`Erreur lors de la suppression des photos pour ${businessId}:`, deleteError);
+          } else {
+            totalDeleted += photosToDelete.length;
+          }
+
+          // Réinitialiser le display_order de la photo restante à 0
+          await supabase
+            .from('business_photos')
+            .update({ display_order: 0 })
+            .eq('id', photos[0].id);
+        }
+      }
+
+      toast({
+        title: "Nettoyage terminé",
+        description: `${totalDeleted} photo(s) dupliquée(s) supprimée(s)`,
+      });
+
+      fetchBusinesses();
+    } catch (error: any) {
+      console.error('Error cleaning duplicate photos:', error);
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: error.message || "Impossible de nettoyer les photos",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const getStatusBadge = (status: string) => {
     const variants: Record<string, "default" | "secondary" | "destructive"> = {
       pending: "secondary",
@@ -1024,6 +1047,30 @@ const Admin = () => {
           </TabsList>
 
           <TabsContent value="businesses">
+            {/* Outil de nettoyage des photos */}
+            <Card className="mb-6 border-blue-500/50 bg-gradient-to-r from-blue-500/5 to-cyan-500/5">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <ImageIcon className="h-5 w-5 text-blue-500" />
+                  Nettoyage des photos dupliquées
+                </CardTitle>
+                <CardDescription>
+                  Supprimez toutes les photos dupliquées de chaque annonce. Seule la première photo de chaque annonce sera conservée.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button
+                  variant="outline"
+                  onClick={handleCleanupDuplicatePhotos}
+                  disabled={loading}
+                  className="border-blue-500 hover:bg-blue-500/10"
+                >
+                  <ImageIcon className="mr-2 h-4 w-4" />
+                  Nettoyer les photos dupliquées
+                </Button>
+              </CardContent>
+            </Card>
+
             <div className="grid gap-6">
           {businesses.map((business) => (
             <Card key={business.id}>
@@ -1980,24 +2027,12 @@ const Admin = () => {
               </div>
             )}
 
-            {/* Ajouter une nouvelle image */}
+            {/* Ajouter une nouvelle photo via PhotoManager */}
             <div>
-              <Label htmlFor="edit-image">Ajouter une nouvelle photo</Label>
-              <div className="mt-2">
-                <Input
-                  id="edit-image"
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => setImageFile(e.target.files?.[0] || null)}
-                  className="cursor-pointer"
-                />
-                {imageFile && (
-                  <p className="text-xs text-muted-foreground mt-2 flex items-center gap-2">
-                    <Upload className="w-4 h-4" />
-                    {imageFile.name}
-                  </p>
-                )}
-              </div>
+              <Label>Gestion des photos</Label>
+              <p className="text-sm text-muted-foreground mt-1">
+                Utilisez le gestionnaire de photos ci-dessus pour ajouter, réorganiser ou supprimer des images.
+              </p>
             </div>
 
             <div>
