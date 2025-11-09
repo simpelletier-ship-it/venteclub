@@ -1584,8 +1584,8 @@ const BusinessDetails = () => {
                 </Card>
               )}
               
-              {/* Chat Section Sticky */}
-              {!isSeller && businessId && user && (
+              {/* Chat Section Sticky - Hidden if chat disabled */}
+              {!isSeller && !business.chat_disabled && businessId && user && (
                 <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5 shadow-lg">
                   <CardHeader>
                     <CardTitle className="text-lg flex items-center gap-2">
@@ -1622,7 +1622,7 @@ const BusinessDetails = () => {
                 </Card>
               )}
 
-              {!user && businessId && (
+              {!user && !business.chat_disabled && businessId && (
                 <Card className="border-primary/20 bg-gradient-to-br from-primary/10 to-accent/10 shadow-lg">
                   <CardHeader>
                     <CardTitle className="text-lg flex items-center gap-2">
@@ -1640,6 +1640,42 @@ const BusinessDetails = () => {
                     >
                       Se connecter
                     </Button>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Display seller contact info when admin has provided it */}
+              {(business.seller_name || business.seller_email || business.seller_phone) && (hasAccess || hasPremium || isSeller) && (
+                <Card className="border-secondary/20 bg-gradient-to-br from-secondary/5 to-primary/5 shadow-lg">
+                  <CardHeader>
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <UserCircle className="w-5 h-5 text-secondary" />
+                      Contact du vendeur
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {business.seller_name && (
+                      <div className="flex items-center gap-2 text-sm">
+                        <User className="w-4 h-4 text-muted-foreground" />
+                        <span className="font-medium">{business.seller_name}</span>
+                      </div>
+                    )}
+                    {business.seller_email && (
+                      <div className="flex items-center gap-2 text-sm">
+                        <Mail className="w-4 h-4 text-muted-foreground" />
+                        <a href={`mailto:${business.seller_email}`} className="text-primary hover:underline">
+                          {business.seller_email}
+                        </a>
+                      </div>
+                    )}
+                    {business.seller_phone && (
+                      <div className="flex items-center gap-2 text-sm">
+                        <Phone className="w-4 h-4 text-muted-foreground" />
+                        <a href={`tel:${business.seller_phone}`} className="text-primary hover:underline">
+                          {business.seller_phone}
+                        </a>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               )}
