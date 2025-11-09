@@ -217,7 +217,7 @@ const Header = () => {
           </div>
 
           {/* Right Side Actions */}
-          <div className="flex items-center gap-3 sm:gap-4 md:gap-6">
+          <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
             {user && <NotificationBell userId={user.id} />}
             
             {isAdmin && (
@@ -245,15 +245,15 @@ const Header = () => {
                   <DropdownMenuTrigger asChild>
                     <Button 
                       variant="ghost" 
-                      className="relative h-10 w-10 rounded-full"
+                      className="relative h-9 w-9 sm:h-10 sm:w-10 rounded-full"
                       aria-label="Menu du profil utilisateur"
                     >
-                      <Avatar className="h-10 w-10 border-2 border-secondary/40 hover:border-secondary transition-colors">
+                      <Avatar className="h-9 w-9 sm:h-10 sm:w-10 border-2 border-secondary/40 hover:border-secondary transition-colors">
                         <AvatarImage 
                           src={getAvatarUrl(profile?.avatar_url, profile?.full_name, user.email)} 
                           alt={profile?.full_name || "Photo de profil"} 
                         />
-                        <AvatarFallback className="bg-secondary text-white font-semibold">
+                        <AvatarFallback className="bg-secondary text-white font-semibold text-sm">
                           {profile?.full_name?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || "U"}
                         </AvatarFallback>
                       </Avatar>
@@ -281,24 +281,34 @@ const Header = () => {
                 </DropdownMenu>
               </>
             ) : (
-              <Button
-                variant="ghost"
-                onClick={() => navigate("/auth")}
-                className="hidden lg:inline-flex font-semibold border border-black px-4 lg:px-6 py-2 lg:py-3 text-sm lg:text-base h-10 lg:h-12"
-              >
-                Connexion
-              </Button>
+              <>
+                {/* Bouton Connexion visible sur mobile */}
+                <Button
+                  onClick={() => navigate("/auth")}
+                  className="lg:hidden bg-[#6366f1] hover:bg-[#4f46e5] text-white font-semibold px-4 py-2 h-9 text-sm shadow-lg"
+                >
+                  Connexion
+                </Button>
+                {/* Bouton Connexion desktop */}
+                <Button
+                  variant="ghost"
+                  onClick={() => navigate("/auth")}
+                  className="hidden lg:inline-flex font-semibold border border-foreground/20 hover:border-foreground/40 hover:bg-accent px-4 lg:px-6 py-2 lg:py-3 text-sm lg:text-base h-10 lg:h-12"
+                >
+                  Connexion
+                </Button>
+              </>
             )}
 
             {/* Mobile Menu Button */}
             <Button
               variant="ghost"
               size="icon"
-              className="lg:hidden"
+              className="lg:hidden h-9 w-9"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label={mobileMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
             >
-              <Menu className="h-6 w-6" />
+              <Menu className="h-5 w-5" />
             </Button>
           </div>
         </div>
@@ -306,6 +316,21 @@ const Header = () => {
         {/* Mobile Menu */}
         {mobileMenuOpen && (
           <div className="lg:hidden mt-4 pb-4 space-y-2 border-t border-border pt-4 animate-slide-up">
+            {/* Bouton Créer un compte prominent pour les non-connectés */}
+            {!user && (
+              <div className="px-2 pb-3 mb-2 border-b border-border">
+                <Button
+                  onClick={() => {
+                    navigate("/auth");
+                    setMobileMenuOpen(false);
+                  }}
+                  className="w-full bg-[#6366f1] hover:bg-[#4f46e5] text-white font-semibold h-11 text-base shadow-lg"
+                >
+                  Créer un compte
+                </Button>
+              </div>
+            )}
+            
             <div className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
               Acheter
             </div>
