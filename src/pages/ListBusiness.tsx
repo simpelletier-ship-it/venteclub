@@ -16,6 +16,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useAutosaveDraft } from "@/hooks/useAutosaveDraft";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
+import { SimpleRichTextEditor } from "@/components/SimpleRichTextEditor";
 import {
   Command,
   CommandEmpty,
@@ -942,12 +943,9 @@ const ListBusiness = () => {
                           </Button>
                         )}
                       </div>
-                      <Textarea
-                        id="description"
-                        value={formData.description}
-                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                        rows={12}
-                        required
+                      <SimpleRichTextEditor
+                        content={formData.description}
+                        onChange={(content) => setFormData({ ...formData, description: content })}
                         placeholder="Décrivez votre entreprise en détail : historique, activités, équipements, clientèle, avantages concurrentiels..."
                       />
                     </div>
