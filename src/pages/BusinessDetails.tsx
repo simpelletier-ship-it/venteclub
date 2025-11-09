@@ -1654,8 +1654,8 @@ const BusinessDetails = () => {
                 </Card>
               )}
 
-              {/* Display seller contact info when admin has provided it */}
-              {(business.seller_name || business.seller_email || business.seller_phone) && (hasAccess || hasPremium || isSeller) && (
+              {/* Display seller contact info - always visible but content varies by access */}
+              {(business.seller_name || business.seller_email || business.seller_phone) && (
                 <Card className="border-secondary/20 bg-gradient-to-br from-secondary/5 to-primary/5 shadow-lg">
                   <CardHeader>
                     <CardTitle className="text-lg flex items-center gap-2">
@@ -1664,34 +1664,43 @@ const BusinessDetails = () => {
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
-                    {business.seller_name && (
-                      <div className="flex items-center gap-2 text-sm">
-                        <User className="w-4 h-4 text-muted-foreground" />
-                        <span className="font-medium">{business.seller_name}</span>
-                      </div>
-                    )}
-                    {business.seller_email && (
+                    {(hasAccess || hasPremium || isSeller) ? (
+                      <>
+                        {business.seller_name && (
+                          <div className="flex items-center gap-2 text-sm">
+                            <User className="w-4 h-4 text-muted-foreground" />
+                            <span className="font-medium">{business.seller_name}</span>
+                          </div>
+                        )}
+                        {business.seller_email && (
+                          <div className="flex items-center gap-2 text-sm">
+                            <Mail className="w-4 h-4 text-muted-foreground" />
+                            <a href={`mailto:${business.seller_email}`} className="text-primary hover:underline">
+                              {business.seller_email}
+                            </a>
+                          </div>
+                        )}
+                        {business.seller_phone && (
+                          <div className="flex items-center gap-2 text-sm">
+                            <Phone className="w-4 h-4 text-muted-foreground" />
+                            <a href={`tel:${business.seller_phone}`} className="text-primary hover:underline">
+                              {business.seller_phone}
+                            </a>
+                          </div>
+                        )}
+                      </>
+                    ) : (
                       <div className="flex items-center gap-2 text-sm">
                         <Mail className="w-4 h-4 text-muted-foreground" />
-                        <a href={`mailto:${business.seller_email}`} className="text-primary hover:underline">
-                          {business.seller_email}
-                        </a>
-                      </div>
-                    )}
-                    {business.seller_phone && (
-                      <div className="flex items-center gap-2 text-sm">
-                        <Phone className="w-4 h-4 text-muted-foreground" />
-                        <a href={`tel:${business.seller_phone}`} className="text-primary hover:underline">
-                          {business.seller_phone}
-                        </a>
+                        <span className="text-muted-foreground">gestionferland@gmail.com</span>
                       </div>
                     )}
                   </CardContent>
                 </Card>
               )}
 
-              {/* Source URL visible only for admins */}
-              {isAdmin && business.source_url && (
+              {/* Source URL - visible to everyone when source_url exists */}
+              {business.source_url && (
                 <Card className="border-muted bg-muted/20">
                   <CardHeader>
                     <CardTitle className="text-sm flex items-center gap-2">
