@@ -6,6 +6,9 @@ import { TrendingUp, MapPin, Star, XCircle, Building2, Home, Store, HelpCircle }
 import { useNavigate } from "react-router-dom";
 import { FavoriteButton } from "./FavoriteButton";
 import { OptimizedImage } from "./OptimizedImage";
+import { AnimatedBadge } from "./AnimatedBadge";
+import { AnimatedNumber } from "./AnimatedNumber";
+import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -149,23 +152,41 @@ const BusinessCard = ({
   };
 
   return (
-    <Card 
-      className={`group relative overflow-hidden card-premium border-border/50 h-full flex flex-col transition-all duration-300 ${
-        status !== 'sold' ? 'hover:shadow-premium hover:border-primary/50 cursor-pointer' : 'cursor-default'
-      } ${featured ? 'ring-2 ring-primary/40' : ''}`}
-      onClick={handleClick}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      whileHover={{ y: -5 }}
+      className="h-full"
     >
-      {/* Image principale */}
-      <div className="relative w-full h-48 overflow-hidden bg-muted">
-        {!imageLoading && mainImageUrl && (
-          <OptimizedImage
-            src={mainImageUrl}
-            alt={title}
-            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-            aspectRatio="16/9"
-          />
-        )}
-      </div>
+      <Card 
+        className={`group relative overflow-hidden card-premium border-border/50 h-full flex flex-col transition-all duration-500 ${
+          status !== 'sold' ? 'hover:shadow-premium hover:border-primary/50 hover:shadow-primary/10 cursor-pointer' : 'cursor-default'
+        } ${featured ? 'ring-2 ring-primary/40 shadow-lg shadow-primary/20' : ''}`}
+        onClick={handleClick}
+      >
+        {/* Gradient overlay on hover */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-[1]" />
+        
+        {/* Image principale */}
+        <div className="relative w-full h-48 overflow-hidden bg-muted">
+          {!imageLoading && mainImageUrl && (
+            <motion.div
+              whileHover={{ scale: 1.1 }}
+              transition={{ duration: 0.4 }}
+            >
+              <OptimizedImage
+                src={mainImageUrl}
+                alt={title}
+                className="w-full h-full object-cover"
+                aspectRatio="16/9"
+              />
+            </motion.div>
+          )}
+          
+          {/* Shimmer effect on image */}
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out pointer-events-none" />
+        </div>
 
       {/* Sold Diagonal Banner */}
       {status === 'sold' && (
@@ -196,9 +217,14 @@ const BusinessCard = ({
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <div onClick={(e) => e.stopPropagation()}>
-                        <Badge className="relative bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 text-amber-950 border-2 border-amber-300/50 shadow-[0_0_20px_rgba(251,191,36,0.5)] cursor-help">
-                          <Star className="w-4 h-4 fill-amber-950 drop-shadow-sm" />
-                        </Badge>
+                        <AnimatedBadge className="relative bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 text-amber-950 border-2 border-amber-300/50 shadow-[0_0_20px_rgba(251,191,36,0.5)] cursor-help animate-pulse-glow" pulse glow>
+                          <motion.div
+                            animate={{ rotate: [0, 10, -10, 0] }}
+                            transition={{ duration: 2, repeat: Infinity }}
+                          >
+                            <Star className="w-4 h-4 fill-amber-950 drop-shadow-sm" />
+                          </motion.div>
+                        </AnimatedBadge>
                       </div>
                     </TooltipTrigger>
                     <TooltipContent side="top" className="bg-popover border-border">
@@ -209,10 +235,16 @@ const BusinessCard = ({
               )}
               
               {/* Badge Type d'annonce */}
-              <Badge className={`${businessType.color} text-white border-0 shadow-md`}>
-                <businessType.icon className="w-3 h-3 mr-1" />
+              <AnimatedBadge className={`${businessType.color} text-white border-0 shadow-md`}>
+                <motion.div
+                  whileHover={{ rotate: 360 }}
+                  transition={{ duration: 0.5 }}
+                  className="flex items-center"
+                >
+                  <businessType.icon className="w-3 h-3 mr-1" />
+                </motion.div>
                 {businessType.label}
-              </Badge>
+              </AnimatedBadge>
               
               {/* Badge Démo */}
               {is_demo && (
@@ -247,9 +279,15 @@ const BusinessCard = ({
                 <Badge className="bg-orange-500 text-white">⏳ En attente</Badge>
               )}
             </div>
-            <h3 className={`text-lg sm:text-2xl font-display font-bold text-foreground group-hover:text-primary transition-colors line-clamp-2 ${status === 'sold' ? 'blur-[0.5px]' : ''}`}>
-              {title}
-            </h3>
+            <motion.h3 
+              className={`text-lg sm:text-2xl font-display font-bold text-foreground transition-colors line-clamp-2 ${status === 'sold' ? 'blur-[0.5px]' : ''}`}
+              whileHover={{ x: 5 }}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
+              <span className="relative group-hover:text-primary transition-colors duration-300">
+                {title}
+              </span>
+            </motion.h3>
             <div className="flex items-center gap-2 text-muted-foreground">
               <MapPin className="w-4 h-4" />
               <span className="font-medium">
@@ -393,6 +431,7 @@ const BusinessCard = ({
         )}
       </CardContent>
     </Card>
+    </motion.div>
   );
 };
 

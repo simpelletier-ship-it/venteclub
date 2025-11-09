@@ -176,6 +176,26 @@ export default {
             transform: "translateY(0)",
           },
         },
+        "slide-down": {
+          "0%": {
+            opacity: "0",
+            transform: "translateY(-20px)",
+          },
+          "100%": {
+            opacity: "1",
+            transform: "translateY(0)",
+          },
+        },
+        "slide-left": {
+          "0%": {
+            opacity: "0",
+            transform: "translateX(20px)",
+          },
+          "100%": {
+            opacity: "1",
+            transform: "translateX(0)",
+          },
+        },
         "float": {
           "0%, 100%": {
             transform: "translateY(0px)",
@@ -214,6 +234,49 @@ export default {
             transform: "scale(1.05)",
           },
         },
+        "pulse-glow": {
+          "0%, 100%": {
+            boxShadow: "0 0 20px hsl(var(--primary) / 0.3)",
+          },
+          "50%": {
+            boxShadow: "0 0 40px hsl(var(--primary) / 0.6)",
+          },
+        },
+        "gradient-x": {
+          "0%, 100%": {
+            backgroundPosition: "0% 50%",
+          },
+          "50%": {
+            backgroundPosition: "100% 50%",
+          },
+        },
+        "wiggle": {
+          "0%, 100%": {
+            transform: "rotate(-1deg)",
+          },
+          "50%": {
+            transform: "rotate(1deg)",
+          },
+        },
+        "flip": {
+          "0%": {
+            transform: "rotateY(0deg)",
+          },
+          "100%": {
+            transform: "rotateY(180deg)",
+          },
+        },
+        "shake": {
+          "0%, 100%": {
+            transform: "translateX(0)",
+          },
+          "10%, 30%, 50%, 70%, 90%": {
+            transform: "translateX(-5px)",
+          },
+          "20%, 40%, 60%, 80%": {
+            transform: "translateX(5px)",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -225,10 +288,17 @@ export default {
         "slide-in-right": "slide-in-right 0.3s ease-out",
         "slide-out-right": "slide-out-right 0.3s ease-out",
         "slide-up": "slide-up 0.5s ease-out",
+        "slide-down": "slide-down 0.5s ease-out",
+        "slide-left": "slide-left 0.5s ease-out",
         "float": "float 3s ease-in-out infinite",
         "glow": "glow 2s ease-in-out infinite",
         "shimmer": "shimmer 3s ease-in-out infinite",
         "bounce-subtle": "bounce-subtle 0.6s ease-out",
+        "pulse-glow": "pulse-glow 2s ease-in-out infinite",
+        "gradient-x": "gradient-x 3s ease infinite",
+        "wiggle": "wiggle 0.5s ease-in-out",
+        "flip": "flip 0.6s ease-in-out",
+        "shake": "shake 0.5s ease-in-out",
         enter: "fade-in 0.3s ease-out, scale-in 0.2s ease-out",
         exit: "fade-out 0.3s ease-out, scale-out 0.2s ease-out",
       },
