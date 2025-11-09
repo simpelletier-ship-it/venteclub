@@ -4,6 +4,19 @@
   publish = "dist"
   command = "npm run build"
 
+# Force HTTPS redirect
+[[redirects]]
+  from = "http://vente.club/*"
+  to = "https://vente.club/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "http://www.vente.club/*"
+  to = "https://vente.club/:splat"
+  status = 301
+  force = true
+
 # Force all routes to index.html for client-side routing (SPA)
 [[redirects]]
   from = "/*"
