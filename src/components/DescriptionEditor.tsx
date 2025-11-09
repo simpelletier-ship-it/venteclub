@@ -1,9 +1,6 @@
-import { useRef, lazy, Suspense } from "react";
+import { useEffect, useRef, useState } from "react";
 import "react-quill/dist/quill.snow.css";
 import "./email-editor.css";
-
-// Import ReactQuill dynamically to avoid issues
-const ReactQuill = lazy(() => import('react-quill'));
 
 interface DescriptionEditorProps {
   value: string;
@@ -11,7 +8,15 @@ interface DescriptionEditorProps {
 }
 
 export const DescriptionEditor = ({ value, onChange }: DescriptionEditorProps) => {
+  const [ReactQuill, setReactQuill] = useState<any>(null);
   const quillRef = useRef<any>(null);
+
+  useEffect(() => {
+    // Import ReactQuill only on client side
+    import('react-quill').then((module) => {
+      setReactQuill(() => module.default);
+    });
+  }, []);
 
   // Configuration des modules Quill avec toutes les fonctionnalités
   const modules = {
@@ -52,20 +57,26 @@ export const DescriptionEditor = ({ value, onChange }: DescriptionEditorProps) =
     "video",
   ];
 
+  if (!ReactQuill) {
+    return (
+      <div className="min-h-[300px] border rounded-md p-4 bg-muted/20 flex items-center justify-center">
+        Chargement de l'éditeur...
+      </div>
+    );
+  }
+
   return (
     <div className="email-editor-wrapper w-full">
-      <Suspense fallback={<div className="min-h-[300px] border rounded-md p-4 bg-muted/20 flex items-center justify-center">Chargement de l'éditeur...</div>}>
-        <ReactQuill
-          ref={quillRef}
-          theme="snow"
-          value={value}
-          onChange={onChange}
-          modules={modules}
-          formats={formats}
-          placeholder="Décrivez votre entreprise en détail... Utilisez la barre d'outils pour formater votre texte, ajouter des images, et créer une description professionnelle."
-          className="min-h-[300px]"
-        />
-      </Suspense>
+      <ReactQuill
+        ref={quillRef}
+        theme="snow"
+        value={value}
+        onChange={onChange}
+        modules={modules}
+        formats={formats}
+        placeholder="Décrivez votre entreprise en détail... Utilisez la barre d'outils pour formater votre texte, ajouter des images, et créer une description professionnelle."
+        className="min-h-[300px]"
+      />
     </div>
   );
 };
