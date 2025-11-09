@@ -2073,9 +2073,16 @@ const Admin = () => {
                 onChange={(content) => setEditFormData({ ...editFormData, description: content })}
                 placeholder="Description détaillée de l'entreprise"
               />
-              <p className="text-xs text-muted-foreground mt-1">
-                Maximum 5000 caractères
-              </p>
+              <div className="flex items-center justify-between mt-1">
+                <p className={`text-xs ${editFormData.description.length > 20000 ? 'text-destructive font-semibold' : 'text-muted-foreground'}`}>
+                  {editFormData.description.length.toLocaleString()}/20 000 caractères
+                </p>
+                {editFormData.description.length > 20000 && (
+                  <p className="text-xs text-destructive">
+                    ⚠️ La description est très longue
+                  </p>
+                )}
+              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">

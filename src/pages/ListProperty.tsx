@@ -489,9 +489,16 @@ const ListProperty = () => {
                 required
                 minLength={50}
               />
-              <p className="text-xs text-muted-foreground">
-                {formData.description.length} caractères (minimum 50)
-              </p>
+              <div className="flex items-center justify-between">
+                <p className={`text-xs ${formData.description.length > 20000 ? 'text-destructive font-semibold' : 'text-muted-foreground'}`}>
+                  {formData.description.length.toLocaleString()}/20 000 caractères (minimum 50)
+                </p>
+                {formData.description.length > 20000 && (
+                  <p className="text-xs text-destructive">
+                    ⚠️ Description très longue
+                  </p>
+                )}
+              </div>
               <Button
                 type="button"
                 variant="outline"

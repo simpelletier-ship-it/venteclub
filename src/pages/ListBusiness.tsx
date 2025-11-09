@@ -969,6 +969,16 @@ const ListBusiness = () => {
                         onChange={(content) => setFormData({ ...formData, description: content })}
                         placeholder="Décrivez votre entreprise en détail : historique, activités, équipements, clientèle, avantages concurrentiels..."
                       />
+                      <div className="flex items-center justify-between mt-1">
+                        <p className={`text-xs ${formData.description.length > 20000 ? 'text-destructive font-semibold' : 'text-muted-foreground'}`}>
+                          {formData.description.length.toLocaleString()}/20 000 caractères
+                        </p>
+                        {formData.description.length > 20000 && (
+                          <p className="text-xs text-destructive">
+                            ⚠️ La description est très longue
+                          </p>
+                        )}
+                      </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
