@@ -11,6 +11,11 @@ interface PremiumPhotoGalleryProps {
 }
 
 export const PremiumPhotoGallery = ({ photos, businessTitle, businessIndustry, businessCity }: PremiumPhotoGalleryProps) => {
+  // Filtrer les photos en double
+  const uniquePhotos = photos.filter((photo, index, self) =>
+    index === self.findIndex((p) => p.photo_url === photo.photo_url)
+  );
+  
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [direction, setDirection] = useState(0);
@@ -19,7 +24,7 @@ export const PremiumPhotoGallery = ({ photos, businessTitle, businessIndustry, b
   const dragProgress = useTransform(dragX, [-200, 0, 200], [1, 0, -1]);
 
   const goToNext = () => {
-    if (currentIndex < photos.length - 1) {
+    if (currentIndex < uniquePhotos.length - 1) {
       setDirection(1);
       setCurrentIndex(prev => prev + 1);
     }
@@ -36,7 +41,7 @@ export const PremiumPhotoGallery = ({ photos, businessTitle, businessIndustry, b
     const threshold = 50;
     if (info.offset.x > threshold && currentIndex > 0) {
       goToPrevious();
-    } else if (info.offset.x < -threshold && currentIndex < photos.length - 1) {
+    } else if (info.offset.x < -threshold && currentIndex < uniquePhotos.length - 1) {
       goToNext();
     }
   };
@@ -62,7 +67,7 @@ export const PremiumPhotoGallery = ({ photos, businessTitle, businessIndustry, b
     }),
   };
 
-  if (photos.length === 0) return null;
+  if (uniquePhotos.length === 0) return null;
 
   return (
     <div className="space-y-6">
@@ -70,7 +75,7 @@ export const PremiumPhotoGallery = ({ photos, businessTitle, businessIndustry, b
       <div className="relative aspect-[16/9] lg:aspect-[21/9] bg-slate-950 rounded-2xl overflow-hidden group">
         <div className="absolute inset-0">
           <img
-            src={photos[currentIndex].photo_url}
+            src={uniquePhotos[currentIndex].photo_url}
             alt={`Photo ${currentIndex + 1} de ${businessTitle} - ${businessIndustry} à ${businessCity}`}
             className="w-full h-full object-cover"
           />
@@ -80,7 +85,7 @@ export const PremiumPhotoGallery = ({ photos, businessTitle, businessIndustry, b
         </div>
 
         {/* Contrôles navigation */}
-        {photos.length > 1 && (
+        {uniquePhotos.length > 1 && (
           <>
             {/* Bouton précédent */}
             <motion.button
@@ -99,7 +104,7 @@ export const PremiumPhotoGallery = ({ photos, businessTitle, businessIndustry, b
               whileHover={{ opacity: 1, scale: 1.05 }}
               className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-white/20 disabled:opacity-30 disabled:cursor-not-allowed"
               onClick={goToNext}
-              disabled={currentIndex === photos.length - 1}
+              disabled={currentIndex === uniquePhotos.length - 1}
             >
               <ChevronRight className="w-5 h-5" />
             </motion.button>
@@ -117,17 +122,17 @@ export const PremiumPhotoGallery = ({ photos, businessTitle, businessIndustry, b
         </motion.button>
 
         {/* Indicateur photo courante */}
-        {photos.length > 1 && (
+        {uniquePhotos.length > 1 && (
           <div className="absolute bottom-4 left-4 px-4 py-2 rounded-full bg-black/40 backdrop-blur-xl border border-white/10 text-white text-sm font-light">
-            {currentIndex + 1} / {photos.length}
+            {currentIndex + 1} / {uniquePhotos.length}
           </div>
         )}
       </div>
 
       {/* Thumbnails */}
-      {photos.length > 1 && (
+      {uniquePhotos.length > 1 && (
         <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-          {photos.map((photo, index) => (
+          {uniquePhotos.map((photo, index) => (
             <button
               key={photo.id}
               onClick={() => {
@@ -180,14 +185,14 @@ export const PremiumPhotoGallery = ({ photos, businessTitle, businessIndustry, b
 
               {/* Image plein écran */}
               <img
-                src={photos[currentIndex].photo_url}
+                src={uniquePhotos[currentIndex].photo_url}
                 alt={`Photo ${currentIndex + 1} en plein écran`}
                 className="max-w-full max-h-full object-contain"
                 onClick={(e) => e.stopPropagation()}
               />
 
               {/* Contrôles navigation plein écran */}
-              {photos.length > 1 && (
+              {uniquePhotos.length > 1 && (
                 <>
                   <Button
                     variant="ghost"
@@ -210,7 +215,7 @@ export const PremiumPhotoGallery = ({ photos, businessTitle, businessIndustry, b
                       e.stopPropagation();
                       goToNext();
                     }}
-                    disabled={currentIndex === photos.length - 1}
+                    disabled={currentIndex === uniquePhotos.length - 1}
                   >
                     <ChevronRight className="w-8 h-8" />
                   </Button>
@@ -219,7 +224,7 @@ export const PremiumPhotoGallery = ({ photos, businessTitle, businessIndustry, b
 
               {/* Indicateur plein écran */}
               <div className="absolute bottom-8 left-1/2 -translate-x-1/2 px-6 py-3 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-white">
-                {currentIndex + 1} / {photos.length}
+                {currentIndex + 1} / {uniquePhotos.length}
               </div>
             </div>
           </motion.div>

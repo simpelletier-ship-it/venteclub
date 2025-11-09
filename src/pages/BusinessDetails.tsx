@@ -260,8 +260,12 @@ const BusinessDetails = () => {
     }
     
     if (data) {
-      console.log('[PHOTOS] Found', data.length, 'photos');
-      setPhotos(data);
+      // Filtrer les doublons basés sur l'URL de la photo
+      const uniquePhotos = data.filter((photo, index, self) =>
+        index === self.findIndex((p) => p.photo_url === photo.photo_url)
+      );
+      console.log('[PHOTOS] Found', data.length, 'photos,', uniquePhotos.length, 'unique');
+      setPhotos(uniquePhotos);
     } else {
       console.log('[PHOTOS] No photos found');
       setPhotos([]);
