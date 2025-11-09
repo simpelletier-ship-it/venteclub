@@ -35,73 +35,91 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
+    console.log("=== REQUEST START ===");
+    console.log("Method:", req.method);
+    console.log("Headers:", Object.fromEntries(req.headers.entries()));
+    
     // Get auth header
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
-      console.error("No authorization header");
+      console.error("❌ No authorization header found");
       return new Response(
-        JSON.stringify({ error: "Non autorisé" }),
+        JSON.stringify({ error: "Non autorisé - header manquant" }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    console.log("Auth header received");
+    console.log("✅ Auth header present:", authHeader.substring(0, 20) + "...");
     
-    // Initialize Supabase clients
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    console.log("✅ Environment variables loaded");
     
-    // Client with user's JWT for authentication
-    const supabaseAuth = createClient(supabaseUrl, supabaseAnonKey, {
-      global: { headers: { Authorization: authHeader } }
-    });
+    // Extract token and verify with service role
+    const token = authHeader.replace("Bearer ", "");
+    console.log("Token extracted, length:", token.length);
     
-    // Client with service role for DB operations
+    // Use service role to verify the JWT token
     const supabaseService = createClient(supabaseUrl, supabaseServiceKey);
-
-    // Verify user with their JWT
-    console.log("Verifying user...");
-    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser();
-
-    if (authError || !user) {
-      console.error("Auth error:", authError?.message || "No user found");
+    console.log("🔍 Verifying token with service role...");
+    
+    const { data: userData, error: userError } = await supabaseService.auth.getUser(token);
+    
+    if (userError) {
+      console.error("❌ Auth verification failed:", userError);
       return new Response(
-        JSON.stringify({ error: "Non autorisé - token invalide" }),
+        JSON.stringify({ error: "Token invalide", details: userError.message }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+    
+    if (!userData.user) {
+      console.error("❌ No user found in token");
+      return new Response(
+        JSON.stringify({ error: "Utilisateur non trouvé" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+    
+    console.log("✅ User verified:", userData.user.id);
 
-    console.log("User authenticated:", user.id);
-
-    // Check admin role using service role client
-    console.log("Checking admin role for user:", user.id);
+    // Check admin role
+    console.log("🔍 Checking admin role for user:", userData.user.id);
     const { data: hasAdminRole, error: roleError } = await supabaseService
       .rpc('has_role', { 
-        _user_id: user.id, 
+        _user_id: userData.user.id, 
         _role: 'admin' 
       });
 
-    if (roleError || !hasAdminRole) {
-      console.error("Role check failed:", { roleError, hasAdminRole });
+    if (roleError) {
+      console.error("❌ Role check error:", roleError);
+      return new Response(
+        JSON.stringify({ error: "Erreur vérification rôle", details: roleError.message }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    if (!hasAdminRole) {
+      console.error("❌ User is not admin");
       return new Response(
         JSON.stringify({ error: "Accès refusé - droits administrateur requis" }),
         { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    console.log("Admin role verified successfully");
+    console.log("✅ Admin role verified");
 
     // Parse and validate request body
-    console.log("Parsing request body...");
+    console.log("📝 Parsing request body...");
     const body = await req.json();
+    console.log("Body keys:", Object.keys(body));
     
     let validated;
     try {
       validated = editBusinessSchema.parse(body);
-      console.log("Validation successful for business_id:", validated.business_id);
+      console.log("✅ Validation successful for business:", validated.business_id);
     } catch (validationError: any) {
-      console.error("Validation error:", validationError);
+      console.error("❌ Validation error:", validationError.errors);
       return new Response(
         JSON.stringify({ 
           error: "Données invalides", 
@@ -114,7 +132,7 @@ const handler = async (req: Request): Promise<Response> => {
     // Update business with validated data
     const { business_id, photo_url, ...updateData } = validated;
     
-    console.log("Updating business:", business_id);
+    console.log("💾 Updating business:", business_id);
     const { error: updateError } = await supabaseService
       .from('businesses')
       .update({
@@ -125,13 +143,18 @@ const handler = async (req: Request): Promise<Response> => {
       .eq('id', business_id);
 
     if (updateError) {
-      console.error("Update error:", updateError);
-      throw updateError;
+      console.error("❌ Update error:", updateError);
+      return new Response(
+        JSON.stringify({ error: "Erreur mise à jour", details: updateError.message }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
+    
+    console.log("✅ Business updated successfully");
 
     // Handle photo update if provided
     if (photo_url) {
-      // Get current photos to determine next display_order
+      console.log("📸 Adding photo...");
       const { data: existingPhotos } = await supabaseService
         .from('business_photos')
         .select('display_order')
@@ -143,7 +166,6 @@ const handler = async (req: Request): Promise<Response> => {
         ? (existingPhotos[0].display_order || 0) + 1 
         : 1;
 
-      // Insert new photo
       const { error: photoError } = await supabaseService
         .from('business_photos')
         .insert({
@@ -153,28 +175,24 @@ const handler = async (req: Request): Promise<Response> => {
         });
 
       if (photoError) {
-        console.error("Photo insert error:", photoError);
-        // Don't fail the whole operation if photo fails
+        console.error("⚠️ Photo insert error:", photoError.message);
+      } else {
+        console.log("✅ Photo added successfully");
       }
     }
 
-    console.log(`Admin ${user.id} updated business ${business_id}`);
+    console.log(`✅ SUCCESS - Admin ${userData.user.id} updated business ${business_id}`);
 
     return new Response(
       JSON.stringify({ success: true, message: "Entreprise mise à jour avec succès" }),
-      {
-        status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      }
+      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error: any) {
-    console.error("Error in admin-update-business function:", error);
+    console.error("💥 UNEXPECTED ERROR:", error);
+    console.error("Error stack:", error.stack);
     return new Response(
-      JSON.stringify({ error: error.message }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      }
+      JSON.stringify({ error: "Erreur serveur", details: error.message }),
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 };
