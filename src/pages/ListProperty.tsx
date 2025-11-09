@@ -401,9 +401,10 @@ const ListProperty = () => {
 
       // Uploader les photos si présentes
       if (photos.length > 0 && business) {
+        const uploadTimestamp = Date.now();
         const photoUploadPromises = photos.map(async (photo, index) => {
           const fileExt = photo.name.split('.').pop();
-          const fileName = `${business.id}/${Date.now()}-${index}.${fileExt}`;
+          const fileName = `${business.id}/${uploadTimestamp}-${index}.${fileExt}`;
           
           const { error: uploadError } = await supabase.storage
             .from('business-photos')

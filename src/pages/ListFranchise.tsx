@@ -203,10 +203,11 @@ const ListFranchise = () => {
 
       // Upload photos
       if (photos.length > 0) {
+        const uploadTimestamp = Date.now();
         for (let i = 0; i < photos.length; i++) {
           const file = photos[i];
           const fileExt = file.name.split('.').pop();
-          const fileName = `${businessData.id}/${Date.now()}-${i}.${fileExt}`;
+          const fileName = `${businessData.id}/${uploadTimestamp}-${i}.${fileExt}`;
 
           const { error: uploadError } = await supabase.storage
             .from('business-photos')
