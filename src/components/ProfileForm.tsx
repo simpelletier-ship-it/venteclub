@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, User, Mail, Phone, MapPin, Building, Globe, Linkedin, Save, Upload } from "lucide-react";
+import { Loader2, User, Mail, Phone, MapPin, Building, Globe, Linkedin, Save, Upload, Trash2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface ProfileFormData {
@@ -165,6 +165,44 @@ export function ProfileForm() {
     }
   };
 
+  const handleDeleteAvatar = async () => {
+    try {
+      if (!userId) return;
+
+      setUploading(true);
+
+      // Supprimer le fichier du storage si une URL existe
+      if (formData.avatar_url && formData.avatar_url.includes('supabase')) {
+        const oldPath = formData.avatar_url.split('/').slice(-2).join('/');
+        await supabase.storage.from('avatars').remove([oldPath]);
+      }
+
+      // Mettre à jour la base de données
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: null })
+        .eq('id', userId);
+
+      if (updateError) throw updateError;
+
+      setFormData({ ...formData, avatar_url: "" });
+
+      toast({
+        title: "Photo supprimée",
+        description: "Votre photo de profil a été supprimée avec succès",
+      });
+    } catch (error: any) {
+      console.error("Error deleting avatar:", error);
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: error.message || "Impossible de supprimer la photo",
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
@@ -255,7 +293,7 @@ export function ProfileForm() {
                 {getInitials()}
               </AvatarFallback>
             </Avatar>
-            <div className="flex-1">
+            <div className="flex-1 space-y-2">
               <Label htmlFor="avatar_file" className="cursor-pointer">
                 <div className="flex items-center gap-2 text-sm font-medium mb-2">
                   <Upload className="h-4 w-4" />
@@ -289,7 +327,19 @@ export function ProfileForm() {
                   )}
                 </Button>
               </Label>
-              <p className="text-xs text-muted-foreground mt-2">
+              {formData.avatar_url && (
+                <Button
+                  type="button"
+                  variant="destructive"
+                  disabled={uploading}
+                  className="w-full"
+                  onClick={handleDeleteAvatar}
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Supprimer la photo
+                </Button>
+              )}
+              <p className="text-xs text-muted-foreground">
                 PNG, JPG, GIF, WEBP (Max 2Mo)
               </p>
             </div>
