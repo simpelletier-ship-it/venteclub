@@ -42,9 +42,13 @@ const Header = () => {
       }
     });
 
-    // Écouter le scroll
+    // Écouter le scroll avec debounce pour éviter les bugs
+    let scrollTimeout: NodeJS.Timeout;
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        setIsScrolled(window.scrollY > 50);
+      }, 50);
     };
 
     window.addEventListener('scroll', handleScroll);
@@ -52,6 +56,7 @@ const Header = () => {
     return () => {
       subscription.unsubscribe();
       window.removeEventListener('scroll', handleScroll);
+      clearTimeout(scrollTimeout);
     };
   }, []);
 
@@ -136,7 +141,7 @@ const Header = () => {
   };
 
   return (
-    <nav className={`border-b border-border bg-background/95 backdrop-blur-xl sticky top-0 z-50 shadow-sm transition-all duration-300 ${isScrolled ? 'py-2' : 'py-3 sm:py-4 md:py-6'}`}>
+    <nav className={`border-b border-border bg-background/95 backdrop-blur-xl sticky top-0 z-50 shadow-sm transition-all duration-500 ease-out ${isScrolled ? 'py-2' : 'py-3 sm:py-4 md:py-6'}`}>
       <div className="container mx-auto px-4 sm:px-6 md:px-8">
         <div className="flex items-center justify-between">
           {/* Logo */}
