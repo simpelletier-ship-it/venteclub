@@ -360,6 +360,8 @@ export const ConversationsList = ({ userId }: ConversationsListProps) => {
                         src={conv.business_photo} 
                         alt={conv.business_title}
                         className="w-full h-full object-cover"
+                        loading="lazy"
+                        decoding="async"
                       />
                     ) : (
                       <div className="w-full h-full bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center">

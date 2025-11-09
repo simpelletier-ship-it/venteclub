@@ -158,6 +158,8 @@ export const PremiumPhotoGallery = ({ photos, businessTitle, businessIndustry, b
                   src={photo.photo_url}
                   alt={`Miniature ${index + 1}`}
                   className="w-full h-full object-cover"
+                  loading="lazy"
+                  decoding="async"
                 />
               </div>
             </button>

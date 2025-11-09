@@ -118,18 +118,76 @@ export default defineConfig(({ mode }) => ({
     minify: 'terser',
     sourcemap: false,
     chunkSizeWarningLimit: 1000,
+    cssCodeSplit: true,
     terserOptions: {
       compress: {
-        drop_console: false,
+        drop_console: true,
         drop_debugger: true,
+        pure_funcs: ['console.log', 'console.info'],
+      },
+      format: {
+        comments: false,
       },
     },
     rollupOptions: {
       output: {
-        manualChunks: {
-          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          'ui-vendor': ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-select'],
+        manualChunks: (id) => {
+          // React core
+          if (id.includes('node_modules/react/') || 
+              id.includes('node_modules/react-dom/') || 
+              id.includes('node_modules/scheduler/')) {
+            return 'react-core';
+          }
+          // Router
+          if (id.includes('node_modules/react-router')) {
+            return 'react-router';
+          }
+          // UI Components - Split par type
+          if (id.includes('@radix-ui')) {
+            return 'radix-ui';
+          }
+          // Supabase
+          if (id.includes('@supabase')) {
+            return 'supabase';
+          }
+          // TanStack Query
+          if (id.includes('@tanstack')) {
+            return 'tanstack';
+          }
+          // Mapbox
+          if (id.includes('mapbox')) {
+            return 'mapbox';
+          }
+          // Tiptap Editor
+          if (id.includes('@tiptap')) {
+            return 'tiptap';
+          }
+          // Chart libraries
+          if (id.includes('recharts')) {
+            return 'charts';
+          }
+          // Form libraries
+          if (id.includes('react-hook-form') || id.includes('@hookform')) {
+            return 'forms';
+          }
+          // Date libraries
+          if (id.includes('date-fns')) {
+            return 'date-utils';
+          }
+          // Animations
+          if (id.includes('framer-motion')) {
+            return 'animations';
+          }
+          // Utilities
+          if (id.includes('node_modules/') && 
+              !id.includes('node_modules/.vite')) {
+            return 'vendor';
+          }
         },
+        // Noms de fichiers optimisés
+        chunkFileNames: 'assets/[name]-[hash].js',
+        entryFileNames: 'assets/[name]-[hash].js',
+        assetFileNames: 'assets/[name]-[hash].[ext]',
       },
     },
   },

@@ -166,6 +166,7 @@ const BusinessListItem = ({
             alt={title}
             className="w-full h-full object-contain bg-muted"
             loading="lazy"
+            decoding="async"
           />
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-muted to-muted/50">

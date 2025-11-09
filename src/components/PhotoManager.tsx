@@ -76,11 +76,13 @@ function SortablePhotoItem({
         </div>
 
         {/* Photo */}
-        <img
-          src={url}
-          alt={`Photo ${index + 1}`}
-          className="w-24 h-24 object-cover rounded-md flex-shrink-0 pointer-events-none"
-        />
+          <img
+            src={url}
+            alt={`Photo ${index + 1}`}
+            className="w-24 h-24 object-cover rounded-md flex-shrink-0 pointer-events-none"
+            loading="lazy"
+            decoding="async"
+          />
 
         {/* Controls */}
         <div className="flex-1 min-w-0">

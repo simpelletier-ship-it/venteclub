@@ -105,6 +105,8 @@ export const MessageBubble = ({
                 src={message.image_url}
                 alt="Message attachment"
                 className="w-full h-auto cursor-pointer hover:opacity-90 transition-opacity"
+                loading="lazy"
+                decoding="async"
                 onError={() => setImageError(true)}
                 onClick={() => window.open(message.image_url!, '_blank')}
               />
