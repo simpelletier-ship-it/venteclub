@@ -133,7 +133,7 @@ export const FloatingOpportunities = () => {
 
         {/* Floating Badge */}
         <div 
-          className="absolute -right-2 top-16 bg-white/95 backdrop-blur-xl border border-white/40 rounded-lg px-3 py-1.5 shadow-xl"
+          className="absolute -right-2 top-8 bg-white/95 backdrop-blur-xl border border-white/40 rounded-lg px-3 py-1.5 shadow-xl"
           style={{ animation: "float 6s ease-in-out infinite", willChange: "transform" }}
         >
           <div className="text-[10px] text-slate-600 font-medium">Nouvelles offres</div>
