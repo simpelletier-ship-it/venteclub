@@ -1,6 +1,13 @@
 import { useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Bold,
   Italic,
   Underline,
@@ -11,6 +18,7 @@ import {
   AlignLeft,
   AlignCenter,
   AlignRight,
+  Highlighter,
 } from "lucide-react";
 
 interface VisualRichTextEditorProps {
@@ -42,6 +50,18 @@ export const VisualRichTextEditor = ({
     document.execCommand(command, false, value);
     editorRef.current?.focus();
     handleInput();
+  };
+
+  const applyHighlight = (color: string) => {
+    executeCommand("backColor", color);
+  };
+
+  const applyFontSize = (size: string) => {
+    executeCommand("fontSize", size);
+  };
+
+  const applyFontFamily = (font: string) => {
+    executeCommand("fontName", font);
   };
 
   const formatButtons = [
@@ -97,10 +117,63 @@ export const VisualRichTextEditor = ({
     },
   ];
 
+  const highlightColors = [
+    { label: "Jaune", value: "#FFFF00" },
+    { label: "Vert", value: "#90EE90" },
+    { label: "Bleu", value: "#ADD8E6" },
+    { label: "Rose", value: "#FFB6C1" },
+    { label: "Orange", value: "#FFD580" },
+  ];
+
+  const fontSizes = [
+    { label: "Petit", value: "2" },
+    { label: "Normal", value: "3" },
+    { label: "Grand", value: "5" },
+    { label: "Très grand", value: "7" },
+  ];
+
+  const fontFamilies = [
+    { label: "Sans Serif", value: "Arial, sans-serif" },
+    { label: "Serif", value: "Georgia, serif" },
+    { label: "Monospace", value: "Courier New, monospace" },
+    { label: "Cursive", value: "Comic Sans MS, cursive" },
+  ];
+
   return (
     <div className="border border-input rounded-lg overflow-hidden bg-background">
       {/* Toolbar */}
-      <div className="border-b border-input bg-muted/30 p-2 flex flex-wrap gap-1">
+      <div className="border-b border-input bg-muted/30 p-2 flex flex-wrap gap-2 items-center">
+        {/* Font Family */}
+        <Select onValueChange={applyFontFamily}>
+          <SelectTrigger className="w-[140px] h-8">
+            <SelectValue placeholder="Police" />
+          </SelectTrigger>
+          <SelectContent>
+            {fontFamilies.map((font) => (
+              <SelectItem key={font.value} value={font.value}>
+                {font.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        {/* Font Size */}
+        <Select onValueChange={applyFontSize}>
+          <SelectTrigger className="w-[120px] h-8">
+            <SelectValue placeholder="Taille" />
+          </SelectTrigger>
+          <SelectContent>
+            {fontSizes.map((size) => (
+              <SelectItem key={size.value} value={size.value}>
+                {size.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <div className="h-6 w-px bg-border" />
+
+        {/* Format buttons */}
         {formatButtons.map((btn, index) => (
           <Button
             key={index}
@@ -114,26 +187,45 @@ export const VisualRichTextEditor = ({
             <btn.icon className="h-4 w-4" />
           </Button>
         ))}
+
+        <div className="h-6 w-px bg-border" />
+
+        {/* Highlight colors */}
+        <div className="flex gap-1 items-center">
+          <Highlighter className="h-4 w-4 text-muted-foreground mr-1" />
+          {highlightColors.map((color) => (
+            <button
+              key={color.value}
+              type="button"
+              onClick={() => applyHighlight(color.value)}
+              title={color.label}
+              className="w-6 h-6 rounded border border-border hover:scale-110 transition-transform"
+              style={{ backgroundColor: color.value }}
+            />
+          ))}
+        </div>
       </div>
 
       {/* Editor */}
-      <div
-        ref={editorRef}
-        contentEditable
-        onInput={handleInput}
-        className="min-h-[300px] max-h-[600px] overflow-y-auto p-4 focus:outline-none prose prose-sm max-w-none"
-        style={{
-          wordWrap: "break-word",
-          overflowWrap: "break-word",
-        }}
-        suppressContentEditableWarning
-      />
+      <div className="relative">
+        <div
+          ref={editorRef}
+          contentEditable
+          onInput={handleInput}
+          className="min-h-[300px] max-h-[600px] overflow-y-auto overflow-x-hidden p-4 focus:outline-none prose prose-sm max-w-none"
+          style={{
+            wordWrap: "break-word",
+            overflowWrap: "break-word",
+          }}
+          suppressContentEditableWarning
+        />
 
-      {!content && (
-        <div className="absolute top-16 left-4 text-muted-foreground pointer-events-none">
-          {placeholder}
-        </div>
-      )}
+        {!content && (
+          <div className="absolute top-4 left-4 text-muted-foreground pointer-events-none">
+            {placeholder}
+          </div>
+        )}
+      </div>
 
       <style>{`
         [contenteditable] {
@@ -178,6 +270,9 @@ export const VisualRichTextEditor = ({
         }
         [contenteditable] p {
           margin: 0.5em 0;
+        }
+        [contenteditable] * {
+          max-width: 100%;
         }
       `}</style>
     </div>
