@@ -12,6 +12,7 @@ const opportunities = [
 export const FloatingOpportunities = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [badgeBounce, setBadgeBounce] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -24,6 +25,13 @@ export const FloatingOpportunities = () => {
 
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    // Déclencher l'animation de rebond quand l'index change
+    setBadgeBounce(true);
+    const timeout = setTimeout(() => setBadgeBounce(false), 600);
+    return () => clearTimeout(timeout);
+  }, [currentIndex]);
 
   const getCardStyle = (offset: number) => {
     const position = (offset + opportunities.length) % opportunities.length;
@@ -129,7 +137,7 @@ export const FloatingOpportunities = () => {
           style={{ animation: "float 6s ease-in-out infinite", willChange: "transform" }}
         >
           <div className="text-[10px] text-slate-600 font-medium">Nouvelles offres</div>
-          <div className="font-bold text-indigo-600 text-sm transition-all duration-500">
+          <div className={`font-bold text-indigo-600 text-sm transition-all duration-300 ${badgeBounce ? 'animate-bounce-subtle' : ''}`}>
             +{8 + (currentIndex * 2)}
           </div>
         </div>

@@ -200,6 +200,20 @@ export default {
             transform: "translateX(200%)",
           },
         },
+        "bounce-subtle": {
+          "0%, 100%": {
+            transform: "scale(1)",
+          },
+          "25%": {
+            transform: "scale(1.2)",
+          },
+          "50%": {
+            transform: "scale(0.95)",
+          },
+          "75%": {
+            transform: "scale(1.05)",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -214,6 +228,7 @@ export default {
         "float": "float 3s ease-in-out infinite",
         "glow": "glow 2s ease-in-out infinite",
         "shimmer": "shimmer 3s ease-in-out infinite",
+        "bounce-subtle": "bounce-subtle 0.6s ease-out",
         enter: "fade-in 0.3s ease-out, scale-in 0.2s ease-out",
         exit: "fade-out 0.3s ease-out, scale-out 0.2s ease-out",
       },
