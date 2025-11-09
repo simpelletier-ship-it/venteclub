@@ -4,6 +4,13 @@
   publish = "dist"
   command = "npm run build"
 
+# Sitemap dynamique via edge function
+[[redirects]]
+  from = "/sitemap.xml"
+  to = "/.netlify/functions/generate-sitemap"
+  status = 200
+  force = true
+
 # Force HTTPS redirect
 [[redirects]]
   from = "http://vente.club/*"
@@ -23,28 +30,7 @@
   to = "/index.html"
   status = 200
   force = false
-  conditions = {path = "!^/(sitemap\\.xml|sitemap-dynamic\\.xml|robots\\.txt|favicon-vente\\.png|logo\\.png|og-image\\.jpg|blog-.*\\.jpg|demo-photos/.*)$"}
-
-# Ensure XML files are served with correct Content-Type
-[[headers]]
-  for = "/sitemap.xml"
-  [headers.values]
-    Content-Type = "application/xml; charset=utf-8"
-    Cache-Control = "public, max-age=3600, must-revalidate"
-    X-Robots-Tag = "all"
-
-[[headers]]
-  for = "/sitemap-dynamic.xml"
-  [headers.values]
-    Content-Type = "application/xml; charset=utf-8"
-    Cache-Control = "public, max-age=3600, must-revalidate"
-    X-Robots-Tag = "all"
-
-[[headers]]
-  for = "/robots.txt"
-  [headers.values]
-    Content-Type = "text/plain; charset=utf-8"
-    Cache-Control = "public, max-age=86400"
+  conditions = {path = "!^/(robots\\.txt|favicon-vente\\.png|logo\\.png|og-image\\.jpg|blog-.*\\.jpg|demo-photos/.*)$"}
 
 # Security headers
 [[headers]]
