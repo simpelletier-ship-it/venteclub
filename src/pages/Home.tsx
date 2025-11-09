@@ -140,7 +140,7 @@ const Home = () => {
       />
       
       {/* Hero Section */}
-      <section className="relative min-h-[70vh] sm:min-h-[80vh] lg:min-h-[85vh] flex items-center bg-gradient-to-br from-[#1e1b4b] via-[#312e81] to-[#1e3a8a] overflow-hidden" aria-label="Section principale">
+      <section className="relative min-h-[65vh] sm:min-h-[75vh] lg:min-h-[85vh] flex items-center bg-gradient-to-br from-[#1e1b4b] via-[#312e81] to-[#1e3a8a] overflow-hidden" aria-label="Section principale">
         {/* Circuit Background */}
         <CircuitBackground />
         
@@ -171,15 +171,15 @@ const Home = () => {
           />
         </div>
         
-        <div className="container mx-auto px-4 py-10 sm:py-16 lg:py-20 relative z-10">
+        <div className="container mx-auto px-4 py-8 sm:py-12 lg:py-20 relative z-10">
           <div className="max-w-6xl mx-auto">
             <div 
-              className="space-y-6 sm:space-y-8 animate-slide-up transition-transform duration-100"
+              className="space-y-4 sm:space-y-6 lg:space-y-8 animate-slide-up transition-transform duration-100"
               style={{ 
                 transform: `translateY(${scrollY * 0.05}px)` 
               }}
             >
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-display font-bold leading-[1.15] tracking-tight text-white">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-display font-bold leading-[1.2] sm:leading-[1.15] tracking-tight text-white">
                 <span className="text-[#818cf8] font-extrabold">Le Club</span> de Référence
                 <br />
                 pour acheter <TypewriterAnimation />
@@ -187,14 +187,14 @@ const Home = () => {
                 partout au Québec
               </h1>
               
-              <p className="text-base sm:text-lg lg:text-xl text-white/80 max-w-3xl leading-relaxed">
+              <p className="text-sm sm:text-base lg:text-lg text-white/90 max-w-3xl leading-relaxed sm:leading-loose">
                 Plateforme intelligente qui rapproche acquéreurs et propriétaires d'entreprises. Nous favorisons la transparence et la fiabilité pour que vos transactions se déroulent en toute confiance.
               </p>
               
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-2 sm:pt-4">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-3 sm:pt-4">
                 <Button 
                   size="lg" 
-                  className="bg-[#6366f1] hover:bg-[#4f46e5] text-white h-12 sm:h-14 px-6 sm:px-10 text-sm sm:text-base font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all group w-full sm:w-auto"
+                  className="bg-[#6366f1] hover:bg-[#4f46e5] text-white h-11 sm:h-12 lg:h-14 px-5 sm:px-8 lg:px-10 text-sm sm:text-base font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all group w-full sm:w-auto"
                   onClick={() => document.getElementById('featured')?.scrollIntoView({ behavior: 'smooth' })}
                 >
                   Explorer les opportunités
@@ -202,7 +202,7 @@ const Home = () => {
                 </Button>
                 <Button 
                   size="lg" 
-                  className="h-12 sm:h-14 px-6 sm:px-10 text-sm sm:text-base font-semibold rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/20 shadow-lg hover:shadow-xl transition-all backdrop-blur-sm w-full sm:w-auto"
+                  className="h-11 sm:h-12 lg:h-14 px-5 sm:px-8 lg:px-10 text-sm sm:text-base font-semibold rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/20 shadow-lg hover:shadow-xl transition-all backdrop-blur-sm w-full sm:w-auto"
                   onClick={() => navigate("/sell")}
                 >
                   Vendre mon entreprise
@@ -220,59 +220,59 @@ const Home = () => {
       </section>
 
       {/* Statistics Section */}
-      <section className="py-12 sm:py-16 bg-[#1e1b4b]" aria-label="Statistiques de la plateforme">
+      <section className="py-10 sm:py-14 lg:py-16 bg-[#1e1b4b]" aria-label="Statistiques de la plateforme">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 max-w-5xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 md:gap-8 max-w-5xl mx-auto">
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#818cf8]/20 mb-3">
-                <Building2 className="w-6 h-6 text-[#818cf8]" />
+              <div className="inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#818cf8]/20 mb-2 sm:mb-3">
+                <Building2 className="w-5 h-5 sm:w-6 sm:h-6 text-[#818cf8]" />
               </div>
-              <div ref={businessesCount.ref} className="text-3xl sm:text-4xl font-bold text-white mb-2 tabular-nums">
+              <div ref={businessesCount.ref} className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-1 sm:mb-2 tabular-nums">
                 {businessesCount.count}+
               </div>
-              <div className="text-sm sm:text-base text-white/70">entreprises actives</div>
+              <div className="text-xs sm:text-sm lg:text-base text-white/70 leading-tight">entreprises actives</div>
             </div>
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#818cf8]/20 mb-3">
-                <Eye className="w-6 h-6 text-[#818cf8]" />
+              <div className="inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#818cf8]/20 mb-2 sm:mb-3">
+                <Eye className="w-5 h-5 sm:w-6 sm:h-6 text-[#818cf8]" />
               </div>
-              <div ref={viewsCount.ref} className="text-3xl sm:text-4xl font-bold text-white mb-2 tabular-nums">
+              <div ref={viewsCount.ref} className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-1 sm:mb-2 tabular-nums">
                 {viewsCount.count}k+
               </div>
-              <div className="text-sm sm:text-base text-white/70">vues totales</div>
+              <div className="text-xs sm:text-sm lg:text-base text-white/70 leading-tight">vues totales</div>
             </div>
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#818cf8]/20 mb-3">
-                <Users className="w-6 h-6 text-[#818cf8]" />
+              <div className="inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#818cf8]/20 mb-2 sm:mb-3">
+                <Users className="w-5 h-5 sm:w-6 sm:h-6 text-[#818cf8]" />
               </div>
-              <div ref={usersCount.ref} className="text-3xl sm:text-4xl font-bold text-white mb-2 tabular-nums">
+              <div ref={usersCount.ref} className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-1 sm:mb-2 tabular-nums">
                 {usersCount.count}+
               </div>
-              <div className="text-sm sm:text-base text-white/70">entrepreneurs inscrits</div>
+              <div className="text-xs sm:text-sm lg:text-base text-white/70 leading-tight">entrepreneurs inscrits</div>
             </div>
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#818cf8]/20 mb-3">
-                <DollarSign className="w-6 h-6 text-[#818cf8]" />
+              <div className="inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#818cf8]/20 mb-2 sm:mb-3">
+                <DollarSign className="w-5 h-5 sm:w-6 sm:h-6 text-[#818cf8]" />
               </div>
-              <div ref={valueCount.ref} className="text-3xl sm:text-4xl font-bold text-white mb-2 tabular-nums">
+              <div ref={valueCount.ref} className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-1 sm:mb-2 tabular-nums">
                 {valueCount.count}M+$
               </div>
-              <div className="text-sm sm:text-base text-white/70">valeur totale des annonces</div>
+              <div className="text-xs sm:text-sm lg:text-base text-white/70 leading-tight">valeur totale des annonces</div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Featured Businesses Section */}
-      <section id="featured" className="py-16 sm:py-20 bg-background relative">
+      <section id="featured" className="py-12 sm:py-16 lg:py-20 bg-background relative">
         {/* Decorative Top Border */}
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12 animate-slide-up">
-            <h2 id="featured-heading" className="text-3xl sm:text-4xl md:text-5xl font-display font-bold text-foreground mb-4">
+          <div className="text-center mb-8 sm:mb-10 lg:mb-12 animate-slide-up">
+            <h2 id="featured-heading" className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-display font-bold text-foreground mb-3 sm:mb-4">
               Opportunités d'affaires en vedette
             </h2>
-            <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-sm sm:text-base lg:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed px-4 sm:px-0">
               Découvrez notre sélection des meilleures entreprises à vendre, approuvées par notre équipe et prêtes à être acquises
             </p>
           </div>
@@ -299,32 +299,32 @@ const Home = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-16 sm:py-20 bg-gradient-to-br from-[#1e1b4b] via-[#312e81] to-[#1e3a8a] border-y border-primary/20" aria-labelledby="features-heading">
+      <section className="py-12 sm:py-16 lg:py-20 bg-gradient-to-br from-[#1e1b4b] via-[#312e81] to-[#1e3a8a] border-y border-primary/20" aria-labelledby="features-heading">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-10 max-w-4xl mx-auto">
-            <h2 id="features-heading" className="text-3xl sm:text-4xl md:text-5xl font-display font-bold mb-6 text-white">
+          <div className="text-center mb-8 sm:mb-10 max-w-4xl mx-auto">
+            <h2 id="features-heading" className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-display font-bold mb-4 sm:mb-6 text-white">
               Des solutions adaptées à chaque entrepreneur
             </h2>
-            <p className="text-base sm:text-lg md:text-xl text-white/90 leading-relaxed text-justify px-4">
+            <p className="text-sm sm:text-base md:text-lg text-white/90 leading-relaxed text-justify px-2 sm:px-4">
               Quel que soit votre secteur d'activité, découvrez un large éventail d'opportunités adaptées à vos compétences et à votre budget. Notre <a href="/ressources" className="text-white hover:text-secondary underline font-semibold transition-colors">plateforme intelligente</a> vous permet d'acquérir une entreprise selon différentes modalités : immobilisation complète incluant bâtiment et équipements, acquisition d'actions pour devenir actionnaire, ou <a href="/blog" className="text-white hover:text-secondary underline font-semibold transition-colors">rachat de fonds de commerce</a> pour reprendre l'activité existante.
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 max-w-5xl mx-auto mb-12">
-            <div className="text-center p-6 sm:p-8 rounded-xl bg-white/10 border border-white/20 hover:bg-white/15 hover:shadow-2xl hover:scale-105 transition-all duration-300 backdrop-blur-sm">
-              <TrendingUp className="w-10 sm:w-12 h-10 sm:h-12 mx-auto mb-3 sm:mb-4 text-white" />
-              <h3 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3 text-white">Recherche optimisée par IA</h3>
-              <p className="text-sm sm:text-base text-white/80 leading-relaxed">Trouvez rapidement les opportunités qui correspondent à votre profil grâce à notre intelligence artificielle</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5 lg:gap-6 max-w-5xl mx-auto mb-10 sm:mb-12">
+            <div className="text-center p-5 sm:p-6 lg:p-8 rounded-xl bg-white/10 border border-white/20 hover:bg-white/15 hover:shadow-2xl hover:scale-105 transition-all duration-300 backdrop-blur-sm">
+              <TrendingUp className="w-9 sm:w-10 lg:w-12 h-9 sm:h-10 lg:h-12 mx-auto mb-2 sm:mb-3 lg:mb-4 text-white" />
+              <h3 className="text-base sm:text-lg lg:text-xl font-bold mb-2 sm:mb-2.5 lg:mb-3 text-white">Recherche optimisée par IA</h3>
+              <p className="text-xs sm:text-sm lg:text-base text-white/80 leading-relaxed">Trouvez rapidement les opportunités qui correspondent à votre profil grâce à notre intelligence artificielle</p>
             </div>
-            <div className="text-center p-6 sm:p-8 rounded-xl bg-white/10 border border-white/20 hover:bg-white/15 hover:shadow-2xl hover:scale-105 transition-all duration-300 backdrop-blur-sm">
-              <Shield className="w-10 sm:w-12 h-10 sm:h-12 mx-auto mb-3 sm:mb-4 text-white" />
-              <h3 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3 text-white">Paiements sécurisés</h3>
-              <p className="text-sm sm:text-base text-white/80 leading-relaxed">Abonnements et achats protégés par une infrastructure de paiement certifiée et conforme aux normes bancaires</p>
+            <div className="text-center p-5 sm:p-6 lg:p-8 rounded-xl bg-white/10 border border-white/20 hover:bg-white/15 hover:shadow-2xl hover:scale-105 transition-all duration-300 backdrop-blur-sm">
+              <Shield className="w-9 sm:w-10 lg:w-12 h-9 sm:h-10 lg:h-12 mx-auto mb-2 sm:mb-3 lg:mb-4 text-white" />
+              <h3 className="text-base sm:text-lg lg:text-xl font-bold mb-2 sm:mb-2.5 lg:mb-3 text-white">Paiements sécurisés</h3>
+              <p className="text-xs sm:text-sm lg:text-base text-white/80 leading-relaxed">Abonnements et achats protégés par une infrastructure de paiement certifiée et conforme aux normes bancaires</p>
             </div>
-            <div className="text-center p-6 sm:p-8 rounded-xl bg-white/10 border border-white/20 hover:bg-white/15 hover:shadow-2xl hover:scale-105 transition-all duration-300 backdrop-blur-sm">
-              <Clock className="w-10 sm:w-12 h-10 sm:h-12 mx-auto mb-3 sm:mb-4 text-white" />
-              <h3 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3 text-white">Interface simplifiée</h3>
-              <p className="text-sm sm:text-base text-white/80 leading-relaxed">Navigation intuitive et gestion facile de vos annonces grâce à notre technologie avancée</p>
+            <div className="text-center p-5 sm:p-6 lg:p-8 rounded-xl bg-white/10 border border-white/20 hover:bg-white/15 hover:shadow-2xl hover:scale-105 transition-all duration-300 backdrop-blur-sm">
+              <Clock className="w-9 sm:w-10 lg:w-12 h-9 sm:h-10 lg:h-12 mx-auto mb-2 sm:mb-3 lg:mb-4 text-white" />
+              <h3 className="text-base sm:text-lg lg:text-xl font-bold mb-2 sm:mb-2.5 lg:mb-3 text-white">Interface simplifiée</h3>
+              <p className="text-xs sm:text-sm lg:text-base text-white/80 leading-relaxed">Navigation intuitive et gestion facile de vos annonces grâce à notre technologie avancée</p>
             </div>
           </div>
           
