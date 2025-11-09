@@ -7,29 +7,23 @@ Disallow: /dashboard/
 Disallow: /messages
 Disallow: /auth
 
-# High-value pages for AI crawlers (GEO optimization)
+# High-value pages
 Allow: /marche
 Allow: /ressources
 Allow: /faq
 Allow: /blog
-Allow: /entreprises
-Allow: /entreprises-a-vendre-montreal
-Allow: /entreprises-a-vendre-quebec
+Allow: /businesses
+Allow: /city/*
 
-# Crawl-delay for polite crawlers
-Crawl-delay: 0
-
-# Sitemap location
+# Sitemap location - UPDATED FOR LOVABLE CLOUD
 Sitemap: https://vente.club/sitemap.xml
 
 # Specific bot rules
 User-agent: Googlebot
 Allow: /
-Crawl-delay: 0
 
 User-agent: Bingbot
 Allow: /
-Crawl-delay: 0
 
 User-agent: Twitterbot
 Allow: /
