@@ -133,9 +133,12 @@ export const FloatingOpportunities = () => {
 
         {/* Floating Badge */}
         <div 
-          className="absolute -right-2 top-8 bg-white/95 backdrop-blur-xl border border-white/40 rounded-lg px-3 py-1.5 shadow-xl"
+          className="absolute -right-2 top-12 bg-white/95 backdrop-blur-xl border border-white/40 rounded-lg px-3 py-1.5 shadow-xl"
           style={{ animation: "float 6s ease-in-out infinite", willChange: "transform" }}
         >
+          {/* Notification indicator */}
+          <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white animate-pulse" />
+          
           <div className="text-[10px] text-slate-600 font-medium">Nouvelles offres</div>
           <div className={`font-bold text-indigo-600 text-sm transition-all duration-300 ${badgeBounce ? 'animate-bounce-subtle' : ''}`}>
             +{8 + (currentIndex * 2)}
