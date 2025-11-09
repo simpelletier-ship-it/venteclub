@@ -1571,6 +1571,7 @@ const ListBusiness = () => {
                       type="button" 
                       onClick={(e) => handleSubmit(e, false)} 
                       disabled={loading || !termsAccepted} 
+                      variant="publish"
                       className="flex-1"
                     >
                       {loading ? "Publication..." : "Publier l'annonce"}

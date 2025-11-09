@@ -461,6 +461,7 @@ const Dashboard = () => {
                                 }
                               }}
                               size="sm"
+                              variant="publish"
                               className="w-full"
                             >
                               Publier l'annonce

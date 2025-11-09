@@ -33,6 +33,10 @@ export default {
           DEFAULT: "hsl(var(--secondary))",
           foreground: "hsl(var(--secondary-foreground))",
         },
+        publish: {
+          DEFAULT: "hsl(var(--publish))",
+          foreground: "hsl(var(--publish-foreground))",
+        },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
           foreground: "hsl(var(--destructive-foreground))",

@@ -28,6 +28,10 @@ All colors MUST be HSL.
     --secondary: 244 60% 55%;
     --secondary-foreground: 0 0% 100%;
     
+    /* Publish: Mauve très foncé pour boutons de publication */
+    --publish: 244 60% 35%;
+    --publish-foreground: 0 0% 100%;
+    
     /* Success: Vert pour revenus */
     --success: 158 100% 36%;
     --success-foreground: 0 0% 100%;
@@ -104,6 +108,9 @@ All colors MUST be HSL.
     
     --secondary: 244 60% 60%;
     --secondary-foreground: 0 0% 100%;
+    
+    --publish: 244 60% 40%;
+    --publish-foreground: 0 0% 100%;
     
     --success: 158 100% 42%;
     --success-foreground: 0 0% 100%;

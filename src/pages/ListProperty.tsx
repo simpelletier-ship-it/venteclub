@@ -788,7 +788,8 @@ const ListProperty = () => {
           <Button
             type="submit"
             size="lg"
-            className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground"
+            variant="publish"
+            className="w-full"
             disabled={loading}
           >
             {loading ? "Publication en cours..." : editingBusinessId ? "Enregistrer les modifications" : "Publier l'annonce"}

@@ -1226,7 +1226,7 @@ const Admin = () => {
                     </div>
 
                     <div className="flex gap-3 pt-4 border-t">
-                      <Button onClick={handlePublishImportedListing} className="flex-1">
+                      <Button onClick={handlePublishImportedListing} variant="publish" className="flex-1">
                         Publier l'annonce
                       </Button>
                       <Button
