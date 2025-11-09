@@ -42,6 +42,12 @@ const Auth = () => {
     lastName: string;
   } | null>(null);
 
+  // États pour le 2FA lors de la connexion
+  const [show2FAPrompt, setShow2FAPrompt] = useState(false);
+  const [twoFactorCode, setTwoFactorCode] = useState("");
+  const [mfaFactorId, setMfaFactorId] = useState<string | null>(null);
+  const [mfaChallengeId, setMfaChallengeId] = useState<string | null>(null);
+
   useEffect(() => {
     // Vérifier la session existante
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -110,6 +116,30 @@ const Auth = () => {
         return;
       }
 
+      // Vérifier si 2FA est activé pour cet utilisateur
+      if (data.user) {
+        const { data: factors } = await supabase.auth.mfa.listFactors();
+        const totpFactor = factors?.totp?.find(f => f.status === 'verified');
+        
+        if (totpFactor) {
+          // 2FA est activé, créer un challenge
+          const { data: challengeData, error: challengeError } = await supabase.auth.mfa.challenge({
+            factorId: totpFactor.id,
+          });
+
+          if (challengeError) {
+            throw challengeError;
+          }
+
+          // Sauvegarder les IDs pour la vérification
+          setMfaFactorId(totpFactor.id);
+          setMfaChallengeId(challengeData.id);
+          setShow2FAPrompt(true);
+          setLoading(false);
+          return;
+        }
+      }
+
       toast({
         title: "Connexion réussie !",
         description: "Bienvenue sur Vente.Club",
@@ -120,6 +150,61 @@ const Auth = () => {
         variant: "destructive",
         title: "Erreur",
         description: translateAuthError(error.message) || "Une erreur est survenue lors de la connexion.",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerify2FA = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!twoFactorCode || twoFactorCode.length !== 6) {
+      toast({
+        variant: "destructive",
+        title: "Code invalide",
+        description: "Veuillez entrer un code à 6 chiffres.",
+      });
+      return;
+    }
+
+    if (!mfaFactorId || !mfaChallengeId) {
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: "Session expirée. Veuillez vous reconnecter.",
+      });
+      setShow2FAPrompt(false);
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const { error } = await supabase.auth.mfa.verify({
+        factorId: mfaFactorId,
+        challengeId: mfaChallengeId,
+        code: twoFactorCode,
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Connexion réussie !",
+        description: "Authentification à deux facteurs validée.",
+      });
+      
+      setShow2FAPrompt(false);
+      setTwoFactorCode("");
+      setMfaFactorId(null);
+      setMfaChallengeId(null);
+      
+      navigate("/");
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Code incorrect",
+        description: "Le code d'authentification est invalide. Vérifiez votre application d'authentification.",
       });
     } finally {
       setLoading(false);
@@ -468,7 +553,59 @@ const Auth = () => {
                   </Alert>
                 )}
                 
-                <form onSubmit={handleSignIn} className="space-y-4">
+                {show2FAPrompt ? (
+                  <form onSubmit={handleVerify2FA} className="space-y-4">
+                    <div className="text-center mb-4">
+                      <h3 className="text-lg font-semibold">Authentification à deux facteurs</h3>
+                      <p className="text-sm text-muted-foreground mt-2">
+                        Entrez le code à 6 chiffres de votre application d'authentification
+                      </p>
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="2fa-code">Code d'authentification</Label>
+                      <Input
+                        id="2fa-code"
+                        type="text"
+                        maxLength={6}
+                        placeholder="000000"
+                        value={twoFactorCode}
+                        onChange={(e) => setTwoFactorCode(e.target.value.replace(/\D/g, ''))}
+                        required
+                        className="w-full mt-2 text-center text-2xl tracking-widest"
+                        autoFocus
+                      />
+                      <p className="text-xs text-muted-foreground text-center mt-2">
+                        Code à 6 chiffres
+                      </p>
+                    </div>
+                    
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => {
+                          setShow2FAPrompt(false);
+                          setTwoFactorCode("");
+                          setMfaFactorId(null);
+                          setMfaChallengeId(null);
+                        }}
+                        className="flex-1"
+                      >
+                        Annuler
+                      </Button>
+                      <Button 
+                        type="submit" 
+                        disabled={loading || twoFactorCode.length !== 6} 
+                        className="flex-1"
+                        variant="secondary"
+                      >
+                        {loading ? "Vérification..." : "Vérifier"}
+                      </Button>
+                    </div>
+                  </form>
+                ) : (
+                  <form onSubmit={handleSignIn} className="space-y-4">
                   <div>
                     <Label htmlFor="login-email">Email</Label>
                     <Input
@@ -550,6 +687,7 @@ const Auth = () => {
                     Google
                   </Button>
                 </form>
+                )}
               </TabsContent>
               
               <TabsContent value="signup">
