@@ -84,7 +84,16 @@ export const RichTextEditor = ({
   }, [content, editor]);
 
   if (!editor) {
-    return null;
+    return (
+      <div className="relative border border-input rounded-lg overflow-hidden bg-background">
+        <div className="border border-input rounded-t-lg bg-muted/30 p-2 h-12 animate-pulse" />
+        <div className="min-h-[300px] p-4 animate-pulse">
+          <div className="h-4 bg-muted rounded w-3/4 mb-4" />
+          <div className="h-4 bg-muted rounded w-1/2 mb-4" />
+          <div className="h-4 bg-muted rounded w-2/3" />
+        </div>
+      </div>
+    );
   }
 
   return (
