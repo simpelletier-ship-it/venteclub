@@ -49,24 +49,30 @@ Deno.serve(async (req) => {
     // Use Lovable AI to extract structured data from the HTML
     console.log('[IMPORT-LISTING] Using AI to extract business data');
     
-    const prompt = `You are extracting business listing data from HTML. Extract ALL available information thoroughly.
+    const prompt = `You are extracting business listing data from HTML of a business for sale listing page.
 
-EXTRACTION RULES:
-1. Title: Look for <h1>, <title>, meta tags, or main heading with business name
-2. Price/Asking Price: Look for "$", "CAD", "USD", "price", "Prix demandé", numbers like "450,000" or "450000"
-3. Description: Look for paragraphs, article content, meta description - extract the FULL description
-4. Revenue: Look for "Revenue", "Revenu", "Chiffre d'affaires", "Sales" + numbers
-5. Location: Look for city names, addresses, "Location", "Ville", "Emplacement"
-6. Industry: Classify based on keywords (restaurant, salon, garage, etc.)
-7. Employees: Look for "employees", "employés", "staff", "personnel" count
-8. Year Established: Look for "established", "fondé", "depuis", "opened", 4-digit years
-9. Profit/BAIIA: Look for "profit", "EBITDA", "BAIIA", "earnings"
-10. Reason for Sale: Look for "reason", "raison de vente", "why selling", "motivation"
-11. Financing: Look for "financing", "financement", "payment terms", "vendor take-back"
-12. Images: Extract ALL image URLs from <img> tags with src attributes
-13. Square Footage: Look for "sq ft", "pi²", "superficie", "surface"
-14. Inventory: Look for "inventory", "stock", "inventaire"
-15. Lease: Look for "lease", "bail", "rent"
+CRITICAL INSTRUCTIONS:
+- IGNORE website navigation, headers, footers, sidebars, and other listings
+- FOCUS ONLY on the main business listing content displayed on this specific page
+- DO NOT extract site-wide metadata (site title, site description, etc.)
+- Extract information from the LISTING CONTENT (article body, listing details section)
+
+EXTRACTION RULES - Look in the MAIN CONTENT AREA only:
+1. Title: The business name from the listing (NOT the website name). Look in <h1>, main article heading, listing title
+2. Price/Asking Price: The specific asking price for THIS business - look for "$", "CAD", "USD", "price", "Prix demandé"
+3. Description: The FULL business description from the listing content (NOT meta description or site description)
+4. Revenue: Annual revenue from listing details - "Revenue", "Revenu", "Chiffre d'affaires", "Sales"
+5. Location: City/address from listing - "Location", "Ville", "Emplacement", address fields
+6. Industry: Business type/category from listing content
+7. Employees: Employee count from listing details
+8. Year Established: Foundation year from listing - "established", "fondé", "depuis", "opened"
+9. Profit/BAIIA: Profit metrics from financial details - "profit", "EBITDA", "BAIIA"
+10. Reason for Sale: Why selling from listing - "reason", "raison de vente"
+11. Financing: Financing options from listing - "financing", "financement", "payment terms"
+12. Images: Business photos from the LISTING GALLERY (not site logos/banners)
+13. Square Footage: Property size from listing specs - "sq ft", "pi²", "superficie"
+14. Inventory: Inventory value from listing - "inventory", "stock", "inventaire"
+15. Lease: Lease terms from listing - "lease", "bail", "rent"
 
 HTML TO ANALYZE:
 ${html}
@@ -178,7 +184,7 @@ BE EXTREMELY THOROUGH - extract ALL available information including images. Retu
       financing_available: extractedData.financing_available || null,
       lease_details: extractedData.lease_details || null,
       inventory_value: extractedData.inventory_value || null,
-      image_urls: Array.isArray(extractedData.image_urls) ? extractedData.image_urls.filter(url => 
+      image_urls: Array.isArray(extractedData.image_urls) ? extractedData.image_urls.filter((url: string) => 
         url && url.startsWith('http') && !url.includes('logo') && !url.includes('icon')
       ).slice(0, 10) : [],
       source_url: url
