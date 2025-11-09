@@ -323,15 +323,6 @@ const ListProperty = () => {
       return;
     }
 
-    if (formData.description.length > 5000) {
-      toast({
-        variant: "destructive",
-        title: "Description trop longue",
-        description: "La description ne peut pas dépasser 5000 caractères.",
-      });
-      return;
-    }
-
     setLoading(true);
 
     try {
@@ -497,10 +488,9 @@ const ListProperty = () => {
                 rows={6}
                 required
                 minLength={50}
-                maxLength={5000}
               />
               <p className="text-xs text-muted-foreground">
-                {formData.description.length}/5000 caractères (minimum 50)
+                {formData.description.length} caractères (minimum 50)
               </p>
               <Button
                 type="button"

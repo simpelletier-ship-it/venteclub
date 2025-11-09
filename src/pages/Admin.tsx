@@ -439,7 +439,7 @@ const Admin = () => {
 
   const editBusinessSchema = z.object({
     title: z.string().trim().min(5, "Le titre doit contenir au moins 5 caractères").max(200, "Le titre doit contenir maximum 200 caractères"),
-    description: z.string().trim().min(20, "La description doit contenir au moins 20 caractères").max(5000, "La description doit contenir maximum 5000 caractères"),
+    description: z.string().trim().min(20, "La description doit contenir au moins 20 caractères"),
     asking_price: z.string().regex(/^\d+(\.\d{1,2})?$/, "Prix invalide"),
     annual_revenue: z.string().optional(),
     profit_margin: z.string().optional(),
