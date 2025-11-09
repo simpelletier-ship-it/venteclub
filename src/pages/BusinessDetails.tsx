@@ -52,6 +52,7 @@ const BusinessDetails = () => {
   const [isUnlockingChat, setIsUnlockingChat] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [imageZoom, setImageZoom] = useState(1);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     const initialize = async () => {
@@ -91,6 +92,13 @@ const BusinessDetails = () => {
         
         console.log('[INIT] Checking if user is seller');
         setIsSeller(session.user.id === businessData.seller_id);
+        
+        console.log('[INIT] Checking if user is admin');
+        const { data: hasAdminRole } = await supabase.rpc('has_role', {
+          _user_id: session.user.id,
+          _role: 'admin'
+        });
+        setIsAdmin(hasAdminRole || false);
         
         console.log('[INIT] Checking if chat is unlocked');
         await checkChatUnlocked(session.user.id, businessData.id);
@@ -1676,6 +1684,28 @@ const BusinessDetails = () => {
                         </a>
                       </div>
                     )}
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Source URL visible only for admins */}
+              {isAdmin && business.source_url && (
+                <Card className="border-muted bg-muted/20">
+                  <CardHeader>
+                    <CardTitle className="text-sm flex items-center gap-2">
+                      <Globe className="w-4 h-4 text-muted-foreground" />
+                      Lien source (Admin)
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <a 
+                      href={business.source_url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-sm text-primary hover:underline break-all"
+                    >
+                      {business.source_url}
+                    </a>
                   </CardContent>
                 </Card>
               )}
