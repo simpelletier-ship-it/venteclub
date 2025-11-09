@@ -1694,7 +1694,7 @@ const BusinessDetails = () => {
                   <CardHeader>
                     <CardTitle className="text-sm flex items-center gap-2">
                       <Globe className="w-4 h-4 text-muted-foreground" />
-                      Lien source (Admin)
+                      Lien source
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
