@@ -226,7 +226,7 @@ const BusinessCard = ({
               <OptimizedImage
                 src={allImages[currentImageIndex]}
                 alt={title}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain bg-muted"
                 aspectRatio="16/9"
               />
               

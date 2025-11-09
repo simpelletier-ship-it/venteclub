@@ -77,7 +77,7 @@ export const PremiumPhotoGallery = ({ photos, businessTitle, businessIndustry, b
           <img
             src={uniquePhotos[currentIndex].photo_url}
             alt={`Photo ${currentIndex + 1} de ${businessTitle} - ${businessIndustry} à ${businessCity}`}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-contain bg-slate-950"
           />
           
           {/* Overlay gradient subtil */}
