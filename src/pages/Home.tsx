@@ -12,6 +12,7 @@ import { useScrollParallax } from "@/hooks/useScrollParallax";
 import { FloatingOpportunities } from "@/components/FloatingOpportunities";
 import { CircuitBackground } from "@/components/CircuitBackground";
 import { useCountUp } from "@/hooks/useCountUp";
+import { trackPageView } from "@/lib/googleAds";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -35,6 +36,9 @@ const Home = () => {
   useEffect(() => {
     fetchFeaturedBusinesses();
     fetchStats();
+    
+    // Envoyer événement de page vue à Google Ads
+    trackPageView();
   }, []);
 
   useEffect(() => {
