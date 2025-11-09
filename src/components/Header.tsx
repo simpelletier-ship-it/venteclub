@@ -133,7 +133,7 @@ const Header = () => {
             className="flex items-center cursor-pointer group" 
             onClick={() => navigate("/")}
           >
-            <span className="text-3xl sm:text-4xl md:text-5xl font-display font-bold text-foreground transition-transform group-hover:scale-105">
+            <span className="text-xl sm:text-2xl md:text-3xl font-display font-bold text-foreground transition-transform group-hover:scale-105">
               Vente<span className="text-secondary">.Club</span>
             </span>
           </div>
