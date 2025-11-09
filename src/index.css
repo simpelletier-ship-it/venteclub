@@ -331,4 +331,74 @@ All colors MUST be HSL.
   .slider-blue .bg-accent {
     @apply bg-blue-600;
   }
+
+  /* TipTap Editor Styles */
+  .ProseMirror {
+    outline: none;
+  }
+
+  .ProseMirror p.is-editor-empty:first-child::before {
+    color: hsl(var(--muted-foreground));
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    pointer-events: none;
+  }
+
+  .ProseMirror img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+    margin: 1rem 0;
+  }
+
+  .ProseMirror a {
+    color: hsl(var(--primary));
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  .ProseMirror blockquote {
+    border-left: 4px solid hsl(var(--primary));
+    padding-left: 1rem;
+    margin: 1rem 0;
+    font-style: italic;
+  }
+
+  .ProseMirror code {
+    background-color: hsl(var(--muted));
+    padding: 0.125rem 0.25rem;
+    border-radius: 0.25rem;
+    font-family: 'Courier New', monospace;
+  }
+
+  .ProseMirror pre {
+    background-color: hsl(var(--muted));
+    padding: 1rem;
+    border-radius: 0.5rem;
+    overflow-x: auto;
+  }
+
+  .ProseMirror ul,
+  .ProseMirror ol {
+    padding-left: 1.5rem;
+  }
+
+  .ProseMirror h1 {
+    font-size: 2rem;
+    font-weight: bold;
+    margin: 1.5rem 0 1rem;
+  }
+
+  .ProseMirror h2 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 1.25rem 0 0.75rem;
+  }
+
+  .ProseMirror h3 {
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin: 1rem 0 0.5rem;
+  }
 }

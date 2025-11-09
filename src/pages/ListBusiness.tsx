@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, X, FileText, TrendingUp, DollarSign, Info, Sparkles, Check, ChevronsUpDown } from "lucide-react";
+import { Upload, X, FileText, TrendingUp, DollarSign, Info, Sparkles, Check, ChevronsUpDown, Eye, Edit } from "lucide-react";
 import { businessSchema } from "@/lib/validations";
 import { TermsDialog } from "@/components/TermsDialog";
 import { PhotoManager } from "@/components/PhotoManager";
@@ -16,6 +16,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useAutosaveDraft } from "@/hooks/useAutosaveDraft";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
+import { RichTextEditor } from "@/components/RichTextEditor";
 import {
   Command,
   CommandEmpty,
@@ -115,6 +116,7 @@ const ListBusiness = () => {
   const [citySearchOpen, setCitySearchOpen] = useState(false);
   const [citySearchValue, setCitySearchValue] = useState("");
   const [priceNegotiable, setPriceNegotiable] = useState(false);
+  const [showDescriptionPreview, setShowDescriptionPreview] = useState(false);
 
   // Autosave draft hook
   const { loadDraft, deleteDraft } = useAutosaveDraft({
@@ -896,59 +898,87 @@ const ListBusiness = () => {
                     </div>
 
                     <div>
-                      <Label htmlFor="description">
-                        Description <span className="text-destructive">*</span>
-                      </Label>
-                      <div className="space-y-2">
-                        <Textarea
-                          id="description"
-                          value={formData.description}
-                          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                          required
-                          rows={8}
-                          placeholder="Décrivez votre entreprise en détail..."
-                          className="resize-y min-h-[200px]"
-                        />
-                        {formData.description && formData.industry && (
+                      <div className="flex items-center justify-between mb-2">
+                        <Label htmlFor="description">
+                          Description <span className="text-destructive">*</span>
+                        </Label>
+                        <div className="flex gap-2">
                           <Button
                             type="button"
                             variant="outline"
                             size="sm"
-                            onClick={async () => {
-                              setLoading(true);
-                              try {
-                                const { data, error } = await supabase.functions.invoke('improve-description', {
-                                  body: {
-                                    description: formData.description,
-                                    title: formData.title,
-                                    industry: formData.industry
-                                  }
-                                });
-
-                                if (error) throw error;
-
-                                if (data?.improvedDescription) {
-                                  setFormData({ ...formData, description: data.improvedDescription });
-                                  toast({
-                                    title: "Description améliorée !",
-                                    description: "Votre description a été reformulée avec succès.",
-                                  });
-                                }
-                              } catch (error: any) {
-                                toast({
-                                  variant: "destructive",
-                                  title: "Erreur",
-                                  description: error.message || "Impossible d'améliorer la description",
-                                });
-                              } finally {
-                                setLoading(false);
-                              }
-                            }}
-                            disabled={loading}
+                            onClick={() => setShowDescriptionPreview(!showDescriptionPreview)}
                           >
-                            <Sparkles className="w-4 h-4 mr-2" />
-                            Améliorer avec l'IA
+                            {showDescriptionPreview ? (
+                              <>
+                                <Edit className="w-4 h-4 mr-2" />
+                                Éditer
+                              </>
+                            ) : (
+                              <>
+                                <Eye className="w-4 h-4 mr-2" />
+                                Aperçu
+                              </>
+                            )}
                           </Button>
+                          {formData.description && formData.industry && !showDescriptionPreview && (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={async () => {
+                                setLoading(true);
+                                try {
+                                  const { data, error } = await supabase.functions.invoke('improve-description', {
+                                    body: {
+                                      description: formData.description,
+                                      title: formData.title,
+                                      industry: formData.industry
+                                    }
+                                  });
+
+                                  if (error) throw error;
+
+                                  if (data?.improvedDescription) {
+                                    setFormData({ ...formData, description: data.improvedDescription });
+                                    toast({
+                                      title: "Description améliorée !",
+                                      description: "Votre description a été reformulée avec succès.",
+                                    });
+                                  }
+                                } catch (error: any) {
+                                  toast({
+                                    variant: "destructive",
+                                    title: "Erreur",
+                                    description: error.message || "Impossible d'améliorer la description",
+                                  });
+                                } finally {
+                                  setLoading(false);
+                                }
+                              }}
+                              disabled={loading}
+                            >
+                              <Sparkles className="w-4 h-4 mr-2" />
+                              Améliorer avec l'IA
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        {showDescriptionPreview ? (
+                          <div className="border border-input rounded-lg p-4 min-h-[300px] bg-muted/30">
+                            <div 
+                              className="prose prose-sm max-w-none"
+                              dangerouslySetInnerHTML={{ __html: formData.description || "<p class='text-muted-foreground'>Aucune description pour le moment</p>" }}
+                            />
+                          </div>
+                        ) : (
+                          <RichTextEditor
+                            content={formData.description}
+                            onChange={(content) => setFormData({ ...formData, description: content })}
+                            placeholder="Décrivez votre entreprise en détail : historique, activités, équipements, clientèle, avantages concurrentiels..."
+                            className="min-h-[300px]"
+                          />
                         )}
                       </div>
                     </div>
