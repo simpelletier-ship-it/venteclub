@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getAvatarUrl } from "@/lib/avatarUtils";
-import { Heart, LayoutDashboard, Settings, LogOut, Menu, Sparkles, MessageSquare, ShoppingBag, Building2, Store } from "lucide-react";
+import { LayoutDashboard, Settings, LogOut, Menu, Sparkles } from "lucide-react";
 import { NotificationBell } from "./NotificationBell";
 
 const Header = () => {
@@ -143,9 +143,8 @@ const Header = () => {
             {/* Lien Acheter une entreprise */}
             <button 
               onClick={() => navigate("/entreprises")} 
-              className="text-muted-foreground hover:text-foreground transition-colors font-semibold text-base lg:text-lg relative group flex items-center gap-2"
+              className="text-muted-foreground hover:text-foreground transition-colors font-semibold text-base lg:text-lg relative group"
             >
-              <ShoppingBag className="w-5 h-5" />
               Acheter une entreprise
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full" />
             </button>
@@ -153,9 +152,8 @@ const Header = () => {
             {/* Lien Vendre une entreprise */}
             <button 
               onClick={() => navigate("/sell")} 
-              className="text-muted-foreground hover:text-foreground transition-colors font-semibold text-base lg:text-lg relative group flex items-center gap-2"
+              className="text-muted-foreground hover:text-foreground transition-colors font-semibold text-base lg:text-lg relative group"
             >
-              <Store className="w-5 h-5" />
               Vendre une entreprise
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full" />
             </button>
@@ -163,9 +161,8 @@ const Header = () => {
             {/* Lien Immobilier commercial */}
             <button 
               onClick={() => navigate("/immeubles-commerciaux")} 
-              className="text-muted-foreground hover:text-foreground transition-colors font-semibold text-base lg:text-lg relative group flex items-center gap-2"
+              className="text-muted-foreground hover:text-foreground transition-colors font-semibold text-base lg:text-lg relative group"
             >
-              <Building2 className="w-5 h-5" />
               Immobilier commercial
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full" />
             </button>
@@ -184,24 +181,22 @@ const Header = () => {
               <>
                 <button 
                   onClick={() => navigate("/messages")} 
-                  className="text-muted-foreground hover:text-foreground transition-colors font-semibold text-base lg:text-lg flex items-center gap-2 relative group"
+                  className="text-muted-foreground hover:text-foreground transition-colors font-semibold text-base lg:text-lg relative group"
                 >
-                  <div className="relative">
-                    <MessageSquare className="w-5 h-5" />
+                  <div className="relative inline-block">
+                    Messagerie
                     {unreadMessagesCount > 0 && (
                       <span className="absolute -top-2 -right-2 h-5 w-5 rounded-full bg-red-500 text-white text-[11px] flex items-center justify-center font-bold">
                         {unreadMessagesCount > 9 ? '9+' : unreadMessagesCount}
                       </span>
                     )}
                   </div>
-                  Messagerie
                   <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full" />
                 </button>
                 <button 
                   onClick={() => navigate("/favorites")} 
-                  className="text-muted-foreground hover:text-foreground transition-colors font-semibold text-base lg:text-lg flex items-center gap-2 relative group"
+                  className="text-muted-foreground hover:text-foreground transition-colors font-semibold text-base lg:text-lg relative group"
                 >
-                  <Heart className="w-5 h-5" />
                   Favoris
                   <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full" />
                 </button>
@@ -332,9 +327,8 @@ const Header = () => {
                 navigate("/entreprises");
                 setMobileMenuOpen(false);
               }}
-              className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors flex items-center gap-2"
+              className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors"
             >
-              <ShoppingBag className="w-4 h-4" />
               Acheter une entreprise
             </button>
             <button
@@ -342,9 +336,8 @@ const Header = () => {
                 navigate("/sell");
                 setMobileMenuOpen(false);
               }}
-              className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors flex items-center gap-2"
+              className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors"
             >
-              <Store className="w-4 h-4" />
               Vendre une entreprise
             </button>
             <button
@@ -352,9 +345,8 @@ const Header = () => {
                 navigate("/immeubles-commerciaux");
                 setMobileMenuOpen(false);
               }}
-              className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors flex items-center gap-2"
+              className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors"
             >
-              <Building2 className="w-4 h-4" />
               Immobilier commercial
             </button>
             {!user && (
@@ -394,26 +386,24 @@ const Header = () => {
                     navigate("/messages");
                     setMobileMenuOpen(false);
                   }}
-                  className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors flex items-center gap-2"
+                  className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors"
                 >
-                  <div className="relative">
-                    <MessageSquare className="w-4 h-4" />
+                  <div className="relative inline-block">
+                    Messagerie
                     {unreadMessagesCount > 0 && (
-                      <span className="absolute -top-2 -right-2 h-4 w-4 rounded-full bg-red-500 text-white text-[10px] flex items-center justify-center font-bold">
+                      <span className="ml-2 h-4 w-4 rounded-full bg-red-500 text-white text-[10px] inline-flex items-center justify-center font-bold">
                         {unreadMessagesCount > 9 ? '9+' : unreadMessagesCount}
                       </span>
                     )}
                   </div>
-                  Messagerie
                 </button>
                 <button
                   onClick={() => {
                     navigate("/favorites");
                     setMobileMenuOpen(false);
                   }}
-                  className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors flex items-center gap-2"
+                  className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors"
                 >
-                  <Heart className="w-4 h-4" />
                   Favoris
                 </button>
               </>
