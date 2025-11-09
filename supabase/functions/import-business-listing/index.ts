@@ -49,30 +49,57 @@ Deno.serve(async (req) => {
     // Use Lovable AI to extract structured data from the HTML
     console.log('[IMPORT-LISTING] Using AI to extract business data');
     
-    const prompt = `You are extracting business listing data from HTML of a business for sale listing page.
+    const prompt = `You are a data extraction specialist. Extract ALL business listing information from this HTML page.
 
-CRITICAL INSTRUCTIONS:
-- IGNORE website navigation, headers, footers, sidebars, and other listings
-- FOCUS ONLY on the main business listing content displayed on this specific page
-- DO NOT extract site-wide metadata (site title, site description, etc.)
-- Extract information from the LISTING CONTENT (article body, listing details section)
+CRITICAL: This is a BUSINESS FOR SALE LISTING PAGE. Extract the business details being sold, NOT the website information.
 
-EXTRACTION RULES - Look in the MAIN CONTENT AREA only:
-1. Title: The business name from the listing (NOT the website name). Look in <h1>, main article heading, listing title
-2. Price/Asking Price: The specific asking price for THIS business - look for "$", "CAD", "USD", "price", "Prix demandé"
-3. Description: The FULL business description from the listing content (NOT meta description or site description)
-4. Revenue: Annual revenue from listing details - "Revenue", "Revenu", "Chiffre d'affaires", "Sales"
-5. Location: City/address from listing - "Location", "Ville", "Emplacement", address fields
-6. Industry: Business type/category from listing content
-7. Employees: Employee count from listing details
-8. Year Established: Foundation year from listing - "established", "fondé", "depuis", "opened"
-9. Profit/BAIIA: Profit metrics from financial details - "profit", "EBITDA", "BAIIA"
-10. Reason for Sale: Why selling from listing - "reason", "raison de vente"
-11. Financing: Financing options from listing - "financing", "financement", "payment terms"
-12. Images: Business photos from the LISTING GALLERY (not site logos/banners)
-13. Square Footage: Property size from listing specs - "sq ft", "pi²", "superficie"
-14. Inventory: Inventory value from listing - "inventory", "stock", "inventaire"
-15. Lease: Lease terms from listing - "lease", "bail", "rent"
+IMPORTANT EXTRACTION STRATEGY:
+1. Find the MAIN CONTENT area (usually <main>, <article>, div with class like "listing", "detail", "content", "business-info")
+2. IGNORE: navigation menus, headers, footers, sidebars, search bars, other listings
+3. Look for structured data in <script type="application/ld+json"> first
+4. Extract from visible content in the main listing area
+
+EXTRACTION CHECKLIST (return null if not found):
+
+BASIC INFO:
+- title: Business name from main heading (h1, h2 in listing area) - NOT website name
+- description: Full business description (all paragraphs in description section)
+- industry: Business category/type (restaurant, salon, garage, boutique, etc.)
+
+LOCATION:
+- address: Full street address if available
+- city: City name
+- province: Province/state
+- region: Region name
+- location: Combined "City, Province" format
+
+FINANCIAL DATA (numbers only, no currency symbols):
+- asking_price: Asking price / Prix demandé
+- asking_price_max: Maximum price if range given
+- annual_revenue: Annual revenue / Revenu annuel / Chiffre d'affaires
+- net_profit: Net profit / Profit net
+- baiia: EBITDA / BAIIA
+- profit_margin: Profit margin % (number only, e.g., 25 not 25%)
+- net_profit_margin: Net profit margin %
+- baiia_margin: BAIIA margin %
+- inventory_value: Inventory value / Valeur inventaire
+
+BUSINESS DETAILS:
+- employees_count: Number of employees / Nombre d'employés
+- year_established: Year founded / Année de fondation (4-digit year)
+- square_footage: Property size in sq ft or m²
+- lease_details: Lease information / Détails du bail
+- withdrawal_reason: Reason for selling / Raison de la vente
+- financing_available: Financing options / Options de financement
+
+IMAGES (VERY IMPORTANT):
+- image_urls: Extract ALL images from:
+  * Photo galleries (<div class="gallery">, <div class="photos">, etc.)
+  * Image carousels (<div class="carousel">, <div class="slider">, etc.)
+  * Main listing images (<img> tags within listing content)
+  * Look for: data-src, data-lazy-src, src attributes
+  * EXCLUDE: logos, icons, navigation images, profile pictures
+  * INCLUDE FULL URLs (if relative, prepend the domain)
 
 HTML TO ANALYZE:
 ${html}
@@ -121,7 +148,7 @@ BE EXTREMELY THOROUGH - extract ALL available information including images. Retu
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
+        model: 'google/gemini-2.5-pro',
         messages: [
           {
             role: 'user',
@@ -129,7 +156,7 @@ BE EXTREMELY THOROUGH - extract ALL available information including images. Retu
           }
         ],
         temperature: 0.1,
-        max_tokens: 2000
+        max_tokens: 4000
       })
     });
 
@@ -184,13 +211,33 @@ BE EXTREMELY THOROUGH - extract ALL available information including images. Retu
       financing_available: extractedData.financing_available || null,
       lease_details: extractedData.lease_details || null,
       inventory_value: extractedData.inventory_value || null,
-      image_urls: Array.isArray(extractedData.image_urls) ? extractedData.image_urls.filter((url: string) => 
-        url && url.startsWith('http') && !url.includes('logo') && !url.includes('icon')
-      ).slice(0, 10) : [],
+      image_urls: Array.isArray(extractedData.image_urls) ? extractedData.image_urls.filter((url: string) => {
+        if (!url || !url.startsWith('http')) return false;
+        const lowerUrl = url.toLowerCase();
+        // Exclude logos, icons, small images, navigation images
+        if (lowerUrl.includes('logo') || lowerUrl.includes('icon') || 
+            lowerUrl.includes('avatar') || lowerUrl.includes('profile') ||
+            lowerUrl.includes('banner') || lowerUrl.includes('header') ||
+            lowerUrl.includes('nav') || lowerUrl.includes('menu') ||
+            lowerUrl.includes('button') || lowerUrl.includes('badge')) {
+          return false;
+        }
+        return true;
+      }).slice(0, 15) : [],
       source_url: url
     };
 
     console.log('[IMPORT-LISTING] Found', businessData.image_urls.length, 'valid images');
+    console.log('[IMPORT-LISTING] Image URLs:', businessData.image_urls);
+    console.log('[IMPORT-LISTING] Business data:', {
+      title: businessData.title,
+      asking_price: businessData.asking_price,
+      city: businessData.city,
+      industry: businessData.industry,
+      employees_count: businessData.employees_count,
+      year_established: businessData.year_established,
+      description_length: businessData.description?.length || 0
+    });
 
     console.log('[IMPORT-LISTING] Import successful:', businessData.title);
 
