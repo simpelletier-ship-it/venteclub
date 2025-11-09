@@ -4,7 +4,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { DescriptionEditor } from "@/components/DescriptionEditor";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -901,9 +900,14 @@ const ListBusiness = () => {
                         Description <span className="text-destructive">*</span>
                       </Label>
                       <div className="space-y-2">
-                        <DescriptionEditor
+                        <Textarea
+                          id="description"
                           value={formData.description}
-                          onChange={(html) => setFormData({ ...formData, description: html })}
+                          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                          required
+                          rows={8}
+                          placeholder="Décrivez votre entreprise en détail..."
+                          className="resize-y min-h-[200px]"
                         />
                         {formData.description && formData.industry && (
                           <Button
