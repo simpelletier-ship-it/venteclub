@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Calendar, Clock, AlertCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { OptimizedImage } from "@/components/OptimizedImage";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import blogEvaluation from "@/assets/blog-evaluation-entreprise.jpg";
@@ -153,7 +154,7 @@ const BlogPost = () => {
 
       {/* Hero Image with Gradient Overlay */}
       <div className="relative w-full h-[400px] lg:h-[500px] overflow-hidden bg-muted">
-        <img
+        <OptimizedImage
           src={post.image}
           alt={post.title}
           className="w-full h-full object-cover"

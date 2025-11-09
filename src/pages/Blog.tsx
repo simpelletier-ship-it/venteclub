@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { OptimizedImage } from "@/components/OptimizedImage";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import blogEvaluation from "@/assets/blog-evaluation-entreprise.jpg";
@@ -169,10 +170,11 @@ const Blog = () => {
                   <article className="group">
                     <div className="grid md:grid-cols-2 gap-6 md:gap-8 items-center">
                       <div className="relative overflow-hidden rounded-lg aspect-[16/10] bg-muted">
-                        <img 
+                        <OptimizedImage 
                           src={blogPosts[0].image} 
                           alt={blogPosts[0].title}
                           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          aspectRatio="16/10"
                         />
                       </div>
                       <div className="space-y-4">
@@ -225,10 +227,11 @@ const Blog = () => {
                         >
                           <Card className="h-full overflow-hidden hover:shadow-lg transition-all duration-300 border">
                             <div className="relative overflow-hidden aspect-[16/10] bg-muted">
-                              <img 
+                              <OptimizedImage 
                                 src={post.image} 
                                 alt={post.title}
                                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                aspectRatio="16/10"
                               />
                             </div>
                             <CardContent className="p-5 space-y-3">
