@@ -69,19 +69,16 @@ export const RichTextEditor = ({
       },
     },
     onUpdate: ({ editor }) => {
-      const html = editor.getHTML();
-      if (html !== content) {
-        onChange(html);
-      }
+      onChange(editor.getHTML());
     },
-  });
+  }, []);
 
-  // Sync external content changes without creating infinite loops
   useEffect(() => {
-    if (editor && content !== undefined && content !== null) {
+    if (editor && content !== undefined) {
       const currentContent = editor.getHTML();
-      if (content !== currentContent) {
-        editor.commands.setContent(content || "", { emitUpdate: false });
+      // Only update if content is truly different to avoid loops
+      if (content !== currentContent && content !== null) {
+        editor.commands.setContent(content, { emitUpdate: false });
       }
     }
   }, [content, editor]);
