@@ -22,6 +22,7 @@ import { PriceHistory } from "@/components/PriceHistory";
 import { MakeOfferDialog } from "@/components/MakeOfferDialog";
 import { ConversationLimitAlert } from "@/components/ConversationLimitAlert";
 import { PremiumUpgradeModal } from "@/components/PremiumUpgradeModal";
+import { sanitizeHtml } from "@/lib/htmlUtils";
 
 const BusinessDetails = () => {
   const { slug } = useParams();
@@ -1022,7 +1023,7 @@ const BusinessDetails = () => {
                     <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-3">Description</h2>
                     <div 
                       className="text-slate-600 dark:text-slate-300 leading-relaxed text-base prose prose-slate dark:prose-invert max-w-none"
-                      dangerouslySetInnerHTML={{ __html: business.description }}
+                      dangerouslySetInnerHTML={{ __html: sanitizeHtml(business.description) }}
                     />
                   </div>
                   
