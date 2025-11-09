@@ -91,7 +91,7 @@ const BusinessCard = ({
   }, []);
 
   useEffect(() => {
-    if (!id || is_demo) {
+    if (!id) {
       setImageLoading(false);
       return;
     }
