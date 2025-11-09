@@ -159,29 +159,77 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/5">
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">
-                Tableau de bord
-              </h1>
-              <p className="text-muted-foreground">
-                Gérez et suivez vos annonces
-              </p>
+    <div className="min-h-screen bg-gradient-to-br from-background via-muted/10 to-background">
+      {/* Header moderne avec gradient */}
+      <div className="bg-gradient-to-r from-primary/95 via-primary to-primary/95 backdrop-blur-xl border-b border-primary/20 shadow-xl">
+        <div className="container mx-auto px-4 py-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="p-3 rounded-xl bg-white/10 backdrop-blur-sm">
+                <Building className="h-6 w-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-white mb-1">
+                  Tableau de bord
+                </h1>
+                <p className="text-sm text-white/80">
+                  Gérez vos {businesses.length} annonce{businesses.length > 1 ? 's' : ''}
+                </p>
+              </div>
             </div>
             <Button 
               onClick={() => navigate('/messages')} 
-              variant="outline"
-              className="gap-2"
+              className="bg-white/10 hover:bg-white/20 text-white border-white/20"
             >
-              <MessageSquare className="h-4 w-4" />
-              <span className="hidden sm:inline">Messagerie</span>
+              <MessageSquare className="h-4 w-4 mr-2" />
+              Messagerie
             </Button>
           </div>
+        </div>
+      </div>
 
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
+        {/* Stats Cards Modernes */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div className="bg-gradient-to-br from-green-500/10 to-green-500/5 border border-green-500/20 rounded-xl p-4 hover:shadow-lg transition-all">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 rounded-lg bg-green-500/10">
+                <CheckCircle className="h-5 w-5 text-green-600" />
+              </div>
+              <span className="text-2xl font-bold text-foreground">{stats.published}</span>
+            </div>
+            <p className="text-sm text-muted-foreground font-medium">Publiées</p>
+          </div>
+          
+          <div className="bg-gradient-to-br from-blue-500/10 to-blue-500/5 border border-blue-500/20 rounded-xl p-4 hover:shadow-lg transition-all">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 rounded-lg bg-blue-500/10">
+                <FileText className="h-5 w-5 text-blue-600" />
+              </div>
+              <span className="text-2xl font-bold text-foreground">{stats.draft}</span>
+            </div>
+            <p className="text-sm text-muted-foreground font-medium">Brouillons</p>
+          </div>
+          
+          <div className="bg-gradient-to-br from-yellow-500/10 to-yellow-500/5 border border-yellow-500/20 rounded-xl p-4 hover:shadow-lg transition-all">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 rounded-lg bg-yellow-500/10">
+                <Eye className="h-5 w-5 text-yellow-600" />
+              </div>
+              <span className="text-2xl font-bold text-foreground">{stats.approved}</span>
+            </div>
+            <p className="text-sm text-muted-foreground font-medium">Approuvées</p>
+          </div>
+          
+          <div className="bg-gradient-to-br from-purple-500/10 to-purple-500/5 border border-purple-500/20 rounded-xl p-4 hover:shadow-lg transition-all">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 rounded-lg bg-purple-500/10">
+                <TrendingUp className="h-5 w-5 text-purple-600" />
+              </div>
+              <span className="text-2xl font-bold text-foreground">{stats.sold}</span>
+            </div>
+            <p className="text-sm text-muted-foreground font-medium">Vendues</p>
+          </div>
         </div>
 
         <Tabs defaultValue={defaultTab} className="w-full">
