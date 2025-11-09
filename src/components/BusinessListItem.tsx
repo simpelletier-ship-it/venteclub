@@ -9,6 +9,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 import { formatPrice } from "@/lib/priceFormatter";
+import { stripHtml } from "@/lib/htmlUtils";
 
 interface BusinessListItemProps {
   id?: string;
@@ -229,7 +230,7 @@ const BusinessListItem = ({
           </div>
 
           <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 sm:line-clamp-1">
-            {description}
+            {stripHtml(description)}
           </p>
         </div>
 

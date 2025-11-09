@@ -13,6 +13,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 import { formatPrice } from "@/lib/priceFormatter";
+import { stripHtml } from "@/lib/htmlUtils";
 
 interface BusinessCardProps {
   id?: string;
@@ -416,9 +417,9 @@ const BusinessCard = ({
 
         <div>
           <p className={`text-muted-foreground text-sm leading-relaxed ${status === 'sold' ? 'blur-[1px]' : ''} ${showFullDescription ? '' : 'line-clamp-2'}`}>
-            {description}
+            {stripHtml(description)}
           </p>
-          {description.length > 120 && status !== 'sold' && (
+          {stripHtml(description).length > 120 && status !== 'sold' && (
             <button
               onClick={(e) => {
                 e.stopPropagation();

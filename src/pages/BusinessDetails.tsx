@@ -1020,9 +1020,10 @@ const BusinessDetails = () => {
                 <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-800 overflow-hidden">
                   <div className="p-8">
                     <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-3">Description</h2>
-                    <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-base">
-                      {business.description}
-                    </p>
+                    <div 
+                      className="text-slate-600 dark:text-slate-300 leading-relaxed text-base prose prose-slate dark:prose-invert max-w-none"
+                      dangerouslySetInnerHTML={{ __html: business.description }}
+                    />
                   </div>
                   
                   {/* Notice Démo */}
