@@ -191,18 +191,6 @@ const Header = () => {
             {user && (
               <>
                 <button 
-                  onClick={() => navigate("/messages")} 
-                  className={`flex items-center gap-2 px-3 py-2 rounded-lg border border-border/50 bg-accent/30 hover:bg-accent/50 transition-all duration-300 font-semibold relative group ${isScrolled ? 'text-xs h-8' : 'text-sm h-9'}`}
-                >
-                  <Mail className={`transition-all duration-300 ${isScrolled ? 'w-3 h-3' : 'w-4 h-4'}`} />
-                  <span>Messagerie</span>
-                  {unreadMessagesCount > 0 && (
-                    <span className="absolute -top-1.5 -right-1.5 h-5 w-5 rounded-full bg-destructive text-white text-[10px] flex items-center justify-center font-bold shadow-lg">
-                      {unreadMessagesCount > 9 ? '9+' : unreadMessagesCount}
-                    </span>
-                  )}
-                </button>
-                <button 
                   onClick={() => navigate("/favorites")} 
                   className={`text-muted-foreground hover:text-foreground transition-all duration-300 font-semibold relative group ${isScrolled ? 'text-xs' : 'text-sm'}`}
                 >
@@ -231,6 +219,18 @@ const Header = () => {
 
             {user ? (
               <>
+                <button 
+                  onClick={() => navigate("/messages")} 
+                  className={`hidden lg:flex items-center gap-2 px-3 py-2 rounded-lg border border-border/50 bg-accent/30 hover:bg-accent/50 transition-all duration-300 font-semibold relative ${isScrolled ? 'text-xs h-8' : 'text-sm h-9'}`}
+                >
+                  <Mail className={`transition-all duration-300 ${isScrolled ? 'w-3 h-3' : 'w-4 h-4'}`} />
+                  <span>Messagerie</span>
+                  {unreadMessagesCount > 0 && (
+                    <span className="absolute -top-1.5 -right-1.5 h-5 w-5 rounded-full bg-destructive text-white text-[10px] flex items-center justify-center font-bold shadow-lg">
+                      {unreadMessagesCount > 9 ? '9+' : unreadMessagesCount}
+                    </span>
+                  )}
+                </button>
                 <Button
                   onClick={() => navigate("/dashboard")}
                   className={`hidden lg:flex bg-[#6366f1] hover:bg-[#4f46e5] text-white font-semibold shadow-lg transition-all duration-300 ${isScrolled ? 'px-2 py-1.5 text-xs h-8' : 'px-3 py-2 text-sm h-9'}`}
