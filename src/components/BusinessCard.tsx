@@ -91,7 +91,7 @@ const BusinessCard = ({
   }, []);
 
   useEffect(() => {
-    if (!id) {
+    if (!id || is_demo) {
       setImageLoading(false);
       return;
     }
@@ -116,7 +116,7 @@ const BusinessCard = ({
     };
     
     fetchAllImages();
-  }, [id]);
+  }, [id, is_demo]);
 
   const handlePrevImage = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -180,7 +180,7 @@ const BusinessCard = ({
         
         {/* Image carousel */}
         <div className="relative w-full h-56 sm:h-64 overflow-hidden bg-muted group/image">
-          {!imageLoading && allImages.length > 0 && (
+          {!imageLoading && allImages.length > 0 && !is_demo && (
             <>
               <OptimizedImage
                 src={allImages[currentImageIndex]}
