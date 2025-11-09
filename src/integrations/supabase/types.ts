@@ -742,6 +742,8 @@ export type Database = {
           receiver_id: string
           reply_to_id: string | null
           sender_id: string
+          voice_duration: number | null
+          voice_url: string | null
         }
         Insert: {
           business_id: string
@@ -755,6 +757,8 @@ export type Database = {
           receiver_id: string
           reply_to_id?: string | null
           sender_id: string
+          voice_duration?: number | null
+          voice_url?: string | null
         }
         Update: {
           business_id?: string
@@ -768,6 +772,8 @@ export type Database = {
           receiver_id?: string
           reply_to_id?: string | null
           sender_id?: string
+          voice_duration?: number | null
+          voice_url?: string | null
         }
         Relationships: [
           {

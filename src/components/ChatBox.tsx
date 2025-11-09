@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { getAvatarUrl } from "@/lib/avatarUtils";
-import { Send, Paperclip, X, Download, FileText, Image as ImageIcon, ExternalLink, User, Crown, HandCoins } from "lucide-react";
+import { Send, Paperclip, X, Download, FileText, Image as ImageIcon, ExternalLink, User, Crown, HandCoins, Play, Pause } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { QuickMessageTemplates } from "@/components/QuickMessageTemplates";
@@ -18,6 +18,8 @@ import { TypingIndicator } from "@/components/TypingIndicator";
 import { OnlineStatus } from "@/components/OnlineStatus";
 import { useTypingIndicator } from "@/hooks/useTypingIndicator";
 import { usePresence } from "@/hooks/usePresence";
+import { VoiceRecorder } from "@/components/VoiceRecorder";
+import { usePushNotifications } from "@/hooks/usePushNotifications";
 
 interface Message {
   id: string;
@@ -30,6 +32,8 @@ interface Message {
   image_url?: string | null;
   reply_to_id?: string | null;
   reactions?: { [emoji: string]: string[] };
+  voice_url?: string | null;
+  voice_duration?: number | null;
 }
 
 interface MessageAttachment {
@@ -62,10 +66,16 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
   const [currentUserProfile, setCurrentUserProfile] = useState<any>(null);
   const [isSeller, setIsSeller] = useState(false);
   const [showPremiumDialog, setShowPremiumDialog] = useState(false);
+  const [showVoiceRecorder, setShowVoiceRecorder] = useState(false);
+  const [playingVoiceId, setPlayingVoiceId] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { permission, requestPermission, showNotification } = usePushNotifications();
+  const { startTyping, stopTyping } = useTypingIndicator(businessId, currentUserId);
+  usePresence(currentUserId, true);
 
   useEffect(() => {
     fetchMessages();
@@ -73,6 +83,11 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
     fetchSellerContact();
     fetchBusinessSlug();
     fetchCurrentUserProfile();
+    
+    // Demander la permission pour les notifications
+    if (permission === 'default') {
+      requestPermission();
+    }
     
     // Subscribe to realtime messages
     const channel = supabase
@@ -93,6 +108,21 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
             // Mark as read if current user is receiver
             if (newMsg.receiver_id === currentUserId) {
               markAsRead(newMsg.id);
+              
+              // Afficher une notification si l'onglet n'est pas actif
+              if (document.hidden) {
+                const notificationBody = newMsg.voice_url 
+                  ? '🎤 Message vocal'
+                  : newMsg.content || '📎 Fichier joint';
+                
+                showNotification(
+                  `Nouveau message de ${otherUserProfile?.full_name || otherUserName || 'Utilisateur'}`,
+                  {
+                    body: notificationBody,
+                    tag: `message-${newMsg.id}`,
+                  }
+                );
+              }
             }
           }
         }
@@ -102,7 +132,7 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [businessId, currentUserId, otherUserId]);
+  }, [businessId, currentUserId, otherUserId, permission, otherUserProfile]);
 
   const fetchBusinessSlug = async () => {
     const { data } = await supabase
@@ -220,7 +250,10 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
       return;
     }
 
-    setMessages(data || []);
+    setMessages((data || []).map(msg => ({
+      ...msg,
+      reactions: (msg.reactions as any) || {}
+    })));
 
     // Fetch attachments for all messages
     if (data && data.length > 0) {
@@ -419,6 +452,67 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
     }
   };
 
+  const handleVoiceSend = async (audioBlob: Blob, duration: number) => {
+    setLoading(true);
+    try {
+      const fileName = `${currentUserId}/${Date.now()}-voice.webm`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('message-attachments')
+        .upload(fileName, audioBlob, {
+          contentType: 'audio/webm',
+        });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('message-attachments')
+        .getPublicUrl(fileName);
+
+      const { error } = await supabase
+        .from('messages')
+        .insert({
+          business_id: businessId,
+          sender_id: currentUserId,
+          receiver_id: otherUserId,
+          content: '🎤 Message vocal',
+          voice_url: publicUrl,
+          voice_duration: duration,
+        });
+
+      if (error) throw error;
+
+      setShowVoiceRecorder(false);
+      toast({
+        title: "Message vocal envoyé",
+        description: "Votre message vocal a été envoyé avec succès.",
+      });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: error.message || "Impossible d'envoyer le message vocal",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const toggleVoicePlay = (voiceUrl: string, messageId: string) => {
+    if (playingVoiceId === messageId) {
+      audioRef.current?.pause();
+      setPlayingVoiceId(null);
+    } else {
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+      audioRef.current = new Audio(voiceUrl);
+      audioRef.current.play();
+      audioRef.current.onended = () => setPlayingVoiceId(null);
+      setPlayingVoiceId(messageId);
+    }
+  };
+
   const getInitials = (name?: string) => {
     if (!name) return <User className="h-5 w-5" />;
     return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
@@ -539,12 +633,39 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
                             : 'bg-card/95 border border-border/60 text-foreground rounded-bl-md'
                         }`}
                       >
-                        {message.content !== "[Fichier joint]" && (
+                         {message.content !== "[Fichier joint]" && message.content !== "🎤 Message vocal" && (
                           <p className={`text-sm sm:text-[15px] leading-relaxed whitespace-pre-wrap break-words ${
                             isCurrentUser ? 'text-primary-foreground' : 'text-foreground'
                           }`}>
                             {message.content}
                           </p>
+                        )}
+                        
+                        {message.voice_url && (
+                          <div className={`flex items-center gap-3 ${message.content !== "🎤 Message vocal" ? 'mt-2' : ''}`}>
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              onClick={() => toggleVoicePlay(message.voice_url!, message.id)}
+                              className={`h-10 w-10 ${isCurrentUser ? 'hover:bg-primary-foreground/20' : 'hover:bg-muted'}`}
+                            >
+                              {playingVoiceId === message.id ? (
+                                <Pause className="h-5 w-5" />
+                              ) : (
+                                <Play className="h-5 w-5" />
+                              )}
+                            </Button>
+                            <div className="flex-1">
+                              <div className={`h-1.5 rounded-full ${isCurrentUser ? 'bg-primary-foreground/30' : 'bg-muted'}`}>
+                                <div className={`h-full rounded-full ${isCurrentUser ? 'bg-primary-foreground' : 'bg-primary'} w-0`} />
+                              </div>
+                              {message.voice_duration && (
+                                <span className="text-xs opacity-70 mt-1 block">
+                                  {Math.floor(message.voice_duration / 60)}:{(message.voice_duration % 60).toString().padStart(2, '0')}
+                                </span>
+                              )}
+                            </div>
+                          </div>
                         )}
                         
                         {attachments.length > 0 && (
@@ -649,43 +770,58 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
         )}
         
         <div className="space-y-2">
-          <div className="flex gap-2 sm:gap-3">
-            <input
-              ref={fileInputRef}
-              type="file"
-              multiple
-              className="hidden"
-              onChange={handleFileSelect}
-              accept="image/*,.pdf,.doc,.docx,.txt"
+          {showVoiceRecorder ? (
+            <VoiceRecorder 
+              onSend={handleVoiceSend}
+              onCancel={() => setShowVoiceRecorder(false)}
             />
-            <Button
-              type="button"
-              variant="outline"
-              size="icon"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={loading || uploading}
-              className="h-10 sm:h-12 w-10 sm:w-12 shrink-0 rounded-lg sm:rounded-xl hover:bg-primary/10 hover:border-primary/50 transition-all duration-200"
-            >
-              <Paperclip className="h-4 sm:h-5 w-4 sm:w-5" />
-            </Button>
-            <Textarea
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder="Écrivez votre message..."
-              className="min-h-[44px] sm:min-h-[56px] max-h-[100px] sm:max-h-[120px] resize-none rounded-lg sm:rounded-xl border-border/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-200 text-sm sm:text-base"
-              disabled={loading || uploading}
-            />
-            <Button
-              type="button"
-              onClick={() => sendMessage()}
-              disabled={loading || uploading || (!newMessage.trim() && selectedFiles.length === 0)}
-              size="icon"
-              className="h-10 sm:h-12 w-10 sm:w-12 shrink-0 rounded-lg sm:rounded-xl bg-gradient-to-br from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-lg hover:shadow-xl transition-all duration-200"
-            >
-              <Send className="h-4 sm:h-5 w-4 sm:w-5" />
-            </Button>
-          </div>
+          ) : (
+            <div className="flex gap-2 sm:gap-3">
+              <input
+                ref={fileInputRef}
+                type="file"
+                multiple
+                className="hidden"
+                onChange={handleFileSelect}
+                accept="image/*,.pdf,.doc,.docx,.txt"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={loading || uploading}
+                className="h-10 sm:h-12 w-10 sm:w-12 shrink-0 rounded-lg sm:rounded-xl hover:bg-primary/10 hover:border-primary/50 transition-all duration-200"
+              >
+                <Paperclip className="h-4 sm:h-5 w-4 sm:w-5" />
+              </Button>
+              <Textarea
+                value={newMessage}
+                onChange={(e) => {
+                  setNewMessage(e.target.value);
+                  startTyping();
+                }}
+                onBlur={stopTyping}
+                onKeyPress={handleKeyPress}
+                placeholder="Écrivez votre message..."
+                className="min-h-[44px] sm:min-h-[56px] max-h-[100px] sm:max-h-[120px] resize-none rounded-lg sm:rounded-xl border-border/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-200 text-sm sm:text-base"
+                disabled={loading || uploading}
+              />
+              <VoiceRecorder 
+                onSend={handleVoiceSend}
+                onCancel={() => setShowVoiceRecorder(false)}
+              />
+              <Button
+                type="button"
+                onClick={() => sendMessage()}
+                disabled={loading || uploading || (!newMessage.trim() && selectedFiles.length === 0)}
+                size="icon"
+                className="h-10 sm:h-12 w-10 sm:w-12 shrink-0 rounded-lg sm:rounded-xl bg-gradient-to-br from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-lg hover:shadow-xl transition-all duration-200"
+              >
+                <Send className="h-4 sm:h-5 w-4 sm:w-5" />
+              </Button>
+            </div>
+          )}
         </div>
         <p className="text-[10px] sm:text-xs text-muted-foreground/70 mt-2 sm:mt-3 flex items-center gap-1 flex-wrap">
           <span>Appuyez sur Entrée pour envoyer</span>
