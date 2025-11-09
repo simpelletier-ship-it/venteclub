@@ -1,7 +1,9 @@
-import { useRef } from "react";
-import ReactQuill from "react-quill";
+import { useRef, lazy, Suspense } from "react";
 import "react-quill/dist/quill.snow.css";
 import "./email-editor.css";
+
+// Import ReactQuill dynamically to avoid issues
+const ReactQuill = lazy(() => import('react-quill'));
 
 interface DescriptionEditorProps {
   value: string;
@@ -9,7 +11,7 @@ interface DescriptionEditorProps {
 }
 
 export const DescriptionEditor = ({ value, onChange }: DescriptionEditorProps) => {
-  const quillRef = useRef<ReactQuill>(null);
+  const quillRef = useRef<any>(null);
 
   // Configuration des modules Quill avec toutes les fonctionnalités
   const modules = {
@@ -52,16 +54,18 @@ export const DescriptionEditor = ({ value, onChange }: DescriptionEditorProps) =
 
   return (
     <div className="email-editor-wrapper w-full">
-      <ReactQuill
-        ref={quillRef}
-        theme="snow"
-        value={value}
-        onChange={onChange}
-        modules={modules}
-        formats={formats}
-        placeholder="Décrivez votre entreprise en détail... Utilisez la barre d'outils pour formater votre texte, ajouter des images, et créer une description professionnelle."
-        className="min-h-[300px]"
-      />
+      <Suspense fallback={<div className="min-h-[300px] border rounded-md p-4 bg-muted/20 flex items-center justify-center">Chargement de l'éditeur...</div>}>
+        <ReactQuill
+          ref={quillRef}
+          theme="snow"
+          value={value}
+          onChange={onChange}
+          modules={modules}
+          formats={formats}
+          placeholder="Décrivez votre entreprise en détail... Utilisez la barre d'outils pour formater votre texte, ajouter des images, et créer une description professionnelle."
+          className="min-h-[300px]"
+        />
+      </Suspense>
     </div>
   );
 };
