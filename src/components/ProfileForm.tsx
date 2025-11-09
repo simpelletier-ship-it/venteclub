@@ -294,21 +294,6 @@ export function ProfileForm() {
               </p>
             </div>
           </div>
-          {formData.avatar_url && (
-            <div className="pt-4 border-t">
-              <Label htmlFor="avatar_url">Ou saisir une URL</Label>
-              <Input
-                id="avatar_url"
-                type="url"
-                placeholder="https://exemple.com/photo.jpg"
-                value={formData.avatar_url}
-                onChange={(e) =>
-                  setFormData({ ...formData, avatar_url: e.target.value })
-                }
-                className="mt-2"
-              />
-            </div>
-          )}
         </CardContent>
       </Card>
 
