@@ -45,17 +45,24 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    console.log("Auth header received, extracting token...");
-    const token = authHeader.replace("Bearer ", "");
+    console.log("Auth header received");
     
     // Initialize Supabase clients
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    
+    // Client with user's JWT for authentication
+    const supabaseAuth = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } }
+    });
+    
+    // Client with service role for DB operations
     const supabaseService = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Verify JWT token using service role (can verify any user token)
-    console.log("Verifying JWT token...");
-    const { data: { user }, error: authError } = await supabaseService.auth.getUser(token);
+    // Verify user with their JWT
+    console.log("Verifying user...");
+    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser();
 
     if (authError || !user) {
       console.error("Auth error:", authError?.message || "No user found");
