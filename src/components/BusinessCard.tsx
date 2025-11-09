@@ -83,7 +83,6 @@ const BusinessCard = ({
   const [allImages, setAllImages] = useState<string[]>([]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [imageLoading, setImageLoading] = useState(true);
-  const [imageDirection, setImageDirection] = useState(0);
   
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -121,13 +120,11 @@ const BusinessCard = ({
 
   const handlePrevImage = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setImageDirection(-1);
     setCurrentImageIndex((prev) => (prev === 0 ? allImages.length - 1 : prev - 1));
   };
 
   const handleNextImage = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setImageDirection(1);
     setCurrentImageIndex((prev) => (prev === allImages.length - 1 ? 0 : prev + 1));
   };
   
@@ -185,21 +182,12 @@ const BusinessCard = ({
         <div className="relative w-full h-56 sm:h-64 overflow-hidden bg-muted group/image">
           {!imageLoading && allImages.length > 0 && (
             <>
-              <motion.div
-                key={currentImageIndex}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.5, ease: "easeInOut" }}
-                className="absolute inset-0"
-              >
-                <OptimizedImage
-                  src={allImages[currentImageIndex]}
-                  alt={title}
-                  className="w-full h-full object-cover"
-                  aspectRatio="16/9"
-                />
-              </motion.div>
+              <OptimizedImage
+                src={allImages[currentImageIndex]}
+                alt={title}
+                className="w-full h-full object-cover"
+                aspectRatio="16/9"
+              />
               
               {/* Navigation arrows - style YouTube - only for non-demo with multiple images */}
               {!is_demo && allImages.length > 1 && (
