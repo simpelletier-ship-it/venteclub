@@ -34,20 +34,23 @@ export const FloatingOpportunities = () => {
         transform: 'translateX(0%) translateY(0%) scale(1)',
         opacity: 1,
         zIndex: 30,
+        filter: 'blur(0px)',
       };
     } else if (position === 1) {
-      // Carte à droite - plus petite et plus bas
+      // Carte à droite - plus petite, plus bas et floutée
       return {
-        transform: 'translateX(90%) translateY(15%) scale(0.72)',
-        opacity: 0.35,
+        transform: 'translateX(90%) translateY(30%) scale(0.68)',
+        opacity: 0.3,
         zIndex: 20,
+        filter: 'blur(2px)',
       };
     } else if (position === opportunities.length - 1) {
-      // Carte à gauche - plus petite et plus bas
+      // Carte à gauche - plus petite, plus bas et floutée
       return {
-        transform: 'translateX(-90%) translateY(15%) scale(0.72)',
-        opacity: 0.35,
+        transform: 'translateX(-90%) translateY(30%) scale(0.68)',
+        opacity: 0.3,
         zIndex: 20,
+        filter: 'blur(2px)',
       };
     } else {
       // Cartes cachées
@@ -55,6 +58,7 @@ export const FloatingOpportunities = () => {
         transform: position < opportunities.length / 2 ? 'translateX(200%)' : 'translateX(-200%)',
         opacity: 0,
         zIndex: 10,
+        filter: 'blur(4px)',
       };
     }
   };
