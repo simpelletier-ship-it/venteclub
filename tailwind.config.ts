@@ -181,7 +181,7 @@ export default {
             transform: "translateY(0px)",
           },
           "50%": {
-            transform: "translateY(-10px)",
+            transform: "translateY(-6px)",
           },
         },
         "glow": {
