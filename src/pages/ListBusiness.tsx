@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, X, FileText, TrendingUp, DollarSign, Info, Sparkles, Check, ChevronsUpDown } from "lucide-react";
+import { Upload, X, FileText, TrendingUp, DollarSign, Info, Sparkles, Check, ChevronsUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { businessSchema } from "@/lib/validations";
 import { TermsDialog } from "@/components/TermsDialog";
 import { Badge } from "@/components/ui/badge";
@@ -383,7 +383,7 @@ const ListBusiness = () => {
       steps.push({ icon: TrendingUp, text: "Sélectionner une catégorie", action: "industry" });
     }
     if (photos.length === 0) {
-      steps.push({ icon: Upload, text: "Ajouter au moins une photo", action: "main-photo" });
+      steps.push({ icon: Upload, text: "Ajouter au moins une photo", action: "photos" });
     }
     return steps;
   }, [formData, photos]);
@@ -408,6 +408,30 @@ const ListBusiness = () => {
     URL.revokeObjectURL(photoPreviewUrls[index]);
     setPhotos(photos.filter((_, i) => i !== index));
     setPhotoPreviewUrls(photoPreviewUrls.filter((_, i) => i !== index));
+  };
+
+  const movePhotoUp = (index: number) => {
+    if (index === 0) return;
+    const newPhotos = [...photos];
+    const newPreviewUrls = [...photoPreviewUrls];
+    
+    [newPhotos[index - 1], newPhotos[index]] = [newPhotos[index], newPhotos[index - 1]];
+    [newPreviewUrls[index - 1], newPreviewUrls[index]] = [newPreviewUrls[index], newPreviewUrls[index - 1]];
+    
+    setPhotos(newPhotos);
+    setPhotoPreviewUrls(newPreviewUrls);
+  };
+
+  const movePhotoDown = (index: number) => {
+    if (index === photos.length - 1) return;
+    const newPhotos = [...photos];
+    const newPreviewUrls = [...photoPreviewUrls];
+    
+    [newPhotos[index + 1], newPhotos[index]] = [newPhotos[index], newPhotos[index + 1]];
+    [newPreviewUrls[index + 1], newPreviewUrls[index]] = [newPreviewUrls[index], newPreviewUrls[index + 1]];
+    
+    setPhotos(newPhotos);
+    setPhotoPreviewUrls(newPreviewUrls);
   };
 
   const handleGenerateImage = async () => {
@@ -995,61 +1019,25 @@ const ListBusiness = () => {
                       />
                     </div>
 
-                    {/* Image principale */}
+                    {/* Photos de l'annonce */}
                     <div>
-                      <Label>Image principale</Label>
-                      <div className="mt-2 space-y-3">
-                        <label
-                          htmlFor="main-photo"
-                          className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-primary/30 rounded-lg cursor-pointer hover:border-primary transition-colors bg-primary/5"
-                        >
-                          {photoPreviewUrls.length > 0 ? (
-                            <img
-                              src={photoPreviewUrls[0]}
-                              alt="Aperçu principal"
-                              className="max-h-48 rounded-lg"
-                            />
-                          ) : (
-                            <>
-                              <div className="text-muted-foreground text-center">
-                                <div className="text-4xl mb-2">📷</div>
-                                <p className="font-medium">Aucune image</p>
-                                <p className="text-sm mt-1">Choisir un fichier</p>
-                              </div>
-                            </>
-                          )}
-                        </label>
-                        <Input
-                          id="main-photo"
-                          type="file"
-                          accept="image/*"
-                          onChange={handlePhotoChange}
-                          className="hidden"
-                        />
-                        <p className="text-xs text-muted-foreground">
-                          Formats acceptés : JPEG, PNG, WEBP, GIF. Max 16 Mo.
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Images supplémentaires */}
-                    <div>
-                      <Label htmlFor="photos">Images supplémentaires</Label>
+                      <Label htmlFor="photos">Photos de l'annonce (jusqu'à 10)</Label>
+                      <p className="text-sm text-muted-foreground mt-1 mb-3">
+                        La première photo sera l'image principale affichée sur la fiche. Vous pouvez réorganiser l'ordre.
+                      </p>
+                      
                       <div className="mt-2 space-y-3">
                         <label
                           htmlFor="photos"
                           className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-primary/30 rounded-lg cursor-pointer hover:border-primary transition-colors bg-primary/5"
                         >
-                          {photoPreviewUrls.length > 1 ? (
-                            <p className="text-muted-foreground text-center">
-                              {photoPreviewUrls.length - 1} image(s) supplémentaire(s).
-                            </p>
-                          ) : (
-                            <p className="text-muted-foreground text-center">Aucune image supplémentaire.</p>
-                          )}
-                          <Button type="button" variant="ghost" size="sm" className="mt-2">
-                            Sélect. fichiers
-                          </Button>
+                          <Upload className="w-8 h-8 text-primary mb-2" />
+                          <p className="text-muted-foreground text-center font-medium">
+                            Cliquez pour ajouter des photos
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {photos.length}/10 photos ajoutées
+                          </p>
                         </label>
                         <Input
                           id="photos"
@@ -1060,8 +1048,69 @@ const ListBusiness = () => {
                           className="hidden"
                         />
                         <p className="text-xs text-muted-foreground">
-                          Sélectionnez jusqu'à 6 fichiers (JPEG, PNG, WEBP, GIF). Max 5Mo par fichier.
+                          Formats acceptés : JPEG, PNG, WEBP, GIF. Max 16 Mo par fichier.
                         </p>
+
+                        {photoPreviewUrls.length > 0 && (
+                          <div className="space-y-2 mt-4">
+                            <p className="text-sm font-medium text-foreground">
+                              {photoPreviewUrls.length} photo{photoPreviewUrls.length > 1 ? 's' : ''} ajoutée{photoPreviewUrls.length > 1 ? 's' : ''}
+                            </p>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                              {photoPreviewUrls.map((url, index) => (
+                                <div key={index} className="relative group border border-border rounded-lg p-2 bg-card">
+                                  <div className="flex items-start gap-3">
+                                    <img
+                                      src={url}
+                                      alt={`Photo ${index + 1}`}
+                                      className="w-24 h-24 object-cover rounded-md flex-shrink-0"
+                                    />
+                                    <div className="flex-1 min-w-0">
+                                      <div className="flex items-center gap-2 mb-2">
+                                        <Badge variant={index === 0 ? "default" : "secondary"} className="text-xs">
+                                          {index === 0 ? "📷 Principale" : `Photo ${index + 1}`}
+                                        </Badge>
+                                      </div>
+                                      <div className="flex flex-wrap gap-1">
+                                        {index > 0 && (
+                                          <Button
+                                            type="button"
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => movePhotoUp(index)}
+                                            className="h-7 px-2 text-xs"
+                                          >
+                                            ↑
+                                          </Button>
+                                        )}
+                                        {index < photoPreviewUrls.length - 1 && (
+                                          <Button
+                                            type="button"
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => movePhotoDown(index)}
+                                            className="h-7 px-2 text-xs"
+                                          >
+                                            ↓
+                                          </Button>
+                                        )}
+                                        <Button
+                                          type="button"
+                                          variant="destructive"
+                                          size="sm"
+                                          onClick={() => removePhoto(index)}
+                                          className="h-7 px-2 text-xs"
+                                        >
+                                          <X className="h-3 w-3" />
+                                        </Button>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
 
                         <div className="relative">
                           <div className="absolute inset-0 flex items-center">
@@ -1074,7 +1123,7 @@ const ListBusiness = () => {
 
                         <div className="space-y-3">
                           <div>
-                            <Label htmlFor="imagePrompt">Prompt personnalisé pour l'IA (optionnel)</Label>
+                            <Label htmlFor="imagePrompt">Générer une photo par IA (optionnel)</Label>
                             <Textarea
                               id="imagePrompt"
                               value={imagePrompt}
@@ -1105,27 +1154,6 @@ const ListBusiness = () => {
                             )}
                           </Button>
                         </div>
-
-                        {photoPreviewUrls.length > 0 && (
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-                            {photoPreviewUrls.map((url, index) => (
-                              <div key={index} className="relative group">
-                                <img
-                                  src={url}
-                                  alt={`Photo ${index + 1}`}
-                                  className="w-full h-32 object-cover rounded-lg"
-                                />
-                                <button
-                                  type="button"
-                                  onClick={() => removePhoto(index)}
-                                  className="absolute top-2 right-2 p-1 bg-destructive text-destructive-foreground rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                                >
-                                  <X className="h-4 w-4" />
-                                </button>
-                              </div>
-                            ))}
-                          </div>
-                        )}
                       </div>
                     </div>
                   </div>
