@@ -9,11 +9,8 @@ import { SEO } from "@/components/SEO";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { TypewriterAnimation } from "@/components/AnimatedSearchBar";
 import { useCountUp } from "@/hooks/useCountUp";
-import { lazy, Suspense } from "react";
-
-// Lazy load heavy components
-const FloatingOpportunities = lazy(() => import("@/components/FloatingOpportunities").then(m => ({ default: m.FloatingOpportunities })));
-const CircuitBackground = lazy(() => import("@/components/CircuitBackground").then(m => ({ default: m.CircuitBackground })));
+import { FloatingOpportunities } from "@/components/FloatingOpportunities";
+import { CircuitBackground } from "@/components/CircuitBackground";
 import { trackPageView } from "@/lib/googleAds";
 
 const Home = () => {
@@ -147,9 +144,7 @@ const Home = () => {
       {/* Hero Section */}
       <section className="relative min-h-[65vh] sm:min-h-[75vh] lg:min-h-[85vh] flex items-center bg-gradient-to-br from-[#1e1b4b] via-[#312e81] to-[#1e3a8a] overflow-hidden" aria-label="Section principale">
         {/* Circuit Background */}
-        <Suspense fallback={<div className="absolute inset-0 bg-gradient-to-br from-[#1e1b4b] via-[#312e81] to-[#1e3a8a]" />}>
-          <CircuitBackground />
-        </Suspense>
+        <CircuitBackground />
         
         {/* Simplified Background Elements - removed parallax for performance */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -195,9 +190,7 @@ const Home = () => {
           
           {/* Floating Animation - Positioned Absolutely */}
           <div className="hidden xl:block absolute left-[66%] top-[68%] -translate-y-1/2 w-[300px] pointer-events-none">
-            <Suspense fallback={null}>
-              <FloatingOpportunities />
-            </Suspense>
+            <FloatingOpportunities />
           </div>
         </div>
         

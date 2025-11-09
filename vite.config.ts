@@ -122,63 +122,16 @@ export default defineConfig(({ mode }) => ({
       compress: {
         drop_console: true,
         drop_debugger: true,
-        pure_funcs: ['console.log', 'console.info'],
       },
     },
     rollupOptions: {
       output: {
-        manualChunks: (id) => {
-          if (id.includes('node_modules')) {
-            // Core React
-            if (id.includes('react/') || id.includes('react-dom/')) {
-              return 'react-core';
-            }
-            // React Router
-            if (id.includes('react-router')) {
-              return 'react-router';
-            }
-            // UI Components
-            if (id.includes('@radix-ui')) {
-              return 'radix-ui';
-            }
-            // Supabase
-            if (id.includes('@supabase')) {
-              return 'supabase';
-            }
-            // Charts
-            if (id.includes('recharts') || id.includes('d3-')) {
-              return 'charts';
-            }
-            // React Query
-            if (id.includes('@tanstack/react-query')) {
-              return 'react-query';
-            }
-            // Icons
-            if (id.includes('lucide-react')) {
-              return 'icons';
-            }
-            // Form libraries
-            if (id.includes('react-hook-form') || id.includes('zod')) {
-              return 'forms';
-            }
-            // Map libraries
-            if (id.includes('mapbox')) {
-              return 'maps';
-            }
-            // Animation libraries
-            if (id.includes('framer-motion')) {
-              return 'animations';
-            }
-            return 'vendor';
-          }
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'ui-vendor': ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-select'],
         },
-        chunkFileNames: 'assets/[name]-[hash].js',
-        entryFileNames: 'assets/[name]-[hash].js',
-        assetFileNames: 'assets/[name]-[hash].[ext]',
       },
     },
-    copyPublicDir: true,
-    assetsInlineLimit: 4096,
   },
   publicDir: 'public',
   assetsInclude: ['**/*.xml', '**/*.txt'],
