@@ -1,4 +1,4 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -33,6 +33,7 @@ export const VisualRichTextEditor = ({
   placeholder = "Commencez à écrire...",
 }: VisualRichTextEditorProps) => {
   const editorRef = useRef<HTMLDivElement>(null);
+  const [activeFormats, setActiveFormats] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (editorRef.current && editorRef.current.innerHTML !== content) {
@@ -40,11 +41,38 @@ export const VisualRichTextEditor = ({
     }
   }, []);
 
+  const updateActiveFormats = () => {
+    const formats = new Set<string>();
+    
+    if (document.queryCommandState("bold")) formats.add("bold");
+    if (document.queryCommandState("italic")) formats.add("italic");
+    if (document.queryCommandState("underline")) formats.add("underline");
+    if (document.queryCommandState("insertUnorderedList")) formats.add("bulletList");
+    if (document.queryCommandState("insertOrderedList")) formats.add("orderedList");
+    if (document.queryCommandState("justifyLeft")) formats.add("justifyLeft");
+    if (document.queryCommandState("justifyCenter")) formats.add("justifyCenter");
+    if (document.queryCommandState("justifyRight")) formats.add("justifyRight");
+    
+    setActiveFormats(formats);
+  };
+
   const handleInput = () => {
     if (editorRef.current) {
       onChange(editorRef.current.innerHTML);
     }
+    updateActiveFormats();
   };
+
+  const handleSelectionChange = () => {
+    updateActiveFormats();
+  };
+
+  useEffect(() => {
+    document.addEventListener("selectionchange", handleSelectionChange);
+    return () => {
+      document.removeEventListener("selectionchange", handleSelectionChange);
+    };
+  }, []);
 
   const executeCommand = (command: string, value?: string) => {
     document.execCommand(command, false, value);
@@ -69,51 +97,61 @@ export const VisualRichTextEditor = ({
       icon: Heading1,
       label: "Titre 1",
       action: () => executeCommand("formatBlock", "h1"),
+      command: "h1",
     },
     {
       icon: Heading2,
       label: "Titre 2",
       action: () => executeCommand("formatBlock", "h2"),
+      command: "h2",
     },
     {
       icon: Bold,
       label: "Gras",
       action: () => executeCommand("bold"),
+      command: "bold",
     },
     {
       icon: Italic,
       label: "Italique",
       action: () => executeCommand("italic"),
+      command: "italic",
     },
     {
       icon: Underline,
       label: "Souligné",
       action: () => executeCommand("underline"),
+      command: "underline",
     },
     {
       icon: List,
       label: "Liste à puces",
       action: () => executeCommand("insertUnorderedList"),
+      command: "bulletList",
     },
     {
       icon: ListOrdered,
       label: "Liste numérotée",
       action: () => executeCommand("insertOrderedList"),
+      command: "orderedList",
     },
     {
       icon: AlignLeft,
       label: "Aligner à gauche",
       action: () => executeCommand("justifyLeft"),
+      command: "justifyLeft",
     },
     {
       icon: AlignCenter,
       label: "Centrer",
       action: () => executeCommand("justifyCenter"),
+      command: "justifyCenter",
     },
     {
       icon: AlignRight,
       label: "Aligner à droite",
       action: () => executeCommand("justifyRight"),
+      command: "justifyRight",
     },
   ];
 
@@ -182,7 +220,7 @@ export const VisualRichTextEditor = ({
             size="sm"
             onClick={btn.action}
             title={btn.label}
-            className="h-8 w-8 p-0"
+            className={`h-8 w-8 p-0 ${activeFormats.has(btn.command) ? 'bg-accent' : ''}`}
           >
             <btn.icon className="h-4 w-4" />
           </Button>
