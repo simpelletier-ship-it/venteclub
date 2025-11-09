@@ -367,7 +367,7 @@ const BusinessCard = ({
           )}
         </div>
 
-        <div className="flex-1" />
+        <div className="flex-1 min-h-[0.5rem]" />
 
         <div className={`grid grid-cols-2 gap-3 pt-3 border-t border-border/50 ${status === 'sold' ? 'blur-[8px]' : ''}`}>
           {/* Check if it's a property listing */}
