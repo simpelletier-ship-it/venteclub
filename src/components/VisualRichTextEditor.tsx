@@ -18,6 +18,7 @@ import {
   AlignLeft,
   AlignCenter,
   AlignRight,
+  AlignJustify,
   Highlighter,
   Image as ImageIcon,
 } from "lucide-react";
@@ -53,6 +54,7 @@ export const VisualRichTextEditor = ({
     if (document.queryCommandState("justifyLeft")) formats.add("justifyLeft");
     if (document.queryCommandState("justifyCenter")) formats.add("justifyCenter");
     if (document.queryCommandState("justifyRight")) formats.add("justifyRight");
+    if (document.queryCommandState("justifyFull")) formats.add("justifyFull");
     
     setActiveFormats(formats);
   };
@@ -162,8 +164,8 @@ export const VisualRichTextEditor = ({
       command: "justifyRight",
     },
     {
-      icon: AlignLeft,
-      label: "Justifier",
+      icon: AlignJustify,
+      label: "Justifier (aligner des 2 côtés)",
       action: () => executeCommand("justifyFull"),
       command: "justifyFull",
     },
@@ -291,7 +293,7 @@ export const VisualRichTextEditor = ({
         />
 
         {!content && (
-          <div className="absolute top-4 left-4 text-muted-foreground pointer-events-none">
+          <div className="absolute top-4 left-8 text-muted-foreground pointer-events-none">
             {placeholder}
           </div>
         )}
