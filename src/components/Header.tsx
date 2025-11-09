@@ -21,6 +21,7 @@ const Header = () => {
   const [profile, setProfile] = useState<any>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -41,7 +42,17 @@ const Header = () => {
       }
     });
 
-    return () => subscription.unsubscribe();
+    // Écouter le scroll
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+
+    return () => {
+      subscription.unsubscribe();
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, []);
 
   const checkAdminStatus = async (userId: string) => {
@@ -125,25 +136,25 @@ const Header = () => {
   };
 
   return (
-    <nav className="border-b border-border bg-background/95 backdrop-blur-xl sticky top-0 z-50 shadow-sm">
-      <div className="container mx-auto px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-6">
+    <nav className={`border-b border-border bg-background/95 backdrop-blur-xl sticky top-0 z-50 shadow-sm transition-all duration-300 ${isScrolled ? 'py-2' : 'py-3 sm:py-4 md:py-6'}`}>
+      <div className="container mx-auto px-4 sm:px-6 md:px-8">
         <div className="flex items-center justify-between">
           {/* Logo */}
           <div 
             className="flex items-center cursor-pointer group" 
             onClick={() => navigate("/")}
           >
-            <span className="text-xl sm:text-2xl md:text-3xl font-display font-bold text-foreground transition-transform group-hover:scale-105">
+            <span className={`font-display font-bold text-foreground transition-all duration-300 group-hover:scale-105 ${isScrolled ? 'text-lg sm:text-xl' : 'text-xl sm:text-2xl md:text-3xl'}`}>
               Vente<span className="text-secondary">.Club</span>
             </span>
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center gap-4 xl:gap-6">
+          <div className={`hidden lg:flex items-center transition-all duration-300 ${isScrolled ? 'gap-3' : 'gap-4 xl:gap-6'}`}>
             {/* Lien Acheter une entreprise */}
             <button 
               onClick={() => navigate("/entreprises")} 
-              className="text-muted-foreground hover:text-foreground transition-colors font-semibold text-sm relative group whitespace-nowrap"
+              className={`text-muted-foreground hover:text-foreground transition-all duration-300 font-semibold relative group whitespace-nowrap ${isScrolled ? 'text-xs' : 'text-sm'}`}
             >
               Acheter une entreprise
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full" />
@@ -152,7 +163,7 @@ const Header = () => {
             {/* Lien Vendre une entreprise */}
             <button 
               onClick={() => navigate("/sell")} 
-              className="text-muted-foreground hover:text-foreground transition-colors font-semibold text-sm relative group whitespace-nowrap"
+              className={`text-muted-foreground hover:text-foreground transition-all duration-300 font-semibold relative group whitespace-nowrap ${isScrolled ? 'text-xs' : 'text-sm'}`}
             >
               Vendre une entreprise
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full" />
@@ -161,7 +172,7 @@ const Header = () => {
             {/* Lien Immobilier commercial */}
             <button 
               onClick={() => navigate("/immeubles-commerciaux")} 
-              className="text-muted-foreground hover:text-foreground transition-colors font-semibold text-sm relative group whitespace-nowrap"
+              className={`text-muted-foreground hover:text-foreground transition-all duration-300 font-semibold relative group whitespace-nowrap ${isScrolled ? 'text-xs' : 'text-sm'}`}
             >
               Immobilier commercial
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full" />
@@ -170,7 +181,7 @@ const Header = () => {
             {!user && (
               <button 
                 onClick={() => navigate("/faq")} 
-                className="text-muted-foreground hover:text-foreground transition-colors font-semibold text-sm relative group"
+                className={`text-muted-foreground hover:text-foreground transition-all duration-300 font-semibold relative group ${isScrolled ? 'text-xs' : 'text-sm'}`}
               >
                 FAQ
                 <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full" />
@@ -181,7 +192,7 @@ const Header = () => {
               <>
                 <button 
                   onClick={() => navigate("/messages")} 
-                  className="text-muted-foreground hover:text-foreground transition-colors font-semibold text-sm relative group"
+                  className={`text-muted-foreground hover:text-foreground transition-all duration-300 font-semibold relative group ${isScrolled ? 'text-xs' : 'text-sm'}`}
                 >
                   <div className="relative inline-block">
                     Messagerie
@@ -195,7 +206,7 @@ const Header = () => {
                 </button>
                 <button 
                   onClick={() => navigate("/favorites")} 
-                  className="text-muted-foreground hover:text-foreground transition-colors font-semibold text-sm relative group"
+                  className={`text-muted-foreground hover:text-foreground transition-all duration-300 font-semibold relative group ${isScrolled ? 'text-xs' : 'text-sm'}`}
                 >
                   Favoris
                   <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full" />
@@ -224,9 +235,9 @@ const Header = () => {
               <>
                 <Button
                   onClick={() => navigate("/dashboard")}
-                  className="hidden lg:flex bg-[#6366f1] hover:bg-[#4f46e5] text-white font-semibold shadow-lg px-3 py-2 text-sm h-9"
+                  className={`hidden lg:flex bg-[#6366f1] hover:bg-[#4f46e5] text-white font-semibold shadow-lg transition-all duration-300 ${isScrolled ? 'px-2 py-1.5 text-xs h-8' : 'px-3 py-2 text-sm h-9'}`}
                 >
-                  <LayoutDashboard className="w-4 h-4 mr-2" />
+                  <LayoutDashboard className={`mr-2 transition-all duration-300 ${isScrolled ? 'w-3 h-3' : 'w-4 h-4'}`} />
                   <span>Tableau de bord</span>
                 </Button>
                 <DropdownMenu>
