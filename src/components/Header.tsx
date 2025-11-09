@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getAvatarUrl } from "@/lib/avatarUtils";
-import { Heart, LayoutDashboard, Settings, LogOut, Menu, Sparkles, MessageSquare, ShoppingBag, Building2, Store, ChevronDown } from "lucide-react";
+import { Heart, LayoutDashboard, Settings, LogOut, Menu, Sparkles, MessageSquare, ShoppingBag, Building2, Store } from "lucide-react";
 import { NotificationBell } from "./NotificationBell";
 
 const Header = () => {
@@ -140,40 +140,33 @@ const Header = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-6 xl:gap-10">
-            {/* Menu Acheter */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="text-muted-foreground hover:text-foreground transition-colors font-semibold text-base lg:text-lg relative group flex items-center gap-2">
-                  <ShoppingBag className="w-5 h-5" />
-                  Acheter
-                  <ChevronDown className="w-5 h-5" />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-56 bg-card/95 backdrop-blur-xl border-border/50 shadow-premium">
-                <DropdownMenuItem onClick={() => navigate("/entreprises")} className="cursor-pointer hover:bg-muted/50 flex items-center gap-2 group">
-                  <Store className="w-4 h-4" />
-                  <div>
-                    <p className="font-medium">Entreprises</p>
-                    <p className="text-xs text-muted-foreground group-hover:text-white transition-colors">Commerces et PME</p>
-                  </div>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate("/immeubles-commerciaux")} className="cursor-pointer hover:bg-muted/50 flex items-center gap-2 group">
-                  <Building2 className="w-4 h-4" />
-                  <div>
-                    <p className="font-medium">Immobilier</p>
-                    <p className="text-xs text-muted-foreground group-hover:text-white transition-colors">Commercial et résidentiel</p>
-                  </div>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {/* Lien Acheter une entreprise */}
+            <button 
+              onClick={() => navigate("/entreprises")} 
+              className="text-muted-foreground hover:text-foreground transition-colors font-semibold text-base lg:text-lg relative group flex items-center gap-2"
+            >
+              <ShoppingBag className="w-5 h-5" />
+              Acheter une entreprise
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full" />
+            </button>
 
-            {/* Lien Vendre */}
+            {/* Lien Vendre une entreprise */}
             <button 
               onClick={() => navigate("/sell")} 
               className="text-muted-foreground hover:text-foreground transition-colors font-semibold text-base lg:text-lg relative group flex items-center gap-2"
             >
               <Store className="w-5 h-5" />
-              Vendre
+              Vendre une entreprise
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full" />
+            </button>
+
+            {/* Lien Immobilier commercial */}
+            <button 
+              onClick={() => navigate("/immeubles-commerciaux")} 
+              className="text-muted-foreground hover:text-foreground transition-colors font-semibold text-base lg:text-lg relative group flex items-center gap-2"
+            >
+              <Building2 className="w-5 h-5" />
+              Immobilier commercial
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full" />
             </button>
 
@@ -332,7 +325,7 @@ const Header = () => {
             )}
             
             <div className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-              Acheter
+              Navigation
             </div>
             <button
               onClick={() => {
@@ -341,8 +334,18 @@ const Header = () => {
               }}
               className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors flex items-center gap-2"
             >
+              <ShoppingBag className="w-4 h-4" />
+              Acheter une entreprise
+            </button>
+            <button
+              onClick={() => {
+                navigate("/sell");
+                setMobileMenuOpen(false);
+              }}
+              className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors flex items-center gap-2"
+            >
               <Store className="w-4 h-4" />
-              Entreprises
+              Vendre une entreprise
             </button>
             <button
               onClick={() => {
@@ -352,7 +355,7 @@ const Header = () => {
               className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors flex items-center gap-2"
             >
               <Building2 className="w-4 h-4" />
-              Immobilier
+              Immobilier commercial
             </button>
             {!user && (
               <button
@@ -427,29 +430,6 @@ const Header = () => {
                 Admin
               </button>
             )}
-            <div className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide mt-4">
-              Vendre
-            </div>
-            <button
-              onClick={() => {
-                navigate("/sell");
-                setMobileMenuOpen(false);
-              }}
-              className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors flex items-center gap-2"
-            >
-              <Store className="w-4 h-4" />
-              Mon entreprise
-            </button>
-            <button
-              onClick={() => {
-                navigate("/sell?type=property");
-                setMobileMenuOpen(false);
-              }}
-              className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors flex items-center gap-2"
-            >
-              <Building2 className="w-4 h-4" />
-              Mon immeuble
-            </button>
           </div>
         )}
       </div>
