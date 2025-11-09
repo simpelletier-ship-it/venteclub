@@ -35,12 +35,12 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    // Initialize Supabase client
+    // Initialize Supabase clients - need both service role and user-based
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
-    // Get user from auth header
+    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+    
+    // Get user from auth header using anon key
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
       return new Response(
@@ -54,7 +54,14 @@ const handler = async (req: Request): Promise<Response> => {
       ? authHeader.substring(7) 
       : authHeader;
 
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    // Create client with anon key to verify user
+    const supabaseAuth = createClient(supabaseUrl, supabaseAnonKey, {
+      global: {
+        headers: { Authorization: authHeader }
+      }
+    });
+
+    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser(token);
 
     if (authError || !user) {
       console.error("Auth error:", authError);
@@ -63,6 +70,9 @@ const handler = async (req: Request): Promise<Response> => {
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+
+    // Now use service role client for admin operations
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     // Check admin role
     const { data: hasAdminRole, error: roleError } = await supabase
