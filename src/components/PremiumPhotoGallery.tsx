@@ -72,16 +72,26 @@ export const PremiumPhotoGallery = ({ photos, businessTitle, businessIndustry, b
   return (
     <div className="space-y-6">
       {/* Carrousel principal */}
-      <div className="relative aspect-[16/9] lg:aspect-[21/9] bg-slate-950 rounded-2xl overflow-hidden group">
+      <div 
+        className="relative aspect-[16/9] lg:aspect-[21/9] bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-900 dark:to-slate-950 rounded-2xl overflow-hidden group cursor-pointer"
+        onClick={() => setIsFullscreen(true)}
+      >
         <div className="absolute inset-0">
           <img
             src={uniquePhotos[currentIndex].photo_url}
             alt={`Photo ${currentIndex + 1} de ${businessTitle} - ${businessIndustry} à ${businessCity}`}
-            className="w-full h-full object-contain bg-slate-950"
+            className="w-full h-full object-cover"
           />
           
           {/* Overlay gradient subtil */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none" />
+          
+          {/* Indicateur de clic pour zoom */}
+          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/20">
+            <div className="bg-white/90 backdrop-blur-sm rounded-full p-4 shadow-lg">
+              <ZoomIn className="w-8 h-8 text-slate-900" />
+            </div>
+          </div>
         </div>
 
         {/* Contrôles navigation */}
@@ -91,8 +101,11 @@ export const PremiumPhotoGallery = ({ photos, businessTitle, businessIndustry, b
             <motion.button
               initial={{ opacity: 0 }}
               whileHover={{ opacity: 1, scale: 1.05 }}
-              className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-white/20 disabled:opacity-30 disabled:cursor-not-allowed"
-              onClick={goToPrevious}
+              className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-white/20 disabled:opacity-30 disabled:cursor-not-allowed z-10"
+              onClick={(e) => {
+                e.stopPropagation();
+                goToPrevious();
+              }}
               disabled={currentIndex === 0}
             >
               <ChevronLeft className="w-5 h-5" />
@@ -102,8 +115,11 @@ export const PremiumPhotoGallery = ({ photos, businessTitle, businessIndustry, b
             <motion.button
               initial={{ opacity: 0 }}
               whileHover={{ opacity: 1, scale: 1.05 }}
-              className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-white/20 disabled:opacity-30 disabled:cursor-not-allowed"
-              onClick={goToNext}
+              className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-white/20 disabled:opacity-30 disabled:cursor-not-allowed z-10"
+              onClick={(e) => {
+                e.stopPropagation();
+                goToNext();
+              }}
               disabled={currentIndex === uniquePhotos.length - 1}
             >
               <ChevronRight className="w-5 h-5" />
@@ -111,19 +127,9 @@ export const PremiumPhotoGallery = ({ photos, businessTitle, businessIndustry, b
           </>
         )}
 
-        {/* Bouton plein écran */}
-        <motion.button
-          initial={{ opacity: 0 }}
-          whileHover={{ scale: 1.05 }}
-          className="absolute bottom-4 right-4 w-10 h-10 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-white/20"
-          onClick={() => setIsFullscreen(true)}
-        >
-          <ZoomIn className="w-5 h-5" />
-        </motion.button>
-
         {/* Indicateur photo courante */}
         {uniquePhotos.length > 1 && (
-          <div className="absolute bottom-4 left-4 px-4 py-2 rounded-full bg-black/40 backdrop-blur-xl border border-white/10 text-white text-sm font-light">
+          <div className="absolute bottom-4 left-4 px-4 py-2 rounded-full bg-black/40 backdrop-blur-xl border border-white/10 text-white text-sm font-light pointer-events-none">
             {currentIndex + 1} / {uniquePhotos.length}
           </div>
         )}
@@ -144,8 +150,8 @@ export const PremiumPhotoGallery = ({ photos, businessTitle, businessIndustry, b
               <div 
                 className={`w-24 h-16 rounded-lg overflow-hidden transition-all duration-200 ${
                   index === currentIndex 
-                    ? 'ring-2 ring-white shadow-lg' 
-                    : 'opacity-50 hover:opacity-75'
+                    ? 'ring-2 ring-primary shadow-lg shadow-primary/30' 
+                    : 'opacity-60 hover:opacity-100 ring-1 ring-border'
                 }`}
               >
                 <img
