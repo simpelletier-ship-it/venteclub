@@ -172,7 +172,7 @@ export const PremiumPhotoGallery = ({ photos, businessTitle, businessIndustry, b
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/95 backdrop-blur-xl"
+            className="fixed inset-0 z-50 bg-black/50 backdrop-blur-md"
             onClick={() => setIsFullscreen(false)}
           >
             <div className="relative w-full h-full flex items-center justify-center p-4">
