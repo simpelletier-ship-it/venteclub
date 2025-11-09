@@ -13,11 +13,12 @@
 .email-editor-wrapper .ql-container {
   border: 1px solid hsl(var(--border));
   font-size: 14px;
-  min-height: 400px;
+  min-height: 300px;
 }
 
 .email-editor-wrapper .ql-editor {
-  min-height: 400px;
+  min-height: 300px;
+  max-height: none;
   color: hsl(var(--foreground));
 }
 
