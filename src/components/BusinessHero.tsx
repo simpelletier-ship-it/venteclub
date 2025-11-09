@@ -107,73 +107,71 @@ export const BusinessHero = ({ business, businessId, userId, isSeller, mainPhoto
         </motion.div>
 
         {/* Contenu principal */}
-        <div className="px-6 lg:px-16 py-6 lg:py-8 pb-12 lg:pb-20">
+        <div className="px-6 lg:px-16 py-4 lg:py-6 pb-8 lg:pb-12">
           <div className="max-w-6xl">
             {/* Badges minimalistes */}
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-              className="flex flex-wrap gap-3 mb-8"
+              className="flex flex-wrap gap-2.5 mb-5"
             >
               {business.property_type ? (
-                <Badge className="bg-white/8 text-white/90 border-white/15 backdrop-blur-2xl hover:bg-white/12 px-5 py-2.5 text-[13px] font-medium rounded-full transition-all duration-300 shadow-lg shadow-black/20">
+                <Badge className="bg-white/8 text-white/90 border-white/15 backdrop-blur-2xl hover:bg-white/12 px-4 py-1.5 text-xs font-medium rounded-full transition-all duration-300 shadow-lg shadow-black/20">
                   Immobilier
                 </Badge>
               ) : business.is_franchise ? (
-                <Badge className="bg-purple-500/15 text-purple-100 border-purple-400/25 backdrop-blur-2xl hover:bg-purple-500/25 px-5 py-2.5 text-[13px] font-medium rounded-full transition-all duration-300 shadow-lg shadow-purple-900/30">
+                <Badge className="bg-purple-500/15 text-purple-100 border-purple-400/25 backdrop-blur-2xl hover:bg-purple-500/25 px-4 py-1.5 text-xs font-medium rounded-full transition-all duration-300 shadow-lg shadow-purple-900/30">
                   Franchise
                 </Badge>
               ) : (
-                <Badge className="bg-white/8 text-white/90 border-white/15 backdrop-blur-2xl hover:bg-white/12 px-5 py-2.5 text-[13px] font-medium rounded-full transition-all duration-300 shadow-lg shadow-black/20">
+                <Badge className="bg-white/8 text-white/90 border-white/15 backdrop-blur-2xl hover:bg-white/12 px-4 py-1.5 text-xs font-medium rounded-full transition-all duration-300 shadow-lg shadow-black/20">
                   Entreprise
                 </Badge>
               )}
               
-              <div className="flex items-center gap-2.5 text-white/75 px-5 py-2.5 bg-white/5 backdrop-blur-2xl rounded-full border border-white/10 text-[13px] font-light shadow-lg shadow-black/20">
+              <div className="flex items-center gap-2 text-white/75 px-4 py-1.5 bg-white/5 backdrop-blur-2xl rounded-full border border-white/10 text-xs font-light shadow-lg shadow-black/20">
                 <MapPin className="w-3.5 h-3.5" />
                 {business.city || business.location}
               </div>
             </motion.div>
 
-            {/* Titre premium */}
+            {/* Titre optimisé */}
             <motion.h1 
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.9, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-              className="text-[clamp(2.25rem,6vw,4.5rem)] font-bold text-white mb-12 leading-[1.08] tracking-[-0.03em]"
-              style={{ 
-                fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", sans-serif',
-                fontFeatureSettings: '"ss01" on, "ss02" on'
-              }}
+              className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-6 leading-tight tracking-tight"
             >
               {business.title}
             </motion.h1>
 
-            {/* Prix élégant */}
+            {/* Prix compact et élégant */}
             <motion.div 
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.9, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
-              className="inline-flex flex-col"
+              className="inline-flex flex-col sm:flex-row sm:items-end sm:gap-6"
             >
-              <div className="text-[11px] text-white/35 font-light uppercase tracking-[0.25em] mb-3">
-                Prix demandé
-              </div>
-              <div className="text-[clamp(3rem,8vw,5rem)] font-bold text-white tracking-[-0.04em] leading-none">
-                {business.asking_price === 0 ? (
-                  <span className="text-[clamp(2.5rem,6vw,4rem)]">À discuter</span>
-                ) : (
-                  <>
-                    {business.asking_price.toLocaleString()}
-                    <span className="text-[clamp(2rem,5vw,3.5rem)] font-light text-white/60 ml-2">$</span>
-                  </>
-                )}
+              <div className="flex flex-col">
+                <div className="text-[10px] text-white/35 font-light uppercase tracking-widest mb-2">
+                  Prix demandé
+                </div>
+                <div className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight leading-none">
+                  {business.asking_price === 0 ? (
+                    <span className="text-2xl sm:text-3xl lg:text-4xl">À discuter</span>
+                  ) : (
+                    <>
+                      {business.asking_price.toLocaleString()}
+                      <span className="text-2xl sm:text-3xl lg:text-4xl font-light text-white/60 ml-1.5">$</span>
+                    </>
+                  )}
+                </div>
               </div>
               
               {business.sale_type && (
-                <div className="mt-6">
-                  <Badge variant="outline" className="border-white/15 text-white/60 bg-white/5 backdrop-blur-2xl text-[11px] font-light px-5 py-2 rounded-full tracking-wide">
+                <div className="mt-4 sm:mt-0 sm:mb-2">
+                  <Badge variant="outline" className="border-white/15 text-white/60 bg-white/5 backdrop-blur-2xl text-[10px] font-light px-4 py-1.5 rounded-full tracking-wide">
                     {business.sale_type === 'assets' && 'Vente d\'actifs'}
                     {business.sale_type === 'shares' && 'Vente d\'actions'}
                     {business.sale_type === 'both' && 'Flexible'}
