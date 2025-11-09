@@ -445,7 +445,7 @@ const Admin = () => {
     profit_margin: z.string().optional(),
     employees_count: z.string().optional(),
     year_established: z.string().optional(),
-    location: z.string().trim().min(2, "Emplacement requis"),
+    location: z.string().trim().max(100, "L'emplacement ne peut pas dépasser 100 caractères").optional().or(z.literal('')),
     city: z.string().trim().min(2, "Ville requise"),
     province: z.string().trim().min(2, "Province requise"),
     industry: z.string().min(1, "Secteur requis"),
