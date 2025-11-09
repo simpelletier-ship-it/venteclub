@@ -1,13 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { MessageSquare, ArrowLeft, ChevronRight, Search, Trash2, SortDesc, User, CheckCheck, Check } from "lucide-react";
+import { MessageSquare, ArrowLeft, Search, Trash2, CheckCheck, Check } from "lucide-react";
 import { ChatBox } from "@/components/ChatBox";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -342,221 +341,238 @@ const Messages = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-muted/5 to-background">
-      <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6">
-        <div className="mb-4 sm:mb-6">
-          <Button
-            variant="ghost"
-            onClick={() => navigate("/dashboard")}
-            className="mb-3 text-sm hover:bg-muted/50 transition-colors group"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-            Retour au tableau de bord
-          </Button>
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2.5 rounded-xl bg-gradient-to-br from-primary/10 to-secondary/10 shadow-sm">
-              <MessageSquare className="h-6 sm:h-7 w-6 sm:w-7 text-primary" />
-            </div>
-            <h1 className="text-2xl sm:text-4xl font-bold text-foreground">
-              Messagerie
-            </h1>
-          </div>
-          <p className="text-sm sm:text-base text-muted-foreground font-medium">
-            Gérez vos conversations professionnelles en temps réel
-          </p>
-        </div>
-
-        {conversations.length === 0 && !selectedConversation ? (
-          <Card className="border-border/60 shadow-xl">
-            <CardContent className="text-center py-16">
-              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center mx-auto mb-5 shadow-lg">
-                <MessageSquare className="h-10 w-10 text-primary" />
-              </div>
-              <p className="text-lg font-bold text-foreground mb-2">
-                Aucune conversation
-              </p>
-              <p className="text-sm text-muted-foreground">
-                Vos conversations apparaîtront ici
-              </p>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:h-[calc(100vh-240px)]">
-            {/* Liste des conversations Professional - Masquer si vide et conversation virtuelle active */}
-            {conversations.length > 0 && (
-              <Card className="lg:col-span-1 border-border/60 shadow-xl overflow-hidden flex flex-col">
-                <CardContent className="p-4 sm:p-5 bg-card/50 backdrop-blur-sm flex flex-col h-full">
-                <div className="flex items-center justify-between mb-5 flex-shrink-0">
-                  <h2 className="font-bold text-lg flex items-center gap-2.5 text-foreground">
-                    <div className="p-2 rounded-xl bg-gradient-to-br from-primary/10 to-secondary/10 shadow-sm">
-                      <MessageSquare className="h-5 w-5 text-primary" />
-                    </div>
-                    Conversations
-                  </h2>
-                  <Badge variant="secondary" className="font-semibold">
-                    {conversations.length}
-                  </Badge>
+    <div className="h-screen flex flex-col bg-background overflow-hidden">
+      {/* Header App-Style avec gradient et shadow */}
+      <div className="flex-shrink-0 bg-gradient-to-r from-primary/95 via-primary to-primary/95 backdrop-blur-xl border-b border-primary/20 shadow-xl">
+        <div className="px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate("/dashboard")}
+              className="text-white hover:bg-white/10 rounded-full"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <div className="p-2 rounded-xl bg-white/10 backdrop-blur-sm">
+                  <MessageSquare className="h-5 w-5 text-white" />
                 </div>
-                
-                {/* Search and filters */}
-                <div className="space-y-3 mb-4 flex-shrink-0">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                {conversations.filter(c => c.unread_count > 0).length > 0 && (
+                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
+                    <span className="text-[10px] font-bold text-white">
+                      {conversations.filter(c => c.unread_count > 0).length}
+                    </span>
+                  </div>
+                )}
+              </div>
+              <div>
+                <h1 className="text-lg font-bold text-white">
+                  Messagerie
+                </h1>
+                <p className="text-xs text-white/80">
+                  {conversations.length} conversation{conversations.length > 1 ? 's' : ''}
+                </p>
+              </div>
+            </div>
+          </div>
+          <Avatar className="h-10 w-10 border-2 border-white/20">
+            <AvatarFallback className="bg-white/10 text-white font-semibold">
+              {user?.email ? getInitials(user.email) : 'U'}
+            </AvatarFallback>
+          </Avatar>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 flex overflow-hidden">
+        {conversations.length === 0 && !selectedConversation ? (
+          <div className="flex-1 flex items-center justify-center p-8">
+            <div className="text-center max-w-sm">
+              <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center mx-auto mb-6 shadow-lg">
+                <MessageSquare className="h-12 w-12 text-primary" />
+              </div>
+              <h2 className="text-2xl font-bold text-foreground mb-3">
+                Aucune conversation
+              </h2>
+              <p className="text-muted-foreground">
+                Vos conversations apparaîtront ici lorsque vous contacterez des vendeurs
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div className="flex-1 grid grid-cols-1 lg:grid-cols-[380px_1fr] overflow-hidden">
+            {/* Liste conversations - Modern App Style */}
+            {conversations.length > 0 && (
+              <div className="hidden lg:flex flex-col border-r border-border/50 bg-card/30 backdrop-blur-sm overflow-hidden">
+                <div className="flex-shrink-0 p-4 border-b border-border/50 bg-card/50">
+                  <h2 className="font-bold text-base text-foreground mb-3 flex items-center justify-between">
+                    <span>Messages</span>
+                    <Badge variant="secondary" className="font-semibold text-xs">
+                      {conversations.length}
+                    </Badge>
+                  </h2>
+                  
+                  {/* Search */}
+                  <div className="relative mb-3">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60" />
                     <Input
                       placeholder="Rechercher..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-9"
+                      className="pl-9 h-9 bg-background/50 border-border/50"
                     />
                   </div>
-                  <div className="flex gap-2">
+                  
+                  {/* Filters */}
+                  <div className="flex gap-1.5">
                     <Button
-                      variant={sortType === 'recent' ? 'default' : 'outline'}
+                      variant={sortType === 'recent' ? 'default' : 'ghost'}
                       size="sm"
                       onClick={() => setSortType('recent')}
+                      className="flex-1 h-8 text-xs"
                     >
-                      <SortDesc className="h-4 w-4 mr-1" />
                       Récents
                     </Button>
                     <Button
-                      variant={sortType === 'unread' ? 'default' : 'outline'}
+                      variant={sortType === 'unread' ? 'default' : 'ghost'}
                       size="sm"
                       onClick={() => setSortType('unread')}
+                      className="flex-1 h-8 text-xs"
                     >
                       Non lus
                     </Button>
                     <Button
-                      variant={sortType === 'name' ? 'default' : 'outline'}
+                      variant={sortType === 'name' ? 'default' : 'ghost'}
                       size="sm"
                       onClick={() => setSortType('name')}
+                      className="flex-1 h-8 text-xs"
                     >
-                      Nom
+                      A-Z
                     </Button>
                   </div>
                 </div>
 
-                <ScrollArea className="flex-1">
-                  <div className="space-y-2 pr-2">
+                <ScrollArea className="flex-1 px-2">
+                  <div className="space-y-1 py-2">
                     {filteredConversations.map((conv) => (
-                        <div
-                         key={`${conv.business_id}-${conv.other_user_id}`}
-                         className={`group relative p-2.5 rounded-lg transition-all duration-300 cursor-pointer ${
-                           selectedConversation?.business_id === conv.business_id &&
-                           selectedConversation?.other_user_id === conv.other_user_id
-                             ? 'bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border-2 border-primary/60 shadow-lg'
-                             : 'bg-card/80 backdrop-blur-sm border border-border/60 hover:bg-card hover:border-primary/40 hover:shadow-md'
-                         }`}
-                         onClick={() => handleConversationClick(conv)}
-                       >
-                         {/* GRID LAYOUT */}
-                         <div className="grid grid-cols-[44px_1fr_44px] gap-2 items-start w-full">
-                           {/* Avatar */}
-                           <div className="relative w-11 h-11">
-                             <Avatar className="h-11 w-11 ring-2 ring-border/40">
-                               <AvatarImage src={conv.other_user_avatar || undefined} alt={conv.other_user_name} />
-                               <AvatarFallback className="bg-gradient-to-br from-primary/20 to-secondary/20 text-foreground font-semibold text-xs">
-                                 {getInitials(conv.other_user_name)}
-                               </AvatarFallback>
-                             </Avatar>
-                             {conv.unread_count > 0 && (
-                               <div className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 rounded-full bg-gradient-to-br from-primary to-primary/90 shadow-lg animate-pulse">
-                                 <span className="text-[10px] font-bold text-primary-foreground">{conv.unread_count}</span>
-                               </div>
-                             )}
-                           </div>
+                      <div
+                        key={`${conv.business_id}-${conv.other_user_id}`}
+                        className={`group relative p-3 rounded-xl transition-all duration-200 cursor-pointer ${
+                          selectedConversation?.business_id === conv.business_id &&
+                          selectedConversation?.other_user_id === conv.other_user_id
+                            ? 'bg-primary/10 border border-primary/20'
+                            : 'hover:bg-muted/50 border border-transparent'
+                        }`}
+                        onClick={() => handleConversationClick(conv)}
+                      >
+                        <div className="flex gap-3 items-start w-full">
+                          {/* Avatar avec status */}
+                          <div className="relative flex-shrink-0">
+                            <Avatar className="h-12 w-12 border-2 border-background">
+                              <AvatarImage src={conv.other_user_avatar || undefined} alt={conv.other_user_name} />
+                              <AvatarFallback className="bg-gradient-to-br from-primary/20 to-secondary/20 text-foreground font-semibold text-xs">
+                                {getInitials(conv.other_user_name)}
+                              </AvatarFallback>
+                            </Avatar>
+                            {conv.unread_count > 0 && (
+                              <div className="absolute -bottom-0.5 -right-0.5 w-5 h-5 bg-primary rounded-full flex items-center justify-center border-2 border-background">
+                                <span className="text-[9px] font-bold text-white">
+                                  {conv.unread_count > 9 ? '9+' : conv.unread_count}
+                                </span>
+                              </div>
+                            )}
+                          </div>
 
-                           {/* Contenu */}
-                           <div className="min-w-0 overflow-hidden">
-                             <div className="flex items-start justify-between gap-1 mb-0.5">
-                               <h3 className="font-bold text-sm truncate group-hover:text-primary transition-colors flex-1 min-w-0">
-                                 {conv.other_user_name}
-                               </h3>
-                               <span className="text-[9px] font-semibold text-muted-foreground/70 whitespace-nowrap flex-shrink-0">
-                                 {new Date(conv.last_message_time).toLocaleDateString('fr-FR', {
-                                   day: '2-digit',
-                                   month: '2-digit',
-                                 })}
-                               </span>
-                             </div>
-                             
-                             <p className="text-[10px] text-muted-foreground/60 mb-0.5 truncate font-medium">
-                               {conv.business_title}
-                             </p>
-                             
-                             <div className="flex items-center gap-1">
-                               <p className="text-[10px] text-foreground/70 truncate leading-tight flex-1 min-w-0">
-                                 {conv.last_message}
-                               </p>
-                               {conv.last_message_sender_id === user?.id && (
-                                 <span className="flex-shrink-0">
-                                   {conv.last_message_read ? (
-                                     <CheckCheck className="w-3 h-3 text-primary" />
-                                   ) : (
-                                     <Check className="w-3 h-3 text-muted-foreground/50" />
-                                   )}
-                                 </span>
-                               )}
-                             </div>
-                           </div>
+                          {/* Content */}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-baseline justify-between gap-2 mb-0.5">
+                              <h3 className="font-semibold text-sm text-foreground truncate">
+                                {conv.other_user_name}
+                              </h3>
+                              <span className="text-[10px] text-muted-foreground/70 flex-shrink-0">
+                                {new Date(conv.last_message_time).toLocaleTimeString('fr-FR', {
+                                  hour: '2-digit',
+                                  minute: '2-digit'
+                                })}
+                              </span>
+                            </div>
+                            <p className="text-xs text-muted-foreground/80 truncate mb-1">
+                              {conv.business_title}
+                            </p>
+                            <div className="flex items-center gap-2">
+                              <p className={`text-xs line-clamp-1 flex-1 ${
+                                conv.unread_count > 0 && conv.last_message_sender_id !== user?.id
+                                  ? 'font-medium text-foreground' 
+                                  : 'text-muted-foreground/70'
+                              }`}>
+                                {conv.last_message_sender_id === user?.id && (
+                                  <>
+                                    {conv.last_message_read ? (
+                                      <CheckCheck className="h-3 w-3 text-primary inline mr-1" />
+                                    ) : (
+                                      <Check className="h-3 w-3 text-muted-foreground inline mr-1" />
+                                    )}
+                                  </>
+                                )}
+                                {conv.last_message}
+                              </p>
+                              {conv.is_seller && (
+                                <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4 flex-shrink-0">
+                                  Vendeur
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
 
-                           {/* Image annonce */}
-                           <div className="w-11 h-11 rounded-lg overflow-hidden bg-muted shadow-sm ring-1 ring-border/40">
-                             {conv.business_photo ? (
-                               <img 
-                                 src={conv.business_photo} 
-                                 alt={conv.business_title}
-                                 className="w-full h-full object-cover"
-                               />
-                             ) : (
-                               <div className="w-full h-full bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center">
-                                 <span className="text-sm">🏢</span>
-                               </div>
-                             )}
-                           </div>
-                         </div>
-                         
-                         {/* Bouton supprimer - EN HAUT À GAUCHE pour ne pas cacher l'image */}
-                         <AlertDialog>
-                           <AlertDialogTrigger asChild>
-                             <Button
-                               variant="ghost"
-                               size="icon"
-                               className="h-6 w-6 absolute -top-1 -left-1 opacity-0 group-hover:opacity-100 transition-opacity bg-destructive/10 hover:bg-destructive/20 rounded-full"
-                               onClick={(e) => e.stopPropagation()}
-                             >
-                               <Trash2 className="h-3 w-3 text-destructive" />
-                             </Button>
-                           </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Supprimer la conversation</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                Êtes-vous sûr de vouloir supprimer cette conversation avec {conv.other_user_name} ? Cette action est irréversible.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Annuler</AlertDialogCancel>
-                              <AlertDialogAction
-                                onClick={() => handleDeleteConversation(conv)}
-                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                              >
-                                Supprimer
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
+                          {/* Delete button */}
+                          <div className="flex-shrink-0">
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button 
+                                  variant="ghost" 
+                                  size="icon"
+                                  className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-destructive/10 hover:text-destructive rounded-full"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <Trash2 className="h-3.5 w-3.5" />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Supprimer la conversation</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Voulez-vous vraiment supprimer cette conversation ? Cette action est irréversible.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel onClick={(e) => e.stopPropagation()}>Annuler</AlertDialogCancel>
+                                  <AlertDialogAction 
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleDeleteConversation(conv);
+                                    }}
+                                    className="bg-destructive hover:bg-destructive/90"
+                                  >
+                                    Supprimer
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </div>
+                        </div>
                       </div>
                     ))}
                   </div>
                 </ScrollArea>
-              </CardContent>
-            </Card>
+              </div>
             )}
 
-            {/* Zone de chat Professional */}
-            <Card className={`${conversations.length > 0 ? 'lg:col-span-2' : 'lg:col-span-3'} border-border/60 shadow-xl overflow-hidden flex flex-col`}>
-              <CardContent className="p-0 h-[600px] lg:h-full flex flex-col bg-card/30 backdrop-blur-sm">
-                {selectedConversation ? (
+            {/* Chat Area - Fullscreen Modern */}
+            <div className="flex-1 flex flex-col bg-background overflow-hidden">
+              {selectedConversation ? (
+                <div className="flex-1 flex flex-col overflow-hidden">
                   <ChatBox
                     businessId={selectedConversation.business_id}
                     currentUserId={user?.id}
@@ -564,23 +580,23 @@ const Messages = () => {
                     otherUserName={selectedConversation.other_user_name}
                     businessTitle={selectedConversation.business_title}
                   />
-                ) : (
-                  <div className="flex items-center justify-center h-full bg-gradient-to-br from-background via-muted/10 to-background">
-                    <div className="text-center px-6 animate-fade-in">
-                      <div className="w-28 h-28 rounded-3xl bg-gradient-to-br from-primary/10 via-secondary/5 to-primary/10 flex items-center justify-center mx-auto mb-6 shadow-xl">
-                        <MessageSquare className="h-14 w-14 text-primary animate-pulse" />
-                      </div>
-                      <p className="text-xl font-bold text-foreground mb-3">
-                        Sélectionnez une conversation
-                      </p>
-                      <p className="text-muted-foreground text-sm max-w-sm mx-auto leading-relaxed">
-                        Choisissez une conversation dans la liste pour commencer à échanger en temps réel
-                      </p>
+                </div>
+              ) : (
+                <div className="flex-1 flex items-center justify-center p-8 bg-muted/20">
+                  <div className="text-center max-w-sm">
+                    <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center mx-auto mb-6">
+                      <MessageSquare className="h-12 w-12 text-primary" />
                     </div>
+                    <h2 className="text-xl font-bold text-foreground mb-2">
+                      Sélectionnez une conversation
+                    </h2>
+                    <p className="text-sm text-muted-foreground">
+                      Choisissez une conversation dans la liste pour commencer à échanger
+                    </p>
                   </div>
-                )}
-              </CardContent>
-            </Card>
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>
