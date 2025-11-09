@@ -6,9 +6,18 @@ export const businessSchema = z.object({
     .min(5, 'Le titre doit contenir au moins 5 caractères')
     .max(200, 'Le titre ne peut pas dépasser 200 caractères'),
   description: z.string()
-    .trim()
-    .min(20, 'La description doit contenir au moins 20 caractères')
-    .max(5000, 'La description ne peut pas dépasser 5000 caractères'),
+    .min(1, 'La description est requise')
+    .max(10000, 'La description ne peut pas dépasser 10000 caractères')
+    .refine(
+      (val) => {
+        // Extract text content from HTML for length validation
+        const div = document.createElement('div');
+        div.innerHTML = val;
+        const textContent = div.textContent || div.innerText || '';
+        return textContent.trim().length >= 20;
+      },
+      { message: 'La description doit contenir au moins 20 caractères de texte' }
+    ),
   industry: z.enum([
     'activite_sport_loisir',
     'art_spectacle_cinema',

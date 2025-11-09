@@ -54,7 +54,7 @@ export const RichTextEditor = ({
         },
       }),
     ],
-    content,
+    content: content || "",
     editorProps: {
       attributes: {
         class: cn(
@@ -69,14 +69,20 @@ export const RichTextEditor = ({
       },
     },
     onUpdate: ({ editor }) => {
-      onChange(editor.getHTML());
+      const html = editor.getHTML();
+      if (html !== content) {
+        onChange(html);
+      }
     },
   });
 
-  // Sync external content changes
+  // Sync external content changes without creating infinite loops
   useEffect(() => {
-    if (editor && content !== editor.getHTML()) {
-      editor.commands.setContent(content);
+    if (editor && content !== undefined && content !== null) {
+      const currentContent = editor.getHTML();
+      if (content !== currentContent) {
+        editor.commands.setContent(content || "", { emitUpdate: false });
+      }
     }
   }, [content, editor]);
 
