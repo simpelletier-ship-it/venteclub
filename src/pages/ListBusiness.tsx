@@ -536,6 +536,8 @@ const ListBusiness = () => {
 
   const handleSubmit = async (e: React.FormEvent, isDraft: boolean = false) => {
     e.preventDefault();
+    
+    console.log('[SUBMIT] Début soumission formulaire, isDraft:', isDraft);
 
     if (!isDraft && !termsAccepted) {
       toast({
@@ -547,6 +549,7 @@ const ListBusiness = () => {
     }
 
     setLoading(true);
+    console.log('[SUBMIT] Loading activé, début traitement');
 
     try {
       const validatedData = businessSchema.parse({
@@ -725,6 +728,9 @@ const ListBusiness = () => {
         navigate("/dashboard");
         return;
       }
+      
+      // === CODE DE CRÉATION D'UNE NOUVELLE ANNONCE ===
+      console.log('[SUBMIT] Création de l\'annonce dans la BD');
       const { data: businessData, error: businessError } = await supabase
         .from("businesses")
         .insert({
@@ -770,18 +776,22 @@ const ListBusiness = () => {
 
       // Upload photos
       if (photos.length > 0 && businessData) {
+        console.log(`[PHOTO-UPLOAD] Début upload de ${photos.length} photos pour business ${businessData.id}`);
         const uploadTimestamp = Date.now();
+        
         for (let i = 0; i < photos.length; i++) {
           const file = photos[i];
           const fileExt = file.name.split('.').pop();
           const fileName = `${businessData.id}/${uploadTimestamp}-${i}.${fileExt}`;
+          
+          console.log(`[PHOTO-UPLOAD] Upload photo ${i + 1}/${photos.length}: ${fileName}`);
 
           const { error: uploadError } = await supabase.storage
             .from('business-photos')
             .upload(fileName, file);
 
           if (uploadError) {
-            console.error('Photo upload error:', uploadError);
+            console.error(`[PHOTO-UPLOAD] Erreur upload photo ${i}:`, uploadError);
             continue;
           }
 
@@ -789,12 +799,20 @@ const ListBusiness = () => {
             .from('business-photos')
             .getPublicUrl(fileName);
 
-          await supabase.from('business_photos').insert({
+          console.log(`[PHOTO-UPLOAD] Insertion en DB photo ${i + 1}: ${publicUrl}`);
+          const { error: insertError } = await supabase.from('business_photos').insert({
             business_id: businessData.id,
             photo_url: publicUrl,
             display_order: i,
           });
+          
+          if (insertError) {
+            console.error(`[PHOTO-UPLOAD] Erreur insertion photo ${i}:`, insertError);
+          } else {
+            console.log(`[PHOTO-UPLOAD] Photo ${i + 1} insérée avec succès`);
+          }
         }
+        console.log(`[PHOTO-UPLOAD] Fin upload - ${photos.length} photos traitées`);
       }
 
       // Create or update seller contact info
