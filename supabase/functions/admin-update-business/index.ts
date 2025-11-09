@@ -45,19 +45,17 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Initialize Supabase client with the user's token for auth check
+    console.log("Auth header received, extracting token...");
+    const token = authHeader.replace("Bearer ", "");
+    
+    // Initialize Supabase clients
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
-    const supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
-      global: {
-        headers: {
-          Authorization: authHeader
-        }
-      }
-    });
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabaseService = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Verify user with the token in headers
-    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+    // Verify JWT token using service role (can verify any user token)
+    console.log("Verifying JWT token...");
+    const { data: { user }, error: authError } = await supabaseService.auth.getUser(token);
 
     if (authError || !user) {
       console.error("Auth error:", authError?.message || "No user found");
@@ -69,27 +67,32 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log("User authenticated:", user.id);
 
-    // Check admin role using the authenticated client
-    const { data: hasAdminRole, error: roleError } = await supabaseClient
+    // Check admin role using service role client
+    console.log("Checking admin role for user:", user.id);
+    const { data: hasAdminRole, error: roleError } = await supabaseService
       .rpc('has_role', { 
         _user_id: user.id, 
         _role: 'admin' 
       });
 
     if (roleError || !hasAdminRole) {
-      console.error("Role check error:", roleError);
+      console.error("Role check failed:", { roleError, hasAdminRole });
       return new Response(
         JSON.stringify({ error: "Accès refusé - droits administrateur requis" }),
         { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
+    console.log("Admin role verified successfully");
+
     // Parse and validate request body
+    console.log("Parsing request body...");
     const body = await req.json();
     
     let validated;
     try {
       validated = editBusinessSchema.parse(body);
+      console.log("Validation successful for business_id:", validated.business_id);
     } catch (validationError: any) {
       console.error("Validation error:", validationError);
       return new Response(
@@ -101,13 +104,10 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Use service role for the actual update to bypass RLS
-    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabaseService = createClient(supabaseUrl, supabaseServiceKey);
-
     // Update business with validated data
     const { business_id, photo_url, ...updateData } = validated;
     
+    console.log("Updating business:", business_id);
     const { error: updateError } = await supabaseService
       .from('businesses')
       .update({
