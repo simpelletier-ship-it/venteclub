@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Star, XCircle, Edit, TrendingUp, Eye, Building, MessageSquare, Crown, FileText, CheckCircle, UserCircle, Sparkles, X } from "lucide-react";
+import { Plus, Star, XCircle, Edit, TrendingUp, Eye, Building, MessageSquare, Crown, FileText, CheckCircle, UserCircle, Sparkles, X, Heart } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import BusinessCard from "@/components/BusinessCard";
@@ -25,13 +25,8 @@ const Dashboard = () => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [withdrawDialogOpen, setWithdrawDialogOpen] = useState(false);
   const [businessToWithdraw, setBusinessToWithdraw] = useState<any>(null);
-  const [stats, setStats] = useState({
-    published: 0,
-    draft: 0,
-    approved: 0,
-    sold: 0
-  });
   const [showLaunchBanner, setShowLaunchBanner] = useState(true);
+  const [favorites, setFavorites] = useState<any[]>([]);
   const defaultTab = searchParams.get('tab') || 'businesses';
 
   useEffect(() => {
@@ -41,6 +36,7 @@ const Dashboard = () => {
       } else {
         setUser(session.user);
         fetchUserBusinesses(session.user.id);
+        fetchUserFavorites(session.user.id);
         
         // Check if user is admin
         const { data: hasAdminRole } = await supabase
@@ -121,19 +117,6 @@ const Dashboard = () => {
 
       console.log('[DASHBOARD] Businesses loaded:', businessesWithFeatured.length);
       setBusinesses(businessesWithFeatured);
-      
-      // Calculate stats
-      const published = businessesWithFeatured.filter(b => b.status === 'active' && b.approval_status === 'approved').length;
-      const draft = businessesWithFeatured.filter(b => b.status === 'inactive').length;
-      const approved = businessesWithFeatured.filter(b => b.approval_status === 'approved').length;
-      const sold = businessesWithFeatured.filter(b => b.status === 'sold').length;
-      
-      setStats({
-        published,
-        draft,
-        approved,
-        sold
-      });
     } catch (error: any) {
       console.error('[DASHBOARD] Error fetching businesses:', error);
       toast({
@@ -143,6 +126,28 @@ const Dashboard = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchUserFavorites = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('business_favorites')
+        .select(`
+          id,
+          business_id,
+          businesses (
+            *
+          )
+        `)
+        .eq('user_id', userId);
+
+      if (error) throw error;
+      
+      const favoriteBusinesses = data?.map(fav => fav.businesses).filter(Boolean) || [];
+      setFavorites(favoriteBusinesses);
+    } catch (error: any) {
+      console.error('[DASHBOARD] Error fetching favorites:', error);
     }
   };
 
@@ -191,49 +196,6 @@ const Dashboard = () => {
       </div>
 
       <div className="container mx-auto px-4 py-8 max-w-7xl">
-        {/* Stats Cards Modernes */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-gradient-to-br from-green-500/10 to-green-500/5 border border-green-500/20 rounded-xl p-4 hover:shadow-lg transition-all">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 rounded-lg bg-green-500/10">
-                <CheckCircle className="h-5 w-5 text-green-600" />
-              </div>
-              <span className="text-2xl font-bold text-foreground">{stats.published}</span>
-            </div>
-            <p className="text-sm text-muted-foreground font-medium">Publiées</p>
-          </div>
-          
-          <div className="bg-gradient-to-br from-blue-500/10 to-blue-500/5 border border-blue-500/20 rounded-xl p-4 hover:shadow-lg transition-all">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 rounded-lg bg-blue-500/10">
-                <FileText className="h-5 w-5 text-blue-600" />
-              </div>
-              <span className="text-2xl font-bold text-foreground">{stats.draft}</span>
-            </div>
-            <p className="text-sm text-muted-foreground font-medium">Brouillons</p>
-          </div>
-          
-          <div className="bg-gradient-to-br from-yellow-500/10 to-yellow-500/5 border border-yellow-500/20 rounded-xl p-4 hover:shadow-lg transition-all">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 rounded-lg bg-yellow-500/10">
-                <Eye className="h-5 w-5 text-yellow-600" />
-              </div>
-              <span className="text-2xl font-bold text-foreground">{stats.approved}</span>
-            </div>
-            <p className="text-sm text-muted-foreground font-medium">Approuvées</p>
-          </div>
-          
-          <div className="bg-gradient-to-br from-purple-500/10 to-purple-500/5 border border-purple-500/20 rounded-xl p-4 hover:shadow-lg transition-all">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 rounded-lg bg-purple-500/10">
-                <TrendingUp className="h-5 w-5 text-purple-600" />
-              </div>
-              <span className="text-2xl font-bold text-foreground">{stats.sold}</span>
-            </div>
-            <p className="text-sm text-muted-foreground font-medium">Vendues</p>
-          </div>
-        </div>
-
         {/* Bannière offre de lancement */}
         {showLaunchBanner && (
           <Alert className="mb-8 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20 border-amber-200 dark:border-amber-800 relative">
@@ -266,10 +228,14 @@ const Dashboard = () => {
         )}
 
         <Tabs defaultValue={defaultTab} className="w-full">
-          <TabsList className="grid w-full max-w-3xl grid-cols-4 h-auto mb-8 gap-4 p-2">
+          <TabsList className="grid w-full max-w-3xl grid-cols-5 h-auto mb-8 gap-4 p-2">
             <TabsTrigger value="businesses" className="text-xs sm:text-sm py-3 sm:py-4 gap-2 px-4">
               <Building className="h-4 w-4" />
               <span>Mes annonces</span>
+            </TabsTrigger>
+            <TabsTrigger value="favorites" className="text-xs sm:text-sm py-3 sm:py-4 gap-2 px-4">
+              <Heart className="h-4 w-4" />
+              <span>Favoris</span>
             </TabsTrigger>
             <TabsTrigger value="statistics" className="text-xs sm:text-sm py-3 sm:py-4 gap-2 px-4">
               <TrendingUp className="h-4 w-4" />
@@ -539,6 +505,32 @@ const Dashboard = () => {
                 })}
               </div>
               </>
+            )}
+          </TabsContent>
+
+          <TabsContent value="favorites" className="space-y-6">
+            {loading ? (
+              <div className="text-center py-12">
+                <p className="text-muted-foreground">Chargement...</p>
+              </div>
+            ) : favorites.length === 0 ? (
+              <Card>
+                <CardContent className="pt-12 pb-12">
+                  <div className="text-center">
+                    <Heart className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold mb-2">Aucun favori</h3>
+                    <p className="text-muted-foreground">
+                      Commencez à ajouter des annonces à vos favoris pour les retrouver ici
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                {favorites.map((business) => (
+                  <BusinessCard key={business.id} {...business} />
+                ))}
+              </div>
             )}
           </TabsContent>
 

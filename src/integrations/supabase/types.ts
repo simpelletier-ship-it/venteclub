@@ -324,12 +324,14 @@ export type Database = {
       businesses: {
         Row: {
           address: string | null
+          admin_updated_at: string | null
           annual_revenue: number | null
           approval_status: string | null
           asking_price: number
           asking_price_max: number | null
           baiia: number | null
           baiia_margin: number | null
+          chat_disabled: boolean | null
           city: string | null
           created_at: string | null
           currency: string | null
@@ -363,17 +365,20 @@ export type Database = {
           rental_units: Json | null
           royalty_percentage: number | null
           sale_type: Database["public"]["Enums"]["sale_type"] | null
+          seller_email: string | null
           seller_id: string
           seller_name: string | null
           seller_phone: string | null
           slug: string
           sold_at: string | null
+          source_url: string | null
           square_footage: number | null
           status: string | null
           territory_available: string | null
           title: string
           training_provided: boolean | null
           updated_at: string | null
+          updated_by_admin: boolean | null
           views_count: number | null
           withdrawal_reason: string | null
           year_built: number | null
@@ -381,12 +386,14 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          admin_updated_at?: string | null
           annual_revenue?: number | null
           approval_status?: string | null
           asking_price: number
           asking_price_max?: number | null
           baiia?: number | null
           baiia_margin?: number | null
+          chat_disabled?: boolean | null
           city?: string | null
           created_at?: string | null
           currency?: string | null
@@ -420,17 +427,20 @@ export type Database = {
           rental_units?: Json | null
           royalty_percentage?: number | null
           sale_type?: Database["public"]["Enums"]["sale_type"] | null
+          seller_email?: string | null
           seller_id: string
           seller_name?: string | null
           seller_phone?: string | null
           slug: string
           sold_at?: string | null
+          source_url?: string | null
           square_footage?: number | null
           status?: string | null
           territory_available?: string | null
           title: string
           training_provided?: boolean | null
           updated_at?: string | null
+          updated_by_admin?: boolean | null
           views_count?: number | null
           withdrawal_reason?: string | null
           year_built?: number | null
@@ -438,12 +448,14 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          admin_updated_at?: string | null
           annual_revenue?: number | null
           approval_status?: string | null
           asking_price?: number
           asking_price_max?: number | null
           baiia?: number | null
           baiia_margin?: number | null
+          chat_disabled?: boolean | null
           city?: string | null
           created_at?: string | null
           currency?: string | null
@@ -477,17 +489,20 @@ export type Database = {
           rental_units?: Json | null
           royalty_percentage?: number | null
           sale_type?: Database["public"]["Enums"]["sale_type"] | null
+          seller_email?: string | null
           seller_id?: string
           seller_name?: string | null
           seller_phone?: string | null
           slug?: string
           sold_at?: string | null
+          source_url?: string | null
           square_footage?: number | null
           status?: string | null
           territory_available?: string | null
           title?: string
           training_provided?: boolean | null
           updated_at?: string | null
+          updated_by_admin?: boolean | null
           views_count?: number | null
           withdrawal_reason?: string | null
           year_built?: number | null
@@ -849,6 +864,9 @@ export type Database = {
       }
       profiles: {
         Row: {
+          account_approved: boolean | null
+          account_approved_at: string | null
+          approved_by: string | null
           avatar_url: string | null
           bio: string | null
           city: string | null
@@ -876,6 +894,9 @@ export type Database = {
           website: string | null
         }
         Insert: {
+          account_approved?: boolean | null
+          account_approved_at?: string | null
+          approved_by?: string | null
           avatar_url?: string | null
           bio?: string | null
           city?: string | null
@@ -903,6 +924,9 @@ export type Database = {
           website?: string | null
         }
         Update: {
+          account_approved?: boolean | null
+          account_approved_at?: string | null
+          approved_by?: string | null
           avatar_url?: string | null
           bio?: string | null
           city?: string | null
@@ -1288,6 +1312,10 @@ export type Database = {
         Args: { business_uuid: string }
         Returns: undefined
       }
+      approve_user_account: {
+        Args: { target_user_id: string }
+        Returns: undefined
+      }
       archive_old_sold_businesses: { Args: never; Returns: undefined }
       can_start_conversation: {
         Args: { p_business_id: string; p_user_id: string }
@@ -1343,6 +1371,10 @@ export type Database = {
       }
       reject_pending_changes: {
         Args: { business_uuid: string; rejection_reason: string }
+        Returns: undefined
+      }
+      revoke_user_approval: {
+        Args: { target_user_id: string }
         Returns: undefined
       }
       sync_premium_subscription: {

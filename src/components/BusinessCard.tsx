@@ -47,6 +47,8 @@ interface BusinessCardProps {
   is_rental_property?: boolean;
   rental_units?: Array<{unit_type: string, monthly_rent: number, count: number}>;
   is_demo?: boolean;
+  updated_by_admin?: boolean;
+  admin_updated_at?: string;
 }
 
 const BusinessCard = ({
@@ -76,6 +78,8 @@ const BusinessCard = ({
   is_rental_property,
   rental_units,
   is_demo = false,
+  updated_by_admin = false,
+  admin_updated_at,
 }: BusinessCardProps) => {
   const navigate = useNavigate();
   const [userId, setUserId] = useState<string | undefined>();
@@ -334,6 +338,29 @@ const BusinessCard = ({
                 </motion.div>
                 {businessType.label}
               </AnimatedBadge>
+
+              {/* Badge Modifié par admin */}
+              {updated_by_admin && (
+                <TooltipProvider delayDuration={200}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Badge variant="outline" className="text-xs border-blue-500/50 bg-blue-500/10 text-blue-600">
+                        ✓ Vérifié
+                      </Badge>
+                    </TooltipTrigger>
+                    <TooltipContent side="top" className="bg-popover border-border">
+                      <p className="text-sm">
+                        Annonce vérifiée et mise à jour par notre équipe
+                        {admin_updated_at && (
+                          <span className="block text-xs text-muted-foreground mt-1">
+                            Le {new Date(admin_updated_at).toLocaleDateString('fr-CA')}
+                          </span>
+                        )}
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
               
               {/* Badge Démo */}
               {is_demo && (

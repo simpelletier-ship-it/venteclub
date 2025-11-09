@@ -42,6 +42,11 @@ const Admin = () => {
     city: "",
     province: "",
     industry: "",
+    seller_name: "",
+    seller_phone: "",
+    seller_email: "",
+    chat_disabled: false,
+    source_url: "",
   });
   const [uploadingImage, setUploadingImage] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -411,6 +416,11 @@ const Admin = () => {
       city: business.city || "",
       province: business.province || "Québec",
       industry: business.industry || "",
+      seller_name: business.seller_name || "",
+      seller_phone: business.seller_phone || "",
+      seller_email: business.seller_email || "",
+      chat_disabled: business.chat_disabled || false,
+      source_url: business.source_url || "",
     });
     setImageFile(null);
     setEditDialogOpen(true);
@@ -428,6 +438,11 @@ const Admin = () => {
     city: z.string().trim().min(2, "Ville requise"),
     province: z.string().trim().min(2, "Province requise"),
     industry: z.string().min(1, "Secteur requis"),
+    seller_name: z.string().trim().max(200).optional(),
+    seller_phone: z.string().trim().max(20).optional(),
+    seller_email: z.string().email("Email invalide").optional().or(z.literal('')),
+    chat_disabled: z.boolean(),
+    source_url: z.string().url("URL invalide").optional().or(z.literal('')),
   });
 
   const handleImageUpload = async (businessId: string): Promise<string | null> => {
@@ -486,6 +501,11 @@ const Admin = () => {
         industry: validated.industry,
         business_id: selectedBusiness?.id,
         photo_url: photoUrl,
+        seller_name: validated.seller_name || null,
+        seller_phone: validated.seller_phone || null,
+        seller_email: validated.seller_email || null,
+        chat_disabled: validated.chat_disabled,
+        source_url: validated.source_url || null,
       };
 
       const { data, error } = await supabase.functions.invoke('admin-update-business', {
@@ -1998,6 +2018,81 @@ const Admin = () => {
                   placeholder="Montréal, QC"
                   className="mt-2"
                 />
+              </div>
+            </div>
+
+            {/* Champs admin uniquement */}
+            <div className="border-t pt-4 mt-4">
+              <div className="flex items-center gap-2 mb-4">
+                <Badge variant="secondary">Admin uniquement</Badge>
+                <p className="text-xs text-muted-foreground">
+                  Ces informations ne seront visibles que par les administrateurs
+                </p>
+              </div>
+
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="edit-seller-name">Nom du contact</Label>
+                    <Input
+                      id="edit-seller-name"
+                      value={editFormData.seller_name}
+                      onChange={(e) => setEditFormData({ ...editFormData, seller_name: e.target.value })}
+                      placeholder="Jean Dupont"
+                      className="mt-2"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="edit-seller-phone">Téléphone du contact</Label>
+                    <Input
+                      id="edit-seller-phone"
+                      value={editFormData.seller_phone}
+                      onChange={(e) => setEditFormData({ ...editFormData, seller_phone: e.target.value })}
+                      placeholder="514-555-1234"
+                      className="mt-2"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <Label htmlFor="edit-seller-email">Email du contact</Label>
+                  <Input
+                    id="edit-seller-email"
+                    type="email"
+                    value={editFormData.seller_email}
+                    onChange={(e) => setEditFormData({ ...editFormData, seller_email: e.target.value })}
+                    placeholder="contact@entreprise.com"
+                    className="mt-2"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="edit-source-url">Lien source de l&apos;annonce</Label>
+                  <Input
+                    id="edit-source-url"
+                    type="url"
+                    value={editFormData.source_url}
+                    onChange={(e) => setEditFormData({ ...editFormData, source_url: e.target.value })}
+                    placeholder="https://exemple.com/annonce"
+                    className="mt-2"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Ce lien ne sera visible que dans l&apos;interface admin
+                  </p>
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="edit-chat-disabled"
+                    checked={editFormData.chat_disabled}
+                    onChange={(e) => setEditFormData({ ...editFormData, chat_disabled: e.target.checked })}
+                    className="h-4 w-4 rounded border-gray-300"
+                  />
+                  <Label htmlFor="edit-chat-disabled" className="font-normal cursor-pointer">
+                    Désactiver le chat pour cette annonce
+                  </Label>
+                </div>
               </div>
             </div>
           </div>

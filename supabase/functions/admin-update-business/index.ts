@@ -22,6 +22,11 @@ const editBusinessSchema = z.object({
   industry: z.string().min(1, "Secteur requis"),
   business_id: z.string().uuid("ID d'entreprise invalide"),
   photo_url: z.string().url().nullable().optional(),
+  seller_name: z.string().trim().max(200).nullable().optional(),
+  seller_phone: z.string().trim().max(20).nullable().optional(),
+  seller_email: z.string().email("Email invalide").nullable().optional(),
+  chat_disabled: z.boolean().optional(),
+  source_url: z.string().url("URL invalide").nullable().optional(),
 });
 
 const handler = async (req: Request): Promise<Response> => {
@@ -93,7 +98,11 @@ const handler = async (req: Request): Promise<Response> => {
     
     const { error: updateError } = await supabase
       .from('businesses')
-      .update(updateData)
+      .update({
+        ...updateData,
+        updated_by_admin: true,
+        admin_updated_at: new Date().toISOString()
+      })
       .eq('id', business_id);
 
     if (updateError) {

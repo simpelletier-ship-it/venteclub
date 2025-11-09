@@ -191,10 +191,10 @@ const Header = () => {
             {user && (
               <>
                 <button 
-                  onClick={() => navigate("/favorites")} 
-                  className={`text-muted-foreground hover:text-foreground transition-all duration-300 font-semibold relative group ${isScrolled ? 'text-xs' : 'text-sm'}`}
+                  onClick={() => navigate("/ressources")} 
+                  className={`text-muted-foreground hover:text-foreground transition-all duration-300 font-semibold relative group ${isScrolled ? 'text-sm' : 'text-base'}`}
                 >
-                  Favoris
+                  Ressources
                   <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full" />
                 </button>
               </>
@@ -401,7 +401,7 @@ const Header = () => {
                     navigate("/messages");
                     setMobileMenuOpen(false);
                   }}
-                  className="w-full text-left px-4 py-2 rounded-lg border border-border/50 bg-accent/30 hover:bg-accent/50 transition-colors flex items-center gap-2 relative"
+                  className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors flex items-center gap-2 relative"
                 >
                   <Mail className="w-4 h-4" />
                   <span>Messagerie</span>
@@ -410,15 +410,6 @@ const Header = () => {
                       {unreadMessagesCount > 9 ? '9+' : unreadMessagesCount}
                     </span>
                   )}
-                </button>
-                <button
-                  onClick={() => {
-                    navigate("/favorites");
-                    setMobileMenuOpen(false);
-                  }}
-                  className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors"
-                >
-                  Favoris
                 </button>
               </>
             )}
