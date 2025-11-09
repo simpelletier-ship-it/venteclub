@@ -1710,6 +1710,24 @@ const BusinessDetails = () => {
                   </CardContent>
                 </Card>
               )}
+
+              {/* Notice légale */}
+              <Card className="border-muted-foreground/20 bg-muted/30">
+                <CardContent className="pt-6">
+                  <div className="flex gap-3">
+                    <div className="text-muted-foreground mt-0.5">
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-xs text-muted-foreground leading-relaxed">
+                        Les informations présentées dans cette annonce sont fournies directement par le vendeur ou son représentant. Vente.club agit uniquement comme plateforme d&apos;affichage et ne participe pas à la transaction. Nous ne vérifions pas indépendamment les informations et ne garantissons pas leur exactitude. Il est fortement recommandé de procéder à votre propre vérification diligente avant toute transaction.
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
               </div>
             </div>
               </div>
