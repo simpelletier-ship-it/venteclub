@@ -496,7 +496,7 @@ const Admin = () => {
         photoUrl = await handleImageUpload(selectedBusiness?.id);
       }
 
-      // Use secure edge function for server-side validation and update
+      // Update directement avec RLS admin - simple et efficace !
       const updateData = {
         title: validated.title,
         description: validated.description,
@@ -508,22 +508,44 @@ const Admin = () => {
         location: validated.location,
         city: validated.city,
         province: validated.province,
-        industry: validated.industry,
-        business_id: selectedBusiness?.id,
-        photo_url: photoUrl,
+        industry: validated.industry as any,
         seller_name: validated.seller_name || null,
         seller_phone: validated.seller_phone || null,
         seller_email: validated.seller_email || null,
         chat_disabled: validated.chat_disabled,
         source_url: validated.source_url || null,
+        updated_by_admin: true,
+        admin_updated_at: new Date().toISOString()
       };
 
-      const { data, error } = await supabase.functions.invoke('admin-update-business', {
-        body: updateData
-      });
+      const { error } = await supabase
+        .from('businesses')
+        .update(updateData)
+        .eq('id', selectedBusiness?.id);
 
       if (error) throw error;
-      if (data?.error) throw new Error(data.error);
+
+      // Ajouter la photo si fournie
+      if (photoUrl) {
+        const { data: existingPhotos } = await supabase
+          .from('business_photos')
+          .select('display_order')
+          .eq('business_id', selectedBusiness?.id)
+          .order('display_order', { ascending: false })
+          .limit(1);
+
+        const nextOrder = existingPhotos && existingPhotos.length > 0 
+          ? (existingPhotos[0].display_order || 0) + 1 
+          : 1;
+
+        await supabase
+          .from('business_photos')
+          .insert({
+            business_id: selectedBusiness?.id,
+            photo_url: photoUrl,
+            display_order: nextOrder
+          });
+      }
 
       toast({
         title: "Succès",
