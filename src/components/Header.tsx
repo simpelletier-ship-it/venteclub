@@ -139,11 +139,11 @@ const Header = () => {
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center gap-6 xl:gap-10">
+          <div className="hidden lg:flex items-center gap-4 xl:gap-6">
             {/* Lien Acheter une entreprise */}
             <button 
               onClick={() => navigate("/entreprises")} 
-              className="text-muted-foreground hover:text-foreground transition-colors font-semibold text-base lg:text-lg relative group"
+              className="text-muted-foreground hover:text-foreground transition-colors font-semibold text-sm relative group whitespace-nowrap"
             >
               Acheter une entreprise
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full" />
@@ -152,7 +152,7 @@ const Header = () => {
             {/* Lien Vendre une entreprise */}
             <button 
               onClick={() => navigate("/sell")} 
-              className="text-muted-foreground hover:text-foreground transition-colors font-semibold text-base lg:text-lg relative group"
+              className="text-muted-foreground hover:text-foreground transition-colors font-semibold text-sm relative group whitespace-nowrap"
             >
               Vendre une entreprise
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full" />
@@ -161,7 +161,7 @@ const Header = () => {
             {/* Lien Immobilier commercial */}
             <button 
               onClick={() => navigate("/immeubles-commerciaux")} 
-              className="text-muted-foreground hover:text-foreground transition-colors font-semibold text-base lg:text-lg relative group"
+              className="text-muted-foreground hover:text-foreground transition-colors font-semibold text-sm relative group whitespace-nowrap"
             >
               Immobilier commercial
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full" />
@@ -170,7 +170,7 @@ const Header = () => {
             {!user && (
               <button 
                 onClick={() => navigate("/faq")} 
-                className="text-muted-foreground hover:text-foreground transition-colors font-semibold text-base lg:text-lg relative group"
+                className="text-muted-foreground hover:text-foreground transition-colors font-semibold text-sm relative group"
               >
                 FAQ
                 <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full" />
@@ -181,12 +181,12 @@ const Header = () => {
               <>
                 <button 
                   onClick={() => navigate("/messages")} 
-                  className="text-muted-foreground hover:text-foreground transition-colors font-semibold text-base lg:text-lg relative group"
+                  className="text-muted-foreground hover:text-foreground transition-colors font-semibold text-sm relative group"
                 >
                   <div className="relative inline-block">
                     Messagerie
                     {unreadMessagesCount > 0 && (
-                      <span className="absolute -top-2 -right-2 h-5 w-5 rounded-full bg-red-500 text-white text-[11px] flex items-center justify-center font-bold">
+                      <span className="absolute -top-2 -right-2 h-4 w-4 rounded-full bg-red-500 text-white text-[10px] flex items-center justify-center font-bold">
                         {unreadMessagesCount > 9 ? '9+' : unreadMessagesCount}
                       </span>
                     )}
@@ -195,7 +195,7 @@ const Header = () => {
                 </button>
                 <button 
                   onClick={() => navigate("/favorites")} 
-                  className="text-muted-foreground hover:text-foreground transition-colors font-semibold text-base lg:text-lg relative group"
+                  className="text-muted-foreground hover:text-foreground transition-colors font-semibold text-sm relative group"
                 >
                   Favoris
                   <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full" />
@@ -205,7 +205,7 @@ const Header = () => {
           </div>
 
           {/* Right Side Actions */}
-          <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
+          <div className="flex items-center gap-2">
             {user && <NotificationBell userId={user.id} />}
             
             {isAdmin && (
@@ -224,10 +224,10 @@ const Header = () => {
               <>
                 <Button
                   onClick={() => navigate("/dashboard")}
-                  className="hidden lg:flex bg-[#6366f1] hover:bg-[#4f46e5] text-white font-semibold shadow-lg px-4 lg:px-6 py-2 lg:py-3 text-sm lg:text-base h-10 lg:h-12"
+                  className="hidden lg:flex bg-[#6366f1] hover:bg-[#4f46e5] text-white font-semibold shadow-lg px-3 py-2 text-sm h-9"
                 >
-                  <LayoutDashboard className="w-5 h-5 lg:mr-2" />
-                  <span className="hidden xl:inline">Tableau de bord</span>
+                  <LayoutDashboard className="w-4 h-4 mr-2" />
+                  <span>Tableau de bord</span>
                 </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -281,7 +281,7 @@ const Header = () => {
                 <Button
                   variant="ghost"
                   onClick={() => navigate("/auth")}
-                  className="hidden lg:inline-flex font-semibold border border-foreground/20 hover:border-foreground/40 hover:bg-accent px-4 lg:px-6 py-2 lg:py-3 text-sm lg:text-base h-10 lg:h-12"
+                  className="hidden lg:inline-flex font-semibold border border-foreground/20 hover:border-foreground/40 hover:bg-accent px-3 py-2 text-sm h-9 whitespace-nowrap"
                 >
                   Connexion / Créer un compte
                 </Button>
