@@ -13,6 +13,11 @@ import { ProfileCompletionAlert } from "@/components/ProfileCompletionAlert";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { MakeOfferDialog } from "@/components/MakeOfferDialog";
 import { PremiumUpgradeModal } from "@/components/PremiumUpgradeModal";
+import { MessageBubble } from "@/components/MessageBubble";
+import { TypingIndicator } from "@/components/TypingIndicator";
+import { OnlineStatus } from "@/components/OnlineStatus";
+import { useTypingIndicator } from "@/hooks/useTypingIndicator";
+import { usePresence } from "@/hooks/usePresence";
 
 interface Message {
   id: string;
@@ -22,6 +27,9 @@ interface Message {
   created_at: string;
   read: boolean;
   read_at?: string;
+  image_url?: string | null;
+  reply_to_id?: string | null;
+  reactions?: { [emoji: string]: string[] };
 }
 
 interface MessageAttachment {
