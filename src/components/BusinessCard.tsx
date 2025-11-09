@@ -259,7 +259,7 @@ const BusinessCard = ({
         </>
       )}
 
-      <CardContent className="p-5 space-y-3 flex flex-col flex-1">
+      <CardContent className="p-4 sm:p-5 space-y-2 flex flex-col flex-1">
         <div className="flex items-start justify-between gap-2">
           <div className="space-y-2 flex-1">
             <div className="flex items-center gap-1.5 flex-wrap">
@@ -360,16 +360,16 @@ const BusinessCard = ({
                 e.stopPropagation();
                 setShowFullDescription(!showFullDescription);
               }}
-              className="text-xs text-primary hover:text-primary/80 font-semibold mt-1 transition-colors"
+              className="text-xs text-primary hover:text-primary/80 font-semibold transition-colors"
             >
               {showFullDescription ? 'Voir moins' : 'Voir plus'}
             </button>
           )}
         </div>
 
-        <div className="flex-1 min-h-[0.5rem]" />
+        <div className="flex-1 min-h-0" />
 
-        <div className={`grid grid-cols-2 gap-3 pt-3 border-t border-border/50 ${status === 'sold' ? 'blur-[8px]' : ''}`}>
+        <div className={`grid grid-cols-2 gap-2.5 pt-2 border-t border-border/50 ${status === 'sold' ? 'blur-[8px]' : ''}`}>
           {/* Check if it's a property listing */}
           {(sale_type === 'property' || property_type) && (
             <>
@@ -446,7 +446,7 @@ const BusinessCard = ({
           )}
         </div>
 
-        <div className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-3 border-t border-border/50 ${status === 'sold' ? 'blur-[8px]' : ''}`}>
+        <div className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 pt-2 border-t border-border/50 ${status === 'sold' ? 'blur-[8px]' : ''}`}>
           <div className="bg-gradient-to-br from-secondary/10 via-secondary/5 to-transparent p-3 rounded-lg border border-secondary/20 flex-1 w-full sm:w-auto">
             <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold mb-1">Prix demandé</p>
             <p className="text-2xl sm:text-3xl font-display font-bold text-[hsl(var(--secondary))] leading-none">{displayPrice}</p>
