@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { CheckCircle, Sparkles, ArrowRight } from "lucide-react";
 import { SEO } from "@/components/SEO";
+import { trackSignupConversion } from "@/lib/googleAds";
 
 export default function EmailConfirmed() {
   const navigate = useNavigate();
@@ -18,13 +19,8 @@ export default function EmailConfirmed() {
       if (session) {
         setLoading(false);
         
-        // Déclencher l'événement de conversion Google Ads
-        if (typeof window !== 'undefined' && window.gtag) {
-          window.gtag('event', 'conversion', {
-            'send_to': 'AW-974642760/z7Q0CLnYktUDEMi839AD'
-          });
-          console.log('[Google Ads] Conversion "Website traffic" déclenchée');
-        }
+        // Déclencher la conversion création de compte
+        trackSignupConversion();
       } else {
         // Attendre un peu pour voir si la session va se charger
         setTimeout(async () => {
@@ -32,13 +28,8 @@ export default function EmailConfirmed() {
           if (retrySession) {
             setLoading(false);
             
-            // Déclencher l'événement de conversion Google Ads
-            if (typeof window !== 'undefined' && window.gtag) {
-              window.gtag('event', 'conversion', {
-                'send_to': 'AW-974642760/z7Q0CLnYktUDEMi839AD'
-              });
-              console.log('[Google Ads] Conversion "Website traffic" déclenchée');
-            }
+            // Déclencher la conversion création de compte
+            trackSignupConversion();
           } else {
             setError(true);
             setLoading(false);

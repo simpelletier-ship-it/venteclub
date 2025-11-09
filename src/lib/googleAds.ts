@@ -62,6 +62,27 @@ export const trackPageView = () => {
 };
 
 /**
+ * Envoie un événement de conversion pour la création de compte
+ */
+export const trackSignupConversion = () => {
+  if (typeof window === 'undefined' || !(window as any).gtag) {
+    console.warn('Google Ads tag not loaded');
+    return;
+  }
+  
+  const gtag = (window as any).gtag;
+
+  try {
+    gtag('event', 'conversion_event_signup', {
+      send_to: 'AW-974642760'
+    });
+    console.log('Google Ads signup conversion sent');
+  } catch (error) {
+    console.error('Error tracking signup conversion:', error);
+  }
+};
+
+/**
  * Envoie un événement personnalisé à Google Ads
  */
 export const trackCustomEvent = (eventName: string, params?: Record<string, any>) => {
