@@ -8,9 +8,10 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, X, FileText, TrendingUp, DollarSign, Info, Sparkles, Check, ChevronsUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import { Upload, X, FileText, TrendingUp, DollarSign, Info, Sparkles, Check, ChevronsUpDown } from "lucide-react";
 import { businessSchema } from "@/lib/validations";
 import { TermsDialog } from "@/components/TermsDialog";
+import { PhotoManager } from "@/components/PhotoManager";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useAutosaveDraft } from "@/hooks/useAutosaveDraft";
@@ -423,7 +424,7 @@ const ListBusiness = () => {
   };
 
   const movePhotoDown = (index: number) => {
-    if (index === photos.length - 1) return;
+    if (index === photoPreviewUrls.length - 1) return;
     const newPhotos = [...photos];
     const newPreviewUrls = [...photoPreviewUrls];
     
@@ -432,6 +433,22 @@ const ListBusiness = () => {
     
     setPhotos(newPhotos);
     setPhotoPreviewUrls(newPreviewUrls);
+  };
+
+  const handlePhotoReorder = (newOrder: string[]) => {
+    // Créer un mapping des URLs vers les fichiers
+    const urlToFileMap = new Map<string, File>();
+    photoPreviewUrls.forEach((url, index) => {
+      if (photos[index]) {
+        urlToFileMap.set(url, photos[index]);
+      }
+    });
+
+    // Réorganiser les fichiers selon le nouvel ordre
+    const newPhotos = newOrder.map(url => urlToFileMap.get(url)).filter(Boolean) as File[];
+    
+    setPhotoPreviewUrls(newOrder);
+    setPhotos(newPhotos);
   };
 
   const handleGenerateImage = async () => {
@@ -1023,10 +1040,10 @@ const ListBusiness = () => {
                     <div>
                       <Label htmlFor="photos">Photos de l'annonce (jusqu'à 10)</Label>
                       <p className="text-sm text-muted-foreground mt-1 mb-3">
-                        La première photo sera l'image principale affichée sur la fiche. Vous pouvez réorganiser l'ordre.
+                        La première photo sera l'image principale affichée sur la fiche. Glissez-déposez pour réorganiser.
                       </p>
                       
-                      <div className="mt-2 space-y-3">
+                      <div className="mt-2 space-y-4">
                         <label
                           htmlFor="photos"
                           className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-primary/30 rounded-lg cursor-pointer hover:border-primary transition-colors bg-primary/5"
@@ -1052,64 +1069,13 @@ const ListBusiness = () => {
                         </p>
 
                         {photoPreviewUrls.length > 0 && (
-                          <div className="space-y-2 mt-4">
-                            <p className="text-sm font-medium text-foreground">
-                              {photoPreviewUrls.length} photo{photoPreviewUrls.length > 1 ? 's' : ''} ajoutée{photoPreviewUrls.length > 1 ? 's' : ''}
-                            </p>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                              {photoPreviewUrls.map((url, index) => (
-                                <div key={index} className="relative group border border-border rounded-lg p-2 bg-card">
-                                  <div className="flex items-start gap-3">
-                                    <img
-                                      src={url}
-                                      alt={`Photo ${index + 1}`}
-                                      className="w-24 h-24 object-cover rounded-md flex-shrink-0"
-                                    />
-                                    <div className="flex-1 min-w-0">
-                                      <div className="flex items-center gap-2 mb-2">
-                                        <Badge variant={index === 0 ? "default" : "secondary"} className="text-xs">
-                                          {index === 0 ? "📷 Principale" : `Photo ${index + 1}`}
-                                        </Badge>
-                                      </div>
-                                      <div className="flex flex-wrap gap-1">
-                                        {index > 0 && (
-                                          <Button
-                                            type="button"
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() => movePhotoUp(index)}
-                                            className="h-7 px-2 text-xs"
-                                          >
-                                            ↑
-                                          </Button>
-                                        )}
-                                        {index < photoPreviewUrls.length - 1 && (
-                                          <Button
-                                            type="button"
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() => movePhotoDown(index)}
-                                            className="h-7 px-2 text-xs"
-                                          >
-                                            ↓
-                                          </Button>
-                                        )}
-                                        <Button
-                                          type="button"
-                                          variant="destructive"
-                                          size="sm"
-                                          onClick={() => removePhoto(index)}
-                                          className="h-7 px-2 text-xs"
-                                        >
-                                          <X className="h-3 w-3" />
-                                        </Button>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
+                          <PhotoManager
+                            photos={photoPreviewUrls}
+                            onReorder={handlePhotoReorder}
+                            onRemove={removePhoto}
+                            onMoveUp={movePhotoUp}
+                            onMoveDown={movePhotoDown}
+                          />
                         )}
 
                         <div className="relative">
