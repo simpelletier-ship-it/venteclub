@@ -34,6 +34,7 @@ export const BusinessStatistics = ({ userId }: BusinessStatisticsProps) => {
         .eq('seller_id', userId)
         .order('created_at', { ascending: false });
 
+      console.log('[STATS] Businesses found:', businessData?.length);
       setBusinesses(businessData || []);
 
       // Build query for analytics
@@ -47,6 +48,7 @@ export const BusinessStatistics = ({ userId }: BusinessStatisticsProps) => {
         const daysAgo = parseInt(timeRange);
         const dateFrom = new Date();
         dateFrom.setDate(dateFrom.getDate() - daysAgo);
+        console.log('[STATS] Fetching analytics from:', dateFrom.toISOString());
         query = query.gte('created_at', dateFrom.toISOString());
       }
 
@@ -56,6 +58,9 @@ export const BusinessStatistics = ({ userId }: BusinessStatisticsProps) => {
       }
 
       const { data: analyticsData } = await query.order('created_at', { ascending: true });
+      console.log('[STATS] Analytics events found:', analyticsData?.length);
+      console.log('[STATS] First event:', analyticsData?.[0]);
+      console.log('[STATS] Last event:', analyticsData?.[analyticsData.length - 1]);
       setAnalytics(analyticsData || []);
     } catch (error) {
       console.error('Error fetching statistics:', error);
@@ -102,11 +107,12 @@ export const BusinessStatistics = ({ userId }: BusinessStatisticsProps) => {
     const dates = [];
     const daysInRange = timeRange === 'all' ? 90 : parseInt(timeRange);
     const today = new Date();
+    today.setHours(0, 0, 0, 0); // Reset to start of day
     
     for (let i = daysInRange - 1; i >= 0; i--) {
       const date = new Date(today);
       date.setDate(date.getDate() - i);
-      dates.push(date.toLocaleDateString('fr-CA'));
+      dates.push(date.toISOString().split('T')[0]); // Format YYYY-MM-DD
     }
     return dates;
   };
@@ -114,7 +120,7 @@ export const BusinessStatistics = ({ userId }: BusinessStatisticsProps) => {
   const dateRange = timeRange === 'all' ? [] : generateDateRange();
   
   const timelineData = analytics.reduce((acc: any[], curr) => {
-    const date = new Date(curr.created_at).toLocaleDateString('fr-CA');
+    const date = new Date(curr.created_at).toISOString().split('T')[0]; // Format YYYY-MM-DD
     const existing = acc.find(item => item.date === date);
     if (existing) {
       existing[curr.event_type] = (existing[curr.event_type] || 0) + 1;
@@ -135,6 +141,11 @@ export const BusinessStatistics = ({ userId }: BusinessStatisticsProps) => {
       if (!timelineData.find(item => item.date === date)) {
         timelineData.push({
           date,
+          view: 0,
+          click: 0,
+          contact_unlock: 0,
+          favorite: 0,
+          lead: 0,
           total: 0
         });
       }
@@ -143,6 +154,9 @@ export const BusinessStatistics = ({ userId }: BusinessStatisticsProps) => {
 
   // Sort by date
   timelineData.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  
+  console.log('[STATS] Timeline data points:', timelineData.length);
+  console.log('[STATS] Date range:', dateRange.length > 0 ? `${dateRange[0]} to ${dateRange[dateRange.length - 1]}` : 'all time');
 
   // Group by city
   const cityData = analytics
