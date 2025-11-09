@@ -47,6 +47,8 @@ const Auth = () => {
   const [twoFactorCode, setTwoFactorCode] = useState("");
   const [mfaFactorId, setMfaFactorId] = useState<string | null>(null);
   const [mfaChallengeId, setMfaChallengeId] = useState<string | null>(null);
+  const [trustDevice, setTrustDevice] = useState(false);
+  const [pendingUserId, setPendingUserId] = useState<string | null>(null);
 
   useEffect(() => {
     // Vérifier la session existante
@@ -122,7 +124,25 @@ const Auth = () => {
         const totpFactor = factors?.totp?.find(f => f.status === 'verified');
         
         if (totpFactor) {
-          // 2FA est activé, créer un challenge
+          // Vérifier si cet appareil est de confiance
+          if (fingerprint?.hash) {
+            const { data: isTrusted } = await supabase.rpc('is_device_trusted', {
+              p_user_id: data.user.id,
+              p_device_fingerprint: fingerprint.hash
+            });
+
+            if (isTrusted) {
+              // Appareil de confiance, pas besoin de 2FA
+              toast({
+                title: "Connexion réussie !",
+                description: "Appareil de confiance reconnu",
+              });
+              navigate("/");
+              return;
+            }
+          }
+
+          // 2FA est activé et appareil pas de confiance, créer un challenge
           const { data: challengeData, error: challengeError } = await supabase.auth.mfa.challenge({
             factorId: totpFactor.id,
           });
@@ -134,6 +154,7 @@ const Auth = () => {
           // Sauvegarder les IDs pour la vérification
           setMfaFactorId(totpFactor.id);
           setMfaChallengeId(challengeData.id);
+          setPendingUserId(data.user.id);
           setShow2FAPrompt(true);
           setLoading(false);
           return;
@@ -189,15 +210,36 @@ const Auth = () => {
 
       if (error) throw error;
 
+      // Si l'utilisateur a coché "faire confiance à cet appareil"
+      if (trustDevice && fingerprint?.hash && pendingUserId) {
+        try {
+          const trustedUntil = new Date();
+          trustedUntil.setDate(trustedUntil.getDate() + 30); // 30 jours
+
+          await supabase.from('trusted_devices').insert({
+            user_id: pendingUserId,
+            device_fingerprint: fingerprint.hash,
+            device_name: navigator.userAgent.includes('Mobile') ? 'Appareil mobile' : 'Ordinateur',
+            trusted_until: trustedUntil.toISOString(),
+          });
+        } catch (error) {
+          console.error('Error saving trusted device:', error);
+        }
+      }
+
       toast({
         title: "Connexion réussie !",
-        description: "Authentification à deux facteurs validée.",
+        description: trustDevice 
+          ? "Cet appareil est maintenant de confiance pour 30 jours"
+          : "Authentification à deux facteurs validée.",
       });
       
       setShow2FAPrompt(false);
       setTwoFactorCode("");
       setMfaFactorId(null);
       setMfaChallengeId(null);
+      setTrustDevice(false);
+      setPendingUserId(null);
       
       navigate("/");
     } catch (error: any) {
@@ -578,6 +620,20 @@ const Auth = () => {
                       <p className="text-xs text-muted-foreground text-center mt-2">
                         Code à 6 chiffres
                       </p>
+                    </div>
+
+                    <div className="flex items-center space-x-2 p-3 bg-muted/50 rounded-lg">
+                      <Checkbox
+                        id="trust-device"
+                        checked={trustDevice}
+                        onCheckedChange={(checked) => setTrustDevice(checked as boolean)}
+                      />
+                      <Label
+                        htmlFor="trust-device"
+                        className="text-sm cursor-pointer"
+                      >
+                        Faire confiance à cet appareil pendant 30 jours
+                      </Label>
                     </div>
                     
                     <div className="flex gap-2">

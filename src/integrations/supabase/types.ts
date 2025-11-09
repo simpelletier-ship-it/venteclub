@@ -1151,6 +1151,33 @@ export type Database = {
         }
         Relationships: []
       }
+      trusted_devices: {
+        Row: {
+          created_at: string | null
+          device_fingerprint: string
+          device_name: string | null
+          id: string
+          trusted_until: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          device_fingerprint: string
+          device_name?: string | null
+          id?: string
+          trusted_until: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          device_fingerprint?: string
+          device_name?: string | null
+          id?: string
+          trusted_until?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_alerts: {
         Row: {
           alert_type: string
@@ -1351,6 +1378,7 @@ export type Database = {
         Returns: boolean
       }
       cleanup_expired_sessions: { Args: never; Returns: undefined }
+      cleanup_expired_trusted_devices: { Args: never; Returns: undefined }
       cleanup_expired_verification_codes: { Args: never; Returns: undefined }
       cleanup_old_login_attempts: { Args: never; Returns: undefined }
       cleanup_old_rate_limits: { Args: never; Returns: undefined }
@@ -1388,6 +1416,10 @@ export type Database = {
       is_account_locked: { Args: { user_email: string }; Returns: boolean }
       is_business_featured: {
         Args: { business_uuid: string }
+        Returns: boolean
+      }
+      is_device_trusted: {
+        Args: { p_device_fingerprint: string; p_user_id: string }
         Returns: boolean
       }
       log_security_event: {

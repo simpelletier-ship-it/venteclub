@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { User, CreditCard, Bell, Mail, Save, Upload, Shield, MapPin, Globe } from "lucide-react";
 import { AlertsManager } from "@/components/AlertsManager";
 import { TwoFactorAuth } from "@/components/TwoFactorAuth";
+import { TrustedDevices } from "@/components/TrustedDevices";
 import { PaymentHistory } from "@/components/PaymentHistory";
 import { PremiumSubscription } from "@/components/PremiumSubscription";
 
@@ -605,6 +606,7 @@ const Settings = () => {
 
             <TabsContent value="security" className="space-y-6">
               <TwoFactorAuth />
+              <TrustedDevices />
               
               <Card>
                 <CardHeader>
