@@ -31,22 +31,22 @@ export const FloatingOpportunities = () => {
     if (position === 0) {
       // Carte centrale
       return {
-        transform: 'translateX(0%) scale(1)',
+        transform: 'translateX(0%) translateY(0%) scale(1)',
         opacity: 1,
         zIndex: 30,
       };
     } else if (position === 1) {
-      // Carte à droite
+      // Carte à droite - plus petite et plus bas
       return {
-        transform: 'translateX(85%) scale(0.85)',
-        opacity: 0.4,
+        transform: 'translateX(90%) translateY(15%) scale(0.72)',
+        opacity: 0.35,
         zIndex: 20,
       };
     } else if (position === opportunities.length - 1) {
-      // Carte à gauche
+      // Carte à gauche - plus petite et plus bas
       return {
-        transform: 'translateX(-85%) scale(0.85)',
-        opacity: 0.4,
+        transform: 'translateX(-90%) translateY(15%) scale(0.72)',
+        opacity: 0.35,
         zIndex: 20,
       };
     } else {
@@ -125,7 +125,9 @@ export const FloatingOpportunities = () => {
           style={{ animation: "float 6s ease-in-out infinite", willChange: "transform" }}
         >
           <div className="text-[10px] text-slate-600 font-medium">Nouvelles offres</div>
-          <div className="font-bold text-indigo-600 text-sm">+12</div>
+          <div className="font-bold text-indigo-600 text-sm transition-all duration-500">
+            +{8 + (currentIndex * 2)}
+          </div>
         </div>
 
         {/* Carousel Indicators */}
