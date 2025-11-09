@@ -8,14 +8,16 @@ interface OptimizedImageProps extends Omit<ImgHTMLAttributes<HTMLImageElement>, 
   fallback?: React.ReactNode;
   aspectRatio?: string;
   objectFit?: 'cover' | 'contain' | 'fill' | 'none' | 'scale-down';
+  priority?: boolean; // Pour les images above-the-fold
 }
 
 /**
  * Composant d'image optimisé avec:
- * - Lazy loading natif
+ * - Lazy loading natif ou eager pour images prioritaires
  * - Support WebP avec fallback
  * - Skeleton pendant le chargement
  * - Gestion d'erreurs avec fallback personnalisable
+ * - fetchpriority pour améliorer LCP
  */
 export const OptimizedImage = ({
   src,
@@ -23,6 +25,7 @@ export const OptimizedImage = ({
   fallback,
   aspectRatio,
   objectFit = 'cover',
+  priority = false,
   className = '',
   ...props
 }: OptimizedImageProps) => {
@@ -82,8 +85,9 @@ export const OptimizedImage = ({
         <img
           src={fallbackSrc}
           alt={alt}
-          loading="lazy"
+          loading={priority ? "eager" : "lazy"}
           decoding="async"
+          fetchPriority={priority ? "high" : "auto"}
           onLoad={handleLoad}
           onError={handleError}
           className={`${className} ${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}

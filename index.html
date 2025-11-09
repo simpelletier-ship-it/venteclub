@@ -53,43 +53,47 @@
     <!-- Theme Color -->
     <meta name="theme-color" content="#0F172A" />
     
-    <!-- Performance Optimizations -->
+    <!-- Performance Optimizations - Core Web Vitals -->
     <link rel="preconnect" href="https://xmwsrvaricrfxovimffm.supabase.co" crossorigin />
     <link rel="dns-prefetch" href="https://xmwsrvaricrfxovimffm.supabase.co" />
+    <link rel="preconnect" href="https://api.mapbox.com" />
+    <link rel="dns-prefetch" href="https://api.mapbox.com" />
     
-    <!-- Fonts with display swap for better performance -->
+    <!-- Fonts with display swap for better LCP -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Sora:wght@400;500;600;700;800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'" />
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Sora:wght@400;500;600;700;800&display=swap" /></noscript>
     
-    <!-- Google Tag Manager -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-PPBNNNKF');</script>
+    <!-- Preload critical hero image for better LCP -->
+    <link rel="preload" as="image" href="/og-image.jpg" fetchpriority="high" />
+    
+    <!-- Google Tag Manager - Defer for better FID -->
+    <script>
+      (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+      new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.defer=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+      })(window,document,'script','dataLayer','GTM-PPBNNNKF');
+    </script>
     <!-- End Google Tag Manager -->
     
-    <!-- Google reCAPTCHA -->
-    <script src="https://www.google.com/recaptcha/enterprise.js" async defer></script>
+    <!-- Google reCAPTCHA - Defer for better FID -->
+    <script src="https://www.google.com/recaptcha/enterprise.js" defer></script>
     
-    <!-- Google tag (gtag.js) - Unified for Google Ads & Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-974642760"></script>
+    <!-- Google tag (gtag.js) - Defer for better FID -->
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-
-      // Configuration Google Ads
       gtag('config', 'AW-974642760');
-      
-      // Configuration Google Analytics 4
       gtag('config', 'G-362DNT7Q72', {
         'send_page_view': true,
         'anonymize_ip': true,
         'cookie_flags': 'SameSite=None;Secure'
       });
     </script>
+    <script defer src="https://www.googletagmanager.com/gtag/js?id=AW-974642760"></script>
   </head>
 
   <body>

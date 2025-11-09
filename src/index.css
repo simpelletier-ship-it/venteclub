@@ -159,6 +159,11 @@ All colors MUST be HSL.
     line-height: 1.6;
   }
   
+  /* Prévenir CLS avec réservation d'espace pour les fonts */
+  body {
+    font-display: swap;
+  }
+  
   /* Optimisation tactile mobile */
   @media (hover: none) and (pointer: coarse) {
     button, a {
