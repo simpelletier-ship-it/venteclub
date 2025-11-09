@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { CheckCircle, XCircle, Eye, ArrowLeft, Trash2, Star, Edit, Upload, UserX, Shield } from "lucide-react";
+import { CheckCircle, XCircle, Eye, ArrowLeft, Trash2, Star, Edit, Upload, UserX, Shield, X, ChevronUp, ChevronDown } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { z } from "zod";
@@ -50,6 +50,7 @@ const Admin = () => {
   });
   const [uploadingImage, setUploadingImage] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [existingPhotos, setExistingPhotos] = useState<any[]>([]);
   const [users, setUsers] = useState<any[]>([]);
   const [userToDelete, setUserToDelete] = useState<any>(null);
   const [deleteUserDialogOpen, setDeleteUserDialogOpen] = useState(false);
@@ -402,7 +403,7 @@ const Admin = () => {
     }
   };
 
-  const handleEditClick = (business: any) => {
+  const handleEditClick = async (business: any) => {
     setSelectedBusiness(business);
     setEditFormData({
       title: business.title,
@@ -423,6 +424,15 @@ const Admin = () => {
       source_url: business.source_url || "",
     });
     setImageFile(null);
+    
+    // Fetch existing photos
+    const { data: photos } = await supabase
+      .from('business_photos')
+      .select('*')
+      .eq('business_id', business.id)
+      .order('display_order', { ascending: true });
+    
+    setExistingPhotos(photos || []);
     setEditDialogOpen(true);
   };
 
@@ -1860,8 +1870,96 @@ const Admin = () => {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
+            {/* Gestion des images existantes */}
+            {existingPhotos.length > 0 && (
+              <div>
+                <Label>Images actuelles ({existingPhotos.length})</Label>
+                <div className="mt-2 space-y-2">
+                  {existingPhotos.map((photo, index) => (
+                    <div key={photo.id} className="flex items-center gap-2 p-2 border rounded-lg bg-muted/30">
+                      <img 
+                        src={photo.photo_url} 
+                        alt={`Photo ${index + 1}`}
+                        className="w-16 h-16 object-cover rounded"
+                      />
+                      <span className="text-sm flex-1 truncate">{photo.photo_url}</span>
+                      <div className="flex gap-1">
+                        {index > 0 && (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={async () => {
+                              const newPhotos = [...existingPhotos];
+                              const temp = newPhotos[index];
+                              newPhotos[index] = newPhotos[index - 1];
+                              newPhotos[index - 1] = temp;
+                              
+                              // Update display orders
+                              await Promise.all(newPhotos.map((p, idx) => 
+                                supabase
+                                  .from('business_photos')
+                                  .update({ display_order: idx })
+                                  .eq('id', p.id)
+                              ));
+                              
+                              setExistingPhotos(newPhotos);
+                              toast({ title: "Ordre modifié" });
+                            }}
+                          >
+                            <ChevronUp className="w-4 h-4" />
+                          </Button>
+                        )}
+                        {index < existingPhotos.length - 1 && (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={async () => {
+                              const newPhotos = [...existingPhotos];
+                              const temp = newPhotos[index];
+                              newPhotos[index] = newPhotos[index + 1];
+                              newPhotos[index + 1] = temp;
+                              
+                              await Promise.all(newPhotos.map((p, idx) => 
+                                supabase
+                                  .from('business_photos')
+                                  .update({ display_order: idx })
+                                  .eq('id', p.id)
+                              ));
+                              
+                              setExistingPhotos(newPhotos);
+                              toast({ title: "Ordre modifié" });
+                            }}
+                          >
+                            <ChevronDown className="w-4 h-4" />
+                          </Button>
+                        )}
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={async () => {
+                            if (!confirm('Supprimer cette image ?')) return;
+                            
+                            await supabase
+                              .from('business_photos')
+                              .delete()
+                              .eq('id', photo.id);
+                            
+                            setExistingPhotos(existingPhotos.filter(p => p.id !== photo.id));
+                            toast({ title: "Image supprimée" });
+                          }}
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Ajouter une nouvelle image */}
             <div>
-              <Label htmlFor="edit-image">Photo de l'entreprise</Label>
+              <Label htmlFor="edit-image">Ajouter une nouvelle photo</Label>
               <div className="mt-2">
                 <Input
                   id="edit-image"
