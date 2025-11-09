@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Star, XCircle, Edit, TrendingUp, Eye, Building, MessageSquare, Crown, FileText, CheckCircle, UserCircle } from "lucide-react";
+import { Plus, Star, XCircle, Edit, TrendingUp, Eye, Building, MessageSquare, Crown, FileText, CheckCircle, UserCircle, Sparkles, X } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import BusinessCard from "@/components/BusinessCard";
@@ -13,6 +13,7 @@ import { WithdrawBusinessDialog } from "@/components/WithdrawBusinessDialog";
 import { PremiumSubscription } from "@/components/PremiumSubscription";
 import { BusinessStatistics } from "@/components/BusinessStatistics";
 import { ProfileForm } from "@/components/ProfileForm";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -30,6 +31,7 @@ const Dashboard = () => {
     approved: 0,
     sold: 0
   });
+  const [showLaunchBanner, setShowLaunchBanner] = useState(true);
   const defaultTab = searchParams.get('tab') || 'businesses';
 
   useEffect(() => {
@@ -231,6 +233,37 @@ const Dashboard = () => {
             <p className="text-sm text-muted-foreground font-medium">Vendues</p>
           </div>
         </div>
+
+        {/* Bannière offre de lancement */}
+        {showLaunchBanner && (
+          <Alert className="mb-8 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20 border-amber-200 dark:border-amber-800 relative">
+            <button
+              onClick={() => setShowLaunchBanner(false)}
+              className="absolute top-3 right-3 text-muted-foreground hover:text-foreground transition-colors"
+              aria-label="Fermer"
+            >
+              <X className="h-4 w-4" />
+            </button>
+            <div className="flex gap-3">
+              <div className="flex-shrink-0">
+                <div className="p-2 bg-gradient-to-br from-amber-500 to-orange-500 rounded-lg">
+                  <Sparkles className="h-5 w-5 text-white" />
+                </div>
+              </div>
+              <AlertDescription className="text-sm space-y-2 pr-8">
+                <p className="font-semibold text-foreground text-base">
+                  🎉 Offre de lancement exclusive
+                </p>
+                <p className="text-muted-foreground">
+                  Le site est en phase de lancement. Profitez dès maintenant : <strong>annonces gratuites et illimitées</strong> + <strong>mise de l&apos;avant gratuite pendant 2 mois</strong> pour toutes vos annonces approuvées.
+                </p>
+                <p className="text-xs text-muted-foreground italic">
+                  Note : Le site présente actuellement des annonces fictives. Les vraies annonces seront approuvées progressivement. Vos commentaires et signalements nous aident à perfectionner la plateforme.
+                </p>
+              </AlertDescription>
+            </div>
+          </Alert>
+        )}
 
         <Tabs defaultValue={defaultTab} className="w-full">
           <TabsList className="grid w-full max-w-3xl grid-cols-4 h-auto mb-8 gap-4 p-2">
