@@ -178,18 +178,6 @@ const Header = () => {
                 <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full" />
               </button>
             )}
-            
-            {user && (
-              <>
-                <button 
-                  onClick={() => navigate("/ressources")} 
-                  className="text-muted-foreground hover:text-foreground transition-all duration-300 font-semibold relative group text-base"
-                >
-                  Ressources
-                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full" />
-                </button>
-              </>
-            )}
           </div>
 
           {/* Right Side Actions */}
@@ -368,15 +356,6 @@ const Header = () => {
             )}
             {user && (
               <>
-                <button
-                  onClick={() => {
-                    navigate("/ressources");
-                    setMobileMenuOpen(false);
-                  }}
-                  className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors"
-                >
-                  Ressources
-                </button>
                 <button
                   onClick={() => {
                     navigate("/dashboard");
