@@ -19,6 +19,7 @@ import {
   AlignCenter,
   AlignRight,
   Highlighter,
+  Image as ImageIcon,
 } from "lucide-react";
 
 interface VisualRichTextEditorProps {
@@ -92,6 +93,13 @@ export const VisualRichTextEditor = ({
     executeCommand("fontName", font);
   };
 
+  const insertImage = () => {
+    const url = prompt("Entrez l'URL de l'image:");
+    if (url) {
+      executeCommand("insertImage", url);
+    }
+  };
+
   const formatButtons = [
     {
       icon: Heading1,
@@ -153,6 +161,12 @@ export const VisualRichTextEditor = ({
       action: () => executeCommand("justifyRight"),
       command: "justifyRight",
     },
+    {
+      icon: AlignLeft,
+      label: "Justifier",
+      action: () => executeCommand("justifyFull"),
+      command: "justifyFull",
+    },
   ];
 
   const highlightColors = [
@@ -171,10 +185,14 @@ export const VisualRichTextEditor = ({
   ];
 
   const fontFamilies = [
-    { label: "Sans Serif", value: "Arial, sans-serif" },
-    { label: "Serif", value: "Georgia, serif" },
-    { label: "Monospace", value: "Courier New, monospace" },
-    { label: "Cursive", value: "Comic Sans MS, cursive" },
+    { label: "Sans Serif (Arial)", value: "Arial, sans-serif" },
+    { label: "Serif (Georgia)", value: "Georgia, serif" },
+    { label: "Times New Roman", value: "'Times New Roman', serif" },
+    { label: "Verdana", value: "Verdana, sans-serif" },
+    { label: "Tahoma", value: "Tahoma, sans-serif" },
+    { label: "Trebuchet", value: "'Trebuchet MS', sans-serif" },
+    { label: "Courier", value: "'Courier New', monospace" },
+    { label: "Comic Sans", value: "'Comic Sans MS', cursive" },
   ];
 
   return (
@@ -228,6 +246,20 @@ export const VisualRichTextEditor = ({
 
         <div className="h-6 w-px bg-border" />
 
+        {/* Image button */}
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={insertImage}
+          title="Insérer une image"
+          className="h-8 w-8 p-0"
+        >
+          <ImageIcon className="h-4 w-4" />
+        </Button>
+
+        <div className="h-6 w-px bg-border" />
+
         {/* Highlight colors */}
         <div className="flex gap-1 items-center">
           <Highlighter className="h-4 w-4 text-muted-foreground mr-1" />
@@ -250,7 +282,7 @@ export const VisualRichTextEditor = ({
           ref={editorRef}
           contentEditable
           onInput={handleInput}
-          className="min-h-[300px] max-h-[600px] overflow-y-auto overflow-x-hidden p-4 focus:outline-none prose prose-sm max-w-none"
+          className="min-h-[300px] max-h-[600px] overflow-y-auto overflow-x-hidden p-4 pl-8 focus:outline-none prose prose-sm max-w-none"
           style={{
             wordWrap: "break-word",
             overflowWrap: "break-word",
@@ -295,22 +327,32 @@ export const VisualRichTextEditor = ({
         }
         [contenteditable] ul {
           list-style-type: disc;
-          margin-left: 1.5em;
+          margin-left: 2em;
+          padding-left: 0.5em;
           margin: 0.5em 0;
         }
         [contenteditable] ol {
           list-style-type: decimal;
-          margin-left: 1.5em;
+          margin-left: 2em;
+          padding-left: 0.5em;
           margin: 0.5em 0;
         }
         [contenteditable] li {
           margin: 0.25em 0;
+          padding-left: 0.25em;
         }
         [contenteditable] p {
           margin: 0.5em 0;
         }
         [contenteditable] * {
           max-width: 100%;
+        }
+        [contenteditable] img {
+          max-width: 100%;
+          height: auto;
+          display: block;
+          margin: 1em 0;
+          border-radius: 8px;
         }
       `}</style>
     </div>
