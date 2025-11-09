@@ -35,44 +35,36 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    // Initialize Supabase clients - need both service role and user-based
+    // Initialize Supabase client with service role
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
     
-    // Get user from auth header using anon key
+    // Get user from auth header
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
+      console.error("No authorization header");
       return new Response(
         JSON.stringify({ error: "Non autorisé" }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // Extract token properly
-    const token = authHeader.startsWith("Bearer ") 
-      ? authHeader.substring(7) 
-      : authHeader;
-
-    // Create client with anon key to verify user
-    const supabaseAuth = createClient(supabaseUrl, supabaseAnonKey, {
-      global: {
-        headers: { Authorization: authHeader }
-      }
-    });
-
-    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser(token);
+    // Extract token
+    const token = authHeader.replace("Bearer ", "");
+    
+    // Verify JWT token using service role (can verify any token)
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
 
     if (authError || !user) {
-      console.error("Auth error:", authError);
+      console.error("Auth error:", authError?.message || "No user found");
       return new Response(
-        JSON.stringify({ error: "Non autorisé" }),
+        JSON.stringify({ error: "Non autorisé - token invalide" }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // Now use service role client for admin operations
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    console.log("User authenticated:", user.id);
 
     // Check admin role
     const { data: hasAdminRole, error: roleError } = await supabase

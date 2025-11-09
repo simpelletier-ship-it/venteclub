@@ -21,7 +21,6 @@ const Header = () => {
   const [profile, setProfile] = useState<any>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
-  const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -42,21 +41,8 @@ const Header = () => {
       }
     });
 
-    // Écouter le scroll avec debounce pour éviter les bugs
-    let scrollTimeout: NodeJS.Timeout;
-    const handleScroll = () => {
-      clearTimeout(scrollTimeout);
-      scrollTimeout = setTimeout(() => {
-        setIsScrolled(window.scrollY > 50);
-      }, 50);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-
     return () => {
       subscription.unsubscribe();
-      window.removeEventListener('scroll', handleScroll);
-      clearTimeout(scrollTimeout);
     };
   }, []);
 
@@ -141,7 +127,7 @@ const Header = () => {
   };
 
   return (
-    <nav className={`border-b border-border bg-background/95 backdrop-blur-xl sticky top-0 z-50 shadow-sm transition-all duration-500 ease-out ${isScrolled ? 'py-2' : 'py-3 sm:py-4 md:py-6'}`}>
+    <nav className="border-b border-border bg-background/95 backdrop-blur-xl sticky top-0 z-50 shadow-sm py-3 sm:py-4 md:py-6">
       <div className="container mx-auto px-4 sm:px-6 md:px-8">
         <div className="flex items-center justify-between">
           {/* Logo */}
@@ -149,17 +135,17 @@ const Header = () => {
             className="flex items-center cursor-pointer group" 
             onClick={() => navigate("/")}
           >
-            <span className={`font-display font-bold text-foreground transition-all duration-300 group-hover:scale-105 ${isScrolled ? 'text-lg sm:text-xl' : 'text-xl sm:text-2xl md:text-3xl'}`}>
+            <span className="font-display font-bold text-foreground text-xl sm:text-2xl md:text-3xl transition-all duration-300 group-hover:scale-105">
               Vente<span className="text-secondary">.Club</span>
             </span>
           </div>
 
           {/* Desktop Navigation - Plus d'espace et mieux organisé */}
-          <div className={`hidden lg:flex items-center flex-1 justify-center transition-all duration-300 ${isScrolled ? 'gap-6' : 'gap-8 xl:gap-10'}`}>
+          <div className="hidden lg:flex items-center flex-1 justify-center gap-8 xl:gap-10">
             {/* Lien Acheter une entreprise */}
             <button 
               onClick={() => navigate("/entreprises")} 
-              className={`text-muted-foreground hover:text-foreground transition-all duration-300 font-semibold relative group whitespace-nowrap ${isScrolled ? 'text-sm' : 'text-base'}`}
+              className="text-muted-foreground hover:text-foreground transition-all duration-300 font-semibold relative group whitespace-nowrap text-base"
             >
               Acheter une entreprise
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full" />
@@ -168,7 +154,7 @@ const Header = () => {
             {/* Lien Vendre une entreprise */}
             <button 
               onClick={() => navigate("/sell")} 
-              className={`text-muted-foreground hover:text-foreground transition-all duration-300 font-semibold relative group whitespace-nowrap ${isScrolled ? 'text-sm' : 'text-base'}`}
+              className="text-muted-foreground hover:text-foreground transition-all duration-300 font-semibold relative group whitespace-nowrap text-base"
             >
               Vendre une entreprise
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full" />
@@ -177,7 +163,7 @@ const Header = () => {
             {/* Lien Immobilier commercial */}
             <button 
               onClick={() => navigate("/immeubles-commerciaux")} 
-              className={`text-muted-foreground hover:text-foreground transition-all duration-300 font-semibold relative group whitespace-nowrap ${isScrolled ? 'text-sm' : 'text-base'}`}
+              className="text-muted-foreground hover:text-foreground transition-all duration-300 font-semibold relative group whitespace-nowrap text-base"
             >
               Immobilier commercial
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full" />
@@ -186,7 +172,7 @@ const Header = () => {
             {!user && (
               <button 
                 onClick={() => navigate("/faq")} 
-                className={`text-muted-foreground hover:text-foreground transition-all duration-300 font-semibold relative group ${isScrolled ? 'text-sm' : 'text-base'}`}
+                className="text-muted-foreground hover:text-foreground transition-all duration-300 font-semibold relative group text-base"
               >
                 FAQ
                 <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full" />
@@ -197,7 +183,7 @@ const Header = () => {
               <>
                 <button 
                   onClick={() => navigate("/ressources")} 
-                  className={`text-muted-foreground hover:text-foreground transition-all duration-300 font-semibold relative group ${isScrolled ? 'text-sm' : 'text-base'}`}
+                  className="text-muted-foreground hover:text-foreground transition-all duration-300 font-semibold relative group text-base"
                 >
                   Ressources
                   <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full" />
@@ -226,9 +212,9 @@ const Header = () => {
               <>
                 <button 
                   onClick={() => navigate("/messages")} 
-                  className={`hidden lg:flex items-center gap-2 px-4 py-2 rounded-lg border border-border/50 bg-accent/30 hover:bg-accent/50 transition-all duration-300 font-semibold relative ${isScrolled ? 'text-sm h-9' : 'text-base h-10'}`}
+                  className="hidden lg:flex items-center gap-2 px-4 py-2 rounded-lg border border-border/50 bg-accent/30 hover:bg-accent/50 transition-all duration-300 font-semibold relative text-base h-10"
                 >
-                  <Mail className={`transition-all duration-300 ${isScrolled ? 'w-4 h-4' : 'w-4 h-4'}`} />
+                  <Mail className="w-4 h-4" />
                   <span>Messagerie</span>
                   {unreadMessagesCount > 0 && (
                     <span className="absolute -top-1.5 -right-1.5 h-5 w-5 rounded-full bg-destructive text-white text-[10px] flex items-center justify-center font-bold shadow-lg">
@@ -238,9 +224,9 @@ const Header = () => {
                 </button>
                 <Button
                   onClick={() => navigate("/dashboard")}
-                  className={`hidden lg:flex bg-[#6366f1] hover:bg-[#4f46e5] text-white font-semibold shadow-lg transition-all duration-300 ${isScrolled ? 'px-4 py-2 text-sm h-9' : 'px-5 py-2.5 text-base h-10'}`}
+                  className="hidden lg:flex bg-[#6366f1] hover:bg-[#4f46e5] text-white font-semibold shadow-lg px-5 py-2.5 text-base h-10"
                 >
-                  <LayoutDashboard className={`mr-2 transition-all duration-300 ${isScrolled ? 'w-4 h-4' : 'w-4 h-4'}`} />
+                  <LayoutDashboard className="mr-2 w-4 h-4" />
                   <span>Tableau de bord</span>
                 </Button>
                 <DropdownMenu>
@@ -295,13 +281,13 @@ const Header = () => {
                 <Button
                   variant="ghost"
                   onClick={() => navigate("/auth")}
-                  className={`hidden lg:inline-flex font-semibold border border-border/50 hover:border-border hover:bg-accent transition-all duration-300 whitespace-nowrap ${isScrolled ? 'px-4 py-2 text-sm h-9' : 'px-5 py-2.5 text-base h-10'}`}
+                  className="hidden lg:inline-flex font-semibold border border-border/50 hover:border-border hover:bg-accent px-5 py-2.5 text-base h-10 whitespace-nowrap"
                 >
                   Connexion
                 </Button>
                 <Button
                   onClick={() => navigate("/auth")}
-                  className={`hidden lg:inline-flex bg-[#6366f1] hover:bg-[#4f46e5] text-white font-semibold shadow-lg transition-all duration-300 whitespace-nowrap ${isScrolled ? 'px-4 py-2 text-sm h-9' : 'px-5 py-2.5 text-base h-10'}`}
+                  className="hidden lg:inline-flex bg-[#6366f1] hover:bg-[#4f46e5] text-white font-semibold shadow-lg px-5 py-2.5 text-base h-10 whitespace-nowrap"
                 >
                   Créer un compte
                 </Button>
