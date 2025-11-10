@@ -1,4 +1,4 @@
-import { useState, ImgHTMLAttributes } from "react";
+import { useState, ImgHTMLAttributes, useEffect } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Image as ImageIcon } from "lucide-react";
 
@@ -9,14 +9,56 @@ interface OptimizedImageProps extends Omit<ImgHTMLAttributes<HTMLImageElement>, 
   aspectRatio?: string;
   objectFit?: 'cover' | 'contain' | 'fill' | 'none' | 'scale-down';
   priority?: boolean; // Pour les images above-the-fold
+  width?: number; // Largeur cible pour l'optimisation Supabase
+  quality?: number; // Qualité de l'image (1-100)
 }
+
+/**
+ * Optimise une URL d'image Supabase avec transformations
+ * - Resize automatique selon la largeur
+ * - Conversion WebP pour réduire la taille
+ * - Compression avec qualité ajustable
+ */
+const getOptimizedImageUrl = (url: string, width?: number, quality: number = 80): string => {
+  if (!url) return url;
+  
+  // Vérifier si c'est une image Supabase
+  const isSupabaseImage = url.includes('supabase.co') && url.includes('/storage/v1/object/public/');
+  
+  if (!isSupabaseImage) return url;
+  
+  try {
+    const urlObj = new URL(url);
+    const params = new URLSearchParams();
+    
+    // Ajouter les transformations d'image Supabase
+    if (width) {
+      params.append('width', width.toString());
+    }
+    
+    // Qualité (1-100)
+    params.append('quality', quality.toString());
+    
+    // Format WebP pour réduire la taille de 25-35%
+    params.append('format', 'webp');
+    
+    // Ajouter les paramètres à l'URL
+    const transformedUrl = `${urlObj.origin}${urlObj.pathname}?${params.toString()}`;
+    return transformedUrl;
+  } catch (error) {
+    console.warn('Failed to optimize image URL:', error);
+    return url;
+  }
+};
 
 /**
  * Composant d'image optimisé avec:
  * - Lazy loading natif ou eager pour images prioritaires
+ * - Transformations Supabase (resize, WebP, compression)
  * - Skeleton pendant le chargement
  * - Gestion d'erreurs avec fallback personnalisable
  * - fetchpriority pour améliorer LCP
+ * - Responsive images avec srcset
  */
 export const OptimizedImage = ({
   src,
@@ -25,11 +67,20 @@ export const OptimizedImage = ({
   aspectRatio,
   objectFit = 'cover',
   priority = false,
+  width,
+  quality = 80,
   className = '',
   ...props
 }: OptimizedImageProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
+  const [optimizedSrc, setOptimizedSrc] = useState(src);
+
+  // Optimiser l'URL de l'image au montage
+  useEffect(() => {
+    const optimized = getOptimizedImageUrl(src, width, quality);
+    setOptimizedSrc(optimized);
+  }, [src, width, quality]);
 
   const handleLoad = () => {
     setIsLoading(false);
@@ -38,6 +89,22 @@ export const OptimizedImage = ({
   const handleError = () => {
     setIsLoading(false);
     setHasError(true);
+  };
+
+  // Générer srcset pour responsive images
+  const generateSrcSet = (): string => {
+    if (!width || !src.includes('supabase.co')) return '';
+    
+    const sizes = [
+      Math.round(width * 0.5),  // 0.5x
+      width,                     // 1x
+      Math.round(width * 1.5),   // 1.5x
+      Math.round(width * 2),     // 2x
+    ];
+    
+    return sizes
+      .map(size => `${getOptimizedImageUrl(src, size, quality)} ${size}w`)
+      .join(', ');
   };
 
   if (hasError) {
@@ -52,13 +119,17 @@ export const OptimizedImage = ({
     );
   }
 
+  const srcSet = generateSrcSet();
+
   return (
     <div className="relative w-full h-full">
       {isLoading && (
         <Skeleton className={`absolute inset-0 ${className}`} />
       )}
       <img
-        src={src}
+        src={optimizedSrc}
+        srcSet={srcSet || undefined}
+        sizes={width ? `(max-width: 768px) 100vw, ${width}px` : undefined}
         alt={alt}
         loading={priority ? "eager" : "lazy"}
         decoding="async"

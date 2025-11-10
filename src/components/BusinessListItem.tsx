@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TrendingUp, MapPin, Star, Home, Store, HelpCircle, Image as ImageIcon } from "lucide-react";
+import { OptimizedImage } from "./OptimizedImage";
 import { useNavigate } from "react-router-dom";
 import { FavoriteButton } from "./FavoriteButton";
 import { useState, useEffect } from "react";
@@ -161,12 +162,13 @@ const BusinessListItem = ({
         {imageLoading ? (
           <Skeleton className="w-full h-full" />
         ) : mainImageUrl ? (
-          <img
+          <OptimizedImage
             src={mainImageUrl}
             alt={title}
             className="w-full h-full object-contain bg-muted"
-            loading="lazy"
-            decoding="async"
+            objectFit="contain"
+            width={400}
+            quality={70}
           />
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-muted to-muted/50">

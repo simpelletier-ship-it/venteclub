@@ -233,6 +233,8 @@ const BusinessCard = ({
                 alt={title}
                 className="w-full h-full object-cover"
                 objectFit="cover"
+                width={600}
+                quality={75}
               />
               
               {/* Navigation arrows - style YouTube - only for non-demo with multiple images */}
