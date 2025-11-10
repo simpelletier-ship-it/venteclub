@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { Upload, X, FileText, TrendingUp, DollarSign, Info, Sparkles, Check, ChevronsUpDown } from "lucide-react";
+import { CurrencyInput } from "@/components/CurrencyInput";
 import VisibilityScoreCard from "@/components/VisibilityScoreCard";
 import { businessSchema } from "@/lib/validations";
 import { TermsDialog } from "@/components/TermsDialog";
@@ -1396,15 +1397,13 @@ const ListBusiness = () => {
                         <Label htmlFor="asking_price">
                           Prix de vente {!priceNegotiable && <span className="text-destructive">*</span>}
                         </Label>
-                        <Input
+                        <CurrencyInput
                           id="asking_price"
-                          type="number"
                           value={formData.asking_price}
-                          onChange={(e) => setFormData({ ...formData, asking_price: e.target.value })}
+                          onChange={(value) => setFormData({ ...formData, asking_price: value })}
                           required={!priceNegotiable}
                           disabled={priceNegotiable}
-                          placeholder={priceNegotiable ? "À discuter" : "Ex: 100 000"}
-                          min="0"
+                          placeholder={priceNegotiable ? "À discuter" : "100 000 $"}
                         />
                         <div className="flex items-center space-x-2 mt-2">
                           <Checkbox
@@ -1427,14 +1426,12 @@ const ListBusiness = () => {
                         <Label htmlFor="asking_price_max">
                           Prix maximum (optionnel)
                         </Label>
-                        <Input
+                        <CurrencyInput
                           id="asking_price_max"
-                          type="number"
                           value={formData.asking_price_max}
-                          onChange={(e) => setFormData({ ...formData, asking_price_max: e.target.value })}
+                          onChange={(value) => setFormData({ ...formData, asking_price_max: value })}
                           disabled={priceNegotiable}
-                          placeholder="Ex: 150 000"
-                          min={formData.asking_price || "0"}
+                          placeholder="150 000 $"
                         />
                         <p className="text-xs text-muted-foreground mt-1">
                           Pour afficher une fourchette de prix (ex: 100 000 $ - 150 000 $)
@@ -1462,12 +1459,11 @@ const ListBusiness = () => {
 
                       <div>
                         <Label htmlFor="annual_revenue">Revenus annuels</Label>
-                        <Input
+                        <CurrencyInput
                           id="annual_revenue"
-                          type="number"
                           value={formData.annual_revenue}
-                          onChange={(e) => setFormData({ ...formData, annual_revenue: e.target.value })}
-                          placeholder="Ex: 250 000"
+                          onChange={(value) => setFormData({ ...formData, annual_revenue: value })}
+                          placeholder="250 000 $"
                         />
                       </div>
                     </div>
@@ -1475,23 +1471,21 @@ const ListBusiness = () => {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div>
                         <Label htmlFor="baiia">BAIIA</Label>
-                        <Input
+                        <CurrencyInput
                           id="baiia"
-                          type="number"
                           value={formData.baiia}
-                          onChange={(e) => setFormData({ ...formData, baiia: e.target.value })}
-                          placeholder="Ex: 50 000"
+                          onChange={(value) => setFormData({ ...formData, baiia: value })}
+                          placeholder="50 000 $"
                         />
                       </div>
 
                       <div>
                         <Label htmlFor="net_profit">Bénéfice net</Label>
-                        <Input
+                        <CurrencyInput
                           id="net_profit"
-                          type="number"
                           value={formData.net_profit}
-                          onChange={(e) => setFormData({ ...formData, net_profit: e.target.value })}
-                          placeholder="Ex: 40 000"
+                          onChange={(value) => setFormData({ ...formData, net_profit: value })}
+                          placeholder="40 000 $"
                         />
                       </div>
 
