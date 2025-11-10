@@ -405,13 +405,6 @@ const Home = () => {
               </p>
               
               <h3 className="text-2xl font-bold text-foreground mt-8 mb-4">
-                Une plateforme sécurisée pour vos transactions
-              </h3>
-              <p>
-                La sécurité de vos transactions est notre priorité absolue. Notre plateforme utilise des protocoles de paiement certifiés conformes aux normes bancaires internationales, garantissant la protection de vos informations personnelles et financières. Chaque annonce est soigneusement vérifiée par notre équipe avant publication pour assurer la qualité et la fiabilité des opportunités présentées.
-              </p>
-              
-              <h3 className="text-2xl font-bold text-foreground mt-8 mb-4">
                 Des opportunités dans tous les secteurs d'activité
               </h3>
               <p>
