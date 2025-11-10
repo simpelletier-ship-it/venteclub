@@ -324,7 +324,6 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
   const sendMessage = async (e?: React.FormEvent) => {
     if (e) {
       e.preventDefault();
-      e.stopPropagation();
     }
     if (!newMessage.trim() && selectedFiles.length === 0) return;
 
@@ -447,8 +446,11 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      e.stopPropagation();
-      sendMessage();
+      const form = e.currentTarget.closest('form');
+      if (form) {
+        const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
+        form.dispatchEvent(submitEvent);
+      }
     }
   };
 
@@ -733,7 +735,7 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
       </ScrollArea>
 
       {/* Input Area - Style moderne */}
-      <div className="p-3 sm:p-6 border-t border-border/50 bg-gradient-to-r from-background via-muted/5 to-background backdrop-blur-sm space-y-3 sm:space-y-4">
+      <form onSubmit={sendMessage} className="p-3 sm:p-6 border-t border-border/50 bg-gradient-to-r from-background via-muted/5 to-background backdrop-blur-sm space-y-3 sm:space-y-4">
         {/* Profile completion alert - Only for buyers */}
         {!isSeller && <ProfileCompletionAlert profile={currentUserProfile} />}
         
@@ -757,6 +759,7 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
                 <span className="flex-1 truncate text-xs sm:text-sm">{file.name}</span>
                 <span className="text-xs text-muted-foreground">{formatFileSize(file.size)}</span>
                 <Button
+                  type="button"
                   size="sm"
                   variant="ghost"
                   onClick={() => removeFile(index)}
@@ -802,7 +805,7 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
                   startTyping();
                 }}
                 onBlur={stopTyping}
-                onKeyPress={handleKeyPress}
+                onKeyDown={handleKeyPress}
                 placeholder="Écrivez votre message..."
                 className="min-h-[44px] sm:min-h-[56px] max-h-[100px] sm:max-h-[120px] resize-none rounded-lg sm:rounded-xl border-border/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-200 text-sm sm:text-base"
                 disabled={loading || uploading}
@@ -812,8 +815,7 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
                 onCancel={() => setShowVoiceRecorder(false)}
               />
               <Button
-                type="button"
-                onClick={() => sendMessage()}
+                type="submit"
                 disabled={loading || uploading || (!newMessage.trim() && selectedFiles.length === 0)}
                 size="icon"
                 className="h-10 sm:h-12 w-10 sm:w-12 shrink-0 rounded-lg sm:rounded-xl bg-gradient-to-br from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-lg hover:shadow-xl transition-all duration-200"
@@ -828,7 +830,7 @@ export const ChatBox = ({ businessId, currentUserId, otherUserId, otherUserName,
           <span className="text-muted-foreground/50">•</span>
           <span>Max 5 fichiers (10 Mo chacun)</span>
         </p>
-      </div>
+      </form>
 
       {/* Dialog Premium Membership */}
       <PremiumUpgradeModal 
