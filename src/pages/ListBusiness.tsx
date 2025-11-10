@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { Upload, X, FileText, TrendingUp, DollarSign, Info, Sparkles, Check, ChevronsUpDown } from "lucide-react";
+import VisibilityScoreCard from "@/components/VisibilityScoreCard";
 import { businessSchema } from "@/lib/validations";
 import { TermsDialog } from "@/components/TermsDialog";
 import { PhotoManager, PhotoItem } from "@/components/PhotoManager";
@@ -1690,71 +1691,7 @@ const ListBusiness = () => {
 
             {/* Sidebar - 1/3 width */}
             <div className="space-y-6">
-              {/* Score de visibilité */}
-              <div className="bg-card p-6 rounded-lg shadow-sm border border-border sticky top-24">
-                <div className="mb-6">
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-base font-semibold text-foreground">Score de visibilité</h3>
-                    <div className="flex items-center gap-2">
-                      <div className={`w-2 h-2 rounded-full ${
-                        visibilityScore === 0 ? "bg-gray-400" :
-                        visibilityScore < 30 ? "bg-red-500" :
-                        visibilityScore < 60 ? "bg-orange-500" :
-                        visibilityScore < 80 ? "bg-yellow-500" :
-                        "bg-green-500"
-                      }`} />
-                      <span className="text-2xl font-bold text-foreground">{visibilityScore}%</span>
-                    </div>
-                  </div>
-                  <Progress 
-                    value={visibilityScore} 
-                    className={`h-2 ${
-                      visibilityScore === 0 ? "[&>div]:bg-slate-400" :
-                      visibilityScore < 30 ? "[&>div]:bg-red-500" :
-                      visibilityScore < 60 ? "[&>div]:bg-amber-500" :
-                      visibilityScore < 80 ? "[&>div]:bg-blue-500" :
-                      "[&>div]:bg-primary"
-                    }`}
-                  />
-                  <p className="text-xs text-muted-foreground mt-2">
-                    {visibilityScore === 0 ? "Aucune donnée" :
-                     visibilityScore < 30 ? "Visibilité faible" :
-                     visibilityScore < 60 ? "Visibilité moyenne" :
-                     visibilityScore < 80 ? "Bonne visibilité" :
-                     "Excellente visibilité"}
-                  </p>
-                </div>
-
-                {/* Prochaines étapes */}
-                {nextSteps.length > 0 && (
-                  <div className="mt-6 pt-6 border-t border-border">
-                    <h4 className="font-semibold text-sm mb-2 text-foreground">Prochaines étapes</h4>
-                    <p className="text-xs text-muted-foreground mb-3">
-                      {nextSteps.length} étape(s) restante(s)
-                    </p>
-                    <div className="space-y-2">
-                      {nextSteps.map((step, index) => (
-                        <Button
-                          key={index}
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          className="w-full justify-start text-left h-auto py-2.5 hover:bg-muted"
-                          onClick={() => {
-                            const element = document.getElementById(step.action);
-                            element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                            element?.focus();
-                          }}
-                        >
-                          <step.icon className="w-4 h-4 mr-2 flex-shrink-0 text-muted-foreground" />
-                          <span className="text-xs flex-1">{step.text}</span>
-                          <span className="ml-2 text-muted-foreground">→</span>
-                        </Button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
+              <VisibilityScoreCard score={visibilityScore} nextSteps={nextSteps} />
             </div>
           </div>
         </div>
