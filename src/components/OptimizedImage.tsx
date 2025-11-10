@@ -14,7 +14,6 @@ interface OptimizedImageProps extends Omit<ImgHTMLAttributes<HTMLImageElement>, 
 /**
  * Composant d'image optimisé avec:
  * - Lazy loading natif ou eager pour images prioritaires
- * - Support WebP avec fallback
  * - Skeleton pendant le chargement
  * - Gestion d'erreurs avec fallback personnalisable
  * - fetchpriority pour améliorer LCP
@@ -31,26 +30,6 @@ export const OptimizedImage = ({
 }: OptimizedImageProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
-
-  // Convertir l'URL vers WebP si possible
-  const getOptimizedSrc = (url: string): { webp: string; fallback: string } => {
-    // Si c'est une URL Supabase Storage
-    if (url.includes('supabase.co/storage')) {
-      // On retourne l'URL originale - Supabase gère l'optimisation
-      return { webp: url, fallback: url };
-    }
-    
-    // Pour les images locales ou autres
-    const extension = url.split('.').pop()?.toLowerCase();
-    if (extension && ['jpg', 'jpeg', 'png'].includes(extension)) {
-      const webpUrl = url.replace(/\.(jpg|jpeg|png)$/i, '.webp');
-      return { webp: webpUrl, fallback: url };
-    }
-    
-    return { webp: url, fallback: url };
-  };
-
-  const { webp, fallback: fallbackSrc } = getOptimizedSrc(src);
 
   const handleLoad = () => {
     setIsLoading(false);
@@ -74,27 +53,22 @@ export const OptimizedImage = ({
   }
 
   return (
-    <div className="relative" style={{ aspectRatio }}>
+    <div className="relative w-full h-full">
       {isLoading && (
         <Skeleton className={`absolute inset-0 ${className}`} />
       )}
-      <picture>
-        {/* Source WebP pour les navigateurs modernes */}
-        <source srcSet={webp} type="image/webp" />
-        {/* Fallback pour les navigateurs plus anciens */}
-        <img
-          src={fallbackSrc}
-          alt={alt}
-          loading={priority ? "eager" : "lazy"}
-          decoding="async"
-          fetchPriority={priority ? "high" : "auto"}
-          onLoad={handleLoad}
-          onError={handleError}
-          className={`${className} ${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}
-          style={{ objectFit }}
-          {...props}
-        />
-      </picture>
+      <img
+        src={src}
+        alt={alt}
+        loading={priority ? "eager" : "lazy"}
+        decoding="async"
+        fetchPriority={priority ? "high" : "auto"}
+        onLoad={handleLoad}
+        onError={handleError}
+        className={`${className} ${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}
+        style={{ objectFit, ...(aspectRatio && { aspectRatio }) }}
+        {...props}
+      />
     </div>
   );
 };
