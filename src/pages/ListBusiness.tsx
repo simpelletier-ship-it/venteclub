@@ -1000,7 +1000,7 @@ const ListBusiness = () => {
                               Annuler amélioration
                             </Button>
                           )}
-                          {formData.description && formData.industry && !previousDescription && (
+                          {formData.description && formData.description.trim().length > 10 && !previousDescription && (
                             <Button
                               type="button"
                               variant="outline"
