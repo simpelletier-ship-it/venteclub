@@ -180,7 +180,7 @@ const Header = () => {
           </div>
 
           {/* Right Side Actions */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             {user && <NotificationBell userId={user.id} />}
             
             {isAdmin && (
@@ -259,9 +259,9 @@ const Header = () => {
               <>
                 <Button
                   onClick={() => navigate("/auth")}
-                  className="lg:hidden bg-[#6366f1] hover:bg-[#4f46e5] text-white font-semibold px-3 py-2 h-9 text-xs shadow-lg whitespace-nowrap"
+                  className="lg:hidden bg-[#6366f1] hover:bg-[#4f46e5] text-white font-semibold px-2 py-1.5 h-8 text-[10px] shadow-lg whitespace-nowrap"
                 >
-                  {t('nav.login')} / {t('nav.createAccount')}
+                  Connexion
                 </Button>
                 <Button
                   variant="ghost"
