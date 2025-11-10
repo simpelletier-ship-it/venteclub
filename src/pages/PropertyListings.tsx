@@ -119,10 +119,12 @@ const PropertyListings = () => {
         <div className="relative container mx-auto px-4 py-20">
           <div className="max-w-5xl mx-auto text-center space-y-8 animate-fade-in">
             {/* Badge - Bleu */}
-            <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white text-sm font-semibold animate-scale-in">
-              <Sparkles className="w-4 h-4 text-blue-400" />
-              {allProperties.length + featuredProperties.length}+ propriétés disponibles
-            </div>
+            {(allProperties.length + featuredProperties.length) > 0 && (
+              <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white text-sm font-semibold animate-scale-in">
+                <Sparkles className="w-4 h-4 text-blue-400" />
+                {allProperties.length + featuredProperties.length}+ propriétés disponibles
+              </div>
+            )}
             
             {/* Main Heading */}
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-bold leading-[1.1] tracking-tight">
@@ -177,7 +179,10 @@ const PropertyListings = () => {
         <div className="container mx-auto px-4">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
             <h2 className="text-xl sm:text-3xl font-display font-bold text-foreground">
-              Toutes les propriétés ({filteredProperties.length})
+              {filteredProperties.length > 0 
+                ? `Toutes les propriétés (${filteredProperties.length})`
+                : 'Ouverture prochaine'
+              }
             </h2>
             
             <div className="inline-flex rounded-xl border border-blue-600/20 bg-card p-1.5 shadow-soft">
