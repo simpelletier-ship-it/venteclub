@@ -2,9 +2,11 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { CheckCircle } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const LogoutSuccess = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   useEffect(() => {
     // Auto-redirect after 3 seconds
@@ -21,15 +23,15 @@ const LogoutSuccess = () => {
         <div className="flex justify-center">
           <CheckCircle className="w-20 h-20 text-accent" />
         </div>
-        <h1 className="text-4xl font-bold">Déconnexion réussie</h1>
+        <h1 className="text-4xl font-bold">{t('logoutSuccess.title')}</h1>
         <p className="text-muted-foreground text-lg">
-          Vous avez été déconnecté avec succès. Vous serez redirigé vers la page d'accueil dans quelques secondes.
+          {t('logoutSuccess.message')}
         </p>
         <Button 
           onClick={() => navigate("/")}
           className="bg-accent hover:bg-accent/90"
         >
-          Retour à l'accueil
+          {t('logoutSuccess.returnHome')}
         </Button>
       </div>
     </div>

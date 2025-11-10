@@ -1,6 +1,9 @@
 {
   "nav": {
     "home": "Home",
+    "buyBusiness": "Buy a Business",
+    "sellBusiness": "Sell a Business",
+    "commercialRealEstate": "Commercial Real Estate",
     "businesses": "Listings",
     "sell": "Sell",
     "resources": "Resources",
@@ -8,11 +11,17 @@
     "contact": "Contact",
     "login": "Login",
     "signup": "Sign Up",
+    "createAccount": "Create Account",
     "dashboard": "Dashboard",
     "messages": "Messages",
+    "messaging": "Messaging",
     "favorites": "Favorites",
     "profile": "Profile",
-    "logout": "Logout"
+    "settings": "Settings",
+    "logout": "Logout",
+    "admin": "Admin",
+    "faq": "FAQ",
+    "navigation": "Navigation"
   },
   "common": {
     "search": "Search",
@@ -26,7 +35,50 @@
     "contactSeller": "Contact Seller",
     "saveToFavorites": "Save to Favorites",
     "share": "Share",
-    "currency": "$"
+    "currency": "$",
+    "loading": "Loading...",
+    "back": "Back",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "submit": "Submit"
+  },
+  "auth": {
+    "login": "Login",
+    "signup": "Sign Up",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "forgotPassword": "Forgot Password?",
+    "resetPassword": "Reset Password",
+    "createAccount": "Create Account",
+    "alreadyHaveAccount": "Already have an account?",
+    "dontHaveAccount": "Don't have an account?",
+    "signInWith": "Sign in with",
+    "google": "Google",
+    "acceptTerms": "I accept the",
+    "termsOfService": "terms of service",
+    "verifyEmail": "Verify Your Email",
+    "verificationCodeSent": "A verification code has been sent to",
+    "checkSpam": "Don't forget to check your spam folder",
+    "verificationCode": "Verification Code",
+    "enterCode": "Enter the 6-digit code received by email",
+    "verify": "Verify",
+    "verifying": "Verifying...",
+    "verifyAndCreateAccount": "Verify and Create Account",
+    "resendCode": "Resend Code",
+    "loginSuccess": "Login Successful!",
+    "welcomeMessage": "Welcome to Vente.Club",
+    "emailNotConfirmed": "Email Not Confirmed",
+    "emailNotConfirmedMessage": "You must confirm your email before logging in. Check your inbox.",
+    "loginError": "Login Error",
+    "twoFactorCode": "Two-Factor Authentication Code",
+    "trustDevice": "Trust this device for 30 days"
   },
   "hero": {
     "title": "Find Your Dream Business",
@@ -42,5 +94,36 @@
     "privacy": "Privacy Policy",
     "followUs": "Follow Us",
     "allRightsReserved": "All Rights Reserved"
+  },
+  "disclaimer": {
+    "title": "Important Notice - Disclaimer",
+    "platformNotice": "Vente.Club is a connection platform only.",
+    "noResponsibility": "We are not involved in transactions and assume no responsibility for:",
+    "accuracy": "The accuracy of information presented in listings",
+    "quality": "The quality, legality, or compliance of businesses sold",
+    "agreements": "Financial or contractual agreements between buyers and sellers",
+    "disputes": "Disputes, losses, or damages arising from transactions",
+    "dueDiligenceTitle": "⚠️ EXERCISE DUE DILIGENCE - It is imperative to:",
+    "verifyInfo": "Verify all financial and operational information",
+    "consultProfessionals": "Consult professionals (lawyer, accountant, business appraiser)",
+    "thoroughVerification": "Conduct thorough due diligence before any commitment",
+    "noPaymentWithoutGuarantees": "Never make payment without appropriate contractual guarantees",
+    "checkCompliance": "Verify the legal and regulatory compliance of the business",
+    "acknowledgment": "By using this platform, you acknowledge and accept these conditions. Vente.Club does not guarantee any results and disclaims all liability."
+  },
+  "notFound": {
+    "title": "404",
+    "message": "Oops! Page Not Found",
+    "returnHome": "Return to Home"
+  },
+  "logoutSuccess": {
+    "title": "Logout Successful",
+    "message": "You have been successfully logged out. You will be redirected to the home page in a few seconds.",
+    "returnHome": "Return to Home"
+  },
+  "map": {
+    "title": "Interactive Map",
+    "subtitle": "Explore all businesses for sale in Quebec",
+    "tip": "💡 Use the polygon tool at the top left to draw an area and see listings in that region"
   }
 }

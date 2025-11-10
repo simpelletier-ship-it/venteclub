@@ -1,6 +1,9 @@
 {
   "nav": {
     "home": "Accueil",
+    "buyBusiness": "Acheter une entreprise",
+    "sellBusiness": "Vendre une entreprise",
+    "commercialRealEstate": "Immobilier commercial",
     "businesses": "Annonces",
     "sell": "Vendre",
     "resources": "Ressources",
@@ -8,11 +11,17 @@
     "contact": "Contact",
     "login": "Connexion",
     "signup": "S'inscrire",
+    "createAccount": "Créer un compte",
     "dashboard": "Tableau de bord",
     "messages": "Messages",
+    "messaging": "Messagerie",
     "favorites": "Favoris",
     "profile": "Profil",
-    "logout": "Déconnexion"
+    "settings": "Paramètres",
+    "logout": "Déconnexion",
+    "admin": "Admin",
+    "faq": "FAQ",
+    "navigation": "Navigation"
   },
   "common": {
     "search": "Rechercher",
@@ -26,7 +35,50 @@
     "contactSeller": "Contacter le vendeur",
     "saveToFavorites": "Ajouter aux favoris",
     "share": "Partager",
-    "currency": "$"
+    "currency": "$",
+    "loading": "Chargement...",
+    "back": "Retour",
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "save": "Enregistrer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "close": "Fermer",
+    "submit": "Soumettre"
+  },
+  "auth": {
+    "login": "Connexion",
+    "signup": "Inscription",
+    "email": "Courriel",
+    "password": "Mot de passe",
+    "confirmPassword": "Confirmer le mot de passe",
+    "firstName": "Prénom",
+    "lastName": "Nom",
+    "forgotPassword": "Mot de passe oublié ?",
+    "resetPassword": "Réinitialiser le mot de passe",
+    "createAccount": "Créer un compte",
+    "alreadyHaveAccount": "Vous avez déjà un compte ?",
+    "dontHaveAccount": "Vous n'avez pas de compte ?",
+    "signInWith": "Se connecter avec",
+    "google": "Google",
+    "acceptTerms": "J'accepte les",
+    "termsOfService": "conditions d'utilisation",
+    "verifyEmail": "Vérifiez votre email",
+    "verificationCodeSent": "Un code de vérification a été envoyé à",
+    "checkSpam": "N'oubliez pas de vérifier vos courriels indésirables",
+    "verificationCode": "Code de vérification",
+    "enterCode": "Entrez le code à 6 chiffres reçu par email",
+    "verify": "Vérifier",
+    "verifying": "Vérification...",
+    "verifyAndCreateAccount": "Vérifier et créer le compte",
+    "resendCode": "Renvoyer le code",
+    "loginSuccess": "Connexion réussie !",
+    "welcomeMessage": "Bienvenue sur Vente.Club",
+    "emailNotConfirmed": "Email non confirmé",
+    "emailNotConfirmedMessage": "Vous devez confirmer votre email avant de vous connecter. Vérifiez votre boîte de réception.",
+    "loginError": "Erreur de connexion",
+    "twoFactorCode": "Code d'authentification à deux facteurs",
+    "trustDevice": "Faire confiance à cet appareil pendant 30 jours"
   },
   "hero": {
     "title": "Trouvez l'entreprise de vos rêves",
@@ -42,5 +94,36 @@
     "privacy": "Politique de confidentialité",
     "followUs": "Suivez-nous",
     "allRightsReserved": "Tous droits réservés"
+  },
+  "disclaimer": {
+    "title": "Avis Important - Décharge de responsabilité",
+    "platformNotice": "Vente.Club est une plateforme de mise en relation uniquement.",
+    "noResponsibility": "Nous ne sommes pas partie prenante dans les transactions et n'assumons aucune responsabilité quant à:",
+    "accuracy": "L'exactitude des informations présentées dans les annonces",
+    "quality": "La qualité, la légalité ou la conformité des entreprises vendues",
+    "agreements": "Les accords financiers ou contractuels entre acheteurs et vendeurs",
+    "disputes": "Les litiges, pertes ou dommages découlant des transactions",
+    "dueDiligenceTitle": "⚠️ FAITES PREUVE DE DILIGENCE RAISONNABLE - Il est impératif de:",
+    "verifyInfo": "Vérifier toutes les informations financières et opérationnelles",
+    "consultProfessionals": "Consulter des professionnels (avocat, comptable, évaluateur d'entreprise)",
+    "thoroughVerification": "Effectuer une vérification diligente approfondie avant tout engagement",
+    "noPaymentWithoutGuarantees": "Ne jamais effectuer de paiement sans garanties contractuelles appropriées",
+    "checkCompliance": "Vérifier la conformité légale et réglementaire de l'entreprise",
+    "acknowledgment": "En utilisant cette plateforme, vous reconnaissez et acceptez ces conditions. Vente.Club ne garantit aucun résultat et décline toute responsabilité."
+  },
+  "notFound": {
+    "title": "404",
+    "message": "Oups ! Page introuvable",
+    "returnHome": "Retour à l'accueil"
+  },
+  "logoutSuccess": {
+    "title": "Déconnexion réussie",
+    "message": "Vous avez été déconnecté avec succès. Vous serez redirigé vers la page d'accueil dans quelques secondes.",
+    "returnHome": "Retour à l'accueil"
+  },
+  "map": {
+    "title": "Carte Interactive",
+    "subtitle": "Explorez toutes les entreprises à vendre au Québec",
+    "tip": "💡 Utilisez l'outil polygone en haut à gauche pour dessiner une zone et voir les annonces dans cette région"
   }
 }

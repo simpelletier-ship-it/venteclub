@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "react-i18next";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,6 +18,7 @@ import { LanguageSwitcher } from "./LanguageSwitcher";
 
 const Header = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [user, setUser] = useState<any>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [profile, setProfile] = useState<any>(null);
@@ -143,30 +145,27 @@ const Header = () => {
 
           {/* Desktop Navigation - Plus d'espace et mieux organisé */}
           <div className="hidden lg:flex items-center flex-1 justify-center gap-8 xl:gap-10">
-            {/* Lien Acheter une entreprise */}
             <button 
               onClick={() => navigate("/entreprises")} 
               className="text-muted-foreground hover:text-foreground transition-all duration-300 font-semibold relative group whitespace-nowrap text-base"
             >
-              Acheter une entreprise
+              {t('nav.buyBusiness')}
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full" />
             </button>
 
-            {/* Lien Vendre une entreprise */}
             <button 
               onClick={() => navigate("/sell")} 
               className="text-muted-foreground hover:text-foreground transition-all duration-300 font-semibold relative group whitespace-nowrap text-base"
             >
-              Vendre une entreprise
+              {t('nav.sellBusiness')}
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full" />
             </button>
 
-            {/* Lien Immobilier commercial */}
             <button 
               onClick={() => navigate("/immeubles-commerciaux")} 
               className="text-muted-foreground hover:text-foreground transition-all duration-300 font-semibold relative group whitespace-nowrap text-base"
             >
-              Immobilier commercial
+              {t('nav.commercialRealEstate')}
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full" />
             </button>
 
@@ -175,7 +174,7 @@ const Header = () => {
                 onClick={() => navigate("/faq")} 
                 className="text-muted-foreground hover:text-foreground transition-all duration-300 font-semibold relative group text-base"
               >
-                FAQ
+                {t('nav.faq')}
                 <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full" />
               </button>
             )}
@@ -193,7 +192,7 @@ const Header = () => {
                 className="hidden md:flex items-center gap-2"
               >
               <Sparkles className="w-4 h-4" />
-              Admin
+              {t('nav.admin')}
             </Button>
           )}
 
@@ -206,7 +205,7 @@ const Header = () => {
                   className="hidden lg:flex items-center gap-2 px-4 py-2 rounded-lg border border-border/50 bg-accent/30 hover:bg-accent/50 transition-all duration-300 font-semibold relative text-base h-10"
                 >
                   <Mail className="w-4 h-4" />
-                  <span>Messagerie</span>
+                  <span>{t('nav.messaging')}</span>
                   {unreadMessagesCount > 0 && (
                     <span className="absolute -top-1.5 -right-1.5 h-5 w-5 rounded-full bg-destructive text-white text-[10px] flex items-center justify-center font-bold shadow-lg">
                       {unreadMessagesCount > 9 ? '9+' : unreadMessagesCount}
@@ -218,7 +217,7 @@ const Header = () => {
                   className="hidden lg:flex bg-[#6366f1] hover:bg-[#4f46e5] text-white font-semibold shadow-lg px-5 py-2.5 text-base h-10"
                 >
                   <LayoutDashboard className="mr-2 w-4 h-4" />
-                  <span>Tableau de bord</span>
+                  <span>{t('nav.dashboard')}</span>
                 </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -250,37 +249,35 @@ const Header = () => {
                     <DropdownMenuSeparator className="bg-border/50" />
                     <DropdownMenuItem onClick={() => navigate("/settings")} className="cursor-pointer hover:bg-muted/50">
                       <Settings className="mr-2 h-4 w-4" />
-                      Paramètres
+                      {t('nav.settings')}
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={handleLogout} className="cursor-pointer hover:bg-muted/50 text-destructive focus:text-destructive">
                       <LogOut className="mr-2 h-4 w-4" />
-                      Déconnexion
+                      {t('nav.logout')}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </>
             ) : (
               <>
-                {/* Bouton Connexion visible sur mobile */}
                 <Button
                   onClick={() => navigate("/auth")}
                   className="lg:hidden bg-[#6366f1] hover:bg-[#4f46e5] text-white font-semibold px-3 py-2 h-9 text-xs shadow-lg whitespace-nowrap"
                 >
-                  Connexion / Créer un compte
+                  {t('nav.login')} / {t('nav.createAccount')}
                 </Button>
-                {/* Boutons desktop pour non-connectés - plus visibles */}
                 <Button
                   variant="ghost"
                   onClick={() => navigate("/auth")}
                   className="hidden lg:inline-flex font-semibold border border-border/50 hover:border-border hover:bg-accent px-5 py-2.5 text-base h-10 whitespace-nowrap"
                 >
-                  Connexion
+                  {t('nav.login')}
                 </Button>
                 <Button
                   onClick={() => navigate("/auth")}
                   className="hidden lg:inline-flex bg-[#6366f1] hover:bg-[#4f46e5] text-white font-semibold shadow-lg px-5 py-2.5 text-base h-10 whitespace-nowrap"
                 >
-                  Créer un compte
+                  {t('nav.createAccount')}
                 </Button>
               </>
             )}
@@ -301,7 +298,6 @@ const Header = () => {
         {/* Mobile Menu */}
         {mobileMenuOpen && (
           <div className="lg:hidden mt-4 pb-4 space-y-2 border-t border-border pt-4 animate-slide-up">
-            {/* Bouton Créer un compte prominent pour les non-connectés */}
             {!user && (
               <div className="px-2 pb-3 mb-2 border-b border-border">
                 <Button
@@ -311,13 +307,13 @@ const Header = () => {
                   }}
                   className="w-full bg-[#6366f1] hover:bg-[#4f46e5] text-white font-semibold h-11 text-base shadow-lg"
                 >
-                  Créer un compte
+                  {t('nav.createAccount')}
                 </Button>
               </div>
             )}
             
             <div className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-              Navigation
+              {t('nav.navigation')}
             </div>
             <button
               onClick={() => {
@@ -326,7 +322,7 @@ const Header = () => {
               }}
               className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors"
             >
-              Acheter une entreprise
+              {t('nav.buyBusiness')}
             </button>
             <button
               onClick={() => {
@@ -335,7 +331,7 @@ const Header = () => {
               }}
               className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors"
             >
-              Vendre une entreprise
+              {t('nav.sellBusiness')}
             </button>
             <button
               onClick={() => {
@@ -344,7 +340,7 @@ const Header = () => {
               }}
               className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors"
             >
-              Immobilier commercial
+              {t('nav.commercialRealEstate')}
             </button>
             {!user && (
               <button
@@ -354,7 +350,7 @@ const Header = () => {
                 }}
                 className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors"
               >
-                FAQ
+                {t('nav.faq')}
               </button>
             )}
             {user && (
@@ -367,7 +363,7 @@ const Header = () => {
                   className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors flex items-center gap-2"
                 >
                   <LayoutDashboard className="w-4 h-4" />
-                  Tableau de bord
+                  {t('nav.dashboard')}
                 </button>
                 <button
                   onClick={() => {
@@ -377,7 +373,7 @@ const Header = () => {
                   className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors flex items-center gap-2 relative"
                 >
                   <Mail className="w-4 h-4" />
-                  <span>Messagerie</span>
+                  <span>{t('nav.messaging')}</span>
                   {unreadMessagesCount > 0 && (
                     <span className="ml-auto h-5 w-5 rounded-full bg-destructive text-white text-[10px] inline-flex items-center justify-center font-bold">
                       {unreadMessagesCount > 9 ? '9+' : unreadMessagesCount}
@@ -395,7 +391,7 @@ const Header = () => {
                 className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors flex items-center gap-2 text-secondary"
               >
                 <Sparkles className="w-4 h-4" />
-                Admin
+                {t('nav.admin')}
               </button>
             )}
           </div>
