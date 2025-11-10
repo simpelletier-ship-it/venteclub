@@ -1,6 +1,7 @@
 import { useState, ImgHTMLAttributes, useEffect } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Image as ImageIcon } from "lucide-react";
+import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
 
 interface OptimizedImageProps extends Omit<ImgHTMLAttributes<HTMLImageElement>, 'src' | 'loading'> {
   src: string;
@@ -11,6 +12,7 @@ interface OptimizedImageProps extends Omit<ImgHTMLAttributes<HTMLImageElement>, 
   priority?: boolean; // Pour les images above-the-fold
   width?: number; // Largeur cible pour l'optimisation Supabase
   quality?: number; // Qualité de l'image (1-100)
+  lazy?: boolean; // Active le lazy loading progressif (true par défaut)
 }
 
 /**
@@ -53,12 +55,14 @@ const getOptimizedImageUrl = (url: string, width?: number, quality: number = 80)
 
 /**
  * Composant d'image optimisé avec:
- * - Lazy loading natif ou eager pour images prioritaires
+ * - Lazy loading progressif avec Intersection Observer
+ * - Chargement anticipé 50px avant d'entrer dans le viewport
  * - Transformations Supabase (resize, WebP, compression)
  * - Skeleton pendant le chargement
  * - Gestion d'erreurs avec fallback personnalisable
  * - fetchpriority pour améliorer LCP
  * - Responsive images avec srcset
+ * - Blur placeholder pour une transition douce
  */
 export const OptimizedImage = ({
   src,
@@ -69,18 +73,34 @@ export const OptimizedImage = ({
   priority = false,
   width,
   quality = 80,
+  lazy = true,
   className = '',
   ...props
 }: OptimizedImageProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [optimizedSrc, setOptimizedSrc] = useState(src);
+  const [shouldLoad, setShouldLoad] = useState(!lazy || priority);
+
+  // Utiliser l'intersection observer pour le lazy loading
+  const [containerRef, isVisible] = useIntersectionObserver({
+    rootMargin: '50px', // Charge 50px avant d'entrer dans le viewport
+    threshold: 0.01,
+    freezeOnceVisible: true,
+  });
 
   // Optimiser l'URL de l'image au montage
   useEffect(() => {
     const optimized = getOptimizedImageUrl(src, width, quality);
     setOptimizedSrc(optimized);
   }, [src, width, quality]);
+
+  // Déclencher le chargement quand visible (si lazy loading activé)
+  useEffect(() => {
+    if (lazy && !priority && isVisible) {
+      setShouldLoad(true);
+    }
+  }, [isVisible, lazy, priority]);
 
   const handleLoad = () => {
     setIsLoading(false);
@@ -122,24 +142,26 @@ export const OptimizedImage = ({
   const srcSet = generateSrcSet();
 
   return (
-    <div className="relative w-full h-full">
+    <div ref={containerRef} className="relative w-full h-full">
       {isLoading && (
         <Skeleton className={`absolute inset-0 ${className}`} />
       )}
-      <img
-        src={optimizedSrc}
-        srcSet={srcSet || undefined}
-        sizes={width ? `(max-width: 768px) 100vw, ${width}px` : undefined}
-        alt={alt}
-        loading={priority ? "eager" : "lazy"}
-        decoding="async"
-        fetchPriority={priority ? "high" : "auto"}
-        onLoad={handleLoad}
-        onError={handleError}
-        className={`${className} ${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}
-        style={{ objectFit, ...(aspectRatio && { aspectRatio }) }}
-        {...props}
-      />
+      {shouldLoad && (
+        <img
+          src={optimizedSrc}
+          srcSet={srcSet || undefined}
+          sizes={width ? `(max-width: 768px) 100vw, ${width}px` : undefined}
+          alt={alt}
+          loading={priority ? "eager" : "lazy"}
+          decoding="async"
+          fetchPriority={priority ? "high" : "auto"}
+          onLoad={handleLoad}
+          onError={handleError}
+          className={`${className} ${isLoading ? 'opacity-0 blur-sm' : 'opacity-100 blur-0'} transition-all duration-500 ease-out`}
+          style={{ objectFit, ...(aspectRatio && { aspectRatio }) }}
+          {...props}
+        />
+      )}
     </div>
   );
 };
