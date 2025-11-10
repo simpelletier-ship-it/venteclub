@@ -11,7 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Upload, X, FileText, TrendingUp, DollarSign, Info, Sparkles, Check, ChevronsUpDown } from "lucide-react";
 import { businessSchema } from "@/lib/validations";
 import { TermsDialog } from "@/components/TermsDialog";
-import { PhotoManager } from "@/components/PhotoManager";
+import { PhotoManager, PhotoItem } from "@/components/PhotoManager";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useAutosaveDraft } from "@/hooks/useAutosaveDraft";
@@ -110,7 +110,7 @@ const ListBusiness = () => {
     instagram: "",
   });
   const [photos, setPhotos] = useState<File[]>([]);
-  const [photoPreviewUrls, setPhotoPreviewUrls] = useState<string[]>([]);
+  const [photoPreviewUrls, setPhotoPreviewUrls] = useState<PhotoItem[]>([]);
   const [generatingImage, setGeneratingImage] = useState(false);
   const [imagePrompt, setImagePrompt] = useState("");
   const [citySearchOpen, setCitySearchOpen] = useState(false);
@@ -308,7 +308,7 @@ const ListBusiness = () => {
       if (business.business_photos && business.business_photos.length > 0) {
         const urls = business.business_photos
           .sort((a: any, b: any) => a.display_order - b.display_order)
-          .map((photo: any) => photo.photo_url);
+          .map((photo: any) => ({ url: photo.photo_url, status: "success" as const }));
         setPhotoPreviewUrls(urls);
       }
 
@@ -402,12 +402,15 @@ const ListBusiness = () => {
     }
 
     setPhotos([...photos, ...files]);
-    const newPreviewUrls = files.map(file => URL.createObjectURL(file));
+    const newPreviewUrls = files.map(file => ({ 
+      url: URL.createObjectURL(file), 
+      status: "success" as const 
+    }));
     setPhotoPreviewUrls([...photoPreviewUrls, ...newPreviewUrls]);
   };
 
   const removePhoto = (index: number) => {
-    URL.revokeObjectURL(photoPreviewUrls[index]);
+    URL.revokeObjectURL(photoPreviewUrls[index].url);
     setPhotos(photos.filter((_, i) => i !== index));
     setPhotoPreviewUrls(photoPreviewUrls.filter((_, i) => i !== index));
   };
@@ -436,17 +439,17 @@ const ListBusiness = () => {
     setPhotoPreviewUrls(newPreviewUrls);
   };
 
-  const handlePhotoReorder = (newOrder: string[]) => {
+  const handlePhotoReorder = (newOrder: PhotoItem[]) => {
     // Créer un mapping des URLs vers les fichiers
     const urlToFileMap = new Map<string, File>();
-    photoPreviewUrls.forEach((url, index) => {
+    photoPreviewUrls.forEach((photoItem, index) => {
       if (photos[index]) {
-        urlToFileMap.set(url, photos[index]);
+        urlToFileMap.set(photoItem.url, photos[index]);
       }
     });
-
+    
     // Réorganiser les fichiers selon le nouvel ordre
-    const newPhotos = newOrder.map(url => urlToFileMap.get(url)).filter(Boolean) as File[];
+    const newPhotos = newOrder.map(item => urlToFileMap.get(item.url)).filter(Boolean) as File[];
     
     setPhotoPreviewUrls(newOrder);
     setPhotos(newPhotos);
@@ -501,7 +504,7 @@ const ListBusiness = () => {
       const file = new File([blob], `ai-generated-${Date.now()}.png`, { type: 'image/png' });
 
       setPhotos([...photos, file]);
-      setPhotoPreviewUrls([...photoPreviewUrls, data.imageUrl]);
+      setPhotoPreviewUrls([...photoPreviewUrls, { url: data.imageUrl, status: "success" }]);
 
       toast({
         title: "Image générée !",
@@ -609,8 +612,8 @@ const ListBusiness = () => {
 
           // Combine existing photos (photoPreviewUrls) with new photos
           const allPhotos = [
-            ...photoPreviewUrls.map((url, index) => ({
-              photo_url: url,
+            ...photoPreviewUrls.map((photoItem, index) => ({
+              photo_url: photoItem.url,
               display_order: index
             })),
             ...newPhotoUrls
