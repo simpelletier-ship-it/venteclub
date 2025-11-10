@@ -8,6 +8,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { Layout } from "@/components/Layout";
 import { EmailVerificationGuard } from "@/components/EmailVerificationGuard";
 import { trackPageView } from "@/lib/analytics";
+import { useWebVitals } from "@/hooks/usePerformanceMonitoring";
 
 // Critical pages loaded immediately
 import Home from "./pages/Home";
@@ -61,13 +62,17 @@ const queryClient = new QueryClient({
 const AdminSecurity = lazy(() => import("./pages/AdminSecurity"));
 const SecurityCompliance = lazy(() => import("./pages/SecurityCompliance"));
 
-// Analytics component to track page views
+// Analytics and Performance Monitoring component
 const AnalyticsTracker = () => {
   const location = useLocation();
 
+  // Track page views
   useEffect(() => {
     trackPageView(location.pathname + location.search);
   }, [location]);
+
+  // Monitor Web Vitals (Core Web Vitals)
+  useWebVitals();
 
   return null;
 };
