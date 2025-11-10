@@ -1,7 +1,9 @@
-import { useState, ImgHTMLAttributes, useEffect } from "react";
+import { useState, ImgHTMLAttributes, useEffect, useRef } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Image as ImageIcon } from "lucide-react";
 import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
+import { useScrollVelocity } from "@/hooks/useScrollVelocity";
+import { getImageLoadQueue } from "@/lib/imageLoadPriority";
 
 interface OptimizedImageProps extends Omit<ImgHTMLAttributes<HTMLImageElement>, 'src' | 'loading'> {
   src: string;
@@ -13,6 +15,7 @@ interface OptimizedImageProps extends Omit<ImgHTMLAttributes<HTMLImageElement>, 
   width?: number; // Largeur cible pour l'optimisation Supabase
   quality?: number; // Qualité de l'image (1-100)
   lazy?: boolean; // Active le lazy loading progressif (true par défaut)
+  smartPriority?: boolean; // Active la priorisation dynamique (true par défaut)
 }
 
 /**
@@ -56,7 +59,8 @@ const getOptimizedImageUrl = (url: string, width?: number, quality: number = 80)
 /**
  * Composant d'image optimisé avec:
  * - Lazy loading progressif avec Intersection Observer
- * - Chargement anticipé 50px avant d'entrer dans le viewport
+ * - Priorisation dynamique basée sur la vélocité et direction du scroll
+ * - Chargement anticipé intelligent (jusqu'à 600px selon la vitesse)
  * - Transformations Supabase (resize, WebP, compression)
  * - Skeleton pendant le chargement
  * - Gestion d'erreurs avec fallback personnalisable
@@ -74,6 +78,7 @@ export const OptimizedImage = ({
   width,
   quality = 80,
   lazy = true,
+  smartPriority = true,
   className = '',
   ...props
 }: OptimizedImageProps) => {
@@ -81,13 +86,16 @@ export const OptimizedImage = ({
   const [hasError, setHasError] = useState(false);
   const [optimizedSrc, setOptimizedSrc] = useState(src);
   const [shouldLoad, setShouldLoad] = useState(!lazy || priority);
+  const imageId = useRef(`img-${Math.random().toString(36).substr(2, 9)}`);
 
-  // Utiliser l'intersection observer pour le lazy loading
+  // Observer la position et la vélocité du scroll
   const [containerRef, isVisible] = useIntersectionObserver({
-    rootMargin: '50px', // Charge 50px avant d'entrer dans le viewport
+    rootMargin: smartPriority ? '200px' : '50px', // Plus de marge si smart priority
     threshold: 0.01,
     freezeOnceVisible: true,
   });
+  
+  const { velocity, direction, isScrolling } = useScrollVelocity();
 
   // Optimiser l'URL de l'image au montage
   useEffect(() => {
@@ -95,12 +103,39 @@ export const OptimizedImage = ({
     setOptimizedSrc(optimized);
   }, [src, width, quality]);
 
-  // Déclencher le chargement quand visible (si lazy loading activé)
+  // Gérer la priorisation dynamique avec la queue
   useEffect(() => {
-    if (lazy && !priority && isVisible) {
-      setShouldLoad(true);
+    if (!lazy || priority || shouldLoad) return;
+    if (!smartPriority) {
+      // Mode simple: charger dès que visible
+      if (isVisible) {
+        setShouldLoad(true);
+      }
+      return;
     }
-  }, [isVisible, lazy, priority]);
+
+    // Mode smart: utiliser la queue de priorité
+    if (isVisible && containerRef.current) {
+      const queue = getImageLoadQueue();
+      
+      const loadCallback = () => {
+        setShouldLoad(true);
+      };
+
+      queue.enqueue(
+        imageId.current,
+        containerRef.current,
+        loadCallback,
+        velocity,
+        direction
+      );
+
+      // Mettre à jour les priorités pendant le scroll
+      if (isScrolling) {
+        queue.updatePriorities(velocity, direction);
+      }
+    }
+  }, [isVisible, lazy, priority, shouldLoad, smartPriority, velocity, direction, isScrolling, containerRef]);
 
   const handleLoad = () => {
     setIsLoading(false);
