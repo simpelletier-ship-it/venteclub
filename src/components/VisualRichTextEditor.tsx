@@ -22,6 +22,7 @@ import {
   Highlighter,
   Image as ImageIcon,
 } from "lucide-react";
+import { EmojiPicker } from "./EmojiPicker";
 
 interface VisualRichTextEditorProps {
   content: string;
@@ -124,6 +125,35 @@ export const VisualRichTextEditor = ({
       }
     } catch (error) {
       console.error('[Editor] Error inserting image:', error);
+    }
+  };
+
+  const insertEmoji = (emoji: string) => {
+    if (!editorRef.current) return;
+    
+    try {
+      // Insérer l'emoji à la position du curseur
+      const selection = window.getSelection();
+      if (selection && selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0);
+        range.deleteContents();
+        const textNode = document.createTextNode(emoji);
+        range.insertNode(textNode);
+        
+        // Déplacer le curseur après l'emoji
+        range.setStartAfter(textNode);
+        range.setEndAfter(textNode);
+        selection.removeAllRanges();
+        selection.addRange(range);
+      } else {
+        // Si pas de sélection, insérer à la fin
+        editorRef.current.innerHTML += emoji;
+      }
+      
+      handleInput();
+      editorRef.current.focus();
+    } catch (error) {
+      console.error('[Editor] Error inserting emoji:', error);
     }
   };
 
@@ -296,6 +326,9 @@ export const VisualRichTextEditor = ({
         >
           <ImageIcon className="h-4 w-4" />
         </Button>
+
+        {/* Emoji picker */}
+        <EmojiPicker onEmojiSelect={insertEmoji} />
 
         <div className="h-6 w-px bg-border" />
 

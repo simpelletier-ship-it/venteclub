@@ -14,6 +14,7 @@ import {
   Eye,
   Edit,
 } from "lucide-react";
+import { EmojiPicker } from "./EmojiPicker";
 
 interface SimpleRichTextEditorProps {
   content: string;
@@ -52,6 +53,25 @@ export const SimpleRichTextEditor = ({
         start + before.length,
         end + before.length
       );
+    }, 0);
+  };
+
+  const insertEmoji = (emoji: string) => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const newText =
+      content.substring(0, start) + emoji + content.substring(end);
+
+    onChange(newText);
+
+    // Restore focus and move cursor after emoji
+    setTimeout(() => {
+      textarea.focus();
+      const newPosition = start + emoji.length;
+      textarea.setSelectionRange(newPosition, newPosition);
     }, 0);
   };
 
@@ -119,6 +139,8 @@ export const SimpleRichTextEditor = ({
               <btn.icon className="h-4 w-4" />
             </Button>
           ))}
+          <div className="h-6 w-px bg-border mx-1" />
+          <EmojiPicker onEmojiSelect={insertEmoji} />
         </div>
         <Button
           type="button"
