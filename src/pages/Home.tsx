@@ -166,7 +166,7 @@ const Home = () => {
               </p>
               
               <p className="text-sm sm:text-base lg:text-lg text-white/90 max-w-3xl leading-relaxed sm:leading-loose">
-                Plateforme intelligente qui rapproche acquéreurs et propriétaires d'entreprises. Nous favorisons la transparence et la fiabilité pour que vos transactions se déroulent en toute confiance.
+                Plateforme de mise en relation directe entre acheteurs et vendeurs d'entreprises au Québec. Recherchez, comparez et contactez les propriétaires dans un environnement transparent et professionnel.
               </p>
               
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-3 sm:pt-4">
