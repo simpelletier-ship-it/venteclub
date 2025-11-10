@@ -121,18 +121,24 @@ const Auth = () => {
       // Vérifier si 2FA est activé pour cet utilisateur
       if (data.user) {
         const { data: factors } = await supabase.auth.mfa.listFactors();
+        console.log('🔒 Facteurs MFA disponibles:', factors);
         const totpFactor = factors?.totp?.find(f => f.status === 'verified');
+        console.log('🔒 Facteur TOTP vérifié trouvé:', totpFactor);
         
         if (totpFactor) {
+          console.log('🔒 2FA actif, vérification de l\'appareil...');
           // Vérifier si cet appareil est de confiance
+          console.log('🔒 Fingerprint hash:', fingerprint?.hash);
           if (fingerprint?.hash) {
             const { data: isTrusted } = await supabase.rpc('is_device_trusted', {
               p_user_id: data.user.id,
               p_device_fingerprint: fingerprint.hash
             });
+            console.log('🔒 Appareil de confiance?', isTrusted);
 
             if (isTrusted) {
               // Appareil de confiance, pas besoin de 2FA
+              console.log('✅ Appareil de confiance détecté, skip 2FA');
               toast({
                 title: "Connexion réussie !",
                 description: "Appareil de confiance reconnu",
@@ -141,6 +147,8 @@ const Auth = () => {
               return;
             }
           }
+          
+          console.log('🔒 Appareil non reconnu, création du challenge 2FA...');
 
           // 2FA est activé et appareil pas de confiance, créer un challenge
           const { data: challengeData, error: challengeError } = await supabase.auth.mfa.challenge({
@@ -148,16 +156,21 @@ const Auth = () => {
           });
 
           if (challengeError) {
+            console.error('❌ Erreur création challenge 2FA:', challengeError);
             throw challengeError;
           }
 
+          console.log('✅ Challenge 2FA créé:', challengeData.id);
           // Sauvegarder les IDs pour la vérification
           setMfaFactorId(totpFactor.id);
           setMfaChallengeId(challengeData.id);
           setPendingUserId(data.user.id);
           setShow2FAPrompt(true);
+          console.log('✅ Affichage du prompt 2FA activé');
           setLoading(false);
           return;
+        } else {
+          console.log('ℹ️ Aucun facteur TOTP vérifié trouvé');
         }
       }
 
