@@ -14,7 +14,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getAvatarUrl } from "@/lib/avatarUtils";
 import { LayoutDashboard, Settings, LogOut, Menu, Sparkles, Mail } from "lucide-react";
 import { NotificationBell } from "./NotificationBell";
-import { LanguageSwitcher } from "./LanguageSwitcher";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -195,8 +194,6 @@ const Header = () => {
               {t('nav.admin')}
             </Button>
           )}
-
-          <LanguageSwitcher />
 
           {user ? (
               <>
