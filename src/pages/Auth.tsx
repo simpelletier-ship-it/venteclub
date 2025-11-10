@@ -768,12 +768,14 @@ const Auth = () => {
                 )}
                 
                 {showVerificationCode ? (
-                  // Formulaire de vérification du code
                   <form onSubmit={handleVerifyCode} className="space-y-4">
                     <div className="text-center mb-6">
                       <h3 className="text-lg font-semibold mb-2">Vérifiez votre email</h3>
                       <p className="text-sm text-muted-foreground">
                         Un code de vérification a été envoyé à <strong>{pendingSignupData?.email}</strong>
+                      </p>
+                      <p className="text-sm text-muted-foreground mt-3">
+                        <strong className="text-foreground">N'oubliez pas de vérifier vos courriels indésirables</strong>
                       </p>
                     </div>
                     
