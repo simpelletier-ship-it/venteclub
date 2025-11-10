@@ -18,6 +18,8 @@ export const TwoFactorAuth = () => {
   const [backupCodes, setBackupCodes] = useState<string[]>([]);
   const [copied, setCopied] = useState(false);
   const [showSetup, setShowSetup] = useState(false);
+  const [showDisableConfirm, setShowDisableConfirm] = useState(false);
+  const [disableCode, setDisableCode] = useState("");
 
   useEffect(() => {
     loadTwoFactorStatus();
@@ -128,31 +130,61 @@ export const TwoFactorAuth = () => {
   };
 
   const handleDisableTwoFactor = async () => {
+    if (!disableCode || disableCode.length !== 6) {
+      toast({
+        variant: "destructive",
+        title: "Code invalide",
+        description: "Veuillez entrer un code à 6 chiffres.",
+      });
+      return;
+    }
+
     setLoading(true);
     try {
       const factors = await supabase.auth.mfa.listFactors();
       const totpFactor = factors.data?.totp?.find(f => f.status === 'verified');
       
-      if (!totpFactor) throw new Error("No verified factor found");
+      if (!totpFactor) throw new Error("Aucun facteur 2FA trouvé");
 
-      const { error } = await supabase.auth.mfa.unenroll({
+      // Créer un challenge pour vérifier le code 2FA (élever à AAL2)
+      const { data: challengeData, error: challengeError } = await supabase.auth.mfa.challenge({
         factorId: totpFactor.id,
       });
 
-      if (error) throw error;
+      if (challengeError) throw challengeError;
+
+      // Vérifier le code 2FA
+      const { error: verifyError } = await supabase.auth.mfa.verify({
+        factorId: totpFactor.id,
+        challengeId: challengeData.id,
+        code: disableCode,
+      });
+
+      if (verifyError) throw verifyError;
+
+      // Maintenant on est à AAL2, on peut désinscrire
+      const { error: unenrollError } = await supabase.auth.mfa.unenroll({
+        factorId: totpFactor.id,
+      });
+
+      if (unenrollError) throw unenrollError;
 
       toast({
         title: "2FA désactivée",
-        description: "L'authentification à deux facteurs a été désactivée.",
+        description: "L'authentification à deux facteurs a été désactivée avec succès.",
       });
 
       setEnabled(false);
       setBackupCodes([]);
+      setShowDisableConfirm(false);
+      setDisableCode("");
     } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Erreur",
-        description: error.message,
+        description: error.message === "Invalid code" || error.message.includes("code")
+          ? "Code incorrect. Vérifiez le code dans votre application d'authentification."
+          : error.message,
       });
     } finally {
       setLoading(false);
@@ -168,6 +200,67 @@ export const TwoFactorAuth = () => {
       description: "Les codes de backup ont été copiés dans le presse-papiers.",
     });
   };
+
+  if (showDisableConfirm) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Shield className="h-5 w-5 text-destructive" />
+            Désactiver 2FA
+          </CardTitle>
+          <CardDescription>
+            Pour désactiver 2FA, entrez le code actuel de votre application d'authentification
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Alert>
+            <AlertTriangle className="h-4 w-4" />
+            <AlertDescription>
+              Cette action réduira la sécurité de votre compte
+            </AlertDescription>
+          </Alert>
+
+          <div className="space-y-2">
+            <Label htmlFor="disable-code">Code de vérification</Label>
+            <Input
+              id="disable-code"
+              type="text"
+              maxLength={6}
+              placeholder="000000"
+              value={disableCode}
+              onChange={(e) => setDisableCode(e.target.value.replace(/\D/g, ''))}
+              className="text-center text-2xl tracking-widest"
+            />
+            <p className="text-xs text-muted-foreground text-center">
+              Entrez le code à 6 chiffres affiché dans votre application
+            </p>
+          </div>
+
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowDisableConfirm(false);
+                setDisableCode("");
+              }}
+              className="flex-1"
+            >
+              Annuler
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDisableTwoFactor}
+              disabled={loading || disableCode.length !== 6}
+              className="flex-1"
+            >
+              {loading ? "Désactivation..." : "Désactiver 2FA"}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (showSetup) {
     return (
@@ -310,11 +403,11 @@ export const TwoFactorAuth = () => {
         {enabled ? (
           <Button
             variant="destructive"
-            onClick={handleDisableTwoFactor}
+            onClick={() => setShowDisableConfirm(true)}
             disabled={loading}
             className="w-full"
           >
-            {loading ? "Désactivation..." : "Désactiver 2FA"}
+            Désactiver 2FA
           </Button>
         ) : (
           <Button
