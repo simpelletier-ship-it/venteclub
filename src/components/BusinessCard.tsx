@@ -113,7 +113,11 @@ const BusinessCard = ({
           .order('display_order', { ascending: true });
         
         if (data && data.length > 0) {
-          setAllImages(data.map(item => item.photo_url as string));
+          // Filtrer les URLs blob invalides
+          const validImages = data
+            .map(item => item.photo_url as string)
+            .filter(url => !url.startsWith('blob:') && url.trim() !== '');
+          setAllImages(validImages);
         }
       } catch (error) {
         console.error('Error fetching images:', error);

@@ -11,10 +11,16 @@ interface PremiumPhotoGalleryProps {
 }
 
 export const PremiumPhotoGallery = ({ photos, businessTitle, businessIndustry, businessCity }: PremiumPhotoGalleryProps) => {
-  // Filtrer les photos en double
-  const uniquePhotos = photos.filter((photo, index, self) =>
-    index === self.findIndex((p) => p.photo_url === photo.photo_url)
-  );
+  // Filtrer les photos invalides et en double
+  const uniquePhotos = photos
+    .filter((photo) => {
+      // Exclure les URLs blob (temporaires) et vides
+      const url = photo.photo_url;
+      return url && !url.startsWith('blob:') && url.trim() !== '';
+    })
+    .filter((photo, index, self) =>
+      index === self.findIndex((p) => p.photo_url === photo.photo_url)
+    );
   
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
