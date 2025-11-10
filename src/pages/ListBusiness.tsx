@@ -116,15 +116,49 @@ const ListBusiness = () => {
   const [citySearchOpen, setCitySearchOpen] = useState(false);
   const [citySearchValue, setCitySearchValue] = useState("");
   const [priceNegotiable, setPriceNegotiable] = useState(false);
+  const [previousDescription, setPreviousDescription] = useState<string>("");
 
   // Autosave draft hook
-  const { loadDraft, deleteDraft } = useAutosaveDraft({
+  const { loadDraft, deleteDraft, saveDraft } = useAutosaveDraft({
     formData,
     userId: user?.id,
     draftType: 'business',
     editingBusinessId,
     minFieldsFilled: 2,
   });
+
+  // Charger le brouillon au montage si disponible
+  useEffect(() => {
+    const loadSavedDraft = async () => {
+      if (user && !editingBusinessId) {
+        const draft = await loadDraft();
+        if (draft) {
+          setFormData(prevData => ({ ...prevData, ...draft }));
+          toast({
+            title: "Brouillon chargé",
+            description: "Votre brouillon a été restauré. Continuez où vous étiez.",
+            duration: 4000,
+          });
+        }
+      }
+    };
+    loadSavedDraft();
+  }, [user, editingBusinessId]);
+
+  // Sauvegarder avant de quitter la page
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      const hasContent = formData.title || formData.description;
+      if (hasContent && !editingBusinessId) {
+        saveDraft();
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [formData, editingBusinessId, saveDraft]);
 
   // Géocoder l'adresse complète quand les champs sont remplis
   useEffect(() => {
@@ -925,51 +959,81 @@ const ListBusiness = () => {
                         <Label htmlFor="description">
                           Description <span className="text-destructive">*</span>
                         </Label>
-                        {formData.description && formData.industry && (
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={async () => {
-                              setLoading(true);
-                              try {
-                                const { data, error } = await supabase.functions.invoke('improve-description', {
-                                  body: {
-                                    description: formData.description,
-                                    title: formData.title,
-                                    industry: formData.industry
-                                  }
-                                });
-
-                                if (error) throw error;
-
-                                if (data?.improvedDescription) {
-                                  setFormData({ ...formData, description: data.improvedDescription });
-                                  toast({
-                                    title: "Description améliorée !",
-                                    description: "Votre description a été reformulée avec succès.",
-                                  });
-                                }
-                              } catch (error: any) {
+                        <div className="flex gap-2">
+                          {previousDescription && (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                setFormData({ ...formData, description: previousDescription });
+                                setPreviousDescription("");
                                 toast({
-                                  variant: "destructive",
-                                  title: "Erreur",
-                                  description: error.message || "Impossible d'améliorer la description",
+                                  title: "Description restaurée",
+                                  description: "Votre description originale a été restaurée.",
                                 });
-                              } finally {
-                                setLoading(false);
-                              }
-                            }}
-                            disabled={loading}
-                          >
-                            <Sparkles className="w-4 h-4 mr-2" />
-                            Améliorer avec l'IA
-                          </Button>
-                        )}
+                              }}
+                            >
+                              <X className="w-4 h-4 mr-2" />
+                              Annuler amélioration
+                            </Button>
+                          )}
+                          {formData.description && formData.industry && !previousDescription && (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={async () => {
+                                setLoading(true);
+                                try {
+                                  // Sauvegarder l'ancienne description
+                                  setPreviousDescription(formData.description);
+                                  
+                                  const { data, error } = await supabase.functions.invoke('improve-description', {
+                                    body: {
+                                      description: formData.description,
+                                      title: formData.title,
+                                      industry: formData.industry
+                                    }
+                                  });
+
+                                  if (error) throw error;
+
+                                  if (data?.improvedDescription) {
+                                    setFormData({ ...formData, description: data.improvedDescription });
+                                    toast({
+                                      title: "Description améliorée !",
+                                      description: "Vous pouvez annuler l'amélioration si besoin.",
+                                    });
+                                  }
+                                } catch (error: any) {
+                                  setPreviousDescription(""); // Reset si erreur
+                                  toast({
+                                    variant: "destructive",
+                                    title: "Erreur",
+                                    description: error.message || "Impossible d'améliorer la description",
+                                  });
+                                } finally {
+                                  setLoading(false);
+                                }
+                              }}
+                              disabled={loading}
+                            >
+                              <Sparkles className="w-4 h-4 mr-2" />
+                              Améliorer avec l'IA
+                            </Button>
+                          )}
+                        </div>
                       </div>
                       <VisualRichTextEditor
                         content={formData.description}
-                        onChange={(content) => setFormData({ ...formData, description: content })}
+                        onChange={(content) => {
+                          setFormData({ ...formData, description: content });
+                          // Reset previous description si l'utilisateur modifie manuellement
+                          if (previousDescription) {
+                            setPreviousDescription("");
+                          }
+                        }}
                         placeholder="Décrivez votre entreprise en détail : historique, activités, équipements, clientèle, avantages concurrentiels..."
                       />
                       <div className="flex items-center justify-between mt-1">

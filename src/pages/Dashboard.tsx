@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Star, XCircle, Edit, TrendingUp, Eye, Building, MessageSquare, Crown, FileText, CheckCircle, UserCircle, Sparkles, X, Heart } from "lucide-react";
+import { Plus, Star, XCircle, Edit, TrendingUp, Eye, Building, MessageSquare, Crown, FileText, CheckCircle, UserCircle, Sparkles, X, Heart, Trash2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import BusinessCard from "@/components/BusinessCard";
@@ -348,8 +348,97 @@ const Dashboard = () => {
                     Créer une nouvelle annonce
                   </Button>
                 </div>
+
+                {/* Brouillons */}
+                {businesses.filter(b => b.status === 'draft').length > 0 && (
+                  <div className="mb-6">
+                    <div className="bg-blue-50 dark:bg-blue-950/30 border-2 border-blue-200 dark:border-blue-800 rounded-xl p-6">
+                      <div className="flex items-start gap-4">
+                        <div className="bg-blue-500 rounded-full p-2">
+                          <FileText className="h-5 w-5 text-white" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="text-lg font-bold text-foreground mb-2">
+                            Brouillon{businesses.filter(b => b.status === 'draft').length > 1 ? 's' : ''} en cours
+                          </h3>
+                          <p className="text-sm text-muted-foreground mb-4">
+                            Vous avez {businesses.filter(b => b.status === 'draft').length} brouillon{businesses.filter(b => b.status === 'draft').length > 1 ? 's' : ''} sauvegardé{businesses.filter(b => b.status === 'draft').length > 1 ? 's' : ''}. Continuez où vous étiez ou supprimez-{businesses.filter(b => b.status === 'draft').length > 1 ? 'les' : 'le'}.
+                          </p>
+                          <div className="space-y-3">
+                            {businesses.filter(b => b.status === 'draft').map((draft) => (
+                              <div key={draft.id} className="bg-white dark:bg-gray-900 rounded-lg p-4 flex items-center justify-between">
+                                <div className="flex-1">
+                                  <h4 className="font-semibold text-foreground">
+                                    {draft.title || 'Brouillon sans titre'}
+                                  </h4>
+                                  <p className="text-xs text-muted-foreground mt-1">
+                                    Sauvegardé le {new Date(draft.created_at).toLocaleDateString('fr-CA', { 
+                                      day: 'numeric', 
+                                      month: 'long',
+                                      hour: '2-digit',
+                                      minute: '2-digit'
+                                    })}
+                                  </p>
+                                </div>
+                                <div className="flex gap-2">
+                                  <Button
+                                    size="sm"
+                                    onClick={() => {
+                                      if (draft.sale_type === 'property') {
+                                        navigate(`/list-property?edit=${draft.id}`);
+                                      } else if (draft.is_franchise) {
+                                        navigate(`/list-franchise?edit=${draft.id}`);
+                                      } else {
+                                        navigate(`/list-business?edit=${draft.id}`);
+                                      }
+                                    }}
+                                  >
+                                    <Edit className="h-3 w-3 mr-1" />
+                                    Continuer
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={async () => {
+                                      try {
+                                        await supabase
+                                          .from('businesses')
+                                          .delete()
+                                          .eq('id', draft.id);
+                                        
+                                        toast({
+                                          title: "Brouillon supprimé",
+                                          description: "Le brouillon a été supprimé avec succès.",
+                                        });
+                                        
+                                        // Recharger les businesses
+                                        const session = await supabase.auth.getSession();
+                                        if (session.data.session) {
+                                          fetchUserBusinesses(session.data.session.user.id);
+                                        }
+                                      } catch (error) {
+                                        toast({
+                                          variant: "destructive",
+                                          title: "Erreur",
+                                          description: "Impossible de supprimer le brouillon.",
+                                        });
+                                      }
+                                    }}
+                                  >
+                                    <Trash2 className="h-3 w-3" />
+                                  </Button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 items-stretch">
-                {businesses.map((business) => {
+                {businesses.filter(b => b.status !== 'draft').map((business) => {
                   const featuredUntil = business.featured_until ? new Date(business.featured_until) : null;
                   const now = new Date();
                   const isActiveFeatured = featuredUntil && featuredUntil > now;
