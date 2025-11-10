@@ -1,6 +1,7 @@
 import { Progress } from "@/components/ui/progress";
 import { LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react";
 
 interface NextStep {
   icon: LucideIcon;
@@ -14,28 +15,34 @@ interface VisibilityScoreCardProps {
 }
 
 const VisibilityScoreCard = ({ score, nextSteps = [] }: VisibilityScoreCardProps) => {
+  const [animatedScore, setAnimatedScore] = useState(0);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setAnimatedScore(score);
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [score]);
+
   const getScoreColor = () => {
     if (score === 0) return "text-muted-foreground";
-    if (score < 30) return "text-destructive";
-    if (score < 60) return "text-orange-500";
-    if (score < 80) return "text-amber-500";
-    return "text-primary";
+    if (score < 50) return "text-muted-foreground/80";
+    if (score < 80) return "text-foreground/90";
+    return "text-foreground";
   };
 
   const getProgressColor = () => {
     if (score === 0) return "[&>div]:bg-muted";
-    if (score < 30) return "[&>div]:bg-destructive";
-    if (score < 60) return "[&>div]:bg-orange-500";
-    if (score < 80) return "[&>div]:bg-amber-500";
-    return "[&>div]:bg-primary";
+    if (score < 50) return "[&>div]:bg-muted-foreground/30";
+    if (score < 80) return "[&>div]:bg-muted-foreground/60";
+    return "[&>div]:bg-foreground";
   };
 
   const getScoreLabel = () => {
     if (score === 0) return "Non commencé";
-    if (score < 30) return "Faible";
-    if (score < 60) return "Moyen";
-    if (score < 80) return "Bon";
-    return "Excellent";
+    if (score < 50) return "À compléter";
+    if (score < 80) return "En cours";
+    return "Optimal";
   };
 
   return (
@@ -45,8 +52,14 @@ const VisibilityScoreCard = ({ score, nextSteps = [] }: VisibilityScoreCardProps
         <div className="flex items-baseline justify-between mb-4">
           <h3 className="text-sm font-medium text-muted-foreground">Visibilité</h3>
           <div className="flex items-baseline gap-1">
-            <span className={`text-4xl font-semibold tracking-tight ${getScoreColor()}`}>
-              {score}
+            <span 
+              className={`text-4xl font-semibold tracking-tight transition-all duration-700 ${getScoreColor()}`}
+              style={{ 
+                transform: `scale(${animatedScore > 0 ? 1 : 0.95})`,
+                opacity: animatedScore > 0 ? 1 : 0.5
+              }}
+            >
+              {animatedScore}
             </span>
             <span className="text-lg text-muted-foreground">%</span>
           </div>
@@ -54,12 +67,12 @@ const VisibilityScoreCard = ({ score, nextSteps = [] }: VisibilityScoreCardProps
 
         {/* Progress bar */}
         <Progress 
-          value={score} 
-          className={`h-1.5 ${getProgressColor()}`}
+          value={animatedScore} 
+          className={`h-1.5 transition-all duration-700 ease-out ${getProgressColor()}`}
         />
 
         {/* Score label */}
-        <p className="text-xs text-muted-foreground mt-3">
+        <p className="text-xs text-muted-foreground mt-3 transition-opacity duration-500">
           {getScoreLabel()}
         </p>
       </div>
