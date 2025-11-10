@@ -61,20 +61,34 @@ export const BusinessStatistics = ({ userId }: BusinessStatisticsProps) => {
       console.log('[STATS] Businesses found:', businessData?.length);
       setBusinesses(businessData || []);
 
-      // Build query for analytics
+      if (!businessData || businessData.length === 0) {
+        setAnalytics([]);
+        setLoading(false);
+        return;
+      }
+
+      // Build query for analytics - use UTC dates for consistency
       let query = supabase
         .from('business_analytics')
         .select('*')
-        .in('business_id', (businessData || []).map(b => b.id));
+        .in('business_id', businessData.map(b => b.id));
 
-      // Filter by time range - include full today
+      // Filter by time range - use UTC midnight for consistency
       if (timeRange !== 'all') {
         const daysAgo = parseInt(timeRange);
-        const dateFrom = new Date();
-        dateFrom.setDate(dateFrom.getDate() - daysAgo);
-        dateFrom.setHours(0, 0, 0, 0); // Start of the day
-        console.log('[STATS] Fetching analytics from:', dateFrom.toISOString());
-        query = query.gte('created_at', dateFrom.toISOString());
+        const now = new Date();
+        
+        // Calculate the start date (N days ago at 00:00 UTC)
+        const startDate = new Date(Date.UTC(
+          now.getUTCFullYear(),
+          now.getUTCMonth(),
+          now.getUTCDate() - daysAgo,
+          0, 0, 0, 0
+        ));
+        
+        console.log('[STATS] Fetching analytics from (UTC):', startDate.toISOString());
+        console.log('[STATS] Time range:', timeRange, 'days');
+        query = query.gte('created_at', startDate.toISOString());
       }
 
       // Filter by specific business
@@ -82,13 +96,29 @@ export const BusinessStatistics = ({ userId }: BusinessStatisticsProps) => {
         query = query.eq('business_id', selectedBusiness);
       }
 
-      const { data: analyticsData } = await query.order('created_at', { ascending: true });
-      console.log('[STATS] Analytics events found:', analyticsData?.length);
-      console.log('[STATS] First event:', analyticsData?.[0]);
-      console.log('[STATS] Last event:', analyticsData?.[analyticsData.length - 1]);
-      setAnalytics(analyticsData || []);
+      const { data: analyticsData, error } = await query.order('created_at', { ascending: true });
+      
+      if (error) {
+        console.error('[STATS] Error fetching analytics:', error);
+        setAnalytics([]);
+      } else {
+        console.log('[STATS] Analytics events found:', analyticsData?.length);
+        if (analyticsData && analyticsData.length > 0) {
+          console.log('[STATS] First event:', analyticsData[0]?.created_at);
+          console.log('[STATS] Last event:', analyticsData[analyticsData.length - 1]?.created_at);
+          console.log('[STATS] Sample events by date:');
+          const byDate: Record<string, number> = {};
+          analyticsData.forEach(a => {
+            const d = a.created_at.split('T')[0];
+            byDate[d] = (byDate[d] || 0) + 1;
+          });
+          console.log('[STATS]', byDate);
+        }
+        setAnalytics(analyticsData || []);
+      }
     } catch (error) {
-      console.error('Error fetching statistics:', error);
+      console.error('[STATS] Error fetching statistics:', error);
+      setAnalytics([]);
     } finally {
       setLoading(false);
     }
@@ -127,34 +157,34 @@ export const BusinessStatistics = ({ userId }: BusinessStatisticsProps) => {
     { name: 'Leads', value: totalLeads, color: COLORS[4] }
   ].filter(item => item.value > 0);
 
-  // Group by date for timeline - ensure all dates in range are present
+  // Group by date for timeline - use UTC dates to match database
   const generateDateRange = () => {
     const dates = [];
     const daysInRange = timeRange === 'all' ? 90 : parseInt(timeRange);
     const now = new Date();
     
-    // Start from today and go back daysInRange days
-    for (let i = 0; i < daysInRange; i++) {
-      const date = new Date(now);
-      date.setDate(now.getDate() - i);
-      // Use UTC date to match database format
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const day = String(date.getDate()).padStart(2, '0');
-      dates.unshift(`${year}-${month}-${day}`); // Add to beginning for chronological order
+    // Generate dates from (today - daysInRange) to today (UTC)
+    for (let i = daysInRange - 1; i >= 0; i--) {
+      const date = new Date(Date.UTC(
+        now.getUTCFullYear(),
+        now.getUTCMonth(),
+        now.getUTCDate() - i,
+        0, 0, 0, 0
+      ));
+      const dateStr = date.toISOString().split('T')[0];
+      dates.push(dateStr);
     }
+    
+    console.log('[STATS] Generated date range:', dates.length, 'dates', dates[0], 'to', dates[dates.length - 1]);
     return dates;
   };
 
   const dateRange = timeRange === 'all' ? [] : generateDateRange();
   
+  // Group analytics by UTC date
   const timelineData = analytics.reduce((acc: any[], curr) => {
-    // Extract date in local timezone to match what user sees
-    const eventDate = new Date(curr.created_at);
-    const year = eventDate.getFullYear();
-    const month = String(eventDate.getMonth() + 1).padStart(2, '0');
-    const day = String(eventDate.getDate()).padStart(2, '0');
-    const date = `${year}-${month}-${day}`;
+    // Use UTC date from database directly (format: YYYY-MM-DD)
+    const date = curr.created_at.split('T')[0];
     
     const existing = acc.find(item => item.date === date);
     if (existing) {
