@@ -2,7 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { TrendingUp, MapPin, Star, XCircle, Building2, Home, Store, HelpCircle, ChevronLeft, ChevronRight } from "lucide-react";
+import { TrendingUp, MapPin, Star, XCircle, Building2, Home, Store, HelpCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { FavoriteButton } from "./FavoriteButton";
 import { OptimizedImage } from "./OptimizedImage";
@@ -85,11 +85,8 @@ const BusinessCard = ({
   const navigate = useNavigate();
   const [userId, setUserId] = useState<string | undefined>();
   const [showFullDescription, setShowFullDescription] = useState(false);
-  const [allImages, setAllImages] = useState<string[]>([]);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [mainImageUrl, setMainImageUrl] = useState<string | null>(null);
   const [imageLoading, setImageLoading] = useState(true);
-  const [touchStart, setTouchStart] = useState(0);
-  const [touchEnd, setTouchEnd] = useState(0);
   
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -103,71 +100,29 @@ const BusinessCard = ({
       return;
     }
     
-    const fetchAllImages = async () => {
+    const fetchMainImage = async () => {
       try {
         // @ts-ignore - Supabase types can be too complex
-        const { data, error } = await supabase
+        const { data } = await supabase
           .from('business_photos')
           .select('photo_url')
           .eq('business_id', id)
-          .order('display_order', { ascending: true });
+          .order('display_order', { ascending: true })
+          .limit(1);
         
-        if (data && data.length > 0) {
-          // Filtrer les URLs blob invalides
-          const validImages = data
-            .map(item => item.photo_url as string)
-            .filter(url => !url.startsWith('blob:') && url.trim() !== '');
-          setAllImages(validImages);
+        if (data && data[0]?.photo_url) {
+          setMainImageUrl(data[0].photo_url as string);
         }
       } catch (error) {
-        console.error('Error fetching images:', error);
+        console.error('Error fetching image:', error);
       } finally {
         setImageLoading(false);
       }
     };
     
-    fetchAllImages();
-  }, [id, is_demo]);
+    fetchMainImage();
+  }, [id]);
 
-  const handlePrevImage = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setCurrentImageIndex((prev) => (prev === 0 ? allImages.length - 1 : prev - 1));
-  };
-
-  const handleNextImage = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setCurrentImageIndex((prev) => (prev === allImages.length - 1 ? 0 : prev + 1));
-  };
-
-  // Gestionnaires de swipe tactile
-  const handleTouchStart = (e: React.TouchEvent) => {
-    setTouchStart(e.targetTouches[0].clientX);
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    setTouchEnd(e.targetTouches[0].clientX);
-  };
-
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    if (!touchStart || !touchEnd) return;
-    
-    const distance = touchStart - touchEnd;
-    const isLeftSwipe = distance > 50;
-    const isRightSwipe = distance < -50;
-
-    if (isLeftSwipe) {
-      e.stopPropagation();
-      setCurrentImageIndex((prev) => (prev === allImages.length - 1 ? 0 : prev + 1));
-    }
-    if (isRightSwipe) {
-      e.stopPropagation();
-      setCurrentImageIndex((prev) => (prev === 0 ? allImages.length - 1 : prev - 1));
-    }
-
-    // Reset
-    setTouchStart(0);
-    setTouchEnd(0);
-  };
   
   const displayRevenue = annual_revenue ? `${annual_revenue.toLocaleString('fr-CA')} $` : 'N/A';
   const displayPrice = formatPrice(asking_price, asking_price_max);
@@ -219,73 +174,18 @@ const BusinessCard = ({
         {/* Gradient overlay on hover */}
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-[1]" />
         
-        {/* Image carousel */}
-        <div 
-          className="relative w-full h-56 sm:h-64 overflow-hidden bg-muted group/image"
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-        >
-          {!imageLoading && allImages.length > 0 && (
-            <>
-              <OptimizedImage
-                src={allImages[currentImageIndex]}
-                alt={title}
-                className="w-full h-full object-cover"
-                objectFit="cover"
-                width={600}
-                quality={75}
-              />
-              
-              {/* Navigation arrows - style YouTube - only for non-demo with multiple images */}
-              {!is_demo && allImages.length > 1 && (
-                <>
-                  <button
-                    onClick={handlePrevImage}
-                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/70 hover:bg-black/90 text-white rounded-full p-2 opacity-0 group-hover/image:opacity-100 transition-all duration-200 hover:scale-110 z-10"
-                    aria-label="Image précédente"
-                  >
-                    <ChevronLeft className="w-5 h-5" />
-                  </button>
-                  <button
-                    onClick={handleNextImage}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/70 hover:bg-black/90 text-white rounded-full p-2 opacity-0 group-hover/image:opacity-100 transition-all duration-200 hover:scale-110 z-10"
-                    aria-label="Image suivante"
-                  >
-                    <ChevronRight className="w-5 h-5" />
-                  </button>
-                </>
-              )}
-              
-              {/* Image counter - style YouTube - only for non-demo with multiple images */}
-              {!is_demo && allImages.length > 1 && (
-                <div className="absolute top-3 right-3 bg-black/80 text-white text-xs font-semibold px-2.5 py-1 rounded-md z-10">
-                  {currentImageIndex + 1} / {allImages.length}
-                </div>
-              )}
-              
-              {/* Pagination dots - only for non-demo with multiple images */}
-              {!is_demo && allImages.length > 1 && (
-                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
-                  {allImages.map((_, idx) => (
-                    <button
-                      key={idx}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setCurrentImageIndex(idx);
-                      }}
-                      className={`transition-all duration-200 rounded-full ${
-                        idx === currentImageIndex
-                          ? 'w-6 h-1.5 bg-white'
-                          : 'w-1.5 h-1.5 bg-white/60 hover:bg-white/80'
-                      }`}
-                      aria-label={`Aller à l'image ${idx + 1}`}
-                    />
-                  ))}
-                </div>
-              )}
-            </>
-          )}
+        {/* Image principale seulement */}
+        <div className="relative w-full h-56 sm:h-64 overflow-hidden bg-muted">
+          {!imageLoading && mainImageUrl ? (
+            <OptimizedImage
+              src={mainImageUrl}
+              alt={title}
+              className="w-full h-full object-cover"
+              objectFit="cover"
+              width={600}
+              quality={75}
+            />
+          ) : null}
         </div>
 
       {/* Sold Diagonal Banner */}
