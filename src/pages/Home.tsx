@@ -186,17 +186,6 @@ const Home = () => {
                   Vendre mon entreprise
                 </Button>
               </div>
-              
-              <div className="flex flex-wrap gap-3 text-sm text-white/80 max-w-3xl">
-                <span>Liens rapides:</span>
-                <Link to="/marche" className="hover:text-[#818cf8] transition-colors underline">Analyse de marché</Link>
-                <span>•</span>
-                <Link to="/ressources" className="hover:text-[#818cf8] transition-colors underline">Guide complet</Link>
-                <span>•</span>
-                <Link to="/blog" className="hover:text-[#818cf8] transition-colors underline">Conseils d'experts</Link>
-                <span>•</span>
-                <Link to="/contact" className="hover:text-[#818cf8] transition-colors underline">Support</Link>
-              </div>
             </div>
           </div>
           
@@ -377,13 +366,20 @@ const Home = () => {
           </div>
 
           {/* Resources Links */}
-          <div className="max-w-5xl mx-auto mt-12 text-center">
-            <p className="text-white/80 text-base">
+          <div className="max-w-5xl mx-auto mt-12">
+            <h3 className="text-xl font-bold text-center mb-4 text-white">Accès rapide aux ressources</h3>
+            <div className="flex flex-wrap justify-center gap-3 text-base">
+              <Link to="/marche" className="text-[#818cf8] hover:text-white transition-colors underline font-semibold">Analyse de marché</Link>
+              <span className="text-white/40">•</span>
+              <Link to="/ressources" className="text-[#818cf8] hover:text-white transition-colors underline font-semibold">Guide complet</Link>
+              <span className="text-white/40">•</span>
+              <Link to="/blog" className="text-[#818cf8] hover:text-white transition-colors underline font-semibold">Conseils d'experts</Link>
+              <span className="text-white/40">•</span>
+              <Link to="/contact" className="text-[#818cf8] hover:text-white transition-colors underline font-semibold">Support</Link>
+            </div>
+            <p className="text-white/70 text-center mt-4 text-sm">
               Besoin d'aide ? <Link to="/sell" className="text-[#818cf8] hover:underline font-semibold">Vendre votre entreprise</Link> • 
-              <Link to="/ressources" className="text-[#818cf8] hover:underline font-semibold ml-1">Guide complet</Link> • 
-              <Link to="/blog" className="text-[#818cf8] hover:underline font-semibold ml-1">Blog</Link> • 
               <Link to="/faq" className="text-[#818cf8] hover:underline font-semibold ml-1">FAQ</Link> • 
-              <Link to="/contact" className="text-[#818cf8] hover:underline font-semibold ml-1">Contact</Link> • 
               <Link to="/about" className="text-[#818cf8] hover:underline font-semibold ml-1">À propos</Link> • 
               <Link to="/terms" className="text-[#818cf8] hover:underline font-semibold ml-1">Conditions</Link>
             </p>
