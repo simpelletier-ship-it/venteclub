@@ -35,7 +35,7 @@ const Sell = () => {
                 </div>
                 <CardTitle className="text-2xl">Entreprise</CardTitle>
                 <CardDescription className="text-base min-h-[48px]">
-                  Vendez votre entreprise établie ou commerciale
+                  Vendez votre entreprise ou commerce établi
                 </CardDescription>
               </CardHeader>
               <CardContent className="flex-1 flex flex-col justify-between text-sm text-muted-foreground">
