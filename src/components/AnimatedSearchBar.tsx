@@ -50,9 +50,9 @@ export const TypewriterAnimation = () => {
 
   return (
     <span className="inline-block">
-      <span className="font-bold">
-        {currentWord.gender} <span className="text-[#818cf8]">{displayedText}</span>
-        <span className="animate-pulse">|</span>
+      <span className="font-bold text-[#818cf8]">
+        {currentWord.gender} <span className="text-white">{displayedText}</span>
+        <span className="animate-pulse text-white">|</span>
       </span>
     </span>
   );
