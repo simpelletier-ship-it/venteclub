@@ -6,6 +6,7 @@ import BusinessCard from "@/components/BusinessCard";
 import { ArrowRight, TrendingUp, Shield, Clock, Sparkles, Building2, Users, Eye, DollarSign } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { SEO } from "@/components/SEO";
+import { BreadcrumbSchema } from "@/components/BreadcrumbSchema";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { TypewriterAnimation } from "@/components/AnimatedSearchBar";
 import { useCountUp } from "@/hooks/useCountUp";
@@ -129,11 +130,16 @@ const Home = () => {
   return (
     <>
       <SEO 
-        title="Achat et Vente d'Entreprises au Québec - Plateforme #1 pour Trouver Votre Opportunité" 
-        description="Plateforme québécoise pour l'achat et la vente d'entreprises : restaurants, commerces, franchises. Connexion directe avec les propriétaires. Recherche optimisée par IA. Transactions sécurisées et accompagnement professionnel."
+        title="Achat et Vente d'Entreprises au Québec - Trouvez Votre Opportunité" 
+        description="Plateforme québécoise pour acheter et vendre des entreprises : restaurants, commerces, franchises. Connexion directe avec propriétaires. Recherche IA. Transactions sécurisées."
         keywords="achat entreprise Québec, vente entreprise, PME à vendre, commerce à vendre, opportunité affaires, reprise commerce Montréal, cession entreprise, prix entreprise 2025"
         canonical="/" 
         structuredData={structuredData} 
+      />
+      <BreadcrumbSchema 
+        items={[
+          { name: "Accueil", url: "/" }
+        ]}
       />
       
       {/* Hero Section */}
@@ -152,12 +158,12 @@ const Home = () => {
           <div className="max-w-6xl mx-auto">
             <div className="space-y-4 sm:space-y-6 lg:space-y-8 animate-slide-up">
               <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-display font-bold leading-[1.2] sm:leading-[1.15] tracking-tight text-white">
-                <span className="text-[#818cf8] font-extrabold">Le Club</span> de Référence
-                <br />
-                pour acheter <TypewriterAnimation />
-                <br />
-                partout au Québec
+                Achat et Vente d'Entreprises au Québec - Trouvez Votre Opportunité
               </h1>
+              
+              <p className="text-base sm:text-lg lg:text-xl text-[#818cf8] font-semibold max-w-3xl">
+                Le Club de Référence pour acheter <TypewriterAnimation /> partout au Québec
+              </p>
               
               <p className="text-sm sm:text-base lg:text-lg text-white/90 max-w-3xl leading-relaxed sm:leading-loose">
                 Plateforme intelligente qui rapproche acquéreurs et propriétaires d'entreprises. Nous favorisons la transparence et la fiabilité pour que vos transactions se déroulent en toute confiance.
@@ -167,7 +173,7 @@ const Home = () => {
                 <Button 
                   size="lg" 
                   className="bg-[#6366f1] hover:bg-[#4f46e5] text-white h-11 sm:h-12 lg:h-14 px-5 sm:px-8 lg:px-10 text-sm sm:text-base font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all group w-full sm:w-auto"
-                  onClick={() => document.getElementById('featured')?.scrollIntoView({ behavior: 'smooth' })}
+                  onClick={() => navigate("/entreprises")}
                 >
                   Explorer les opportunités
                   <ArrowRight className="ml-2 w-4 sm:w-5 h-4 sm:h-5 group-hover:translate-x-1 transition-transform" />
@@ -179,6 +185,17 @@ const Home = () => {
                 >
                   Vendre mon entreprise
                 </Button>
+              </div>
+              
+              <div className="flex flex-wrap gap-3 text-sm text-white/80 max-w-3xl">
+                <span>Liens rapides:</span>
+                <Link to="/marche" className="hover:text-[#818cf8] transition-colors underline">Analyse de marché</Link>
+                <span>•</span>
+                <Link to="/ressources" className="hover:text-[#818cf8] transition-colors underline">Guide complet</Link>
+                <span>•</span>
+                <Link to="/blog" className="hover:text-[#818cf8] transition-colors underline">Conseils d'experts</Link>
+                <span>•</span>
+                <Link to="/contact" className="hover:text-[#818cf8] transition-colors underline">Support</Link>
               </div>
             </div>
           </div>
@@ -194,6 +211,7 @@ const Home = () => {
       {/* Statistics Section */}
       <section className="py-10 sm:py-14 lg:py-16 bg-[#1e1b4b]" aria-label="Statistiques de la plateforme">
         <div className="container mx-auto px-4">
+          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-8 text-white">La plateforme de confiance au Québec</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 md:gap-8 max-w-5xl mx-auto">
             <div className="text-center">
               <div className="inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#818cf8]/20 mb-2 sm:mb-3">
@@ -283,53 +301,91 @@ const Home = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5 lg:gap-6 max-w-5xl mx-auto mb-10 sm:mb-12">
-            <div className="text-center p-5 sm:p-6 lg:p-8 rounded-xl bg-white/10 border border-white/20 hover:bg-white/15 hover:shadow-2xl hover:scale-105 transition-all duration-300 backdrop-blur-sm">
-              <TrendingUp className="w-9 sm:w-10 lg:w-12 h-9 sm:h-10 lg:h-12 mx-auto mb-2 sm:mb-3 lg:mb-4 text-white" />
+            <Link to="/entreprises" className="text-center p-5 sm:p-6 lg:p-8 rounded-xl bg-white/10 border border-white/20 hover:bg-white/15 hover:shadow-2xl hover:scale-105 transition-all duration-300 backdrop-blur-sm group">
+              <TrendingUp className="w-9 sm:w-10 lg:w-12 h-9 sm:h-10 lg:h-12 mx-auto mb-2 sm:mb-3 lg:mb-4 text-white group-hover:text-[#818cf8] transition-colors" />
               <h3 className="text-base sm:text-lg lg:text-xl font-bold mb-2 sm:mb-2.5 lg:mb-3 text-white">Recherche optimisée par IA</h3>
               <p className="text-xs sm:text-sm lg:text-base text-white/80 leading-relaxed">Trouvez rapidement les opportunités qui correspondent à votre profil grâce à notre intelligence artificielle</p>
-            </div>
-            <div className="text-center p-5 sm:p-6 lg:p-8 rounded-xl bg-white/10 border border-white/20 hover:bg-white/15 hover:shadow-2xl hover:scale-105 transition-all duration-300 backdrop-blur-sm">
-              <Shield className="w-9 sm:w-10 lg:w-12 h-9 sm:h-10 lg:h-12 mx-auto mb-2 sm:mb-3 lg:mb-4 text-white" />
+            </Link>
+            <Link to="/club-select" className="text-center p-5 sm:p-6 lg:p-8 rounded-xl bg-white/10 border border-white/20 hover:bg-white/15 hover:shadow-2xl hover:scale-105 transition-all duration-300 backdrop-blur-sm group">
+              <Shield className="w-9 sm:w-10 lg:w-12 h-9 sm:h-10 lg:h-12 mx-auto mb-2 sm:mb-3 lg:mb-4 text-white group-hover:text-[#818cf8] transition-colors" />
               <h3 className="text-base sm:text-lg lg:text-xl font-bold mb-2 sm:mb-2.5 lg:mb-3 text-white">Paiements sécurisés</h3>
               <p className="text-xs sm:text-sm lg:text-base text-white/80 leading-relaxed">Abonnements et achats protégés par une infrastructure de paiement certifiée et conforme aux normes bancaires</p>
-            </div>
-            <div className="text-center p-5 sm:p-6 lg:p-8 rounded-xl bg-white/10 border border-white/20 hover:bg-white/15 hover:shadow-2xl hover:scale-105 transition-all duration-300 backdrop-blur-sm">
-              <Clock className="w-9 sm:w-10 lg:w-12 h-9 sm:h-10 lg:h-12 mx-auto mb-2 sm:mb-3 lg:mb-4 text-white" />
+            </Link>
+            <Link to="/dashboard" className="text-center p-5 sm:p-6 lg:p-8 rounded-xl bg-white/10 border border-white/20 hover:bg-white/15 hover:shadow-2xl hover:scale-105 transition-all duration-300 backdrop-blur-sm group">
+              <Clock className="w-9 sm:w-10 lg:w-12 h-9 sm:h-10 lg:h-12 mx-auto mb-2 sm:mb-3 lg:mb-4 text-white group-hover:text-[#818cf8] transition-colors" />
               <h3 className="text-base sm:text-lg lg:text-xl font-bold mb-2 sm:mb-2.5 lg:mb-3 text-white">Interface simplifiée</h3>
               <p className="text-xs sm:text-sm lg:text-base text-white/80 leading-relaxed">Navigation intuitive et gestion facile de vos annonces grâce à notre technologie avancée</p>
-            </div>
+            </Link>
           </div>
           
-          {/* Popular Categories - Internal Links */}
-          <div className="max-w-5xl mx-auto mt-12">
-            <h3 className="text-2xl font-bold text-center mb-6 text-white">Catégories populaires au Québec</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <a href="/entreprises-a-vendre-montreal" className="text-center p-4 rounded-lg bg-white/5 hover:bg-white/10 transition-colors border border-white/10 hover:border-[#818cf8]">
-                <p className="font-semibold text-white">Montréal</p>
-                <p className="text-xs text-white/70 mt-1">Entreprises à vendre</p>
-              </a>
-              <a href="/entreprises-a-vendre-quebec" className="text-center p-4 rounded-lg bg-white/5 hover:bg-white/10 transition-colors border border-white/10 hover:border-[#818cf8]">
-                <p className="font-semibold text-white">Québec</p>
+          {/* Popular Cities Section */}
+          <div className="max-w-6xl mx-auto mt-12">
+            <h3 className="text-2xl sm:text-3xl font-bold text-center mb-6 text-white">Entreprises à vendre par ville au Québec</h3>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+              <Link to="/entreprises-a-vendre-montreal" className="text-center p-4 rounded-lg bg-white/5 hover:bg-white/10 transition-colors border border-white/10 hover:border-[#818cf8] group">
+                <p className="font-semibold text-white group-hover:text-[#818cf8]">Montréal</p>
+                <p className="text-xs text-white/70 mt-1">Entreprises</p>
+              </Link>
+              <Link to="/entreprises-a-vendre-quebec" className="text-center p-4 rounded-lg bg-white/5 hover:bg-white/10 transition-colors border border-white/10 hover:border-[#818cf8] group">
+                <p className="font-semibold text-white group-hover:text-[#818cf8]">Québec</p>
                 <p className="text-xs text-white/70 mt-1">Opportunités</p>
-              </a>
-              <a href="/entreprises-a-vendre-laval" className="text-center p-4 rounded-lg bg-white/5 hover:bg-white/10 transition-colors border border-white/10 hover:border-[#818cf8]">
-                <p className="font-semibold text-white">Laval</p>
+              </Link>
+              <Link to="/entreprises-a-vendre-laval" className="text-center p-4 rounded-lg bg-white/5 hover:bg-white/10 transition-colors border border-white/10 hover:border-[#818cf8] group">
+                <p className="font-semibold text-white group-hover:text-[#818cf8]">Laval</p>
                 <p className="text-xs text-white/70 mt-1">Commerces</p>
-              </a>
-              <a href="/immeubles-commerciaux" className="text-center p-4 rounded-lg bg-white/5 hover:bg-white/10 transition-colors border border-white/10 hover:border-[#818cf8]">
-                <p className="font-semibold text-white">Immeubles</p>
+              </Link>
+              <Link to="/entreprises-a-vendre-gatineau" className="text-center p-4 rounded-lg bg-white/5 hover:bg-white/10 transition-colors border border-white/10 hover:border-[#818cf8] group">
+                <p className="font-semibold text-white group-hover:text-[#818cf8]">Gatineau</p>
+                <p className="text-xs text-white/70 mt-1">Affaires</p>
+              </Link>
+              <Link to="/entreprises-a-vendre-longueuil" className="text-center p-4 rounded-lg bg-white/5 hover:bg-white/10 transition-colors border border-white/10 hover:border-[#818cf8] group">
+                <p className="font-semibold text-white group-hover:text-[#818cf8]">Longueuil</p>
+                <p className="text-xs text-white/70 mt-1">PME</p>
+              </Link>
+              <Link to="/entreprises-a-vendre-sherbrooke" className="text-center p-4 rounded-lg bg-white/5 hover:bg-white/10 transition-colors border border-white/10 hover:border-[#818cf8] group">
+                <p className="font-semibold text-white group-hover:text-[#818cf8]">Sherbrooke</p>
+                <p className="text-xs text-white/70 mt-1">Business</p>
+              </Link>
+            </div>
+          </div>
+
+          {/* Popular Industries Section */}
+          <div className="max-w-6xl mx-auto mt-12">
+            <h3 className="text-2xl sm:text-3xl font-bold text-center mb-6 text-white">Secteurs d'activité populaires</h3>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+              <Link to="/entreprises?industry=Restauration" className="text-center p-4 rounded-lg bg-white/5 hover:bg-white/10 transition-colors border border-white/10 hover:border-[#818cf8] group">
+                <p className="font-semibold text-white group-hover:text-[#818cf8]">Restaurants</p>
+                <p className="text-xs text-white/70 mt-1">Restauration</p>
+              </Link>
+              <Link to="/entreprises?industry=Commerce+de+détail" className="text-center p-4 rounded-lg bg-white/5 hover:bg-white/10 transition-colors border border-white/10 hover:border-[#818cf8] group">
+                <p className="font-semibold text-white group-hover:text-[#818cf8]">Commerces</p>
+                <p className="text-xs text-white/70 mt-1">Détail</p>
+              </Link>
+              <Link to="/entreprises?sale_type=franchise" className="text-center p-4 rounded-lg bg-white/5 hover:bg-white/10 transition-colors border border-white/10 hover:border-[#818cf8] group">
+                <p className="font-semibold text-white group-hover:text-[#818cf8]">Franchises</p>
+                <p className="text-xs text-white/70 mt-1">Clé en main</p>
+              </Link>
+              <Link to="/entreprises?industry=Services+professionnels" className="text-center p-4 rounded-lg bg-white/5 hover:bg-white/10 transition-colors border border-white/10 hover:border-[#818cf8] group">
+                <p className="font-semibold text-white group-hover:text-[#818cf8]">Services</p>
+                <p className="text-xs text-white/70 mt-1">Professionnels</p>
+              </Link>
+              <Link to="/immeubles-commerciaux" className="text-center p-4 rounded-lg bg-white/5 hover:bg-white/10 transition-colors border border-white/10 hover:border-[#818cf8] group">
+                <p className="font-semibold text-white group-hover:text-[#818cf8]">Immeubles</p>
                 <p className="text-xs text-white/70 mt-1">Commerciaux</p>
-              </a>
+              </Link>
             </div>
           </div>
 
           {/* Resources Links */}
           <div className="max-w-5xl mx-auto mt-12 text-center">
-            <p className="text-white/80">
-              Besoin d'aide pour <a href="/sell" className="text-[#818cf8] hover:underline font-semibold">vendre votre entreprise</a> ? 
-              Consultez nos <a href="/ressources" className="text-[#818cf8] hover:underline font-semibold">ressources</a> et notre 
-              <a href="/faq" className="text-[#818cf8] hover:underline font-semibold ml-1">FAQ</a> ou 
-              <a href="/contact" className="text-[#818cf8] hover:underline font-semibold ml-1">contactez-nous</a> pour un accompagnement personnalisé.
+            <p className="text-white/80 text-base">
+              Besoin d'aide ? <Link to="/sell" className="text-[#818cf8] hover:underline font-semibold">Vendre votre entreprise</Link> • 
+              <Link to="/ressources" className="text-[#818cf8] hover:underline font-semibold ml-1">Guide complet</Link> • 
+              <Link to="/blog" className="text-[#818cf8] hover:underline font-semibold ml-1">Blog</Link> • 
+              <Link to="/faq" className="text-[#818cf8] hover:underline font-semibold ml-1">FAQ</Link> • 
+              <Link to="/contact" className="text-[#818cf8] hover:underline font-semibold ml-1">Contact</Link> • 
+              <Link to="/about" className="text-[#818cf8] hover:underline font-semibold ml-1">À propos</Link> • 
+              <Link to="/terms" className="text-[#818cf8] hover:underline font-semibold ml-1">Conditions</Link>
             </p>
           </div>
         </div>
@@ -345,7 +401,7 @@ const Home = () => {
             
             <div className="space-y-6 text-muted-foreground leading-relaxed">
               <p>
-                <strong className="text-foreground">Vente.club</strong> est la plateforme québécoise de référence qui facilite la mise en relation entre acheteurs et vendeurs d'entreprises. Que vous cherchiez à acquérir un restaurant établi, un commerce de détail prospère, une franchise reconnue ou un immeuble commercial, notre plateforme vous offre l'accès à des centaines d'opportunités d'affaires vérifiées partout au Québec.
+                <strong className="text-foreground">Vente.club</strong> est la <Link to="/marche" className="text-secondary hover:underline font-semibold">plateforme québécoise de référence</Link> qui facilite la mise en relation entre acheteurs et vendeurs d'entreprises. Que vous cherchiez à acquérir un <Link to="/entreprises?industry=Restauration" className="text-secondary hover:underline">restaurant établi</Link>, un <Link to="/entreprises?industry=Commerce+de+détail" className="text-secondary hover:underline">commerce de détail prospère</Link>, une <Link to="/entreprises?sale_type=franchise" className="text-secondary hover:underline">franchise reconnue</Link> ou un <Link to="/immeubles-commerciaux" className="text-secondary hover:underline">immeuble commercial</Link>, notre plateforme vous offre l'accès à des centaines d'opportunités d'affaires vérifiées partout au Québec.
               </p>
               
               <h3 className="text-2xl font-bold text-foreground mt-8 mb-4">
@@ -359,14 +415,14 @@ const Home = () => {
                 Des opportunités dans tous les secteurs d'activité
               </h3>
               <p>
-                Notre catalogue diversifié couvre l'ensemble des secteurs d'activité au Québec. De la restauration à l'hôtellerie, du commerce de détail aux services professionnels, en passant par l'industrie manufacturière et les franchises établies, vous trouverez des entreprises rentables adaptées à votre budget et à vos compétences. Nos annonces détaillées incluent les états financiers, les données d'exploitation et les informations clés pour faciliter votre prise de décision.
+                Notre <Link to="/entreprises" className="text-secondary hover:underline font-semibold">catalogue diversifié</Link> couvre l'ensemble des secteurs d'activité au Québec. De la restauration à l'hôtellerie, du commerce de détail aux services professionnels, en passant par l'industrie manufacturière et les franchises établies, vous trouverez des <strong className="text-foreground">entreprises rentables</strong> adaptées à votre budget et à vos compétences. Nos <Link to="/entreprises" className="text-secondary hover:underline">annonces détaillées</Link> incluent les états financiers, les données d'exploitation et les informations clés pour faciliter votre prise de décision.
               </p>
               
               <h3 className="text-2xl font-bold text-foreground mt-8 mb-4">
                 Un accompagnement professionnel à chaque étape
               </h3>
               <p>
-                Que vous soyez acheteur ou vendeur, nous mettons à votre disposition des ressources complètes pour vous guider tout au long du processus. De l'évaluation initiale à la négociation finale, en passant par la due diligence et les aspects juridiques, notre centre de ressources et notre équipe d'experts sont là pour répondre à vos questions et faciliter vos démarches. Consultez notre blog régulièrement mis à jour avec des conseils pratiques, des analyses de marché et des guides détaillés.
+                Que vous soyez <Link to="/entreprises" className="text-secondary hover:underline">acheteur</Link> ou <Link to="/sell" className="text-secondary hover:underline">vendeur</Link>, nous mettons à votre disposition des <Link to="/ressources" className="text-secondary hover:underline font-semibold">ressources complètes</Link> pour vous guider tout au long du processus. De l'évaluation initiale à la négociation finale, en passant par la due diligence et les aspects juridiques, notre <Link to="/ressources" className="text-secondary hover:underline">centre de ressources</Link> et notre équipe d'experts sont là pour répondre à vos questions et faciliter vos démarches. Consultez notre <Link to="/blog" className="text-secondary hover:underline font-semibold">blog</Link> régulièrement mis à jour avec des conseils pratiques, des analyses de marché et des guides détaillés.
               </p>
               
               <div className="bg-gradient-to-r from-[#6366f1]/10 to-[#818cf8]/10 p-6 rounded-lg border border-[#6366f1]/20 mt-8">
@@ -383,8 +439,25 @@ const Home = () => {
               </div>
               
               <p className="mt-8">
-                Rejoignez dès aujourd'hui des milliers d'entrepreneurs québécois qui ont fait confiance à Vente.club pour réaliser leur projet d'acquisition ou de cession d'entreprise. Créez votre compte gratuitement et explorez notre catalogue complet d'opportunités d'affaires disponibles dans toutes les régions du Québec.
+                Rejoignez dès aujourd'hui des milliers d'entrepreneurs québécois qui ont fait confiance à Vente.club pour réaliser leur projet d'acquisition ou de cession d'entreprise. <Link to="/auth" className="text-secondary hover:underline font-semibold">Créez votre compte gratuitement</Link> et explorez notre <Link to="/entreprises" className="text-secondary hover:underline font-semibold">catalogue complet</Link> d'opportunités d'affaires disponibles dans toutes les <Link to="/marche" className="text-secondary hover:underline">régions du Québec</Link>.
               </p>
+              
+              <div className="mt-8 p-6 bg-secondary/5 rounded-lg border border-secondary/10">
+                <h4 className="text-lg font-bold text-foreground mb-3">Explorez nos ressources</h4>
+                <div className="flex flex-wrap gap-3">
+                  <Link to="/entreprises-a-vendre-montreal" className="text-secondary hover:underline">Entreprises à Montréal</Link>
+                  <span>•</span>
+                  <Link to="/entreprises-a-vendre-quebec" className="text-secondary hover:underline">Entreprises à Québec</Link>
+                  <span>•</span>
+                  <Link to="/entreprises-a-vendre-laval" className="text-secondary hover:underline">Entreprises à Laval</Link>
+                  <span>•</span>
+                  <Link to="/club-select" className="text-secondary hover:underline font-semibold">Abonnement Club Select</Link>
+                  <span>•</span>
+                  <Link to="/marche" className="text-secondary hover:underline">Analyse de marché</Link>
+                  <span>•</span>
+                  <Link to="/contact" className="text-secondary hover:underline">Contactez-nous</Link>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -394,20 +467,20 @@ const Home = () => {
       <section className="py-16 sm:py-20 bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50" aria-labelledby="faq-heading">
         <div className="container mx-auto px-4 max-w-4xl">
           <div className="text-center mb-8">
-            <h2 id="faq-heading" className="text-4xl font-display font-bold">Questions fréquentes</h2>
-            <p className="text-muted-foreground mt-2">Tout ce que vous devez savoir sur l'achat et la vente d'entreprises</p>
+            <h2 id="faq-heading" className="text-4xl font-display font-bold">Questions fréquentes sur l'achat et vente d'entreprises</h2>
+            <p className="text-muted-foreground mt-2">Tout ce que vous devez savoir sur l'acquisition et la cession d'entreprises au Québec</p>
           </div>
           <Accordion type="single" collapsible className="w-full mb-8">
             <AccordionItem value="item-1">
               <AccordionTrigger>Comment acheter une entreprise au Québec?</AccordionTrigger>
               <AccordionContent>
-                L'achat d'une entreprise commence par l'identification d'opportunités sur notre plateforme. <a href="/entreprises" className="text-secondary hover:underline font-semibold">Explorez les annonces</a>, contactez les vendeurs directement, effectuez une due diligence complète, négociez le prix et finalisez la transaction avec des professionnels. Consultez notre <a href="/blog" className="text-secondary hover:underline font-semibold">guide complet</a> pour plus de détails.
+                L'<strong>achat d'une entreprise</strong> commence par l'identification d'opportunités sur notre plateforme. <Link to="/entreprises" className="text-secondary hover:underline font-semibold">Explorez les annonces</Link>, contactez les vendeurs directement, effectuez une due diligence complète, négociez le prix et finalisez la transaction avec des professionnels. Consultez notre <Link to="/blog" className="text-secondary hover:underline font-semibold">guide complet</Link> et nos <Link to="/ressources" className="text-secondary hover:underline">ressources</Link> pour plus de détails.
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="item-2">
               <AccordionTrigger>Comment vendre mon entreprise?</AccordionTrigger>
               <AccordionContent>
-                <a href="/auth" className="text-secondary hover:underline font-semibold">Créez un compte gratuit</a>, puis <a href="/sell" className="text-secondary hover:underline font-semibold">soumettez votre annonce</a> avec tous les détails de votre entreprise. Notre équipe approuvera votre annonce pour s'assurer qu'elle respecte nos standards de publication. Profitez de notre réseau de plus de 10 000 acheteurs potentiels au Québec.
+                <Link to="/auth" className="text-secondary hover:underline font-semibold">Créez un compte gratuit</Link>, puis <Link to="/sell" className="text-secondary hover:underline font-semibold">soumettez votre annonce</Link> avec tous les détails de votre entreprise. Notre équipe approuvera votre annonce pour s'assurer qu'elle respecte nos standards de publication. Profitez de notre réseau de plus de 10 000 acheteurs potentiels au Québec. Consultez notre <Link to="/blog" className="text-secondary hover:underline">blog</Link> pour des conseils sur la préparation de votre vente.
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="item-3">
@@ -419,7 +492,7 @@ const Home = () => {
             <AccordionItem value="item-4">
               <AccordionTrigger>Quels types d'entreprises puis-je trouver?</AccordionTrigger>
               <AccordionContent>
-                Restaurants, cafés, boutiques, garages, salons de beauté, franchises, immeubles commerciaux et bien plus. Découvrez toutes les <a href="/marche" className="text-secondary hover:underline font-semibold">catégories disponibles</a> et trouvez l'opportunité qui correspond à vos compétences.
+                <Link to="/entreprises?industry=Restauration" className="text-secondary hover:underline">Restaurants</Link>, cafés, boutiques, garages, salons de beauté, <Link to="/entreprises?sale_type=franchise" className="text-secondary hover:underline">franchises</Link>, <Link to="/immeubles-commerciaux" className="text-secondary hover:underline">immeubles commerciaux</Link> et bien plus. Découvrez toutes les <Link to="/marche" className="text-secondary hover:underline font-semibold">catégories disponibles</Link> dans les villes comme <Link to="/entreprises-a-vendre-montreal" className="text-secondary hover:underline">Montréal</Link>, <Link to="/entreprises-a-vendre-quebec" className="text-secondary hover:underline">Québec</Link> et <Link to="/entreprises-a-vendre-laval" className="text-secondary hover:underline">Laval</Link>.
               </AccordionContent>
             </AccordionItem>
           </Accordion>
