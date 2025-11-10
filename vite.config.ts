@@ -120,7 +120,7 @@ export default defineConfig(({ mode }) => ({
     chunkSizeWarningLimit: 1000,
     terserOptions: {
       compress: {
-        drop_console: false,
+        drop_console: true,
         drop_debugger: true,
       },
       format: {
@@ -131,11 +131,25 @@ export default defineConfig(({ mode }) => ({
       output: {
         manualChunks: {
           'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          'supabase': ['@supabase/supabase-js'],
-          'ui': ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu'],
+          'supabase-vendor': ['@supabase/supabase-js'],
+          'ui-vendor': ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-popover', '@radix-ui/react-select'],
+          'form-vendor': ['react-hook-form', '@hookform/resolvers', 'zod'],
+          'map-vendor': ['mapbox-gl', '@mapbox/mapbox-gl-draw'],
+          'editor-vendor': ['@tiptap/react', '@tiptap/starter-kit'],
+          'query-vendor': ['@tanstack/react-query'],
         },
       },
     },
+  },
+  optimizeDeps: {
+    include: [
+      'react',
+      'react-dom',
+      'react-router-dom',
+      '@tanstack/react-query',
+      'lucide-react',
+      '@supabase/supabase-js',
+    ],
   },
   publicDir: 'public',
   assetsInclude: ['**/*.xml', '**/*.txt'],
