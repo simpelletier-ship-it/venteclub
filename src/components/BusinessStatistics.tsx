@@ -24,6 +24,30 @@ export const BusinessStatistics = ({ userId }: BusinessStatisticsProps) => {
     fetchData();
   }, [userId, timeRange, selectedBusiness]);
 
+  // Realtime subscription for analytics updates
+  useEffect(() => {
+    const channel = supabase
+      .channel('business-analytics-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'business_analytics'
+        },
+        (payload) => {
+          console.log('[STATS] Realtime update:', payload);
+          // Refetch data when analytics change
+          fetchData();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [userId, timeRange, selectedBusiness]);
+
   const fetchData = async () => {
     setLoading(true);
     try {
