@@ -6,8 +6,9 @@ import { TrendingUp, MapPin, Star, Home, Store, HelpCircle, Image as ImageIcon }
 import { OptimizedImage } from "./OptimizedImage";
 import { useNavigate } from "react-router-dom";
 import { FavoriteButton } from "./FavoriteButton";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { usePreloadBusinessImages } from "@/hooks/useVisibleBusinesses";
 
 import { formatPrice } from "@/lib/priceFormatter";
 import { stripHtml } from "@/lib/htmlUtils";
@@ -65,11 +66,39 @@ const BusinessListItem = ({
   const [userId, setUserId] = useState<string | undefined>();
   const [mainImageUrl, setMainImageUrl] = useState<string | null>(null);
   const [imageLoading, setImageLoading] = useState(true);
+  const [isVisible, setIsVisible] = useState(false);
+  const itemRef = useRef<HTMLDivElement>(null);
+  
+  // Précharger l'image quand l'item devient visible
+  const isPreloaded = usePreloadBusinessImages(id || '', mainImageUrl, isVisible);
   
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUserId(session?.user?.id);
     });
+  }, []);
+
+  // Intersection Observer pour détecter la visibilité
+  useEffect(() => {
+    if (!itemRef.current) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsVisible(true);
+          }
+        });
+      },
+      {
+        rootMargin: '200px', // Commencer à précharger 200px avant
+        threshold: 0.01,
+      }
+    );
+
+    observer.observe(itemRef.current);
+
+    return () => observer.disconnect();
   }, []);
 
   useEffect(() => {
@@ -131,12 +160,14 @@ const BusinessListItem = ({
 
   return (
     <div 
+      ref={itemRef}
       className={`group relative flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-card border border-border rounded-xl transition-all duration-300 ${
         status !== 'sold' ? 'hover:shadow-[var(--shadow-hover)] cursor-pointer' : 'cursor-default'
       } overflow-hidden ${
         featured ? 'ring-2 ring-amber-500/30' : ''
       }`}
       onClick={handleClick}
+      data-business-id={id}
     >
       {/* Sold Diagonal Banner */}
       {status === 'sold' && (

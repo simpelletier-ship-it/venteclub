@@ -9,8 +9,9 @@ import { OptimizedImage } from "./OptimizedImage";
 import { AnimatedBadge } from "./AnimatedBadge";
 import { AnimatedNumber } from "./AnimatedNumber";
 import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { usePreloadBusinessImages } from "@/hooks/useVisibleBusinesses";
 
 import { formatPrice } from "@/lib/priceFormatter";
 import { stripHtml } from "@/lib/htmlUtils";
@@ -87,11 +88,39 @@ const BusinessCard = ({
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [mainImageUrl, setMainImageUrl] = useState<string | null>(null);
   const [imageLoading, setImageLoading] = useState(true);
+  const [isVisible, setIsVisible] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+  
+  // Précharger l'image quand la carte devient visible
+  const isPreloaded = usePreloadBusinessImages(id || '', mainImageUrl, isVisible);
   
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUserId(session?.user?.id);
     });
+  }, []);
+
+  // Intersection Observer pour détecter la visibilité
+  useEffect(() => {
+    if (!cardRef.current) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsVisible(true);
+          }
+        });
+      },
+      {
+        rootMargin: '200px', // Commencer à précharger 200px avant
+        threshold: 0.01,
+      }
+    );
+
+    observer.observe(cardRef.current);
+
+    return () => observer.disconnect();
   }, []);
 
   useEffect(() => {
@@ -159,13 +188,15 @@ const BusinessCard = ({
 
   return (
     <motion.div
+      ref={cardRef}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
       whileHover={{ y: -5 }}
       className="h-full"
+      data-business-id={id}
     >
-      <Card 
+      <Card
         className={`group relative overflow-hidden card-premium border-border/50 h-full flex flex-col transition-all duration-500 ${
           status !== 'sold' ? 'hover:shadow-premium hover:border-primary/50 hover:shadow-primary/10 cursor-pointer' : 'cursor-default'
         } ${featured ? 'ring-2 ring-primary/40 shadow-lg shadow-primary/20' : ''}`}
