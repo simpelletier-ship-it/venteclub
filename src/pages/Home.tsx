@@ -122,11 +122,6 @@ const Home = () => {
       "areaServed": {
         "@type": "State",
         "name": "Québec"
-      },
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "4.8",
-        "reviewCount": "287"
       }
     }
   };
@@ -135,7 +130,7 @@ const Home = () => {
     <>
       <SEO 
         title="Achat et Vente d'Entreprises au Québec - Plateforme #1 pour Trouver Votre Opportunité" 
-        description="Découvrez des centaines d'entreprises à vendre au Québec : restaurants, commerces, franchises. Connexion directe avec les propriétaires. Recherche optimisée par IA. Transactions sécurisées. Rejoignez plus de 10 000 entrepreneurs québécois."
+        description="Plateforme québécoise pour l'achat et la vente d'entreprises : restaurants, commerces, franchises. Connexion directe avec les propriétaires. Recherche optimisée par IA. Transactions sécurisées et accompagnement professionnel."
         keywords="achat entreprise Québec, vente entreprise, PME à vendre, commerce à vendre, opportunité affaires, reprise commerce Montréal, cession entreprise, prix entreprise 2025"
         canonical="/" 
         structuredData={structuredData} 
