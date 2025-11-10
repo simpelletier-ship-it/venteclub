@@ -9,6 +9,7 @@ import { Layout } from "@/components/Layout";
 import { EmailVerificationGuard } from "@/components/EmailVerificationGuard";
 import { trackPageView } from "@/lib/analytics";
 import { useWebVitals } from "@/hooks/usePerformanceMonitoring";
+import { MobileNotificationsContainer } from "@/components/MobileNotificationsContainer";
 
 // Critical pages loaded immediately
 import Home from "./pages/Home";
@@ -83,6 +84,7 @@ const App = () => (
       <AuthProvider>
         <Toaster />
         <Sonner />
+        <MobileNotificationsContainer />
         <BrowserRouter>
           <AnalyticsTracker />
           <Layout>
