@@ -43,11 +43,12 @@ export const BusinessStatistics = ({ userId }: BusinessStatisticsProps) => {
         .select('*')
         .in('business_id', (businessData || []).map(b => b.id));
 
-      // Filter by time range
+      // Filter by time range - include full today
       if (timeRange !== 'all') {
         const daysAgo = parseInt(timeRange);
         const dateFrom = new Date();
         dateFrom.setDate(dateFrom.getDate() - daysAgo);
+        dateFrom.setHours(0, 0, 0, 0); // Start of the day
         console.log('[STATS] Fetching analytics from:', dateFrom.toISOString());
         query = query.gte('created_at', dateFrom.toISOString());
       }
@@ -107,11 +108,12 @@ export const BusinessStatistics = ({ userId }: BusinessStatisticsProps) => {
     const dates = [];
     const daysInRange = timeRange === 'all' ? 90 : parseInt(timeRange);
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Reset to start of day
+    today.setHours(23, 59, 59, 999); // Include full current day
     
     for (let i = daysInRange - 1; i >= 0; i--) {
       const date = new Date(today);
       date.setDate(date.getDate() - i);
+      date.setHours(0, 0, 0, 0); // Start of each day
       dates.push(date.toISOString().split('T')[0]); // Format YYYY-MM-DD
     }
     return dates;
