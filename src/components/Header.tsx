@@ -13,6 +13,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getAvatarUrl } from "@/lib/avatarUtils";
 import { LayoutDashboard, Settings, LogOut, Menu, Sparkles, Mail } from "lucide-react";
 import { NotificationBell } from "./NotificationBell";
+import { LanguageSwitcher } from "./LanguageSwitcher";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -191,12 +192,14 @@ const Header = () => {
                 size="sm"
                 className="hidden md:flex items-center gap-2"
               >
-                <Sparkles className="w-4 h-4" />
-                Admin
-              </Button>
-            )}
+              <Sparkles className="w-4 h-4" />
+              Admin
+            </Button>
+          )}
 
-            {user ? (
+          <LanguageSwitcher />
+
+          {user ? (
               <>
                 <button 
                   onClick={() => navigate("/messages")} 

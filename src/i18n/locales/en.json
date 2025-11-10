@@ -1,0 +1,46 @@
+{
+  "nav": {
+    "home": "Home",
+    "businesses": "Listings",
+    "sell": "Sell",
+    "resources": "Resources",
+    "about": "About",
+    "contact": "Contact",
+    "login": "Login",
+    "signup": "Sign Up",
+    "dashboard": "Dashboard",
+    "messages": "Messages",
+    "favorites": "Favorites",
+    "profile": "Profile",
+    "logout": "Logout"
+  },
+  "common": {
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "price": "Price",
+    "location": "Location",
+    "category": "Category",
+    "loadMore": "Load More",
+    "viewDetails": "View Details",
+    "contactSeller": "Contact Seller",
+    "saveToFavorites": "Save to Favorites",
+    "share": "Share",
+    "currency": "$"
+  },
+  "hero": {
+    "title": "Find Your Dream Business",
+    "subtitle": "The leading platform to buy and sell businesses in Quebec",
+    "searchPlaceholder": "Search by city, industry or keyword...",
+    "browseListings": "Browse Listings"
+  },
+  "footer": {
+    "description": "The leading platform to buy and sell businesses in Quebec",
+    "quickLinks": "Quick Links",
+    "legal": "Legal",
+    "terms": "Terms of Service",
+    "privacy": "Privacy Policy",
+    "followUs": "Follow Us",
+    "allRightsReserved": "All Rights Reserved"
+  }
+}

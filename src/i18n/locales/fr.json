@@ -1,0 +1,46 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "businesses": "Annonces",
+    "sell": "Vendre",
+    "resources": "Ressources",
+    "about": "À propos",
+    "contact": "Contact",
+    "login": "Connexion",
+    "signup": "S'inscrire",
+    "dashboard": "Tableau de bord",
+    "messages": "Messages",
+    "favorites": "Favoris",
+    "profile": "Profil",
+    "logout": "Déconnexion"
+  },
+  "common": {
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "sort": "Trier",
+    "price": "Prix",
+    "location": "Emplacement",
+    "category": "Catégorie",
+    "loadMore": "Charger plus",
+    "viewDetails": "Voir les détails",
+    "contactSeller": "Contacter le vendeur",
+    "saveToFavorites": "Ajouter aux favoris",
+    "share": "Partager",
+    "currency": "$"
+  },
+  "hero": {
+    "title": "Trouvez l'entreprise de vos rêves",
+    "subtitle": "La plateforme de référence pour acheter et vendre des entreprises au Québec",
+    "searchPlaceholder": "Rechercher par ville, industrie ou mot-clé...",
+    "browseListings": "Parcourir les annonces"
+  },
+  "footer": {
+    "description": "La plateforme de référence pour acheter et vendre des entreprises au Québec",
+    "quickLinks": "Liens rapides",
+    "legal": "Légal",
+    "terms": "Conditions d'utilisation",
+    "privacy": "Politique de confidentialité",
+    "followUs": "Suivez-nous",
+    "allRightsReserved": "Tous droits réservés"
+  }
+}
