@@ -28,6 +28,13 @@
   status = 301
   force = true
 
+# Redirect www to non-www (HTTPS)
+[[redirects]]
+  from = "https://www.vente.club/*"
+  to = "https://vente.club/:splat"
+  status = 301
+  force = true
+
 # Force all routes to index.html for client-side routing (SPA)
 [[redirects]]
   from = "/*"

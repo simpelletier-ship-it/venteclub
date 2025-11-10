@@ -335,6 +335,61 @@ const Home = () => {
         </div>
       </section>
 
+      {/* SEO Content Section */}
+      <section className="py-16 sm:py-20 bg-background" aria-labelledby="seo-heading">
+        <div className="container mx-auto px-4 max-w-5xl">
+          <div className="prose prose-lg max-w-none">
+            <h2 id="seo-heading" className="text-3xl sm:text-4xl font-display font-bold text-foreground mb-6">
+              Votre partenaire pour l'achat et la vente d'entreprises au Québec
+            </h2>
+            
+            <div className="space-y-6 text-muted-foreground leading-relaxed">
+              <p>
+                <strong className="text-foreground">Vente.club</strong> est la plateforme québécoise de référence qui facilite la mise en relation entre acheteurs et vendeurs d'entreprises. Que vous cherchiez à acquérir un restaurant établi, un commerce de détail prospère, une franchise reconnue ou un immeuble commercial, notre plateforme vous offre l'accès à des centaines d'opportunités d'affaires vérifiées partout au Québec.
+              </p>
+              
+              <h3 className="text-2xl font-bold text-foreground mt-8 mb-4">
+                Une plateforme sécurisée pour vos transactions
+              </h3>
+              <p>
+                La sécurité de vos transactions est notre priorité absolue. Notre plateforme utilise des protocoles de paiement certifiés conformes aux normes bancaires internationales, garantissant la protection de vos informations personnelles et financières. Chaque annonce est soigneusement vérifiée par notre équipe avant publication pour assurer la qualité et la fiabilité des opportunités présentées.
+              </p>
+              
+              <h3 className="text-2xl font-bold text-foreground mt-8 mb-4">
+                Des opportunités dans tous les secteurs d'activité
+              </h3>
+              <p>
+                Notre catalogue diversifié couvre l'ensemble des secteurs d'activité au Québec. De la restauration à l'hôtellerie, du commerce de détail aux services professionnels, en passant par l'industrie manufacturière et les franchises établies, vous trouverez des entreprises rentables adaptées à votre budget et à vos compétences. Nos annonces détaillées incluent les états financiers, les données d'exploitation et les informations clés pour faciliter votre prise de décision.
+              </p>
+              
+              <h3 className="text-2xl font-bold text-foreground mt-8 mb-4">
+                Un accompagnement professionnel à chaque étape
+              </h3>
+              <p>
+                Que vous soyez acheteur ou vendeur, nous mettons à votre disposition des ressources complètes pour vous guider tout au long du processus. De l'évaluation initiale à la négociation finale, en passant par la due diligence et les aspects juridiques, notre centre de ressources et notre équipe d'experts sont là pour répondre à vos questions et faciliter vos démarches. Consultez notre blog régulièrement mis à jour avec des conseils pratiques, des analyses de marché et des guides détaillés.
+              </p>
+              
+              <div className="bg-gradient-to-r from-[#6366f1]/10 to-[#818cf8]/10 p-6 rounded-lg border border-[#6366f1]/20 mt-8">
+                <h3 className="text-xl font-bold text-foreground mb-3">
+                  Pourquoi choisir Vente.club ?
+                </h3>
+                <ul className="space-y-2 list-disc list-inside text-muted-foreground">
+                  <li><strong className="text-foreground">Connexion directe</strong> avec les propriétaires d'entreprises sans intermédiaires</li>
+                  <li><strong className="text-foreground">Recherche optimisée par IA</strong> pour trouver rapidement les meilleures opportunités</li>
+                  <li><strong className="text-foreground">Transactions sécurisées</strong> avec infrastructure de paiement certifiée</li>
+                  <li><strong className="text-foreground">Support expert</strong> disponible pour vous accompagner dans vos démarches</li>
+                  <li><strong className="text-foreground">Réseau établi</strong> de plus de 28 entrepreneurs et investisseurs actifs</li>
+                </ul>
+              </div>
+              
+              <p className="mt-8">
+                Rejoignez dès aujourd'hui des milliers d'entrepreneurs québécois qui ont fait confiance à Vente.club pour réaliser leur projet d'acquisition ou de cession d'entreprise. Créez votre compte gratuitement et explorez notre catalogue complet d'opportunités d'affaires disponibles dans toutes les régions du Québec.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* FAQ Section */}
       <section className="py-16 sm:py-20 bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50" aria-labelledby="faq-heading">
         <div className="container mx-auto px-4 max-w-4xl">
