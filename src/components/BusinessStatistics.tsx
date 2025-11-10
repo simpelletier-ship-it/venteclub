@@ -131,14 +131,17 @@ export const BusinessStatistics = ({ userId }: BusinessStatisticsProps) => {
   const generateDateRange = () => {
     const dates = [];
     const daysInRange = timeRange === 'all' ? 90 : parseInt(timeRange);
-    const today = new Date();
-    today.setHours(23, 59, 59, 999); // Include full current day
+    const now = new Date();
     
-    for (let i = daysInRange - 1; i >= 0; i--) {
-      const date = new Date(today);
-      date.setDate(date.getDate() - i);
-      date.setHours(0, 0, 0, 0); // Start of each day
-      dates.push(date.toISOString().split('T')[0]); // Format YYYY-MM-DD
+    // Start from today and go back daysInRange days
+    for (let i = 0; i < daysInRange; i++) {
+      const date = new Date(now);
+      date.setDate(now.getDate() - i);
+      // Use UTC date to match database format
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      dates.unshift(`${year}-${month}-${day}`); // Add to beginning for chronological order
     }
     return dates;
   };
@@ -146,7 +149,13 @@ export const BusinessStatistics = ({ userId }: BusinessStatisticsProps) => {
   const dateRange = timeRange === 'all' ? [] : generateDateRange();
   
   const timelineData = analytics.reduce((acc: any[], curr) => {
-    const date = new Date(curr.created_at).toISOString().split('T')[0]; // Format YYYY-MM-DD
+    // Extract date in local timezone to match what user sees
+    const eventDate = new Date(curr.created_at);
+    const year = eventDate.getFullYear();
+    const month = String(eventDate.getMonth() + 1).padStart(2, '0');
+    const day = String(eventDate.getDate()).padStart(2, '0');
+    const date = `${year}-${month}-${day}`;
+    
     const existing = acc.find(item => item.date === date);
     if (existing) {
       existing[curr.event_type] = (existing[curr.event_type] || 0) + 1;
