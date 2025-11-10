@@ -421,8 +421,6 @@ const Home = () => {
                 <ul className="space-y-2 list-disc list-inside text-muted-foreground">
                   <li><strong className="text-foreground">Connexion directe</strong> avec les propriétaires d'entreprises sans intermédiaires</li>
                   <li><strong className="text-foreground">Recherche optimisée par IA</strong> pour trouver rapidement les meilleures opportunités</li>
-                  <li><strong className="text-foreground">Transactions sécurisées</strong> avec infrastructure de paiement certifiée</li>
-                  <li><strong className="text-foreground">Support expert</strong> disponible pour vous accompagner dans vos démarches</li>
                   <li><strong className="text-foreground">Réseau établi</strong> de plus de 28 entrepreneurs et investisseurs actifs</li>
                 </ul>
               </div>
