@@ -243,35 +243,15 @@ const SalaryCalculator = () => {
         return annualValue;
     }
   };
-  
-  // Debug logs pour vérifier les calculs
-  console.log('=== Calculateur Salaire Debug ===');
-  console.log('Période:', period);
-  console.log('Salaire saisi:', grossSalary);
-  console.log('Salaire annuel calculé:', annualSalary);
-  console.log('Province:', province);
-  console.log('Résultats annuels:', {
-    gross: results.gross,
-    federalTax: results.federalTax,
-    provincialTax: results.provincialTax,
-    cppContribution: results.cppContribution,
-    eiContribution: results.eiContribution,
-    qpipContribution: results.qpipContribution,
-    totalTax: results.totalTax,
-    netIncome: results.netIncome
-  });
-  if (period === 'hourly') {
-    console.log('Résultats horaires:', {
-      gross: getPeriodValue(results.gross),
-      qpip: getPeriodValue(results.qpipContribution),
-      cpp: getPeriodValue(results.cppContribution),
-      ei: getPeriodValue(results.eiContribution),
-      federalTax: getPeriodValue(results.federalTax),
-      provincialTax: getPeriodValue(results.provincialTax),
-      totalTax: getPeriodValue(results.totalTax),
-      net: getPeriodValue(results.netIncome)
-    });
-  }
+
+  const formatPeriodPrice = (annualValue: number) => {
+    const periodValue = getPeriodValue(annualValue);
+    // For hourly, show 2 decimals if value is less than 10
+    if (period === "hourly" && periodValue < 10 && periodValue > 0) {
+      return periodValue.toFixed(2) + " $";
+    }
+    return formatPrice(periodValue);
+  };
 
   const chartData = [
     { name: "Salaire net", value: results.netIncome, color: "#10b981" },
@@ -433,35 +413,35 @@ const SalaryCalculator = () => {
                             <div className="flex justify-between items-center py-2 border-b">
                               <span className="text-muted-foreground">Salaire brut</span>
                               <span className="font-semibold text-lg">
-                                {formatPrice(getPeriodValue(results.gross))}
+                                {formatPeriodPrice(results.gross)}
                               </span>
                             </div>
                             <div className="flex justify-between items-center text-red-600 dark:text-red-400">
                               <span>Impôt fédéral</span>
-                              <span>- {formatPrice(getPeriodValue(results.federalTax))}</span>
+                              <span>- {formatPeriodPrice(results.federalTax)}</span>
                             </div>
                             <div className="flex justify-between items-center text-orange-600 dark:text-orange-400">
                               <span>Impôt provincial</span>
-                              <span>- {formatPrice(getPeriodValue(results.provincialTax))}</span>
+                              <span>- {formatPeriodPrice(results.provincialTax)}</span>
                             </div>
                             <div className="flex justify-between items-center text-purple-600 dark:text-purple-400">
                               <span>{province === "QC" ? "RRQ" : "RPC"}</span>
-                              <span>- {formatPrice(getPeriodValue(results.cppContribution))}</span>
+                              <span>- {formatPeriodPrice(results.cppContribution)}</span>
                             </div>
                             <div className="flex justify-between items-center text-blue-600 dark:text-blue-400">
                               <span>Assurance-emploi</span>
-                              <span>- {formatPrice(getPeriodValue(results.eiContribution))}</span>
+                              <span>- {formatPeriodPrice(results.eiContribution)}</span>
                             </div>
                             {province === "QC" && (
                               <div className="flex justify-between items-center text-pink-600 dark:text-pink-400">
                                 <span>RQAP</span>
-                                <span>- {formatPrice(getPeriodValue(results.qpipContribution))}</span>
+                                <span>- {formatPeriodPrice(results.qpipContribution)}</span>
                               </div>
                             )}
                             <div className="flex justify-between items-center py-3 border-t-2 border-primary">
                               <span className="font-bold text-lg">Salaire net</span>
                               <span className="font-bold text-2xl text-green-600 dark:text-green-400">
-                                {formatPrice(getPeriodValue(results.netIncome))}
+                                {formatPeriodPrice(results.netIncome)}
                               </span>
                             </div>
                           </div>
