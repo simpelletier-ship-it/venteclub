@@ -5,6 +5,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsi
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface NetWorthGamificationProps {
   netWorth: number;
@@ -12,6 +13,7 @@ interface NetWorthGamificationProps {
 
 export const NetWorthGamification = ({ netWorth }: NetWorthGamificationProps) => {
   const [showChart, setShowChart] = useState(false);
+  const [selectedPeriod, setSelectedPeriod] = useState<'7d' | '30d' | '90d' | '1y'>('30d');
 
   // Fetch historical data for chart
   const { data: historicalData = [] } = useQuery({
@@ -89,6 +91,37 @@ export const NetWorthGamification = ({ netWorth }: NetWorthGamificationProps) =>
     },
   });
 
+  // Calculate period-based change
+  const calculatePeriodChange = (period: '7d' | '30d' | '90d' | '1y') => {
+    if (!historicalData || historicalData.length < 2) return { amount: 0, percentage: 0 };
+    
+    const daysMap = { '7d': 7, '30d': 30, '90d': 90, '1y': 365 };
+    const daysAgo = daysMap[period];
+    
+    const targetDate = new Date();
+    targetDate.setDate(targetDate.getDate() - daysAgo);
+    
+    // Find closest historical point
+    const sortedData = [...historicalData].reverse(); // Most recent first
+    const oldDataPoint = sortedData.find(d => {
+      const dataDate = new Date();
+      const monthIndex = historicalData.length - 1 - sortedData.indexOf(d);
+      dataDate.setMonth(dataDate.getMonth() - monthIndex);
+      return dataDate <= targetDate;
+    }) || historicalData[0];
+    
+    const currentNetWorth = historicalData[historicalData.length - 1]?.valeurNette || netWorth;
+    const oldNetWorth = oldDataPoint.valeurNette;
+    
+    const amount = currentNetWorth - oldNetWorth;
+    const percentage = oldNetWorth !== 0 ? (amount / Math.abs(oldNetWorth)) * 100 : 0;
+    
+    return { amount, percentage };
+  };
+
+  const periodChange = calculatePeriodChange(selectedPeriod);
+  const isPositiveChange = periodChange.amount >= 0;
+
   // Calcul du pourcentage (0-100%)
   const getPercentage = () => {
     if (netWorth < 0) {
@@ -139,8 +172,8 @@ export const NetWorthGamification = ({ netWorth }: NetWorthGamificationProps) =>
       <Card className="overflow-hidden border-0 shadow-lg bg-gradient-to-br from-card via-card to-muted/20">
         <CardContent className="p-8">
         {/* Header minimaliste */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex-1">
             <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Valeur nette</h3>
             <div className="flex items-center gap-3 mt-2">
               <span className={`text-4xl font-bold tracking-tight ${netWorth >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
@@ -152,6 +185,26 @@ export const NetWorthGamification = ({ netWorth }: NetWorthGamificationProps) =>
                 <TrendingDown className="h-8 w-8 text-red-600 dark:text-red-400 animate-pulse" />
               )}
             </div>
+            
+            {/* Period Change Indicator */}
+            {historicalData && historicalData.length > 1 && (
+              <div className="mt-3">
+                <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium ${
+                  isPositiveChange 
+                    ? 'bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-400' 
+                    : 'bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-400'
+                }`}>
+                  {isPositiveChange ? (
+                    <TrendingUp className="h-4 w-4" />
+                  ) : (
+                    <TrendingDown className="h-4 w-4" />
+                  )}
+                  <span>
+                    {isPositiveChange ? '+' : ''}{formatPrice(periodChange.amount)} ({isPositiveChange ? '+' : ''}{periodChange.percentage.toFixed(2)}%)
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
           
           {isWealth && (
@@ -160,6 +213,20 @@ export const NetWorthGamification = ({ netWorth }: NetWorthGamificationProps) =>
             </div>
           )}
         </div>
+
+        {/* Period Selector */}
+        {historicalData && historicalData.length > 1 && (
+          <div className="mb-6">
+            <Tabs value={selectedPeriod} onValueChange={(v) => setSelectedPeriod(v as any)}>
+              <TabsList className="grid w-full grid-cols-4 bg-muted/50">
+                <TabsTrigger value="7d" className="text-xs">7 jours</TabsTrigger>
+                <TabsTrigger value="30d" className="text-xs">30 jours</TabsTrigger>
+                <TabsTrigger value="90d" className="text-xs">90 jours</TabsTrigger>
+                <TabsTrigger value="1y" className="text-xs">1 an</TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
+        )}
 
         {/* Barre de progression professionnelle */}
         <div className="space-y-3">
