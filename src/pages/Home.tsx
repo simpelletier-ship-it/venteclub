@@ -196,7 +196,7 @@ const Home = () => {
               <div className="flex flex-col sm:flex-row gap-4 sm:gap-5 pt-12 sm:pt-16 lg:pt-20">
                 <Button 
                   size="lg" 
-                  className="bg-white text-[#1e1b4b] hover:bg-white/95 h-14 sm:h-16 lg:h-[4.5rem] px-8 sm:px-10 lg:px-12 text-base sm:text-lg lg:text-xl font-bold rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 group w-full sm:w-auto"
+                  className="bg-[#6366f1] hover:bg-[#4f46e5] text-white h-14 sm:h-16 lg:h-[4.5rem] px-8 sm:px-10 lg:px-12 text-base sm:text-lg lg:text-xl font-bold rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 group w-full sm:w-auto"
                   onClick={() => navigate("/entreprises")}
                 >
                   Explorer les opportunités
@@ -222,7 +222,7 @@ const Home = () => {
       </section>
 
       {/* Statistics Section */}
-      <section className="py-6 sm:py-8 lg:py-10 bg-[#1e1b4b]" aria-label="Statistiques de la plateforme">
+      <section className="pt-0 pb-6 sm:pb-8 lg:pb-10 bg-[#1e1b4b]" aria-label="Statistiques de la plateforme">
         <div className="container mx-auto px-4">
           <h2 className="text-xl sm:text-2xl font-bold text-center mb-5 text-white">La plateforme de confiance au Québec</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-5 max-w-4xl mx-auto">
@@ -268,8 +268,6 @@ const Home = () => {
 
       {/* Featured Businesses Section */}
       <section id="featured" className="py-12 sm:py-16 lg:py-20 bg-background relative">
-        {/* Decorative Top Border */}
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
         <div className="container mx-auto px-4">
           <div className="text-center mb-8 sm:mb-10 lg:mb-12 animate-slide-up">
             <h2 id="featured-heading" className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-display font-bold text-foreground mb-3 sm:mb-4">
