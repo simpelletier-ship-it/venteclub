@@ -154,9 +154,9 @@ const Home = () => {
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#4f46e5]/10 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '12s', animationDelay: '4s' }} />
         </div>
         
-        <div className="container mx-auto px-4 py-6 sm:py-8 lg:py-12 relative z-10">
+        <div className="container mx-auto px-4 py-8 sm:py-10 lg:py-14 relative z-10">
           <div className="max-w-6xl mx-auto">
-            <div className="space-y-6 sm:space-y-7 lg:space-y-9 animate-slide-up">
+            <div className="space-y-6 sm:space-y-7 lg:space-y-9 animate-slide-up mb-12 sm:mb-16 lg:mb-20">
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-display font-bold leading-[1.15] tracking-tight text-white">
                 Achetez ou vendez<br /><TypewriterAnimation />
               </h1>
@@ -165,7 +165,7 @@ const Home = () => {
                 La plateforme de référence au Québec pour acquérir une entreprise établie
               </p>
               
-              <div className="flex flex-col sm:flex-row gap-4 sm:gap-5 pt-4 sm:pt-6">
+              <div className="flex flex-col sm:flex-row gap-4 sm:gap-5 pt-6 sm:pt-8">
                 <Button 
                   size="lg" 
                   className="bg-[#6366f1] hover:bg-[#4f46e5] text-white h-14 sm:h-16 lg:h-[4.5rem] px-8 sm:px-10 lg:px-12 text-base sm:text-lg lg:text-xl font-semibold rounded-xl shadow-lg hover:shadow-2xl transition-all group w-full sm:w-auto"
@@ -186,7 +186,7 @@ const Home = () => {
           </div>
           
           {/* Floating Animation - Positioned Absolutely */}
-          <div className="hidden xl:block absolute left-[66%] top-[68%] -translate-y-1/2 w-[300px] pointer-events-none">
+          <div className="hidden xl:block absolute left-[66%] top-[75%] -translate-y-1/2 w-[300px] pointer-events-none">
             <FloatingOpportunities />
           </div>
         </div>
