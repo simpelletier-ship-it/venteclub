@@ -93,46 +93,46 @@ All colors MUST be HSL.
 
   .dark {
     --background: 220 26% 12%;
-    --foreground: 210 40% 98%;
+    --foreground: 0 0% 98%;
     
-    --card: 220 20% 15%;
-    --card-foreground: 210 40% 98%;
+    --card: 220 20% 16%;
+    --card-foreground: 0 0% 98%;
     
-    --popover: 220 20% 15%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 220 20% 16%;
+    --popover-foreground: 0 0% 98%;
     
     --primary: 244 66% 80%;
     --primary-foreground: 220 26% 12%;
     --primary-light: 244 66% 88%;
     --primary-dark: 244 66% 70%;
     
-    --secondary: 244 60% 60%;
+    --secondary: 244 60% 65%;
     --secondary-foreground: 0 0% 100%;
     
-    --publish: 244 60% 40%;
+    --publish: 244 60% 45%;
     --publish-foreground: 0 0% 100%;
     
-    --success: 158 100% 42%;
+    --success: 158 100% 45%;
     --success-foreground: 0 0% 100%;
-    --success-light: 158 100% 50%;
+    --success-light: 158 100% 55%;
     
     --primary-pale: 244 66% 85%;
-    --primary-pale-foreground: 244 60% 45%;
+    --primary-pale-foreground: 244 80% 70%;
     
-    --muted: 220 20% 20%;
-    --muted-foreground: 220 13% 75%;
+    --muted: 220 20% 22%;
+    --muted-foreground: 220 18% 88%;
     
     --accent: 244 66% 75%;
     --accent-foreground: 220 26% 12%;
     
-    --franchise: 24 100% 55%;
+    --franchise: 24 100% 58%;
     --franchise-foreground: 0 0% 100%;
     
-    --destructive: 0 84% 60%;
+    --destructive: 0 84% 65%;
     --destructive-foreground: 0 0% 100%;
     
-    --border: 220 20% 25%;
-    --input: 220 20% 25%;
+    --border: 220 20% 28%;
+    --input: 220 20% 28%;
     --ring: 244 66% 80%;
     
     --shadow-sm: 0 1px 3px hsla(0, 0%, 0%, 0.3);
