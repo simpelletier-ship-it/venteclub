@@ -89,26 +89,35 @@ const SalaryCalculator = () => {
   const [province, setProvince] = useState("QC");
   const [hoursPerWeek, setHoursPerWeek] = useState("40");
 
-  // Réinitialiser le salaire quand la période change
+  // Convertir automatiquement le salaire entre les périodes
   const handlePeriodChange = (newPeriod: "annual" | "monthly" | "biweekly" | "weekly" | "hourly") => {
-    setPeriod(newPeriod);
-    // Ajuster le salaire par défaut selon la période
+    // Convertir le salaire actuel en annuel d'abord
+    const currentAnnualSalary = getAnnualSalary();
+    
+    // Puis convertir l'annuel vers la nouvelle période
+    let convertedSalary: number;
+    const hours = parseFloat(hoursPerWeek) || 40;
+    
     switch (newPeriod) {
       case "hourly":
-        setGrossSalary("25");
+        convertedSalary = currentAnnualSalary / (52 * hours);
         break;
       case "weekly":
-        setGrossSalary("1000");
+        convertedSalary = currentAnnualSalary / 52;
         break;
       case "biweekly":
-        setGrossSalary("2000");
+        convertedSalary = currentAnnualSalary / 26;
         break;
       case "monthly":
-        setGrossSalary("4333");
+        convertedSalary = currentAnnualSalary / 12;
         break;
       default:
-        setGrossSalary("52000");
+        convertedSalary = currentAnnualSalary;
     }
+    
+    // Arrondir à 2 décimales pour éviter les valeurs trop longues
+    setGrossSalary(Math.round(convertedSalary * 100) / 100 + "");
+    setPeriod(newPeriod);
   };
 
   const calculateTax = (income: number) => {
@@ -246,20 +255,60 @@ const SalaryCalculator = () => {
   return (
     <>
       <Helmet>
-        <title>Calculateur de Salaire Net Québec 2025 | Vente.Club</title>
-        <meta name="description" content="Calculez votre salaire net après impôts au Québec. Inclut impôts fédéral et provincial, RPC, assurance-emploi, RQAP. Calculs précis avec les taux 2025." />
+        <title>Calculateur de Salaire Net Québec 2025 - Gratuit et Précis | Impôt, RRQ, AE</title>
+        <meta name="description" content="Calculateur de salaire net gratuit pour le Québec 2025. Calcul instantané de votre paie après impôts fédéral et provincial, RRQ, assurance-emploi et RQAP. Conversion automatique annuel, mensuel, bihebdomadaire, hebdomadaire et horaire." />
+        <meta name="keywords" content="calculateur salaire net québec, calcul paie après impôt, salaire brut net québec, impôt québec 2025, calculateur impôt revenu, paie nette québec, calculateur paie, salaire horaire annuel, RRQ AE RQAP" />
+        <link rel="canonical" href="https://vente.club/outils/salaire" />
+        
+        {/* Open Graph / Facebook */}
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="Calculateur de Salaire Net Québec 2025 - Gratuit" />
+        <meta property="og:description" content="Calculez instantanément votre salaire net après impôts au Québec avec les taux 2025. Conversion automatique entre toutes les périodes de paie." />
+        <meta property="og:url" content="https://vente.club/outils/salaire" />
+        
+        {/* Schema.org markup for Google */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            "name": "Calculateur de Salaire Net Québec",
+            "description": "Calculateur gratuit de salaire net après impôts pour le Québec avec les taux d'imposition 2025",
+            "applicationCategory": "FinanceApplication",
+            "operatingSystem": "Any",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "CAD"
+            },
+            "featureList": [
+              "Calcul impôt fédéral et provincial",
+              "RRQ (Régime de rentes du Québec)",
+              "Assurance-emploi",
+              "RQAP (Régime québécois d'assurance parentale)",
+              "Conversion entre périodes de paie"
+            ]
+          })}
+        </script>
       </Helmet>
 
-      <div className="min-h-screen bg-background py-12">
+      <div className="min-h-screen bg-background py-8">
         <div className="container mx-auto px-4 max-w-6xl">
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold mb-2 text-foreground">
-              Calculateur de Salaire Net - Québec
+          {/* SEO-optimized header section */}
+          <header className="text-center mb-8">
+            <h1 className="text-3xl md:text-4xl font-bold mb-3 text-foreground">
+              Calculateur de Salaire Net Québec 2025
             </h1>
-            <p className="text-muted-foreground text-lg">
-              Estimez le montant de votre salaire après impôts (taux 2025)
+            <p className="text-muted-foreground text-base md:text-lg mb-4">
+              Calculez instantanément votre paie nette après impôts • Taux 2025 à jour
             </p>
-          </div>
+            <div className="max-w-3xl mx-auto text-sm text-muted-foreground mb-6">
+              <p className="leading-relaxed">
+                Outil gratuit de calcul de salaire net pour le Québec. Obtenez une estimation précise de votre paie après déductions des 
+                <strong> impôts fédéral et provincial, cotisations RRQ, assurance-emploi et RQAP</strong>. 
+                Conversion automatique entre salaire annuel, mensuel, bihebdomadaire, hebdomadaire et horaire.
+              </p>
+            </div>
+          </header>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Input Section */}
@@ -511,6 +560,162 @@ const SalaryCalculator = () => {
               <p>• Ces calculs sont des estimations. Consultez un comptable pour des calculs précis</p>
             </CardContent>
           </Card>
+
+          {/* SEO Content Section */}
+          <section className="mt-12 space-y-8 max-w-4xl mx-auto">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-2xl">Comment fonctionne le calculateur de salaire net au Québec?</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4 text-muted-foreground">
+                <p>
+                  Notre calculateur de salaire net utilise les <strong>taux d'imposition 2025 officiels</strong> pour estimer avec précision 
+                  votre paie nette après toutes les déductions obligatoires au Québec et au Canada.
+                </p>
+                
+                <h3 className="text-lg font-semibold text-foreground mt-6 mb-3">Déductions incluses dans le calcul:</h3>
+                <ul className="list-disc pl-6 space-y-2">
+                  <li><strong>Impôt fédéral:</strong> Calculé selon les paliers d'imposition progressifs du gouvernement canadien</li>
+                  <li><strong>Impôt provincial (Québec):</strong> Taux spécifiques à la province de Québec, incluant le crédit d'impôt de base</li>
+                  <li><strong>RRQ (Régime de rentes du Québec):</strong> Cotisation au régime de pension provincial (5.95% en 2025)</li>
+                  <li><strong>Assurance-emploi (AE):</strong> Taux réduit pour le Québec (1.27% vs 1.58% ailleurs au Canada)</li>
+                  <li><strong>RQAP (Régime québécois d'assurance parentale):</strong> Cotisation unique au Québec (0.494% en 2025)</li>
+                </ul>
+
+                <h3 className="text-lg font-semibold text-foreground mt-6 mb-3">Conversion intelligente entre périodes de paie</h3>
+                <p>
+                  Notre calculateur offre une <strong>conversion automatique intelligente</strong> entre toutes les périodes de paie. 
+                  Entrez votre salaire dans n'importe quelle période (horaire, hebdomadaire, bihebdomadaire, mensuel ou annuel), 
+                  et changez de période pour voir instantanément l'équivalent converti. Par exemple, un salaire de 25 $/heure 
+                  (40h/semaine) est automatiquement converti en 52 000 $/année. Cette fonctionnalité unique facilite la comparaison 
+                  d'offres d'emploi avec différentes structures de rémunération.
+                </p>
+
+                <h3 className="text-lg font-semibold text-foreground mt-6 mb-3">Taux effectif vs taux marginal d'imposition</h3>
+                <p>
+                  <strong>Le taux effectif</strong> représente le pourcentage réel de votre salaire qui va aux impôts et cotisations, 
+                  tandis que <strong>le taux marginal</strong> est le taux appliqué sur votre dernier dollar gagné. 
+                  Le système d'imposition progressif canadien signifie que votre taux effectif est toujours inférieur à votre taux marginal.
+                </p>
+
+                <h3 className="text-lg font-semibold text-foreground mt-6 mb-3">Pourquoi utiliser un calculateur de salaire net?</h3>
+                <ul className="list-disc pl-6 space-y-2">
+                  <li>Négocier votre salaire en toute connaissance de votre revenu net réel</li>
+                  <li>Comparer des offres d'emploi avec différentes structures de paie (horaire, salaire annuel, commission)</li>
+                  <li>Planifier votre budget personnel basé sur votre revenu disponible après impôts</li>
+                  <li>Comprendre l'impact fiscal d'une augmentation de salaire ou d'une prime</li>
+                  <li>Évaluer le coût net d'un changement d'emploi ou de province</li>
+                  <li>Prévoir vos retenues à la source pour une meilleure planification financière</li>
+                </ul>
+
+                <div className="bg-primary/5 p-4 rounded-lg mt-6">
+                  <p className="text-sm">
+                    <strong>Note importante:</strong> Ce calculateur fournit une estimation basée sur les taux standards 2025. 
+                    Votre salaire net réel peut varier selon d'autres facteurs comme les déductions REER, cotisations syndicales, 
+                    régimes de pension d'employeur, assurance collective, etc. Consultez toujours un professionnel pour une planification fiscale détaillée.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-2xl">Questions fréquentes sur le calcul de salaire net</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <h4 className="font-semibold text-foreground mb-2">Quelle est la différence entre salaire brut et salaire net?</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Le <strong>salaire brut</strong> est votre rémunération totale avant toute déduction, tel que négocié avec votre employeur. 
+                    Le <strong>salaire net</strong> (ou "take-home pay") est ce que vous recevez réellement dans votre compte bancaire après 
+                    toutes les déductions d'impôts fédéral et provincial, cotisations RRQ, assurance-emploi et RQAP. En moyenne au Québec, 
+                    le salaire net représente environ 70-75% du salaire brut.
+                  </p>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold text-foreground mb-2">Les taux d'imposition sont-ils à jour pour 2025?</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Oui, notre calculateur utilise les <strong>taux officiels 2025</strong> pour l'impôt fédéral (paliers de 15% à 33%), 
+                    l'impôt provincial du Québec (14% à 25.75%), le RRQ (5.95%), l'assurance-emploi (1.27% au Québec) et le RQAP (0.494%). 
+                    Ces taux sont mis à jour annuellement selon les budgets fédéral et provinciaux.
+                  </p>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold text-foreground mb-2">Comment convertir un salaire horaire en salaire annuel au Québec?</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Pour convertir un taux horaire en salaire annuel, multipliez votre taux horaire par le nombre d'heures travaillées 
+                    par semaine (généralement 35-40h), puis par 52 semaines. <strong>Formule:</strong> Salaire annuel = Taux horaire × Heures/semaine × 52. 
+                    Exemple: 25 $/h × 40h × 52 = 52 000 $/an. Notre calculateur fait cette conversion automatiquement.
+                  </p>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold text-foreground mb-2">Pourquoi le taux d'assurance-emploi est-il différent au Québec?</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Le Québec a son propre <strong>régime d'assurance parentale (RQAP)</strong> qui offre de meilleures prestations de maternité, 
+                    paternité et parentales. En échange, les travailleurs québécois paient une cotisation RQAP additionnelle (0.494%), 
+                    mais bénéficient d'un taux réduit d'assurance-emploi fédérale (1.27% vs 1.58% dans les autres provinces).
+                  </p>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold text-foreground mb-2">Ce calculateur fonctionne-t-il pour d'autres provinces canadiennes?</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Oui! Notre calculateur supporte actuellement <strong>4 provinces:</strong> Québec, Ontario, Colombie-Britannique et Alberta, 
+                    chacune avec leurs taux provinciaux spécifiques. Les taux d'imposition provincial varient considérablement entre les provinces, 
+                    allant de 10% (Alberta) à 25.75% (Québec) pour les tranches supérieures.
+                  </p>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold text-foreground mb-2">Qu'est-ce que le crédit d'impôt personnel de base?</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Le <strong>montant personnel de base</strong> est un crédit d'impôt non remboursable accordé automatiquement à tous les contribuables. 
+                    En 2025, il est de 15 705 $ au fédéral et 18 056 $ au Québec. Cela signifie que vous ne payez pas d'impôt sur cette portion 
+                    de vos revenus. Notre calculateur applique automatiquement ces crédits pour un résultat plus précis.
+                  </p>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold text-foreground mb-2">Comment calculer mon salaire net d'un bonus ou d'une prime?</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Les bonus et primes sont généralement imposés au même taux que votre salaire régulier, mais peuvent vous faire passer 
+                    dans une tranche d'imposition supérieure temporairement. Pour calculer votre bonus net, ajoutez-le à votre salaire annuel 
+                    dans notre calculateur. Notez que l'employeur peut retenir davantage à la source, avec un remboursement lors de votre 
+                    déclaration d'impôts si trop retenu.
+                  </p>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold text-foreground mb-2">Que faire si mon calcul ne correspond pas à ma paie réelle?</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Les écarts peuvent provenir de: cotisations syndicales, régimes de pension d'employeur (REER collectif), 
+                    assurances collectives, déductions pour uniformes/outils, ou erreurs dans les retenues à la source de l'employeur. 
+                    Vérifiez votre talon de paie et contactez votre service de paie ou un comptable si les différences sont importantes. 
+                    Vous pourriez avoir droit à un remboursement d'impôts lors de votre déclaration.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-primary/5 to-primary/10">
+              <CardHeader>
+                <CardTitle className="text-xl">Autres outils de calcul financier disponibles</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Complétez votre planification financière avec nos autres calculateurs gratuits:
+                </p>
+                <ul className="space-y-2 text-sm">
+                  <li>• <strong>Planificateur de budget:</strong> Gérez vos revenus et dépenses mensuelles</li>
+                  <li>• <strong>Calculateur d'impôt sur le revenu:</strong> Estimez votre retour d'impôt annuel</li>
+                  <li>• <strong>Simulateur REER/CELI:</strong> Optimisez votre épargne-retraite</li>
+                </ul>
+              </CardContent>
+            </Card>
+          </section>
         </div>
       </div>
     </>
