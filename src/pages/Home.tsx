@@ -9,6 +9,7 @@ import { SEO } from "@/components/SEO";
 import { BreadcrumbSchema } from "@/components/BreadcrumbSchema";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { StaticHeroBackground } from "@/components/StaticHeroBackground";
+import { TypewriterAnimation } from "@/components/AnimatedSearchBar";
 import { trackPageView } from "@/lib/googleAds";
 
 const Home = () => {
@@ -148,8 +149,8 @@ const Home = () => {
                 Achat et Vente d'Entreprises au Québec - Trouvez Votre Opportunité
               </h1>
               
-              <p className="text-base sm:text-lg lg:text-xl text-[#818cf8] font-semibold max-w-3xl">
-                Le Club de Référence pour acheter une entreprise, une franchise, un immeuble ou un commerce partout au Québec
+              <p className="text-base sm:text-lg lg:text-xl font-semibold max-w-3xl">
+                Le Club de Référence pour acheter <TypewriterAnimation /> partout au Québec
               </p>
               
               <p className="text-sm sm:text-base lg:text-lg text-white/90 max-w-3xl leading-relaxed sm:leading-loose">
