@@ -16,6 +16,8 @@ import { NetWorthGamification } from "@/components/budget/NetWorthGamification";
 import { BudgetTransactions } from "@/components/budget/BudgetTransactions";
 import { BudgetAssetsDebts } from "@/components/budget/BudgetAssetsDebts";
 import { BudgetPlanner } from "@/components/budget/BudgetPlanner";
+import { BudgetInsights } from "@/components/budget/BudgetInsights";
+import { DebtCalculator } from "@/components/budget/DebtCalculator";
 
 const BudgetCalculator = () => {
   const navigate = useNavigate();
@@ -46,11 +48,11 @@ const BudgetCalculator = () => {
     });
   }, []);
 
-  // Fetch user's net worth (only if authenticated)
+  // Fetch user's data for insights
   const { data: assets = [] } = useQuery({
     queryKey: ['user-assets'],
     queryFn: async () => {
-      const { data, error } = await supabase.from('user_assets').select('value');
+      const { data, error } = await supabase.from('user_assets').select('*');
       if (error) throw error;
       return data;
     },
@@ -60,7 +62,49 @@ const BudgetCalculator = () => {
   const { data: debts = [] } = useQuery({
     queryKey: ['user-debts'],
     queryFn: async () => {
-      const { data, error } = await supabase.from('user_debts').select('balance');
+      const { data, error } = await supabase.from('user_debts').select('*');
+      if (error) throw error;
+      return data;
+    },
+    enabled: isAuthenticated,
+  });
+
+  const { data: transactions = [] } = useQuery({
+    queryKey: ['budget-transactions-all'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('budget_transactions')
+        .select('*')
+        .order('transaction_date', { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+    enabled: isAuthenticated,
+  });
+
+  const { data: categories = [] } = useQuery({
+    queryKey: ['budget-categories'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('budget_categories').select('*');
+      if (error) throw error;
+      return data as Array<{
+        id: string;
+        name: string;
+        icon: string;
+        color: string;
+        type: 'income' | 'expense';
+        user_id: string;
+        created_at: string;
+        is_custom: boolean;
+      }>;
+    },
+    enabled: isAuthenticated,
+  });
+
+  const { data: goals = [] } = useQuery({
+    queryKey: ['budget-goals'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('budget_goals').select('*');
       if (error) throw error;
       return data;
     },
@@ -418,18 +462,17 @@ const BudgetCalculator = () => {
               <div className="space-y-6">
                 <NetWorthGamification netWorth={netWorth} />
                 
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Comparaison Budget vs Réel</CardTitle>
-                    <CardDescription>Suivez vos performances financières</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-center py-12 text-muted-foreground">
-                      <p className="text-lg mb-2">📊 Comparaison en cours de développement</p>
-                      <p>Ajoutez des transactions et définissez votre budget pour voir vos performances</p>
-                    </div>
-                  </CardContent>
-                </Card>
+                {/* Insights & Recommendations */}
+                <BudgetInsights 
+                  transactions={transactions}
+                  categories={categories}
+                  goals={goals}
+                  debts={debts}
+                  assets={assets}
+                />
+
+                {/* Debt Calculator */}
+                {debts.length > 0 && <DebtCalculator debts={debts} />}
               </div>
             </TabsContent>
 
