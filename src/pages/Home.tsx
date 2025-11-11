@@ -11,6 +11,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { StaticHeroBackground } from "@/components/StaticHeroBackground";
 import { TypewriterAnimation } from "@/components/AnimatedSearchBar";
 import { trackPageView } from "@/lib/googleAds";
+import { FloatingOpportunities } from "@/components/FloatingOpportunities";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -141,6 +142,9 @@ const Home = () => {
       <section className="relative min-h-[55vh] sm:min-h-[60vh] lg:min-h-[65vh] flex items-center bg-gradient-to-br from-[#1e1b4b] via-[#312e81] to-[#1e3a8a] overflow-hidden" aria-label="Section principale">
         {/* Static optimized background */}
         <StaticHeroBackground />
+        
+        {/* Floating Opportunities Carousel */}
+        <FloatingOpportunities />
         
         <div className="container mx-auto px-4 py-6 sm:py-8 lg:py-12 relative z-10">
           <div className="max-w-6xl mx-auto">
