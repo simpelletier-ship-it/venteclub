@@ -156,20 +156,51 @@ const Home = () => {
         
         <div className="container mx-auto px-4 py-8 sm:py-10 lg:py-14 relative z-10">
           <div className="max-w-6xl mx-auto">
-            <div className="space-y-6 sm:space-y-7 lg:space-y-9 animate-slide-up mb-12 sm:mb-16 lg:mb-20">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-display font-bold leading-[1.15] tracking-tight text-white">
-                Achetez ou vendez<br /><TypewriterAnimation />
-              </h1>
+            <div className="space-y-6 sm:space-y-7 lg:space-y-8 animate-slide-up mb-12 sm:mb-16 lg:mb-20">
+              <div className="space-y-4">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-display font-bold leading-[1.15] tracking-tight text-white">
+                  Achetez ou vendez une entreprise au Québec
+                </h1>
+                
+                <p className="text-xl sm:text-2xl lg:text-3xl text-[#818cf8] font-medium leading-relaxed animate-fade-in" style={{ animationDelay: '0.3s' }}>
+                  La plateforme québécoise pour acheter, vendre et découvrir des entreprises établies.
+                </p>
+              </div>
               
-              <p className="text-lg sm:text-xl lg:text-2xl text-white/90 max-w-3xl leading-relaxed text-justify">
-                La plateforme de référence au Québec pour acquérir une entreprise établie. 
-                Découvrez des centaines d'opportunités d'affaires vérifiées et connectez directement avec les propriétaires dans un environnement transparent et professionnel.
-              </p>
+              <div className="space-y-6 max-w-3xl">
+                <p className="text-base sm:text-lg lg:text-xl text-white/90 leading-relaxed text-justify">
+                  Vente.Club est la plateforme de référence au Québec pour acquérir ou céder une entreprise en toute confiance.
+                  Découvrez des centaines d'opportunités d'affaires vérifiées et entrez directement en contact avec les propriétaires, dans un environnement transparent et professionnel.
+                </p>
+                
+                <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-sm sm:text-base text-white/70 font-medium">
+                  <span className="flex items-center gap-2">
+                    <svg className="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    Annonces approuvées
+                  </span>
+                  <span className="text-white/50">·</span>
+                  <span className="flex items-center gap-2">
+                    <svg className="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    Affichage gratuit
+                  </span>
+                  <span className="text-white/50">·</span>
+                  <span className="flex items-center gap-2">
+                    <svg className="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    100% québécois
+                  </span>
+                </div>
+              </div>
               
-              <div className="flex flex-col sm:flex-row gap-4 sm:gap-5 pt-20 sm:pt-24 lg:pt-28 mt-10">
+              <div className="flex flex-col sm:flex-row gap-4 sm:gap-5 pt-12 sm:pt-16 lg:pt-20">
                 <Button 
                   size="lg" 
-                  className="bg-[#6366f1] hover:bg-[#4f46e5] text-white h-14 sm:h-16 lg:h-[4.5rem] px-8 sm:px-10 lg:px-12 text-base sm:text-lg lg:text-xl font-semibold rounded-xl shadow-lg hover:shadow-2xl transition-all group w-full sm:w-auto"
+                  className="bg-white text-[#1e1b4b] hover:bg-white/95 h-14 sm:h-16 lg:h-[4.5rem] px-8 sm:px-10 lg:px-12 text-base sm:text-lg lg:text-xl font-bold rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 group w-full sm:w-auto"
                   onClick={() => navigate("/entreprises")}
                 >
                   Explorer les opportunités
@@ -177,7 +208,7 @@ const Home = () => {
                 </Button>
                 <Button 
                   size="lg" 
-                  className="h-14 sm:h-16 lg:h-[4.5rem] px-8 sm:px-10 lg:px-12 text-base sm:text-lg lg:text-xl font-semibold rounded-xl bg-white/10 hover:bg-white/20 text-white border-2 border-white/30 shadow-lg hover:shadow-2xl transition-all backdrop-blur-sm w-full sm:w-auto"
+                  className="h-14 sm:h-16 lg:h-[4.5rem] px-8 sm:px-10 lg:px-12 text-base sm:text-lg lg:text-xl font-semibold rounded-xl backdrop-blur-lg bg-white/10 hover:bg-white/20 text-white border-2 border-white/30 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 w-full sm:w-auto"
                   onClick={() => navigate("/sell")}
                 >
                   Vendre mon entreprise
