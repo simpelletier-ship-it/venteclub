@@ -119,14 +119,17 @@ export default defineConfig(({ mode }) => ({
     target: 'es2020',
     minify: 'terser',
     sourcemap: false,
-    chunkSizeWarningLimit: 1000,
+    chunkSizeWarningLimit: 1500,
     cssCodeSplit: true,
+    cssMinify: 'lightningcss',
     terserOptions: {
       compress: {
         drop_console: true,
         drop_debugger: true,
-        passes: 2,
-        pure_funcs: ['console.log', 'console.info', 'console.debug'],
+        passes: 3,
+        pure_funcs: ['console.log', 'console.info', 'console.debug', 'console.warn'],
+        dead_code: true,
+        unused: true,
       },
       format: {
         comments: false,
@@ -203,6 +206,9 @@ export default defineConfig(({ mode }) => ({
     ],
     exclude: [
       'framer-motion',
+      'web-vitals',
+      '@tiptap/react',
+      'mapbox-gl',
     ],
   },
   publicDir: 'public',

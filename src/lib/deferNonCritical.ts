@@ -7,31 +7,35 @@ export const deferNonCriticalResources = () => {
   // Use requestIdleCallback if available, otherwise setTimeout
   const scheduleDeferred = (callback: () => void) => {
     if ('requestIdleCallback' in window) {
-      (window as any).requestIdleCallback(callback, { timeout: 2000 });
+      (window as any).requestIdleCallback(callback, { timeout: 3000 });
     } else {
-      setTimeout(callback, 1);
+      setTimeout(callback, 2000);
     }
   };
 
-  // Defer Web Vitals initialization
-  scheduleDeferred(() => {
-    import('web-vitals').then(({ onCLS, onFCP, onLCP, onTTFB, onINP }) => {
-      const sendToAnalytics = (metric: any) => {
-        if (typeof window !== 'undefined' && (window as any).gtag) {
-          (window as any).gtag('event', metric.name, {
-            event_category: 'Web Vitals',
-            value: Math.round(metric.name === 'CLS' ? metric.value * 1000 : metric.value),
-            event_label: metric.id,
-            non_interaction: true,
-          });
-        }
-      };
+  // Only load Web Vitals in development or when specifically debugging
+  if (import.meta.env.DEV || localStorage.getItem('debug_vitals') === 'true') {
+    scheduleDeferred(() => {
+      import('web-vitals').then(({ onCLS, onFCP, onLCP, onTTFB, onINP }) => {
+        const sendToAnalytics = (metric: any) => {
+          console.log('[Web Vitals]', metric.name, metric.value);
+          
+          if (typeof window !== 'undefined' && (window as any).gtag) {
+            (window as any).gtag('event', metric.name, {
+              event_category: 'Web Vitals',
+              value: Math.round(metric.name === 'CLS' ? metric.value * 1000 : metric.value),
+              event_label: metric.id,
+              non_interaction: true,
+            });
+          }
+        };
 
-      onCLS(sendToAnalytics);
-      onFCP(sendToAnalytics);
-      onLCP(sendToAnalytics);
-      onTTFB(sendToAnalytics);
-      onINP(sendToAnalytics);
+        onCLS(sendToAnalytics);
+        onFCP(sendToAnalytics);
+        onLCP(sendToAnalytics);
+        onTTFB(sendToAnalytics);
+        onINP(sendToAnalytics);
+      });
     });
-  });
+  }
 };

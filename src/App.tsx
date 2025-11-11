@@ -52,10 +52,11 @@ const TestEmail = lazy(() => import("./pages/TestEmail"));
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      gcTime: 10 * 60 * 1000, // 10 minutes
+      staleTime: 10 * 60 * 1000, // 10 minutes - reduced refetching
+      gcTime: 30 * 60 * 1000, // 30 minutes - longer cache
       retry: 1,
       refetchOnWindowFocus: false,
+      refetchOnMount: false,
     },
   },
 });
@@ -64,17 +65,19 @@ const queryClient = new QueryClient({
 const AdminSecurity = lazy(() => import("./pages/AdminSecurity"));
 const SecurityCompliance = lazy(() => import("./pages/SecurityCompliance"));
 
-// Analytics and Performance Monitoring component
+// Analytics tracker component - lightweight for performance
 const AnalyticsTracker = () => {
   const location = useLocation();
 
-  // Track page views
+  // Track page views with minimal overhead
   useEffect(() => {
-    trackPageView(location.pathname + location.search);
+    // Defer tracking to avoid blocking render
+    const timer = setTimeout(() => {
+      trackPageView(location.pathname + location.search);
+    }, 100);
+    
+    return () => clearTimeout(timer);
   }, [location]);
-
-  // Monitor Web Vitals (Core Web Vitals)
-  useWebVitals();
 
   return null;
 };
