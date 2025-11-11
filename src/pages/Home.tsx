@@ -157,9 +157,8 @@ const Home = () => {
         <div className="container mx-auto px-4 py-6 sm:py-8 lg:py-12 relative z-10">
           <div className="max-w-6xl mx-auto">
             <div className="space-y-6 sm:space-y-7 lg:space-y-9 animate-slide-up">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-display font-bold leading-[1.15] tracking-tight">
-                <span className="text-white">Achetez ou vendez{"\u00A0"}</span>
-                <span className="text-[#818cf8]"><TypewriterAnimation /></span>
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-display font-bold leading-[1.15] tracking-tight text-white">
+                Achetez ou vendez <TypewriterAnimation />
               </h1>
               
               <p className="text-lg sm:text-xl lg:text-2xl text-white/90 max-w-3xl leading-relaxed">
