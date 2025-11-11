@@ -27,7 +27,7 @@ interface BudgetGoal {
   frequency?: string;
 }
 
-export const BudgetPlanner = () => {
+export const BudgetPlanner = ({ isAuthenticated }: { isAuthenticated: boolean }) => {
   const [open, setOpen] = useState(false);
   const [editingGoal, setEditingGoal] = useState<{ categoryId: string; currentLimit: number; currentFrequency?: string } | null>(null);
   const [monthlyLimit, setMonthlyLimit] = useState("");
@@ -48,6 +48,8 @@ export const BudgetPlanner = () => {
       if (error) throw error;
       return data as Category[];
     },
+    enabled: isAuthenticated,
+    retry: 1,
   });
 
   // Fetch budget goals
@@ -61,6 +63,8 @@ export const BudgetPlanner = () => {
       if (error) throw error;
       return data as BudgetGoal[];
     },
+    enabled: isAuthenticated,
+    retry: 1,
   });
 
   // Fetch current month transactions to compare with budget
@@ -79,6 +83,8 @@ export const BudgetPlanner = () => {
       if (error) throw error;
       return data;
     },
+    enabled: isAuthenticated,
+    retry: 1,
   });
 
   // Fetch assets to include in budget comparison
@@ -92,6 +98,8 @@ export const BudgetPlanner = () => {
       if (error) throw error;
       return data;
     },
+    enabled: isAuthenticated,
+    retry: 1,
   });
 
   // Add/Update budget goal mutation

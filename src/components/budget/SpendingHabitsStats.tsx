@@ -7,9 +7,9 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 
 const COLORS = ['#ef4444', '#f59e0b', '#3b82f6', '#ec4899', '#06b6d4', '#8b5cf6'];
 
-export const SpendingHabitsStats = () => {
+export const SpendingHabitsStats = ({ isAuthenticated }: { isAuthenticated: boolean }) => {
   // Fetch transactions from last 30 days
-  const { data: transactions = [] } = useQuery({
+  const { data: transactions = [], isLoading, isError } = useQuery({
     queryKey: ['spending-habits'],
     queryFn: async () => {
       const thirtyDaysAgo = new Date();
@@ -24,7 +24,33 @@ export const SpendingHabitsStats = () => {
       if (error) throw error;
       return data;
     },
+    enabled: isAuthenticated,
+    retry: 1,
   });
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <Card>
+          <CardContent className="py-12 text-center">
+            <p className="text-muted-foreground">Chargement de vos habitudes...</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (isError || !isAuthenticated) {
+    return (
+      <div className="space-y-6">
+        <Card>
+          <CardContent className="py-12 text-center">
+            <p className="text-muted-foreground">Aucune donnée disponible</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   // Calculate stats
   const totalSpent = transactions.reduce((sum, t) => sum + Number(t.amount), 0);

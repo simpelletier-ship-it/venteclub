@@ -503,11 +503,11 @@ const BudgetCalculator = () => {
             </TabsContent>
 
             <TabsContent value="habits">
-              <SpendingHabitsStats />
+              <SpendingHabitsStats isAuthenticated={isAuthenticated} />
             </TabsContent>
 
             <TabsContent value="budget">
-              <BudgetPlanner />
+              <BudgetPlanner isAuthenticated={isAuthenticated} />
             </TabsContent>
 
             <TabsContent value="transactions">
