@@ -806,6 +806,57 @@ export type Database = {
           },
         ]
       }
+      financial_goals: {
+        Row: {
+          color: string | null
+          completed: boolean | null
+          completed_at: string | null
+          created_at: string | null
+          current_amount: number | null
+          deadline: string | null
+          icon: string | null
+          id: string
+          name: string
+          notes: string | null
+          target_amount: number
+          type: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          color?: string | null
+          completed?: boolean | null
+          completed_at?: string | null
+          created_at?: string | null
+          current_amount?: number | null
+          deadline?: string | null
+          icon?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          target_amount: number
+          type: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          color?: string | null
+          completed?: boolean | null
+          completed_at?: string | null
+          created_at?: string | null
+          current_amount?: number | null
+          deadline?: string | null
+          icon?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          target_amount?: number
+          type?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       login_attempts: {
         Row: {
           attempted_at: string | null
@@ -1383,6 +1434,42 @@ export type Database = {
         }
         Relationships: []
       }
+      user_achievements: {
+        Row: {
+          badge_description: string | null
+          badge_name: string
+          badge_type: string
+          color: string | null
+          earned_at: string | null
+          icon: string
+          id: string
+          user_id: string
+          viewed: boolean | null
+        }
+        Insert: {
+          badge_description?: string | null
+          badge_name: string
+          badge_type: string
+          color?: string | null
+          earned_at?: string | null
+          icon: string
+          id?: string
+          user_id: string
+          viewed?: boolean | null
+        }
+        Update: {
+          badge_description?: string | null
+          badge_name?: string
+          badge_type?: string
+          color?: string | null
+          earned_at?: string | null
+          icon?: string
+          id?: string
+          user_id?: string
+          viewed?: boolean | null
+        }
+        Relationships: []
+      }
       user_alerts: {
         Row: {
           alert_type: string
@@ -1448,6 +1535,68 @@ export type Database = {
           value?: number
         }
         Relationships: []
+      }
+      user_challenges: {
+        Row: {
+          category_id: string | null
+          challenge_type: string
+          completed_at: string | null
+          created_at: string | null
+          description: string | null
+          duration_days: number
+          end_date: string
+          icon: string | null
+          id: string
+          name: string
+          progress: number | null
+          start_date: string
+          status: string | null
+          target_value: number | null
+          user_id: string
+        }
+        Insert: {
+          category_id?: string | null
+          challenge_type: string
+          completed_at?: string | null
+          created_at?: string | null
+          description?: string | null
+          duration_days: number
+          end_date: string
+          icon?: string | null
+          id?: string
+          name: string
+          progress?: number | null
+          start_date: string
+          status?: string | null
+          target_value?: number | null
+          user_id: string
+        }
+        Update: {
+          category_id?: string | null
+          challenge_type?: string
+          completed_at?: string | null
+          created_at?: string | null
+          description?: string | null
+          duration_days?: number
+          end_date?: string
+          icon?: string | null
+          id?: string
+          name?: string
+          progress?: number | null
+          start_date?: string
+          status?: string | null
+          target_value?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_challenges_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "budget_categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_debts: {
         Row: {

@@ -18,6 +18,9 @@ import { BudgetAssetsDebts } from "@/components/budget/BudgetAssetsDebts";
 import { BudgetPlanner } from "@/components/budget/BudgetPlanner";
 import { BudgetInsights } from "@/components/budget/BudgetInsights";
 import { DebtCalculator } from "@/components/budget/DebtCalculator";
+import { FinancialGoals } from "@/components/budget/FinancialGoals";
+import { ChallengesManager } from "@/components/budget/ChallengesManager";
+import { AchievementsBadges } from "@/components/budget/AchievementsBadges";
 
 const BudgetCalculator = () => {
   const navigate = useNavigate();
@@ -451,11 +454,14 @@ const BudgetCalculator = () => {
           </div>
 
           <Tabs defaultValue="overview" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="overview">Budget vs Réel</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2">
+              <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
               <TabsTrigger value="simple">Mon Budget</TabsTrigger>
-              <TabsTrigger value="transactions">Transactions Réelles</TabsTrigger>
+              <TabsTrigger value="transactions">Transactions</TabsTrigger>
               <TabsTrigger value="assets">Actifs & Dettes</TabsTrigger>
+              <TabsTrigger value="goals">🎯 Objectifs</TabsTrigger>
+              <TabsTrigger value="challenges">🔥 Défis</TabsTrigger>
+              <TabsTrigger value="achievements">🏆 Badges</TabsTrigger>
             </TabsList>
 
             <TabsContent value="overview">
@@ -486,6 +492,18 @@ const BudgetCalculator = () => {
 
             <TabsContent value="assets">
               <BudgetAssetsDebts />
+            </TabsContent>
+
+            <TabsContent value="goals">
+              <FinancialGoals />
+            </TabsContent>
+
+            <TabsContent value="challenges">
+              <ChallengesManager />
+            </TabsContent>
+
+            <TabsContent value="achievements">
+              <AchievementsBadges />
             </TabsContent>
           </Tabs>
 
