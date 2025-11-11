@@ -469,8 +469,8 @@ const BudgetCalculator = () => {
 
           {/* Quick Add & Streak - Highlighted at top */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <QuickExpenseTracker />
-            <DailyStreakReward />
+            <QuickExpenseTracker isAuthenticated={isAuthenticated} />
+            <DailyStreakReward isAuthenticated={isAuthenticated} />
           </div>
 
           <Tabs defaultValue="overview" className="space-y-6">
@@ -520,9 +520,9 @@ const BudgetCalculator = () => {
 
             <TabsContent value="goals">
               <div className="space-y-8">
-                <GoalRecommendations />
+                <GoalRecommendations isAuthenticated={isAuthenticated} />
                 <FinancialGoals />
-                <AchievementsBadges />
+                <AchievementsBadges isAuthenticated={isAuthenticated} />
               </div>
             </TabsContent>
 

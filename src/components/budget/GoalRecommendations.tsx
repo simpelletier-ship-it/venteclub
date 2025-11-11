@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Sparkles, Target, TrendingUp } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -16,19 +16,9 @@ interface Recommendation {
   icon: string;
 }
 
-export const GoalRecommendations = () => {
+export const GoalRecommendations = ({ isAuthenticated }: { isAuthenticated: boolean }) => {
   const queryClient = useQueryClient();
   const [selectedReco, setSelectedReco] = useState<Recommendation | null>(null);
-  const [isReady, setIsReady] = useState(false);
-
-  // Check auth first
-  useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setIsReady(!!session);
-    };
-    checkAuth();
-  }, []);
 
   // Fetch user data for recommendations
   const { data: transactions = [], isError: transactionsError } = useQuery({
@@ -43,7 +33,7 @@ export const GoalRecommendations = () => {
       if (error) throw error;
       return data || [];
     },
-    enabled: isReady,
+    enabled: isAuthenticated,
     retry: 1,
   });
 
@@ -54,7 +44,7 @@ export const GoalRecommendations = () => {
       if (error) throw error;
       return data || [];
     },
-    enabled: isReady,
+    enabled: isAuthenticated,
     retry: 1,
   });
 
@@ -65,7 +55,7 @@ export const GoalRecommendations = () => {
       if (error) throw error;
       return data || [];
     },
-    enabled: isReady,
+    enabled: isAuthenticated,
     retry: 1,
   });
 
@@ -127,7 +117,7 @@ export const GoalRecommendations = () => {
   };
 
   // Handle errors gracefully
-  if (transactionsError || goalsError || debtsError || !isReady) {
+  if (transactionsError || goalsError || debtsError || !isAuthenticated) {
     return (
       <Card>
         <CardContent className="py-8 text-center">

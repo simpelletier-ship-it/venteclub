@@ -4,19 +4,9 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import confetti from "canvas-confetti";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
-export const AchievementsBadges = () => {
-  const [isReady, setIsReady] = useState(false);
-
-  // Check auth first
-  useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setIsReady(!!session);
-    };
-    checkAuth();
-  }, []);
+export const AchievementsBadges = ({ isAuthenticated }: { isAuthenticated: boolean }) => {
 
   // Fetch achievements
   const { data: achievements = [], isError, isLoading } = useQuery({
@@ -30,12 +20,12 @@ export const AchievementsBadges = () => {
       if (error) throw error;
       return data || [];
     },
-    enabled: isReady,
+    enabled: isAuthenticated,
     retry: 1,
   });
 
   // Show loading state
-  if (!isReady || isLoading) {
+  if (!isAuthenticated || isLoading) {
     return (
       <Card>
         <CardContent className="py-12 text-center">

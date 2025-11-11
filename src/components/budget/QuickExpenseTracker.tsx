@@ -31,7 +31,7 @@ const suggestCategory = (description: string, categories: any[]) => {
   return null;
 };
 
-export const QuickExpenseTracker = () => {
+export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: boolean }) => {
   const queryClient = useQueryClient();
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
@@ -49,8 +49,10 @@ export const QuickExpenseTracker = () => {
         .order('name', { ascending: true });
       
       if (error) throw error;
-      return data;
+      return data || [];
     },
+    enabled: isAuthenticated,
+    retry: 1,
   });
 
   // Quick add mutation

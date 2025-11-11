@@ -16,19 +16,9 @@ const STREAK_MILESTONES = [
   { days: 90, badge: '👑 3 Mois', reward: 'Maître du budget!' },
 ];
 
-export const DailyStreakReward = () => {
+export const DailyStreakReward = ({ isAuthenticated }: { isAuthenticated: boolean }) => {
   const queryClient = useQueryClient();
   const [showCelebration, setShowCelebration] = useState(false);
-  const [isReady, setIsReady] = useState(false);
-
-  // Check auth first
-  useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setIsReady(!!session);
-    };
-    checkAuth();
-  }, []);
 
   // Fetch user's transaction history to calculate streak
   const { data: transactions = [], isError, isLoading } = useQuery({
@@ -43,12 +33,12 @@ export const DailyStreakReward = () => {
       if (error) throw error;
       return data || [];
     },
-    enabled: isReady,
+    enabled: isAuthenticated,
     retry: 1,
   });
 
   // Show loading state
-  if (!isReady || isLoading) {
+  if (!isAuthenticated || isLoading) {
     return (
       <Card className="border-2 border-primary/30">
         <CardContent className="py-8 text-center">
