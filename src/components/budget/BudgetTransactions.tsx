@@ -79,8 +79,11 @@ export const BudgetTransactions = ({ isAuthenticated }: { isAuthenticated: boole
       
       if (error) throw error;
       
-      // Create default categories if user has none
-      if (!data || data.length === 0) {
+      // Check if user has default categories (is_custom = false)
+      const hasDefaultCategories = data && data.some(cat => cat.is_custom === false);
+      
+      // Create default categories if user doesn't have them yet
+      if (!hasDefaultCategories) {
         const defaultCategories = [
           // Revenus
           { name: "Salaire", icon: "💼", color: "#10b981", type: "income", user_id: user.id, is_custom: false },
@@ -107,16 +110,16 @@ export const BudgetTransactions = ({ isAuthenticated }: { isAuthenticated: boole
 
         if (insertError) {
           console.error("Error creating default categories:", insertError);
-        } else {
-          // Re-fetch categories after creating defaults
-          const { data: newData } = await supabase
-            .from('budget_categories')
-            .select('*')
-            .order('type', { ascending: true })
-            .order('name', { ascending: true });
-          
-          return newData as Category[];
         }
+        
+        // Re-fetch all categories (default + custom)
+        const { data: newData } = await supabase
+          .from('budget_categories')
+          .select('*')
+          .order('type', { ascending: true })
+          .order('name', { ascending: true });
+        
+        return newData as Category[];
       }
       
       return data as Category[];
