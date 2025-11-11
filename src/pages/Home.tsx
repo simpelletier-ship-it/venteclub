@@ -156,7 +156,7 @@ const Home = () => {
         
         <div className="container mx-auto px-4 py-8 sm:py-10 lg:py-14 relative z-10">
           <div className="max-w-6xl mx-auto">
-            <div className="space-y-6 sm:space-y-7 lg:space-y-8 animate-slide-up mb-12 sm:mb-16 lg:mb-20">
+            <div className="space-y-6 sm:space-y-7 lg:space-y-8 animate-slide-up">
               <div className="space-y-4">
                 <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-display font-bold leading-[1.15] tracking-tight text-white">
                   Achetez ou vendez<br /><TypewriterAnimation />
