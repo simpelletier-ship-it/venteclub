@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Trash2, Search } from "lucide-react";
+import { Plus, Trash2, Search, Calendar as CalendarIcon, List } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +14,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import confetti from "canvas-confetti";
+import { TransactionsCalendar } from "./TransactionsCalendar";
 
 interface Category {
   id: string;
@@ -21,6 +22,16 @@ interface Category {
   icon: string;
   color: string;
   type: 'income' | 'expense';
+}
+
+interface Transaction {
+  id: string;
+  amount: number;
+  description: string;
+  transaction_date: string;
+  type: string;
+  category_id: string;
+  category: Category;
 }
 
 export const BudgetTransactions = ({ isAuthenticated }: { isAuthenticated: boolean }) => {
@@ -38,6 +49,9 @@ export const BudgetTransactions = ({ isAuthenticated }: { isAuthenticated: boole
   const [filterCategory, setFilterCategory] = useState<string>('all');
   const [filterDateStart, setFilterDateStart] = useState("");
   const [filterDateEnd, setFilterDateEnd] = useState("");
+  
+  // View mode
+  const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
   
   // States for adding custom categories
   const [categoryDialogOpen, setCategoryDialogOpen] = useState(false);
@@ -294,8 +308,32 @@ export const BudgetTransactions = ({ isAuthenticated }: { isAuthenticated: boole
           <p className="text-muted-foreground">Enregistrez vos revenus et dépenses réels</p>
         </div>
         
-        <div className="flex gap-2">
-          <Dialog open={categoryDialogOpen} onOpenChange={setCategoryDialogOpen}>
+        <div className="flex items-center gap-2">
+          <div className="flex border rounded-lg p-1">
+            <Button
+              variant={viewMode === 'list' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => setViewMode('list')}
+              className="gap-2"
+            >
+              <List className="h-4 w-4" />
+              Liste
+            </Button>
+            <Button
+              variant={viewMode === 'calendar' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => setViewMode('calendar')}
+              className="gap-2"
+            >
+              <CalendarIcon className="h-4 w-4" />
+              Calendrier
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex items-center justify-end flex-wrap gap-2">
+        <Dialog open={categoryDialogOpen} onOpenChange={setCategoryDialogOpen}>
             <DialogTrigger asChild>
               <Button variant="outline">
                 <Plus className="mr-2 h-4 w-4" />
@@ -380,11 +418,11 @@ export const BudgetTransactions = ({ isAuthenticated }: { isAuthenticated: boole
                 <Button type="submit" className="w-full" disabled={addCategory.isPending}>
                   {addCategory.isPending ? "Ajout..." : "Créer la catégorie"}
                 </Button>
-              </form>
-            </DialogContent>
-          </Dialog>
+            </form>
+          </DialogContent>
+        </Dialog>
 
-          <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
               <Button>
                 <Plus className="mr-2 h-4 w-4" />
@@ -484,13 +522,18 @@ export const BudgetTransactions = ({ isAuthenticated }: { isAuthenticated: boole
               <Button type="submit" className="w-full" disabled={addTransaction.isPending}>
                 {addTransaction.isPending ? "Ajout..." : "Ajouter"}
               </Button>
-            </form>
-          </DialogContent>
-          </Dialog>
-        </div>
+          </form>
+        </DialogContent>
+        </Dialog>
       </div>
 
-      <Card>
+      {viewMode === 'calendar' ? (
+        <TransactionsCalendar 
+          transactions={transactions as any} 
+          categories={categories as any} 
+        />
+      ) : (
+        <Card>
         <CardHeader>
           <CardTitle>Historique récent</CardTitle>
           <CardDescription>Vos 50 dernières transactions</CardDescription>
@@ -627,6 +670,7 @@ export const BudgetTransactions = ({ isAuthenticated }: { isAuthenticated: boole
           </div>
         </CardContent>
       </Card>
+      )}
     </div>
   );
 };
