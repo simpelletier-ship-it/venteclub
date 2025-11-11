@@ -14,6 +14,44 @@ export type Database = {
   }
   public: {
     Tables: {
+      asset_history: {
+        Row: {
+          asset_id: string
+          created_at: string | null
+          id: string
+          notes: string | null
+          recorded_at: string
+          user_id: string
+          value: number
+        }
+        Insert: {
+          asset_id: string
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          recorded_at?: string
+          user_id: string
+          value: number
+        }
+        Update: {
+          asset_id?: string
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          recorded_at?: string
+          user_id?: string
+          value?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "asset_history_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "user_assets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       blocked_ips: {
         Row: {
           blocked_at: string | null
@@ -689,6 +727,44 @@ export type Database = {
             columns: ["business_id"]
             isOneToOne: false
             referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      debt_history: {
+        Row: {
+          balance: number
+          created_at: string | null
+          debt_id: string
+          id: string
+          notes: string | null
+          recorded_at: string
+          user_id: string
+        }
+        Insert: {
+          balance: number
+          created_at?: string | null
+          debt_id: string
+          id?: string
+          notes?: string | null
+          recorded_at?: string
+          user_id: string
+        }
+        Update: {
+          balance?: number
+          created_at?: string | null
+          debt_id?: string
+          id?: string
+          notes?: string | null
+          recorded_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "debt_history_debt_id_fkey"
+            columns: ["debt_id"]
+            isOneToOne: false
+            referencedRelation: "user_debts"
             referencedColumns: ["id"]
           },
         ]

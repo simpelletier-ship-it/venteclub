@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, TrendingDown, DollarSign, Calendar } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { formatPrice } from "@/lib/priceFormat";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
@@ -7,19 +9,30 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 
 const COLORS = ['#ef4444', '#f59e0b', '#3b82f6', '#ec4899', '#06b6d4', '#8b5cf6'];
 
+const PERIOD_OPTIONS = [
+  { value: '7', label: '7 jours' },
+  { value: '30', label: '1 mois' },
+  { value: '90', label: '3 mois' },
+  { value: '180', label: '6 mois' },
+  { value: '365', label: '1 an' },
+];
+
 export const SpendingHabitsStats = ({ isAuthenticated }: { isAuthenticated: boolean }) => {
-  // Fetch transactions from last 30 days
+  const [period, setPeriod] = useState('30');
+  const [chartPeriod, setChartPeriod] = useState('7');
+
+  // Fetch transactions based on selected period
   const { data: transactions = [], isLoading, isError } = useQuery({
-    queryKey: ['spending-habits'],
+    queryKey: ['spending-habits', period],
     queryFn: async () => {
-      const thirtyDaysAgo = new Date();
-      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      const daysAgo = new Date();
+      daysAgo.setDate(daysAgo.getDate() - parseInt(period));
       
       const { data, error } = await supabase
         .from('budget_transactions')
         .select('*, category:budget_categories(*)')
         .eq('type', 'expense')
-        .gte('transaction_date', thirtyDaysAgo.toISOString().split('T')[0]);
+        .gte('transaction_date', daysAgo.toISOString().split('T')[0]);
       
       if (error) throw error;
       return data;
@@ -54,7 +67,7 @@ export const SpendingHabitsStats = ({ isAuthenticated }: { isAuthenticated: bool
 
   // Calculate stats
   const totalSpent = transactions.reduce((sum, t) => sum + Number(t.amount), 0);
-  const avgPerDay = totalSpent / 30;
+  const avgPerDay = totalSpent / parseInt(period);
   const avgPerTransaction = transactions.length > 0 ? totalSpent / transactions.length : 0;
 
   // Group by category
@@ -69,19 +82,20 @@ export const SpendingHabitsStats = ({ isAuthenticated }: { isAuthenticated: bool
     .sort((a, b) => b.value - a.value)
     .slice(0, 6);
 
-  // Group by day for trend
-  const last7Days = Array.from({ length: 7 }, (_, i) => {
+  // Group by day for trend chart
+  const chartDays = parseInt(chartPeriod);
+  const lastDays = Array.from({ length: chartDays }, (_, i) => {
     const date = new Date();
-    date.setDate(date.getDate() - (6 - i));
+    date.setDate(date.getDate() - (chartDays - 1 - i));
     return date.toISOString().split('T')[0];
   });
 
-  const dailySpending = last7Days.map(date => {
+  const dailySpending = lastDays.map(date => {
     const total = transactions
       .filter(t => t.transaction_date === date)
       .reduce((sum, t) => sum + Number(t.amount), 0);
     return {
-      date: new Date(date).toLocaleDateString('fr-CA', { weekday: 'short' }),
+      date: new Date(date).toLocaleDateString('fr-CA', chartDays <= 7 ? { weekday: 'short' } : { day: 'numeric', month: 'short' }),
       total,
     };
   });
@@ -91,12 +105,24 @@ export const SpendingHabitsStats = ({ isAuthenticated }: { isAuthenticated: bool
 
   return (
     <div className="space-y-6">
-      <div>
-        <h3 className="text-2xl font-bold flex items-center gap-2">
-          <TrendingUp className="h-6 w-6 text-primary" />
-          Vos Habitudes de Dépenses
-        </h3>
-        <p className="text-muted-foreground">Analyse des 30 derniers jours</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-2xl font-bold flex items-center gap-2">
+            <TrendingUp className="h-6 w-6 text-primary" />
+            Vos Habitudes de Dépenses
+          </h3>
+          <p className="text-muted-foreground">Analyse de la période sélectionnée</p>
+        </div>
+        <Select value={period} onValueChange={setPeriod}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {PERIOD_OPTIONS.map(opt => (
+              <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Summary Cards */}
@@ -105,7 +131,7 @@ export const SpendingHabitsStats = ({ isAuthenticated }: { isAuthenticated: bool
           <CardHeader className="pb-3">
             <CardDescription className="flex items-center gap-1">
               <DollarSign className="h-4 w-4" />
-              Total dépensé (30j)
+              Total dépensé ({PERIOD_OPTIONS.find(p => p.value === period)?.label})
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -143,7 +169,19 @@ export const SpendingHabitsStats = ({ isAuthenticated }: { isAuthenticated: bool
         {/* Daily trend */}
         <Card>
           <CardHeader>
-            <CardTitle>Tendance des 7 derniers jours</CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle>Tendance quotidienne</CardTitle>
+              <Select value={chartPeriod} onValueChange={setChartPeriod}>
+                <SelectTrigger className="w-[140px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {PERIOD_OPTIONS.map(opt => (
+                    <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={250}>

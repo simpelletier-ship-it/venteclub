@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, TrendingUp, TrendingDown, Trash2 } from "lucide-react";
+import { Plus, TrendingUp, TrendingDown, Trash2, Edit } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,13 +38,18 @@ export const BudgetAssetsDebts = ({ isAuthenticated }: { isAuthenticated: boolea
   
   // Assets state
   const [assetDialog, setAssetDialog] = useState(false);
+  const [updateAssetDialog, setUpdateAssetDialog] = useState(false);
+  const [selectedAsset, setSelectedAsset] = useState<any>(null);
   const [assetName, setAssetName] = useState("");
   const [assetType, setAssetType] = useState("");
   const [assetValue, setAssetValue] = useState("");
   const [assetNotes, setAssetNotes] = useState("");
+  const [assetRecordedAt, setAssetRecordedAt] = useState("");
 
   // Debts state
   const [debtDialog, setDebtDialog] = useState(false);
+  const [updateDebtDialog, setUpdateDebtDialog] = useState(false);
+  const [selectedDebt, setSelectedDebt] = useState<any>(null);
   const [debtName, setDebtName] = useState("");
   const [debtType, setDebtType] = useState("");
   const [debtBalance, setDebtBalance] = useState("");
@@ -53,6 +58,7 @@ export const BudgetAssetsDebts = ({ isAuthenticated }: { isAuthenticated: boolea
   const [debtFrequency, setDebtFrequency] = useState("monthly");
   const [debtDueDate, setDebtDueDate] = useState("");
   const [debtNotes, setDebtNotes] = useState("");
+  const [debtRecordedAt, setDebtRecordedAt] = useState("");
 
   // Fetch assets
   const { data: assets = [] } = useQuery({
@@ -174,11 +180,90 @@ export const BudgetAssetsDebts = ({ isAuthenticated }: { isAuthenticated: boolea
     },
   });
 
+  // Update asset mutation with history
+  const updateAssetValue = useMutation({
+    mutationFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user || !selectedAsset) throw new Error("Non authentifié");
+
+      const newValue = parseFloat(assetValue);
+      
+      // Update asset value
+      const { error: updateError } = await supabase
+        .from('user_assets')
+        .update({ value: newValue })
+        .eq('id', selectedAsset.id);
+
+      if (updateError) throw updateError;
+
+      // Create history entry
+      const { error: historyError } = await supabase
+        .from('asset_history')
+        .insert({
+          user_id: user.id,
+          asset_id: selectedAsset.id,
+          value: newValue,
+          recorded_at: assetRecordedAt || new Date().toISOString(),
+          notes: assetNotes || null,
+        });
+
+      if (historyError) throw historyError;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user-assets'] });
+      queryClient.invalidateQueries({ queryKey: ['net-worth-history'] });
+      toast.success("Actif mis à jour avec succès");
+      setUpdateAssetDialog(false);
+      setSelectedAsset(null);
+      resetAssetForm();
+    },
+  });
+
+  // Update debt mutation with history
+  const updateDebtBalance = useMutation({
+    mutationFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user || !selectedDebt) throw new Error("Non authentifié");
+
+      const newBalance = parseFloat(debtBalance);
+      
+      // Update debt balance
+      const { error: updateError } = await supabase
+        .from('user_debts')
+        .update({ balance: newBalance })
+        .eq('id', selectedDebt.id);
+
+      if (updateError) throw updateError;
+
+      // Create history entry
+      const { error: historyError } = await supabase
+        .from('debt_history')
+        .insert({
+          user_id: user.id,
+          debt_id: selectedDebt.id,
+          balance: newBalance,
+          recorded_at: debtRecordedAt || new Date().toISOString(),
+          notes: debtNotes || null,
+        });
+
+      if (historyError) throw historyError;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user-debts'] });
+      queryClient.invalidateQueries({ queryKey: ['net-worth-history'] });
+      toast.success("Dette mise à jour avec succès");
+      setUpdateDebtDialog(false);
+      setSelectedDebt(null);
+      resetDebtForm();
+    },
+  });
+
   const resetAssetForm = () => {
     setAssetName("");
     setAssetType("");
     setAssetValue("");
     setAssetNotes("");
+    setAssetRecordedAt("");
   };
 
   const resetDebtForm = () => {
@@ -190,6 +275,7 @@ export const BudgetAssetsDebts = ({ isAuthenticated }: { isAuthenticated: boolea
     setDebtFrequency("monthly");
     setDebtDueDate("");
     setDebtNotes("");
+    setDebtRecordedAt("");
   };
 
   const totalAssets = assets.reduce((sum, asset) => sum + Number(asset.value), 0);
@@ -309,9 +395,23 @@ export const BudgetAssetsDebts = ({ isAuthenticated }: { isAuthenticated: boolea
                           {ASSET_TYPES.find(t => t.value === asset.type)?.label}
                         </CardDescription>
                       </div>
-                      <Button variant="ghost" size="icon" onClick={() => deleteAsset.mutate(asset.id)}>
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
+                      <div className="flex gap-1">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          onClick={() => {
+                            setSelectedAsset(asset);
+                            setAssetValue(asset.value.toString());
+                            setAssetRecordedAt(new Date().toISOString().split('T')[0]);
+                            setUpdateAssetDialog(true);
+                          }}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon" onClick={() => deleteAsset.mutate(asset.id)}>
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </div>
                     </div>
                   </CardHeader>
                   <CardContent>
@@ -429,9 +529,23 @@ export const BudgetAssetsDebts = ({ isAuthenticated }: { isAuthenticated: boolea
                           {DEBT_TYPES.find(t => t.value === debt.type)?.label}
                         </CardDescription>
                       </div>
-                      <Button variant="ghost" size="icon" onClick={() => deleteDebt.mutate(debt.id)}>
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
+                      <div className="flex gap-1">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          onClick={() => {
+                            setSelectedDebt(debt);
+                            setDebtBalance(debt.balance.toString());
+                            setDebtRecordedAt(new Date().toISOString().split('T')[0]);
+                            setUpdateDebtDialog(true);
+                          }}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon" onClick={() => deleteDebt.mutate(debt.id)}>
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </div>
                     </div>
                   </CardHeader>
                   <CardContent>
@@ -451,6 +565,72 @@ export const BudgetAssetsDebts = ({ isAuthenticated }: { isAuthenticated: boolea
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Update Asset Dialog */}
+      <Dialog open={updateAssetDialog} onOpenChange={setUpdateAssetDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Mettre à jour {selectedAsset?.name}</DialogTitle>
+            <DialogDescription>Enregistrer une nouvelle valeur avec historique</DialogDescription>
+          </DialogHeader>
+          <form onSubmit={(e) => { e.preventDefault(); updateAssetValue.mutate(); }} className="space-y-4">
+            <div>
+              <Label>Nouvelle valeur</Label>
+              <CurrencyInput value={assetValue} onChange={setAssetValue} className="mt-1" required />
+            </div>
+            <div>
+              <Label>Date d'enregistrement</Label>
+              <Input 
+                type="date" 
+                value={assetRecordedAt} 
+                onChange={(e) => setAssetRecordedAt(e.target.value)} 
+                className="mt-1"
+                required 
+              />
+            </div>
+            <div>
+              <Label>Notes (optionnel)</Label>
+              <Textarea value={assetNotes} onChange={(e) => setAssetNotes(e.target.value)} className="mt-1" rows={2} placeholder="Ex: Contribution annuelle" />
+            </div>
+            <Button type="submit" className="w-full" disabled={updateAssetValue.isPending}>
+              {updateAssetValue.isPending ? "Mise à jour..." : "Enregistrer"}
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Update Debt Dialog */}
+      <Dialog open={updateDebtDialog} onOpenChange={setUpdateDebtDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Mettre à jour {selectedDebt?.name}</DialogTitle>
+            <DialogDescription>Enregistrer un nouveau solde avec historique</DialogDescription>
+          </DialogHeader>
+          <form onSubmit={(e) => { e.preventDefault(); updateDebtBalance.mutate(); }} className="space-y-4">
+            <div>
+              <Label>Nouveau solde</Label>
+              <CurrencyInput value={debtBalance} onChange={setDebtBalance} className="mt-1" required />
+            </div>
+            <div>
+              <Label>Date d'enregistrement</Label>
+              <Input 
+                type="date" 
+                value={debtRecordedAt} 
+                onChange={(e) => setDebtRecordedAt(e.target.value)} 
+                className="mt-1"
+                required 
+              />
+            </div>
+            <div>
+              <Label>Notes (optionnel)</Label>
+              <Textarea value={debtNotes} onChange={(e) => setDebtNotes(e.target.value)} className="mt-1" rows={2} placeholder="Ex: Paiement régulier" />
+            </div>
+            <Button type="submit" className="w-full" disabled={updateDebtBalance.isPending}>
+              {updateDebtBalance.isPending ? "Mise à jour..." : "Enregistrer"}
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

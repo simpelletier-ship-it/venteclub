@@ -16,79 +16,100 @@ export const NetWorthGamification = ({ netWorth, isAuthenticated }: NetWorthGami
   const [showChart, setShowChart] = useState(false);
   const [selectedPeriod, setSelectedPeriod] = useState<'7d' | '30d' | '90d' | '1y'>('30d');
 
-  // Fetch historical data for chart
+  // Fetch historical data for chart using asset/debt history
   const { data: historicalData = [] } = useQuery({
-    queryKey: ['net-worth-history'],
+    queryKey: ['net-worth-history', selectedPeriod],
     enabled: isAuthenticated,
     retry: 1,
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return [];
 
-      // Get last 12 months
-      const months = [];
-      for (let i = 11; i >= 0; i--) {
-        const date = new Date();
-        date.setMonth(date.getMonth() - i);
-        date.setDate(1);
-        months.push({
-          month: date.toISOString().split('T')[0],
-          label: date.toLocaleDateString('fr-CA', { month: 'short', year: 'numeric' })
-        });
+      // Calculate date range based on period
+      const now = new Date();
+      const startDate = new Date();
+      
+      switch (selectedPeriod) {
+        case '7d':
+          startDate.setDate(now.getDate() - 7);
+          break;
+        case '30d':
+          startDate.setDate(now.getDate() - 30);
+          break;
+        case '90d':
+          startDate.setDate(now.getDate() - 90);
+          break;
+        case '1y':
+          startDate.setFullYear(now.getFullYear() - 1);
+          break;
       }
 
-      // Get transactions grouped by month
-      const { data: transactions } = await supabase
-        .from('budget_transactions')
-        .select('transaction_date, amount, type')
-        .gte('transaction_date', months[0].month)
-        .order('transaction_date');
+      // Fetch asset history
+      const { data: assetHistory } = await supabase
+        .from('asset_history')
+        .select('*, asset:user_assets(name)')
+        .gte('recorded_at', startDate.toISOString())
+        .order('recorded_at');
 
-      // Get assets and debts snapshots (current values only for now)
+      // Fetch debt history
+      const { data: debtHistory } = await supabase
+        .from('debt_history')
+        .select('*, debt:user_debts(name)')
+        .gte('recorded_at', startDate.toISOString())
+        .order('recorded_at');
+
+      // Get current values
       const { data: assets } = await supabase
         .from('user_assets')
-        .select('value');
+        .select('value, id, name');
       
       const { data: debts } = await supabase
         .from('user_debts')
-        .select('balance');
+        .select('balance, id, name');
 
-      const totalAssets = assets?.reduce((sum, a) => sum + Number(a.value), 0) || 0;
-      const totalDebts = debts?.reduce((sum, d) => sum + Number(d.balance), 0) || 0;
+      // Group history by date
+      const dateMap = new Map<string, { assets: number; debts: number }>();
 
-      // Calculate cumulative net worth for each month
-      let cumulativeIncome = 0;
-      let cumulativeExpenses = 0;
+      // Add asset history
+      assetHistory?.forEach(entry => {
+        const date = new Date(entry.recorded_at).toISOString().split('T')[0];
+        if (!dateMap.has(date)) {
+          dateMap.set(date, { assets: 0, debts: 0 });
+        }
+      });
 
-      return months.map((month, index) => {
-        const monthTransactions = transactions?.filter(t => {
-          const tDate = new Date(t.transaction_date);
-          const mDate = new Date(month.month);
-          return tDate.getMonth() === mDate.getMonth() && 
-                 tDate.getFullYear() === mDate.getFullYear();
-        }) || [];
+      // Add debt history
+      debtHistory?.forEach(entry => {
+        const date = new Date(entry.recorded_at).toISOString().split('T')[0];
+        if (!dateMap.has(date)) {
+          dateMap.set(date, { assets: 0, debts: 0 });
+        }
+      });
 
-        const monthIncome = monthTransactions
-          .filter(t => t.type === 'income')
-          .reduce((sum, t) => sum + Number(t.amount), 0);
-        
-        const monthExpenses = monthTransactions
-          .filter(t => t.type === 'expense')
-          .reduce((sum, t) => sum + Number(t.amount), 0);
+      // Sort dates
+      const sortedDates = Array.from(dateMap.keys()).sort();
 
-        cumulativeIncome += monthIncome;
-        cumulativeExpenses += monthExpenses;
+      // Calculate cumulative values for each date
+      const currentAssetValues = new Map(assets?.map(a => [a.id, Number(a.value)]) || []);
+      const currentDebtValues = new Map(debts?.map(d => [d.id, Number(d.balance)]) || []);
 
-        // Simplified calculation: starting point + cumulative transactions
-        const estimatedNetWorth = totalAssets - totalDebts + (cumulativeIncome - cumulativeExpenses);
+      return sortedDates.map(date => {
+        // Update asset values based on history
+        assetHistory?.filter(h => new Date(h.recorded_at).toISOString().split('T')[0] === date)
+          .forEach(h => currentAssetValues.set(h.asset_id, Number(h.value)));
+
+        // Update debt values based on history
+        debtHistory?.filter(h => new Date(h.recorded_at).toISOString().split('T')[0] === date)
+          .forEach(h => currentDebtValues.set(h.debt_id, Number(h.balance)));
+
+        const totalAssets = Array.from(currentAssetValues.values()).reduce((sum, v) => sum + v, 0);
+        const totalDebts = Array.from(currentDebtValues.values()).reduce((sum, v) => sum + v, 0);
 
         return {
-          month: month.label,
+          date: new Date(date).toLocaleDateString('fr-CA', { day: 'numeric', month: 'short' }),
           actifs: totalAssets,
           dettes: totalDebts,
-          valeurNette: estimatedNetWorth,
-          revenus: monthIncome,
-          dépenses: monthExpenses,
+          valeurNette: totalAssets - totalDebts,
         };
       });
     },
@@ -98,22 +119,11 @@ export const NetWorthGamification = ({ netWorth, isAuthenticated }: NetWorthGami
   const calculatePeriodChange = (period: '7d' | '30d' | '90d' | '1y') => {
     if (!historicalData || historicalData.length < 2) return { amount: 0, percentage: 0 };
     
-    const daysMap = { '7d': 7, '30d': 30, '90d': 90, '1y': 365 };
-    const daysAgo = daysMap[period];
+    // Get first and last data points
+    const oldDataPoint = historicalData[0];
+    const currentDataPoint = historicalData[historicalData.length - 1];
     
-    const targetDate = new Date();
-    targetDate.setDate(targetDate.getDate() - daysAgo);
-    
-    // Find closest historical point
-    const sortedData = [...historicalData].reverse(); // Most recent first
-    const oldDataPoint = sortedData.find(d => {
-      const dataDate = new Date();
-      const monthIndex = historicalData.length - 1 - sortedData.indexOf(d);
-      dataDate.setMonth(dataDate.getMonth() - monthIndex);
-      return dataDate <= targetDate;
-    }) || historicalData[0];
-    
-    const currentNetWorth = historicalData[historicalData.length - 1]?.valeurNette || netWorth;
+    const currentNetWorth = currentDataPoint?.valeurNette || netWorth;
     const oldNetWorth = oldDataPoint.valeurNette;
     
     const amount = currentNetWorth - oldNetWorth;
@@ -158,7 +168,7 @@ export const NetWorthGamification = ({ netWorth, isAuthenticated }: NetWorthGami
     if (active && payload && payload.length) {
       return (
         <div className="bg-card border border-border rounded-lg shadow-lg p-3">
-          <p className="text-sm font-semibold mb-2">{payload[0].payload.month}</p>
+          <p className="text-sm font-semibold mb-2">{payload[0].payload.date}</p>
           {payload.map((entry: any, index: number) => (
             <p key={index} className="text-sm" style={{ color: entry.color }}>
               {entry.name}: {formatPrice(entry.value)}
@@ -367,7 +377,7 @@ export const NetWorthGamification = ({ netWorth, isAuthenticated }: NetWorthGami
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                 <XAxis 
-                  dataKey="month" 
+                  dataKey="date" 
                   className="text-xs"
                   stroke="hsl(var(--muted-foreground))"
                 />
