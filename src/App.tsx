@@ -10,12 +10,13 @@ import { EmailVerificationGuard } from "@/components/EmailVerificationGuard";
 import { trackPageView } from "@/lib/analytics";
 import { useWebVitals } from "@/hooks/usePerformanceMonitoring";
 import { MobileNotificationsContainer } from "@/components/MobileNotificationsContainer";
+import { LoadingFallback } from "@/components/LoadingFallback";
 
-// Critical pages loaded immediately
-import Home from "./pages/Home";
-import Businesses from "./pages/Businesses";
+// Lazy load ALL pages for optimal performance
+const Home = lazy(() => import("./pages/Home"));
+const Businesses = lazy(() => import("./pages/Businesses"));
 
-// Lazy load all other pages
+// Other lazy loaded pages
 const Auth = lazy(() => import("./pages/Auth"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const Sell = lazy(() => import("./pages/Sell"));
@@ -88,7 +89,7 @@ const App = () => (
         <BrowserRouter>
           <AnalyticsTracker />
           <Layout>
-            <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
+            <Suspense fallback={<LoadingFallback />}>
               <Routes>
                 {/* Pages VRAIMENT publiques (accessibles sans compte) */}
                 <Route path="/auth" element={<Auth />} />

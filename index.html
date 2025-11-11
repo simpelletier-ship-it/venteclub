@@ -86,34 +86,40 @@
     <link rel="dns-prefetch" href="https://api.mapbox.com" />
     <link rel="dns-prefetch" href="https://js.stripe.com" />
     
-    <!-- Preload critical resources for faster initial load -->
-    <link rel="modulepreload" href="/src/main.tsx" />
-    <link rel="modulepreload" href="/src/App.tsx" />
-    <link rel="modulepreload" href="/src/pages/Home.tsx" />
-    <link rel="modulepreload" href="/src/components/Layout.tsx" />
-    <link rel="modulepreload" href="/src/components/Header.tsx" />
-    
-    <!-- Google Tag Manager -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-PPBNNNKF');</script>
-    <!-- End Google Tag Manager -->
-    
-    <!-- Google reCAPTCHA -->
-    <script src="https://www.google.com/recaptcha/enterprise.js" async defer></script>
-    
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-974642760"></script>
+    <!-- Load analytics after page is interactive for better performance -->
     <script>
+      // Defer GTM loading until after page interactive
+      window.addEventListener('load', function() {
+        setTimeout(function() {
+          (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+          new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+          j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+          'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+          })(window,document,'script','dataLayer','GTM-PPBNNNKF');
+        }, 0);
+      });
+      
+      // Initialize dataLayer early
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-      gtag('config', 'AW-974642760');
-      gtag('config', 'G-362DNT7Q72', {
-        'anonymize_ip': true,
-        'cookie_flags': 'SameSite=None;Secure'
+      
+      // Defer Google Analytics loading
+      window.addEventListener('load', function() {
+        setTimeout(function() {
+          var script = document.createElement('script');
+          script.async = true;
+          script.src = 'https://www.googletagmanager.com/gtag/js?id=AW-974642760';
+          document.head.appendChild(script);
+          
+          script.onload = function() {
+            gtag('config', 'AW-974642760');
+            gtag('config', 'G-362DNT7Q72', {
+              'anonymize_ip': true,
+              'cookie_flags': 'SameSite=None;Secure'
+            });
+          };
+        }, 1000);
       });
     </script>
   </head>
