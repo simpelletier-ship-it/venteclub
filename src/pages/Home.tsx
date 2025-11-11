@@ -157,11 +157,11 @@ const Home = () => {
         <div className="container mx-auto px-4 py-8 sm:py-10 lg:py-14 relative z-10">
           <div className="max-w-6xl mx-auto">
             <div className="space-y-6 sm:space-y-7 lg:space-y-9 animate-slide-up mb-12 sm:mb-16 lg:mb-20">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-display font-bold leading-[1.15] tracking-tight text-white">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-sans font-bold leading-[1.15] tracking-tight text-white">
                 Achetez ou vendez<br /><TypewriterAnimation />
               </h1>
               
-              <p className="text-lg sm:text-xl lg:text-2xl text-white/90 max-w-3xl leading-relaxed">
+              <p className="text-lg sm:text-xl lg:text-2xl text-white/90 max-w-3xl leading-relaxed text-justify">
                 La plateforme de référence au Québec pour acquérir une entreprise établie. 
                 Découvrez des centaines d'opportunités d'affaires vérifiées et connectez directement avec les propriétaires dans un environnement transparent et professionnel.
               </p>
