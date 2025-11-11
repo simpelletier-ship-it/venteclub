@@ -1,13 +1,18 @@
 import { useState } from "react";
-import { Plus, TrendingDown, Zap } from "lucide-react";
+import { Plus, TrendingDown, Zap, Sparkles } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 import { CurrencyInput } from "@/components/CurrencyInput";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+
+const EMOJI_OPTIONS = ['🍔', '🚗', '🏠', '💡', '🎮', '👕', '📱', '💊', '🎓', '✈️', '🎬', '☕', '🛒', '🏋️', '📚'];
+const COLOR_OPTIONS = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6', '#8b5cf6', '#ec4899', '#64748b'];
 
 // AI-powered category suggestions based on description
 const suggestCategory = (description: string, categories: any[]) => {
@@ -37,6 +42,10 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
   const [description, setDescription] = useState("");
   const [suggestedCategory, setSuggestedCategory] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [newCategoryOpen, setNewCategoryOpen] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState("");
+  const [newCategoryIcon, setNewCategoryIcon] = useState("🍔");
+  const [newCategoryColor, setNewCategoryColor] = useState("#3b82f6");
 
   // Fetch categories
   const { data: categories = [] } = useQuery({
@@ -85,6 +94,44 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
       setDescription("");
       setSuggestedCategory(null);
       setSelectedCategory("");
+    },
+  });
+
+  // Create new category mutation
+  const createCategory = useMutation({
+    mutationFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Non authentifié");
+
+      if (!newCategoryName.trim()) throw new Error("Le nom est requis");
+
+      const { data, error } = await supabase
+        .from('budget_categories')
+        .insert({
+          user_id: user.id,
+          name: newCategoryName.trim(),
+          icon: newCategoryIcon,
+          color: newCategoryColor,
+          type: 'expense',
+          is_custom: true,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (newCategory) => {
+      queryClient.invalidateQueries({ queryKey: ['budget-categories'] });
+      toast.success(`✨ Catégorie "${newCategory.name}" créée!`, { duration: 2000 });
+      setSelectedCategory(newCategory.id);
+      setNewCategoryOpen(false);
+      setNewCategoryName("");
+      setNewCategoryIcon("🍔");
+      setNewCategoryColor("#3b82f6");
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Erreur lors de la création");
     },
   });
 
@@ -153,6 +200,84 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
                   {cat.icon} {cat.name}
                 </SelectItem>
               ))}
+              <Dialog open={newCategoryOpen} onOpenChange={setNewCategoryOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="ghost" className="w-full justify-start mt-2 border-t">
+                    <Plus className="mr-2 h-4 w-4" />
+                    Nouvelle catégorie
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2">
+                      <Sparkles className="h-5 w-5 text-primary" />
+                      Créer une catégorie
+                    </DialogTitle>
+                    <DialogDescription>
+                      Ajoutez une nouvelle catégorie personnalisée
+                    </DialogDescription>
+                  </DialogHeader>
+                  
+                  <div className="space-y-4 py-4">
+                    <div className="space-y-2">
+                      <Label>Nom de la catégorie</Label>
+                      <Input
+                        value={newCategoryName}
+                        onChange={(e) => setNewCategoryName(e.target.value)}
+                        placeholder="Ex: Restaurant, Essence..."
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Icône</Label>
+                      <div className="grid grid-cols-8 gap-2">
+                        {EMOJI_OPTIONS.map((emoji) => (
+                          <Button
+                            key={emoji}
+                            type="button"
+                            variant={newCategoryIcon === emoji ? "default" : "outline"}
+                            className="h-10 w-10 p-0 text-xl"
+                            onClick={() => setNewCategoryIcon(emoji)}
+                          >
+                            {emoji}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Couleur</Label>
+                      <div className="grid grid-cols-8 gap-2">
+                        {COLOR_OPTIONS.map((color) => (
+                          <Button
+                            key={color}
+                            type="button"
+                            variant="outline"
+                            className="h-10 w-10 p-0 relative"
+                            onClick={() => setNewCategoryColor(color)}
+                          >
+                            <div 
+                              className="absolute inset-1 rounded"
+                              style={{ backgroundColor: color }}
+                            />
+                            {newCategoryColor === color && (
+                              <span className="absolute inset-0 flex items-center justify-center text-white">✓</span>
+                            )}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <Button 
+                    onClick={() => createCategory.mutate()}
+                    disabled={createCategory.isPending || !newCategoryName.trim()}
+                    className="w-full"
+                  >
+                    {createCategory.isPending ? "Création..." : "Créer la catégorie"}
+                  </Button>
+                </DialogContent>
+              </Dialog>
             </SelectContent>
           </Select>
 
