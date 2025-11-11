@@ -156,31 +156,33 @@ const Home = () => {
         
         <div className="container mx-auto px-4 py-6 sm:py-8 lg:py-12 relative z-10">
           <div className="max-w-6xl mx-auto">
-            <div className="space-y-4 sm:space-y-6 lg:space-y-8 animate-slide-up">
-              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-display font-bold leading-[1.2] sm:leading-[1.15] tracking-tight text-white">
-                Achat et Vente d'Entreprises au Québec
+            <div className="space-y-6 sm:space-y-7 lg:space-y-9 animate-slide-up">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-display font-bold leading-[1.15] tracking-tight">
+                <span className="text-white">Achat et Vente</span>{" "}
+                <span className="text-[#818cf8]">d'Entreprises</span>{" "}
+                <span className="text-white">au Québec</span>
               </h1>
               
-              <p className="text-base sm:text-lg lg:text-xl text-[#818cf8] font-semibold max-w-3xl">
+              <p className="text-lg sm:text-xl lg:text-2xl text-[#818cf8] font-semibold max-w-3xl leading-relaxed">
                 Le Club de Référence pour acheter <TypewriterAnimation /> partout au Québec
               </p>
               
-              <p className="text-sm sm:text-base lg:text-lg text-white/90 max-w-3xl leading-relaxed sm:leading-loose">
+              <p className="text-base sm:text-lg lg:text-xl text-white/90 max-w-3xl leading-relaxed">
                 Plateforme de mise en relation directe entre acheteurs et vendeurs d'entreprises au Québec. Recherchez, comparez et contactez les propriétaires dans un environnement transparent et professionnel.
               </p>
               
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-3 sm:pt-4">
+              <div className="flex flex-col sm:flex-row gap-4 sm:gap-5 pt-4 sm:pt-6">
                 <Button 
                   size="lg" 
-                  className="bg-[#6366f1] hover:bg-[#4f46e5] text-white h-11 sm:h-12 lg:h-14 px-5 sm:px-8 lg:px-10 text-sm sm:text-base font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all group w-full sm:w-auto"
+                  className="bg-[#6366f1] hover:bg-[#4f46e5] text-white h-14 sm:h-16 lg:h-[4.5rem] px-8 sm:px-10 lg:px-12 text-base sm:text-lg lg:text-xl font-semibold rounded-xl shadow-lg hover:shadow-2xl transition-all group w-full sm:w-auto"
                   onClick={() => navigate("/entreprises")}
                 >
                   Explorer les opportunités
-                  <ArrowRight className="ml-2 w-4 sm:w-5 h-4 sm:h-5 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="ml-2 w-5 sm:w-6 h-5 sm:h-6 group-hover:translate-x-1 transition-transform" />
                 </Button>
                 <Button 
                   size="lg" 
-                  className="h-11 sm:h-12 lg:h-14 px-5 sm:px-8 lg:px-10 text-sm sm:text-base font-semibold rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/20 shadow-lg hover:shadow-xl transition-all backdrop-blur-sm w-full sm:w-auto"
+                  className="h-14 sm:h-16 lg:h-[4.5rem] px-8 sm:px-10 lg:px-12 text-base sm:text-lg lg:text-xl font-semibold rounded-xl bg-white/10 hover:bg-white/20 text-white border-2 border-white/30 shadow-lg hover:shadow-2xl transition-all backdrop-blur-sm w-full sm:w-auto"
                   onClick={() => navigate("/sell")}
                 >
                   Vendre mon entreprise
