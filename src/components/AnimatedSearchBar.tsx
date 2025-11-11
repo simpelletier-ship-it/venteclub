@@ -49,11 +49,10 @@ export const TypewriterAnimation = () => {
   }, [displayedText, isDeleting, wordIndex]);
 
   return (
-    <span className="inline-block min-w-[180px]">
+    <span className="inline-block">
       <span className="font-bold">
-        <span className="text-white">{currentWord.gender} </span>
-        <span className="text-[#818cf8]">{displayedText}</span>
-        <span className="animate-pulse text-[#818cf8]">|</span>
+        {currentWord.gender} <span className="text-[#818cf8]">{displayedText}</span>
+        <span className="animate-pulse">|</span>
       </span>
     </span>
   );

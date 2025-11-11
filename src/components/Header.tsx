@@ -129,7 +129,7 @@ const Header = () => {
   };
 
   return (
-    <nav className="border-b border-border bg-background/95 backdrop-blur-xl sticky top-0 z-50 shadow-sm py-2">
+    <nav className="border-b border-border bg-background/95 backdrop-blur-xl sticky top-0 z-50 shadow-sm py-3 sm:py-4 md:py-6">
       <div className="container mx-auto px-4 sm:px-6 md:px-8">
         <div className="flex items-center justify-between">
           {/* Logo */}

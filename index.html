@@ -72,90 +72,48 @@
     <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
     <link rel="dns-prefetch" href="https://www.google-analytics.com" />
     
-    <!-- Fonts - Optimized subset with swap for instant text display -->
+    <!-- Fonts - Preconnect and async load for faster loading -->
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap&subset=latin" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap&subset=latin" media="print" onload="this.media='all'" />
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap&subset=latin" /></noscript>
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" media="print" onload="this.media='all'" />
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" /></noscript>
     
-    <!-- Preload critical assets for faster LCP and reduce layout shift -->
-    <link rel="preload" as="image" href="/logo.png" fetchpriority="high" type="image/png" />
+    <!-- Preload critical assets for faster LCP -->
+    <link rel="preload" as="image" href="/logo.png" fetchpriority="high" />
     
-    <!-- Minimal critical inline styles for instant render and improved FCP -->
-    <style>
-      *{box-sizing:border-box}
-      html{-webkit-text-size-adjust:100%;tab-size:4}
-      body{margin:0;font-family:Inter,system-ui,-apple-system,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
-      #root{min-height:100vh;display:flex;flex-direction:column}
-      .loading-spinner{display:flex;align-items:center;justify-content:center;min-height:100vh;background:#0f172a}
-      .spinner{width:2rem;height:2rem;border:2px solid #312e81;border-top-color:#6366f1;border-radius:50%;animation:spin .6s linear infinite}
-      @keyframes spin{to{transform:rotate(360deg)}}
-      img{max-width:100%;height:auto}
-      a{color:inherit;text-decoration:none}
-    </style>
+    <!-- Resource hints for external services -->
+    <link rel="dns-prefetch" href="https://api.mapbox.com" />
+    <link rel="dns-prefetch" href="https://js.stripe.com" />
     
-    <!-- Load analytics after page is interactive for better performance -->
+    <!-- Preload critical resources for faster initial load -->
+    <link rel="modulepreload" href="/src/main.tsx" />
+    <link rel="modulepreload" href="/src/App.tsx" />
+    <link rel="modulepreload" href="/src/pages/Home.tsx" />
+    <link rel="modulepreload" href="/src/components/Layout.tsx" />
+    <link rel="modulepreload" href="/src/components/Header.tsx" />
+    
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-PPBNNNKF');</script>
+    <!-- End Google Tag Manager -->
+    
+    <!-- Google reCAPTCHA -->
+    <script src="https://www.google.com/recaptcha/enterprise.js" async defer></script>
+    
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-974642760"></script>
     <script>
-      // Defer GTM loading until after page interactive
-      window.addEventListener('load', function() {
-        if ('requestIdleCallback' in window) {
-          requestIdleCallback(function() {
-            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-            })(window,document,'script','dataLayer','GTM-PPBNNNKF');
-          }, {timeout: 2000});
-        } else {
-          setTimeout(function() {
-            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-            })(window,document,'script','dataLayer','GTM-PPBNNNKF');
-          }, 2000);
-        }
-      });
-      
-      // Initialize dataLayer early but minimal
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-      
-      // Defer Google Analytics loading even more
-      window.addEventListener('load', function() {
-        if ('requestIdleCallback' in window) {
-          requestIdleCallback(function() {
-            var script = document.createElement('script');
-            script.async = true;
-            script.src = 'https://www.googletagmanager.com/gtag/js?id=AW-974642760';
-            document.head.appendChild(script);
-            
-            script.onload = function() {
-              gtag('config', 'AW-974642760');
-              gtag('config', 'G-362DNT7Q72', {
-                'anonymize_ip': true,
-                'cookie_flags': 'SameSite=None;Secure'
-              });
-            };
-          }, {timeout: 3000});
-        } else {
-          setTimeout(function() {
-            var script = document.createElement('script');
-            script.async = true;
-            script.src = 'https://www.googletagmanager.com/gtag/js?id=AW-974642760';
-            document.head.appendChild(script);
-            
-            script.onload = function() {
-              gtag('config', 'AW-974642760');
-              gtag('config', 'G-362DNT7Q72', {
-                'anonymize_ip': true,
-                'cookie_flags': 'SameSite=None;Secure'
-              });
-            };
-          }, 3000);
-        }
+      gtag('config', 'AW-974642760');
+      gtag('config', 'G-362DNT7Q72', {
+        'anonymize_ip': true,
+        'cookie_flags': 'SameSite=None;Secure'
       });
     </script>
   </head>

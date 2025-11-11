@@ -226,7 +226,7 @@ const PropertyListings = () => {
               )
             ) : (
               <div className={viewMode === 'grid' ? "col-span-full text-center py-16" : "text-center py-16"}>
-                <p className="text-lg text-muted-foreground">À venir</p>
+                <p className="text-lg text-muted-foreground">Aucune propriété ne correspond à vos critères de recherche</p>
               </div>
             )}
           </div>

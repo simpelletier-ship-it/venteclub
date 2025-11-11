@@ -10,13 +10,12 @@ import { EmailVerificationGuard } from "@/components/EmailVerificationGuard";
 import { trackPageView } from "@/lib/analytics";
 import { useWebVitals } from "@/hooks/usePerformanceMonitoring";
 import { MobileNotificationsContainer } from "@/components/MobileNotificationsContainer";
-import { LoadingFallback } from "@/components/LoadingFallback";
 
-// Lazy load ALL pages for optimal performance
-const Home = lazy(() => import("./pages/Home"));
-const Businesses = lazy(() => import("./pages/Businesses"));
+// Critical pages loaded immediately
+import Home from "./pages/Home";
+import Businesses from "./pages/Businesses";
 
-// Other lazy loaded pages
+// Lazy load all other pages
 const Auth = lazy(() => import("./pages/Auth"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const Sell = lazy(() => import("./pages/Sell"));
@@ -52,11 +51,10 @@ const TestEmail = lazy(() => import("./pages/TestEmail"));
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 10 * 60 * 1000, // 10 minutes - reduced refetching
-      gcTime: 30 * 60 * 1000, // 30 minutes - longer cache
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      gcTime: 10 * 60 * 1000, // 10 minutes
       retry: 1,
       refetchOnWindowFocus: false,
-      refetchOnMount: false,
     },
   },
 });
@@ -65,19 +63,17 @@ const queryClient = new QueryClient({
 const AdminSecurity = lazy(() => import("./pages/AdminSecurity"));
 const SecurityCompliance = lazy(() => import("./pages/SecurityCompliance"));
 
-// Analytics tracker component - lightweight for performance
+// Analytics and Performance Monitoring component
 const AnalyticsTracker = () => {
   const location = useLocation();
 
-  // Track page views with minimal overhead
+  // Track page views
   useEffect(() => {
-    // Defer tracking to avoid blocking render
-    const timer = setTimeout(() => {
-      trackPageView(location.pathname + location.search);
-    }, 100);
-    
-    return () => clearTimeout(timer);
+    trackPageView(location.pathname + location.search);
   }, [location]);
+
+  // Monitor Web Vitals (Core Web Vitals)
+  useWebVitals();
 
   return null;
 };
@@ -92,7 +88,7 @@ const App = () => (
         <BrowserRouter>
           <AnalyticsTracker />
           <Layout>
-            <Suspense fallback={<LoadingFallback />}>
+            <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
               <Routes>
                 {/* Pages VRAIMENT publiques (accessibles sans compte) */}
                 <Route path="/auth" element={<Auth />} />

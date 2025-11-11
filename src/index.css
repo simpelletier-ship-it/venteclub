@@ -163,7 +163,7 @@ All colors MUST be HSL.
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     font-size: 16px;
-    line-height: 1.5;
+    line-height: 1.6;
   }
   
   /* Prévenir CLS avec réservation d'espace pour les fonts */
@@ -179,49 +179,10 @@ All colors MUST be HSL.
     }
   }
   
-  /* Hiérarchie typographique professionnelle */
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Space Grotesk', 'Inter', sans-serif;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    line-height: 1.2;
-  }
-  
-  h1 {
-    @apply text-5xl md:text-6xl lg:text-7xl;
-    font-weight: 700;
-    letter-spacing: -0.03em;
-  }
-  
-  h2 {
-    @apply text-3xl md:text-4xl lg:text-5xl;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-  }
-  
-  h3 {
-    @apply text-2xl md:text-3xl lg:text-4xl;
+    font-family: 'Sora', 'Inter', sans-serif;
     font-weight: 600;
-  }
-  
-  h4 {
-    @apply text-xl md:text-2xl;
-    font-weight: 600;
-  }
-  
-  /* Espacement entre sections */
-  section {
-    @apply mb-24 lg:mb-32;
-  }
-  
-  section + section {
-    @apply mt-24 lg:mt-32;
-  }
-  
-  /* Espacement paragraphes */
-  p {
-    line-height: 1.6;
-    @apply mb-6;
+    letter-spacing: -0.02em;
   }
 }
 

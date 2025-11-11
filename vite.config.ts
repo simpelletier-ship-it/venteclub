@@ -119,16 +119,14 @@ export default defineConfig(({ mode }) => ({
     target: 'es2020',
     minify: 'terser',
     sourcemap: false,
-    chunkSizeWarningLimit: 1500,
+    chunkSizeWarningLimit: 1000,
     cssCodeSplit: true,
     terserOptions: {
       compress: {
         drop_console: true,
         drop_debugger: true,
-        passes: 3,
-        pure_funcs: ['console.log', 'console.info', 'console.debug', 'console.warn'],
-        dead_code: true,
-        unused: true,
+        passes: 2,
+        pure_funcs: ['console.log', 'console.info', 'console.debug'],
       },
       format: {
         comments: false,
@@ -205,9 +203,6 @@ export default defineConfig(({ mode }) => ({
     ],
     exclude: [
       'framer-motion',
-      'web-vitals',
-      '@tiptap/react',
-      'mapbox-gl',
     ],
   },
   publicDir: 'public',
