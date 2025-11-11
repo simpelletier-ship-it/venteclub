@@ -162,10 +162,11 @@ const Home = () => {
               </h1>
               
               <p className="text-lg sm:text-xl lg:text-2xl text-white/90 max-w-3xl leading-relaxed">
-                La plateforme de référence au Québec pour acquérir une entreprise établie
+                La plateforme de référence au Québec pour acquérir une entreprise établie. 
+                Découvrez des centaines d'opportunités d'affaires vérifiées et connectez directement avec les propriétaires dans un environnement transparent et professionnel.
               </p>
               
-              <div className="flex flex-col sm:flex-row gap-4 sm:gap-5 pt-16 sm:pt-20 lg:pt-24 mt-8">
+              <div className="flex flex-col sm:flex-row gap-4 sm:gap-5 pt-20 sm:pt-24 lg:pt-28 mt-10">
                 <Button 
                   size="lg" 
                   className="bg-[#6366f1] hover:bg-[#4f46e5] text-white h-14 sm:h-16 lg:h-[4.5rem] px-8 sm:px-10 lg:px-12 text-base sm:text-lg lg:text-xl font-semibold rounded-xl shadow-lg hover:shadow-2xl transition-all group w-full sm:w-auto"
