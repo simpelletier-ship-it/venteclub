@@ -227,20 +227,22 @@ export const CategoryManager = ({ isAuthenticated }: { isAuthenticated: boolean 
           <div className="flex gap-2">
             <Button
               variant="ghost"
-              size="sm"
+              size="icon"
               onClick={() => openEditDialog(category)}
+              title="Modifier"
             >
               <Pencil className="h-4 w-4" />
             </Button>
             {category.is_custom && (
               <Button
                 variant="ghost"
-                size="sm"
+                size="icon"
                 onClick={() => {
                   if (confirm(`Supprimer la catégorie "${category.name}" ?`)) {
                     deleteCategory.mutate(category.id);
                   }
                 }}
+                title="Supprimer"
               >
                 <Trash2 className="h-4 w-4 text-destructive" />
               </Button>

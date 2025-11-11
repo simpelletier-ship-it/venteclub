@@ -1,11 +1,25 @@
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 export const CreateDefaultCategories = () => {
   const queryClient = useQueryClient();
+
+  // Check if default categories already exist
+  const { data: existingCategories = [] } = useQuery({
+    queryKey: ['budget-categories-check-defaults'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('budget_categories')
+        .select('id, is_custom')
+        .eq('is_custom', false)
+        .limit(1);
+      if (error) throw error;
+      return data || [];
+    },
+  });
 
   const createDefaults = useMutation({
     mutationFn: async () => {
@@ -46,6 +60,11 @@ export const CreateDefaultCategories = () => {
       toast.error("Erreur lors de la création des catégories: " + error.message);
     },
   });
+
+  // Hide button if default categories already exist
+  if (existingCategories.length > 0) {
+    return null;
+  }
 
   return (
     <Button 

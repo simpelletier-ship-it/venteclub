@@ -1,12 +1,14 @@
 import { useState } from "react";
-import { Plus, TrendingDown, Zap, Sparkles } from "lucide-react";
+import { Plus, TrendingDown, Zap, Sparkles, Check, ChevronsUpDown } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { CurrencyInput } from "@/components/CurrencyInput";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator } from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -42,6 +44,7 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
   const [description, setDescription] = useState("");
   const [suggestedCategory, setSuggestedCategory] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [categoryOpen, setCategoryOpen] = useState(false);
   const [newCategoryOpen, setNewCategoryOpen] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
   const [newCategoryIcon, setNewCategoryIcon] = useState("🍔");
@@ -187,99 +190,143 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
             )}
           </div>
 
-          <Select 
-            value={selectedCategory || suggestedCategory || ""} 
-            onValueChange={setSelectedCategory}
-          >
-            <SelectTrigger className="h-11">
-              <SelectValue placeholder={suggestedCategory ? "✓ Catégorie suggérée" : "Catégorie"} />
-            </SelectTrigger>
-            <SelectContent>
-              {categories.map((cat: any) => (
-                <SelectItem key={cat.id} value={cat.id}>
-                  {cat.icon} {cat.name}
-                </SelectItem>
-              ))}
-              <Dialog open={newCategoryOpen} onOpenChange={setNewCategoryOpen}>
-                <DialogTrigger asChild>
-                  <Button variant="ghost" className="w-full justify-start mt-2 border-t">
-                    <Plus className="mr-2 h-4 w-4" />
-                    Nouvelle catégorie
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle className="flex items-center gap-2">
-                      <Sparkles className="h-5 w-5 text-primary" />
-                      Créer une catégorie
-                    </DialogTitle>
-                    <DialogDescription>
-                      Ajoutez une nouvelle catégorie personnalisée
-                    </DialogDescription>
-                  </DialogHeader>
-                  
-                  <div className="space-y-4 py-4">
-                    <div className="space-y-2">
-                      <Label>Nom de la catégorie</Label>
-                      <Input
-                        value={newCategoryName}
-                        onChange={(e) => setNewCategoryName(e.target.value)}
-                        placeholder="Ex: Restaurant, Essence..."
-                      />
-                    </div>
+          <Popover open={categoryOpen} onOpenChange={setCategoryOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                role="combobox"
+                aria-expanded={categoryOpen}
+                className="w-full justify-between h-11"
+              >
+                {(selectedCategory || suggestedCategory) 
+                  ? (() => {
+                      const cat = categories.find(c => c.id === (selectedCategory || suggestedCategory));
+                      return cat ? `${cat.icon} ${cat.name}` : "Sélectionner une catégorie...";
+                    })()
+                  : "🔍 Rechercher ou créer une catégorie..."
+                }
+                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-full p-0" align="start">
+              <Command>
+                <CommandInput placeholder="Rechercher une catégorie..." />
+                <CommandList>
+                  <CommandEmpty>Aucune catégorie trouvée.</CommandEmpty>
+                  <CommandGroup>
+                    {categories.map((cat: any) => (
+                      <CommandItem
+                        key={cat.id}
+                        value={cat.name}
+                        onSelect={() => {
+                          setSelectedCategory(cat.id);
+                          setCategoryOpen(false);
+                        }}
+                      >
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            (selectedCategory || suggestedCategory) === cat.id ? "opacity-100" : "opacity-0"
+                          )}
+                        />
+                        <span className="mr-2">{cat.icon}</span>
+                        {cat.name}
+                        {suggestedCategory === cat.id && !selectedCategory && (
+                          <span className="ml-auto text-xs text-muted-foreground">Suggérée</span>
+                        )}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                  <CommandSeparator />
+                  <CommandGroup>
+                    <CommandItem
+                      onSelect={() => {
+                        setCategoryOpen(false);
+                        setNewCategoryOpen(true);
+                      }}
+                    >
+                      <Plus className="mr-2 h-4 w-4" />
+                      Créer une nouvelle catégorie
+                    </CommandItem>
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
 
-                    <div className="space-y-2">
-                      <Label>Icône</Label>
-                      <div className="grid grid-cols-8 gap-2">
-                        {EMOJI_OPTIONS.map((emoji) => (
-                          <Button
-                            key={emoji}
-                            type="button"
-                            variant={newCategoryIcon === emoji ? "default" : "outline"}
-                            className="h-10 w-10 p-0 text-xl"
-                            onClick={() => setNewCategoryIcon(emoji)}
-                          >
-                            {emoji}
-                          </Button>
-                        ))}
-                      </div>
-                    </div>
+          {/* Dialog for creating new category */}
+          <Dialog open={newCategoryOpen} onOpenChange={setNewCategoryOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-primary" />
+                  Créer une catégorie
+                </DialogTitle>
+                <DialogDescription>
+                  Ajoutez une nouvelle catégorie personnalisée
+                </DialogDescription>
+              </DialogHeader>
+              
+              <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <Label>Nom de la catégorie</Label>
+                  <Input
+                    value={newCategoryName}
+                    onChange={(e) => setNewCategoryName(e.target.value)}
+                    placeholder="Ex: Restaurant, Essence..."
+                  />
+                </div>
 
-                    <div className="space-y-2">
-                      <Label>Couleur</Label>
-                      <div className="grid grid-cols-8 gap-2">
-                        {COLOR_OPTIONS.map((color) => (
-                          <Button
-                            key={color}
-                            type="button"
-                            variant="outline"
-                            className="h-10 w-10 p-0 relative"
-                            onClick={() => setNewCategoryColor(color)}
-                          >
-                            <div 
-                              className="absolute inset-1 rounded"
-                              style={{ backgroundColor: color }}
-                            />
-                            {newCategoryColor === color && (
-                              <span className="absolute inset-0 flex items-center justify-center text-white">✓</span>
-                            )}
-                          </Button>
-                        ))}
-                      </div>
-                    </div>
+                <div className="space-y-2">
+                  <Label>Icône</Label>
+                  <div className="grid grid-cols-8 gap-2">
+                    {EMOJI_OPTIONS.map((emoji) => (
+                      <Button
+                        key={emoji}
+                        type="button"
+                        variant={newCategoryIcon === emoji ? "default" : "outline"}
+                        className="h-10 w-10 p-0 text-xl"
+                        onClick={() => setNewCategoryIcon(emoji)}
+                      >
+                        {emoji}
+                      </Button>
+                    ))}
                   </div>
+                </div>
 
-                  <Button 
-                    onClick={() => createCategory.mutate()}
-                    disabled={createCategory.isPending || !newCategoryName.trim()}
-                    className="w-full"
-                  >
-                    {createCategory.isPending ? "Création..." : "Créer la catégorie"}
-                  </Button>
-                </DialogContent>
-              </Dialog>
-            </SelectContent>
-          </Select>
+                <div className="space-y-2">
+                  <Label>Couleur</Label>
+                  <div className="grid grid-cols-8 gap-2">
+                    {COLOR_OPTIONS.map((color) => (
+                      <Button
+                        key={color}
+                        type="button"
+                        variant="outline"
+                        className="h-10 w-10 p-0 relative"
+                        onClick={() => setNewCategoryColor(color)}
+                      >
+                        <div 
+                          className="absolute inset-1 rounded"
+                          style={{ backgroundColor: color }}
+                        />
+                        {newCategoryColor === color && (
+                          <span className="absolute inset-0 flex items-center justify-center text-white">✓</span>
+                        )}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <Button 
+                onClick={() => createCategory.mutate()}
+                disabled={createCategory.isPending || !newCategoryName.trim()}
+                className="w-full"
+              >
+                {createCategory.isPending ? "Création..." : "Créer la catégorie"}
+              </Button>
+            </DialogContent>
+          </Dialog>
 
           <Button 
             className="w-full h-12 text-base"
