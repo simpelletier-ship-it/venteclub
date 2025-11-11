@@ -162,7 +162,7 @@ const Home = () => {
               </p>
               
               {/* Credibility Line */}
-              <div className="flex items-center justify-center gap-4 sm:gap-6 text-white/90 text-xs sm:text-sm pt-2">
+              <div className="flex items-center gap-4 sm:gap-6 text-white/90 text-xs sm:text-sm pt-2">
                 <div className="flex items-center gap-1.5">
                   <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-green-500/20 flex items-center justify-center">
                     <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -212,7 +212,7 @@ const Home = () => {
           </div>
           
           {/* Floating Animation - Positioned Absolutely */}
-          <div className="hidden xl:block absolute left-[66%] top-[68%] -translate-y-1/2 w-[400px] pointer-events-none">
+          <div className="hidden xl:block absolute left-[66%] top-[55%] -translate-y-1/2 w-[400px] pointer-events-none">
             <FloatingOpportunities />
           </div>
         </div>
