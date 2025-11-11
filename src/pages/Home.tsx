@@ -143,7 +143,7 @@ const Home = () => {
       />
       
       {/* Hero Section */}
-      <section className="relative min-h-[70vh] sm:min-h-[75vh] lg:min-h-[80vh] flex items-center bg-gradient-to-br from-[#1e1b4b] via-[#312e81] to-[#1e3a8a] overflow-hidden pb-0" aria-label="Section principale">
+      <section className="relative min-h-[70vh] sm:min-h-[75vh] lg:min-h-[80vh] flex items-center bg-gradient-to-br from-[#1e1b4b] via-[#312e81] to-[#1e3a8a] overflow-hidden" aria-label="Section principale">
         {/* Circuit Background */}
         <CircuitBackground />
         
@@ -156,7 +156,7 @@ const Home = () => {
         
         <div className="container mx-auto px-4 py-8 sm:py-10 lg:py-14 relative z-10">
           <div className="max-w-6xl mx-auto">
-            <div className="space-y-6 sm:space-y-7 lg:space-y-8 animate-slide-up">
+            <div className="space-y-6 sm:space-y-7 lg:space-y-8 animate-slide-up mb-12 sm:mb-16 lg:mb-20">
               <div className="space-y-4">
                 <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-display font-bold leading-[1.15] tracking-tight text-white">
                   Achetez ou vendez<br /><TypewriterAnimation />
@@ -218,11 +218,10 @@ const Home = () => {
             <FloatingOpportunities />
           </div>
         </div>
-        
       </section>
 
       {/* Statistics Section */}
-      <section className="pt-0 pb-6 sm:pb-8 lg:pb-10 bg-[#1e1b4b]" aria-label="Statistiques de la plateforme">
+      <section className="py-6 sm:py-8 lg:py-10 bg-[#1e1b4b]" aria-label="Statistiques de la plateforme">
         <div className="container mx-auto px-4">
           <h2 className="text-xl sm:text-2xl font-bold text-center mb-5 text-white">La plateforme de confiance au Québec</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-5 max-w-4xl mx-auto">
