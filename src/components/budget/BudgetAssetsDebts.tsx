@@ -50,6 +50,7 @@ export const BudgetAssetsDebts = () => {
   const [debtInterestRate, setDebtInterestRate] = useState("");
   const [debtMinPayment, setDebtMinPayment] = useState("");
   const [debtFrequency, setDebtFrequency] = useState("monthly");
+  const [debtDueDate, setDebtDueDate] = useState("");
   const [debtNotes, setDebtNotes] = useState("");
 
   // Fetch assets
@@ -122,6 +123,7 @@ export const BudgetAssetsDebts = () => {
           interest_rate: parseFloat(debtInterestRate),
           minimum_payment: debtMinPayment ? parseFloat(debtMinPayment) : null,
           payment_frequency: debtFrequency,
+          due_date: debtDueDate || null,
           notes: debtNotes || null,
         });
 
@@ -172,6 +174,7 @@ export const BudgetAssetsDebts = () => {
     setDebtInterestRate("");
     setDebtMinPayment("");
     setDebtFrequency("monthly");
+    setDebtDueDate("");
     setDebtNotes("");
   };
 
@@ -374,6 +377,15 @@ export const BudgetAssetsDebts = () => {
                     </Select>
                   </div>
                   <div>
+                    <Label>Date d'échéance (optionnel)</Label>
+                    <Input 
+                      type="date" 
+                      value={debtDueDate} 
+                      onChange={(e) => setDebtDueDate(e.target.value)} 
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
                     <Label>Notes (optionnel)</Label>
                     <Textarea value={debtNotes} onChange={(e) => setDebtNotes(e.target.value)} className="mt-1" rows={2} />
                   </div>
@@ -413,6 +425,9 @@ export const BudgetAssetsDebts = () => {
                     <div className="text-sm text-muted-foreground mt-1">Taux: {debt.interest_rate}%</div>
                     {debt.minimum_payment && (
                       <div className="text-sm text-muted-foreground">Paiement min: {formatPrice(debt.minimum_payment)}</div>
+                    )}
+                    {debt.due_date && (
+                      <div className="text-sm text-muted-foreground">Échéance: {new Date(debt.due_date).toLocaleDateString('fr-CA')}</div>
                     )}
                     {debt.notes && <p className="text-sm text-muted-foreground mt-2">{debt.notes}</p>}
                   </CardContent>

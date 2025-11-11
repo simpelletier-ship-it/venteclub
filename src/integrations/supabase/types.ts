@@ -1454,6 +1454,7 @@ export type Database = {
           balance: number
           created_at: string
           currency: string | null
+          due_date: string | null
           id: string
           interest_rate: number
           minimum_payment: number | null
@@ -1468,6 +1469,7 @@ export type Database = {
           balance: number
           created_at?: string
           currency?: string | null
+          due_date?: string | null
           id?: string
           interest_rate: number
           minimum_payment?: number | null
@@ -1482,6 +1484,7 @@ export type Database = {
           balance?: number
           created_at?: string
           currency?: string | null
+          due_date?: string | null
           id?: string
           interest_rate?: number
           minimum_payment?: number | null
