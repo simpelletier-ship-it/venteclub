@@ -143,7 +143,7 @@ const Home = () => {
       />
       
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-[#1e1b4b] via-[#312e81] to-[#1e3a8a] overflow-hidden pt-12 sm:pt-16 lg:pt-20 pb-12 sm:pb-16 lg:pb-20" aria-label="Section principale">
+      <section className="relative bg-gradient-to-br from-[#1e1b4b] via-[#312e81] to-[#1e3a8a] overflow-hidden pt-12 sm:pt-16 lg:pt-20 pb-0" aria-label="Section principale">
         {/* Circuit Background */}
         <CircuitBackground />
         
@@ -193,7 +193,7 @@ const Home = () => {
                 </div>
               </div>
               
-              <div className="flex flex-col sm:flex-row gap-4 sm:gap-5 pt-8 sm:pt-10 lg:pt-12">
+              <div className="flex flex-col sm:flex-row gap-4 sm:gap-5 pt-8 sm:pt-10 lg:pt-12 pb-8 sm:pb-10 lg:pb-12">
                 <Button 
                   size="lg" 
                   className="bg-[#6366f1] hover:bg-[#4f46e5] text-white h-14 sm:h-16 lg:h-[4.5rem] px-8 sm:px-10 lg:px-12 text-base sm:text-lg lg:text-xl font-bold rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 group w-full sm:w-auto"
@@ -221,7 +221,7 @@ const Home = () => {
       </section>
 
       {/* Statistics Section */}
-      <section className="py-8 sm:py-10 lg:py-12 bg-[#1e1b4b]" aria-label="Statistiques de la plateforme">
+      <section className="pt-8 pb-8 sm:pt-10 sm:pb-10 lg:pt-12 lg:pb-12 bg-[#1e1b4b]" aria-label="Statistiques de la plateforme">
         <div className="container mx-auto px-4">
           <h2 className="text-xl sm:text-2xl font-bold text-center mb-5 text-white">La plateforme de confiance au Québec</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-5 max-w-4xl mx-auto">
