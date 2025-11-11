@@ -15,6 +15,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import confetti from "canvas-confetti";
 import { TransactionsCalendar } from "./TransactionsCalendar";
+import { CreateDefaultCategories } from "./CreateDefaultCategories";
 
 interface Category {
   id: string;
@@ -79,8 +80,11 @@ export const BudgetTransactions = ({ isAuthenticated }: { isAuthenticated: boole
       
       if (error) throw error;
       
-      // Check if user has default categories (is_custom = false)
-      const hasDefaultCategories = data && data.some(cat => cat.is_custom === false);
+      // Check if user has specific default categories (check by name)
+      const defaultCategoryNames = ["Salaire", "Logement", "Alimentation", "Transport"];
+      const hasDefaultCategories = data && defaultCategoryNames.some(name => 
+        data.some(cat => cat.name === name && cat.is_custom === false)
+      );
       
       // Create default categories if user doesn't have them yet
       if (!hasDefaultCategories) {
@@ -110,14 +114,21 @@ export const BudgetTransactions = ({ isAuthenticated }: { isAuthenticated: boole
 
         if (insertError) {
           console.error("Error creating default categories:", insertError);
+          // Return existing data if insert fails
+          return data as Category[];
         }
         
         // Re-fetch all categories (default + custom)
-        const { data: newData } = await supabase
+        const { data: newData, error: refetchError } = await supabase
           .from('budget_categories')
           .select('*')
           .order('type', { ascending: true })
           .order('name', { ascending: true });
+        
+        if (refetchError) {
+          console.error("Error refetching categories:", refetchError);
+          return data as Category[];
+        }
         
         return newData as Category[];
       }
@@ -336,6 +347,8 @@ export const BudgetTransactions = ({ isAuthenticated }: { isAuthenticated: boole
       </div>
 
       <div className="flex items-center justify-end flex-wrap gap-2">
+        <CreateDefaultCategories />
+        
         <Dialog open={categoryDialogOpen} onOpenChange={setCategoryDialogOpen}>
             <DialogTrigger asChild>
               <Button variant="outline">
