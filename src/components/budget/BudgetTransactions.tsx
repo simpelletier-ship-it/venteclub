@@ -33,6 +33,12 @@ export const BudgetTransactions = ({ isAuthenticated }: { isAuthenticated: boole
   const [recurringFrequency, setRecurringFrequency] = useState("monthly");
   const [searchQuery, setSearchQuery] = useState("");
   
+  // Advanced filters
+  const [filterType, setFilterType] = useState<'all' | 'income' | 'expense'>('all');
+  const [filterCategory, setFilterCategory] = useState<string>('all');
+  const [filterDateStart, setFilterDateStart] = useState("");
+  const [filterDateEnd, setFilterDateEnd] = useState("");
+  
   // States for adding custom categories
   const [categoryDialogOpen, setCategoryDialogOpen] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
@@ -234,15 +240,49 @@ export const BudgetTransactions = ({ isAuthenticated }: { isAuthenticated: boole
   const incomeCategories = categories.filter(c => c.type === 'income');
   const expenseCategories = categories.filter(c => c.type === 'expense');
 
-  // Filter transactions based on search query
+  // Filter transactions based on search query and advanced filters
   const filteredTransactions = transactions.filter(transaction => {
-    if (!searchQuery) return true;
-    const query = searchQuery.toLowerCase();
-    const categoryName = transaction.category?.name?.toLowerCase() || '';
-    const desc = transaction.description?.toLowerCase() || '';
-    const amount = transaction.amount?.toString() || '';
-    return categoryName.includes(query) || desc.includes(query) || amount.includes(query);
+    // Search filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      const categoryName = transaction.category?.name?.toLowerCase() || '';
+      const desc = transaction.description?.toLowerCase() || '';
+      const amount = transaction.amount?.toString() || '';
+      if (!categoryName.includes(query) && !desc.includes(query) && !amount.includes(query)) {
+        return false;
+      }
+    }
+
+    // Type filter
+    if (filterType !== 'all' && transaction.type !== filterType) {
+      return false;
+    }
+
+    // Category filter
+    if (filterCategory !== 'all' && transaction.category_id !== filterCategory) {
+      return false;
+    }
+
+    // Date range filter
+    if (filterDateStart && transaction.transaction_date < filterDateStart) {
+      return false;
+    }
+    if (filterDateEnd && transaction.transaction_date > filterDateEnd) {
+      return false;
+    }
+
+    return true;
   });
+
+  const resetFilters = () => {
+    setSearchQuery("");
+    setFilterType('all');
+    setFilterCategory('all');
+    setFilterDateStart("");
+    setFilterDateEnd("");
+  };
+
+  const hasActiveFilters = searchQuery || filterType !== 'all' || filterCategory !== 'all' || filterDateStart || filterDateEnd;
 
   const commonEmojis = ["💼", "💰", "🏠", "🍽️", "🚗", "🎬", "🏥", "📚", "💡", "🛡️", "👕", "💳", "✈️", "🎮", "📱", "💻", "🎯", "🎨", "🏋️", "🛒"];
 
@@ -456,7 +496,7 @@ export const BudgetTransactions = ({ isAuthenticated }: { isAuthenticated: boole
           <CardDescription>Vos 50 dernières transactions</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="mb-4">
+          <div className="space-y-4 mb-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
@@ -467,6 +507,85 @@ export const BudgetTransactions = ({ isAuthenticated }: { isAuthenticated: boole
                 className="pl-9"
               />
             </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+              <div>
+                <Label className="text-xs text-muted-foreground">Type</Label>
+                <Select value={filterType} onValueChange={(v) => setFilterType(v as any)}>
+                  <SelectTrigger className="mt-1">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Tous</SelectItem>
+                    <SelectItem value="income">💰 Revenus</SelectItem>
+                    <SelectItem value="expense">💳 Dépenses</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label className="text-xs text-muted-foreground">Catégorie</Label>
+                <Select value={filterCategory} onValueChange={setFilterCategory}>
+                  <SelectTrigger className="mt-1">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Toutes</SelectItem>
+                    {incomeCategories.length > 0 && (
+                      <>
+                        <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">Revenus</div>
+                        {incomeCategories.map(cat => (
+                          <SelectItem key={cat.id} value={cat.id}>
+                            {cat.icon} {cat.name}
+                          </SelectItem>
+                        ))}
+                      </>
+                    )}
+                    {expenseCategories.length > 0 && (
+                      <>
+                        <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">Dépenses</div>
+                        {expenseCategories.map(cat => (
+                          <SelectItem key={cat.id} value={cat.id}>
+                            {cat.icon} {cat.name}
+                          </SelectItem>
+                        ))}
+                      </>
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label className="text-xs text-muted-foreground">Date début</Label>
+                <Input
+                  type="date"
+                  value={filterDateStart}
+                  onChange={(e) => setFilterDateStart(e.target.value)}
+                  className="mt-1"
+                />
+              </div>
+
+              <div>
+                <Label className="text-xs text-muted-foreground">Date fin</Label>
+                <Input
+                  type="date"
+                  value={filterDateEnd}
+                  onChange={(e) => setFilterDateEnd(e.target.value)}
+                  className="mt-1"
+                />
+              </div>
+            </div>
+
+            {hasActiveFilters && (
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-muted-foreground">
+                  {filteredTransactions.length} transaction{filteredTransactions.length > 1 ? 's' : ''} trouvée{filteredTransactions.length > 1 ? 's' : ''}
+                </p>
+                <Button variant="ghost" size="sm" onClick={resetFilters}>
+                  Réinitialiser les filtres
+                </Button>
+              </div>
+            )}
           </div>
           
           <div className="space-y-2">
