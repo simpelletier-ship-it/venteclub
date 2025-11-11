@@ -225,7 +225,8 @@ const SalaryCalculator = () => {
     }
   };
 
-  const results = calculateTax(getAnnualSalary());
+  const annualSalary = getAnnualSalary();
+  const results = calculateTax(annualSalary);
 
   const getPeriodValue = (annualValue: number) => {
     switch (period) {
@@ -242,6 +243,35 @@ const SalaryCalculator = () => {
         return annualValue;
     }
   };
+  
+  // Debug logs pour vérifier les calculs
+  console.log('=== Calculateur Salaire Debug ===');
+  console.log('Période:', period);
+  console.log('Salaire saisi:', grossSalary);
+  console.log('Salaire annuel calculé:', annualSalary);
+  console.log('Province:', province);
+  console.log('Résultats annuels:', {
+    gross: results.gross,
+    federalTax: results.federalTax,
+    provincialTax: results.provincialTax,
+    cppContribution: results.cppContribution,
+    eiContribution: results.eiContribution,
+    qpipContribution: results.qpipContribution,
+    totalTax: results.totalTax,
+    netIncome: results.netIncome
+  });
+  if (period === 'hourly') {
+    console.log('Résultats horaires:', {
+      gross: getPeriodValue(results.gross),
+      qpip: getPeriodValue(results.qpipContribution),
+      cpp: getPeriodValue(results.cppContribution),
+      ei: getPeriodValue(results.eiContribution),
+      federalTax: getPeriodValue(results.federalTax),
+      provincialTax: getPeriodValue(results.provincialTax),
+      totalTax: getPeriodValue(results.totalTax),
+      net: getPeriodValue(results.netIncome)
+    });
+  }
 
   const chartData = [
     { name: "Salaire net", value: results.netIncome, color: "#10b981" },
