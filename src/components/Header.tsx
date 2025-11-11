@@ -14,6 +14,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getAvatarUrl } from "@/lib/avatarUtils";
 import { LayoutDashboard, Settings, LogOut, Menu, Sparkles, Mail } from "lucide-react";
 import { NotificationBell } from "./NotificationBell";
+import { ThemeToggle } from "./ThemeToggle";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -181,6 +182,7 @@ const Header = () => {
 
           {/* Right Side Actions */}
           <div className="flex items-center gap-2">
+            <ThemeToggle />
             {user && <NotificationBell userId={user.id} />}
             
             {isAdmin && (

@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import Header from "./Header";
 import { Footer } from "./Footer";
 import { ScrollToTop } from "./ScrollToTop";
+import { MobileBottomNav } from "./MobileBottomNav";
 import { AlertCircle } from "lucide-react";
 
 interface LayoutProps {
@@ -15,6 +16,7 @@ export const Layout = ({ children }: LayoutProps) => {
       <main className="flex-1">{children}</main>
       <Footer />
       <ScrollToTop />
+      <MobileBottomNav />
     </div>
   );
 };

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import BusinessCard from "@/components/BusinessCard";
 import BusinessListItem from "@/components/BusinessListItem";
 import FilterBar from "@/components/FilterBar";
+import { BusinessCardSkeleton } from "@/components/BusinessCardSkeleton";
 import { ArrowRight, Grid3x3, List, TrendingUp, Sparkles, Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { SEO } from "@/components/SEO";
@@ -18,6 +19,7 @@ const Businesses = () => {
   const [allBusinesses, setAllBusinesses] = useState<any[]>([]);
   const [filteredBusinesses, setFilteredBusinesses] = useState<any[]>([]);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
+  const [loading, setLoading] = useState(true);
   const scrollY = useScrollParallax();
   
   useEffect(() => {
@@ -26,6 +28,7 @@ const Businesses = () => {
 
   const fetchBusinesses = async () => {
     try {
+      setLoading(true);
       // Fetch only the columns we need for display (NO photos)
       const { data: businesses } = await supabase
         .from('businesses')
@@ -48,6 +51,8 @@ const Businesses = () => {
       }
     } catch (error) {
       console.error('[FETCH-BUSINESSES] Error:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -218,7 +223,18 @@ const Businesses = () => {
           </div>
 
           <div className={viewMode === 'grid' ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8" : "space-y-3 sm:space-y-4"}>
-            {filteredBusinesses.length > 0 ? (
+            {loading ? (
+              // Skeletons pendant le chargement
+              viewMode === 'grid' ? (
+                Array.from({ length: 9 }).map((_, i) => (
+                  <BusinessCardSkeleton key={`skeleton-${i}`} />
+                ))
+              ) : (
+                Array.from({ length: 6 }).map((_, i) => (
+                  <div key={`skeleton-list-${i}`} className="h-48 rounded-xl bg-muted animate-pulse" />
+                ))
+              )
+            ) : filteredBusinesses.length > 0 ? (
               filteredBusinesses.map((business) => 
                 viewMode === 'grid' ? (
                   <BusinessCard key={business.id} {...business} />

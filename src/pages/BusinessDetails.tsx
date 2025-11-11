@@ -23,6 +23,8 @@ import { MakeOfferDialog } from "@/components/MakeOfferDialog";
 import { ConversationLimitAlert } from "@/components/ConversationLimitAlert";
 import { PremiumUpgradeModal } from "@/components/PremiumUpgradeModal";
 import { sanitizeHtml } from "@/lib/htmlUtils";
+import { BusinessDetailsSkeleton } from "@/components/BusinessDetailsSkeleton";
+import { SellerProfileCard } from "@/components/SellerProfileCard";
 
 const BusinessDetails = () => {
   const { slug } = useParams();

@@ -192,18 +192,24 @@ const BusinessCard = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      whileHover={{ y: -5 }}
+      whileHover={{ y: -8, scale: 1.01 }}
+      whileTap={{ scale: 0.98 }}
       className="h-full"
       data-business-id={id}
     >
       <Card
         className={`group relative overflow-hidden card-premium border-border/50 h-full flex flex-col transition-all duration-500 ${
-          status !== 'sold' ? 'hover:shadow-premium hover:border-primary/50 hover:shadow-primary/10 cursor-pointer' : 'cursor-default'
+          status !== 'sold' ? 'hover:shadow-premium hover:border-primary/50 hover:shadow-primary/20 cursor-pointer' : 'cursor-default'
         } ${featured ? 'ring-2 ring-primary/40 shadow-lg shadow-primary/20' : ''}`}
         onClick={handleClick}
       >
-        {/* Gradient overlay on hover */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-[1]" />
+        {/* Enhanced gradient overlay on hover */}
+        <motion.div 
+          className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent/10 pointer-events-none z-[1]" 
+          initial={{ opacity: 0 }}
+          whileHover={{ opacity: 1 }}
+          transition={{ duration: 0.3 }}
+        />
         
         {/* Image principale seulement */}
         <div className="relative w-full h-56 sm:h-64 overflow-hidden bg-muted">
@@ -335,12 +341,16 @@ const BusinessCard = ({
             </div>
             <motion.h3 
               className={`text-xl sm:text-2xl font-display font-bold text-foreground transition-colors line-clamp-2 leading-tight ${status === 'sold' ? 'blur-[0.5px]' : ''}`}
+              initial={{ x: 0 }}
               whileHover={{ x: 3 }}
-              transition={{ type: "spring", stiffness: 300 }}
+              transition={{ type: "spring", stiffness: 400, damping: 20 }}
             >
-              <span className="relative group-hover:text-primary transition-colors duration-300">
+              <motion.span 
+                className="relative group-hover:text-primary transition-colors duration-300"
+                whileHover={{ scale: 1.02 }}
+              >
                 {title}
-              </span>
+              </motion.span>
             </motion.h3>
             <div className="flex items-center gap-1.5 text-muted-foreground text-sm">
               <MapPin className="w-3.5 h-3.5" />

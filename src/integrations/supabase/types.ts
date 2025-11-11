@@ -912,8 +912,13 @@ export type Database = {
           phone: string | null
           postal_code: string | null
           province: string | null
+          response_time_hours: number | null
+          seller_since: string | null
+          specialties: string[] | null
           street_address: string | null
+          total_responses: number | null
           updated_at: string | null
+          verified_seller: boolean | null
           website: string | null
         }
         Insert: {
@@ -943,8 +948,13 @@ export type Database = {
           phone?: string | null
           postal_code?: string | null
           province?: string | null
+          response_time_hours?: number | null
+          seller_since?: string | null
+          specialties?: string[] | null
           street_address?: string | null
+          total_responses?: number | null
           updated_at?: string | null
+          verified_seller?: boolean | null
           website?: string | null
         }
         Update: {
@@ -974,8 +984,13 @@ export type Database = {
           phone?: string | null
           postal_code?: string | null
           province?: string | null
+          response_time_hours?: number | null
+          seller_since?: string | null
+          specialties?: string[] | null
           street_address?: string | null
+          total_responses?: number | null
           updated_at?: string | null
+          verified_seller?: boolean | null
           website?: string | null
         }
         Relationships: []
@@ -1117,6 +1132,45 @@ export type Database = {
           seller_id?: string
         }
         Relationships: []
+      }
+      seller_response_stats: {
+        Row: {
+          created_at: string | null
+          id: string
+          message_id: string | null
+          response_time_minutes: number
+          seller_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          message_id?: string | null
+          response_time_minutes: number
+          seller_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          message_id?: string | null
+          response_time_minutes?: number
+          seller_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seller_response_stats_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "messages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "seller_response_stats_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       subscription_plans: {
         Row: {
@@ -1369,6 +1423,10 @@ export type Database = {
         Returns: undefined
       }
       archive_old_sold_businesses: { Args: never; Returns: undefined }
+      calculate_average_response_time: {
+        Args: { seller_uuid: string }
+        Returns: number
+      }
       can_start_conversation: {
         Args: { p_business_id: string; p_user_id: string }
         Returns: Json

@@ -10,6 +10,7 @@ import { EmailVerificationGuard } from "@/components/EmailVerificationGuard";
 import { trackPageView } from "@/lib/analytics";
 import { useWebVitals } from "@/hooks/usePerformanceMonitoring";
 import { MobileNotificationsContainer } from "@/components/MobileNotificationsContainer";
+import { ThemeProvider } from "next-themes";
 
 // Critical pages loaded immediately
 import Home from "./pages/Home";
@@ -80,16 +81,17 @@ const AnalyticsTracker = () => {
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <AuthProvider>
-        <Toaster />
-        <Sonner />
-        <MobileNotificationsContainer />
-        <BrowserRouter>
-          <AnalyticsTracker />
-          <Layout>
-            <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
-              <Routes>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <TooltipProvider>
+        <AuthProvider>
+          <Toaster />
+          <Sonner />
+          <MobileNotificationsContainer />
+          <BrowserRouter>
+            <AnalyticsTracker />
+            <Layout>
+              <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
+                <Routes>
                 {/* Pages VRAIMENT publiques (accessibles sans compte) */}
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
@@ -141,6 +143,7 @@ const App = () => (
         </BrowserRouter>
       </AuthProvider>
     </TooltipProvider>
+    </ThemeProvider>
   </QueryClientProvider>
 );
 

@@ -13,6 +13,8 @@ import { QUEBEC_INDUSTRIES, LISTING_TYPES } from "@/lib/constants";
 import { QUEBEC_REGIONS, getCitiesFromRegions } from "@/lib/quebecRegions";
 import { formatPrice } from "@/lib/priceFormat";
 import { ChevronDown, X } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { MobileFiltersSheet } from "./MobileFiltersSheet";
 
 interface FilterBarProps {
   onFilter?: (filters: { 
@@ -27,6 +29,7 @@ interface FilterBarProps {
 }
 
 const FilterBar = ({ onFilter, accentColor = 'purple' }: FilterBarProps) => {
+  const isMobile = useIsMobile();
   const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
   const [selectedIndustries, setSelectedIndustries] = useState<string[]>([]);
   const [selectedListingTypes, setSelectedListingTypes] = useState<string[]>([]);
@@ -94,6 +97,30 @@ const FilterBar = ({ onFilter, accentColor = 'purple' }: FilterBarProps) => {
       onFilter({});
     }
   };
+
+  // Si mobile, afficher seulement le bouton qui ouvre le sheet
+  if (isMobile) {
+    return (
+      <div className="w-full max-w-5xl mx-auto bg-card rounded-xl shadow-elegant p-4 border border-border">
+        <MobileFiltersSheet
+          selectedRegions={selectedRegions}
+          selectedIndustries={selectedIndustries}
+          selectedListingTypes={selectedListingTypes}
+          priceRange={priceRange}
+          onRegionToggle={toggleRegion}
+          onIndustryToggle={toggleIndustry}
+          onListingTypeToggle={toggleListingType}
+          onPriceChange={setPriceRange}
+          onApply={handleFilter}
+          onReset={handleReset}
+          accentColor={accentColor}
+        />
+        <p className="text-sm text-muted-foreground mt-3 text-center">
+          Affinez votre recherche par type, régions, secteurs ou fourchette de prix
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-5xl mx-auto bg-card rounded-xl sm:rounded-2xl shadow-elegant p-4 sm:p-6 border border-border">
