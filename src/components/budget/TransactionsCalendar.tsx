@@ -56,36 +56,8 @@ export const TransactionsCalendar = ({ transactions, categories }: TransactionsC
     .filter(t => t.type === 'expense')
     .reduce((sum, t) => sum + t.amount, 0);
 
-  // Custom day content with transaction indicators
-  const renderDay = (date: Date) => {
-    const dateStr = format(date, 'yyyy-MM-dd');
-    const dayTransactions = transactionsByDate[dateStr] || [];
-    
-    if (dayTransactions.length === 0) {
-      return <div className="w-full h-full flex items-center justify-center">{date.getDate()}</div>;
-    }
-
-    // Get unique categories for this day
-    const uniqueCategories = Array.from(new Set(dayTransactions.map(t => t.category_id)))
-      .map(catId => categories.find(c => c.id === catId))
-      .filter(Boolean)
-      .slice(0, 3); // Show max 3 category indicators
-
-    return (
-      <div className="w-full h-full flex flex-col items-center justify-center gap-0.5">
-        <div className="font-medium">{date.getDate()}</div>
-        <div className="flex gap-0.5">
-          {uniqueCategories.map((cat, idx) => (
-            <div
-              key={idx}
-              className="w-1.5 h-1.5 rounded-full"
-              style={{ backgroundColor: cat?.color }}
-            />
-          ))}
-        </div>
-      </div>
-    );
-  };
+  // Mark days that have transactions
+  const daysWithTransactions = Object.keys(transactionsByDate).map(dateStr => new Date(dateStr));
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -101,8 +73,11 @@ export const TransactionsCalendar = ({ transactions, categories }: TransactionsC
             onSelect={setSelectedDate}
             locale={fr}
             className={cn("rounded-md border pointer-events-auto")}
-            components={{
-              Day: ({ date }) => renderDay(date)
+            modifiers={{
+              hasTransactions: daysWithTransactions
+            }}
+            modifiersClassNames={{
+              hasTransactions: "font-bold text-primary relative after:content-[''] after:absolute after:bottom-1 after:left-1/2 after:-translate-x-1/2 after:w-1 after:h-1 after:rounded-full after:bg-primary"
             }}
           />
 
