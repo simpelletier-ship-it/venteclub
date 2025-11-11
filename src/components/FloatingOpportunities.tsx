@@ -146,7 +146,7 @@ export const FloatingOpportunities = () => {
         </div>
 
         {/* Carousel Indicators */}
-        <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
+        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
           {opportunities.map((_, index) => (
             <div
               key={index}
