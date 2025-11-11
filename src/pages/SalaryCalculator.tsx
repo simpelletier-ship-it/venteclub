@@ -16,69 +16,126 @@ const PROVINCES = [
   { value: "AB", label: "Alberta" },
 ];
 
-// Taux 2025 pour le Québec
-const TAX_RATES_QC = {
-  federal: [
-    { max: 55867, rate: 0.15 },
-    { max: 111733, rate: 0.205 },
-    { max: 173205, rate: 0.26 },
-    { max: 246752, rate: 0.29 },
-    { max: Infinity, rate: 0.33 }
-  ],
-  provincial: [
-    { max: 51780, rate: 0.14 },
-    { max: 103545, rate: 0.19 },
-    { max: 126000, rate: 0.24 },
-    { max: Infinity, rate: 0.2575 }
-  ],
-  cpp: { rate: 0.0595, max: 68500, exemption: 3500 },
-  ei: { rate: 0.0127, max: 63200 },
-  qpip: { rate: 0.00494, max: 94000 }
+// Taux d'imposition fédéraux 2025 (communs à toutes les provinces)
+const FEDERAL_TAX_BRACKETS = [
+  { max: 55867, rate: 0.15 },
+  { max: 111733, rate: 0.205 },
+  { max: 173205, rate: 0.26 },
+  { max: 246752, rate: 0.29 },
+  { max: Infinity, rate: 0.33 }
+];
+
+// Taux provinciaux 2025
+const PROVINCIAL_TAX_RATES: Record<string, any> = {
+  QC: {
+    brackets: [
+      { max: 51780, rate: 0.14 },
+      { max: 103545, rate: 0.19 },
+      { max: 126000, rate: 0.24 },
+      { max: Infinity, rate: 0.2575 }
+    ],
+    qpip: { rate: 0.00494, max: 94000 }
+  },
+  ON: {
+    brackets: [
+      { max: 51446, rate: 0.0505 },
+      { max: 102894, rate: 0.0915 },
+      { max: 150000, rate: 0.1116 },
+      { max: 220000, rate: 0.1216 },
+      { max: Infinity, rate: 0.1316 }
+    ]
+  },
+  BC: {
+    brackets: [
+      { max: 47937, rate: 0.0506 },
+      { max: 95875, rate: 0.077 },
+      { max: 110076, rate: 0.105 },
+      { max: 133664, rate: 0.1229 },
+      { max: 181232, rate: 0.147 },
+      { max: Infinity, rate: 0.168 }
+    ]
+  },
+  AB: {
+    brackets: [
+      { max: 148269, rate: 0.10 },
+      { max: 177922, rate: 0.12 },
+      { max: 237230, rate: 0.13 },
+      { max: 355845, rate: 0.14 },
+      { max: Infinity, rate: 0.15 }
+    ]
+  }
+};
+
+// CPP/QPP et EI 2025
+const CPP_RATE = 0.0595;
+const CPP_MAX = 68500;
+const CPP_EXEMPTION = 3500;
+const EI_RATE = 0.0158; // Taux standard (sauf Québec)
+const EI_RATE_QC = 0.0127; // Taux réduit Québec
+const EI_MAX = 63200;
+
+// Crédits d'impôt de base 2025 (montant personnel de base)
+const FEDERAL_BASIC_PERSONAL_AMOUNT = 15705;
+const PROVINCIAL_BASIC_AMOUNTS: Record<string, number> = {
+  QC: 18056,
+  ON: 11865,
+  BC: 12580,
+  AB: 21885
 };
 
 const SalaryCalculator = () => {
   const [grossSalary, setGrossSalary] = useState("52000");
   const [period, setPeriod] = useState<"annual" | "monthly" | "biweekly" | "weekly" | "hourly">("annual");
-  const [province, setProvince] = useState("QC");
+  const [province, setProvince] = useState("ON");
   const [hoursPerWeek, setHoursPerWeek] = useState("40");
 
   const calculateTax = (income: number) => {
-    let federalTax = 0;
-    let provincialTax = 0;
-    let remainingIncome = income;
-    
-    // Calcul impôt fédéral
+    // Calcul impôt fédéral brut
+    let federalTaxGross = 0;
     let previousMax = 0;
-    for (const bracket of TAX_RATES_QC.federal) {
-      const taxableInBracket = Math.min(remainingIncome, bracket.max - previousMax);
+    for (const bracket of FEDERAL_TAX_BRACKETS) {
+      const taxableInBracket = Math.min(income, bracket.max) - previousMax;
       if (taxableInBracket <= 0) break;
-      federalTax += taxableInBracket * bracket.rate;
-      previousMax = bracket.max;
-      if (remainingIncome <= bracket.max) break;
+      federalTaxGross += taxableInBracket * bracket.rate;
+      previousMax = Math.min(income, bracket.max);
+      if (income <= bracket.max) break;
     }
+    
+    // Appliquer crédit de base fédéral
+    const federalBasicCredit = FEDERAL_BASIC_PERSONAL_AMOUNT * 0.15;
+    const federalTax = Math.max(0, federalTaxGross - federalBasicCredit);
 
-    // Calcul impôt provincial
-    remainingIncome = income;
+    // Calcul impôt provincial brut
+    const provincialRates = PROVINCIAL_TAX_RATES[province];
+    let provincialTaxGross = 0;
     previousMax = 0;
-    for (const bracket of TAX_RATES_QC.provincial) {
-      const taxableInBracket = Math.min(remainingIncome, bracket.max - previousMax);
+    for (const bracket of provincialRates.brackets) {
+      const taxableInBracket = Math.min(income, bracket.max) - previousMax;
       if (taxableInBracket <= 0) break;
-      provincialTax += taxableInBracket * bracket.rate;
-      previousMax = bracket.max;
-      if (remainingIncome <= bracket.max) break;
+      provincialTaxGross += taxableInBracket * bracket.rate;
+      previousMax = Math.min(income, bracket.max);
+      if (income <= bracket.max) break;
     }
+    
+    // Appliquer crédit de base provincial
+    const provincialBasicAmount = PROVINCIAL_BASIC_AMOUNTS[province];
+    const provincialBasicCredit = provincialBasicAmount * provincialRates.brackets[0].rate;
+    const provincialTax = Math.max(0, provincialTaxGross - provincialBasicCredit);
 
-    // RPC/QPP
+    // CPP/QPP (RPC/RRQ)
     const cppContribution = Math.min(
-      Math.max(income - TAX_RATES_QC.cpp.exemption, 0) * TAX_RATES_QC.cpp.rate,
-      (TAX_RATES_QC.cpp.max - TAX_RATES_QC.cpp.exemption) * TAX_RATES_QC.cpp.rate
+      Math.max(income - CPP_EXEMPTION, 0) * CPP_RATE,
+      (CPP_MAX - CPP_EXEMPTION) * CPP_RATE
     );
 
-    // Assurance-emploi
-    const eiContribution = Math.min(income * TAX_RATES_QC.ei.rate, TAX_RATES_QC.ei.max * TAX_RATES_QC.ei.rate);
+    // Assurance-emploi (EI)
+    const eiRate = province === "QC" ? EI_RATE_QC : EI_RATE;
+    const eiContribution = Math.min(income * eiRate, EI_MAX * eiRate);
 
     // RQAP (Québec seulement)
-    const qpipContribution = Math.min(income * TAX_RATES_QC.qpip.rate, TAX_RATES_QC.qpip.max * TAX_RATES_QC.qpip.rate);
+    const qpipContribution = province === "QC" 
+      ? Math.min(income * provincialRates.qpip.rate, provincialRates.qpip.max * provincialRates.qpip.rate)
+      : 0;
 
     const totalTax = federalTax + provincialTax + cppContribution + eiContribution + qpipContribution;
     const netIncome = income - totalTax;
@@ -92,22 +149,25 @@ const SalaryCalculator = () => {
       qpipContribution,
       totalTax,
       netIncome,
-      effectiveRate: (totalTax / income) * 100,
+      effectiveRate: income > 0 ? (totalTax / income) * 100 : 0,
       marginalRate: calculateMarginalRate(income)
     };
   };
 
   const calculateMarginalRate = (income: number) => {
+    // Trouver le taux fédéral marginal
     let federalRate = 0.15;
-    for (const bracket of TAX_RATES_QC.federal) {
+    for (const bracket of FEDERAL_TAX_BRACKETS) {
       if (income <= bracket.max) {
         federalRate = bracket.rate;
         break;
       }
     }
 
-    let provincialRate = 0.14;
-    for (const bracket of TAX_RATES_QC.provincial) {
+    // Trouver le taux provincial marginal
+    const provincialRates = PROVINCIAL_TAX_RATES[province];
+    let provincialRate = provincialRates.brackets[0].rate;
+    for (const bracket of provincialRates.brackets) {
       if (income <= bracket.max) {
         provincialRate = bracket.rate;
         break;
@@ -156,10 +216,10 @@ const SalaryCalculator = () => {
     { name: "Salaire net", value: results.netIncome, color: "#10b981" },
     { name: "Impôt fédéral", value: results.federalTax, color: "#ef4444" },
     { name: "Impôt provincial", value: results.provincialTax, color: "#f59e0b" },
-    { name: "RPC/QPP", value: results.cppContribution, color: "#8b5cf6" },
+    { name: province === "QC" ? "RRQ" : "RPC", value: results.cppContribution, color: "#8b5cf6" },
     { name: "Assurance-emploi", value: results.eiContribution, color: "#3b82f6" },
-    { name: "RQAP", value: results.qpipContribution, color: "#ec4899" },
-  ];
+    ...(province === "QC" ? [{ name: "RQAP", value: results.qpipContribution, color: "#ec4899" }] : []),
+  ].filter(item => item.value > 0);
 
   return (
     <>
@@ -283,17 +343,19 @@ const SalaryCalculator = () => {
                               <span>- {formatPrice(getPeriodValue(results.provincialTax))}</span>
                             </div>
                             <div className="flex justify-between items-center text-purple-600 dark:text-purple-400">
-                              <span>RPC/QPP</span>
+                              <span>{province === "QC" ? "RRQ" : "RPC"}</span>
                               <span>- {formatPrice(getPeriodValue(results.cppContribution))}</span>
                             </div>
                             <div className="flex justify-between items-center text-blue-600 dark:text-blue-400">
                               <span>Assurance-emploi</span>
                               <span>- {formatPrice(getPeriodValue(results.eiContribution))}</span>
                             </div>
-                            <div className="flex justify-between items-center text-pink-600 dark:text-pink-400">
-                              <span>RQAP</span>
-                              <span>- {formatPrice(getPeriodValue(results.qpipContribution))}</span>
-                            </div>
+                            {province === "QC" && (
+                              <div className="flex justify-between items-center text-pink-600 dark:text-pink-400">
+                                <span>RQAP</span>
+                                <span>- {formatPrice(getPeriodValue(results.qpipContribution))}</span>
+                              </div>
+                            )}
                             <div className="flex justify-between items-center py-3 border-t-2 border-primary">
                               <span className="font-bold text-lg">Salaire net</span>
                               <span className="font-bold text-2xl text-green-600 dark:text-green-400">
@@ -362,9 +424,11 @@ const SalaryCalculator = () => {
               <CardTitle className="text-blue-900 dark:text-blue-100">À propos des calculs</CardTitle>
             </CardHeader>
             <CardContent className="text-blue-800 dark:text-blue-200 space-y-2">
-              <p>• Les calculs sont basés sur les taux d'imposition 2025 du Québec et du Canada</p>
-              <p>• RPC/QPP : Cotisation au Régime de pensions du Canada / Régime de rentes du Québec</p>
-              <p>• RQAP : Régime québécois d'assurance parentale (Québec seulement)</p>
+              <p>• Les calculs sont basés sur les taux d'imposition 2025 du Canada et de votre province</p>
+              <p>• Les crédits d'impôt de base sont automatiquement appliqués (montant personnel de base)</p>
+              <p>• {province === "QC" ? "RRQ" : "RPC"} : {province === "QC" ? "Régime de rentes du Québec" : "Régime de pensions du Canada"}</p>
+              <p>• AE : Assurance-emploi (taux réduit au Québec car RQAP est distinct)</p>
+              {province === "QC" && <p>• RQAP : Régime québécois d'assurance parentale (Québec seulement)</p>}
               <p>• Ces calculs sont des estimations. Consultez un comptable pour des calculs précis</p>
             </CardContent>
           </Card>
