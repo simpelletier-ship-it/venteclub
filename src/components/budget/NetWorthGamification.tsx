@@ -9,15 +9,18 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface NetWorthGamificationProps {
   netWorth: number;
+  isAuthenticated: boolean;
 }
 
-export const NetWorthGamification = ({ netWorth }: NetWorthGamificationProps) => {
+export const NetWorthGamification = ({ netWorth, isAuthenticated }: NetWorthGamificationProps) => {
   const [showChart, setShowChart] = useState(false);
   const [selectedPeriod, setSelectedPeriod] = useState<'7d' | '30d' | '90d' | '1y'>('30d');
 
   // Fetch historical data for chart
   const { data: historicalData = [] } = useQuery({
     queryKey: ['net-worth-history'],
+    enabled: isAuthenticated,
+    retry: 1,
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return [];

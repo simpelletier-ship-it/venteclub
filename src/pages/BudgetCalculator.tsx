@@ -484,7 +484,7 @@ const BudgetCalculator = () => {
 
             <TabsContent value="overview">
               <div className="space-y-6">
-                <NetWorthGamification netWorth={netWorth} />
+                <NetWorthGamification netWorth={netWorth} isAuthenticated={isAuthenticated} />
                 
                 {/* Insights & Recommendations */}
                 <BudgetInsights 
