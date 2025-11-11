@@ -165,7 +165,7 @@ const Home = () => {
                 La plateforme de référence au Québec pour acquérir une entreprise établie
               </p>
               
-              <div className="flex flex-col sm:flex-row gap-4 sm:gap-5 pt-6 sm:pt-8">
+              <div className="flex flex-col sm:flex-row gap-4 sm:gap-5 pt-10 sm:pt-12 lg:pt-16 mt-4">
                 <Button 
                   size="lg" 
                   className="bg-[#6366f1] hover:bg-[#4f46e5] text-white h-14 sm:h-16 lg:h-[4.5rem] px-8 sm:px-10 lg:px-12 text-base sm:text-lg lg:text-xl font-semibold rounded-xl shadow-lg hover:shadow-2xl transition-all group w-full sm:w-auto"
@@ -186,7 +186,7 @@ const Home = () => {
           </div>
           
           {/* Floating Animation - Positioned Absolutely */}
-          <div className="hidden xl:block absolute left-[66%] top-[75%] -translate-y-1/2 w-[300px] pointer-events-none">
+          <div className="hidden xl:block absolute left-[66%] top-[58%] -translate-y-1/2 w-[300px] pointer-events-none">
             <FloatingOpportunities />
           </div>
         </div>
