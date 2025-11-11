@@ -154,7 +154,7 @@ const Home = () => {
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#4f46e5]/10 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '12s', animationDelay: '4s' }} />
         </div>
         
-        <div className="container mx-auto px-4 py-8 sm:py-10 lg:py-14 relative z-10">
+        <div className="container mx-auto px-4 pt-8 sm:pt-10 lg:pt-14 pb-0 relative z-10">
           <div className="max-w-6xl mx-auto">
             <div className="space-y-6 sm:space-y-7 lg:space-y-8 animate-slide-up">
               <div className="space-y-4">
@@ -221,7 +221,7 @@ const Home = () => {
       </section>
 
       {/* Statistics Section */}
-      <section className="py-6 sm:py-8 lg:py-10 bg-[#1e1b4b]" aria-label="Statistiques de la plateforme">
+      <section className="pt-6 sm:pt-8 lg:pt-10 pb-6 sm:pb-8 lg:pb-10 bg-[#1e1b4b]" aria-label="Statistiques de la plateforme">
         <div className="container mx-auto px-4">
           <h2 className="text-xl sm:text-2xl font-bold text-center mb-5 text-white">La plateforme de confiance au Québec</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-5 max-w-4xl mx-auto">
