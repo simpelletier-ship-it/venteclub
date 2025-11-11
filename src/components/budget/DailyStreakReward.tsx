@@ -37,35 +37,6 @@ export const DailyStreakReward = ({ isAuthenticated }: { isAuthenticated: boolea
     retry: 1,
   });
 
-  // Show loading state
-  if (!isAuthenticated || isLoading) {
-    return (
-      <Card className="border-2 border-primary/30">
-        <CardContent className="py-8 text-center">
-          <Flame className="h-8 w-8 text-muted-foreground mx-auto mb-3 opacity-50" />
-          <p className="text-muted-foreground text-sm">Chargement de votre série...</p>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  // Handle errors
-  if (isError) {
-    return (
-      <Card className="border-2 border-primary/30">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Flame className="h-6 w-6 text-muted-foreground" />
-            Série Quotidienne
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground text-sm">Enregistrez vos dépenses chaque jour pour maintenir votre série</p>
-        </CardContent>
-      </Card>
-    );
-  }
-
   // Calculate current streak
   const calculateStreak = () => {
     if (transactions.length === 0) return 0;
@@ -116,6 +87,35 @@ export const DailyStreakReward = ({ isAuthenticated }: { isAuthenticated: boolea
     const today = new Date().toISOString().split('T')[0];
     return transactions.some(t => t.transaction_date === today);
   };
+
+  // Show loading state
+  if (!isAuthenticated || isLoading) {
+    return (
+      <Card className="border-2 border-primary/30">
+        <CardContent className="py-8 text-center">
+          <Flame className="h-8 w-8 text-muted-foreground mx-auto mb-3 opacity-50" />
+          <p className="text-muted-foreground text-sm">Chargement de votre série...</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Handle errors
+  if (isError) {
+    return (
+      <Card className="border-2 border-primary/30">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Flame className="h-6 w-6 text-muted-foreground" />
+            Série Quotidienne
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-muted-foreground text-sm">Enregistrez vos dépenses chaque jour pour maintenir votre série</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10">
