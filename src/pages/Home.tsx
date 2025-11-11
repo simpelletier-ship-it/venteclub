@@ -130,7 +130,7 @@ const Home = () => {
   return (
     <>
       <SEO 
-        title="Achat et Vente d'Entreprises au Québec - Trouvez Votre Opportunité" 
+        title="Achat et Vente d'Entreprises au Québec" 
         description="Plateforme québécoise pour acheter et vendre des entreprises : restaurants, commerces, franchises. Connexion directe avec propriétaires. Recherche IA. Transactions sécurisées."
         keywords="achat entreprise Québec, vente entreprise, PME à vendre, commerce à vendre, opportunité affaires, reprise commerce Montréal, cession entreprise, prix entreprise 2025"
         canonical="/" 
@@ -158,7 +158,7 @@ const Home = () => {
           <div className="max-w-6xl mx-auto">
             <div className="space-y-4 sm:space-y-6 lg:space-y-8 animate-slide-up">
               <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-display font-bold leading-[1.2] sm:leading-[1.15] tracking-tight text-white">
-                Achat et Vente d'Entreprises au Québec - Trouvez Votre Opportunité
+                Achat et Vente d'Entreprises au Québec
               </h1>
               
               <p className="text-base sm:text-lg lg:text-xl text-[#818cf8] font-semibold max-w-3xl">
