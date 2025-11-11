@@ -163,18 +163,48 @@ const Home = () => {
                 Plateforme intelligente qui rapproche acquéreurs et propriétaires d'entreprises. Nous favorisons la transparence et la fiabilité pour que vos transactions se déroulent en toute confiance.
               </p>
               
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-3 sm:pt-4">
+              {/* Credibility Line */}
+              <div className="flex items-center justify-center gap-4 sm:gap-6 text-white/90 text-xs sm:text-sm pt-2">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-green-500/20 flex items-center justify-center">
+                    <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <span className="font-medium">Annonces approuvées</span>
+                </div>
+                <span className="text-white/50">·</span>
+                <div className="flex items-center gap-1.5">
+                  <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-green-500/20 flex items-center justify-center">
+                    <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <span className="font-medium">Affichage gratuit</span>
+                </div>
+                <span className="text-white/50">·</span>
+                <div className="flex items-center gap-1.5">
+                  <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-green-500/20 flex items-center justify-center">
+                    <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <span className="font-medium">100% québécois</span>
+                </div>
+              </div>
+              
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-6 sm:pt-8">
                 <Button 
                   size="lg" 
-                  className="bg-[#6366f1] hover:bg-[#4f46e5] text-white h-11 sm:h-12 lg:h-14 px-5 sm:px-8 lg:px-10 text-sm sm:text-base font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all group w-full sm:w-auto"
+                  className="bg-[#6366f1] hover:bg-[#4f46e5] text-white h-14 sm:h-16 lg:h-[72px] px-8 sm:px-10 lg:px-14 text-base sm:text-lg lg:text-xl font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all group w-full sm:w-auto"
                   onClick={() => document.getElementById('featured')?.scrollIntoView({ behavior: 'smooth' })}
                 >
                   Explorer les opportunités
-                  <ArrowRight className="ml-2 w-4 sm:w-5 h-4 sm:h-5 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="ml-2 w-5 sm:w-6 h-5 sm:h-6 group-hover:translate-x-1 transition-transform" />
                 </Button>
                 <Button 
                   size="lg" 
-                  className="h-11 sm:h-12 lg:h-14 px-5 sm:px-8 lg:px-10 text-sm sm:text-base font-semibold rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/20 shadow-lg hover:shadow-xl transition-all backdrop-blur-sm w-full sm:w-auto"
+                  className="h-14 sm:h-16 lg:h-[72px] px-8 sm:px-10 lg:px-14 text-base sm:text-lg lg:text-xl font-semibold rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/20 shadow-lg hover:shadow-xl transition-all backdrop-blur-sm w-full sm:w-auto"
                   onClick={() => navigate("/sell")}
                 >
                   Vendre mon entreprise
@@ -184,7 +214,7 @@ const Home = () => {
           </div>
           
           {/* Floating Animation - Positioned Absolutely */}
-          <div className="hidden xl:block absolute left-[66%] top-[68%] -translate-y-1/2 w-[300px] pointer-events-none">
+          <div className="hidden xl:block absolute left-[66%] top-[68%] -translate-y-1/2 w-[400px] pointer-events-none">
             <FloatingOpportunities />
           </div>
         </div>
