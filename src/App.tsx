@@ -53,6 +53,7 @@ const Tools = lazy(() => import("./pages/Tools"));
 const SalaryCalculator = lazy(() => import("./pages/SalaryCalculator"));
 const TaxReturnCalculator = lazy(() => import("./pages/TaxReturnCalculator"));
 const BudgetCalculator = lazy(() => import("./pages/BudgetCalculator"));
+const BudgetPlanner = lazy(() => import("./pages/BudgetPlanner"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -146,6 +147,7 @@ const App = () => (
                 <Route path="/outils/calculateur-salaire" element={<EmailVerificationGuard><SalaryCalculator /></EmailVerificationGuard>} />
                 <Route path="/outils/retour-impot" element={<EmailVerificationGuard><TaxReturnCalculator /></EmailVerificationGuard>} />
                 <Route path="/outils/budget" element={<EmailVerificationGuard><BudgetCalculator /></EmailVerificationGuard>} />
+                <Route path="/outils/planificateur-budget" element={<EmailVerificationGuard><BudgetPlanner /></EmailVerificationGuard>} />
                 
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />

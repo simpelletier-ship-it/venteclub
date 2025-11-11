@@ -89,6 +89,154 @@ export type Database = {
         }
         Relationships: []
       }
+      budget_categories: {
+        Row: {
+          color: string | null
+          created_at: string
+          icon: string | null
+          id: string
+          is_custom: boolean | null
+          name: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          icon?: string | null
+          id?: string
+          is_custom?: boolean | null
+          name: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          icon?: string | null
+          id?: string
+          is_custom?: boolean | null
+          name?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      budget_goals: {
+        Row: {
+          category_id: string | null
+          created_at: string
+          id: string
+          monthly_limit: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category_id?: string | null
+          created_at?: string
+          id?: string
+          monthly_limit: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category_id?: string | null
+          created_at?: string
+          id?: string
+          monthly_limit?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "budget_goals_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "budget_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      budget_monthly_summaries: {
+        Row: {
+          created_at: string
+          id: string
+          month: string
+          net_worth: number | null
+          total_expenses: number | null
+          total_income: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          month: string
+          net_worth?: number | null
+          total_expenses?: number | null
+          total_income?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          month?: string
+          net_worth?: number | null
+          total_expenses?: number | null
+          total_income?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      budget_transactions: {
+        Row: {
+          amount: number
+          category_id: string | null
+          created_at: string
+          description: string | null
+          id: string
+          is_recurring: boolean | null
+          recurring_frequency: string | null
+          transaction_date: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          category_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_recurring?: boolean | null
+          recurring_frequency?: string | null
+          transaction_date: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          category_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_recurring?: boolean | null
+          recurring_frequency?: string | null
+          transaction_date?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "budget_transactions_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "budget_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       business_analytics: {
         Row: {
           business_id: string
@@ -1258,6 +1406,87 @@ export type Database = {
           created_at?: string
           email_enabled?: boolean
           id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_assets: {
+        Row: {
+          created_at: string
+          currency: string | null
+          id: string
+          name: string
+          notes: string | null
+          type: string
+          updated_at: string
+          user_id: string
+          value: number
+        }
+        Insert: {
+          created_at?: string
+          currency?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          type: string
+          updated_at?: string
+          user_id: string
+          value: number
+        }
+        Update: {
+          created_at?: string
+          currency?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          type?: string
+          updated_at?: string
+          user_id?: string
+          value?: number
+        }
+        Relationships: []
+      }
+      user_debts: {
+        Row: {
+          balance: number
+          created_at: string
+          currency: string | null
+          id: string
+          interest_rate: number
+          minimum_payment: number | null
+          name: string
+          notes: string | null
+          payment_frequency: string | null
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          balance: number
+          created_at?: string
+          currency?: string | null
+          id?: string
+          interest_rate: number
+          minimum_payment?: number | null
+          name: string
+          notes?: string | null
+          payment_frequency?: string | null
+          type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          balance?: number
+          created_at?: string
+          currency?: string | null
+          id?: string
+          interest_rate?: number
+          minimum_payment?: number | null
+          name?: string
+          notes?: string | null
+          payment_frequency?: string | null
+          type?: string
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
