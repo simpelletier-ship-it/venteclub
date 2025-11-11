@@ -1,5 +1,5 @@
 import { Helmet } from "react-helmet";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -13,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { NetWorthGamification } from "@/components/budget/NetWorthGamification";
 import { BudgetTransactions } from "@/components/budget/BudgetTransactions";
 import { BudgetAssetsDebts } from "@/components/budget/BudgetAssetsDebts";
@@ -31,6 +32,10 @@ const BudgetCalculator = () => {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
   const isAuthenticated = !!user;
+
+  useEffect(() => {
+    console.log('BudgetCalculator - Auth state:', { user: !!user, loading, isAuthenticated });
+  }, [user, loading, isAuthenticated]);
 
   // Simple calculator state (for non-authenticated users)
   const [monthlyIncome, setMonthlyIncome] = useState("4000");
@@ -443,8 +448,9 @@ const BudgetCalculator = () => {
 
   // Advanced planner for authenticated users
   return (
-    <>
-      <Helmet>
+    <ErrorBoundary>
+      <>
+        <Helmet>
         <title>Planificateur de Budget Québec | Outil Gratuit de Gestion Financière</title>
         <meta name="description" content="Planificateur de budget intelligent et gratuit pour gérer vos finances personnelles au Québec. Suivi des dépenses, objectifs d'épargne, analyse des habitudes et coaching financier personnalisé." />
         <meta name="keywords" content="budget québec, planificateur financier gratuit, gestion budget personnel, suivi dépenses, objectifs épargne, calculateur budget" />
@@ -542,7 +548,8 @@ const BudgetCalculator = () => {
           </Card>
         </div>
       </div>
-    </>
+      </>
+    </ErrorBoundary>
   );
 };
 
