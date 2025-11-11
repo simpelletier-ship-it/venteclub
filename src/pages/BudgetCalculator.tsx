@@ -28,6 +28,7 @@ import { QuickExpenseTracker } from "@/components/budget/QuickExpenseTracker";
 import { SpendingHabitsStats } from "@/components/budget/SpendingHabitsStats";
 import { GoalRecommendations } from "@/components/budget/GoalRecommendations";
 import { DailyStreakReward } from "@/components/budget/DailyStreakReward";
+import RecurringExpenses from "@/components/budget/RecurringExpenses";
 
 const BudgetCalculator = () => {
   const navigate = useNavigate();
@@ -479,10 +480,11 @@ const BudgetCalculator = () => {
           </div>
 
           <Tabs defaultValue="overview" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2">
+            <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2">
               <TabsTrigger value="overview">📊 Vue d'ensemble</TabsTrigger>
               <TabsTrigger value="habits">📈 Habitudes</TabsTrigger>
               <TabsTrigger value="transactions">💳 Transactions</TabsTrigger>
+              <TabsTrigger value="recurring">🔁 Récurrentes</TabsTrigger>
               <TabsTrigger value="budget">📋 Budget</TabsTrigger>
               <TabsTrigger value="assets">💰 Actifs</TabsTrigger>
               <TabsTrigger value="goals">🎯 Objectifs</TabsTrigger>
@@ -517,6 +519,10 @@ const BudgetCalculator = () => {
 
             <TabsContent value="transactions">
               <BudgetTransactions isAuthenticated={isAuthenticated} />
+            </TabsContent>
+
+            <TabsContent value="recurring">
+              <RecurringExpenses isAuthenticated={isAuthenticated} />
             </TabsContent>
 
             <TabsContent value="assets">
