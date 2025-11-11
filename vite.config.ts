@@ -121,7 +121,6 @@ export default defineConfig(({ mode }) => ({
     sourcemap: false,
     chunkSizeWarningLimit: 1500,
     cssCodeSplit: true,
-    cssMinify: 'lightningcss',
     terserOptions: {
       compress: {
         drop_console: true,
