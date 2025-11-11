@@ -15,6 +15,7 @@ import { formatPrice } from "@/lib/priceFormat";
 import { ChevronDown, X } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { MobileFiltersSheet } from "./MobileFiltersSheet";
+import { AutocompleteSearch } from "./AutocompleteSearch";
 
 interface FilterBarProps {
   onFilter?: (filters: { 
@@ -98,10 +99,29 @@ const FilterBar = ({ onFilter, accentColor = 'purple' }: FilterBarProps) => {
     }
   };
 
+  const handleAutocompleteSelect = (item: any) => {
+    if (item.type === 'city') {
+      // Find which region contains this city
+      const region = QUEBEC_REGIONS.find(r => r.cities.includes(item.label));
+      if (region && !selectedRegions.includes(region.code)) {
+        setSelectedRegions([...selectedRegions, region.code]);
+      }
+    } else if (item.type === 'industry' && item.value) {
+      if (!selectedIndustries.includes(item.value)) {
+        setSelectedIndustries([...selectedIndustries, item.value]);
+      }
+    }
+    // Appliquer automatiquement les filtres après sélection
+    setTimeout(() => handleFilter(), 100);
+  };
+
   // Si mobile, afficher seulement le bouton qui ouvre le sheet
   if (isMobile) {
     return (
       <div className="w-full max-w-5xl mx-auto bg-card rounded-xl shadow-elegant p-4 border border-border">
+        <div className="mb-4">
+          <AutocompleteSearch onSelect={handleAutocompleteSelect} />
+        </div>
         <MobileFiltersSheet
           selectedRegions={selectedRegions}
           selectedIndustries={selectedIndustries}
@@ -125,6 +145,11 @@ const FilterBar = ({ onFilter, accentColor = 'purple' }: FilterBarProps) => {
   return (
     <div className="w-full max-w-5xl mx-auto bg-card rounded-xl sm:rounded-2xl shadow-elegant p-4 sm:p-6 border border-border">
       <div className="flex flex-col gap-4 sm:gap-6">
+        {/* Recherche intelligente avec auto-complétion */}
+        <div className="w-full">
+          <AutocompleteSearch onSelect={handleAutocompleteSelect} />
+        </div>
+
         <div className="flex flex-col md:flex-row gap-3 sm:gap-4">
           {/* Type d'annonce */}
           <Popover open={listingTypesOpen} onOpenChange={setListingTypesOpen}>
