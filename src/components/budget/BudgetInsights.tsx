@@ -41,6 +41,16 @@ interface BudgetInsightsProps {
 }
 
 export const BudgetInsights = ({ transactions, categories, goals, debts, assets }: BudgetInsightsProps) => {
+  // Helper function to convert to monthly - MUST BE DECLARED FIRST
+  const convertToMonthly = (amount: number, frequency: string) => {
+    switch (frequency) {
+      case 'weekly': return amount * 4.33;
+      case 'biweekly': return amount * 2.17;
+      case 'yearly': return amount / 12;
+      default: return amount;
+    }
+  };
+
   // Calculate insights
   const getInsights = () => {
     const insights: Array<{
@@ -184,15 +194,6 @@ export const BudgetInsights = ({ transactions, categories, goals, debts, assets 
   };
 
   const insights = getInsights();
-
-  const convertToMonthly = (amount: number, frequency: string) => {
-    switch (frequency) {
-      case 'weekly': return amount * 4.33;
-      case 'biweekly': return amount * 2.17;
-      case 'yearly': return amount / 12;
-      default: return amount;
-    }
-  };
 
   const getTypeColor = (type: string) => {
     switch (type) {
