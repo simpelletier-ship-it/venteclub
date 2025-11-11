@@ -4,11 +4,22 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import confetti from "canvas-confetti";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export const AchievementsBadges = () => {
+  const [isReady, setIsReady] = useState(false);
+
+  // Check auth first
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setIsReady(!!session);
+    };
+    checkAuth();
+  }, []);
+
   // Fetch achievements
-  const { data: achievements = [] } = useQuery({
+  const { data: achievements = [], isError, isLoading } = useQuery({
     queryKey: ['user-achievements'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -17,9 +28,38 @@ export const AchievementsBadges = () => {
         .order('earned_at', { ascending: false });
       
       if (error) throw error;
-      return data;
+      return data || [];
     },
+    enabled: isReady,
+    retry: 1,
   });
+
+  // Show loading state
+  if (!isReady || isLoading) {
+    return (
+      <Card>
+        <CardContent className="py-12 text-center">
+          <Trophy className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-50 animate-pulse" />
+          <p className="text-muted-foreground">Chargement de vos récompenses...</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Handle errors
+  if (isError) {
+    return (
+      <Card>
+        <CardContent className="py-12 text-center">
+          <Trophy className="h-12 w-12 text-yellow-500 mx-auto mb-4 opacity-50" />
+          <p className="text-muted-foreground">Aucun badge pour le moment</p>
+          <p className="text-sm text-muted-foreground mt-2">
+            Complétez des objectifs pour débloquer des badges!
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   // Show confetti for new unviewed achievements
   useEffect(() => {

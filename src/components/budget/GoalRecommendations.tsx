@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Sparkles, Target, TrendingUp } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,9 +19,19 @@ interface Recommendation {
 export const GoalRecommendations = () => {
   const queryClient = useQueryClient();
   const [selectedReco, setSelectedReco] = useState<Recommendation | null>(null);
+  const [isReady, setIsReady] = useState(false);
+
+  // Check auth first
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setIsReady(!!session);
+    };
+    checkAuth();
+  }, []);
 
   // Fetch user data for recommendations
-  const { data: transactions = [] } = useQuery({
+  const { data: transactions = [], isError: transactionsError } = useQuery({
     queryKey: ['transactions-for-reco'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -31,26 +41,32 @@ export const GoalRecommendations = () => {
         .order('transaction_date', { ascending: false })
         .limit(10);
       if (error) throw error;
-      return data;
+      return data || [];
     },
+    enabled: isReady,
+    retry: 1,
   });
 
-  const { data: existingGoals = [] } = useQuery({
+  const { data: existingGoals = [], isError: goalsError } = useQuery({
     queryKey: ['financial-goals'],
     queryFn: async () => {
       const { data, error } = await supabase.from('financial_goals').select('*');
       if (error) throw error;
-      return data;
+      return data || [];
     },
+    enabled: isReady,
+    retry: 1,
   });
 
-  const { data: debts = [] } = useQuery({
+  const { data: debts = [], isError: debtsError } = useQuery({
     queryKey: ['user-debts'],
     queryFn: async () => {
       const { data, error } = await supabase.from('user_debts').select('*');
       if (error) throw error;
-      return data;
+      return data || [];
     },
+    enabled: isReady,
+    retry: 1,
   });
 
   // Calculate personalized recommendations
@@ -109,6 +125,18 @@ export const GoalRecommendations = () => {
 
     return recommendations.slice(0, 3); // Top 3 recommendations
   };
+
+  // Handle errors gracefully
+  if (transactionsError || goalsError || debtsError || !isReady) {
+    return (
+      <Card>
+        <CardContent className="py-8 text-center">
+          <Sparkles className="h-12 w-12 text-muted-foreground mx-auto mb-3 opacity-50" />
+          <p className="text-muted-foreground">Chargement des recommandations...</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   const recommendations = generateRecommendations();
 

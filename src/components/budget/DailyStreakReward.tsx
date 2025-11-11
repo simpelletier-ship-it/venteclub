@@ -19,9 +19,19 @@ const STREAK_MILESTONES = [
 export const DailyStreakReward = () => {
   const queryClient = useQueryClient();
   const [showCelebration, setShowCelebration] = useState(false);
+  const [isReady, setIsReady] = useState(false);
+
+  // Check auth first
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setIsReady(!!session);
+    };
+    checkAuth();
+  }, []);
 
   // Fetch user's transaction history to calculate streak
-  const { data: transactions = [] } = useQuery({
+  const { data: transactions = [], isError, isLoading } = useQuery({
     queryKey: ['transactions-for-streak'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -31,9 +41,40 @@ export const DailyStreakReward = () => {
         .limit(100);
       
       if (error) throw error;
-      return data;
+      return data || [];
     },
+    enabled: isReady,
+    retry: 1,
   });
+
+  // Show loading state
+  if (!isReady || isLoading) {
+    return (
+      <Card className="border-2 border-primary/30">
+        <CardContent className="py-8 text-center">
+          <Flame className="h-8 w-8 text-muted-foreground mx-auto mb-3 opacity-50" />
+          <p className="text-muted-foreground text-sm">Chargement de votre série...</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Handle errors
+  if (isError) {
+    return (
+      <Card className="border-2 border-primary/30">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Flame className="h-6 w-6 text-muted-foreground" />
+            Série Quotidienne
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-muted-foreground text-sm">Enregistrez vos dépenses chaque jour pour maintenir votre série</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   // Calculate current streak
   const calculateStreak = () => {
