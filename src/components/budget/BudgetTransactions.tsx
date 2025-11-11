@@ -13,6 +13,7 @@ import { formatPrice } from "@/lib/priceFormat";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import confetti from "canvas-confetti";
 
 interface Category {
   id: string;
@@ -140,7 +141,22 @@ export const BudgetTransactions = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['budget-transactions'] });
-      toast.success("Transaction ajoutée avec succès");
+      
+      // Check if it was an income transaction for celebration
+      const category = categories.find(c => c.id === selectedCategory);
+      if (category?.type === 'income') {
+        confetti({
+          particleCount: 30,
+          spread: 45,
+          origin: { y: 0.7 },
+          colors: ['#10b981', '#059669', '#047857']
+        });
+      }
+      
+      toast.success("Transaction ajoutée avec succès", {
+        duration: 3000,
+        className: "animate-fade-in",
+      });
       setOpen(false);
       setAmount("");
       setDescription("");

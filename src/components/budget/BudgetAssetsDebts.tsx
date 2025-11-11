@@ -13,6 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import confetti from "canvas-confetti";
 
 const ASSET_TYPES = [
   { value: 'rrsp', label: 'REER' },
@@ -101,7 +102,16 @@ export const BudgetAssetsDebts = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user-assets'] });
-      toast.success("Actif ajouté avec succès");
+      confetti({
+        particleCount: 40,
+        spread: 50,
+        origin: { y: 0.7 },
+        colors: ['#3b82f6', '#2563eb', '#1d4ed8']
+      });
+      toast.success("Actif ajouté avec succès 💎", {
+        duration: 3000,
+        className: "animate-scale-in",
+      });
       setAssetDialog(false);
       resetAssetForm();
     },

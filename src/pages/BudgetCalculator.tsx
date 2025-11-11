@@ -21,6 +21,7 @@ import { DebtCalculator } from "@/components/budget/DebtCalculator";
 import { FinancialGoals } from "@/components/budget/FinancialGoals";
 import { ChallengesManager } from "@/components/budget/ChallengesManager";
 import { AchievementsBadges } from "@/components/budget/AchievementsBadges";
+import { ThemeCustomizer } from "@/components/budget/ThemeCustomizer";
 
 const BudgetCalculator = () => {
   const navigate = useNavigate();
@@ -454,7 +455,7 @@ const BudgetCalculator = () => {
           </div>
 
           <Tabs defaultValue="overview" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2">
+            <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2">
               <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
               <TabsTrigger value="simple">Mon Budget</TabsTrigger>
               <TabsTrigger value="transactions">Transactions</TabsTrigger>
@@ -462,6 +463,7 @@ const BudgetCalculator = () => {
               <TabsTrigger value="goals">🎯 Objectifs</TabsTrigger>
               <TabsTrigger value="challenges">🔥 Défis</TabsTrigger>
               <TabsTrigger value="achievements">🏆 Badges</TabsTrigger>
+              <TabsTrigger value="customize">✨ Personnaliser</TabsTrigger>
             </TabsList>
 
             <TabsContent value="overview">
@@ -504,6 +506,10 @@ const BudgetCalculator = () => {
 
             <TabsContent value="achievements">
               <AchievementsBadges />
+            </TabsContent>
+
+            <TabsContent value="customize">
+              <ThemeCustomizer />
             </TabsContent>
           </Tabs>
 

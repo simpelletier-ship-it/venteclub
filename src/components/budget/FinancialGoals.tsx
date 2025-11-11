@@ -13,6 +13,7 @@ import { formatPrice } from "@/lib/priceFormat";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import confetti from "canvas-confetti";
 
 const GOAL_TYPES = [
   { value: 'savings', label: '💰 Épargne', icon: '💰' },
@@ -74,7 +75,15 @@ export const FinancialGoals = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['financial-goals'] });
-      toast.success("Objectif créé avec succès! 🎯");
+      confetti({
+        particleCount: 50,
+        spread: 60,
+        origin: { y: 0.7 }
+      });
+      toast.success("Objectif créé avec succès! 🎯", {
+        duration: 4000,
+        className: "animate-scale-in",
+      });
       setDialogOpen(false);
       resetForm();
     },
@@ -104,12 +113,47 @@ export const FinancialGoals = () => {
       // Award achievement if goal completed
       if (completed) {
         await awardAchievement('goal_completed', '🏆 Objectif atteint!', `Vous avez atteint votre objectif: ${goal.name}`);
+        
+        // Big celebration for completed goal
+        confetti({
+          particleCount: 150,
+          spread: 120,
+          origin: { y: 0.5 },
+          colors: ['#fbbf24', '#f59e0b', '#d97706', '#b45309']
+        });
+        setTimeout(() => {
+          confetti({
+            particleCount: 100,
+            angle: 60,
+            spread: 55,
+            origin: { x: 0 }
+          });
+        }, 250);
+        setTimeout(() => {
+          confetti({
+            particleCount: 100,
+            angle: 120,
+            spread: 55,
+            origin: { x: 1 }
+          });
+        }, 400);
       }
     },
-    onSuccess: () => {
+    onSuccess: (_, { goalId }) => {
       queryClient.invalidateQueries({ queryKey: ['financial-goals'] });
       queryClient.invalidateQueries({ queryKey: ['user-achievements'] });
-      toast.success("Progression mise à jour! 📈");
+      
+      const goal = goals.find((g: any) => g.id === goalId);
+      const updatedAmount = Number(goal?.current_amount || 0) + parseFloat(amountToAdd);
+      const isCompleted = updatedAmount >= Number(goal?.target_amount || 0);
+      
+      toast.success(
+        isCompleted ? "🎉 Objectif atteint! Félicitations!" : "Progression mise à jour! 📈", 
+        {
+          duration: isCompleted ? 6000 : 4000,
+          className: "animate-scale-in",
+        }
+      );
       setUpdateDialogOpen(false);
       setSelectedGoal(null);
       setAmountToAdd("");
@@ -223,7 +267,7 @@ export const FinancialGoals = () => {
               const daysRemaining = goal.deadline ? Math.ceil((new Date(goal.deadline).getTime() - Date.now()) / (1000 * 60 * 60 * 24)) : null;
 
               return (
-                <Card key={goal.id} className="hover:shadow-lg transition-shadow">
+                <Card key={goal.id} className="hover:shadow-lg transition-all duration-300 hover:scale-[1.02] animate-fade-in">
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-2">

@@ -14,6 +14,7 @@ import { formatPrice } from "@/lib/priceFormat";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import confetti from "canvas-confetti";
 
 const CHALLENGE_TYPES = [
   { value: 'no_spend', label: '🚫 Zéro dépense', description: 'Ne rien dépenser dans une catégorie' },
@@ -106,7 +107,16 @@ export const ChallengesManager = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user-challenges'] });
-      toast.success("Défi créé! Bonne chance! 🔥");
+      confetti({
+        particleCount: 40,
+        spread: 50,
+        origin: { y: 0.7 },
+        colors: ['#f97316', '#ea580c', '#c2410c']
+      });
+      toast.success("Défi créé! Bonne chance! 🔥", {
+        duration: 4000,
+        className: "animate-scale-in",
+      });
       setDialogOpen(false);
       resetForm();
     },
@@ -141,7 +151,24 @@ export const ChallengesManager = () => {
     onSuccess: (_, { status }) => {
       queryClient.invalidateQueries({ queryKey: ['user-challenges'] });
       queryClient.invalidateQueries({ queryKey: ['user-achievements'] });
-      toast.success(status === 'completed' ? "Défi réussi! 🎉" : "Défi abandonné");
+      
+      if (status === 'completed') {
+        // Celebration for completed challenge
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 },
+          colors: ['#f97316', '#ea580c', '#fbbf24', '#f59e0b']
+        });
+        toast.success("🎉 Défi réussi! Incroyable!", {
+          duration: 5000,
+          className: "animate-scale-in",
+        });
+      } else {
+        toast.success("Défi abandonné", {
+          duration: 3000,
+        });
+      }
     },
   });
 
@@ -296,7 +323,7 @@ export const ChallengesManager = () => {
               const isExpired = daysRemaining < 0;
 
               return (
-                <Card key={challenge.id} className="hover:shadow-lg transition-shadow border-orange-200 dark:border-orange-800">
+                <Card key={challenge.id} className="hover:shadow-lg transition-all duration-300 hover:scale-[1.02] animate-fade-in border-orange-200 dark:border-orange-800">
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <div>
