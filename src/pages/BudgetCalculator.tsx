@@ -19,9 +19,12 @@ import { BudgetPlanner } from "@/components/budget/BudgetPlanner";
 import { BudgetInsights } from "@/components/budget/BudgetInsights";
 import { DebtCalculator } from "@/components/budget/DebtCalculator";
 import { FinancialGoals } from "@/components/budget/FinancialGoals";
-import { ChallengesManager } from "@/components/budget/ChallengesManager";
 import { AchievementsBadges } from "@/components/budget/AchievementsBadges";
 import { ThemeCustomizer } from "@/components/budget/ThemeCustomizer";
+import { QuickExpenseTracker } from "@/components/budget/QuickExpenseTracker";
+import { SpendingHabitsStats } from "@/components/budget/SpendingHabitsStats";
+import { GoalRecommendations } from "@/components/budget/GoalRecommendations";
+import { DailyStreakReward } from "@/components/budget/DailyStreakReward";
 
 const BudgetCalculator = () => {
   const navigate = useNavigate();
@@ -213,8 +216,13 @@ const BudgetCalculator = () => {
     return (
       <>
         <Helmet>
-          <title>Planificateur de Budget Québec | Vente.Club</title>
-          <meta name="description" content="Créez et gérez votre budget mensuel et annuel. Calculateur gratuit pour optimiser vos finances personnelles." />
+          <title>Planificateur de Budget Québec | Outil Gratuit de Gestion Financière</title>
+          <meta name="description" content="Planificateur de budget intelligent et gratuit pour gérer vos finances personnelles au Québec. Suivi des dépenses, objectifs d'épargne, analyse des habitudes et coaching financier personnalisé." />
+          <meta name="keywords" content="budget québec, planificateur financier gratuit, gestion budget personnel, suivi dépenses, objectifs épargne, calculateur budget" />
+          <link rel="canonical" href="https://vente.club/outils/budget" />
+          <meta property="og:title" content="Planificateur de Budget Québec | Outil Gratuit" />
+          <meta property="og:description" content="Gérez votre budget avec intelligence. Suivi automatique, recommandations personnalisées et gamification pour atteindre vos objectifs financiers." />
+          <meta property="og:type" content="website" />
         </Helmet>
 
         <div className="min-h-screen bg-background py-8">
@@ -439,30 +447,40 @@ const BudgetCalculator = () => {
   return (
     <>
       <Helmet>
-        <title>Planificateur de Budget Québec | Vente.Club</title>
-        <meta name="description" content="Planificateur de budget complet avec suivi des revenus, dépenses, actifs, dettes et gamification de votre valeur nette. Gratuit et privé." />
+        <title>Planificateur de Budget Québec | Outil Gratuit de Gestion Financière</title>
+        <meta name="description" content="Planificateur de budget intelligent et gratuit pour gérer vos finances personnelles au Québec. Suivi des dépenses, objectifs d'épargne, analyse des habitudes et coaching financier personnalisé." />
+        <meta name="keywords" content="budget québec, planificateur financier gratuit, gestion budget personnel, suivi dépenses, objectifs épargne, calculateur budget" />
+        <link rel="canonical" href="https://vente.club/outils/budget" />
+        <meta property="og:title" content="Planificateur de Budget Québec | Outil Gratuit" />
+        <meta property="og:description" content="Gérez votre budget avec intelligence. Suivi automatique, recommandations personnalisées et gamification pour atteindre vos objectifs financiers." />
+        <meta property="og:type" content="website" />
       </Helmet>
 
       <div className="min-h-screen bg-background py-8">
         <div className="container mx-auto px-4 max-w-7xl">
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold mb-2 text-foreground">
-              Planificateur de Budget Personnel
+          <div className="text-center mb-6">
+            <h1 className="text-3xl font-bold mb-2">
+              Mon Planificateur Budgétaire Intelligent
             </h1>
-            <p className="text-muted-foreground text-lg">
-              Gérez vos finances, atteignez vos objectifs
+            <p className="text-muted-foreground">
+              Suivi rapide • Recommandations personnalisées • Récompenses quotidiennes
             </p>
           </div>
 
+          {/* Quick Add & Streak - Highlighted at top */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <QuickExpenseTracker />
+            <DailyStreakReward />
+          </div>
+
           <Tabs defaultValue="overview" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2">
-              <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
-              <TabsTrigger value="simple">Mon Budget</TabsTrigger>
-              <TabsTrigger value="transactions">Transactions</TabsTrigger>
-              <TabsTrigger value="assets">Actifs & Dettes</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2">
+              <TabsTrigger value="overview">📊 Vue d'ensemble</TabsTrigger>
+              <TabsTrigger value="habits">📈 Habitudes</TabsTrigger>
+              <TabsTrigger value="transactions">💳 Transactions</TabsTrigger>
+              <TabsTrigger value="budget">📋 Budget</TabsTrigger>
+              <TabsTrigger value="assets">💰 Actifs</TabsTrigger>
               <TabsTrigger value="goals">🎯 Objectifs</TabsTrigger>
-              <TabsTrigger value="challenges">🔥 Défis</TabsTrigger>
-              <TabsTrigger value="achievements">🏆 Badges</TabsTrigger>
               <TabsTrigger value="customize">✨ Personnaliser</TabsTrigger>
             </TabsList>
 
@@ -484,7 +502,11 @@ const BudgetCalculator = () => {
               </div>
             </TabsContent>
 
-            <TabsContent value="simple">
+            <TabsContent value="habits">
+              <SpendingHabitsStats />
+            </TabsContent>
+
+            <TabsContent value="budget">
               <BudgetPlanner />
             </TabsContent>
 
@@ -497,15 +519,11 @@ const BudgetCalculator = () => {
             </TabsContent>
 
             <TabsContent value="goals">
-              <FinancialGoals />
-            </TabsContent>
-
-            <TabsContent value="challenges">
-              <ChallengesManager />
-            </TabsContent>
-
-            <TabsContent value="achievements">
-              <AchievementsBadges />
+              <div className="space-y-8">
+                <GoalRecommendations />
+                <FinancialGoals />
+                <AchievementsBadges />
+              </div>
             </TabsContent>
 
             <TabsContent value="customize">
