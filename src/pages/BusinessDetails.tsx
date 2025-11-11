@@ -1020,11 +1020,11 @@ const BusinessDetails = () => {
                   />
                 )}
 
-                <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-800 overflow-hidden">
+                <div className="bg-card rounded-2xl shadow-lg border border-border overflow-hidden">
                   <div className="p-8">
-                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-3">Description</h2>
+                    <h2 className="text-2xl font-bold text-foreground mb-3">Description</h2>
                     <div 
-                      className="text-slate-600 dark:text-slate-300 leading-relaxed text-base prose prose-slate dark:prose-invert max-w-none"
+                      className="text-card-foreground/90 leading-relaxed text-base prose prose-slate dark:prose-invert max-w-none"
                       dangerouslySetInnerHTML={{ __html: sanitizeHtml(business.description) }}
                     />
                   </div>
@@ -1047,16 +1047,16 @@ const BusinessDetails = () => {
 
                 {/* Property Characteristics - For Real Estate Only */}
                 {business.property_type && (
-                  <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-800 p-8">
-                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
+                  <div className="bg-card rounded-2xl shadow-lg border border-border p-8">
+                    <h2 className="text-2xl font-bold text-foreground mb-6 flex items-center gap-2">
                       🏢 Caractéristiques de la propriété
                     </h2>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                       {/* Type de propriété */}
-                      <div className="bg-slate-50 dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700">
-                        <div className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2">Type de propriété</div>
-                        <div className="text-lg font-bold text-slate-900 dark:text-white">
+                      <div className="bg-muted p-5 rounded-xl border border-border">
+                        <div className="text-sm font-medium text-muted-foreground mb-2">Type de propriété</div>
+                        <div className="text-lg font-bold text-foreground">
                           {business.property_type === 'bureau' && 'Bureau commercial'}
                           {business.property_type === 'commerce' && 'Espace commercial'}
                           {business.property_type === 'industriel' && 'Bâtiment industriel'}
@@ -1069,9 +1069,9 @@ const BusinessDetails = () => {
 
                       {/* Date de création de l'annonce */}
                       {business.created_at && (
-                        <div className="bg-slate-50 dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700">
-                          <div className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2">Date de publication</div>
-                          <div className="text-lg font-bold text-slate-900 dark:text-white">
+                        <div className="bg-muted p-5 rounded-xl border border-border">
+                          <div className="text-sm font-medium text-muted-foreground mb-2">Date de publication</div>
+                          <div className="text-lg font-bold text-foreground">
                             {new Date(business.created_at).toLocaleDateString('fr-CA', { 
                               year: 'numeric', 
                               month: 'long', 
@@ -1083,26 +1083,26 @@ const BusinessDetails = () => {
 
                       {/* Superficie */}
                       {business.square_footage && (
-                        <div className="bg-slate-50 dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700">
-                          <div className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2">Superficie</div>
-                          <div className="text-lg font-bold text-slate-900 dark:text-white">
+                        <div className="bg-muted p-5 rounded-xl border border-border">
+                          <div className="text-sm font-medium text-muted-foreground mb-2">Superficie</div>
+                          <div className="text-lg font-bold text-foreground">
                             {Number(business.square_footage).toLocaleString('fr-CA')} pi²
                           </div>
                         </div>
                       )}
 
                       {/* Année de construction */}
-                      <div className="bg-slate-50 dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700">
-                        <div className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2">Année de construction</div>
-                        <div className="text-lg font-bold text-slate-900 dark:text-white">
+                      <div className="bg-muted p-5 rounded-xl border border-border">
+                        <div className="text-sm font-medium text-muted-foreground mb-2">Année de construction</div>
+                        <div className="text-lg font-bold text-foreground">
                           {business.year_built || 'Non spécifiée'}
                         </div>
                       </div>
 
                       {/* Type de propriété locative */}
                       {business.is_rental_property && (
-                        <div className="bg-slate-50 dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700">
-                          <div className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2">Type</div>
+                        <div className="bg-muted p-5 rounded-xl border border-border">
+                          <div className="text-sm font-medium text-muted-foreground mb-2">Type</div>
                           <div className="text-lg font-bold text-secondary">
                             🏠 Propriété locative
                           </div>
@@ -1112,9 +1112,9 @@ const BusinessDetails = () => {
 
                     {/* Adresse complète */}
                     {business.address && (
-                      <div className="mt-6 bg-slate-50 dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700">
-                        <div className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2">Adresse</div>
-                        <div className="text-base font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+                      <div className="mt-6 bg-muted p-5 rounded-xl border border-border">
+                        <div className="text-sm font-medium text-muted-foreground mb-2">Adresse</div>
+                        <div className="text-base font-semibold text-foreground flex items-center gap-2">
                           <MapPin className="w-5 h-5 text-secondary" />
                           {business.address}
                         </div>
@@ -1160,12 +1160,12 @@ const BusinessDetails = () => {
 
                 {/* Location Information */}
                 {!business.property_type && (business.city || business.region) && (
-                  <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-800 p-6">
+                  <div className="bg-card rounded-2xl shadow-lg border border-border p-6">
                     <div className="flex items-start gap-3">
                       <MapPin className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
                       <div>
-                        <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">Localisation</h3>
-                        <p className="text-base text-slate-600 dark:text-slate-300">
+                        <h3 className="text-lg font-bold text-foreground mb-2">Localisation</h3>
+                        <p className="text-base text-muted-foreground">
                           {business.city && business.region 
                             ? `${business.city}, ${business.region}, ${business.province || 'Québec'}` 
                             : business.location}
@@ -1180,23 +1180,23 @@ const BusinessDetails = () => {
                 {!business.property_type && (
                   <div className="grid grid-cols-2 gap-4">
                     {business.employees_count && (
-                      <div className="bg-white dark:bg-slate-900 rounded-xl shadow-md border border-slate-200 dark:border-slate-800 p-6">
-                        <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 mb-3">
+                      <div className="bg-card rounded-xl shadow-md border border-border p-6">
+                        <div className="flex items-center gap-2 text-muted-foreground mb-3">
                           <Users className="w-5 h-5" />
                           <span className="text-sm font-medium">Employés</span>
                         </div>
-                        <div className="text-3xl font-bold text-slate-900 dark:text-white">
+                        <div className="text-3xl font-bold text-foreground">
                           {business.employees_count}
                         </div>
                       </div>
                     )}
                     {business.year_established && (
-                      <div className="bg-white dark:bg-slate-900 rounded-xl shadow-md border border-slate-200 dark:border-slate-800 p-6">
-                        <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 mb-3">
+                      <div className="bg-card rounded-xl shadow-md border border-border p-6">
+                        <div className="flex items-center gap-2 text-muted-foreground mb-3">
                           <Calendar className="w-5 h-5" />
                           <span className="text-sm font-medium">Année</span>
                         </div>
-                        <div className="text-3xl font-bold text-slate-900 dark:text-white">
+                        <div className="text-3xl font-bold text-foreground">
                           {business.year_established}
                         </div>
                       </div>
@@ -1206,22 +1206,22 @@ const BusinessDetails = () => {
 
                 {/* Portrait Financier Premium - Only show for non-property businesses */}
                 {!business.property_type && (business.annual_revenue || business.baiia || business.net_profit) && (
-                  <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-800 overflow-hidden">
+                  <div className="bg-card rounded-2xl shadow-lg border border-border overflow-hidden">
                     <div className="p-8">
-                      <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">Portrait financier</h2>
-                      <p className="text-sm text-slate-600 dark:text-slate-400 mb-8">Aperçu des performances financières de l'entreprise</p>
+                      <h2 className="text-2xl font-bold text-foreground mb-2 tracking-tight">Portrait financier</h2>
+                      <p className="text-sm text-muted-foreground mb-8">Aperçu des performances financières de l'entreprise</p>
                       
                       {/* Résultats - Premium Cards */}
                       {(business.annual_revenue || business.baiia || business.net_profit) && (
                         <div className="mb-6">
-                          <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-5">Résultats</h3>
+                          <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-5">Résultats</h3>
                           
-                          <div className="space-y-4">
+                           <div className="space-y-4">
                             {business.annual_revenue && (
-                              <div className="group bg-slate-50 dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700 transition-all duration-200 hover:shadow-md">
+                              <div className="group bg-muted rounded-xl p-6 border border-border transition-all duration-200 hover:shadow-md">
                                 <div className="flex justify-between items-center">
-                                  <span className="text-slate-600 dark:text-slate-400 font-medium text-base">Revenu annuel</span>
-                                  <span className="font-bold text-2xl text-slate-900 dark:text-white">
+                                  <span className="text-muted-foreground font-medium text-base">Revenu annuel</span>
+                                  <span className="font-bold text-2xl text-foreground">
                                     {new Intl.NumberFormat('fr-CA', {
                                       style: 'currency',
                                       currency: business.currency || 'CAD',
@@ -1234,10 +1234,10 @@ const BusinessDetails = () => {
                             )}
                             
                             {business.baiia && (
-                              <div className="group bg-slate-50 dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700 transition-all duration-200 hover:shadow-md">
+                              <div className="group bg-muted rounded-xl p-6 border border-border transition-all duration-200 hover:shadow-md">
                                 <div className="flex justify-between items-center">
-                                  <span className="text-slate-600 dark:text-slate-400 font-medium text-base">BAIIA</span>
-                                  <span className="font-bold text-2xl text-slate-900 dark:text-white">
+                                  <span className="text-muted-foreground font-medium text-base">BAIIA</span>
+                                  <span className="font-bold text-2xl text-foreground">
                                     {new Intl.NumberFormat('fr-CA', {
                                       style: 'currency',
                                       currency: business.currency || 'CAD',
@@ -1250,10 +1250,10 @@ const BusinessDetails = () => {
                             )}
                             
                             {business.net_profit && (
-                              <div className="group bg-slate-50 dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700 transition-all duration-200 hover:shadow-md">
+                              <div className="group bg-muted rounded-xl p-6 border border-border transition-all duration-200 hover:shadow-md">
                                 <div className="flex justify-between items-center">
-                                  <span className="text-slate-600 dark:text-slate-400 font-medium text-base">Bénéfice net</span>
-                                  <span className="font-bold text-2xl text-slate-900 dark:text-white">
+                                  <span className="text-muted-foreground font-medium text-base">Bénéfice net</span>
+                                  <span className="font-bold text-2xl text-foreground">
                                     {new Intl.NumberFormat('fr-CA', {
                                       style: 'currency',
                                       currency: business.currency || 'CAD',
@@ -1268,17 +1268,17 @@ const BusinessDetails = () => {
                             {business.net_profit_margin && (
                               <div className="group bg-amber-50 dark:bg-amber-950/30 rounded-xl p-6 border-2 border-amber-200 dark:border-amber-800 transition-all duration-300 hover:shadow-xl hover:border-amber-400 dark:hover:border-amber-600 hover:-translate-y-1">
                                 <div className="flex justify-between items-center">
-                                  <span className="text-slate-600 dark:text-slate-400 font-semibold text-base">Marge bénéficiaire nette</span>
+                                  <span className="text-muted-foreground font-semibold text-base">Marge bénéficiaire nette</span>
                                   <span className="font-bold text-2xl text-amber-600 dark:text-amber-400 transition-transform duration-300 group-hover:scale-110">{business.net_profit_margin}%</span>
                                 </div>
                               </div>
                             )}
 
                             {business.profit_margin && (
-                              <div className="group bg-slate-50 dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700 transition-all duration-200 hover:shadow-md">
+                              <div className="group bg-muted rounded-xl p-6 border border-border transition-all duration-200 hover:shadow-md">
                                 <div className="flex justify-between items-center">
-                                  <span className="text-slate-600 dark:text-slate-400 font-medium text-base">Marge de profit</span>
-                                  <span className="font-bold text-2xl text-slate-900 dark:text-white">{business.profit_margin}%</span>
+                                  <span className="text-muted-foreground font-medium text-base">Marge de profit</span>
+                                  <span className="font-bold text-2xl text-foreground">{business.profit_margin}%</span>
                                 </div>
                               </div>
                             )}
