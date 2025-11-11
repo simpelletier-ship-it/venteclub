@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Search } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,6 +31,7 @@ export const BudgetTransactions = ({ isAuthenticated }: { isAuthenticated: boole
   const [transactionDate, setTransactionDate] = useState(new Date().toISOString().split('T')[0]);
   const [isRecurring, setIsRecurring] = useState(false);
   const [recurringFrequency, setRecurringFrequency] = useState("monthly");
+  const [searchQuery, setSearchQuery] = useState("");
   
   // States for adding custom categories
   const [categoryDialogOpen, setCategoryDialogOpen] = useState(false);
@@ -232,6 +233,16 @@ export const BudgetTransactions = ({ isAuthenticated }: { isAuthenticated: boole
 
   const incomeCategories = categories.filter(c => c.type === 'income');
   const expenseCategories = categories.filter(c => c.type === 'expense');
+
+  // Filter transactions based on search query
+  const filteredTransactions = transactions.filter(transaction => {
+    if (!searchQuery) return true;
+    const query = searchQuery.toLowerCase();
+    const categoryName = transaction.category?.name?.toLowerCase() || '';
+    const desc = transaction.description?.toLowerCase() || '';
+    const amount = transaction.amount?.toString() || '';
+    return categoryName.includes(query) || desc.includes(query) || amount.includes(query);
+  });
 
   const commonEmojis = ["💼", "💰", "🏠", "🍽️", "🚗", "🎬", "🏥", "📚", "💡", "🛡️", "👕", "💳", "✈️", "🎮", "📱", "💻", "🎯", "🎨", "🏋️", "🛒"];
 
@@ -445,11 +456,26 @@ export const BudgetTransactions = ({ isAuthenticated }: { isAuthenticated: boole
           <CardDescription>Vos 50 dernières transactions</CardDescription>
         </CardHeader>
         <CardContent>
+          <div className="mb-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder="Rechercher par catégorie, description ou montant..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-9"
+              />
+            </div>
+          </div>
+          
           <div className="space-y-2">
-            {transactions.length === 0 ? (
+            {filteredTransactions.length === 0 && searchQuery ? (
+              <p className="text-center text-muted-foreground py-8">Aucune transaction trouvée pour "{searchQuery}"</p>
+            ) : transactions.length === 0 ? (
               <p className="text-center text-muted-foreground py-8">Aucune transaction pour le moment</p>
             ) : (
-              transactions.map((transaction: any) => (
+              filteredTransactions.map((transaction: any) => (
                 <div key={transaction.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors">
                   <div className="flex items-center gap-3">
                     <div className="text-2xl">{transaction.category?.icon}</div>
