@@ -86,8 +86,30 @@ const PROVINCIAL_BASIC_AMOUNTS: Record<string, number> = {
 const SalaryCalculator = () => {
   const [grossSalary, setGrossSalary] = useState("52000");
   const [period, setPeriod] = useState<"annual" | "monthly" | "biweekly" | "weekly" | "hourly">("annual");
-  const [province, setProvince] = useState("ON");
+  const [province, setProvince] = useState("QC");
   const [hoursPerWeek, setHoursPerWeek] = useState("40");
+
+  // Réinitialiser le salaire quand la période change
+  const handlePeriodChange = (newPeriod: "annual" | "monthly" | "biweekly" | "weekly" | "hourly") => {
+    setPeriod(newPeriod);
+    // Ajuster le salaire par défaut selon la période
+    switch (newPeriod) {
+      case "hourly":
+        setGrossSalary("25");
+        break;
+      case "weekly":
+        setGrossSalary("1000");
+        break;
+      case "biweekly":
+        setGrossSalary("2000");
+        break;
+      case "monthly":
+        setGrossSalary("4333");
+        break;
+      default:
+        setGrossSalary("52000");
+    }
+  };
 
   const calculateTax = (income: number) => {
     // Calcul impôt fédéral brut
@@ -259,7 +281,7 @@ const SalaryCalculator = () => {
 
                 <div>
                   <Label>Période</Label>
-                  <Select value={period} onValueChange={(v: any) => setPeriod(v)}>
+                  <Select value={period} onValueChange={(v: any) => handlePeriodChange(v)}>
                     <SelectTrigger className="mt-1">
                       <SelectValue />
                     </SelectTrigger>
@@ -310,7 +332,7 @@ const SalaryCalculator = () => {
             {/* Results Section */}
             <div className="lg:col-span-2 space-y-6">
               {/* Tabs for different periods */}
-              <Tabs defaultValue="annual" value={period} onValueChange={(v: any) => setPeriod(v)}>
+              <Tabs defaultValue="annual" value={period} onValueChange={(v: any) => handlePeriodChange(v)}>
                 <TabsList className="grid w-full grid-cols-5">
                   <TabsTrigger value="annual">Année</TabsTrigger>
                   <TabsTrigger value="monthly">Mois</TabsTrigger>
