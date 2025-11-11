@@ -411,6 +411,82 @@ export const BudgetPlanner = () => {
         </Card>
       </div>
 
+      {/* Budget vs Réel par Catégorie */}
+      <Card>
+        <CardHeader>
+          <CardTitle>📊 Comparatif par Catégorie</CardTitle>
+          <CardDescription>Budget planifié vs Dépenses réelles</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {expenseCategories
+              .filter(cat => getCategoryBudget(cat.id) > 0)
+              .map(category => {
+                const budget = getCategoryBudget(category.id);
+                const spent = getCategorySpent(category.id);
+                const difference = budget - spent;
+                const percentage = budget > 0 ? (spent / budget) * 100 : 0;
+                
+                return (
+                  <div key={category.id} className="border rounded-lg p-4 hover:bg-muted/50 transition-colors">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl">{category.icon}</span>
+                        <div>
+                          <div className="font-semibold">{category.name}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {percentage.toFixed(0)}% du budget utilisé
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-3 gap-4 mb-3">
+                      <div>
+                        <div className="text-xs text-muted-foreground mb-1">Budget</div>
+                        <div className="text-lg font-bold">{formatPrice(budget)}</div>
+                      </div>
+                      <div>
+                        <div className="text-xs text-muted-foreground mb-1">Réel</div>
+                        <div className={`text-lg font-bold ${spent > budget ? 'text-red-600' : 'text-foreground'}`}>
+                          {formatPrice(spent)}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-xs text-muted-foreground mb-1">Différence</div>
+                        <div className={`text-lg font-bold ${difference >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                          {difference >= 0 ? '+' : ''}{formatPrice(difference)}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="h-3 bg-muted rounded-full overflow-hidden">
+                      <div 
+                        className={`h-full transition-all duration-500 ${
+                          percentage > 100 ? 'bg-red-500' : percentage > 80 ? 'bg-yellow-500' : 'bg-green-500'
+                        }`}
+                        style={{ width: `${Math.min(percentage, 100)}%` }}
+                      />
+                    </div>
+                    
+                    {percentage > 100 && (
+                      <div className="mt-2 text-xs text-red-600 font-medium">
+                        ⚠️ Dépassement de {formatPrice(spent - budget)}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            
+            {expenseCategories.filter(cat => getCategoryBudget(cat.id) > 0).length === 0 && (
+              <div className="text-center text-muted-foreground py-8">
+                Aucun budget défini pour les catégories de dépenses
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Income Categories */}
       <div>
         <h4 className="text-lg font-semibold mb-3 text-green-600 dark:text-green-400">💰 Revenus</h4>
