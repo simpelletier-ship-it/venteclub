@@ -153,7 +153,7 @@ const Home = () => {
                 Achat et Vente d'Entreprises au Québec - Trouvez Votre Opportunité
               </h1>
               
-              <p className="text-base sm:text-lg lg:text-xl font-semibold max-w-3xl">
+              <p className="text-base sm:text-lg lg:text-xl text-[#818cf8] font-semibold max-w-3xl">
                 Le Club de Référence pour acheter <TypewriterAnimation /> partout au Québec
               </p>
               
