@@ -23,6 +23,7 @@ import { DebtCalculator } from "@/components/budget/DebtCalculator";
 import { FinancialGoals } from "@/components/budget/FinancialGoals";
 import { AchievementsBadges } from "@/components/budget/AchievementsBadges";
 import { ThemeCustomizer } from "@/components/budget/ThemeCustomizer";
+import { CategoryManager } from "@/components/budget/CategoryManager";
 import { QuickExpenseTracker } from "@/components/budget/QuickExpenseTracker";
 import { SpendingHabitsStats } from "@/components/budget/SpendingHabitsStats";
 import { GoalRecommendations } from "@/components/budget/GoalRecommendations";
@@ -531,7 +532,10 @@ const BudgetCalculator = () => {
             </TabsContent>
 
             <TabsContent value="customize">
-              <ThemeCustomizer />
+              <div className="space-y-6">
+                <ThemeCustomizer />
+                <CategoryManager isAuthenticated={isAuthenticated} />
+              </div>
             </TabsContent>
           </Tabs>
 
