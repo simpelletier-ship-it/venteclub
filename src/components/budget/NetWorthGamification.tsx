@@ -1,12 +1,94 @@
-import { TrendingUp, TrendingDown, Sparkles } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { TrendingUp, TrendingDown, Sparkles, LineChart as LineChartIcon } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatPrice } from "@/lib/priceFormat";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Area, AreaChart } from "recharts";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useState } from "react";
 
 interface NetWorthGamificationProps {
   netWorth: number;
 }
 
 export const NetWorthGamification = ({ netWorth }: NetWorthGamificationProps) => {
+  const [showChart, setShowChart] = useState(false);
+
+  // Fetch historical data for chart
+  const { data: historicalData = [] } = useQuery({
+    queryKey: ['net-worth-history'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return [];
+
+      // Get last 12 months
+      const months = [];
+      for (let i = 11; i >= 0; i--) {
+        const date = new Date();
+        date.setMonth(date.getMonth() - i);
+        date.setDate(1);
+        months.push({
+          month: date.toISOString().split('T')[0],
+          label: date.toLocaleDateString('fr-CA', { month: 'short', year: 'numeric' })
+        });
+      }
+
+      // Get transactions grouped by month
+      const { data: transactions } = await supabase
+        .from('budget_transactions')
+        .select('transaction_date, amount, type')
+        .gte('transaction_date', months[0].month)
+        .order('transaction_date');
+
+      // Get assets and debts snapshots (current values only for now)
+      const { data: assets } = await supabase
+        .from('user_assets')
+        .select('value');
+      
+      const { data: debts } = await supabase
+        .from('user_debts')
+        .select('balance');
+
+      const totalAssets = assets?.reduce((sum, a) => sum + Number(a.value), 0) || 0;
+      const totalDebts = debts?.reduce((sum, d) => sum + Number(d.balance), 0) || 0;
+
+      // Calculate cumulative net worth for each month
+      let cumulativeIncome = 0;
+      let cumulativeExpenses = 0;
+
+      return months.map((month, index) => {
+        const monthTransactions = transactions?.filter(t => {
+          const tDate = new Date(t.transaction_date);
+          const mDate = new Date(month.month);
+          return tDate.getMonth() === mDate.getMonth() && 
+                 tDate.getFullYear() === mDate.getFullYear();
+        }) || [];
+
+        const monthIncome = monthTransactions
+          .filter(t => t.type === 'income')
+          .reduce((sum, t) => sum + Number(t.amount), 0);
+        
+        const monthExpenses = monthTransactions
+          .filter(t => t.type === 'expense')
+          .reduce((sum, t) => sum + Number(t.amount), 0);
+
+        cumulativeIncome += monthIncome;
+        cumulativeExpenses += monthExpenses;
+
+        // Simplified calculation: starting point + cumulative transactions
+        const estimatedNetWorth = totalAssets - totalDebts + (cumulativeIncome - cumulativeExpenses);
+
+        return {
+          month: month.label,
+          actifs: totalAssets,
+          dettes: totalDebts,
+          valeurNette: estimatedNetWorth,
+          revenus: monthIncome,
+          dépenses: monthExpenses,
+        };
+      });
+    },
+  });
+
   // Calcul du pourcentage (0-100%)
   const getPercentage = () => {
     if (netWorth < 0) {
@@ -36,9 +118,26 @@ export const NetWorthGamification = ({ netWorth }: NetWorthGamificationProps) =>
     return "Fortune construite! 👑";
   };
 
+  const CustomTooltip = ({ active, payload }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-card border border-border rounded-lg shadow-lg p-3">
+          <p className="text-sm font-semibold mb-2">{payload[0].payload.month}</p>
+          {payload.map((entry: any, index: number) => (
+            <p key={index} className="text-sm" style={{ color: entry.color }}>
+              {entry.name}: {formatPrice(entry.value)}
+            </p>
+          ))}
+        </div>
+      );
+    }
+    return null;
+  };
+
   return (
-    <Card className="overflow-hidden border-0 shadow-lg bg-gradient-to-br from-card via-card to-muted/20">
-      <CardContent className="p-8">
+    <div className="space-y-6">
+      <Card className="overflow-hidden border-0 shadow-lg bg-gradient-to-br from-card via-card to-muted/20">
+        <CardContent className="p-8">
         {/* Header minimaliste */}
         <div className="flex items-center justify-between mb-8">
           <div>
@@ -144,5 +243,100 @@ export const NetWorthGamification = ({ netWorth }: NetWorthGamificationProps) =>
         </div>
       </CardContent>
     </Card>
+
+    {/* Evolution Chart */}
+    <Card className="overflow-hidden">
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <LineChartIcon className="h-5 w-5 text-primary" />
+            <CardTitle>Évolution de la valeur nette</CardTitle>
+          </div>
+          <button
+            onClick={() => setShowChart(!showChart)}
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            {showChart ? 'Masquer' : 'Afficher'}
+          </button>
+        </div>
+      </CardHeader>
+      
+      {showChart && (
+        <CardContent>
+          {historicalData.length > 0 ? (
+            <ResponsiveContainer width="100%" height={350}>
+              <AreaChart data={historicalData}>
+                <defs>
+                  <linearGradient id="colorValeurNette" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                  </linearGradient>
+                  <linearGradient id="colorActifs" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.2}/>
+                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                <XAxis 
+                  dataKey="month" 
+                  className="text-xs"
+                  stroke="hsl(var(--muted-foreground))"
+                />
+                <YAxis 
+                  className="text-xs"
+                  stroke="hsl(var(--muted-foreground))"
+                  tickFormatter={(value) => {
+                    if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M`;
+                    if (value >= 1000) return `${(value / 1000).toFixed(0)}k`;
+                    return value.toString();
+                  }}
+                />
+                <Tooltip content={<CustomTooltip />} />
+                <Legend 
+                  wrapperStyle={{ paddingTop: '20px' }}
+                  iconType="line"
+                />
+                <Area
+                  type="monotone"
+                  dataKey="actifs"
+                  stroke="#3b82f6"
+                  strokeWidth={2}
+                  fill="url(#colorActifs)"
+                  name="Actifs"
+                  dot={false}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="dettes"
+                  stroke="#ef4444"
+                  strokeWidth={2}
+                  fill="none"
+                  name="Dettes"
+                  strokeDasharray="5 5"
+                  dot={false}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="valeurNette"
+                  stroke="#10b981"
+                  strokeWidth={3}
+                  fill="url(#colorValeurNette)"
+                  name="Valeur Nette"
+                  dot={{ fill: '#10b981', r: 4 }}
+                  activeDot={{ r: 6 }}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="text-center py-12 text-muted-foreground">
+              <LineChartIcon className="h-12 w-12 mx-auto mb-3 opacity-50" />
+              <p className="text-lg mb-2">Pas encore de données</p>
+              <p className="text-sm">Ajoutez des transactions pour voir l'évolution</p>
+            </div>
+          )}
+        </CardContent>
+      )}
+    </Card>
+    </div>
   );
 };
