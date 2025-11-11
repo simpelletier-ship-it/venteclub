@@ -143,7 +143,7 @@ const Home = () => {
       />
       
       {/* Hero Section */}
-      <section className="relative min-h-[55vh] sm:min-h-[60vh] lg:min-h-[65vh] flex items-center bg-gradient-to-br from-[#1e1b4b] via-[#312e81] to-[#1e3a8a] overflow-hidden" aria-label="Section principale">
+      <section className="relative min-h-[70vh] sm:min-h-[75vh] lg:min-h-[80vh] flex items-center bg-gradient-to-br from-[#1e1b4b] via-[#312e81] to-[#1e3a8a] overflow-hidden" aria-label="Section principale">
         {/* Circuit Background */}
         <CircuitBackground />
         
@@ -198,45 +198,45 @@ const Home = () => {
       </section>
 
       {/* Statistics Section */}
-      <section className="py-10 sm:py-14 lg:py-16 bg-[#1e1b4b]" aria-label="Statistiques de la plateforme">
+      <section className="py-6 sm:py-8 lg:py-10 bg-[#1e1b4b]" aria-label="Statistiques de la plateforme">
         <div className="container mx-auto px-4">
-          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-8 text-white">La plateforme de confiance au Québec</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 md:gap-8 max-w-5xl mx-auto">
+          <h2 className="text-xl sm:text-2xl font-bold text-center mb-5 text-white">La plateforme de confiance au Québec</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-5 max-w-4xl mx-auto">
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#818cf8]/20 mb-2 sm:mb-3">
-                <Building2 className="w-5 h-5 sm:w-6 sm:h-6 text-[#818cf8]" />
+              <div className="inline-flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#818cf8]/20 mb-1.5 sm:mb-2">
+                <Building2 className="w-4 h-4 sm:w-5 sm:h-5 text-[#818cf8]" />
               </div>
-              <div ref={businessesCount.ref} className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-1 sm:mb-2 tabular-nums">
+              <div ref={businessesCount.ref} className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-0.5 sm:mb-1 tabular-nums">
                 {businessesCount.count}+
               </div>
-              <div className="text-xs sm:text-sm lg:text-base text-white/70 leading-tight">entreprises actives</div>
+              <div className="text-xs sm:text-sm text-white/70 leading-tight">entreprises actives</div>
             </div>
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#818cf8]/20 mb-2 sm:mb-3">
-                <Eye className="w-5 h-5 sm:w-6 sm:h-6 text-[#818cf8]" />
+              <div className="inline-flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#818cf8]/20 mb-1.5 sm:mb-2">
+                <Eye className="w-4 h-4 sm:w-5 sm:h-5 text-[#818cf8]" />
               </div>
-              <div ref={viewsCount.ref} className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-1 sm:mb-2 tabular-nums">
+              <div ref={viewsCount.ref} className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-0.5 sm:mb-1 tabular-nums">
                 {viewsCount.count}k+
               </div>
-              <div className="text-xs sm:text-sm lg:text-base text-white/70 leading-tight">vues totales</div>
+              <div className="text-xs sm:text-sm text-white/70 leading-tight">vues totales</div>
             </div>
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#818cf8]/20 mb-2 sm:mb-3">
-                <Users className="w-5 h-5 sm:w-6 sm:h-6 text-[#818cf8]" />
+              <div className="inline-flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#818cf8]/20 mb-1.5 sm:mb-2">
+                <Users className="w-4 h-4 sm:w-5 sm:h-5 text-[#818cf8]" />
               </div>
-              <div ref={usersCount.ref} className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-1 sm:mb-2 tabular-nums">
+              <div ref={usersCount.ref} className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-0.5 sm:mb-1 tabular-nums">
                 {usersCount.count}+
               </div>
-              <div className="text-xs sm:text-sm lg:text-base text-white/70 leading-tight">entrepreneurs inscrits</div>
+              <div className="text-xs sm:text-sm text-white/70 leading-tight">entrepreneurs inscrits</div>
             </div>
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#818cf8]/20 mb-2 sm:mb-3">
-                <DollarSign className="w-5 h-5 sm:w-6 sm:h-6 text-[#818cf8]" />
+              <div className="inline-flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#818cf8]/20 mb-1.5 sm:mb-2">
+                <DollarSign className="w-4 h-4 sm:w-5 sm:h-5 text-[#818cf8]" />
               </div>
-              <div ref={valueCount.ref} className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-1 sm:mb-2 tabular-nums">
+              <div ref={valueCount.ref} className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-0.5 sm:mb-1 tabular-nums">
                 {valueCount.count}M+$
               </div>
-              <div className="text-xs sm:text-sm lg:text-base text-white/70 leading-tight">valeur totale des annonces</div>
+              <div className="text-xs sm:text-sm text-white/70 leading-tight">valeur totale des annonces</div>
             </div>
           </div>
         </div>
