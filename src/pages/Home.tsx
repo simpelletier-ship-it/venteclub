@@ -157,20 +157,13 @@ const Home = () => {
         <div className="container mx-auto px-4 py-6 sm:py-8 lg:py-12 relative z-10">
           <div className="max-w-6xl mx-auto">
             <div className="space-y-6 sm:space-y-7 lg:space-y-9 animate-slide-up">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-display font-bold leading-[1.15] tracking-tight whitespace-normal">
-                <span className="text-white inline-block">Achat et Vente{"\u00A0"}</span>
-                <span className="text-[#818cf8] inline-block">d'Entreprises{"\u00A0"}</span>
-                <span className="text-white inline-block">au{"\u00A0"}Québec</span>
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-display font-bold leading-[1.15] tracking-tight">
+                <span className="text-white">Achetez ou vendez{"\u00A0"}</span>
+                <span className="text-[#818cf8]"><TypewriterAnimation /></span>
               </h1>
               
-              <p className="text-lg sm:text-xl lg:text-2xl text-[#818cf8] font-semibold max-w-3xl leading-relaxed">
-                <span className="inline-block">Le Club de Référence pour acheter{"\u00A0"}</span>
-                <span className="inline-block min-w-[200px]"><TypewriterAnimation /></span>
-                <span className="inline-block">{"\u00A0"}partout au Québec</span>
-              </p>
-              
-              <p className="text-base sm:text-lg lg:text-xl text-white/90 max-w-3xl leading-relaxed">
-                Plateforme de mise en relation directe entre acheteurs et vendeurs d'entreprises au Québec. Recherchez, comparez et contactez les propriétaires dans un environnement transparent et professionnel.
+              <p className="text-lg sm:text-xl lg:text-2xl text-white/90 max-w-3xl leading-relaxed">
+                La plateforme de référence au Québec pour acquérir une entreprise établie
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4 sm:gap-5 pt-4 sm:pt-6">
