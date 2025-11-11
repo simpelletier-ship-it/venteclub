@@ -191,7 +191,7 @@ const Home = () => {
                 </div>
               </div>
               
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-20 sm:pt-24 lg:pt-28">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-28 sm:pt-32 lg:pt-36">
                 <Button 
                   size="lg" 
                   className="bg-[#6366f1] hover:bg-[#4f46e5] text-white h-14 sm:h-16 lg:h-[72px] px-8 sm:px-10 lg:px-14 text-base sm:text-lg lg:text-xl font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all group w-full sm:w-auto"
