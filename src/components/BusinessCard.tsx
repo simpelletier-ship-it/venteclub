@@ -205,7 +205,7 @@ const BusinessCard = ({
         {/* Gradient overlay on hover */}
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-[1]" />
         
-        {/* Image principale avec dimensions explicites */}
+        {/* Image principale seulement */}
         <div className="relative w-full h-56 sm:h-64 overflow-hidden bg-muted">
           {!imageLoading && mainImageUrl ? (
             <OptimizedImage
@@ -214,12 +214,9 @@ const BusinessCard = ({
               className="w-full h-full object-cover"
               objectFit="cover"
               width={600}
-              quality={70}
-              aspectRatio="16/9"
+              quality={75}
             />
-          ) : (
-            <div className="w-full h-full bg-gradient-to-br from-muted to-muted/50" />
-          )}
+          ) : null}
         </div>
 
       {/* Sold Diagonal Banner */}

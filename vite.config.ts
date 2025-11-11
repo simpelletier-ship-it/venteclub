@@ -53,56 +53,10 @@ export default defineConfig(({ mode }) => ({
         maximumFileSizeToCacheInBytes: 5000000,
         runtimeCaching: [
           {
-            // Assets statiques - Cache-First agressif avec longue expiration
-            urlPattern: /\.(?:js|css|woff|woff2|ttf|eot|otf)$/i,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'static-assets-v1',
-              expiration: {
-                maxEntries: 60,
-                maxAgeSeconds: 60 * 60 * 24 * 365 // 1 an
-              },
-              cacheableResponse: {
-                statuses: [0, 200]
-              }
-            }
-          },
-          {
-            // Images locales et externes - Cache-First très agressif
-            urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp|avif|ico)$/i,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'images-cache-v1',
-              expiration: {
-                maxEntries: 300,
-                maxAgeSeconds: 60 * 60 * 24 * 90 // 90 jours
-              },
-              cacheableResponse: {
-                statuses: [0, 200]
-              }
-            }
-          },
-          {
-            // Supabase Storage - Cache-First avec revalidation
-            urlPattern: /^https:.*\.supabase\.co\/storage\/.*/i,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'supabase-storage-v1',
-              expiration: {
-                maxEntries: 200,
-                maxAgeSeconds: 60 * 60 * 24 * 30 // 30 jours
-              },
-              cacheableResponse: {
-                statuses: [0, 200]
-              }
-            }
-          },
-          {
-            // API Supabase - Network-First avec fallback rapide
             urlPattern: /^https:\/\/xmwsrvaricrfxovimffm\.supabase\.co\/.*/i,
             handler: 'NetworkFirst',
             options: {
-              cacheName: 'api-cache-v1',
+              cacheName: 'api-cache',
               networkTimeoutSeconds: 10,
               expiration: {
                 maxEntries: 100,
@@ -138,6 +92,17 @@ export default defineConfig(({ mode }) => ({
               },
               cacheableResponse: {
                 statuses: [0, 200]
+              }
+            }
+          },
+          {
+            urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp)$/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'images-cache',
+              expiration: {
+                maxEntries: 200,
+                maxAgeSeconds: 60 * 60 * 24 * 30 // 30 jours
               }
             }
           }

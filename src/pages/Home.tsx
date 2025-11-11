@@ -8,10 +8,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { SEO } from "@/components/SEO";
 import { BreadcrumbSchema } from "@/components/BreadcrumbSchema";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { StaticHeroBackground } from "@/components/StaticHeroBackground";
 import { TypewriterAnimation } from "@/components/AnimatedSearchBar";
-import { trackPageView } from "@/lib/googleAds";
+import { useCountUp } from "@/hooks/useCountUp";
 import { FloatingOpportunities } from "@/components/FloatingOpportunities";
+import { CircuitBackground } from "@/components/CircuitBackground";
+import { trackPageView } from "@/lib/googleAds";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -25,15 +26,18 @@ const Home = () => {
     totalValue: 0
   });
   
+  // Compteurs animés pour les statistiques - animation rapide
+  const businessesCount = useCountUp({ end: stats.totalBusinesses, duration: 1200, delay: 100 });
+  const viewsCount = useCountUp({ end: Math.floor(stats.totalViews / 1000), duration: 1200, delay: 200 });
+  const usersCount = useCountUp({ end: 28, duration: 1200, delay: 300 });
+  const valueCount = useCountUp({ end: Math.floor(stats.totalValue / 1000000), duration: 1200, delay: 400 });
+  
   useEffect(() => {
-    // Defer heavy operations to not block initial render
-    const timer = setTimeout(() => {
-      fetchFeaturedBusinesses();
-      fetchStats();
-      trackPageView();
-    }, 100);
+    fetchFeaturedBusinesses();
+    fetchStats();
     
-    return () => clearTimeout(timer);
+    // Envoyer événement de page vue à Google Ads
+    trackPageView();
   }, []);
 
   useEffect(() => {
@@ -138,17 +142,21 @@ const Home = () => {
         ]}
       />
       
-      {/* Hero Section - Optimized for performance */}
+      {/* Hero Section */}
       <section className="relative min-h-[55vh] sm:min-h-[60vh] lg:min-h-[65vh] flex items-center bg-gradient-to-br from-[#1e1b4b] via-[#312e81] to-[#1e3a8a] overflow-hidden" aria-label="Section principale">
-        {/* Static optimized background */}
-        <StaticHeroBackground />
+        {/* Circuit Background */}
+        <CircuitBackground />
         
-        {/* Floating Opportunities Carousel */}
-        <FloatingOpportunities />
+        {/* Simplified Background Elements - removed parallax for performance */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-20 -right-20 w-96 h-96 bg-[#6366f1]/20 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '8s' }} />
+          <div className="absolute bottom-20 -left-20 w-96 h-96 bg-[#818cf8]/20 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '10s', animationDelay: '2s' }} />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#4f46e5]/10 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '12s', animationDelay: '4s' }} />
+        </div>
         
         <div className="container mx-auto px-4 py-6 sm:py-8 lg:py-12 relative z-10">
           <div className="max-w-6xl mx-auto">
-            <div className="space-y-4 sm:space-y-6 lg:space-y-8">
+            <div className="space-y-4 sm:space-y-6 lg:space-y-8 animate-slide-up">
               <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-display font-bold leading-[1.2] sm:leading-[1.15] tracking-tight text-white">
                 Achat et Vente d'Entreprises au Québec - Trouvez Votre Opportunité
               </h1>
@@ -180,10 +188,16 @@ const Home = () => {
               </div>
             </div>
           </div>
+          
+          {/* Floating Animation - Positioned Absolutely */}
+          <div className="hidden xl:block absolute left-[66%] top-[68%] -translate-y-1/2 w-[300px] pointer-events-none">
+            <FloatingOpportunities />
+          </div>
         </div>
+        
       </section>
 
-      {/* Statistics Section - Static for best performance */}
+      {/* Statistics Section */}
       <section className="py-10 sm:py-14 lg:py-16 bg-[#1e1b4b]" aria-label="Statistiques de la plateforme">
         <div className="container mx-auto px-4">
           <h2 className="text-2xl sm:text-3xl font-bold text-center mb-8 text-white">La plateforme de confiance au Québec</h2>
@@ -192,8 +206,8 @@ const Home = () => {
               <div className="inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#818cf8]/20 mb-2 sm:mb-3">
                 <Building2 className="w-5 h-5 sm:w-6 sm:h-6 text-[#818cf8]" />
               </div>
-              <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-1 sm:mb-2 tabular-nums">
-                {stats.totalBusinesses || 0}+
+              <div ref={businessesCount.ref} className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-1 sm:mb-2 tabular-nums">
+                {businessesCount.count}+
               </div>
               <div className="text-xs sm:text-sm lg:text-base text-white/70 leading-tight">entreprises actives</div>
             </div>
@@ -201,8 +215,8 @@ const Home = () => {
               <div className="inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#818cf8]/20 mb-2 sm:mb-3">
                 <Eye className="w-5 h-5 sm:w-6 sm:h-6 text-[#818cf8]" />
               </div>
-              <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-1 sm:mb-2 tabular-nums">
-                {Math.floor((stats.totalViews || 0) / 1000)}k+
+              <div ref={viewsCount.ref} className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-1 sm:mb-2 tabular-nums">
+                {viewsCount.count}k+
               </div>
               <div className="text-xs sm:text-sm lg:text-base text-white/70 leading-tight">vues totales</div>
             </div>
@@ -210,8 +224,8 @@ const Home = () => {
               <div className="inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#818cf8]/20 mb-2 sm:mb-3">
                 <Users className="w-5 h-5 sm:w-6 sm:h-6 text-[#818cf8]" />
               </div>
-              <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-1 sm:mb-2 tabular-nums">
-                28+
+              <div ref={usersCount.ref} className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-1 sm:mb-2 tabular-nums">
+                {usersCount.count}+
               </div>
               <div className="text-xs sm:text-sm lg:text-base text-white/70 leading-tight">entrepreneurs inscrits</div>
             </div>
@@ -219,8 +233,8 @@ const Home = () => {
               <div className="inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#818cf8]/20 mb-2 sm:mb-3">
                 <DollarSign className="w-5 h-5 sm:w-6 sm:h-6 text-[#818cf8]" />
               </div>
-              <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-1 sm:mb-2 tabular-nums">
-                {Math.floor((stats.totalValue || 0) / 1000000)}M+$
+              <div ref={valueCount.ref} className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-1 sm:mb-2 tabular-nums">
+                {valueCount.count}M+$
               </div>
               <div className="text-xs sm:text-sm lg:text-base text-white/70 leading-tight">valeur totale des annonces</div>
             </div>

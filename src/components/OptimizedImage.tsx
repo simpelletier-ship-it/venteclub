@@ -19,12 +19,12 @@ interface OptimizedImageProps extends Omit<ImgHTMLAttributes<HTMLImageElement>, 
 }
 
 /**
- * Optimise une URL d'image Supabase avec transformations agressives
+ * Optimise une URL d'image Supabase avec transformations
  * - Resize automatique selon la largeur
- * - Conversion WebP pour réduire la taille de 70-80%
- * - Compression avec qualité optimisée pour web
+ * - Conversion WebP pour réduire la taille
+ * - Compression avec qualité ajustable
  */
-const getOptimizedImageUrl = (url: string, width?: number, quality: number = 75): string => {
+const getOptimizedImageUrl = (url: string, width?: number, quality: number = 80): string => {
   if (!url) return url;
   
   // Vérifier si c'est une image Supabase
@@ -41,14 +41,11 @@ const getOptimizedImageUrl = (url: string, width?: number, quality: number = 75)
       params.append('width', width.toString());
     }
     
-    // Qualité optimisée pour le web (70-75 est le sweet spot)
+    // Qualité (1-100)
     params.append('quality', quality.toString());
     
-    // Format WebP pour réduire la taille de 70-80%
+    // Format WebP pour réduire la taille de 25-35%
     params.append('format', 'webp');
-    
-    // Resize mode cover pour toujours remplir l'espace
-    params.append('resize', 'cover');
     
     // Ajouter les paramètres à l'URL
     const transformedUrl = `${urlObj.origin}${urlObj.pathname}?${params.toString()}`;
@@ -69,7 +66,7 @@ const getOptimizedImageUrl = (url: string, width?: number, quality: number = 75)
  * - Gestion d'erreurs avec fallback personnalisable
  * - fetchpriority pour améliorer LCP
  * - Responsive images avec srcset
- * - Dimensions explicites pour éviter CLS
+ * - Blur placeholder pour une transition douce
  */
 export const OptimizedImage = ({
   src,
@@ -79,7 +76,7 @@ export const OptimizedImage = ({
   objectFit = 'cover',
   priority = false,
   width,
-  quality = 75, // Réduction de qualité pour gagner en performance
+  quality = 80,
   lazy = true,
   smartPriority = true,
   className = '',
@@ -93,7 +90,7 @@ export const OptimizedImage = ({
 
   // Observer la position et la vélocité du scroll
   const [containerRef, isVisible] = useIntersectionObserver({
-    rootMargin: smartPriority ? '200px' : '50px',
+    rootMargin: smartPriority ? '200px' : '50px', // Plus de marge si smart priority
     threshold: 0.01,
     freezeOnceVisible: true,
   });
@@ -190,14 +187,12 @@ export const OptimizedImage = ({
           srcSet={srcSet || undefined}
           sizes={width ? `(max-width: 768px) 100vw, ${width}px` : undefined}
           alt={alt}
-          width={width}
-          height={width && aspectRatio ? Math.round(width / parseFloat(aspectRatio.split('/')[0]) * parseFloat(aspectRatio.split('/')[1] || '1')) : undefined}
           loading={priority ? "eager" : "lazy"}
           decoding="async"
           fetchPriority={priority ? "high" : "auto"}
           onLoad={handleLoad}
           onError={handleError}
-          className={`${className} ${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300 ease-out`}
+          className={`${className} ${isLoading ? 'opacity-0 blur-sm' : 'opacity-100 blur-0'} transition-all duration-500 ease-out`}
           style={{ objectFit, ...(aspectRatio && { aspectRatio }) }}
           {...props}
         />
