@@ -23,7 +23,7 @@ interface Category {
   type: 'income' | 'expense';
 }
 
-export const BudgetTransactions = () => {
+export const BudgetTransactions = ({ isAuthenticated }: { isAuthenticated: boolean }) => {
   const [open, setOpen] = useState(false);
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
@@ -44,6 +44,8 @@ export const BudgetTransactions = () => {
   // Fetch categories and create defaults if needed
   const { data: categories = [] } = useQuery({
     queryKey: ['budget-categories'],
+    enabled: isAuthenticated,
+    retry: 1,
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Non authentifié");
@@ -103,6 +105,8 @@ export const BudgetTransactions = () => {
   // Fetch transactions
   const { data: transactions = [] } = useQuery({
     queryKey: ['budget-transactions'],
+    enabled: isAuthenticated,
+    retry: 1,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('budget_transactions')

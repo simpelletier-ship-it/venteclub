@@ -24,7 +24,7 @@ const GOAL_TYPES = [
   { value: 'other', label: '🎯 Autre', icon: '🎯' },
 ];
 
-export const FinancialGoals = () => {
+export const FinancialGoals = ({ isAuthenticated }: { isAuthenticated: boolean }) => {
   const queryClient = useQueryClient();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [updateDialogOpen, setUpdateDialogOpen] = useState(false);
@@ -41,6 +41,8 @@ export const FinancialGoals = () => {
   // Fetch goals
   const { data: goals = [] } = useQuery({
     queryKey: ['financial-goals'],
+    enabled: isAuthenticated,
+    retry: 1,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('financial_goals')

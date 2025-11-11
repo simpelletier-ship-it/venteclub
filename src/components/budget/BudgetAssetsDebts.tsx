@@ -33,7 +33,7 @@ const DEBT_TYPES = [
   { value: 'other', label: 'Autre' },
 ];
 
-export const BudgetAssetsDebts = () => {
+export const BudgetAssetsDebts = ({ isAuthenticated }: { isAuthenticated: boolean }) => {
   const queryClient = useQueryClient();
   
   // Assets state
@@ -57,6 +57,8 @@ export const BudgetAssetsDebts = () => {
   // Fetch assets
   const { data: assets = [] } = useQuery({
     queryKey: ['user-assets'],
+    enabled: isAuthenticated,
+    retry: 1,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('user_assets')
@@ -71,6 +73,8 @@ export const BudgetAssetsDebts = () => {
   // Fetch debts
   const { data: debts = [] } = useQuery({
     queryKey: ['user-debts'],
+    enabled: isAuthenticated,
+    retry: 1,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('user_debts')

@@ -511,17 +511,17 @@ const BudgetCalculator = () => {
             </TabsContent>
 
             <TabsContent value="transactions">
-              <BudgetTransactions />
+              <BudgetTransactions isAuthenticated={isAuthenticated} />
             </TabsContent>
 
             <TabsContent value="assets">
-              <BudgetAssetsDebts />
+              <BudgetAssetsDebts isAuthenticated={isAuthenticated} />
             </TabsContent>
 
             <TabsContent value="goals">
               <div className="space-y-8">
                 <GoalRecommendations isAuthenticated={isAuthenticated} />
-                <FinancialGoals />
+                <FinancialGoals isAuthenticated={isAuthenticated} />
                 <AchievementsBadges isAuthenticated={isAuthenticated} />
               </div>
             </TabsContent>
