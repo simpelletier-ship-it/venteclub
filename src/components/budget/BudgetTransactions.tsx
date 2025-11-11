@@ -31,12 +31,22 @@ export const BudgetTransactions = () => {
   const [isRecurring, setIsRecurring] = useState(false);
   const [recurringFrequency, setRecurringFrequency] = useState("monthly");
   
+  // States for adding custom categories
+  const [categoryDialogOpen, setCategoryDialogOpen] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState("");
+  const [newCategoryIcon, setNewCategoryIcon] = useState("📝");
+  const [newCategoryType, setNewCategoryType] = useState<'income' | 'expense'>('expense');
+  const [newCategoryColor, setNewCategoryColor] = useState("#3b82f6");
+  
   const queryClient = useQueryClient();
 
-  // Fetch categories
+  // Fetch categories and create defaults if needed
   const { data: categories = [] } = useQuery({
     queryKey: ['budget-categories'],
     queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Non authentifié");
+
       const { data, error } = await supabase
         .from('budget_categories')
         .select('*')
@@ -44,6 +54,47 @@ export const BudgetTransactions = () => {
         .order('name', { ascending: true });
       
       if (error) throw error;
+      
+      // Create default categories if user has none
+      if (!data || data.length === 0) {
+        const defaultCategories = [
+          // Revenus
+          { name: "Salaire", icon: "💼", color: "#10b981", type: "income", user_id: user.id, is_custom: false },
+          { name: "Freelance", icon: "💻", color: "#06b6d4", type: "income", user_id: user.id, is_custom: false },
+          { name: "Investissements", icon: "📈", color: "#8b5cf6", type: "income", user_id: user.id, is_custom: false },
+          { name: "Autre revenu", icon: "💰", color: "#14b8a6", type: "income", user_id: user.id, is_custom: false },
+          
+          // Dépenses
+          { name: "Logement", icon: "🏠", color: "#ef4444", type: "expense", user_id: user.id, is_custom: false },
+          { name: "Alimentation", icon: "🍽️", color: "#f59e0b", type: "expense", user_id: user.id, is_custom: false },
+          { name: "Transport", icon: "🚗", color: "#3b82f6", type: "expense", user_id: user.id, is_custom: false },
+          { name: "Divertissement", icon: "🎬", color: "#ec4899", type: "expense", user_id: user.id, is_custom: false },
+          { name: "Santé", icon: "🏥", color: "#06b6d4", type: "expense", user_id: user.id, is_custom: false },
+          { name: "Éducation", icon: "📚", color: "#8b5cf6", type: "expense", user_id: user.id, is_custom: false },
+          { name: "Services publics", icon: "💡", color: "#f59e0b", type: "expense", user_id: user.id, is_custom: false },
+          { name: "Assurances", icon: "🛡️", color: "#6366f1", type: "expense", user_id: user.id, is_custom: false },
+          { name: "Vêtements", icon: "👕", color: "#ec4899", type: "expense", user_id: user.id, is_custom: false },
+          { name: "Autre dépense", icon: "💳", color: "#64748b", type: "expense", user_id: user.id, is_custom: false },
+        ];
+
+        const { error: insertError } = await supabase
+          .from('budget_categories')
+          .insert(defaultCategories);
+
+        if (insertError) {
+          console.error("Error creating default categories:", insertError);
+        } else {
+          // Re-fetch categories after creating defaults
+          const { data: newData } = await supabase
+            .from('budget_categories')
+            .select('*')
+            .order('type', { ascending: true })
+            .order('name', { ascending: true });
+          
+          return newData as Category[];
+        }
+      }
+      
       return data as Category[];
     },
   });
@@ -116,29 +167,159 @@ export const BudgetTransactions = () => {
     },
   });
 
+  // Add custom category mutation
+  const addCategory = useMutation({
+    mutationFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Non authentifié");
+
+      const { error } = await supabase
+        .from('budget_categories')
+        .insert({
+          user_id: user.id,
+          name: newCategoryName,
+          icon: newCategoryIcon,
+          color: newCategoryColor,
+          type: newCategoryType,
+          is_custom: true,
+        });
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['budget-categories'] });
+      toast.success("Catégorie ajoutée avec succès");
+      setCategoryDialogOpen(false);
+      setNewCategoryName("");
+      setNewCategoryIcon("📝");
+      setNewCategoryType("expense");
+      setNewCategoryColor("#3b82f6");
+    },
+    onError: (error) => {
+      toast.error("Erreur: " + error.message);
+    },
+  });
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     addTransaction.mutate();
   };
 
+  const handleCategorySubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    addCategory.mutate();
+  };
+
   const incomeCategories = categories.filter(c => c.type === 'income');
   const expenseCategories = categories.filter(c => c.type === 'expense');
 
+  const commonEmojis = ["💼", "💰", "🏠", "🍽️", "🚗", "🎬", "🏥", "📚", "💡", "🛡️", "👕", "💳", "✈️", "🎮", "📱", "💻", "🎯", "🎨", "🏋️", "🛒"];
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
-          <h3 className="text-2xl font-bold">Transactions</h3>
-          <p className="text-muted-foreground">Suivez vos revenus et dépenses</p>
+          <h3 className="text-2xl font-bold">Transactions Réelles</h3>
+          <p className="text-muted-foreground">Enregistrez vos revenus et dépenses réels</p>
         </div>
         
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              Ajouter une transaction
-            </Button>
-          </DialogTrigger>
+        <div className="flex gap-2">
+          <Dialog open={categoryDialogOpen} onOpenChange={setCategoryDialogOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline">
+                <Plus className="mr-2 h-4 w-4" />
+                Nouvelle catégorie
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle>Ajouter une catégorie</DialogTitle>
+                <DialogDescription>Créez une catégorie personnalisée</DialogDescription>
+              </DialogHeader>
+              <form onSubmit={handleCategorySubmit} className="space-y-4">
+                <div>
+                  <Label>Type</Label>
+                  <Select value={newCategoryType} onValueChange={(v) => setNewCategoryType(v as 'income' | 'expense')}>
+                    <SelectTrigger className="mt-1">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="income">💰 Revenu</SelectItem>
+                      <SelectItem value="expense">💳 Dépense</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label>Nom de la catégorie</Label>
+                  <Input
+                    value={newCategoryName}
+                    onChange={(e) => setNewCategoryName(e.target.value)}
+                    placeholder="Ex: Café, Gym, etc."
+                    className="mt-1"
+                    required
+                    maxLength={30}
+                  />
+                </div>
+
+                <div>
+                  <Label>Icône</Label>
+                  <div className="flex gap-2 mt-1">
+                    <Input
+                      value={newCategoryIcon}
+                      onChange={(e) => setNewCategoryIcon(e.target.value)}
+                      className="w-20"
+                      maxLength={2}
+                    />
+                    <div className="flex flex-wrap gap-1 flex-1">
+                      {commonEmojis.map(emoji => (
+                        <Button
+                          key={emoji}
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="w-8 h-8 p-0"
+                          onClick={() => setNewCategoryIcon(emoji)}
+                        >
+                          {emoji}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <Label>Couleur</Label>
+                  <div className="flex gap-2 mt-1">
+                    <Input
+                      type="color"
+                      value={newCategoryColor}
+                      onChange={(e) => setNewCategoryColor(e.target.value)}
+                      className="w-20 h-10"
+                    />
+                    <Input
+                      value={newCategoryColor}
+                      onChange={(e) => setNewCategoryColor(e.target.value)}
+                      placeholder="#3b82f6"
+                      className="flex-1"
+                    />
+                  </div>
+                </div>
+
+                <Button type="submit" className="w-full" disabled={addCategory.isPending}>
+                  {addCategory.isPending ? "Ajout..." : "Créer la catégorie"}
+                </Button>
+              </form>
+            </DialogContent>
+          </Dialog>
+
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="mr-2 h-4 w-4" />
+                Ajouter une transaction
+              </Button>
+            </DialogTrigger>
           <DialogContent className="max-w-md">
             <DialogHeader>
               <DialogTitle>Nouvelle transaction</DialogTitle>
@@ -234,7 +415,8 @@ export const BudgetTransactions = () => {
               </Button>
             </form>
           </DialogContent>
-        </Dialog>
+          </Dialog>
+        </div>
       </div>
 
       <Card>

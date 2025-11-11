@@ -407,14 +407,29 @@ const BudgetCalculator = () => {
 
           <Tabs defaultValue="overview" className="space-y-6">
             <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
-              <TabsTrigger value="simple">Calculateur simple</TabsTrigger>
-              <TabsTrigger value="transactions">Transactions</TabsTrigger>
+              <TabsTrigger value="overview">Budget vs Réel</TabsTrigger>
+              <TabsTrigger value="simple">Mon Budget</TabsTrigger>
+              <TabsTrigger value="transactions">Transactions Réelles</TabsTrigger>
               <TabsTrigger value="assets">Actifs & Dettes</TabsTrigger>
             </TabsList>
 
             <TabsContent value="overview">
-              <NetWorthGamification netWorth={netWorth} />
+              <div className="space-y-6">
+                <NetWorthGamification netWorth={netWorth} />
+                
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Comparaison Budget vs Réel</CardTitle>
+                    <CardDescription>Suivez vos performances financières</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-center py-12 text-muted-foreground">
+                      <p className="text-lg mb-2">📊 Comparaison en cours de développement</p>
+                      <p>Ajoutez des transactions et définissez votre budget pour voir vos performances</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
             </TabsContent>
 
             <TabsContent value="simple">
