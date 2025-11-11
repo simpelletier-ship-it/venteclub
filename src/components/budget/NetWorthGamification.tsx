@@ -95,8 +95,8 @@ export const NetWorthGamification = ({ netWorth }: NetWorthGamificationProps) =>
       // Sous l'eau: plus on a de dettes, plus on descend (max -100k = 0%)
       return Math.max(0, ((netWorth + 100000) / 100000) * 25);
     } else if (netWorth <= 1000000) {
-      // Progression normale: 0 = 25%, 1M = 75%
-      return 25 + (netWorth / 1000000) * 50;
+      // Progression normale: 0 = 0%, 1M = 75%
+      return (netWorth / 1000000) * 75;
     } else {
       // Richesse: 1M = 75%, 10M+ = 100%
       return Math.min(100, 75 + ((netWorth - 1000000) / 9000000) * 25);
@@ -195,26 +195,45 @@ export const NetWorthGamification = ({ netWorth }: NetWorthGamificationProps) =>
 
           {/* Milestones minimalistes */}
           <div className="flex justify-between text-xs text-muted-foreground mt-4 px-1">
-            <div className="text-center">
-              <div className={`w-1.5 h-1.5 rounded-full mx-auto mb-1 ${netWorth >= -100000 ? 'bg-primary' : 'bg-muted'}`} />
-              <span>-100k</span>
-            </div>
-            <div className="text-center">
-              <div className={`w-1.5 h-1.5 rounded-full mx-auto mb-1 ${netWorth >= 0 ? 'bg-primary' : 'bg-muted'}`} />
-              <span>0</span>
-            </div>
-            <div className="text-center">
-              <div className={`w-1.5 h-1.5 rounded-full mx-auto mb-1 ${netWorth >= 500000 ? 'bg-primary' : 'bg-muted'}`} />
-              <span>500k</span>
-            </div>
-            <div className="text-center">
-              <div className={`w-1.5 h-1.5 rounded-full mx-auto mb-1 ${netWorth >= 1000000 ? 'bg-primary' : 'bg-muted'}`} />
-              <span>1M</span>
-            </div>
-            <div className="text-center">
-              <div className={`w-1.5 h-1.5 rounded-full mx-auto mb-1 ${netWorth >= 5000000 ? 'bg-primary' : 'bg-muted'}`} />
-              <span>5M+</span>
-            </div>
+            {netWorth < 0 ? (
+              <>
+                <div className="text-center">
+                  <div className={`w-1.5 h-1.5 rounded-full mx-auto mb-1 ${netWorth >= -100000 ? 'bg-primary' : 'bg-muted'}`} />
+                  <span>-100k</span>
+                </div>
+                <div className="text-center">
+                  <div className={`w-1.5 h-1.5 rounded-full mx-auto mb-1 ${netWorth >= -50000 ? 'bg-primary' : 'bg-muted'}`} />
+                  <span>-50k</span>
+                </div>
+                <div className="text-center">
+                  <div className={`w-1.5 h-1.5 rounded-full mx-auto mb-1 ${netWorth >= 0 ? 'bg-primary' : 'bg-muted'}`} />
+                  <span>0</span>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="text-center">
+                  <div className={`w-1.5 h-1.5 rounded-full mx-auto mb-1 bg-primary`} />
+                  <span>0</span>
+                </div>
+                <div className="text-center">
+                  <div className={`w-1.5 h-1.5 rounded-full mx-auto mb-1 ${netWorth >= 250000 ? 'bg-primary' : 'bg-muted'}`} />
+                  <span>250k</span>
+                </div>
+                <div className="text-center">
+                  <div className={`w-1.5 h-1.5 rounded-full mx-auto mb-1 ${netWorth >= 500000 ? 'bg-primary' : 'bg-muted'}`} />
+                  <span>500k</span>
+                </div>
+                <div className="text-center">
+                  <div className={`w-1.5 h-1.5 rounded-full mx-auto mb-1 ${netWorth >= 1000000 ? 'bg-primary' : 'bg-muted'}`} />
+                  <span>1M</span>
+                </div>
+                <div className="text-center">
+                  <div className={`w-1.5 h-1.5 rounded-full mx-auto mb-1 ${netWorth >= 5000000 ? 'bg-primary' : 'bg-muted'}`} />
+                  <span>5M+</span>
+                </div>
+              </>
+            )}
           </div>
         </div>
 

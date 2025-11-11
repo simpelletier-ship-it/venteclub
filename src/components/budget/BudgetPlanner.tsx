@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { Plus, Trash2, PencilLine } from "lucide-react";
+import { Plus, Trash2, PencilLine, CalendarDays } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { CurrencyInput } from "@/components/CurrencyInput";
 import { formatPrice } from "@/lib/priceFormat";
@@ -19,10 +20,18 @@ interface Category {
   type: 'income' | 'expense';
 }
 
+interface BudgetGoal {
+  id: string;
+  category_id: string;
+  monthly_limit: number;
+  frequency?: string;
+}
+
 export const BudgetPlanner = () => {
   const [open, setOpen] = useState(false);
-  const [editingGoal, setEditingGoal] = useState<{ categoryId: string; currentLimit: number } | null>(null);
+  const [editingGoal, setEditingGoal] = useState<{ categoryId: string; currentLimit: number; currentFrequency?: string } | null>(null);
   const [monthlyLimit, setMonthlyLimit] = useState("");
+  const [frequency, setFrequency] = useState("monthly");
   
   const queryClient = useQueryClient();
 
@@ -50,7 +59,7 @@ export const BudgetPlanner = () => {
         .select('*');
       
       if (error) throw error;
-      return data;
+      return data as BudgetGoal[];
     },
   });
 
@@ -74,16 +83,22 @@ export const BudgetPlanner = () => {
 
   // Add/Update budget goal mutation
   const saveGoal = useMutation({
-    mutationFn: async ({ categoryId, limit }: { categoryId: string; limit: number }) => {
+    mutationFn: async ({ categoryId, limit, freq }: { categoryId: string; limit: number; freq: string }) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Non authentifié");
 
       const existingGoal = goals.find(g => g.category_id === categoryId);
 
+      // Convert to monthly amount based on frequency
+      let monthlyAmount = limit;
+      if (freq === 'weekly') monthlyAmount = limit * 4.33;
+      else if (freq === 'biweekly') monthlyAmount = limit * 2.17;
+      else if (freq === 'yearly') monthlyAmount = limit / 12;
+
       if (existingGoal) {
         const { error } = await supabase
           .from('budget_goals')
-          .update({ monthly_limit: limit })
+          .update({ monthly_limit: monthlyAmount, frequency: freq })
           .eq('id', existingGoal.id);
         if (error) throw error;
       } else {
@@ -92,7 +107,8 @@ export const BudgetPlanner = () => {
           .insert({
             user_id: user.id,
             category_id: categoryId,
-            monthly_limit: limit,
+            monthly_limit: monthlyAmount,
+            frequency: freq,
           });
         if (error) throw error;
       }
@@ -103,6 +119,7 @@ export const BudgetPlanner = () => {
       setOpen(false);
       setEditingGoal(null);
       setMonthlyLimit("");
+      setFrequency("monthly");
     },
     onError: (error) => {
       toast.error("Erreur: " + error.message);
@@ -130,12 +147,13 @@ export const BudgetPlanner = () => {
 
   const handleSubmit = (e: React.FormEvent, categoryId: string) => {
     e.preventDefault();
-    saveGoal.mutate({ categoryId, limit: parseFloat(monthlyLimit) });
+    saveGoal.mutate({ categoryId, limit: parseFloat(monthlyLimit), freq: frequency });
   };
 
-  const handleEdit = (categoryId: string, currentLimit: number) => {
-    setEditingGoal({ categoryId, currentLimit });
+  const handleEdit = (categoryId: string, currentLimit: number, currentFreq?: string) => {
+    setEditingGoal({ categoryId, currentLimit, currentFrequency: currentFreq || 'monthly' });
     setMonthlyLimit(currentLimit.toString());
+    setFrequency(currentFreq || 'monthly');
     setOpen(true);
   };
 
@@ -148,6 +166,20 @@ export const BudgetPlanner = () => {
   const getCategoryBudget = (categoryId: string) => {
     const goal = goals.find(g => g.category_id === categoryId);
     return goal ? Number(goal.monthly_limit) : 0;
+  };
+
+  const getCategoryFrequency = (categoryId: string) => {
+    const goal = goals.find(g => g.category_id === categoryId);
+    return goal?.frequency || 'monthly';
+  };
+
+  const getFrequencyLabel = (freq: string) => {
+    switch (freq) {
+      case 'weekly': return 'semaine';
+      case 'biweekly': return '2 sem.';
+      case 'yearly': return 'année';
+      default: return 'mois';
+    }
   };
 
   const incomeCategories = categories.filter(c => c.type === 'income');
@@ -163,6 +195,7 @@ export const BudgetPlanner = () => {
     const spent = getCategorySpent(category.id);
     const remaining = budget - spent;
     const percentage = budget > 0 ? (spent / budget) * 100 : 0;
+    const freq = getCategoryFrequency(category.id);
 
     return (
       <Card key={category.id} className="hover:shadow-md transition-shadow">
@@ -173,8 +206,9 @@ export const BudgetPlanner = () => {
               <div>
                 <div className="font-medium">{category.name}</div>
                 {budget > 0 && (
-                  <div className="text-xs text-muted-foreground">
-                    Budget: {formatPrice(budget)}
+                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <CalendarDays className="h-3 w-3" />
+                    <span>{formatPrice(budget)}/mois ({getFrequencyLabel(freq)})</span>
                   </div>
                 )}
               </div>
@@ -186,7 +220,7 @@ export const BudgetPlanner = () => {
                     variant="ghost"
                     size="icon"
                     className="h-8 w-8"
-                    onClick={() => handleEdit(category.id, budget)}
+                    onClick={() => handleEdit(category.id, budget, freq)}
                   >
                     <PencilLine className="h-4 w-4" />
                   </Button>
@@ -222,20 +256,45 @@ export const BudgetPlanner = () => {
                   </DialogTrigger>
                   <DialogContent className="max-w-md">
                     <DialogHeader>
-                      <DialogTitle>Définir le budget mensuel</DialogTitle>
+                      <DialogTitle>Définir le budget</DialogTitle>
                       <DialogDescription>
                         Pour {category.icon} {category.name}
                       </DialogDescription>
                     </DialogHeader>
                     <form onSubmit={(e) => handleSubmit(e, category.id)} className="space-y-4">
                       <div>
-                        <Label>Budget mensuel</Label>
+                        <Label>Fréquence</Label>
+                        <Select value={frequency} onValueChange={setFrequency}>
+                          <SelectTrigger className="mt-1">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="weekly">📅 Hebdomadaire (par semaine)</SelectItem>
+                            <SelectItem value="biweekly">📆 Aux 2 semaines</SelectItem>
+                            <SelectItem value="monthly">🗓️ Mensuel (par mois)</SelectItem>
+                            <SelectItem value="yearly">📊 Annuel (par année)</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div>
+                        <Label>Montant {frequency === 'weekly' ? 'hebdomadaire' : frequency === 'biweekly' ? 'aux 2 semaines' : frequency === 'yearly' ? 'annuel' : 'mensuel'}</Label>
                         <CurrencyInput 
                           value={monthlyLimit} 
                           onChange={setMonthlyLimit} 
                           className="mt-1" 
                           required 
+                          placeholder={frequency === 'weekly' ? 'Ex: 500 $/semaine' : frequency === 'biweekly' ? 'Ex: 1000 $/2 sem.' : frequency === 'yearly' ? 'Ex: 60000 $/an' : 'Ex: 2000 $/mois'}
                         />
+                        {frequency !== 'monthly' && monthlyLimit && (
+                          <p className="text-xs text-muted-foreground mt-1">
+                            ≈ {formatPrice(
+                              frequency === 'weekly' ? parseFloat(monthlyLimit) * 4.33 :
+                              frequency === 'biweekly' ? parseFloat(monthlyLimit) * 2.17 :
+                              parseFloat(monthlyLimit) / 12
+                            )}/mois
+                          </p>
+                        )}
                       </div>
                       <Button type="submit" className="w-full" disabled={saveGoal.isPending}>
                         {saveGoal.isPending ? "Enregistrement..." : "Enregistrer"}
@@ -359,24 +418,49 @@ export const BudgetPlanner = () => {
           if (!isOpen) {
             setEditingGoal(null);
             setMonthlyLimit("");
+            setFrequency("monthly");
           }
         }}>
           <DialogContent className="max-w-md">
             <DialogHeader>
-              <DialogTitle>Modifier le budget mensuel</DialogTitle>
+              <DialogTitle>Modifier le budget</DialogTitle>
               <DialogDescription>
-                Ajustez le montant budgété pour cette catégorie
+                Ajustez le montant et la fréquence
               </DialogDescription>
             </DialogHeader>
             <form onSubmit={(e) => handleSubmit(e, editingGoal.categoryId)} className="space-y-4">
               <div>
-                <Label>Budget mensuel</Label>
+                <Label>Fréquence</Label>
+                <Select value={frequency} onValueChange={setFrequency}>
+                  <SelectTrigger className="mt-1">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="weekly">📅 Hebdomadaire</SelectItem>
+                    <SelectItem value="biweekly">📆 Aux 2 semaines</SelectItem>
+                    <SelectItem value="monthly">🗓️ Mensuel</SelectItem>
+                    <SelectItem value="yearly">📊 Annuel</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label>Montant {frequency === 'weekly' ? 'hebdomadaire' : frequency === 'biweekly' ? 'aux 2 semaines' : frequency === 'yearly' ? 'annuel' : 'mensuel'}</Label>
                 <CurrencyInput 
                   value={monthlyLimit} 
                   onChange={setMonthlyLimit} 
                   className="mt-1" 
                   required 
                 />
+                {frequency !== 'monthly' && monthlyLimit && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    ≈ {formatPrice(
+                      frequency === 'weekly' ? parseFloat(monthlyLimit) * 4.33 :
+                      frequency === 'biweekly' ? parseFloat(monthlyLimit) * 2.17 :
+                      parseFloat(monthlyLimit) / 12
+                    )}/mois
+                  </p>
+                )}
               </div>
               <Button type="submit" className="w-full" disabled={saveGoal.isPending}>
                 {saveGoal.isPending ? "Enregistrement..." : "Enregistrer"}

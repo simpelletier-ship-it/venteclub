@@ -126,6 +126,7 @@ export type Database = {
         Row: {
           category_id: string | null
           created_at: string
+          frequency: string | null
           id: string
           monthly_limit: number
           updated_at: string
@@ -134,6 +135,7 @@ export type Database = {
         Insert: {
           category_id?: string | null
           created_at?: string
+          frequency?: string | null
           id?: string
           monthly_limit: number
           updated_at?: string
@@ -142,6 +144,7 @@ export type Database = {
         Update: {
           category_id?: string | null
           created_at?: string
+          frequency?: string | null
           id?: string
           monthly_limit?: number
           updated_at?: string
