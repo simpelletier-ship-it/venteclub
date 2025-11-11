@@ -143,7 +143,7 @@ const Home = () => {
       />
       
       {/* Hero Section */}
-      <section className="relative min-h-[70vh] sm:min-h-[75vh] lg:min-h-[80vh] flex items-center bg-gradient-to-br from-[#1e1b4b] via-[#312e81] to-[#1e3a8a] overflow-hidden" aria-label="Section principale">
+      <section className="relative min-h-[70vh] sm:min-h-[75vh] lg:min-h-[80vh] flex items-center bg-gradient-to-br from-[#1e1b4b] via-[#312e81] to-[#1e3a8a] overflow-hidden pb-0" aria-label="Section principale">
         {/* Circuit Background */}
         <CircuitBackground />
         
@@ -156,20 +156,16 @@ const Home = () => {
         
         <div className="container mx-auto px-4 py-8 sm:py-10 lg:py-14 relative z-10">
           <div className="max-w-6xl mx-auto">
-            <div className="space-y-6 sm:space-y-7 lg:space-y-8 animate-slide-up mb-12 sm:mb-16 lg:mb-20">
+            <div className="space-y-6 sm:space-y-7 lg:space-y-8 animate-slide-up">
               <div className="space-y-4">
                 <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-display font-bold leading-[1.15] tracking-tight text-white">
-                  Achetez ou vendez une entreprise au Québec
+                  Achetez ou vendez<br /><TypewriterAnimation />
                 </h1>
-                
-                <p className="text-xl sm:text-2xl lg:text-3xl text-[#818cf8] font-medium leading-relaxed animate-fade-in" style={{ animationDelay: '0.3s' }}>
-                  La plateforme québécoise pour acheter, vendre et découvrir des entreprises établies.
-                </p>
               </div>
               
               <div className="space-y-6 max-w-3xl">
                 <p className="text-base sm:text-lg lg:text-xl text-white/90 leading-relaxed text-justify">
-                  Vente.Club est la plateforme de référence au Québec pour acquérir ou céder une entreprise en toute confiance.
+                  La plateforme de référence au Québec pour acquérir ou céder une entreprise en toute confiance.
                   Découvrez des centaines d'opportunités d'affaires vérifiées et entrez directement en contact avec les propriétaires, dans un environnement transparent et professionnel.
                 </p>
                 
