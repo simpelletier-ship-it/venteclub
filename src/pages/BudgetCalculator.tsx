@@ -1,5 +1,5 @@
 import { Helmet } from "react-helmet";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -12,6 +12,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "@/contexts/AuthContext";
 import { NetWorthGamification } from "@/components/budget/NetWorthGamification";
 import { BudgetTransactions } from "@/components/budget/BudgetTransactions";
 import { BudgetAssetsDebts } from "@/components/budget/BudgetAssetsDebts";
@@ -28,8 +29,8 @@ import { DailyStreakReward } from "@/components/budget/DailyStreakReward";
 
 const BudgetCalculator = () => {
   const navigate = useNavigate();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const { user, loading } = useAuth();
+  const isAuthenticated = !!user;
 
   // Simple calculator state (for non-authenticated users)
   const [monthlyIncome, setMonthlyIncome] = useState("4000");
@@ -47,23 +48,16 @@ const BudgetCalculator = () => {
   const [savings, setSavings] = useState("300");
   const [debtPayment, setDebtPayment] = useState("200");
 
-  // Check authentication
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setIsAuthenticated(!!session);
-      setIsLoading(false);
-    });
-  }, []);
-
   // Fetch user's data for insights
   const { data: assets = [] } = useQuery({
     queryKey: ['user-assets'],
     queryFn: async () => {
       const { data, error } = await supabase.from('user_assets').select('*');
       if (error) throw error;
-      return data;
+      return data || [];
     },
     enabled: isAuthenticated,
+    retry: 1,
   });
 
   const { data: debts = [] } = useQuery({
@@ -71,9 +65,10 @@ const BudgetCalculator = () => {
     queryFn: async () => {
       const { data, error } = await supabase.from('user_debts').select('*');
       if (error) throw error;
-      return data;
+      return data || [];
     },
     enabled: isAuthenticated,
+    retry: 1,
   });
 
   const { data: transactions = [] } = useQuery({
@@ -84,9 +79,10 @@ const BudgetCalculator = () => {
         .select('*')
         .order('transaction_date', { ascending: false });
       if (error) throw error;
-      return data;
+      return data || [];
     },
     enabled: isAuthenticated,
+    retry: 1,
   });
 
   const { data: categories = [] } = useQuery({
@@ -94,7 +90,7 @@ const BudgetCalculator = () => {
     queryFn: async () => {
       const { data, error } = await supabase.from('budget_categories').select('*');
       if (error) throw error;
-      return data as Array<{
+      return (data || []) as Array<{
         id: string;
         name: string;
         icon: string;
@@ -106,6 +102,7 @@ const BudgetCalculator = () => {
       }>;
     },
     enabled: isAuthenticated,
+    retry: 1,
   });
 
   const { data: goals = [] } = useQuery({
@@ -113,9 +110,10 @@ const BudgetCalculator = () => {
     queryFn: async () => {
       const { data, error } = await supabase.from('budget_goals').select('*');
       if (error) throw error;
-      return data;
+      return data || [];
     },
     enabled: isAuthenticated,
+    retry: 1,
   });
 
   const calculateSimpleBudget = () => {
@@ -203,7 +201,7 @@ const BudgetCalculator = () => {
   const budgetStatus = getBudgetStatus();
   const StatusIcon = budgetStatus.icon;
 
-  if (isLoading) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
