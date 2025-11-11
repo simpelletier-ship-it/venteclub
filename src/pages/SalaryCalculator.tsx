@@ -333,12 +333,13 @@ const SalaryCalculator = () => {
             <div className="lg:col-span-2 space-y-6">
               {/* Tabs for different periods */}
               <Tabs defaultValue="annual" value={period} onValueChange={(v: any) => handlePeriodChange(v)}>
-                <TabsList className="grid w-full grid-cols-5">
+                <TabsList className="grid w-full grid-cols-6">
                   <TabsTrigger value="annual">Année</TabsTrigger>
                   <TabsTrigger value="monthly">Mois</TabsTrigger>
                   <TabsTrigger value="biweekly">2 sem.</TabsTrigger>
                   <TabsTrigger value="weekly">Semaine</TabsTrigger>
                   <TabsTrigger value="hourly">Heure</TabsTrigger>
+                  <TabsTrigger value="compare">Comparaison</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value={period} className="mt-4">
@@ -409,6 +410,62 @@ const SalaryCalculator = () => {
                             </PieChart>
                           </ResponsiveContainer>
                         </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+
+                {/* Comparaison rapide */}
+                <TabsContent value="compare" className="mt-4">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Comparaison rapide - Toutes les périodes</CardTitle>
+                      <CardDescription>Vue d'ensemble de votre salaire net selon différentes périodes</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="overflow-x-auto">
+                        <table className="w-full">
+                          <thead>
+                            <tr className="border-b border-border">
+                              <th className="text-left py-3 px-4 font-semibold text-foreground">Période</th>
+                              <th className="text-right py-3 px-4 font-semibold text-foreground">Salaire brut</th>
+                              <th className="text-right py-3 px-4 font-semibold text-foreground">Impôts totaux</th>
+                              <th className="text-right py-3 px-4 font-semibold text-green-600 dark:text-green-400">Salaire net</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr className="border-b border-border hover:bg-muted/50 transition-colors">
+                              <td className="py-3 px-4 font-medium text-foreground">Annuel</td>
+                              <td className="text-right py-3 px-4 text-muted-foreground">{formatPrice(results.gross)}</td>
+                              <td className="text-right py-3 px-4 text-red-600 dark:text-red-400">- {formatPrice(results.totalTax)}</td>
+                              <td className="text-right py-3 px-4 font-semibold text-green-600 dark:text-green-400">{formatPrice(results.netIncome)}</td>
+                            </tr>
+                            <tr className="border-b border-border hover:bg-muted/50 transition-colors">
+                              <td className="py-3 px-4 font-medium text-foreground">Mensuel</td>
+                              <td className="text-right py-3 px-4 text-muted-foreground">{formatPrice(results.gross / 12)}</td>
+                              <td className="text-right py-3 px-4 text-red-600 dark:text-red-400">- {formatPrice(results.totalTax / 12)}</td>
+                              <td className="text-right py-3 px-4 font-semibold text-green-600 dark:text-green-400">{formatPrice(results.netIncome / 12)}</td>
+                            </tr>
+                            <tr className="border-b border-border hover:bg-muted/50 transition-colors">
+                              <td className="py-3 px-4 font-medium text-foreground">Bihebdomadaire</td>
+                              <td className="text-right py-3 px-4 text-muted-foreground">{formatPrice(results.gross / 26)}</td>
+                              <td className="text-right py-3 px-4 text-red-600 dark:text-red-400">- {formatPrice(results.totalTax / 26)}</td>
+                              <td className="text-right py-3 px-4 font-semibold text-green-600 dark:text-green-400">{formatPrice(results.netIncome / 26)}</td>
+                            </tr>
+                            <tr className="border-b border-border hover:bg-muted/50 transition-colors">
+                              <td className="py-3 px-4 font-medium text-foreground">Hebdomadaire</td>
+                              <td className="text-right py-3 px-4 text-muted-foreground">{formatPrice(results.gross / 52)}</td>
+                              <td className="text-right py-3 px-4 text-red-600 dark:text-red-400">- {formatPrice(results.totalTax / 52)}</td>
+                              <td className="text-right py-3 px-4 font-semibold text-green-600 dark:text-green-400">{formatPrice(results.netIncome / 52)}</td>
+                            </tr>
+                            <tr className="hover:bg-muted/50 transition-colors">
+                              <td className="py-3 px-4 font-medium text-foreground">Horaire</td>
+                              <td className="text-right py-3 px-4 text-muted-foreground">{formatPrice(results.gross / (52 * parseFloat(hoursPerWeek || "40")))}</td>
+                              <td className="text-right py-3 px-4 text-red-600 dark:text-red-400">- {formatPrice(results.totalTax / (52 * parseFloat(hoursPerWeek || "40")))}</td>
+                              <td className="text-right py-3 px-4 font-semibold text-green-600 dark:text-green-400">{formatPrice(results.netIncome / (52 * parseFloat(hoursPerWeek || "40")))}</td>
+                            </tr>
+                          </tbody>
+                        </table>
                       </div>
                     </CardContent>
                   </Card>
