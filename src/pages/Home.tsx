@@ -152,9 +152,7 @@ const Home = () => {
           <div className="max-w-6xl mx-auto">
             <div className="space-y-4 sm:space-y-6 lg:space-y-8 animate-slide-up">
               <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-display font-bold leading-[1.2] sm:leading-[1.15] tracking-tight text-white">
-                <span className="text-[#818cf8] font-extrabold">Le Club</span> de Référence
-                <br />
-                pour acheter <TypewriterAnimation />
+                Achetez ou vendez une <TypewriterAnimation />
                 <br />
                 partout au Québec
               </h1>
