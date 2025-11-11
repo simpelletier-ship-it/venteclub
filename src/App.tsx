@@ -49,6 +49,10 @@ const FeaturedListing = lazy(() => import("./pages/FeaturedListing"));
 const EmailConfirmed = lazy(() => import("./pages/EmailConfirmed"));
 const PremiumSuccess = lazy(() => import("./pages/PremiumSuccess"));
 const TestEmail = lazy(() => import("./pages/TestEmail"));
+const Tools = lazy(() => import("./pages/Tools"));
+const SalaryCalculator = lazy(() => import("./pages/SalaryCalculator"));
+const TaxReturnCalculator = lazy(() => import("./pages/TaxReturnCalculator"));
+const BudgetCalculator = lazy(() => import("./pages/BudgetCalculator"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -136,6 +140,12 @@ const App = () => (
                 <Route path="/profile/:userId" element={<EmailVerificationGuard><Profile /></EmailVerificationGuard>} />
                 <Route path="/seller/:sellerId" element={<EmailVerificationGuard><SellerProfile /></EmailVerificationGuard>} />
                 <Route path="/test-email" element={<EmailVerificationGuard><TestEmail /></EmailVerificationGuard>} />
+                
+                {/* Tools Routes */}
+                <Route path="/outils" element={<EmailVerificationGuard><Tools /></EmailVerificationGuard>} />
+                <Route path="/outils/calculateur-salaire" element={<EmailVerificationGuard><SalaryCalculator /></EmailVerificationGuard>} />
+                <Route path="/outils/retour-impot" element={<EmailVerificationGuard><TaxReturnCalculator /></EmailVerificationGuard>} />
+                <Route path="/outils/budget" element={<EmailVerificationGuard><BudgetCalculator /></EmailVerificationGuard>} />
                 
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />

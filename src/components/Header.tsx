@@ -169,6 +169,14 @@ const Header = () => {
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full" />
             </button>
 
+            <button 
+              onClick={() => navigate("/outils")} 
+              className="text-muted-foreground hover:text-foreground transition-all duration-300 font-semibold relative group whitespace-nowrap text-base"
+            >
+              Outils
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full" />
+            </button>
+
             {!user && (
               <button 
                 onClick={() => navigate("/faq")} 
@@ -340,6 +348,15 @@ const Header = () => {
               className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors"
             >
               {t('nav.commercialRealEstate')}
+            </button>
+            <button
+              onClick={() => {
+                navigate("/outils");
+                setMobileMenuOpen(false);
+              }}
+              className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors"
+            >
+              Outils
             </button>
             {!user && (
               <button
