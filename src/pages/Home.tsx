@@ -160,7 +160,7 @@ const Home = () => {
               </h1>
               
               <p className="text-sm sm:text-base lg:text-lg text-white/90 max-w-3xl leading-relaxed sm:leading-loose">
-                Plateforme intelligente qui rapproche acquéreurs et propriétaires d'entreprises. Nous favorisons la transparence et la fiabilité pour que vos transactions se déroulent en toute confiance.
+                Vente.Club est la plateforme québécoise qui facilite l'achat et la vente d'entreprises établies. Découvrez des centaines d'opportunités d'affaires et connectez-vous directement avec les propriétaires dans un environnement simple, transparent et professionnel.
               </p>
               
               {/* Credibility Line */}
