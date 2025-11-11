@@ -40,6 +40,7 @@ const CityPage = lazy(() => import("./pages/CityPage"));
 const Terms = lazy(() => import("./pages/Terms"));
 const PropertyListings = lazy(() => import("./pages/PropertyListings"));
 const Profile = lazy(() => import("./pages/Profile"));
+const SellerProfile = lazy(() => import("./pages/SellerProfile"));
 const Resources = lazy(() => import("./pages/Resources"));
 const FAQ = lazy(() => import("./pages/FAQ"));
 const Market = lazy(() => import("./pages/Market"));
@@ -133,6 +134,7 @@ const App = () => (
                 <Route path="/favorites" element={<EmailVerificationGuard><Favorites /></EmailVerificationGuard>} />
                 <Route path="/messages" element={<EmailVerificationGuard><Messages /></EmailVerificationGuard>} />
                 <Route path="/profile/:userId" element={<EmailVerificationGuard><Profile /></EmailVerificationGuard>} />
+                <Route path="/seller/:sellerId" element={<EmailVerificationGuard><SellerProfile /></EmailVerificationGuard>} />
                 <Route path="/test-email" element={<EmailVerificationGuard><TestEmail /></EmailVerificationGuard>} />
                 
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

@@ -133,7 +133,7 @@ export const SellerProfileCard = ({
           <Button 
             variant="outline" 
             className="w-full"
-            onClick={() => navigate(`/profile/${sellerId}`)}
+            onClick={() => navigate(`/seller/${sellerId}`)}
           >
             <User className="mr-2 w-4 h-4" />
             Voir le profil complet
