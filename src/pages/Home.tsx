@@ -143,7 +143,7 @@ const Home = () => {
       />
       
       {/* Hero Section */}
-      <section className="relative min-h-[70vh] sm:min-h-[75vh] lg:min-h-[80vh] flex items-center bg-gradient-to-br from-[#1e1b4b] via-[#312e81] to-[#1e3a8a] overflow-hidden" aria-label="Section principale">
+      <section className="relative min-h-[65vh] sm:min-h-[70vh] lg:min-h-[75vh] flex items-start pt-12 sm:pt-16 lg:pt-20 bg-gradient-to-br from-[#1e1b4b] via-[#312e81] to-[#1e3a8a] overflow-hidden" aria-label="Section principale">
         {/* Circuit Background */}
         <CircuitBackground />
         
@@ -154,7 +154,7 @@ const Home = () => {
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#4f46e5]/10 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '12s', animationDelay: '4s' }} />
         </div>
         
-        <div className="container mx-auto px-4 pt-8 sm:pt-10 lg:pt-14 pb-0 relative z-10">
+        <div className="container mx-auto px-4 pb-8 sm:pb-10 lg:pb-12 relative z-10">
           <div className="max-w-6xl mx-auto">
             <div className="space-y-6 sm:space-y-7 lg:space-y-8 animate-slide-up">
               <div className="space-y-4">
@@ -193,7 +193,7 @@ const Home = () => {
                 </div>
               </div>
               
-              <div className="flex flex-col sm:flex-row gap-4 sm:gap-5 pt-12 sm:pt-16 lg:pt-20">
+              <div className="flex flex-col sm:flex-row gap-4 sm:gap-5 pt-8 sm:pt-10 lg:pt-12">
                 <Button 
                   size="lg" 
                   className="bg-[#6366f1] hover:bg-[#4f46e5] text-white h-14 sm:h-16 lg:h-[4.5rem] px-8 sm:px-10 lg:px-12 text-base sm:text-lg lg:text-xl font-bold rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 group w-full sm:w-auto"
