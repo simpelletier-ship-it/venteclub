@@ -1507,13 +1507,32 @@ const BusinessDetails = () => {
                         )}
                       </div>
                     </div>
-                  </div>
-                )}
+                </div>
+              )}
 
+              {/* Profil vendeur enrichi */}
+              {hasAccess && sellerContact && business.seller_id && (
+                <div className="mt-6">
+                  <SellerProfileCard
+                    sellerId={business.seller_id}
+                    sellerName={
+                      sellerContact.full_name || 
+                      `${sellerContact.first_name || ''} ${sellerContact.last_name || ''}`.trim() ||
+                      'Vendeur'
+                    }
+                    sellerAvatar={sellerContact.avatar_url}
+                    bio={sellerContact.bio}
+                    responseTimeHours={sellerContact.response_time_hours}
+                    totalResponses={sellerContact.total_responses || 0}
+                    verifiedSeller={sellerContact.verified_seller || false}
+                    sellerSince={sellerContact.seller_since || sellerContact.created_at}
+                    specialties={sellerContact.specialties || []}
+                  />
+                </div>
+              )}
 
-
-                {/* Calculateur de financement */}
-                {business.asking_price > 0 && (
+              {/* Calculateur de financement */}
+              {business.asking_price > 0 && (
                   <div className="border-t pt-6 mt-6">
                     <Collapsible open={isCalculatorOpen} onOpenChange={setIsCalculatorOpen}>
                       <CollapsibleTrigger asChild>
