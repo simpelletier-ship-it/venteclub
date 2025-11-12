@@ -319,25 +319,48 @@ export const NetWorthGamification = ({ netWorth, isAuthenticated }: NetWorthGami
 
         {/* Stats cards minimalistes */}
         <div className="grid grid-cols-3 gap-4 mt-8">
+          {/* Variation sur période */}
           <div className="bg-muted/50 rounded-lg p-4 text-center hover:bg-muted transition-colors">
-            <div className="text-2xl font-bold text-foreground">
-              {netWorth >= 0 ? '+' : ''}{((netWorth / 1000000) * 100).toFixed(1)}%
+            <div className={`text-2xl font-bold ${isPositiveChange ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+              {historicalData && historicalData.length > 1 ? (
+                <>
+                  {isPositiveChange ? '+' : ''}{periodChange.percentage.toFixed(1)}%
+                </>
+              ) : (
+                '0%'
+              )}
             </div>
-            <div className="text-xs text-muted-foreground mt-1">vers 1M</div>
+            <div className="text-xs text-muted-foreground mt-1">
+              {selectedPeriod === '7d' ? '7 jours' : selectedPeriod === '30d' ? '30 jours' : selectedPeriod === '90d' ? '90 jours' : '1 an'}
+            </div>
           </div>
           
+          {/* Valeur nette actuelle */}
           <div className="bg-muted/50 rounded-lg p-4 text-center hover:bg-muted transition-colors">
             <div className="text-2xl font-bold text-foreground">
-              {Math.abs(netWorth) < 1000 ? formatPrice(netWorth) : `${(Math.abs(netWorth) / 1000).toFixed(0)}k`}
+              {Math.abs(netWorth) >= 1000000 
+                ? `${(netWorth / 1000000).toFixed(1)}M` 
+                : Math.abs(netWorth) >= 1000 
+                  ? `${(netWorth / 1000).toFixed(0)}k`
+                  : formatPrice(netWorth)}
             </div>
-            <div className="text-xs text-muted-foreground mt-1">actuel</div>
+            <div className="text-xs text-muted-foreground mt-1">valeur nette</div>
           </div>
           
+          {/* Ratio actifs/dettes */}
           <div className="bg-muted/50 rounded-lg p-4 text-center hover:bg-muted transition-colors">
             <div className="text-2xl font-bold text-foreground">
-              {netWorth >= 1000000 ? '🏆' : netWorth >= 0 ? '📈' : '💪'}
+              {(() => {
+                const latestData = historicalData && historicalData.length > 0 
+                  ? historicalData[historicalData.length - 1] 
+                  : { actifs: 0, dettes: 0 };
+                const ratio = latestData.dettes > 0 
+                  ? (latestData.actifs / latestData.dettes).toFixed(1)
+                  : latestData.actifs > 0 ? '∞' : '0';
+                return ratio;
+              })()}
             </div>
-            <div className="text-xs text-muted-foreground mt-1">statut</div>
+            <div className="text-xs text-muted-foreground mt-1">ratio A/D</div>
           </div>
         </div>
       </CardContent>
