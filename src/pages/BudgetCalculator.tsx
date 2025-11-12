@@ -32,6 +32,7 @@ import RecurringExpenses from "@/components/budget/RecurringExpenses";
 import { ExpensesByCategory } from "@/components/budget/ExpensesByCategory";
 import { ExpenseTrendsChart } from "@/components/budget/ExpenseTrendsChart";
 import { FinancialHealthScore } from "@/components/budget/FinancialHealthScore";
+import { ScenarioSimulator } from "@/components/budget/ScenarioSimulator";
 
 const BudgetCalculator = () => {
   const navigate = useNavigate();
@@ -122,10 +123,21 @@ const BudgetCalculator = () => {
     retry: 1,
   });
 
-  const { data: goals = [] } = useQuery({
+  const { data: budgetGoals = [] } = useQuery({
     queryKey: ['budget-goals'],
     queryFn: async () => {
       const { data, error } = await supabase.from('budget_goals').select('*');
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: isAuthenticated,
+    retry: 1,
+  });
+
+  const { data: financialGoals = [] } = useQuery({
+    queryKey: ['financial-goals'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('financial_goals').select('*');
       if (error) throw error;
       return data || [];
     },
@@ -287,6 +299,14 @@ const BudgetCalculator = () => {
                 
                 <NetWorthGamification netWorth={netWorth} isAuthenticated={isAuthenticated} />
                 
+                <ScenarioSimulator 
+                  transactions={transactions}
+                  categories={categories}
+                  goals={financialGoals}
+                  assets={assets}
+                  debts={debts}
+                />
+                
                 <ExpenseTrendsChart transactions={transactions} />
                 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -302,7 +322,7 @@ const BudgetCalculator = () => {
                   <BudgetInsights 
                     transactions={transactions}
                     categories={categories}
-                    goals={goals}
+                    goals={budgetGoals}
                     debts={debts}
                     assets={assets}
                   />

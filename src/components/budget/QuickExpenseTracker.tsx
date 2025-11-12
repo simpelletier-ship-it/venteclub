@@ -147,6 +147,7 @@ const SortableCategoryItem = ({
 
 export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: boolean }) => {
   const queryClient = useQueryClient();
+  const [transactionType, setTransactionType] = useState<'expense' | 'income'>('expense');
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
   const [suggestedCategory, setSuggestedCategory] = useState<string | null>(null);
@@ -163,12 +164,12 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
 
   // Fetch categories
   const { data: categories = [] } = useQuery({
-    queryKey: ['budget-categories'],
+    queryKey: ['budget-categories', transactionType],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('budget_categories')
         .select('*')
-        .eq('type', 'expense')
+        .eq('type', transactionType)
         .order('display_order', { ascending: true })
         .order('name', { ascending: true });
       
@@ -257,7 +258,7 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
           amount: parseFloat(amount),
           description: description || null,
           transaction_date: format(transactionDate, 'yyyy-MM-dd'),
-          type: 'expense',
+          type: transactionType,
         });
 
       if (error) throw error;
@@ -265,7 +266,7 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['budget-transactions'] });
       queryClient.invalidateQueries({ queryKey: ['user-daily-streaks'] });
-      toast.success("✅ Dépense ajoutée!", { duration: 2000 });
+      toast.success(transactionType === 'expense' ? "✅ Dépense ajoutée!" : "✅ Revenu ajouté!", { duration: 2000 });
       setAmount("");
       setDescription("");
       setSuggestedCategory(null);
@@ -289,7 +290,7 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
           name: newCategoryName.trim(),
           icon: newCategoryIcon,
           color: newCategoryColor,
-          type: 'expense',
+          type: transactionType,
           is_custom: true,
         })
         .select()
@@ -380,8 +381,40 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
   return (
     <Card className="shadow-lg">
       <CardHeader className="pb-4">
-        <CardTitle className="text-2xl">💸 Ajouter une dépense</CardTitle>
-        <CardDescription className="text-base">Simple et rapide</CardDescription>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="text-2xl">
+              {transactionType === 'expense' ? '💸 Ajouter une dépense' : '💰 Ajouter un revenu'}
+            </CardTitle>
+            <CardDescription className="text-base">Simple et rapide</CardDescription>
+          </div>
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant={transactionType === 'expense' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => {
+                setTransactionType('expense');
+                setSelectedCategory("");
+                setSuggestedCategory(null);
+              }}
+            >
+              💸 Dépense
+            </Button>
+            <Button
+              type="button"
+              variant={transactionType === 'income' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => {
+                setTransactionType('income');
+                setSelectedCategory("");
+                setSuggestedCategory(null);
+              }}
+            >
+              💰 Revenu
+            </Button>
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
