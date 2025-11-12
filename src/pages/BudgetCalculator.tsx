@@ -36,6 +36,8 @@ import { ScenarioSimulator } from "@/components/budget/ScenarioSimulator";
 import { QuickNetWorthUpdate } from "@/components/budget/QuickNetWorthUpdate";
 import { PremiumAnalysisTab } from "@/components/budget/PremiumAnalysisTab";
 import { BudgetResetDialog } from "@/components/budget/BudgetResetDialog";
+import { TagStatistics } from "@/components/budget/TagStatistics";
+import { TransactionTemplates } from "@/components/budget/TransactionTemplates";
 
 const BudgetCalculator = () => {
   const navigate = useNavigate();
@@ -417,6 +419,15 @@ const BudgetCalculator = () => {
                 <div className="flex justify-center">
                   <QuickNetWorthUpdate currentNetWorth={netWorth} isAuthenticated={isAuthenticated} />
                 </div>
+
+                {/* Tag Statistics */}
+                <TagStatistics isAuthenticated={isAuthenticated} />
+
+                {/* Transaction Templates */}
+                <TransactionTemplates 
+                  isAuthenticated={isAuthenticated}
+                  categories={categories}
+                />
 
                 {/* Suivi en temps réel */}
                 <Card className="overflow-hidden">

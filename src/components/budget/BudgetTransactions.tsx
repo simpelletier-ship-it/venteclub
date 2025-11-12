@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Trash2, Search, Calendar as CalendarIcon, List } from "lucide-react";
+import { Plus, Trash2, Search, Calendar as CalendarIcon, List, Tag as TagIcon } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import confetti from "canvas-confetti";
 import { TransactionsCalendar } from "./TransactionsCalendar";
 import { CreateDefaultCategories } from "./CreateDefaultCategories";
+import { Badge } from "@/components/ui/badge";
 
 interface Category {
   id: string;
@@ -33,6 +34,7 @@ interface Transaction {
   type: string;
   category_id: string;
   category: Category;
+  tag_ids?: string[];
 }
 
 export const BudgetTransactions = ({ isAuthenticated }: { isAuthenticated: boolean }) => {
@@ -50,6 +52,7 @@ export const BudgetTransactions = ({ isAuthenticated }: { isAuthenticated: boole
   const [filterCategory, setFilterCategory] = useState<string>('all');
   const [filterDateStart, setFilterDateStart] = useState("");
   const [filterDateEnd, setFilterDateEnd] = useState("");
+  const [filterTag, setFilterTag] = useState<string>('all');
   
   // View mode
   const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
@@ -137,8 +140,8 @@ export const BudgetTransactions = ({ isAuthenticated }: { isAuthenticated: boole
     },
   });
 
-  // Fetch transactions
-  const { data: transactions = [] } = useQuery({
+  // Fetch transactions with tags
+  const { data: transactions = [] } = useQuery<Transaction[]>({
     queryKey: ['budget-transactions'],
     enabled: isAuthenticated,
     retry: 1,
@@ -150,7 +153,39 @@ export const BudgetTransactions = ({ isAuthenticated }: { isAuthenticated: boole
         .limit(50);
       
       if (error) throw error;
-      return data;
+      
+      // Fetch tag links for all transactions
+      if (data && data.length > 0) {
+        const txIds = data.map(t => t.id);
+        const { data: tagLinks } = await supabase
+          .from('transaction_tag_links')
+          .select('transaction_id, tag_id')
+          .in('transaction_id', txIds);
+        
+        // Add tag_ids to transactions
+        return data.map(tx => ({
+          ...tx,
+          tag_ids: tagLinks?.filter(l => l.transaction_id === tx.id).map(l => l.tag_id) || []
+        })) as Transaction[];
+      }
+      
+      return data as Transaction[];
+    },
+  });
+
+  // Fetch tags
+  const { data: tags = [] } = useQuery({
+    queryKey: ['transaction-tags'],
+    enabled: isAuthenticated,
+    retry: 1,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('transaction_tags')
+        .select('*')
+        .order('name');
+      
+      if (error) throw error;
+      return data || [];
     },
   });
 
@@ -291,6 +326,13 @@ export const BudgetTransactions = ({ isAuthenticated }: { isAuthenticated: boole
       return false;
     }
 
+    // Tag filter
+    if (filterTag !== 'all') {
+      if (!transaction.tag_ids || !transaction.tag_ids.includes(filterTag)) {
+        return false;
+      }
+    }
+
     // Date range filter
     if (filterDateStart && transaction.transaction_date < filterDateStart) {
       return false;
@@ -306,11 +348,12 @@ export const BudgetTransactions = ({ isAuthenticated }: { isAuthenticated: boole
     setSearchQuery("");
     setFilterType('all');
     setFilterCategory('all');
+    setFilterTag('all');
     setFilterDateStart("");
     setFilterDateEnd("");
   };
 
-  const hasActiveFilters = searchQuery || filterType !== 'all' || filterCategory !== 'all' || filterDateStart || filterDateEnd;
+  const hasActiveFilters = searchQuery || filterType !== 'all' || filterCategory !== 'all' || filterTag !== 'all' || filterDateStart || filterDateEnd;
 
   const commonEmojis = ["💼", "💰", "🏠", "🍽️", "🚗", "🎬", "🏥", "📚", "💡", "🛡️", "👕", "💳", "✈️", "🎮", "📱", "💻", "🎯", "🎨", "🏋️", "🛒"];
 
@@ -460,6 +503,26 @@ export const BudgetTransactions = ({ isAuthenticated }: { isAuthenticated: boole
                 <SelectItem value="expense">💳 Dépenses</SelectItem>
               </SelectContent>
             </Select>
+            {tags.length > 0 && (
+              <Select value={filterTag} onValueChange={setFilterTag}>
+                <SelectTrigger className="w-[160px] h-11">
+                  <SelectValue placeholder="Filtrer par tag" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">
+                    <div className="flex items-center gap-2">
+                      <TagIcon className="h-4 w-4" />
+                      Tous les tags
+                    </div>
+                  </SelectItem>
+                  {tags.map(tag => (
+                    <SelectItem key={tag.id} value={tag.id}>
+                      {tag.icon} {tag.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           </div>
           
           {filteredTransactions.length === 0 ? (
@@ -485,6 +548,28 @@ export const BudgetTransactions = ({ isAuthenticated }: { isAuthenticated: boole
                       <p className="text-sm text-muted-foreground truncate">
                         {transaction.description || new Date(transaction.transaction_date).toLocaleDateString('fr-CA', { day: 'numeric', month: 'long' })}
                       </p>
+                      {transaction.tag_ids && transaction.tag_ids.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mt-2">
+                          {transaction.tag_ids.map((tagId: string) => {
+                            const tag = tags.find(t => t.id === tagId);
+                            if (!tag) return null;
+                            return (
+                              <Badge 
+                                key={tagId} 
+                                variant="secondary" 
+                                className="text-xs"
+                                style={{ 
+                                  backgroundColor: tag.color + '20',
+                                  color: tag.color,
+                                  borderColor: tag.color + '40'
+                                }}
+                              >
+                                {tag.icon} {tag.name}
+                              </Badge>
+                            );
+                          })}
+                        </div>
+                      )}
                     </div>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
