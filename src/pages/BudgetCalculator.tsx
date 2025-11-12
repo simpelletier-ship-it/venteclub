@@ -351,23 +351,23 @@ const BudgetCalculator = () => {
               Suivi des dépenses en temps réel, objectifs d'épargne, coaching financier personnalisé et gamification.
             </p>
             
-            {/* SEO-optimized feature highlights */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto mt-6">
-              <div className="p-3 bg-muted/50 rounded-lg">
-                <div className="text-2xl mb-1">📊</div>
-                <div className="text-sm font-semibold">Suivi en temps réel</div>
+            {/* SEO-optimized feature highlights - Simple list style */}
+            <div className="flex flex-wrap justify-center gap-6 max-w-3xl mx-auto mt-6 text-sm">
+              <div className="flex items-center gap-2">
+                <span className="text-2xl">📊</span>
+                <span className="text-muted-foreground">Suivi en temps réel</span>
               </div>
-              <div className="p-3 bg-muted/50 rounded-lg">
-                <div className="text-2xl mb-1">💰</div>
-                <div className="text-sm font-semibold">REER & CELI</div>
+              <div className="flex items-center gap-2">
+                <span className="text-2xl">💰</span>
+                <span className="text-muted-foreground">REER & CELI</span>
               </div>
-              <div className="p-3 bg-muted/50 rounded-lg">
-                <div className="text-2xl mb-1">🎯</div>
-                <div className="text-sm font-semibold">Objectifs épargne</div>
+              <div className="flex items-center gap-2">
+                <span className="text-2xl">🎯</span>
+                <span className="text-muted-foreground">Objectifs épargne</span>
               </div>
-              <div className="p-3 bg-muted/50 rounded-lg">
-                <div className="text-2xl mb-1">🤖</div>
-                <div className="text-sm font-semibold">Coach IA</div>
+              <div className="flex items-center gap-2">
+                <span className="text-2xl">🤖</span>
+                <span className="text-muted-foreground">Coach IA</span>
               </div>
             </div>
           </div>
