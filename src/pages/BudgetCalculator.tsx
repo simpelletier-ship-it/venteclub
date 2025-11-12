@@ -376,12 +376,9 @@ const BudgetCalculator = () => {
           <QuickExpenseTracker isAuthenticated={isAuthenticated} />
 
           <Tabs defaultValue="overview" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-2 lg:grid-cols-6 gap-2 h-auto">
+            <TabsList className="grid w-full grid-cols-2 lg:grid-cols-5 gap-2 h-auto">
               <TabsTrigger value="overview" className="text-base py-3">
                 📊 Tableau de bord
-              </TabsTrigger>
-              <TabsTrigger value="analysis" className="text-base py-3">
-                ✨ Analyses Avancées
               </TabsTrigger>
               <TabsTrigger value="transactions" className="text-base py-3">
                 💳 Mes dépenses
@@ -399,7 +396,26 @@ const BudgetCalculator = () => {
 
             <TabsContent value="overview">
               <div className="space-y-6">
-                {/* Suivi en temps réel - Mis en avant */}
+                {/* Vue d'ensemble visuelle - En premier */}
+                <ExpenseTrendsChart transactions={transactions} />
+                
+                <ExpensesByCategory 
+                  transactions={transactions}
+                  categories={categories}
+                  onAnalyze={() => {
+                    const tabsList = document.querySelector('[role="tablist"]');
+                    const transactionsTab = tabsList?.querySelector('[value="transactions"]') as HTMLButtonElement;
+                    transactionsTab?.click();
+                  }}
+                />
+
+                <NetWorthGamification netWorth={netWorth} isAuthenticated={isAuthenticated} />
+                
+                <div className="flex justify-center">
+                  <QuickNetWorthUpdate currentNetWorth={netWorth} isAuthenticated={isAuthenticated} />
+                </div>
+
+                {/* Suivi en temps réel */}
                 <Card className="overflow-hidden">
                   <CardHeader className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent">
                     <CardTitle className="flex items-center gap-2">
@@ -407,7 +423,7 @@ const BudgetCalculator = () => {
                       Suivi en temps réel
                     </CardTitle>
                     <CardDescription>
-                      Vos actifs, objectifs et recommandations personnalisées
+                      Vos actifs et recommandations personnalisées
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="p-6 space-y-6">
@@ -444,15 +460,6 @@ const BudgetCalculator = () => {
                       </div>
                     </div>
 
-                    {/* Objectifs d'épargne */}
-                    <div>
-                      <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                        <span>🎯</span>
-                        Objectifs d'épargne
-                      </h3>
-                      <FinancialGoals isAuthenticated={isAuthenticated} />
-                    </div>
-
                     {/* Coach IA */}
                     <div>
                       <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
@@ -469,49 +476,55 @@ const BudgetCalculator = () => {
                   </CardContent>
                 </Card>
 
-                {/* Analyses visuelles */}
-                <FinancialHealthScore 
-                  transactions={transactions}
-                  assets={assets}
-                  debts={debts}
-                />
-                
-                <ExpenseTrendsChart transactions={transactions} />
-                
-                <ExpensesByCategory 
-                  transactions={transactions}
-                  categories={categories}
-                  onAnalyze={() => {
-                    const tabsList = document.querySelector('[role="tablist"]');
-                    const transactionsTab = tabsList?.querySelector('[value="transactions"]') as HTMLButtonElement;
-                    transactionsTab?.click();
-                  }}
-                />
+                {/* Objectifs d'épargne */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <span className="text-2xl">🎯</span>
+                      Objectifs d'épargne
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <FinancialGoals isAuthenticated={isAuthenticated} />
+                  </CardContent>
+                </Card>
 
-                <NetWorthGamification netWorth={netWorth} isAuthenticated={isAuthenticated} />
-                
-                <div className="flex justify-center">
-                  <QuickNetWorthUpdate currentNetWorth={netWorth} isAuthenticated={isAuthenticated} />
-                </div>
+                {/* Analyses avancées */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <span className="text-2xl">✨</span>
+                      Analyses avancées
+                    </CardTitle>
+                    <CardDescription>
+                      Insights et recommandations intelligentes pour optimiser vos finances
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <FinancialHealthScore 
+                      transactions={transactions}
+                      assets={assets}
+                      debts={debts}
+                    />
 
-                {/* Simulateur de scénarios - En bas */}
-                <ScenarioSimulator 
-                  transactions={transactions}
-                  categories={categories}
-                  goals={financialGoals}
-                  assets={assets}
-                  debts={debts}
-                />
+                    <PremiumAnalysisTab 
+                      transactions={transactions}
+                      categories={categories}
+                      debts={debts}
+                      assets={assets}
+                    />
+
+                    {/* Simulateur de scénarios */}
+                    <ScenarioSimulator 
+                      transactions={transactions}
+                      categories={categories}
+                      goals={financialGoals}
+                      assets={assets}
+                      debts={debts}
+                    />
+                  </CardContent>
+                </Card>
               </div>
-            </TabsContent>
-
-            <TabsContent value="analysis">
-            <PremiumAnalysisTab 
-              transactions={transactions}
-              categories={categories}
-              debts={debts}
-              assets={assets}
-            />
             </TabsContent>
 
             <TabsContent value="budget">
@@ -519,23 +532,7 @@ const BudgetCalculator = () => {
             </TabsContent>
 
             <TabsContent value="transactions">
-              <div className="space-y-6">
-                <FinancialHealthScore 
-                  transactions={transactions}
-                  assets={assets}
-                  debts={debts}
-                />
-                <ExpensesByCategory 
-                  transactions={transactions}
-                  categories={categories}
-                  onAnalyze={() => {
-                    const tabsList = document.querySelector('[role="tablist"]');
-                    const transactionsTab = tabsList?.querySelector('[value="transactions"]') as HTMLButtonElement;
-                    transactionsTab?.click();
-                  }}
-                />
-                <BudgetTransactions isAuthenticated={isAuthenticated} />
-              </div>
+              <BudgetTransactions isAuthenticated={isAuthenticated} />
             </TabsContent>
 
             <TabsContent value="assets">
