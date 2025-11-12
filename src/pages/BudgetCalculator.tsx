@@ -501,26 +501,11 @@ const BudgetCalculator = () => {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-6">
-                    <FinancialHealthScore 
-                      transactions={transactions}
-                      assets={assets}
-                      debts={debts}
-                    />
-
                     <PremiumAnalysisTab 
                       transactions={transactions}
                       categories={categories}
                       debts={debts}
                       assets={assets}
-                    />
-
-                    {/* Simulateur de scénarios */}
-                    <ScenarioSimulator 
-                      transactions={transactions}
-                      categories={categories}
-                      goals={financialGoals}
-                      assets={assets}
-                      debts={debts}
                     />
                   </CardContent>
                 </Card>
