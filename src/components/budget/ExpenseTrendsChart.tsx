@@ -2,18 +2,41 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { formatPrice } from "@/lib/priceFormat";
 import { TrendingUp, TrendingDown } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useState } from "react";
 
 interface ExpenseTrendsChartProps {
   transactions: any[];
 }
 
 export const ExpenseTrendsChart = ({ transactions }: ExpenseTrendsChartProps) => {
-  // Get last 6 months data
-  const getLast6MonthsData = () => {
+  const [period, setPeriod] = useState<string>("6months");
+
+  // Get data based on period
+  const getDataByPeriod = () => {
     const data = [];
     const today = new Date();
     
-    for (let i = 5; i >= 0; i--) {
+    let monthsCount = 6;
+    switch (period) {
+      case "7days":
+        monthsCount = 1;
+        break;
+      case "1month":
+        monthsCount = 1;
+        break;
+      case "3months":
+        monthsCount = 3;
+        break;
+      case "6months":
+        monthsCount = 6;
+        break;
+      case "1year":
+        monthsCount = 12;
+        break;
+    }
+    
+    for (let i = monthsCount - 1; i >= 0; i--) {
       const date = new Date(today.getFullYear(), today.getMonth() - i, 1);
       const monthKey = date.toISOString().slice(0, 7);
       const monthName = date.toLocaleDateString('fr-CA', { month: 'short', year: 'numeric' });
@@ -41,7 +64,7 @@ export const ExpenseTrendsChart = ({ transactions }: ExpenseTrendsChartProps) =>
     return data;
   };
 
-  const chartData = getLast6MonthsData();
+  const chartData = getDataByPeriod();
   
   // Calculate trend
   const currentMonth = chartData[chartData.length - 1]?.expenses || 0;
@@ -84,24 +107,44 @@ export const ExpenseTrendsChart = ({ transactions }: ExpenseTrendsChartProps) =>
     <Card className="shadow-lg">
       <CardHeader>
         <div className="flex items-start justify-between">
-          <div>
+          <div className="flex-1">
             <CardTitle className="text-xl">📈 Évolution des dépenses</CardTitle>
-            <CardDescription>6 derniers mois</CardDescription>
+            <CardDescription>Tendances sur la période sélectionnée</CardDescription>
           </div>
-          {previousMonth > 0 && (
-            <div className={`flex items-center gap-1 px-3 py-1 rounded-full text-sm font-semibold ${
-              isIncreasing 
-                ? 'bg-red-100 dark:bg-red-950/30 text-red-700 dark:text-red-400' 
-                : 'bg-green-100 dark:bg-green-950/30 text-green-700 dark:text-green-400'
-            }`}>
-              {isIncreasing ? (
-                <TrendingUp className="h-4 w-4" />
-              ) : (
-                <TrendingDown className="h-4 w-4" />
-              )}
-              {Math.abs(trend).toFixed(1)}%
-            </div>
-          )}
+          <div className="flex items-center gap-2">
+            <Select value={period} onValueChange={setPeriod}>
+              <SelectTrigger className="w-[140px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="7days">7 jours</SelectItem>
+                <SelectItem value="1month">1 mois</SelectItem>
+                <SelectItem value="3months">3 mois</SelectItem>
+                <SelectItem value="6months">6 mois</SelectItem>
+                <SelectItem value="1year">1 an</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+        <div className="flex items-start justify-between mt-2">
+          <div>
+          </div>
+          <div>
+            {previousMonth > 0 && (
+              <div className={`flex items-center gap-1 px-3 py-1 rounded-full text-sm font-semibold ${
+                isIncreasing 
+                  ? 'bg-red-100 dark:bg-red-950/30 text-red-700 dark:text-red-400' 
+                  : 'bg-green-100 dark:bg-green-950/30 text-green-700 dark:text-green-400'
+              }`}>
+                {isIncreasing ? (
+                  <TrendingUp className="h-4 w-4" />
+                ) : (
+                  <TrendingDown className="h-4 w-4" />
+                )}
+                {Math.abs(trend).toFixed(1)}%
+              </div>
+            )}
+          </div>
         </div>
       </CardHeader>
       <CardContent>

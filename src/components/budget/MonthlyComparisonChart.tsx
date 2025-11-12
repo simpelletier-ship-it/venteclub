@@ -2,12 +2,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { TrendingUp, TrendingDown, AlertCircle, Snowflake, Sun, Leaf, Cloud } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useState } from "react";
 
 interface MonthlyComparisonChartProps {
   transactions: any[];
 }
 
 export const MonthlyComparisonChart = ({ transactions }: MonthlyComparisonChartProps) => {
+  const [period, setPeriod] = useState<string>("1year");
+
   // Group transactions by month
   const monthlyData: { [key: string]: { income: number, expenses: number, month: string, year: number } } = {};
   
@@ -31,6 +35,20 @@ export const MonthlyComparisonChart = ({ transactions }: MonthlyComparisonChartP
     }
   });
 
+  // Determine how many months to show based on period
+  let monthsToShow = 12;
+  switch (period) {
+    case "3months":
+      monthsToShow = 3;
+      break;
+    case "6months":
+      monthsToShow = 6;
+      break;
+    case "1year":
+      monthsToShow = 12;
+      break;
+  }
+
   // Convert to array and sort by date
   const chartData = Object.entries(monthlyData)
     .map(([key, data]) => ({
@@ -40,7 +58,7 @@ export const MonthlyComparisonChart = ({ transactions }: MonthlyComparisonChartP
       balance: data.income - data.expenses
     }))
     .sort((a, b) => a.monthKey.localeCompare(b.monthKey))
-    .slice(-12); // Last 12 months
+    .slice(-monthsToShow);
 
   // Calculate month-over-month changes
   const changes = chartData.map((current, index) => {
@@ -107,13 +125,27 @@ export const MonthlyComparisonChart = ({ transactions }: MonthlyComparisonChartP
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <TrendingUp className="h-5 w-5 text-primary" />
-          Comparaison Mensuelle
-        </CardTitle>
-        <CardDescription>
-          Analyse des variations et tendances saisonnières
-        </CardDescription>
+        <div className="flex items-start justify-between">
+          <div className="flex-1">
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="h-5 w-5 text-primary" />
+              Comparaison Mensuelle
+            </CardTitle>
+            <CardDescription>
+              Analyse des variations et tendances saisonnières
+            </CardDescription>
+          </div>
+          <Select value={period} onValueChange={setPeriod}>
+            <SelectTrigger className="w-[140px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="3months">3 mois</SelectItem>
+              <SelectItem value="6months">6 mois</SelectItem>
+              <SelectItem value="1year">1 an</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Abnormal Increases Alert */}
