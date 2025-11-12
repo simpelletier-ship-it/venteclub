@@ -4,10 +4,11 @@ import { formatPrice } from "@/lib/priceFormat";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Trash2, TrendingUp } from "lucide-react";
+import { Trash2, TrendingUp, List, Grid3x3 } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface ExpensesByCategoryProps {
   transactions: any[];
@@ -19,6 +20,7 @@ export const ExpensesByCategory = ({ transactions, categories, onAnalyze }: Expe
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const [groupByDescription, setGroupByDescription] = useState(false);
   const queryClient = useQueryClient();
 
   // Calculate expenses by category for current month
@@ -210,41 +212,121 @@ export const ExpensesByCategory = ({ transactions, categories, onAnalyze }: Expe
             </p>
           </DialogHeader>
 
-          <div className="space-y-2 mt-4">
-            {selectedCategoryData?.transactions.map((transaction: any) => (
-              <div
-                key={transaction.id}
-                className="flex items-center justify-between p-3 rounded-lg border hover:bg-accent/30 transition-colors"
-              >
-                <div className="flex-1">
-                  <p className="font-semibold">
-                    {transaction.description || 'Sans description'}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    {new Date(transaction.transaction_date).toLocaleDateString('fr-CA', { 
-                      day: 'numeric', 
-                      month: 'long',
-                      year: 'numeric'
-                    })}
-                  </p>
+          <Tabs defaultValue="chronological" className="mt-4">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="chronological" className="flex items-center gap-2">
+                <List className="h-4 w-4" />
+                Chronologique
+              </TabsTrigger>
+              <TabsTrigger value="grouped" className="flex items-center gap-2">
+                <Grid3x3 className="h-4 w-4" />
+                Par description
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="chronological" className="space-y-2">
+              {selectedCategoryData?.transactions.map((transaction: any) => (
+                <div
+                  key={transaction.id}
+                  className="flex items-center justify-between p-3 rounded-lg border hover:bg-accent/30 transition-colors"
+                >
+                  <div className="flex-1">
+                    <p className="font-semibold">
+                      {transaction.description || 'Sans description'}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {new Date(transaction.transaction_date).toLocaleDateString('fr-CA', { 
+                        day: 'numeric', 
+                        month: 'long',
+                        year: 'numeric'
+                      })}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <p className="font-bold text-lg">
+                      {formatPrice(transaction.amount)}
+                    </p>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => deleteTransaction.mutate(transaction.id)}
+                      disabled={deleteTransaction.isPending}
+                      className="h-8 w-8"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <p className="font-bold text-lg">
-                    {formatPrice(transaction.amount)}
-                  </p>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => deleteTransaction.mutate(transaction.id)}
-                    disabled={deleteTransaction.isPending}
-                    className="h-8 w-8"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </TabsContent>
+
+            <TabsContent value="grouped" className="space-y-3">
+              {(() => {
+                // Group transactions by description
+                const grouped = (selectedCategoryData?.transactions || []).reduce((acc: any, transaction: any) => {
+                  const desc = transaction.description || 'Sans description';
+                  if (!acc[desc]) {
+                    acc[desc] = {
+                      description: desc,
+                      transactions: [],
+                      total: 0,
+                    };
+                  }
+                  acc[desc].transactions.push(transaction);
+                  acc[desc].total += Number(transaction.amount);
+                  return acc;
+                }, {});
+
+                const groupedArray = Object.values(grouped).sort((a: any, b: any) => b.total - a.total);
+
+                return groupedArray.map((group: any) => (
+                  <div key={group.description} className="border rounded-lg p-3 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-bold text-lg">{group.description}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {group.transactions.length} transaction(s)
+                        </p>
+                      </div>
+                      <p className="text-xl font-bold text-primary">
+                        {formatPrice(group.total)}
+                      </p>
+                    </div>
+                    
+                    <div className="space-y-1 pl-4 border-l-2 border-border">
+                      {group.transactions.map((transaction: any) => (
+                        <div
+                          key={transaction.id}
+                          className="flex items-center justify-between text-sm py-1"
+                        >
+                          <span className="text-muted-foreground">
+                            {new Date(transaction.transaction_date).toLocaleDateString('fr-CA', { 
+                              day: 'numeric', 
+                              month: 'short'
+                            })}
+                          </span>
+                          <div className="flex items-center gap-2">
+                            <span className="font-semibold">
+                              {formatPrice(transaction.amount)}
+                            </span>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => deleteTransaction.mutate(transaction.id)}
+                              disabled={deleteTransaction.isPending}
+                              className="h-6 w-6"
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ));
+              })()}
+            </TabsContent>
+          </Tabs>
         </DialogContent>
       </Dialog>
     </>

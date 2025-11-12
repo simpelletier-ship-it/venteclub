@@ -150,6 +150,7 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
   const [transactionType, setTransactionType] = useState<'expense' | 'income'>('expense');
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
+  const [descriptionOpen, setDescriptionOpen] = useState(false);
   const [suggestedCategory, setSuggestedCategory] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [categoryOpen, setCategoryOpen] = useState(false);
@@ -175,6 +176,28 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
       
       if (error) throw error;
       return data || [];
+    },
+    enabled: isAuthenticated,
+    retry: 1,
+  });
+
+  // Fetch unique descriptions for autocomplete
+  const { data: previousDescriptions = [] } = useQuery({
+    queryKey: ['transaction-descriptions', transactionType],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('budget_transactions')
+        .select('description')
+        .eq('type', transactionType)
+        .not('description', 'is', null)
+        .order('created_at', { ascending: false })
+        .limit(100);
+      
+      if (error) throw error;
+      
+      // Get unique descriptions
+      const unique = [...new Set(data.map(t => t.description))];
+      return unique;
     },
     enabled: isAuthenticated,
     retry: 1,
@@ -557,12 +580,48 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
           
           <div>
             <Label className="text-base font-medium mb-2 block">Description (optionnel)</Label>
-            <Input
-              value={description}
-              onChange={(e) => handleDescriptionChange(e.target.value)}
-              placeholder="Ex: Épicerie, Café..."
-              className="h-11"
-            />
+            <Popover open={descriptionOpen} onOpenChange={setDescriptionOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={descriptionOpen}
+                  className="w-full h-11 justify-start text-left font-normal"
+                >
+                  {description || "Ex: Épicerie, Café..."}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-full p-0" align="start">
+                <Command>
+                  <CommandInput 
+                    placeholder="Tapez une description..." 
+                    value={description}
+                    onValueChange={handleDescriptionChange}
+                  />
+                  <CommandList>
+                    <CommandEmpty>Aucune suggestion.</CommandEmpty>
+                    <CommandGroup heading="Descriptions récentes">
+                      {previousDescriptions
+                        .filter(desc => desc.toLowerCase().includes(description.toLowerCase()))
+                        .slice(0, 10)
+                        .map((desc) => (
+                          <CommandItem
+                            key={desc}
+                            value={desc}
+                            onSelect={(value) => {
+                              setDescription(value);
+                              handleDescriptionChange(value);
+                              setDescriptionOpen(false);
+                            }}
+                          >
+                            {desc}
+                          </CommandItem>
+                        ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
             {suggestedCategory && (
               <p className="text-sm text-muted-foreground mt-1 flex items-center gap-1">
                 💡 {categories.find(c => c.id === suggestedCategory)?.name}
