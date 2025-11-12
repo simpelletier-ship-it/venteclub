@@ -51,15 +51,19 @@ const DEFAULT_INCOME_CATEGORIES = [
 
 export const CategoryManager = ({ isAuthenticated }: { isAuthenticated: boolean }) => {
   const queryClient = useQueryClient();
-  const [editingCategory, setEditingCategory] = useState<any>(null);
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editingCategoryId, setEditingCategoryId] = useState<string | null>(null);
   const [newCategoryOpen, setNewCategoryOpen] = useState(false);
   const [categoryType, setCategoryType] = useState<'expense' | 'income'>('expense');
   
-  // Form state
+  // Form state for new category
   const [name, setName] = useState("");
   const [icon, setIcon] = useState("🍔");
   const [color, setColor] = useState("#3b82f6");
+  
+  // Inline edit state
+  const [editName, setEditName] = useState("");
+  const [editIcon, setEditIcon] = useState("");
+  const [editColor, setEditColor] = useState("");
 
   // Fetch categories
   const { data: categories = [], isLoading } = useQuery({
@@ -146,8 +150,7 @@ export const CategoryManager = ({ isAuthenticated }: { isAuthenticated: boolean 
 
   // Update mutation
   const updateCategory = useMutation({
-    mutationFn: async () => {
-      if (!editingCategory) throw new Error("Aucune catégorie sélectionnée");
+    mutationFn: async ({ id, name, icon, color }: { id: string, name: string, icon: string, color: string }) => {
       if (!name.trim()) throw new Error("Le nom est requis");
 
       const { error } = await supabase
@@ -157,15 +160,14 @@ export const CategoryManager = ({ isAuthenticated }: { isAuthenticated: boolean 
           icon,
           color,
         })
-        .eq('id', editingCategory.id);
+        .eq('id', id);
 
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['budget-categories'] });
       toast.success("✅ Catégorie mise à jour!");
-      setEditDialogOpen(false);
-      resetForm();
+      setEditingCategoryId(null);
     },
   });
 
@@ -189,15 +191,29 @@ export const CategoryManager = ({ isAuthenticated }: { isAuthenticated: boolean 
     setName("");
     setIcon("🍔");
     setColor("#3b82f6");
-    setEditingCategory(null);
   };
 
-  const openEditDialog = (category: any) => {
-    setEditingCategory(category);
-    setName(category.name);
-    setIcon(category.icon || "🍔");
-    setColor(category.color || "#3b82f6");
-    setEditDialogOpen(true);
+  const startEditing = (category: any) => {
+    setEditingCategoryId(category.id);
+    setEditName(category.name);
+    setEditIcon(category.icon || "🍔");
+    setEditColor(category.color || "#3b82f6");
+  };
+
+  const cancelEditing = () => {
+    setEditingCategoryId(null);
+    setEditName("");
+    setEditIcon("");
+    setEditColor("");
+  };
+
+  const saveEditing = (categoryId: string) => {
+    updateCategory.mutate({
+      id: categoryId,
+      name: editName,
+      icon: editIcon,
+      color: editColor,
+    });
   };
 
   const expenseCategories = categories.filter(c => c.type === 'expense');
@@ -205,51 +221,122 @@ export const CategoryManager = ({ isAuthenticated }: { isAuthenticated: boolean 
 
   const CategoryList = ({ cats, type }: { cats: any[], type: string }) => (
     <div className="space-y-2">
-      {cats.map((category) => (
-        <div
-          key={category.id}
-          className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
-        >
-          <div className="flex items-center gap-3">
-            <div 
-              className="w-10 h-10 rounded-full flex items-center justify-center text-xl"
-              style={{ backgroundColor: category.color + '20' }}
-            >
-              {category.icon}
-            </div>
-            <div>
-              <div className="font-medium">{category.name}</div>
-              <div className="text-xs text-muted-foreground">
-                {category.is_custom ? 'Personnalisée' : 'Par défaut'}
-              </div>
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => openEditDialog(category)}
-              title="Modifier"
-            >
-              <Pencil className="h-4 w-4" />
-            </Button>
-            {category.is_custom && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => {
-                  if (confirm(`Supprimer la catégorie "${category.name}" ?`)) {
-                    deleteCategory.mutate(category.id);
-                  }
-                }}
-                title="Supprimer"
-              >
-                <Trash2 className="h-4 w-4 text-destructive" />
-              </Button>
+      {cats.map((category) => {
+        const isEditing = editingCategoryId === category.id;
+        
+        return (
+          <div
+            key={category.id}
+            className="flex items-center justify-between p-3 rounded-lg border bg-card transition-colors"
+          >
+            {isEditing ? (
+              // Mode édition inline
+              <>
+                <div className="flex items-center gap-3 flex-1">
+                  <div className="flex gap-2">
+                    {EMOJI_OPTIONS.slice(0, 8).map((emoji) => (
+                      <Button
+                        key={emoji}
+                        type="button"
+                        variant={editIcon === emoji ? "default" : "outline"}
+                        size="icon"
+                        className="h-8 w-8 text-lg"
+                        onClick={() => setEditIcon(emoji)}
+                      >
+                        {emoji}
+                      </Button>
+                    ))}
+                  </div>
+                  <Input
+                    value={editName}
+                    onChange={(e) => setEditName(e.target.value)}
+                    className="flex-1"
+                    placeholder="Nom de la catégorie"
+                  />
+                  <div className="flex gap-1">
+                    {COLOR_OPTIONS.slice(0, 6).map((c) => (
+                      <Button
+                        key={c}
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        className="h-8 w-8 p-0 relative"
+                        onClick={() => setEditColor(c)}
+                      >
+                        <div 
+                          className="absolute inset-1 rounded"
+                          style={{ backgroundColor: c }}
+                        />
+                        {editColor === c && (
+                          <span className="absolute inset-0 flex items-center justify-center text-white text-xs">✓</span>
+                        )}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    onClick={() => saveEditing(category.id)}
+                    disabled={!editName.trim() || updateCategory.isPending}
+                  >
+                    ✓ Sauvegarder
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={cancelEditing}
+                  >
+                    ✕ Annuler
+                  </Button>
+                </div>
+              </>
+            ) : (
+              // Mode affichage normal
+              <>
+                <div className="flex items-center gap-3">
+                  <div 
+                    className="w-10 h-10 rounded-full flex items-center justify-center text-xl"
+                    style={{ backgroundColor: category.color + '20' }}
+                  >
+                    {category.icon}
+                  </div>
+                  <div>
+                    <div className="font-medium">{category.name}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {category.is_custom ? 'Personnalisée' : 'Par défaut'}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => startEditing(category)}
+                    title="Modifier"
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  {category.is_custom && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => {
+                        if (confirm(`Supprimer la catégorie "${category.name}" ?`)) {
+                          deleteCategory.mutate(category.id);
+                        }
+                      }}
+                      title="Supprimer"
+                    >
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  )}
+                </div>
+              </>
             )}
           </div>
-        </div>
-      ))}
+        );
+      })}
       {cats.length === 0 && (
         <p className="text-center text-muted-foreground py-8">
           Aucune catégorie {type === 'expense' ? 'de dépense' : 'de revenu'}
@@ -384,26 +471,6 @@ export const CategoryManager = ({ isAuthenticated }: { isAuthenticated: boolean 
             <CategoryList cats={incomeCategories} type="income" />
           </TabsContent>
         </Tabs>
-
-        {/* Edit Dialog */}
-        <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Modifier la catégorie</DialogTitle>
-              <DialogDescription>
-                Personnalisez votre catégorie
-              </DialogDescription>
-            </DialogHeader>
-            <CategoryFormContent />
-            <Button 
-              onClick={() => updateCategory.mutate()}
-              disabled={updateCategory.isPending || !name.trim()}
-              className="w-full"
-            >
-              {updateCategory.isPending ? "Mise à jour..." : "Enregistrer"}
-            </Button>
-          </DialogContent>
-        </Dialog>
       </CardContent>
     </Card>
   );
