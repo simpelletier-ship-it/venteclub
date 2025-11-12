@@ -4,11 +4,12 @@ import { formatPrice } from "@/lib/priceFormat";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Trash2, TrendingUp, List, Grid3x3 } from "lucide-react";
+import { Trash2, TrendingUp, List, Grid3x3, ArrowUpDown } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface ExpensesByCategoryProps {
   transactions: any[];
@@ -20,11 +21,36 @@ export const ExpensesByCategory = ({ transactions, categories, onAnalyze }: Expe
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
-  const [groupByDescription, setGroupByDescription] = useState(false);
+  const [period, setPeriod] = useState<string>("month");
+  const [sortBy, setSortBy] = useState<string>("date");
   const queryClient = useQueryClient();
 
-  // Calculate expenses by category for current month
-  const currentMonth = new Date().toISOString().slice(0, 7);
+  // Calculate date range based on selected period
+  const getDateRange = () => {
+    const now = new Date();
+    let startDate = new Date();
+    
+    switch (period) {
+      case "week":
+        startDate.setDate(now.getDate() - 7);
+        break;
+      case "month":
+        startDate.setMonth(now.getMonth() - 1);
+        break;
+      case "3months":
+        startDate.setMonth(now.getMonth() - 3);
+        break;
+      case "year":
+        startDate.setFullYear(now.getFullYear() - 1);
+        break;
+      default:
+        startDate.setMonth(now.getMonth() - 1);
+    }
+    
+    return startDate.toISOString().split('T')[0];
+  };
+
+  const startDate = getDateRange();
   
   const expensesByCategoryAll = categories
     .filter(cat => cat.type === 'expense')
@@ -32,7 +58,7 @@ export const ExpensesByCategory = ({ transactions, categories, onAnalyze }: Expe
       const categoryTransactions = transactions.filter(
         t => t.category_id === category.id && 
         t.type === 'expense' && 
-        t.transaction_date?.startsWith(currentMonth)
+        t.transaction_date >= startDate
       );
       
       const total = categoryTransactions.reduce((sum, t) => sum + Number(t.amount), 0);
@@ -71,6 +97,19 @@ export const ExpensesByCategory = ({ transactions, categories, onAnalyze }: Expe
   const totalExpenses = expensesByCategory.reduce((sum, item) => sum + item.value, 0);
 
   const selectedCategoryData = expensesByCategory.find(c => c.id === selectedCategory);
+
+  // Sort transactions based on selected sort option
+  const sortTransactions = (trans: any[]) => {
+    const sorted = [...trans];
+    switch (sortBy) {
+      case "date":
+        return sorted.sort((a, b) => new Date(b.transaction_date).getTime() - new Date(a.transaction_date).getTime());
+      case "amount":
+        return sorted.sort((a, b) => b.amount - a.amount);
+      default:
+        return sorted;
+    }
+  };
 
   // Delete transaction mutation
   const deleteTransaction = useMutation({
@@ -152,16 +191,29 @@ export const ExpensesByCategory = ({ transactions, categories, onAnalyze }: Expe
       <Card className="shadow-lg">
         <CardHeader>
           <div className="flex items-start justify-between">
-            <div>
+            <div className="flex-1">
               <CardTitle className="text-xl">📊 Dépenses par catégorie</CardTitle>
-              <CardDescription>Ce mois-ci • {formatPrice(totalExpenses)} total</CardDescription>
+              <CardDescription>{formatPrice(totalExpenses)} total</CardDescription>
             </div>
-            {onAnalyze && (
-              <Button variant="outline" size="sm" onClick={onAnalyze}>
-                <TrendingUp className="mr-2 h-4 w-4" />
-                Analyser
-              </Button>
-            )}
+            <div className="flex items-center gap-2">
+              <Select value={period} onValueChange={setPeriod}>
+                <SelectTrigger className="w-[140px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="week">Cette semaine</SelectItem>
+                  <SelectItem value="month">Ce mois</SelectItem>
+                  <SelectItem value="3months">3 mois</SelectItem>
+                  <SelectItem value="year">Cette année</SelectItem>
+                </SelectContent>
+              </Select>
+              {onAnalyze && (
+                <Button variant="outline" size="sm" onClick={onAnalyze}>
+                  <TrendingUp className="mr-2 h-4 w-4" />
+                  Analyser
+                </Button>
+              )}
+            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -222,13 +274,36 @@ export const ExpensesByCategory = ({ transactions, categories, onAnalyze }: Expe
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-xl">
-              <span className="text-2xl">{selectedCategoryData?.icon}</span>
-              {selectedCategoryData?.name}
-            </DialogTitle>
-            <p className="text-sm text-muted-foreground">
-              {selectedCategoryData?.transactions.length} transaction(s) • {formatPrice(selectedCategoryData?.value || 0)}
-            </p>
+            <div className="flex items-start justify-between">
+              <div>
+                <DialogTitle className="flex items-center gap-2 text-xl">
+                  <span className="text-2xl">{selectedCategoryData?.icon}</span>
+                  {selectedCategoryData?.name}
+                </DialogTitle>
+                <p className="text-sm text-muted-foreground">
+                  {selectedCategoryData?.transactions.length} transaction(s) • {formatPrice(selectedCategoryData?.value || 0)}
+                </p>
+              </div>
+              <Select value={sortBy} onValueChange={setSortBy}>
+                <SelectTrigger className="w-[160px]">
+                  <SelectValue placeholder="Trier par..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="date">
+                    <div className="flex items-center gap-2">
+                      <ArrowUpDown className="h-4 w-4" />
+                      Par date
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="amount">
+                    <div className="flex items-center gap-2">
+                      <ArrowUpDown className="h-4 w-4" />
+                      Par montant
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </DialogHeader>
 
           <Tabs defaultValue="chronological" className="mt-4">
@@ -244,7 +319,7 @@ export const ExpensesByCategory = ({ transactions, categories, onAnalyze }: Expe
             </TabsList>
 
             <TabsContent value="chronological" className="space-y-2">
-              {selectedCategoryData?.transactions.map((transaction: any) => (
+              {sortTransactions(selectedCategoryData?.transactions || []).map((transaction: any) => (
                 <div
                   key={transaction.id}
                   className="flex items-center justify-between p-3 rounded-lg border hover:bg-accent/30 transition-colors"

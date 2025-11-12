@@ -34,6 +34,7 @@ import { ExpenseTrendsChart } from "@/components/budget/ExpenseTrendsChart";
 import { FinancialHealthScore } from "@/components/budget/FinancialHealthScore";
 import { ScenarioSimulator } from "@/components/budget/ScenarioSimulator";
 import { QuickNetWorthUpdate } from "@/components/budget/QuickNetWorthUpdate";
+import { MonthlyReportExport } from "@/components/budget/MonthlyReportExport";
 
 const BudgetCalculator = () => {
   const navigate = useNavigate();
@@ -188,6 +189,44 @@ const BudgetCalculator = () => {
   const totalDebts = debts.reduce((sum, debt) => sum + Number(debt.balance), 0);
   const netWorth = totalAssets - totalDebts;
 
+  // Calculate total income and expenses for PDF export
+  const totalIncome = transactions
+    .filter(t => t.type === 'income')
+    .reduce((sum, t) => sum + Number(t.amount), 0);
+  const totalExpenses = transactions
+    .filter(t => t.type === 'expense')
+    .reduce((sum, t) => sum + Number(t.amount), 0);
+
+  // Generate recommendations for PDF export
+  const generateRecommendations = () => {
+    const recommendations: string[] = [];
+    
+    if (totalExpenses > totalIncome) {
+      recommendations.push("⚠️ Vos dépenses dépassent vos revenus. Identifiez les dépenses non essentielles à réduire.");
+    }
+    
+    if (totalDebts > totalAssets) {
+      recommendations.push("📉 Vos dettes dépassent vos actifs. Priorisez le remboursement des dettes à haut taux d'intérêt.");
+    }
+    
+    if (netWorth > 0) {
+      recommendations.push("✅ Félicitations ! Votre valeur nette est positive. Continuez sur cette voie.");
+    }
+    
+    if (financialGoals.length === 0) {
+      recommendations.push("🎯 Définissez des objectifs financiers pour mieux structurer votre épargne.");
+    }
+    
+    if (transactions.filter(t => t.type === 'income' && t.is_recurring).length === 0) {
+      recommendations.push("💡 Automatisez vos revenus récurrents pour simplifier votre suivi budgétaire.");
+    }
+    
+    recommendations.push("📊 Continuez à suivre vos dépenses quotidiennes pour maintenir une vue claire de votre situation financière.");
+    recommendations.push("💰 Envisagez d'augmenter votre épargne mensuelle de 5-10% si votre budget le permet.");
+    
+    return recommendations;
+  };
+
   const chartData = [
     { name: "Dépenses fixes", value: results.fixedExpenses, color: "#ef4444" },
     { name: "Dépenses variables", value: results.variableExpenses, color: "#f59e0b" },
@@ -334,6 +373,20 @@ const BudgetCalculator = () => {
 
           {/* Quick Add */}
           <QuickExpenseTracker isAuthenticated={isAuthenticated} />
+
+          {/* Export PDF */}
+          <div className="flex justify-center mb-6">
+            <MonthlyReportExport
+              transactions={transactions}
+              categories={categories}
+              assets={assets}
+              debts={debts}
+              netWorth={netWorth}
+              totalIncome={totalIncome}
+              totalExpenses={totalExpenses}
+              recommendations={generateRecommendations()}
+            />
+          </div>
 
           <Tabs defaultValue="overview" className="space-y-6">
             <TabsList className="grid w-full grid-cols-2 lg:grid-cols-5 gap-2 h-auto">
