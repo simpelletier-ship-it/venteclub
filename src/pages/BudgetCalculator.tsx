@@ -41,6 +41,13 @@ const BudgetCalculator = () => {
     console.log('BudgetCalculator - Auth state:', { user: !!user, loading, isAuthenticated });
   }, [user, loading, isAuthenticated]);
 
+  // Redirect to auth if not authenticated
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      navigate('/auth?redirect=/outils/budget');
+    }
+  }, [loading, isAuthenticated, navigate]);
+
   // Simple calculator state (for non-authenticated users)
   const [monthlyIncome, setMonthlyIncome] = useState("4000");
   const [rent, setRent] = useState("1200");
@@ -218,239 +225,11 @@ const BudgetCalculator = () => {
     );
   }
 
-  // Simple calculator for non-authenticated users
+  // Require authentication
   if (!isAuthenticated) {
-    return (
-      <>
-        <Helmet>
-          <title>Planificateur de Budget Québec | Outil Gratuit de Gestion Financière</title>
-          <meta name="description" content="Planificateur de budget intelligent et gratuit pour gérer vos finances personnelles au Québec. Suivi des dépenses, objectifs d'épargne, analyse des habitudes et coaching financier personnalisé." />
-          <meta name="keywords" content="budget québec, planificateur financier gratuit, gestion budget personnel, suivi dépenses, objectifs épargne, calculateur budget" />
-          <link rel="canonical" href="https://vente.club/outils/budget" />
-          <meta property="og:title" content="Planificateur de Budget Québec | Outil Gratuit" />
-          <meta property="og:description" content="Gérez votre budget avec intelligence. Suivi automatique, recommandations personnalisées et gamification pour atteindre vos objectifs financiers." />
-          <meta property="og:type" content="website" />
-        </Helmet>
-
-        <div className="min-h-screen bg-background py-8">
-          <div className="container mx-auto px-4 max-w-6xl">
-            <div className="text-center mb-8">
-              <h1 className="text-4xl font-bold mb-2 text-foreground">
-                Planificateur de Budget
-              </h1>
-              <p className="text-muted-foreground text-lg">
-                Créez et gérez votre budget mensuel et annuel
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Input Section */}
-              <div className="lg:col-span-1 space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Revenus mensuels</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div>
-                      <Label>Revenu net mensuel</Label>
-                      <CurrencyInput value={monthlyIncome} onChange={setMonthlyIncome} className="mt-1" />
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Dépenses fixes</CardTitle>
-                    <CardDescription>Dépenses récurrentes mensuelles</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div>
-                      <Label>Loyer / Hypothèque</Label>
-                      <CurrencyInput value={rent} onChange={setRent} className="mt-1" />
-                    </div>
-                    <div>
-                      <Label>Électricité / Chauffage</Label>
-                      <CurrencyInput value={utilities} onChange={setUtilities} className="mt-1" />
-                    </div>
-                    <div>
-                      <Label>Internet</Label>
-                      <CurrencyInput value={internet} onChange={setInternet} className="mt-1" />
-                    </div>
-                    <div>
-                      <Label>Téléphone</Label>
-                      <CurrencyInput value={phone} onChange={setPhone} className="mt-1" />
-                    </div>
-                    <div>
-                      <Label>Assurances</Label>
-                      <CurrencyInput value={insurance} onChange={setInsurance} className="mt-1" />
-                    </div>
-                    <div>
-                      <Label>Paiement auto</Label>
-                      <CurrencyInput value={carPayment} onChange={setCarPayment} className="mt-1" />
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Dépenses variables</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div>
-                      <Label>Épicerie</Label>
-                      <CurrencyInput value={groceries} onChange={setGroceries} className="mt-1" />
-                    </div>
-                    <div>
-                      <Label>Transport</Label>
-                      <CurrencyInput value={transportation} onChange={setTransportation} className="mt-1" />
-                    </div>
-                    <div>
-                      <Label>Divertissement</Label>
-                      <CurrencyInput value={entertainment} onChange={setEntertainment} className="mt-1" />
-                    </div>
-                    <div>
-                      <Label>Restaurants</Label>
-                      <CurrencyInput value={restaurants} onChange={setRestaurants} className="mt-1" />
-                    </div>
-                    <div>
-                      <Label>Magasinage</Label>
-                      <CurrencyInput value={shopping} onChange={setShopping} className="mt-1" />
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Épargne et dettes</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div>
-                      <Label>Épargne mensuelle</Label>
-                      <CurrencyInput value={savings} onChange={setSavings} className="mt-1" />
-                    </div>
-                    <div>
-                      <Label>Remboursement dettes</Label>
-                      <CurrencyInput value={debtPayment} onChange={setDebtPayment} className="mt-1" />
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Results Section */}
-              <div className="lg:col-span-2 space-y-6">
-                <Alert className={`border-2 ${budgetStatus.type === 'success' ? 'border-green-500 bg-green-50 dark:bg-green-950/20' : budgetStatus.type === 'error' ? 'border-red-500 bg-red-50 dark:bg-red-950/20' : 'border-yellow-500 bg-yellow-50 dark:bg-yellow-950/20'}`}>
-                  <StatusIcon className={`h-5 w-5 ${budgetStatus.color}`} />
-                  <AlertDescription className={budgetStatus.color}>
-                    {budgetStatus.message}
-                  </AlertDescription>
-                </Alert>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Card>
-                    <CardHeader className="pb-3">
-                      <CardDescription>Revenus mensuels</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-3xl font-bold">{formatPrice(results.income)}</div>
-                    </CardContent>
-                  </Card>
-
-                  <Card>
-                    <CardHeader className="pb-3">
-                      <CardDescription>Dépenses totales</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-3xl font-bold text-red-600 dark:text-red-400">
-                        {formatPrice(results.totalExpenses)}
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card>
-                    <CardHeader className="pb-3">
-                      <CardDescription>Taux d'épargne</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-3xl font-bold text-green-600 dark:text-green-400">
-                        {results.savingsRate.toFixed(1)}%
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card className={results.remaining >= 0 ? 'bg-green-50 dark:bg-green-950/20' : 'bg-red-50 dark:bg-red-950/20'}>
-                    <CardHeader className="pb-3">
-                      <CardDescription>Restant</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className={`text-3xl font-bold ${results.remaining >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-                        {formatPrice(results.remaining)}
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Répartition du budget</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <ResponsiveContainer width="100%" height={300}>
-                      <PieChart>
-                        <Pie
-                          data={chartData}
-                          cx="50%"
-                          cy="50%"
-                          innerRadius={60}
-                          outerRadius={100}
-                          paddingAngle={2}
-                          dataKey="value"
-                          label={(entry) => `${entry.name}: ${((entry.value / results.income) * 100).toFixed(0)}%`}
-                        >
-                          {chartData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.color} />
-                          ))}
-                        </Pie>
-                        <Tooltip formatter={(value: number) => formatPrice(value)} />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  </CardContent>
-                </Card>
-
-                <Card className="bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
-                  <CardHeader>
-                    <CardTitle className="text-blue-900 dark:text-blue-100 flex items-center gap-2">
-                      <TrendingUp className="h-5 w-5" />
-                      Débloquez toutes les fonctionnalités
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="text-blue-800 dark:text-blue-200 space-y-3">
-                    <p className="font-semibold">Connectez-vous pour accéder à :</p>
-                    <ul className="space-y-2">
-                      <li>• 📊 Suivi détaillé des transactions avec historique</li>
-                      <li>• 💰 Gestion complète des actifs (REER, CELI, propriétés)</li>
-                      <li>• 💳 Suivi des dettes avec taux d'intérêt</li>
-                      <li>• 🎮 Gamification de votre valeur nette</li>
-                      <li>• 📈 Graphiques mensuels et rapports</li>
-                      <li>• 🔒 Données chiffrées et privées</li>
-                    </ul>
-                    <Button 
-                      className="w-full mt-4" 
-                      size="lg"
-                      onClick={() => navigate('/auth?redirect=/outils/budget')}
-                    >
-                      Se connecter pour plus de fonctionnalités
-                    </Button>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          </div>
-        </div>
-      </>
-    );
+    return null; // Will redirect via useEffect
   }
 
-  // Advanced planner for authenticated users
   return (
     <ErrorBoundary>
       <>
@@ -507,6 +286,11 @@ const BudgetCalculator = () => {
                   <ExpensesByCategory 
                     transactions={transactions}
                     categories={categories}
+                    onAnalyze={() => {
+                      const tabsList = document.querySelector('[role="tablist"]');
+                      const transactionsTab = tabsList?.querySelector('[value="transactions"]') as HTMLButtonElement;
+                      transactionsTab?.click();
+                    }}
                   />
                   <BudgetInsights 
                     transactions={transactions}
