@@ -34,6 +34,7 @@ import { ExpenseTrendsChart } from "@/components/budget/ExpenseTrendsChart";
 import { FinancialHealthScore } from "@/components/budget/FinancialHealthScore";
 import { ScenarioSimulator } from "@/components/budget/ScenarioSimulator";
 import { QuickNetWorthUpdate } from "@/components/budget/QuickNetWorthUpdate";
+import { PremiumAnalysisTab } from "@/components/budget/PremiumAnalysisTab";
 import { MonthlyReportExport } from "@/components/budget/MonthlyReportExport";
 
 const BudgetCalculator = () => {
@@ -389,9 +390,15 @@ const BudgetCalculator = () => {
           </div>
 
           <Tabs defaultValue="overview" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-2 lg:grid-cols-5 gap-2 h-auto">
+            <TabsList className="grid w-full grid-cols-2 lg:grid-cols-6 gap-2 h-auto">
               <TabsTrigger value="overview" className="text-base py-3">
                 📊 Tableau de bord
+              </TabsTrigger>
+              <TabsTrigger value="analysis" className="text-base py-3 relative">
+                <span className="flex items-center gap-2">
+                  ✨ Analyses Premium
+                  <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-[10px] px-1.5 py-0.5 rounded-full font-bold">NEW</span>
+                </span>
               </TabsTrigger>
               <TabsTrigger value="transactions" className="text-base py-3">
                 💳 Mes dépenses
@@ -443,6 +450,14 @@ const BudgetCalculator = () => {
 
                 <FinancialGoals isAuthenticated={isAuthenticated} />
               </div>
+            </TabsContent>
+
+            <TabsContent value="analysis">
+              <PremiumAnalysisTab 
+                transactions={transactions}
+                categories={categories}
+                debts={debts}
+              />
             </TabsContent>
 
             <TabsContent value="budget">
