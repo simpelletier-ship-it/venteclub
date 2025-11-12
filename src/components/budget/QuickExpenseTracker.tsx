@@ -156,56 +156,54 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
     quickAdd.mutate();
   };
 
+  // Get popular categories (first 6 expense categories)
+  const popularCategories = categories.slice(0, 6);
+
   return (
-    <Card className="border-2 border-primary/20 shadow-lg">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Zap className="h-5 w-5 text-primary" />
-          Ajout Rapide
-        </CardTitle>
-        <CardDescription>Enregistrez une dépense en quelques secondes</CardDescription>
+    <Card className="shadow-lg">
+      <CardHeader className="pb-4">
+        <CardTitle className="text-2xl">💸 Ajouter une dépense</CardTitle>
+        <CardDescription className="text-base">Simple et rapide</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="space-y-3">
+        <div className="space-y-4">
           <div>
+            <Label className="text-base font-medium mb-2 block">Montant</Label>
             <CurrencyInput 
               value={amount} 
               onChange={setAmount}
-              placeholder="Montant"
-              className="text-lg h-12"
+              placeholder="0 $"
+              className="text-2xl h-14 font-bold"
             />
           </div>
           
           <div>
-            <Input
-              value={description}
-              onChange={(e) => handleDescriptionChange(e.target.value)}
-              placeholder="Description (optionnel, ex: Café Starbucks)"
-              className="h-11"
-            />
-            {suggestedCategory && (
-              <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
-                💡 Suggestion: {categories.find(c => c.id === suggestedCategory)?.name}
-              </p>
-            )}
-          </div>
+            <Label className="text-base font-medium mb-2 block">Catégorie</Label>
+            
+            {/* Popular categories as large buttons */}
+            <div className="grid grid-cols-3 gap-2 mb-3">
+              {popularCategories.map((cat: any) => (
+                <Button
+                  key={cat.id}
+                  type="button"
+                  variant={selectedCategory === cat.id ? "default" : "outline"}
+                  className="h-16 flex flex-col gap-1 text-sm"
+                  onClick={() => setSelectedCategory(cat.id)}
+                >
+                  <span className="text-2xl">{cat.icon}</span>
+                  <span className="text-xs">{cat.name}</span>
+                </Button>
+              ))}
+            </div>
 
-          <Popover open={categoryOpen} onOpenChange={setCategoryOpen}>
+            {/* More categories dropdown */}
+            <Popover open={categoryOpen} onOpenChange={setCategoryOpen}>
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
-                role="combobox"
-                aria-expanded={categoryOpen}
-                className="w-full justify-between h-11"
+                className="w-full h-11"
               >
-                {(selectedCategory || suggestedCategory) 
-                  ? (() => {
-                      const cat = categories.find(c => c.id === (selectedCategory || suggestedCategory));
-                      return cat ? `${cat.icon} ${cat.name}` : "Sélectionner une catégorie...";
-                    })()
-                  : "🔍 Rechercher ou créer une catégorie..."
-                }
-                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                Autre catégorie...
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-full p-0" align="start">
@@ -253,6 +251,22 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
               </Command>
             </PopoverContent>
           </Popover>
+          </div>
+          
+          <div>
+            <Label className="text-base font-medium mb-2 block">Description (optionnel)</Label>
+            <Input
+              value={description}
+              onChange={(e) => handleDescriptionChange(e.target.value)}
+              placeholder="Ex: Épicerie, Café..."
+              className="h-11"
+            />
+            {suggestedCategory && (
+              <p className="text-sm text-muted-foreground mt-1 flex items-center gap-1">
+                💡 {categories.find(c => c.id === suggestedCategory)?.name}
+              </p>
+            )}
+          </div>
 
           {/* Dialog for creating new category */}
           <Dialog open={newCategoryOpen} onOpenChange={setNewCategoryOpen}>
@@ -329,12 +343,12 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
           </Dialog>
 
           <Button 
-            className="w-full h-12 text-base"
+            className="w-full h-14 text-lg font-semibold"
             onClick={handleQuickAdd}
             disabled={quickAdd.isPending}
+            size="lg"
           >
-            <Plus className="mr-2 h-5 w-5" />
-            {quickAdd.isPending ? "Ajout..." : "Ajouter"}
+            {quickAdd.isPending ? "⏳ Ajout en cours..." : "✅ Ajouter la dépense"}
           </Button>
         </div>
       </CardContent>

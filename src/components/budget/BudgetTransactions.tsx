@@ -318,131 +318,15 @@ export const BudgetTransactions = ({ isAuthenticated }: { isAuthenticated: boole
     <div className="space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
-          <h3 className="text-2xl font-bold">Transactions Réelles</h3>
-          <p className="text-muted-foreground">Enregistrez vos revenus et dépenses réels</p>
+          <h3 className="text-2xl font-bold">📝 Historique</h3>
+          <p className="text-muted-foreground text-base">Toutes vos transactions</p>
         </div>
         
-        <div className="flex items-center gap-2">
-          <div className="flex border rounded-lg p-1">
-            <Button
-              variant={viewMode === 'list' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setViewMode('list')}
-              className="gap-2"
-            >
-              <List className="h-4 w-4" />
-              Liste
-            </Button>
-            <Button
-              variant={viewMode === 'calendar' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setViewMode('calendar')}
-              className="gap-2"
-            >
-              <CalendarIcon className="h-4 w-4" />
-              Calendrier
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex items-center justify-end flex-wrap gap-2">
-        <CreateDefaultCategories />
-        
-        <Dialog open={categoryDialogOpen} onOpenChange={setCategoryDialogOpen}>
-            <DialogTrigger asChild>
-              <Button variant="outline">
-                <Plus className="mr-2 h-4 w-4" />
-                Nouvelle catégorie
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-md">
-              <DialogHeader>
-                <DialogTitle>Ajouter une catégorie</DialogTitle>
-                <DialogDescription>Créez une catégorie personnalisée</DialogDescription>
-              </DialogHeader>
-              <form onSubmit={handleCategorySubmit} className="space-y-4">
-                <div>
-                  <Label>Type</Label>
-                  <Select value={newCategoryType} onValueChange={(v) => setNewCategoryType(v as 'income' | 'expense')}>
-                    <SelectTrigger className="mt-1">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="income">💰 Revenu</SelectItem>
-                      <SelectItem value="expense">💳 Dépense</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <Label>Nom de la catégorie</Label>
-                  <Input
-                    value={newCategoryName}
-                    onChange={(e) => setNewCategoryName(e.target.value)}
-                    placeholder="Ex: Café, Gym, etc."
-                    className="mt-1"
-                    required
-                    maxLength={30}
-                  />
-                </div>
-
-                <div>
-                  <Label>Icône</Label>
-                  <div className="flex gap-2 mt-1">
-                    <Input
-                      value={newCategoryIcon}
-                      onChange={(e) => setNewCategoryIcon(e.target.value)}
-                      className="w-20"
-                      maxLength={2}
-                    />
-                    <div className="flex flex-wrap gap-1 flex-1">
-                      {commonEmojis.map(emoji => (
-                        <Button
-                          key={emoji}
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          className="w-8 h-8 p-0"
-                          onClick={() => setNewCategoryIcon(emoji)}
-                        >
-                          {emoji}
-                        </Button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <Label>Couleur</Label>
-                  <div className="flex gap-2 mt-1">
-                    <Input
-                      type="color"
-                      value={newCategoryColor}
-                      onChange={(e) => setNewCategoryColor(e.target.value)}
-                      className="w-20 h-10"
-                    />
-                    <Input
-                      value={newCategoryColor}
-                      onChange={(e) => setNewCategoryColor(e.target.value)}
-                      placeholder="#3b82f6"
-                      className="flex-1"
-                    />
-                  </div>
-                </div>
-
-                <Button type="submit" className="w-full" disabled={addCategory.isPending}>
-                  {addCategory.isPending ? "Ajout..." : "Créer la catégorie"}
-                </Button>
-            </form>
-          </DialogContent>
-        </Dialog>
-
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-              <Button>
-                <Plus className="mr-2 h-4 w-4" />
-                Ajouter une transaction
+              <Button size="lg" className="h-12">
+                <Plus className="mr-2 h-5 w-5" />
+                Ajouter
               </Button>
             </DialogTrigger>
           <DialogContent className="max-w-md">
@@ -555,135 +439,72 @@ export const BudgetTransactions = ({ isAuthenticated }: { isAuthenticated: boole
           <CardDescription>Vos 50 dernières transactions</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4 mb-4">
-            <div className="relative">
+          {/* Simple Search */}
+          <div className="flex gap-2 mb-4">
+            <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                type="text"
-                placeholder="Rechercher par catégorie, description ou montant..."
+                placeholder="Rechercher..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9"
+                className="pl-10 h-11"
               />
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-              <div>
-                <Label className="text-xs text-muted-foreground">Type</Label>
-                <Select value={filterType} onValueChange={(v) => setFilterType(v as any)}>
-                  <SelectTrigger className="mt-1">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Tous</SelectItem>
-                    <SelectItem value="income">💰 Revenus</SelectItem>
-                    <SelectItem value="expense">💳 Dépenses</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label className="text-xs text-muted-foreground">Catégorie</Label>
-                <Select value={filterCategory} onValueChange={setFilterCategory}>
-                  <SelectTrigger className="mt-1">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Toutes</SelectItem>
-                    {incomeCategories.length > 0 && (
-                      <>
-                        <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">Revenus</div>
-                        {incomeCategories.map(cat => (
-                          <SelectItem key={cat.id} value={cat.id}>
-                            {cat.icon} {cat.name}
-                          </SelectItem>
-                        ))}
-                      </>
-                    )}
-                    {expenseCategories.length > 0 && (
-                      <>
-                        <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">Dépenses</div>
-                        {expenseCategories.map(cat => (
-                          <SelectItem key={cat.id} value={cat.id}>
-                            {cat.icon} {cat.name}
-                          </SelectItem>
-                        ))}
-                      </>
-                    )}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label className="text-xs text-muted-foreground">Date début</Label>
-                <Input
-                  type="date"
-                  value={filterDateStart}
-                  onChange={(e) => setFilterDateStart(e.target.value)}
-                  className="mt-1"
-                />
-              </div>
-
-              <div>
-                <Label className="text-xs text-muted-foreground">Date fin</Label>
-                <Input
-                  type="date"
-                  value={filterDateEnd}
-                  onChange={(e) => setFilterDateEnd(e.target.value)}
-                  className="mt-1"
-                />
-              </div>
-            </div>
-
-            {hasActiveFilters && (
-              <div className="flex items-center justify-between">
-                <p className="text-sm text-muted-foreground">
-                  {filteredTransactions.length} transaction{filteredTransactions.length > 1 ? 's' : ''} trouvée{filteredTransactions.length > 1 ? 's' : ''}
-                </p>
-                <Button variant="ghost" size="sm" onClick={resetFilters}>
-                  Réinitialiser les filtres
-                </Button>
-              </div>
-            )}
+            <Select value={filterType} onValueChange={(v) => setFilterType(v as any)}>
+              <SelectTrigger className="w-[140px] h-11">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tout</SelectItem>
+                <SelectItem value="income">💰 Revenus</SelectItem>
+                <SelectItem value="expense">💳 Dépenses</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           
-          <div className="space-y-2">
-            {filteredTransactions.length === 0 && searchQuery ? (
-              <p className="text-center text-muted-foreground py-8">Aucune transaction trouvée pour "{searchQuery}"</p>
-            ) : transactions.length === 0 ? (
-              <p className="text-center text-muted-foreground py-8">Aucune transaction pour le moment</p>
-            ) : (
-              filteredTransactions.map((transaction: any) => (
-                <div key={transaction.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors">
-                  <div className="flex items-center gap-3">
-                    <div className="text-2xl">{transaction.category?.icon}</div>
-                    <div>
-                      <div className="font-medium">{transaction.category?.name}</div>
-                      {transaction.description && (
-                        <div className="text-sm text-muted-foreground">{transaction.description}</div>
-                      )}
-                      <div className="text-xs text-muted-foreground">
-                        {new Date(transaction.transaction_date).toLocaleDateString('fr-CA')}
-                        {transaction.is_recurring && " • Récurrent"}
-                      </div>
+          {filteredTransactions.length === 0 ? (
+            <p className="text-center text-muted-foreground py-12 text-base">
+              Aucune transaction
+            </p>
+          ) : (
+            <div className="divide-y">
+              {filteredTransactions.map((transaction: any) => (
+                <div
+                  key={transaction.id}
+                  className="flex items-center justify-between p-4 hover:bg-accent/30 transition-colors"
+                >
+                  <div className="flex items-center gap-3 flex-1">
+                    <div
+                      className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shrink-0"
+                      style={{ backgroundColor: transaction.category?.color + '20' }}
+                    >
+                      {transaction.category?.icon || '💳'}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-semibold text-base">{transaction.category?.name || 'Sans catégorie'}</p>
+                      <p className="text-sm text-muted-foreground truncate">
+                        {transaction.description || new Date(transaction.transaction_date).toLocaleDateString('fr-CA', { day: 'numeric', month: 'long' })}
+                      </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className={`font-semibold ${transaction.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
-                      {transaction.type === 'income' ? '+' : '-'}{formatPrice(transaction.amount)}
-                    </span>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <p className={`font-bold text-lg ${transaction.type === 'income' ? 'text-green-600 dark:text-green-400' : 'text-foreground'}`}>
+                      {transaction.type === 'income' ? '+' : ''}{formatPrice(transaction.amount)}
+                    </p>
                     <Button
                       variant="ghost"
                       size="icon"
                       onClick={() => deleteTransaction.mutate(transaction.id)}
+                      disabled={deleteTransaction.isPending}
+                      className="h-8 w-8"
                     >
-                      <Trash2 className="h-4 w-4 text-destructive" />
+                      <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
                 </div>
-              ))
-            )}
-          </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
       )}

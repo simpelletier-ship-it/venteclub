@@ -473,29 +473,29 @@ const BudgetCalculator = () => {
             </p>
           </div>
 
-          {/* Quick Add & Streak - Highlighted at top */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <QuickExpenseTracker isAuthenticated={isAuthenticated} />
-            <DailyStreakReward isAuthenticated={isAuthenticated} />
-          </div>
+          {/* Quick Add */}
+          <QuickExpenseTracker isAuthenticated={isAuthenticated} />
 
           <Tabs defaultValue="overview" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2">
-              <TabsTrigger value="overview">📊 Vue d'ensemble</TabsTrigger>
-              <TabsTrigger value="habits">📈 Habitudes</TabsTrigger>
-              <TabsTrigger value="transactions">💳 Transactions</TabsTrigger>
-              <TabsTrigger value="recurring">🔁 Récurrentes</TabsTrigger>
-              <TabsTrigger value="budget">📋 Budget</TabsTrigger>
-              <TabsTrigger value="assets">💰 Actifs</TabsTrigger>
-              <TabsTrigger value="goals">🎯 Objectifs</TabsTrigger>
-              <TabsTrigger value="customize">✨ Personnaliser</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 gap-2 h-auto">
+              <TabsTrigger value="overview" className="text-base py-3">
+                📊 Tableau de bord
+              </TabsTrigger>
+              <TabsTrigger value="transactions" className="text-base py-3">
+                💳 Mes dépenses
+              </TabsTrigger>
+              <TabsTrigger value="budget" className="text-base py-3">
+                💰 Mon budget
+              </TabsTrigger>
+              <TabsTrigger value="assets" className="text-base py-3">
+                🏦 Mes actifs
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="overview">
               <div className="space-y-6">
                 <NetWorthGamification netWorth={netWorth} isAuthenticated={isAuthenticated} />
                 
-                {/* Insights & Recommendations */}
                 <BudgetInsights 
                   transactions={transactions}
                   categories={categories}
@@ -503,14 +503,7 @@ const BudgetCalculator = () => {
                   debts={debts}
                   assets={assets}
                 />
-
-                {/* Debt Calculator */}
-                {debts.length > 0 && <DebtCalculator debts={debts} />}
               </div>
-            </TabsContent>
-
-            <TabsContent value="habits">
-              <SpendingHabitsStats isAuthenticated={isAuthenticated} />
             </TabsContent>
 
             <TabsContent value="budget">
@@ -521,27 +514,8 @@ const BudgetCalculator = () => {
               <BudgetTransactions isAuthenticated={isAuthenticated} />
             </TabsContent>
 
-            <TabsContent value="recurring">
-              <RecurringExpenses isAuthenticated={isAuthenticated} />
-            </TabsContent>
-
             <TabsContent value="assets">
               <BudgetAssetsDebts isAuthenticated={isAuthenticated} />
-            </TabsContent>
-
-            <TabsContent value="goals">
-              <div className="space-y-8">
-                <GoalRecommendations isAuthenticated={isAuthenticated} />
-                <FinancialGoals isAuthenticated={isAuthenticated} />
-                <AchievementsBadges isAuthenticated={isAuthenticated} />
-              </div>
-            </TabsContent>
-
-            <TabsContent value="customize">
-              <div className="space-y-6">
-                <ThemeCustomizer />
-                <CategoryManager isAuthenticated={isAuthenticated} />
-              </div>
             </TabsContent>
           </Tabs>
 
