@@ -29,6 +29,7 @@ import { SpendingHabitsStats } from "@/components/budget/SpendingHabitsStats";
 import { GoalRecommendations } from "@/components/budget/GoalRecommendations";
 import { DailyStreakReward } from "@/components/budget/DailyStreakReward";
 import RecurringExpenses from "@/components/budget/RecurringExpenses";
+import { ExpensesByCategory } from "@/components/budget/ExpensesByCategory";
 
 const BudgetCalculator = () => {
   const navigate = useNavigate();
@@ -496,13 +497,19 @@ const BudgetCalculator = () => {
               <div className="space-y-6">
                 <NetWorthGamification netWorth={netWorth} isAuthenticated={isAuthenticated} />
                 
-                <BudgetInsights 
-                  transactions={transactions}
-                  categories={categories}
-                  goals={goals}
-                  debts={debts}
-                  assets={assets}
-                />
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <ExpensesByCategory 
+                    transactions={transactions}
+                    categories={categories}
+                  />
+                  <BudgetInsights 
+                    transactions={transactions}
+                    categories={categories}
+                    goals={goals}
+                    debts={debts}
+                    assets={assets}
+                  />
+                </div>
               </div>
             </TabsContent>
 
