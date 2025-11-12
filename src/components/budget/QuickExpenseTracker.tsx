@@ -1,11 +1,14 @@
 import { useState } from "react";
-import { Plus, TrendingDown, Zap, Sparkles, Check, ChevronsUpDown, Settings, Pin, PinOff, GripVertical } from "lucide-react";
+import { Plus, TrendingDown, Zap, Sparkles, Check, ChevronsUpDown, Settings, Pin, PinOff, GripVertical, Calendar as CalendarIcon } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { CurrencyInput } from "@/components/CurrencyInput";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
+import { fr } from "date-fns/locale";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
@@ -142,6 +145,7 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
   const [newCategoryName, setNewCategoryName] = useState("");
   const [newCategoryIcon, setNewCategoryIcon] = useState("🍔");
   const [newCategoryColor, setNewCategoryColor] = useState("#3b82f6");
+  const [transactionDate, setTransactionDate] = useState<Date>(new Date());
 
   // Fetch categories
   const { data: categories = [] } = useQuery({
@@ -238,7 +242,7 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
           category_id: categoryToUse,
           amount: parseFloat(amount),
           description: description || null,
-          transaction_date: new Date().toISOString().split('T')[0],
+          transaction_date: format(transactionDate, 'yyyy-MM-dd'),
           type: 'expense',
         });
 
@@ -252,6 +256,7 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
       setDescription("");
       setSuggestedCategory(null);
       setSelectedCategory("");
+      // Keep transactionDate for next transaction
     },
   });
 
@@ -432,6 +437,33 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
               </Command>
             </PopoverContent>
           </Popover>
+          </div>
+
+          <div>
+            <Label className="text-base font-medium mb-2 block">Date</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full h-11 justify-start text-left font-normal",
+                    !transactionDate && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {transactionDate ? format(transactionDate, "d MMMM yyyy", { locale: fr }) : "Sélectionner une date"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={transactionDate}
+                  onSelect={(date) => date && setTransactionDate(date)}
+                  initialFocus
+                  locale={fr}
+                />
+              </PopoverContent>
+            </Popover>
           </div>
           
           <div>
