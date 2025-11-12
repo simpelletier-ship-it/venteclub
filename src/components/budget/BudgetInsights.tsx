@@ -1,255 +1,342 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { TrendingUp, TrendingDown, AlertTriangle, Lightbulb, Target, Calendar, Zap } from "lucide-react";
+import { TrendingUp, TrendingDown, AlertCircle, Lightbulb, Target, DollarSign } from "lucide-react";
 import { formatPrice } from "@/lib/priceFormat";
 
 interface Transaction {
-  category_id: string;
+  id: string;
   amount: number;
   type: string;
   transaction_date: string;
-  is_recurring?: boolean;
-  recurring_frequency?: string;
+  category_id: string;
+  description?: string;
 }
 
 interface Category {
   id: string;
   name: string;
-  type: 'income' | 'expense';
+  type: string;
+  icon?: string;
 }
 
-interface BudgetGoal {
-  category_id: string;
-  monthly_limit: number;
+interface Goal {
+  id: string;
+  name: string;
+  target_amount: number;
+  current_amount: number;
+  deadline?: string;
+}
+
+interface Asset {
+  id: string;
+  value: number;
+  type: string;
 }
 
 interface Debt {
-  name: string;
+  id: string;
   balance: number;
   interest_rate: number;
-  minimum_payment?: number;
-  payment_frequency: string;
 }
 
 interface BudgetInsightsProps {
   transactions: Transaction[];
   categories: Category[];
-  goals: BudgetGoal[];
-  debts: Debt[];
-  assets: any[];
+  goals?: Goal[];
+  assets?: Asset[];
+  debts?: Debt[];
 }
 
-export const BudgetInsights = ({ transactions, categories, goals, debts, assets }: BudgetInsightsProps) => {
-  // Helper function to convert to monthly - MUST BE DECLARED FIRST
-  const convertToMonthly = (amount: number, frequency: string) => {
-    switch (frequency) {
-      case 'weekly': return amount * 4.33;
-      case 'biweekly': return amount * 2.17;
-      case 'yearly': return amount / 12;
-      default: return amount;
-    }
+interface Insight {
+  type: 'warning' | 'tip' | 'success' | 'info';
+  title: string;
+  description: string;
+  action?: string;
+  savings?: number;
+  icon: 'trending-up' | 'trending-down' | 'alert' | 'lightbulb' | 'target' | 'dollar';
+}
+
+export const BudgetInsights = ({ 
+  transactions, 
+  categories, 
+  goals = [], 
+  assets = [], 
+  debts = [] 
+}: BudgetInsightsProps) => {
+  const now = new Date();
+  const currentMonth = now.getMonth();
+  const lastMonth = currentMonth - 1;
+  const threeMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 3, 1);
+
+  // Fonction helper pour obtenir le nom d'une catégorie
+  const getCategoryName = (categoryId: string) => {
+    return categories.find(c => c.id === categoryId)?.name || 'Autre';
   };
 
-  // Calculate insights
-  const getInsights = () => {
-    const insights: Array<{
-      type: 'success' | 'warning' | 'info' | 'danger';
-      icon: any;
-      title: string;
-      description: string;
-      action?: string;
-    }> = [];
+  // Analyser les insights
+  const generateInsights = (): Insight[] => {
+    const insights: Insight[] = [];
 
-    // 1. High-interest debt alert
-    const highInterestDebts = debts.filter(d => d.interest_rate > 15);
-    if (highInterestDebts.length > 0) {
-      const totalHighInterest = highInterestDebts.reduce((sum, d) => sum + d.balance, 0);
-      const monthlyInterest = highInterestDebts.reduce((sum, d) => 
-        sum + (d.balance * (d.interest_rate / 100) / 12), 0
-      );
-      insights.push({
-        type: 'danger',
-        icon: AlertTriangle,
-        title: '⚠️ Taux d\'intérêt élevés détectés',
-        description: `Vous payez environ ${formatPrice(monthlyInterest)}/mois en intérêts sur ${formatPrice(totalHighInterest)} de dettes à taux élevé (>${15}%). Priorisez le remboursement de ces dettes.`,
-        action: 'Voir stratégie de remboursement'
-      });
+    // 1. Comparer les dépenses ce mois vs mois dernier
+    const thisMonthExpenses = transactions
+      .filter(t => t.type === 'expense' && new Date(t.transaction_date).getMonth() === currentMonth)
+      .reduce((sum, t) => sum + t.amount, 0);
+
+    const lastMonthExpenses = transactions
+      .filter(t => t.type === 'expense' && new Date(t.transaction_date).getMonth() === lastMonth)
+      .reduce((sum, t) => sum + t.amount, 0);
+
+    if (lastMonthExpenses > 0) {
+      const changePercent = ((thisMonthExpenses - lastMonthExpenses) / lastMonthExpenses) * 100;
+      
+      if (changePercent > 15) {
+        insights.push({
+          type: 'warning',
+          title: 'Dépenses en hausse',
+          description: `+${changePercent.toFixed(0)}% (${formatPrice(thisMonthExpenses - lastMonthExpenses)})`,
+          action: 'Vérifiez les catégories en hausse.',
+          icon: 'trending-up'
+        });
+      } else if (changePercent < -10) {
+        insights.push({
+          type: 'success',
+          title: 'Belles économies',
+          description: `-${Math.abs(changePercent).toFixed(0)}%`,
+          savings: Math.abs(thisMonthExpenses - lastMonthExpenses),
+          icon: 'trending-down'
+        });
+      }
     }
 
-    // 2. Recurring income vs expenses
-    const recurringIncome = transactions
-      .filter(t => t.type === 'income' && t.is_recurring)
-      .reduce((sum, t) => {
-        const monthly = convertToMonthly(t.amount, t.recurring_frequency || 'monthly');
-        return sum + monthly;
-      }, 0);
+    // 2. Catégorie la plus dépensière
+    const expensesByCategory = transactions
+      .filter(t => t.type === 'expense' && new Date(t.transaction_date) >= threeMonthsAgo)
+      .reduce((acc, t) => {
+        acc[t.category_id] = (acc[t.category_id] || 0) + t.amount;
+        return acc;
+      }, {} as Record<string, number>);
 
-    const recurringExpenses = transactions
-      .filter(t => t.type === 'expense' && t.is_recurring)
-      .reduce((sum, t) => {
-        const monthly = convertToMonthly(t.amount, t.recurring_frequency || 'monthly');
-        return sum + monthly;
-      }, 0);
+    const topCategory = Object.entries(expensesByCategory)
+      .sort(([, a], [, b]) => b - a)[0];
 
-    const cashflow = recurringIncome - recurringExpenses;
-    
-    if (cashflow > 0) {
-      insights.push({
-        type: 'success',
-        icon: TrendingUp,
-        title: '✅ Cashflow positif',
-        description: `Vos revenus récurrents dépassent vos dépenses récurrentes de ${formatPrice(cashflow)}/mois. Excellent! Pensez à automatiser votre épargne.`,
-        action: 'Configurer épargne automatique'
-      });
-    } else if (cashflow < 0) {
-      insights.push({
-        type: 'warning',
-        icon: TrendingDown,
-        title: '⚠️ Cashflow négatif',
-        description: `Vos dépenses récurrentes dépassent vos revenus de ${formatPrice(Math.abs(cashflow))}/mois. Identifiez les dépenses à réduire.`,
-        action: 'Analyser les dépenses'
-      });
+    if (topCategory) {
+      const [categoryId, amount] = topCategory;
+      const categoryName = getCategoryName(categoryId);
+      const totalExpenses = Object.values(expensesByCategory).reduce((a, b) => a + b, 0);
+      const percentage = (amount / totalExpenses) * 100;
+
+      if (percentage > 30) {
+        insights.push({
+          type: 'info',
+          title: `${categoryName}: ${percentage.toFixed(0)}%`,
+          description: `${formatPrice(amount)} en 3 mois`,
+          action: `Optimisez cette catégorie.`,
+          icon: 'dollar'
+        });
+      }
     }
 
-    // 3. Budget overspending
-    const overspentCategories = goals.filter(goal => {
-      const spent = transactions
-        .filter(t => t.category_id === goal.category_id)
-        .reduce((sum, t) => sum + t.amount, 0);
-      return spent > goal.monthly_limit;
+    // 3. Augmentations par catégorie
+    const thisMonthByCategory = transactions
+      .filter(t => t.type === 'expense' && new Date(t.transaction_date).getMonth() === currentMonth)
+      .reduce((acc, t) => {
+        acc[t.category_id] = (acc[t.category_id] || 0) + t.amount;
+        return acc;
+      }, {} as Record<string, number>);
+
+    const lastMonthByCategory = transactions
+      .filter(t => t.type === 'expense' && new Date(t.transaction_date).getMonth() === lastMonth)
+      .reduce((acc, t) => {
+        acc[t.category_id] = (acc[t.category_id] || 0) + t.amount;
+        return acc;
+      }, {} as Record<string, number>);
+
+    Object.keys(thisMonthByCategory).forEach(categoryId => {
+      const thisMonth = thisMonthByCategory[categoryId];
+      const lastMonth = lastMonthByCategory[categoryId] || 0;
+      
+      if (lastMonth > 0 && thisMonth > lastMonth * 1.5 && thisMonth > 100) {
+        const categoryName = getCategoryName(categoryId);
+        
+        insights.push({
+          type: 'warning',
+          title: `${categoryName} en hausse`,
+          description: `+${formatPrice(thisMonth - lastMonth)}`,
+          action: `Surveillez cette catégorie.`,
+          icon: 'alert'
+        });
+      }
     });
 
-    if (overspentCategories.length > 0) {
+    // 4. Petites dépenses fréquentes
+    const smallFrequentExpenses = transactions
+      .filter(t => 
+        t.type === 'expense' && 
+        t.amount < 20 && 
+        new Date(t.transaction_date).getMonth() === currentMonth
+      );
+
+    if (smallFrequentExpenses.length > 20) {
+      const total = smallFrequentExpenses.reduce((sum, t) => sum + t.amount, 0);
       insights.push({
-        type: 'warning',
-        icon: Target,
-        title: `🎯 ${overspentCategories.length} budget${overspentCategories.length > 1 ? 's' : ''} dépassé${overspentCategories.length > 1 ? 's' : ''}`,
-        description: `Vous avez dépassé votre budget dans ${overspentCategories.length} catégorie${overspentCategories.length > 1 ? 's' : ''} ce mois-ci.`,
-        action: 'Voir détails'
+        type: 'tip',
+        title: 'Micro-dépenses',
+        description: `${smallFrequentExpenses.length} × <20$ = ${formatPrice(total)}`,
+        action: `Réduisez ces petites dépenses.`,
+        savings: total * 0.3,
+        icon: 'lightbulb'
       });
     }
 
-    // 4. Asset allocation recommendation
-    const totalAssets = assets.reduce((sum, a) => sum + Number(a.value), 0);
-    const totalDebts = debts.reduce((sum, d) => sum + d.balance, 0);
-    const netWorth = totalAssets - totalDebts;
+    // 5. Taux d'épargne
+    const thisMonthIncome = transactions
+      .filter(t => t.type === 'income' && new Date(t.transaction_date).getMonth() === currentMonth)
+      .reduce((sum, t) => sum + t.amount, 0);
 
-    if (netWorth > 0 && totalAssets > 10000) {
-      const rrspAmount = assets.filter(a => a.type === 'rrsp').reduce((sum, a) => sum + Number(a.value), 0);
-      const tfsaAmount = assets.filter(a => a.type === 'tfsa').reduce((sum, a) => sum + Number(a.value), 0);
-      const investmentAmount = assets.filter(a => a.type === 'investment').reduce((sum, a) => sum + Number(a.value), 0);
+    if (thisMonthIncome > 0) {
+      const savingsRate = ((thisMonthIncome - thisMonthExpenses) / thisMonthIncome) * 100;
       
-      const investedAmount = rrspAmount + tfsaAmount + investmentAmount;
-      const investmentRatio = (investedAmount / totalAssets) * 100;
-
-      if (investmentRatio < 30) {
+      if (savingsRate < 5) {
         insights.push({
-          type: 'info',
-          icon: Lightbulb,
-          title: '💡 Opportunité d\'investissement',
-          description: `Seulement ${investmentRatio.toFixed(0)}% de vos actifs sont investis. Maximisez vos REER et CELI pour profiter des avantages fiscaux et de la croissance composée.`,
-          action: 'Voir stratégie d\'investissement'
+          type: 'warning',
+          title: 'Épargne faible',
+          description: `${savingsRate.toFixed(1)}%`,
+          action: `Cible: 10-15%`,
+          icon: 'target'
+        });
+      } else if (savingsRate >= 20) {
+        insights.push({
+          type: 'success',
+          title: 'Excellent!',
+          description: `${savingsRate.toFixed(0)}% épargnés`,
+          icon: 'target'
         });
       }
     }
 
-    // 5. Emergency fund check
-    const liquidAssets = assets
-      .filter(a => a.type === 'savings' || a.type === 'tfsa')
-      .reduce((sum, a) => sum + Number(a.value), 0);
-    
-    const emergencyFundTarget = recurringExpenses * 6; // 6 months of expenses
+    // 6. Économies sur restaurants
+    const restaurantCategories = categories
+      .filter(c => c.name.toLowerCase().includes('restaurant') || c.name.toLowerCase().includes('café'))
+      .map(c => c.id);
 
-    if (liquidAssets < emergencyFundTarget && recurringExpenses > 0) {
-      const remaining = emergencyFundTarget - liquidAssets;
+    const restaurantExpenses = transactions
+      .filter(t => 
+        t.type === 'expense' && 
+        restaurantCategories.includes(t.category_id) &&
+        new Date(t.transaction_date) >= threeMonthsAgo
+      )
+      .reduce((sum, t) => sum + t.amount, 0);
+
+    const monthlyRestaurant = restaurantExpenses / 3;
+
+    if (monthlyRestaurant > 200) {
+      const potentialSavings = monthlyRestaurant * 0.3;
       insights.push({
-        type: 'info',
-        icon: Zap,
-        title: '🛡️ Fonds d\'urgence insuffisant',
-        description: `Votre fonds d'urgence devrait couvrir 6 mois de dépenses (${formatPrice(emergencyFundTarget)}). Il vous reste ${formatPrice(remaining)} à épargner.`,
-        action: 'Créer plan d\'épargne'
+        type: 'tip',
+        title: 'Restaurants',
+        description: `${formatPrice(monthlyRestaurant)}/mois`,
+        action: `Cuisinez plus: ~${formatPrice(potentialSavings)}/mois`,
+        savings: potentialSavings,
+        icon: 'lightbulb'
       });
     }
 
-    // 6. Upcoming payment reminders
-    const today = new Date();
-    const dayOfMonth = today.getDate();
-    
-    if (dayOfMonth >= 1 && dayOfMonth <= 5) {
-      const monthlyDebts = debts.filter(d => d.payment_frequency === 'monthly');
-      if (monthlyDebts.length > 0) {
-        const totalPayments = monthlyDebts.reduce((sum, d) => sum + (d.minimum_payment || 0), 0);
-        insights.push({
-          type: 'info',
-          icon: Calendar,
-          title: '📅 Paiements mensuels à venir',
-          description: `N'oubliez pas vos paiements mensuels totalisant ${formatPrice(totalPayments)}. Assurez-vous d'avoir les fonds nécessaires.`,
-          action: 'Voir calendrier'
-        });
-      }
-    }
-
-    return insights;
+    return insights.slice(0, 6); // Limiter à 6 insights max
   };
 
-  const insights = getInsights();
+  const insights = generateInsights();
 
-  const getTypeColor = (type: string) => {
-    switch (type) {
-      case 'success': return 'bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800';
-      case 'warning': return 'bg-yellow-50 dark:bg-yellow-950/20 border-yellow-200 dark:border-yellow-800';
-      case 'danger': return 'bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800';
-      default: return 'bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800';
+  const getIcon = (iconType: Insight['icon']) => {
+    switch (iconType) {
+      case 'trending-up': return TrendingUp;
+      case 'trending-down': return TrendingDown;
+      case 'alert': return AlertCircle;
+      case 'lightbulb': return Lightbulb;
+      case 'target': return Target;
+      case 'dollar': return DollarSign;
     }
   };
 
-  const getTypeTextColor = (type: string) => {
+  const getIconColor = (type: Insight['type']) => {
     switch (type) {
-      case 'success': return 'text-green-700 dark:text-green-400';
-      case 'warning': return 'text-yellow-700 dark:text-yellow-400';
-      case 'danger': return 'text-red-700 dark:text-red-400';
-      default: return 'text-blue-700 dark:text-blue-400';
+      case 'warning': return 'text-red-500';
+      case 'success': return 'text-green-500';
+      case 'tip': return 'text-blue-500';
+      case 'info': return 'text-yellow-500';
+    }
+  };
+
+  const getBorderColor = (type: Insight['type']) => {
+    switch (type) {
+      case 'warning': return 'border-red-200 dark:border-red-800';
+      case 'success': return 'border-green-200 dark:border-green-800';
+      case 'tip': return 'border-blue-200 dark:border-blue-800';
+      case 'info': return 'border-yellow-200 dark:border-yellow-800';
+    }
+  };
+
+  const getBgColor = (type: Insight['type']) => {
+    switch (type) {
+      case 'warning': return 'bg-red-50 dark:bg-red-950/20';
+      case 'success': return 'bg-green-50 dark:bg-green-950/20';
+      case 'tip': return 'bg-blue-50 dark:bg-blue-950/20';
+      case 'info': return 'bg-yellow-50 dark:bg-yellow-950/20';
     }
   };
 
   if (insights.length === 0) {
-    return null;
+    return (
+      <Card className="p-6">
+        <div className="text-center text-muted-foreground">
+          <Lightbulb className="h-12 w-12 mx-auto mb-4 opacity-50" />
+          <p className="text-sm">Ajoutez des transactions pour recevoir des conseils.</p>
+        </div>
+      </Card>
+    );
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Lightbulb className="h-5 w-5 text-primary" />
-          Insights & Recommandations
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        {insights.map((insight, index) => {
-          const Icon = insight.icon;
-          return (
-            <Alert key={index} className={`${getTypeColor(insight.type)} border transition-all hover:shadow-md`}>
-              <Icon className={`h-4 w-4 ${getTypeTextColor(insight.type)}`} />
-              <AlertDescription className="ml-2">
-                <div className="space-y-2">
-                  <div className={`font-semibold ${getTypeTextColor(insight.type)}`}>
-                    {insight.title}
+    <Card className="p-6">
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-semibold">💡 Coach financier</h3>
+          <Badge variant="outline" className="text-xs">
+            {insights.length}
+          </Badge>
+        </div>
+
+        <div className="space-y-2">
+          {insights.map((insight, idx) => {
+            const Icon = getIcon(insight.icon);
+            return (
+              <div 
+                key={idx}
+                className={`p-3 rounded-lg border-l-2 ${getBorderColor(insight.type)} ${getBgColor(insight.type)}`}
+              >
+                <div className="flex items-center gap-2">
+                  <Icon className={`h-4 w-4 flex-shrink-0 ${getIconColor(insight.type)}`} />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-baseline gap-2">
+                      <h4 className="font-medium text-sm">{insight.title}</h4>
+                      <span className="text-xs text-muted-foreground">{insight.description}</span>
+                    </div>
+                    {insight.action && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {insight.action}
+                      </p>
+                    )}
+                    {insight.savings && (
+                      <Badge variant="secondary" className="mt-1 text-xs">
+                        Économie: {formatPrice(insight.savings)}
+                      </Badge>
+                    )}
                   </div>
-                  <div className="text-sm text-muted-foreground">
-                    {insight.description}
-                  </div>
-                  {insight.action && (
-                    <Badge variant="outline" className="text-xs cursor-pointer hover:bg-muted">
-                      {insight.action}
-                    </Badge>
-                  )}
                 </div>
-              </AlertDescription>
-            </Alert>
-          );
-        })}
-      </CardContent>
+              </div>
+            );
+          })}
+        </div>
+      </div>
     </Card>
   );
 };

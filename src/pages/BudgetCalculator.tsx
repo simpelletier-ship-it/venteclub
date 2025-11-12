@@ -314,7 +314,6 @@ const BudgetCalculator = () => {
                   <BudgetInsights 
                     transactions={transactions}
                     categories={categories}
-                    goals={budgetGoals}
                     debts={debts}
                     assets={assets}
                   />
