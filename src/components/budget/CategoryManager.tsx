@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Pencil, Trash2, Plus, Sparkles } from "lucide-react";
+import { Pencil, Trash2, Plus, GripVertical } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,23 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 const EMOJI_OPTIONS = ['🍔', '🚗', '🏠', '💡', '🎮', '👕', '📱', '💊', '🎓', '✈️', '🎬', '☕', '🛒', '🏋️', '📚', '💰', '🎉', '💼', '📈', '🏘️', '🏷️', '💳', '🎁', '💵', '⛽', '💅', '🐾', '🛡️', '🍽️', '📺', '📦'];
 const COLOR_OPTIONS = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6', '#8b5cf6', '#ec4899', '#64748b', '#10b981', '#dc2626', '#ea580c', '#d946ef', '#06b6d4', '#84cc16', '#6366f1', '#0ea5e9', '#a855f7', '#94a3b8', '#14b8a6', '#f59e0b'];
@@ -73,6 +90,7 @@ export const CategoryManager = ({ isAuthenticated }: { isAuthenticated: boolean 
         .from('budget_categories')
         .select('*')
         .order('type', { ascending: true })
+        .order('display_order', { ascending: true })
         .order('name', { ascending: true });
       
       if (error) throw error;
@@ -216,133 +234,222 @@ export const CategoryManager = ({ isAuthenticated }: { isAuthenticated: boolean 
     });
   };
 
+  // Reorder mutation
+  const reorderCategories = useMutation({
+    mutationFn: async (updates: { id: string, display_order: number }[]) => {
+      // Update each category individually
+      const promises = updates.map(({ id, display_order }) =>
+        supabase
+          .from('budget_categories')
+          .update({ display_order })
+          .eq('id', id)
+      );
+      
+      const results = await Promise.all(promises);
+      const error = results.find(r => r.error)?.error;
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['budget-categories'] });
+    },
+  });
+
+  // Drag and drop sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event: DragEndEvent, type: 'expense' | 'income') => {
+    const { active, over } = event;
+
+    if (!over || active.id === over.id) return;
+
+    const cats = type === 'expense' ? expenseCategories : incomeCategories;
+    const oldIndex = cats.findIndex(c => c.id === active.id);
+    const newIndex = cats.findIndex(c => c.id === over.id);
+
+    const reordered = arrayMove(cats, oldIndex, newIndex);
+    
+    // Update display_order for all affected categories
+    const updates = reordered.map((cat, index) => ({
+      id: cat.id,
+      display_order: index,
+    }));
+
+    reorderCategories.mutate(updates);
+  };
+
   const expenseCategories = categories.filter(c => c.type === 'expense');
   const incomeCategories = categories.filter(c => c.type === 'income');
 
-  const CategoryList = ({ cats, type }: { cats: any[], type: string }) => (
-    <div className="space-y-2">
-      {cats.map((category) => {
-        const isEditing = editingCategoryId === category.id;
-        
-        return (
+  const SortableItem = ({ category, type }: { category: any, type: string }) => {
+    const {
+      attributes,
+      listeners,
+      setNodeRef,
+      transform,
+      transition,
+      isDragging,
+    } = useSortable({ id: category.id });
+
+    const style = {
+      transform: CSS.Transform.toString(transform),
+      transition,
+      opacity: isDragging ? 0.5 : 1,
+    };
+
+    const isEditing = editingCategoryId === category.id;
+
+    return (
+      <div
+        ref={setNodeRef}
+        style={style}
+        className="flex items-center gap-2 p-3 rounded-lg border bg-card transition-colors"
+      >
+        {!isEditing && (
           <div
-            key={category.id}
-            className="flex items-center justify-between p-3 rounded-lg border bg-card transition-colors"
+            {...attributes}
+            {...listeners}
+            className="cursor-grab active:cursor-grabbing touch-none"
           >
-            {isEditing ? (
-              // Mode édition inline
-              <>
-                <div className="flex items-center gap-3 flex-1">
-                  <div className="flex gap-2">
-                    {EMOJI_OPTIONS.slice(0, 8).map((emoji) => (
-                      <Button
-                        key={emoji}
-                        type="button"
-                        variant={editIcon === emoji ? "default" : "outline"}
-                        size="icon"
-                        className="h-8 w-8 text-lg"
-                        onClick={() => setEditIcon(emoji)}
-                      >
-                        {emoji}
-                      </Button>
-                    ))}
-                  </div>
-                  <Input
-                    value={editName}
-                    onChange={(e) => setEditName(e.target.value)}
-                    className="flex-1"
-                    placeholder="Nom de la catégorie"
-                  />
-                  <div className="flex gap-1">
-                    {COLOR_OPTIONS.slice(0, 6).map((c) => (
-                      <Button
-                        key={c}
-                        type="button"
-                        variant="outline"
-                        size="icon"
-                        className="h-8 w-8 p-0 relative"
-                        onClick={() => setEditColor(c)}
-                      >
-                        <div 
-                          className="absolute inset-1 rounded"
-                          style={{ backgroundColor: c }}
-                        />
-                        {editColor === c && (
-                          <span className="absolute inset-0 flex items-center justify-center text-white text-xs">✓</span>
-                        )}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    onClick={() => saveEditing(category.id)}
-                    disabled={!editName.trim() || updateCategory.isPending}
-                  >
-                    ✓ Sauvegarder
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={cancelEditing}
-                  >
-                    ✕ Annuler
-                  </Button>
-                </div>
-              </>
-            ) : (
-              // Mode affichage normal
-              <>
-                <div className="flex items-center gap-3">
-                  <div 
-                    className="w-10 h-10 rounded-full flex items-center justify-center text-xl"
-                    style={{ backgroundColor: category.color + '20' }}
-                  >
-                    {category.icon}
-                  </div>
-                  <div>
-                    <div className="font-medium">{category.name}</div>
-                    <div className="text-xs text-muted-foreground">
-                      {category.is_custom ? 'Personnalisée' : 'Par défaut'}
-                    </div>
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => startEditing(category)}
-                    title="Modifier"
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  {category.is_custom && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => {
-                        if (confirm(`Supprimer la catégorie "${category.name}" ?`)) {
-                          deleteCategory.mutate(category.id);
-                        }
-                      }}
-                      title="Supprimer"
-                    >
-                      <Trash2 className="h-4 w-4 text-destructive" />
-                    </Button>
-                  )}
-                </div>
-              </>
-            )}
+            <GripVertical className="h-5 w-5 text-muted-foreground" />
           </div>
-        );
-      })}
-      {cats.length === 0 && (
-        <p className="text-center text-muted-foreground py-8">
-          Aucune catégorie {type === 'expense' ? 'de dépense' : 'de revenu'}
-        </p>
-      )}
-    </div>
+        )}
+        
+        {isEditing ? (
+          // Mode édition inline
+          <>
+            <div className="flex items-center gap-3 flex-1">
+              <div className="flex gap-2">
+                {EMOJI_OPTIONS.slice(0, 8).map((emoji) => (
+                  <Button
+                    key={emoji}
+                    type="button"
+                    variant={editIcon === emoji ? "default" : "outline"}
+                    size="icon"
+                    className="h-8 w-8 text-lg"
+                    onClick={() => setEditIcon(emoji)}
+                  >
+                    {emoji}
+                  </Button>
+                ))}
+              </div>
+              <Input
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+                className="flex-1"
+                placeholder="Nom de la catégorie"
+              />
+              <div className="flex gap-1">
+                {COLOR_OPTIONS.slice(0, 6).map((c) => (
+                  <Button
+                    key={c}
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    className="h-8 w-8 p-0 relative"
+                    onClick={() => setEditColor(c)}
+                  >
+                    <div 
+                      className="absolute inset-1 rounded"
+                      style={{ backgroundColor: c }}
+                    />
+                    {editColor === c && (
+                      <span className="absolute inset-0 flex items-center justify-center text-white text-xs">✓</span>
+                    )}
+                  </Button>
+                ))}
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                onClick={() => saveEditing(category.id)}
+                disabled={!editName.trim() || updateCategory.isPending}
+              >
+                ✓ Sauvegarder
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={cancelEditing}
+              >
+                ✕ Annuler
+              </Button>
+            </div>
+          </>
+        ) : (
+          // Mode affichage normal
+          <>
+            <div className="flex items-center gap-3 flex-1">
+              <div 
+                className="w-10 h-10 rounded-full flex items-center justify-center text-xl"
+                style={{ backgroundColor: category.color + '20' }}
+              >
+                {category.icon}
+              </div>
+              <div>
+                <div className="font-medium">{category.name}</div>
+                <div className="text-xs text-muted-foreground">
+                  {category.is_custom ? 'Personnalisée' : 'Par défaut'}
+                </div>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => startEditing(category)}
+                title="Modifier"
+              >
+                <Pencil className="h-4 w-4" />
+              </Button>
+              {category.is_custom && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => {
+                    if (confirm(`Supprimer la catégorie "${category.name}" ?`)) {
+                      deleteCategory.mutate(category.id);
+                    }
+                  }}
+                  title="Supprimer"
+                >
+                  <Trash2 className="h-4 w-4 text-destructive" />
+                </Button>
+              )}
+            </div>
+          </>
+        )}
+      </div>
+    );
+  };
+
+  const CategoryList = ({ cats, type }: { cats: any[], type: 'expense' | 'income' }) => (
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragEnd={(event) => handleDragEnd(event, type)}
+    >
+      <SortableContext
+        items={cats.map(c => c.id)}
+        strategy={verticalListSortingStrategy}
+      >
+        <div className="space-y-2">
+          {cats.map((category) => (
+            <SortableItem key={category.id} category={category} type={type} />
+          ))}
+          {cats.length === 0 && (
+            <p className="text-center text-muted-foreground py-8">
+              Aucune catégorie {type === 'expense' ? 'de dépense' : 'de revenu'}
+            </p>
+          )}
+        </div>
+      </SortableContext>
+    </DndContext>
   );
 
   const CategoryFormContent = () => (

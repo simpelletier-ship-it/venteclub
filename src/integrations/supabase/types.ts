@@ -131,6 +131,7 @@ export type Database = {
         Row: {
           color: string | null
           created_at: string
+          display_order: number | null
           icon: string | null
           id: string
           is_custom: boolean | null
@@ -141,6 +142,7 @@ export type Database = {
         Insert: {
           color?: string | null
           created_at?: string
+          display_order?: number | null
           icon?: string | null
           id?: string
           is_custom?: boolean | null
@@ -151,6 +153,7 @@ export type Database = {
         Update: {
           color?: string | null
           created_at?: string
+          display_order?: number | null
           icon?: string | null
           id?: string
           is_custom?: boolean | null
