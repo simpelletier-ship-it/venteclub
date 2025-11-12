@@ -771,7 +771,7 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
             disabled={quickAdd.isPending || !amount || parseFloat(amount) <= 0}
             size="lg"
           >
-            {quickAdd.isPending ? "⏳ Ajout en cours..." : "✅ Ajouter la dépense"}
+            {quickAdd.isPending ? "⏳ Ajout en cours..." : transactionType === 'income' ? "✅ Ajouter le revenu" : "✅ Ajouter la dépense"}
           </Button>
         </div>
       </CardContent>
