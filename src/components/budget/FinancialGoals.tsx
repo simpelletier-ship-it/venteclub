@@ -16,10 +16,13 @@ import { toast } from "sonner";
 import confetti from "canvas-confetti";
 
 const GOAL_TYPES = [
-  { value: 'savings', label: '💰 Épargne', icon: '💰' },
+  { value: 'vacation', label: '✈️ Voyage', icon: '✈️' },
+  { value: 'house_downpayment', label: '🏠 Mise de fond maison', icon: '🏠' },
+  { value: 'car', label: '🚗 Voiture', icon: '🚗' },
+  { value: 'emergency_fund', label: '🚨 Fonds d\'urgence', icon: '🚨' },
+  { value: 'savings', label: '💰 Épargne générale', icon: '💰' },
   { value: 'debt_payoff', label: '💳 Remboursement de dettes', icon: '💳' },
   { value: 'investment', label: '📈 Investissement', icon: '📈' },
-  { value: 'emergency_fund', label: '🚨 Fonds d\'urgence', icon: '🚨' },
   { value: 'purchase', label: '🛍️ Achat important', icon: '🛍️' },
   { value: 'other', label: '🎯 Autre', icon: '🎯' },
 ];
@@ -267,6 +270,14 @@ export const FinancialGoals = ({ isAuthenticated }: { isAuthenticated: boolean }
               const progress = (Number(goal.current_amount) / Number(goal.target_amount)) * 100;
               const remaining = Number(goal.target_amount) - Number(goal.current_amount);
               const daysRemaining = goal.deadline ? Math.ceil((new Date(goal.deadline).getTime() - Date.now()) / (1000 * 60 * 60 * 24)) : null;
+              
+              // Calculate average monthly savings needed
+              const monthlyNeeded = daysRemaining && daysRemaining > 0 ? (remaining / (daysRemaining / 30)) : 0;
+              
+              // Calculate estimated months to complete (if no deadline but has progress)
+              const avgMonthlySavings = Number(goal.current_amount) > 0 && goal.created_at ? 
+                (Number(goal.current_amount) / Math.max(1, (Date.now() - new Date(goal.created_at).getTime()) / (1000 * 60 * 60 * 24 * 30))) : 0;
+              const estimatedMonths = avgMonthlySavings > 0 ? Math.ceil(remaining / avgMonthlySavings) : null;
 
               return (
                 <Card key={goal.id} className="hover:shadow-lg transition-all duration-300 hover:scale-[1.02] animate-fade-in">
@@ -299,19 +310,45 @@ export const FinancialGoals = ({ isAuthenticated }: { isAuthenticated: boolean }
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Reste à économiser:</span>
-                      <span className="font-bold text-lg text-primary">{formatPrice(remaining)}</span>
+                    <div className="space-y-3 bg-muted/30 p-3 rounded-lg">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">Reste à économiser:</span>
+                        <span className="font-bold text-lg text-primary">{formatPrice(remaining)}</span>
+                      </div>
+
+                      {daysRemaining !== null && daysRemaining > 0 && (
+                        <>
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="text-muted-foreground">📅 Temps restant:</span>
+                            <span className={daysRemaining < 30 ? 'text-orange-600 font-semibold' : 'font-semibold'}>
+                              {Math.floor(daysRemaining / 30)} mois {daysRemaining % 30} jours
+                            </span>
+                          </div>
+                          {monthlyNeeded > 0 && (
+                            <div className="flex items-center justify-between text-xs">
+                              <span className="text-muted-foreground">💰 Épargne mensuelle requise:</span>
+                              <span className="font-semibold text-primary">{formatPrice(monthlyNeeded)}/mois</span>
+                            </div>
+                          )}
+                        </>
+                      )}
+
+                      {!goal.deadline && estimatedMonths && estimatedMonths > 0 && (
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-muted-foreground">⏱️ Temps estimé restant:</span>
+                          <span className="font-semibold">~{estimatedMonths} mois</span>
+                        </div>
+                      )}
+
+                      {daysRemaining !== null && daysRemaining <= 0 && (
+                        <div className="text-xs text-orange-600 font-semibold">
+                          ⚠️ Date limite dépassée
+                        </div>
+                      )}
                     </div>
 
-                    {daysRemaining !== null && (
-                      <div className={`text-xs ${daysRemaining < 30 ? 'text-orange-600' : 'text-muted-foreground'}`}>
-                        ⏰ {daysRemaining > 0 ? `${daysRemaining} jours restants` : 'Date limite dépassée'}
-                      </div>
-                    )}
-
                     {goal.notes && (
-                      <p className="text-xs text-muted-foreground italic">{goal.notes}</p>
+                      <p className="text-xs text-muted-foreground italic bg-muted/20 p-2 rounded">{goal.notes}</p>
                     )}
 
                     <Button 
@@ -368,8 +405,26 @@ export const FinancialGoals = ({ isAuthenticated }: { isAuthenticated: boolean }
         <Card>
           <CardContent className="py-12 text-center">
             <Target className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <p className="text-muted-foreground">Aucun objectif défini pour le moment</p>
-            <p className="text-sm text-muted-foreground mt-2">Créez votre premier objectif financier!</p>
+            <p className="text-muted-foreground mb-4">Aucun objectif défini pour le moment</p>
+            <p className="text-sm text-muted-foreground mb-6">Commencez par définir vos objectifs financiers!</p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-2xl mx-auto text-left">
+              <div className="p-4 bg-muted/30 rounded-lg border border-border">
+                <div className="text-2xl mb-2">✈️</div>
+                <div className="font-semibold mb-1">Voyage</div>
+                <div className="text-xs text-muted-foreground">Économisez pour vos prochaines vacances de rêve</div>
+              </div>
+              <div className="p-4 bg-muted/30 rounded-lg border border-border">
+                <div className="text-2xl mb-2">🏠</div>
+                <div className="font-semibold mb-1">Mise de fond</div>
+                <div className="text-xs text-muted-foreground">Accumulez votre mise de fond pour votre première maison</div>
+              </div>
+              <div className="p-4 bg-muted/30 rounded-lg border border-border">
+                <div className="text-2xl mb-2">🚗</div>
+                <div className="font-semibold mb-1">Voiture</div>
+                <div className="text-xs text-muted-foreground">Préparez l'achat de votre prochaine voiture</div>
+              </div>
+            </div>
           </CardContent>
         </Card>
       )}

@@ -415,12 +415,6 @@ const BudgetCalculator = () => {
                   debts={debts}
                 />
                 
-                <NetWorthGamification netWorth={netWorth} isAuthenticated={isAuthenticated} />
-                
-                <div className="flex justify-center">
-                  <QuickNetWorthUpdate currentNetWorth={netWorth} isAuthenticated={isAuthenticated} />
-                </div>
-                
                 <ExpenseTrendsChart transactions={transactions} />
                 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -440,6 +434,14 @@ const BudgetCalculator = () => {
                     assets={assets}
                   />
                 </div>
+
+                <NetWorthGamification netWorth={netWorth} isAuthenticated={isAuthenticated} />
+                
+                <div className="flex justify-center">
+                  <QuickNetWorthUpdate currentNetWorth={netWorth} isAuthenticated={isAuthenticated} />
+                </div>
+
+                <FinancialGoals isAuthenticated={isAuthenticated} />
               </div>
             </TabsContent>
 
