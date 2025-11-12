@@ -31,6 +31,7 @@ import { DailyStreakReward } from "@/components/budget/DailyStreakReward";
 import RecurringExpenses from "@/components/budget/RecurringExpenses";
 import { ExpensesByCategory } from "@/components/budget/ExpensesByCategory";
 import { ExpenseTrendsChart } from "@/components/budget/ExpenseTrendsChart";
+import { FinancialHealthScore } from "@/components/budget/FinancialHealthScore";
 
 const BudgetCalculator = () => {
   const navigate = useNavigate();
@@ -278,6 +279,12 @@ const BudgetCalculator = () => {
 
             <TabsContent value="overview">
               <div className="space-y-6">
+                <FinancialHealthScore 
+                  transactions={transactions}
+                  assets={assets}
+                  debts={debts}
+                />
+                
                 <NetWorthGamification netWorth={netWorth} isAuthenticated={isAuthenticated} />
                 
                 <ExpenseTrendsChart transactions={transactions} />
