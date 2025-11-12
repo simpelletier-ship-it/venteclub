@@ -21,6 +21,7 @@ const ASSET_TYPES = [
   { value: 'property', label: 'Propriété/Maison' },
   { value: 'investment', label: 'Placements' },
   { value: 'savings', label: 'Épargne' },
+  { value: 'emergency_fund', label: 'Fonds d\'urgence' },
   { value: 'other', label: 'Autre' },
 ];
 

@@ -1,5 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Sector } from "recharts";
 import { formatPrice } from "@/lib/priceFormat";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -18,6 +18,7 @@ interface ExpensesByCategoryProps {
 export const ExpensesByCategory = ({ transactions, categories, onAnalyze }: ExpensesByCategoryProps) => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const queryClient = useQueryClient();
 
   // Calculate expenses by category for current month
@@ -107,26 +108,21 @@ export const ExpensesByCategory = ({ transactions, categories, onAnalyze }: Expe
     setDialogOpen(true);
   };
 
-  const CustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, icon }: any) => {
-    const RADIAN = Math.PI / 180;
-    const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
-    const x = cx + radius * Math.cos(-midAngle * RADIAN);
-    const y = cy + radius * Math.sin(-midAngle * RADIAN);
-
-    if (percent < 0.05) return null; // Don't show label if less than 5%
+  const renderActiveShape = (props: any) => {
+    const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill } = props;
 
     return (
-      <text
-        x={x}
-        y={y}
-        fill="white"
-        textAnchor={x > cx ? 'start' : 'end'}
-        dominantBaseline="central"
-        className="text-lg font-bold"
-        style={{ textShadow: '0 1px 3px rgba(0,0,0,0.5)' }}
-      >
-        {icon}
-      </text>
+      <g>
+        <Sector
+          cx={cx}
+          cy={cy}
+          innerRadius={innerRadius}
+          outerRadius={outerRadius + 10}
+          startAngle={startAngle}
+          endAngle={endAngle}
+          fill={fill}
+        />
+      </g>
     );
   };
 
@@ -155,11 +151,14 @@ export const ExpensesByCategory = ({ transactions, categories, onAnalyze }: Expe
                 cx="50%"
                 cy="50%"
                 labelLine={false}
-                label={(props) => <CustomLabel {...props} icon={props.icon} />}
                 outerRadius={110}
                 fill="#8884d8"
                 dataKey="value"
                 onClick={handleCategoryClick}
+                onMouseEnter={(_, index) => setActiveIndex(index)}
+                onMouseLeave={() => setActiveIndex(null)}
+                activeIndex={activeIndex ?? undefined}
+                activeShape={renderActiveShape}
                 cursor="pointer"
               >
                 {expensesByCategory.map((entry, index) => (
