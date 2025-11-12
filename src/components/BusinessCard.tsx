@@ -198,7 +198,7 @@ const BusinessCard = ({
       data-business-id={id}
     >
       <Card
-        className={`group relative overflow-hidden card-premium border-border/50 h-full flex flex-col transition-all duration-500 bg-white dark:bg-slate-800 ${
+        className={`group relative overflow-hidden card-premium border-border/50 h-full flex flex-col transition-all duration-500 ${
           status !== 'sold' ? 'hover:shadow-premium hover:border-primary/50 hover:shadow-primary/20 cursor-pointer' : 'cursor-default'
         } ${featured ? 'ring-2 ring-primary/40 shadow-lg shadow-primary/20' : ''}`}
         onClick={handleClick}
