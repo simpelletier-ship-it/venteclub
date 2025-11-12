@@ -636,46 +636,6 @@ BALANCE: ${formatPrice(totalIncomeActual - totalExpenseActual)}
         </div>
       </div>
 
-      {/* Assets as Income Section */}
-      {assets.length > 0 && (
-        <div>
-          <h4 className="text-lg font-semibold mb-3 text-blue-600 dark:text-blue-400">💎 Actifs / Épargne (Inclus dans revenus réels)</h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {assets.map((asset: any) => (
-              <Card key={asset.id} className="hover:shadow-md transition-shadow border-blue-200 dark:border-blue-800">
-                <CardContent className="p-4">
-                  <div className="flex items-start justify-between mb-3">
-                    <div>
-                      <div className="font-medium">{asset.name}</div>
-                      <div className="text-xs text-muted-foreground">
-                        {asset.type === 'rrsp' && 'REER'}
-                        {asset.type === 'tfsa' && 'CELI'}
-                        {asset.type === 'property' && 'Propriété'}
-                        {asset.type === 'investment' && 'Placements'}
-                        {asset.type === 'savings' && 'Épargne'}
-                        {asset.type === 'other' && 'Autre'}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Valeur actuelle</span>
-                      <span className="text-blue-600 font-semibold">{formatPrice(Number(asset.value))}</span>
-                    </div>
-                    {asset.notes && (
-                      <div className="text-xs text-muted-foreground mt-2">{asset.notes}</div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-          <p className="text-sm text-muted-foreground mt-2">
-            💡 Ces actifs sont inclus dans vos revenus réels totaux ci-dessus
-          </p>
-        </div>
-      )}
-
       {/* Expense Categories */}
       <div>
         <h4 className="text-lg font-semibold mb-3 text-red-600 dark:text-red-400">💳 Dépenses</h4>

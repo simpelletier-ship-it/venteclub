@@ -20,7 +20,7 @@ export const PremiumAnalysisTab = ({ transactions, categories, debts, assets }: 
       <Alert className="border-primary/50 bg-primary/5">
         <Sparkles className="h-4 w-4 text-primary" />
         <AlertDescription className="text-sm">
-          <strong className="font-semibold">Analyses Premium</strong> - Découvrez des insights avancés pour maximiser vos économies et optimiser votre santé financière.
+          <strong className="font-semibold">Analyses Avancées</strong> - Découvrez des insights avancés gratuits pour maximiser vos économies et optimiser votre santé financière.
         </AlertDescription>
       </Alert>
 
