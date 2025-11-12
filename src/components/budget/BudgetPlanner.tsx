@@ -1,11 +1,13 @@
 import { useState } from "react";
-import { Plus, Trash2, PencilLine, CalendarDays } from "lucide-react";
+import { Plus, Trash2, PencilLine, CalendarDays, RotateCcw, FileDown, AlertTriangle } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { CurrencyInput } from "@/components/CurrencyInput";
 import { formatPrice } from "@/lib/priceFormat";
 import { supabase } from "@/integrations/supabase/client";
@@ -165,6 +167,92 @@ export const BudgetPlanner = ({ isAuthenticated }: { isAuthenticated: boolean })
       toast.success("Budget supprimé");
     },
   });
+
+  // Reset all data mutation
+  const resetAll = useMutation({
+    mutationFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Non authentifié");
+
+      // Delete all user data in parallel
+      const promises = [
+        supabase.from('budget_transactions').delete().eq('user_id', user.id),
+        supabase.from('budget_goals').delete().eq('user_id', user.id),
+        supabase.from('user_assets').delete().eq('user_id', user.id),
+        supabase.from('user_debts').delete().eq('user_id', user.id),
+        supabase.from('financial_goals').delete().eq('user_id', user.id),
+        supabase.from('asset_history').delete().eq('user_id', user.id),
+        supabase.from('debt_history').delete().eq('user_id', user.id),
+        supabase.from('budget_categories').delete().eq('user_id', user.id).eq('is_custom', true),
+      ];
+
+      const results = await Promise.all(promises);
+      const error = results.find(r => r.error)?.error;
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['budget-transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['budget-goals'] });
+      queryClient.invalidateQueries({ queryKey: ['user-assets'] });
+      queryClient.invalidateQueries({ queryKey: ['user-debts'] });
+      queryClient.invalidateQueries({ queryKey: ['financial-goals'] });
+      queryClient.invalidateQueries({ queryKey: ['budget-categories'] });
+      toast.success("✅ Toutes les données ont été réinitialisées!", { duration: 3000 });
+    },
+    onError: (error: any) => {
+      toast.error("Erreur: " + error.message);
+    },
+  });
+
+  const exportPDF = () => {
+    // First compute the values we need
+    const incomeData = incomeCategories.map(cat => ({
+      name: cat.name,
+      icon: cat.icon,
+      budget: getCategoryBudget(cat.id),
+      actual: getCategorySpent(cat.id),
+    })).filter(c => c.budget > 0);
+
+    const expenseData = expenseCategories.map(cat => ({
+      name: cat.name,
+      icon: cat.icon,
+      budget: getCategoryBudget(cat.id),
+      actual: getCategorySpent(cat.id),
+    })).filter(c => c.budget > 0);
+
+    // Create a simple text export
+    const content = `
+RÉSUMÉ BUDGÉTAIRE MENSUEL
+Date: ${new Date().toLocaleDateString('fr-CA')}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+REVENUS
+${incomeData.map(c => `${c.icon} ${c.name}: ${formatPrice(c.actual)} / ${formatPrice(c.budget)}`).join('\n')}
+
+Total revenus: ${formatPrice(totalIncomeActual)} / ${formatPrice(totalIncomeBudget)}
+
+DÉPENSES
+${expenseData.map(c => `${c.icon} ${c.name}: ${formatPrice(c.actual)} / ${formatPrice(c.budget)}`).join('\n')}
+
+Total dépenses: ${formatPrice(totalExpenseActual)} / ${formatPrice(totalExpenseBudget)}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BALANCE: ${formatPrice(totalIncomeActual - totalExpenseActual)}
+`;
+
+    // Download as text file
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `budget-${new Date().toISOString().split('T')[0]}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    toast.success("📄 Résumé exporté!", { duration: 2000 });
+  };
 
   const handleSubmit = (e: React.FormEvent, categoryId: string) => {
     e.preventDefault();
@@ -363,9 +451,54 @@ export const BudgetPlanner = ({ isAuthenticated }: { isAuthenticated: boolean })
 
   return (
     <div className="space-y-6">
-      <div>
-        <h3 className="text-2xl font-bold">Mon Budget Mensuel</h3>
-        <p className="text-muted-foreground">Définissez vos objectifs par catégorie</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-2xl font-bold">Mon Budget Mensuel</h3>
+          <p className="text-muted-foreground">Définissez vos objectifs par catégorie</p>
+        </div>
+        
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="sm">
+              Actions
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuItem onClick={exportPDF}>
+              <FileDown className="h-4 w-4 mr-2" />
+              Exporter résumé
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-destructive focus:text-destructive">
+                  <RotateCcw className="h-4 w-4 mr-2" />
+                  Tout réinitialiser
+                </DropdownMenuItem>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle className="flex items-center gap-2">
+                    <AlertTriangle className="h-5 w-5 text-destructive" />
+                    Réinitialiser toutes les données?
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Cette action est irréversible. Toutes vos transactions, budgets, actifs, dettes, objectifs et catégories personnalisées seront supprimés définitivement.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Annuler</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={() => resetAll.mutate()}
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  >
+                    Confirmer la réinitialisation
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       {/* Summary cards */}
