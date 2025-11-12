@@ -159,7 +159,12 @@ export const FinancialHealthScore = ({ transactions, assets, debts }: FinancialH
 
   // Recommandations personnalisées
   const getRecommendations = () => {
-    const recommendations: Array<{ icon: string; title: string; description: string; priority: 'high' | 'medium' | 'low' }> = [];
+    const recommendations: Array<{ 
+      icon: string; 
+      title: string; 
+      description: string; 
+      priority: 'success' | 'high' | 'medium' | 'low' 
+    }> = [];
     
     const totalIncome = transactions
       .filter(t => t.type === 'income')
@@ -175,72 +180,109 @@ export const FinancialHealthScore = ({ transactions, assets, debts }: FinancialH
       .filter(a => a.type === 'savings' || a.type === 'emergency_fund')
       .reduce((sum, a) => sum + a.value, 0);
     
-    const monthlyExpenses = totalExpenses / 3; // Moyenne sur 3 mois
+    const monthlyExpenses = totalExpenses / 3;
     const emergencyFundMonths = monthlyExpenses > 0 ? liquidAssets / monthlyExpenses : 0;
     
-    // Priorité haute: Fonds d'urgence insuffisant
+    // Félicitations pour les bonnes performances
+    if (emergencyFundMonths >= 3) {
+      recommendations.push({
+        icon: "🎉",
+        title: "Fonds d'urgence solide",
+        description: `${emergencyFundMonths.toFixed(1)} mois de dépenses de côté.`,
+        priority: 'success'
+      });
+    }
+    
+    if (savingsRate >= 15 && totalIncome > 0) {
+      recommendations.push({
+        icon: "🌟",
+        title: "Excellent taux d'épargne",
+        description: `${savingsRate.toFixed(0)}% de vos revenus épargnés.`,
+        priority: 'success'
+      });
+    }
+    
+    if (debts.length === 0 && assets.length > 0) {
+      recommendations.push({
+        icon: "✨",
+        title: "Aucune dette",
+        description: "Continuez sur cette lancée.",
+        priority: 'success'
+      });
+    }
+    
+    if (regularityScore >= 20) {
+      recommendations.push({
+        icon: "👏",
+        title: "Dépenses régulières",
+        description: "Bon contrôle de vos finances.",
+        priority: 'success'
+      });
+    }
+    
+    // Conseils d'amélioration - minimalistes
     if (emergencyFundMonths < 3) {
       recommendations.push({
         icon: "🚨",
-        title: "Créez votre fonds d'urgence",
-        description: `Vous avez ${emergencyFundMonths.toFixed(1)} mois de dépenses de côté. Visez 3-6 mois (${formatPrice(monthlyExpenses * 3)} - ${formatPrice(monthlyExpenses * 6)}) pour être protégé en cas d'imprévu.`,
+        title: "Fonds d'urgence",
+        description: `Visez ${formatPrice(monthlyExpenses * 3)} (3 mois).`,
         priority: 'high'
       });
     }
     
-    // Priorité haute: Taux d'épargne très faible
     if (savingsRate < 10 && totalIncome > 0) {
-      const targetSavings = totalIncome * 0.15;
-      const currentSavings = totalIncome - totalExpenses;
-      const toSave = targetSavings - currentSavings;
-      
       recommendations.push({
         icon: "💰",
-        title: "Augmentez votre épargne",
-        description: `Vous épargnez ${savingsRate.toFixed(0)}% de vos revenus. Essayez d'économiser ${formatPrice(toSave)} de plus par mois pour atteindre 15%.`,
+        title: "Épargne à améliorer",
+        description: `Cible: 15% de vos revenus.`,
         priority: 'high'
       });
     }
     
-    // Priorité moyenne: Dettes avec intérêts élevés
     const highInterestDebts = debts.filter(d => d.interest_rate > 10);
     if (highInterestDebts.length > 0) {
-      const totalHighInterest = highInterestDebts.reduce((sum, d) => sum + d.balance, 0);
       recommendations.push({
         icon: "📉",
-        title: "Remboursez vos dettes coûteuses",
-        description: `Vous avez ${formatPrice(totalHighInterest)} en dettes avec taux d'intérêt élevé (>10%). Priorisez leur remboursement pour économiser sur les intérêts.`,
+        title: "Dettes coûteuses",
+        description: `Priorisez les taux >10%.`,
         priority: 'medium'
       });
     }
     
-    // Priorité moyenne: Dépenses irrégulières
     if (regularityScore < 15 && transactions.length > 10) {
       recommendations.push({
         icon: "📊",
-        title: "Stabilisez vos dépenses",
-        description: "Vos dépenses varient beaucoup d'un mois à l'autre. Créez un budget mensuel pour mieux prévoir et contrôler vos dépenses.",
+        title: "Stabiliser dépenses",
+        description: "Créez un budget mensuel.",
         priority: 'medium'
       });
     }
     
-    // Priorité faible: Diversification actifs
-    if (assets.length === 1 && assets[0].value > 10000) {
+    if (stabilityScore < 15 && transactions.filter(t => t.type === 'income').length > 5) {
       recommendations.push({
-        icon: "🌱",
-        title: "Diversifiez vos placements",
-        description: "Envisagez de diversifier vos actifs (REER, CELI, placements) pour optimiser votre croissance financière et réduire les risques.",
+        icon: "💼",
+        title: "Revenus irréguliers",
+        description: "Créez un coussin financier.",
         priority: 'low'
       });
     }
     
-    // Priorité faible: Revenus stables
-    if (stabilityScore < 15 && transactions.filter(t => t.type === 'income').length > 5) {
+    if (assets.length === 1 && assets[0].value > 10000) {
       recommendations.push({
-        icon: "💼",
-        title: "Stabilisez vos revenus",
-        description: "Vos revenus fluctuent. Cherchez des sources de revenus plus stables ou créez un coussin financier pour absorber les variations.",
+        icon: "🌱",
+        title: "Diversifier",
+        description: "REER, CELI, placements.",
         priority: 'low'
+      });
+    }
+    
+    // Toujours avoir au moins 2 conseils
+    if (recommendations.length < 2) {
+      recommendations.push({
+        icon: "💡",
+        title: "Continuez vos efforts",
+        description: "Vous êtes sur la bonne voie.",
+        priority: 'success'
       });
     }
     
@@ -327,25 +369,26 @@ export const FinancialHealthScore = ({ transactions, assets, debts }: FinancialH
         {/* Recommandations personnalisées */}
         {recommendations.length > 0 && (
           <div className="space-y-3 pt-4 border-t">
-            <h4 className="text-base font-semibold flex items-center gap-2">
-              <AlertCircle className="h-5 w-5 text-primary" />
-              Conseils personnalisés pour vous
+            <h4 className="text-sm font-semibold flex items-center gap-2 text-muted-foreground">
+              <AlertCircle className="h-4 w-4" />
+              Conseils
             </h4>
-            <div className="space-y-3">
+            <div className="space-y-2">
               {recommendations.map((rec, idx) => (
                 <div 
                   key={idx} 
-                  className={`p-4 rounded-lg border-l-4 ${
+                  className={`p-3 rounded-lg border-l-2 ${
+                    rec.priority === 'success' ? 'bg-green-50 dark:bg-green-950/20 border-green-500' :
                     rec.priority === 'high' ? 'bg-red-50 dark:bg-red-950/20 border-red-500' :
                     rec.priority === 'medium' ? 'bg-yellow-50 dark:bg-yellow-950/20 border-yellow-500' :
                     'bg-blue-50 dark:bg-blue-950/20 border-blue-500'
                   }`}
                 >
-                  <div className="flex items-start gap-3">
-                    <span className="text-2xl flex-shrink-0">{rec.icon}</span>
-                    <div className="flex-1 space-y-1">
-                      <h5 className="font-semibold text-sm">{rec.title}</h5>
-                      <p className="text-sm text-muted-foreground leading-relaxed">
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg">{rec.icon}</span>
+                    <div className="flex-1 min-w-0">
+                      <h5 className="font-medium text-sm">{rec.title}</h5>
+                      <p className="text-xs text-muted-foreground">
                         {rec.description}
                       </p>
                     </div>
