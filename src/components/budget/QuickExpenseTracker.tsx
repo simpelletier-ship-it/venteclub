@@ -167,8 +167,9 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
   };
 
   const handleQuickAdd = () => {
-    if (!amount || parseFloat(amount) <= 0) {
-      toast.error("Entrez un montant valide");
+    const numAmount = parseFloat(amount);
+    if (!amount || isNaN(numAmount) || numAmount <= 0) {
+      toast.error("Le montant doit être supérieur à 0$");
       return;
     }
     quickAdd.mutate();
@@ -439,7 +440,7 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
           <Button 
             className="w-full h-14 text-lg font-semibold"
             onClick={handleQuickAdd}
-            disabled={quickAdd.isPending}
+            disabled={quickAdd.isPending || !amount || parseFloat(amount) <= 0}
             size="lg"
           >
             {quickAdd.isPending ? "⏳ Ajout en cours..." : "✅ Ajouter la dépense"}
