@@ -312,21 +312,22 @@ export const CategoryManager = ({ isAuthenticated }: { isAuthenticated: boolean 
   );
 
   return (
-    <Card>
+    <Card className="shadow-lg">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Sparkles className="h-5 w-5 text-primary" />
-          Gérer les catégories
-        </CardTitle>
+        <CardTitle className="text-xl">🎨 Gérer les catégories</CardTitle>
         <CardDescription>
-          Modifiez les catégories existantes ou créez-en de nouvelles
+          Personnalisez vos catégories de revenus et dépenses
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="expense" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="expense">Dépenses ({expenseCategories.length})</TabsTrigger>
-            <TabsTrigger value="income">Revenus ({incomeCategories.length})</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 h-11">
+            <TabsTrigger value="expense" className="text-base">
+              💳 Dépenses ({expenseCategories.length})
+            </TabsTrigger>
+            <TabsTrigger value="income" className="text-base">
+              💰 Revenus ({incomeCategories.length})
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="expense" className="space-y-4">

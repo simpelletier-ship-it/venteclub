@@ -16,14 +16,6 @@ import { toast } from "sonner";
 const EMOJI_OPTIONS = ['🍔', '🚗', '🏠', '💡', '🎮', '👕', '📱', '💊', '🎓', '✈️', '🎬', '☕', '🛒', '🏋️', '📚'];
 const COLOR_OPTIONS = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6', '#8b5cf6', '#ec4899', '#64748b'];
 
-// Quick shortcuts for common expenses
-const QUICK_SHORTCUTS = [
-  { label: '☕ Café', amount: 5, categoryName: 'Divertissement', icon: '☕' },
-  { label: '⛽ Essence', amount: 60, categoryName: 'Transport', icon: '⛽' },
-  { label: '🛒 Épicerie', amount: 50, categoryName: 'Alimentation', icon: '🛒' },
-  { label: '🍽️ Restaurant', amount: 30, categoryName: 'Divertissement', icon: '🍽️' },
-];
-
 // AI-powered category suggestions based on description
 const suggestCategory = (description: string, categories: any[]) => {
   const desc = description.toLowerCase();
@@ -164,15 +156,6 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
     quickAdd.mutate();
   };
 
-  const handleShortcutClick = (shortcut: typeof QUICK_SHORTCUTS[0]) => {
-    const category = categories.find(c => c.name === shortcut.categoryName);
-    if (category) {
-      setAmount(shortcut.amount.toString());
-      setSelectedCategory(category.id);
-      setDescription(shortcut.label);
-    }
-  };
-
   // Get popular categories (first 6 expense categories)
   const popularCategories = categories.slice(0, 6);
 
@@ -184,27 +167,6 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {/* Quick shortcuts */}
-          <div>
-            <Label className="text-sm font-medium mb-2 block">⚡ Raccourcis rapides</Label>
-            <div className="grid grid-cols-2 gap-2">
-              {QUICK_SHORTCUTS.map((shortcut) => (
-                <Button
-                  key={shortcut.label}
-                  type="button"
-                  variant="outline"
-                  className="h-14 text-sm font-semibold hover:bg-primary/10 hover:border-primary transition-all"
-                  onClick={() => handleShortcutClick(shortcut)}
-                >
-                  <span className="text-xl mr-2">{shortcut.icon}</span>
-                  <div className="text-left">
-                    <div className="text-xs opacity-70">{shortcut.label.split(' ')[1]}</div>
-                    <div className="font-bold">{shortcut.amount} $</div>
-                  </div>
-                </Button>
-              ))}
-            </div>
-          </div>
           <div>
             <Label className="text-base font-medium mb-2 block">Montant</Label>
             <CurrencyInput 

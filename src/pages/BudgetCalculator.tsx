@@ -30,6 +30,7 @@ import { GoalRecommendations } from "@/components/budget/GoalRecommendations";
 import { DailyStreakReward } from "@/components/budget/DailyStreakReward";
 import RecurringExpenses from "@/components/budget/RecurringExpenses";
 import { ExpensesByCategory } from "@/components/budget/ExpensesByCategory";
+import { ExpenseTrendsChart } from "@/components/budget/ExpenseTrendsChart";
 
 const BudgetCalculator = () => {
   const navigate = useNavigate();
@@ -478,7 +479,7 @@ const BudgetCalculator = () => {
           <QuickExpenseTracker isAuthenticated={isAuthenticated} />
 
           <Tabs defaultValue="overview" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 gap-2 h-auto">
+            <TabsList className="grid w-full grid-cols-2 lg:grid-cols-5 gap-2 h-auto">
               <TabsTrigger value="overview" className="text-base py-3">
                 📊 Tableau de bord
               </TabsTrigger>
@@ -491,11 +492,16 @@ const BudgetCalculator = () => {
               <TabsTrigger value="assets" className="text-base py-3">
                 🏦 Mes actifs
               </TabsTrigger>
+              <TabsTrigger value="customize" className="text-base py-3">
+                🎨 Personnaliser
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="overview">
               <div className="space-y-6">
                 <NetWorthGamification netWorth={netWorth} isAuthenticated={isAuthenticated} />
+                
+                <ExpenseTrendsChart transactions={transactions} />
                 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <ExpensesByCategory 
@@ -523,6 +529,13 @@ const BudgetCalculator = () => {
 
             <TabsContent value="assets">
               <BudgetAssetsDebts isAuthenticated={isAuthenticated} />
+            </TabsContent>
+
+            <TabsContent value="customize">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <CategoryManager isAuthenticated={isAuthenticated} />
+                <ThemeCustomizer />
+              </div>
             </TabsContent>
           </Tabs>
 
