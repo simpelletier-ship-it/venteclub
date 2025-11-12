@@ -1,15 +1,16 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Sector } from "recharts";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Sector, BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend } from "recharts";
 import { formatPrice } from "@/lib/priceFormat";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Trash2, TrendingUp, List, Grid3x3, ArrowUpDown } from "lucide-react";
+import { Trash2, TrendingUp, List, Grid3x3, ArrowUpDown, PieChartIcon, BarChart3 } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 interface ExpensesByCategoryProps {
   transactions: any[];
@@ -23,6 +24,7 @@ export const ExpensesByCategory = ({ transactions, categories, onAnalyze }: Expe
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [period, setPeriod] = useState<string>("month");
   const [sortBy, setSortBy] = useState<string>("date");
+  const [chartType, setChartType] = useState<string>("pie");
   const queryClient = useQueryClient();
 
   // Calculate date range based on selected period
@@ -196,6 +198,14 @@ export const ExpensesByCategory = ({ transactions, categories, onAnalyze }: Expe
               <CardDescription>{formatPrice(totalExpenses)} total</CardDescription>
             </div>
             <div className="flex items-center gap-2">
+              <ToggleGroup type="single" value={chartType} onValueChange={(v) => v && setChartType(v)}>
+                <ToggleGroupItem value="pie" aria-label="Graphique circulaire">
+                  <PieChartIcon className="h-4 w-4" />
+                </ToggleGroupItem>
+                <ToggleGroupItem value="bar" aria-label="Graphique à bandes">
+                  <BarChart3 className="h-4 w-4" />
+                </ToggleGroupItem>
+              </ToggleGroup>
               <Select value={period} onValueChange={setPeriod}>
                 <SelectTrigger className="w-[140px]">
                   <SelectValue />
@@ -218,28 +228,60 @@ export const ExpensesByCategory = ({ transactions, categories, onAnalyze }: Expe
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={expensesByCategory}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                outerRadius={110}
-                fill="#8884d8"
-                dataKey="value"
-                onClick={handleCategoryClick}
-                onMouseEnter={(_, index) => setActiveIndex(index)}
-                onMouseLeave={() => setActiveIndex(null)}
-                activeIndex={activeIndex ?? undefined}
-                activeShape={renderActiveShape}
-                cursor="pointer"
-              >
-                {expensesByCategory.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
-              </Pie>
-              <Tooltip content={<CustomTooltip />} />
-            </PieChart>
+            {chartType === "pie" ? (
+              <PieChart>
+                <Pie
+                  data={expensesByCategory}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  outerRadius={110}
+                  fill="#8884d8"
+                  dataKey="value"
+                  onClick={handleCategoryClick}
+                  onMouseEnter={(_, index) => setActiveIndex(index)}
+                  onMouseLeave={() => setActiveIndex(null)}
+                  activeIndex={activeIndex ?? undefined}
+                  activeShape={renderActiveShape}
+                  cursor="pointer"
+                >
+                  {expensesByCategory.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip content={<CustomTooltip />} />
+              </PieChart>
+            ) : (
+              <BarChart data={expensesByCategory}>
+                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                <XAxis 
+                  dataKey="name" 
+                  className="text-xs"
+                  tick={{ fill: 'currentColor' }}
+                  angle={-45}
+                  textAnchor="end"
+                  height={80}
+                />
+                <YAxis 
+                  className="text-xs"
+                  tick={{ fill: 'currentColor' }}
+                  tickFormatter={(value) => `${(value / 1000).toFixed(0)}k`}
+                />
+                <Tooltip content={<CustomTooltip />} />
+                <Legend />
+                <Bar 
+                  dataKey="value" 
+                  fill="#6366f1"
+                  onClick={handleCategoryClick}
+                  cursor="pointer"
+                  name="Dépenses"
+                >
+                  {expensesByCategory.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Bar>
+              </BarChart>
+            )}
           </ResponsiveContainer>
 
           {/* Legend - Clickable */}

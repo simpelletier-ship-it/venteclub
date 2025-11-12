@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { TransactionTagManager } from "./TransactionTagManager";
 import {
   DndContext,
   closestCenter,
@@ -162,6 +163,7 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
   const [transactionDate, setTransactionDate] = useState<Date>(new Date());
   const [editCategoryOpen, setEditCategoryOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<any>(null);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   // Fetch categories
   const { data: categories = [] } = useQuery({
@@ -273,7 +275,7 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
       const categoryToUse = selectedCategory || suggestedCategory;
       if (!categoryToUse) throw new Error("Veuillez sélectionner une catégorie");
 
-      const { error } = await supabase
+      const { data: transaction, error } = await supabase
         .from('budget_transactions')
         .insert({
           user_id: user.id,
@@ -282,9 +284,28 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
           description: description || null,
           transaction_date: format(transactionDate, 'yyyy-MM-dd'),
           type: transactionType,
-        });
+        })
+        .select()
+        .single();
 
       if (error) throw error;
+
+      // Add tag links if tags were selected
+      if (selectedTags.length > 0 && transaction) {
+        const tagLinks = selectedTags.map(tagId => ({
+          transaction_id: transaction.id,
+          tag_id: tagId,
+        }));
+
+        const { error: tagError } = await supabase
+          .from('transaction_tag_links')
+          .insert(tagLinks);
+
+        if (tagError) {
+          console.error("Error adding tags:", tagError);
+          // Don't throw, transaction was successful
+        }
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['budget-transactions'] });
@@ -294,6 +315,7 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
       setDescription("");
       setSuggestedCategory(null);
       setSelectedCategory("");
+      setSelectedTags([]);
       // Keep transactionDate for next transaction
     },
   });
@@ -628,6 +650,12 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
               </p>
             )}
           </div>
+
+          {/* Transaction Tags */}
+          <TransactionTagManager 
+            selectedTags={selectedTags}
+            onTagsChange={setSelectedTags}
+          />
 
           {/* Dialog for creating new category */}
           <Dialog open={newCategoryOpen} onOpenChange={setNewCategoryOpen}>

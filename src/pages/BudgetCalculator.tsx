@@ -35,7 +35,7 @@ import { FinancialHealthScore } from "@/components/budget/FinancialHealthScore";
 import { ScenarioSimulator } from "@/components/budget/ScenarioSimulator";
 import { QuickNetWorthUpdate } from "@/components/budget/QuickNetWorthUpdate";
 import { PremiumAnalysisTab } from "@/components/budget/PremiumAnalysisTab";
-import { MonthlyReportExport } from "@/components/budget/MonthlyReportExport";
+import { BudgetResetDialog } from "@/components/budget/BudgetResetDialog";
 
 const BudgetCalculator = () => {
   const navigate = useNavigate();
@@ -343,9 +343,12 @@ const BudgetCalculator = () => {
         <div className="container mx-auto px-4 max-w-7xl">
           {/* SEO Content Section */}
           <div className="text-center mb-8 space-y-4">
-            <h1 className="text-4xl font-bold mb-3">
-              Planificateur de Budget Québec Gratuit 2025
-            </h1>
+            <div className="flex items-center justify-center gap-4">
+              <h1 className="text-4xl font-bold mb-3">
+                Planificateur de Budget Québec Gratuit 2025
+              </h1>
+              <BudgetResetDialog />
+            </div>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
               Gérez vos finances personnelles intelligemment avec notre outil gratuit de planification budgétaire. 
               Suivi des dépenses en temps réel, objectifs d'épargne, coaching financier personnalisé et gamification.

@@ -1489,6 +1489,69 @@ export type Database = {
         }
         Relationships: []
       }
+      transaction_tag_links: {
+        Row: {
+          created_at: string | null
+          id: string
+          tag_id: string
+          transaction_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          tag_id: string
+          transaction_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          tag_id?: string
+          transaction_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transaction_tag_links_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "transaction_tags"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transaction_tag_links_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "budget_transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      transaction_tags: {
+        Row: {
+          color: string | null
+          created_at: string | null
+          icon: string | null
+          id: string
+          name: string
+          user_id: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string | null
+          icon?: string | null
+          id?: string
+          name: string
+          user_id: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string | null
+          icon?: string | null
+          id?: string
+          name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       trusted_devices: {
         Row: {
           created_at: string | null
