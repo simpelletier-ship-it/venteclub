@@ -135,6 +135,7 @@ export type Database = {
           icon: string | null
           id: string
           is_custom: boolean | null
+          is_pinned: boolean | null
           name: string
           type: string
           user_id: string
@@ -146,6 +147,7 @@ export type Database = {
           icon?: string | null
           id?: string
           is_custom?: boolean | null
+          is_pinned?: boolean | null
           name: string
           type: string
           user_id: string
@@ -157,6 +159,7 @@ export type Database = {
           icon?: string | null
           id?: string
           is_custom?: boolean | null
+          is_pinned?: boolean | null
           name?: string
           type?: string
           user_id?: string

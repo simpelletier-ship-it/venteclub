@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, TrendingDown, Zap, Sparkles, Check, ChevronsUpDown } from "lucide-react";
+import { Plus, TrendingDown, Zap, Sparkles, Check, ChevronsUpDown, Settings, Pin, PinOff } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -46,6 +46,7 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
   const [selectedCategory, setSelectedCategory] = useState("");
   const [categoryOpen, setCategoryOpen] = useState(false);
   const [newCategoryOpen, setNewCategoryOpen] = useState(false);
+  const [editPinnedOpen, setEditPinnedOpen] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
   const [newCategoryIcon, setNewCategoryIcon] = useState("🍔");
   const [newCategoryColor, setNewCategoryColor] = useState("#3b82f6");
@@ -58,6 +59,7 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
         .from('budget_categories')
         .select('*')
         .eq('type', 'expense')
+        .order('display_order', { ascending: true })
         .order('name', { ascending: true });
       
       if (error) throw error;
@@ -65,6 +67,22 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
     },
     enabled: isAuthenticated,
     retry: 1,
+  });
+
+  // Toggle pin mutation
+  const togglePin = useMutation({
+    mutationFn: async ({ categoryId, isPinned }: { categoryId: string, isPinned: boolean }) => {
+      const { error } = await supabase
+        .from('budget_categories')
+        .update({ is_pinned: !isPinned })
+        .eq('id', categoryId);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['budget-categories'] });
+      toast.success("✅ Catégories mises à jour!", { duration: 1500 });
+    },
   });
 
   // Quick add mutation
@@ -156,8 +174,9 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
     quickAdd.mutate();
   };
 
-  // Get popular categories (first 6 expense categories)
-  const popularCategories = categories.slice(0, 6);
+  // Get pinned categories (fallback to first 6 if none pinned)
+  const pinnedCategories = categories.filter(c => c.is_pinned);
+  const displayCategories = pinnedCategories.length > 0 ? pinnedCategories : categories.slice(0, 6);
 
   return (
     <Card className="shadow-lg">
@@ -178,11 +197,22 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
           </div>
           
           <div>
-            <Label className="text-base font-medium mb-2 block">Catégorie</Label>
+            <div className="flex items-center justify-between mb-2">
+              <Label className="text-base font-medium">Catégorie</Label>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setEditPinnedOpen(true)}
+                className="h-8 px-2 text-xs"
+              >
+                <Settings className="h-3.5 w-3.5 mr-1" />
+                Modifier
+              </Button>
+            </div>
             
-            {/* Popular categories as large buttons */}
+            {/* Pinned categories as large buttons */}
             <div className="grid grid-cols-3 gap-2 mb-3">
-              {popularCategories.map((cat: any) => (
+              {displayCategories.map((cat: any) => (
                 <Button
                   key={cat.id}
                   type="button"
@@ -338,6 +368,70 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
                 className="w-full"
               >
                 {createCategory.isPending ? "Création..." : "Créer la catégorie"}
+              </Button>
+            </DialogContent>
+          </Dialog>
+
+          {/* Dialog for editing pinned categories */}
+          <Dialog open={editPinnedOpen} onOpenChange={setEditPinnedOpen}>
+            <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <Pin className="h-5 w-5 text-primary" />
+                  Personnaliser les catégories rapides
+                </DialogTitle>
+                <DialogDescription>
+                  Épinglez vos catégories favorites pour y accéder rapidement
+                </DialogDescription>
+              </DialogHeader>
+              
+              <div className="space-y-2 py-4">
+                {categories.map((cat: any) => (
+                  <div
+                    key={cat.id}
+                    className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div 
+                        className="w-10 h-10 rounded-full flex items-center justify-center text-xl"
+                        style={{ backgroundColor: cat.color + '20' }}
+                      >
+                        {cat.icon}
+                      </div>
+                      <div>
+                        <div className="font-medium">{cat.name}</div>
+                        <div className="text-xs text-muted-foreground">
+                          {cat.is_custom ? 'Personnalisée' : 'Par défaut'}
+                        </div>
+                      </div>
+                    </div>
+                    <Button
+                      variant={cat.is_pinned ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => togglePin.mutate({ categoryId: cat.id, isPinned: cat.is_pinned })}
+                      disabled={togglePin.isPending}
+                    >
+                      {cat.is_pinned ? (
+                        <>
+                          <Pin className="h-4 w-4 mr-1" />
+                          Épinglée
+                        </>
+                      ) : (
+                        <>
+                          <PinOff className="h-4 w-4 mr-1" />
+                          Épingler
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                ))}
+              </div>
+
+              <Button 
+                onClick={() => setEditPinnedOpen(false)}
+                className="w-full"
+              >
+                Terminé
               </Button>
             </DialogContent>
           </Dialog>
