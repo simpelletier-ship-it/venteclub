@@ -63,17 +63,27 @@ export const FinancialGoals = ({ isAuthenticated }: { isAuthenticated: boolean }
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Non authentifié");
 
+      // Validate required fields
+      if (!name || !type || !targetAmount) {
+        throw new Error("Veuillez remplir tous les champs obligatoires");
+      }
+
+      const amount = parseFloat(targetAmount.replace(/\s/g, ''));
+      if (isNaN(amount) || amount <= 0) {
+        throw new Error("Le montant doit être supérieur à 0");
+      }
+
       const goalType = GOAL_TYPES.find(t => t.value === type);
       const { error } = await supabase
         .from('financial_goals')
         .insert({
           user_id: user.id,
-          name,
+          name: name.trim(),
           type,
-          target_amount: parseFloat(targetAmount),
+          target_amount: amount,
           deadline: deadline || null,
           icon: goalType?.icon || '🎯',
-          notes: notes || null,
+          notes: notes?.trim() || null,
         });
 
       if (error) throw error;
@@ -91,6 +101,10 @@ export const FinancialGoals = ({ isAuthenticated }: { isAuthenticated: boolean }
       });
       setDialogOpen(false);
       resetForm();
+    },
+    onError: (error: any) => {
+      console.error('Error creating goal:', error);
+      toast.error(error.message || "Erreur lors de la création de l'objectif");
     },
   });
 
