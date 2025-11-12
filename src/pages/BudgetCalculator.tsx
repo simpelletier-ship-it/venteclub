@@ -453,11 +453,12 @@ const BudgetCalculator = () => {
             </TabsContent>
 
             <TabsContent value="analysis">
-              <PremiumAnalysisTab 
-                transactions={transactions}
-                categories={categories}
-                debts={debts}
-              />
+            <PremiumAnalysisTab 
+              transactions={transactions}
+              categories={categories}
+              debts={debts}
+              assets={assets}
+            />
             </TabsContent>
 
             <TabsContent value="budget">
