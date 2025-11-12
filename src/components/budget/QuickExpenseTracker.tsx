@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, TrendingDown, Zap, Sparkles, Check, ChevronsUpDown, Settings, Pin, PinOff, GripVertical, Calendar as CalendarIcon } from "lucide-react";
+import { Plus, TrendingDown, Zap, Sparkles, Check, ChevronsUpDown, Settings, Pin, PinOff, GripVertical, Calendar as CalendarIcon, Pencil } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -60,11 +60,13 @@ const suggestCategory = (description: string, categories: any[]) => {
 
 const SortableCategoryItem = ({ 
   category, 
-  onTogglePin, 
+  onTogglePin,
+  onEdit,
   isPending 
 }: { 
   category: any, 
   onTogglePin: (params: { categoryId: string, isPinned: boolean }) => void,
+  onEdit: (category: any) => void,
   isPending: boolean 
 }) => {
   const {
@@ -111,24 +113,34 @@ const SortableCategoryItem = ({
         </div>
       </div>
       
-      <Button
-        variant={category.is_pinned ? "default" : "outline"}
-        size="sm"
-        onClick={() => onTogglePin({ categoryId: category.id, isPinned: category.is_pinned })}
-        disabled={isPending}
-      >
-        {category.is_pinned ? (
-          <>
-            <Pin className="h-4 w-4 mr-1" />
-            Épinglée
-          </>
-        ) : (
-          <>
-            <PinOff className="h-4 w-4 mr-1" />
-            Épingler
-          </>
-        )}
-      </Button>
+      <div className="flex gap-2">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => onEdit(category)}
+        >
+          <Pencil className="h-4 w-4 mr-1" />
+          Modifier
+        </Button>
+        <Button
+          variant={category.is_pinned ? "default" : "outline"}
+          size="sm"
+          onClick={() => onTogglePin({ categoryId: category.id, isPinned: category.is_pinned })}
+          disabled={isPending}
+        >
+          {category.is_pinned ? (
+            <>
+              <Pin className="h-4 w-4 mr-1" />
+              Épinglée
+            </>
+          ) : (
+            <>
+              <PinOff className="h-4 w-4 mr-1" />
+              Épingler
+            </>
+          )}
+        </Button>
+      </div>
     </div>
   );
 };
@@ -146,6 +158,8 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
   const [newCategoryIcon, setNewCategoryIcon] = useState("🍔");
   const [newCategoryColor, setNewCategoryColor] = useState("#3b82f6");
   const [transactionDate, setTransactionDate] = useState<Date>(new Date());
+  const [editCategoryOpen, setEditCategoryOpen] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<any>(null);
 
   // Fetch categories
   const { data: categories = [] } = useQuery({
@@ -297,6 +311,48 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
       toast.error(error.message || "Erreur lors de la création");
     },
   });
+
+  // Update category mutation
+  const updateCategory = useMutation({
+    mutationFn: async (updates: { id: string, name: string, icon: string, color: string }) => {
+      const { error } = await supabase
+        .from('budget_categories')
+        .update({
+          name: updates.name.trim(),
+          icon: updates.icon,
+          color: updates.color,
+        })
+        .eq('id', updates.id);
+
+      if (error) throw error;
+      return updates;
+    },
+    onSuccess: (updates) => {
+      queryClient.invalidateQueries({ queryKey: ['budget-categories'] });
+      toast.success(`✅ Catégorie "${updates.name}" modifiée!`, { duration: 2000 });
+      setEditCategoryOpen(false);
+      setEditingCategory(null);
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Erreur lors de la modification");
+    },
+  });
+
+  const handleEditCategory = (category: any) => {
+    setEditingCategory(category);
+    setEditCategoryOpen(true);
+  };
+
+  const handleSaveEdit = () => {
+    if (editingCategory) {
+      updateCategory.mutate({
+        id: editingCategory.id,
+        name: editingCategory.name,
+        icon: editingCategory.icon,
+        color: editingCategory.color,
+      });
+    }
+  };
 
   const handleDescriptionChange = (value: string) => {
     setDescription(value);
@@ -578,11 +634,12 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
                   strategy={verticalListSortingStrategy}
                 >
                   <div className="space-y-2 py-4">
-                    {categories.map((cat: any) => (
+                     {categories.map((cat: any) => (
                       <SortableCategoryItem 
                         key={cat.id} 
                         category={cat} 
                         onTogglePin={togglePin.mutate}
+                        onEdit={handleEditCategory}
                         isPending={togglePin.isPending}
                       />
                     ))}
@@ -595,6 +652,82 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
                 className="w-full"
               >
                 Terminé
+              </Button>
+            </DialogContent>
+          </Dialog>
+
+          {/* Dialog for editing a category */}
+          <Dialog open={editCategoryOpen} onOpenChange={setEditCategoryOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <Pencil className="h-5 w-5 text-primary" />
+                  Modifier la catégorie
+                </DialogTitle>
+                <DialogDescription>
+                  Personnalisez le nom, l'icône et la couleur
+                </DialogDescription>
+              </DialogHeader>
+              
+              {editingCategory && (
+                <div className="space-y-4 py-4">
+                  <div className="space-y-2">
+                    <Label>Nom de la catégorie</Label>
+                    <Input
+                      value={editingCategory.name}
+                      onChange={(e) => setEditingCategory({ ...editingCategory, name: e.target.value })}
+                      placeholder="Ex: Restaurant, Essence..."
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Icône</Label>
+                    <div className="grid grid-cols-8 gap-2">
+                      {EMOJI_OPTIONS.map((emoji) => (
+                        <Button
+                          key={emoji}
+                          type="button"
+                          variant={editingCategory.icon === emoji ? "default" : "outline"}
+                          className="h-10 w-10 p-0 text-xl"
+                          onClick={() => setEditingCategory({ ...editingCategory, icon: emoji })}
+                        >
+                          {emoji}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Couleur</Label>
+                    <div className="grid grid-cols-8 gap-2">
+                      {COLOR_OPTIONS.map((color) => (
+                        <Button
+                          key={color}
+                          type="button"
+                          variant="outline"
+                          className="h-10 w-10 p-0 relative"
+                          onClick={() => setEditingCategory({ ...editingCategory, color })}
+                        >
+                          <div 
+                            className="absolute inset-1 rounded"
+                            style={{ backgroundColor: color }}
+                          />
+                          {editingCategory.color === color && (
+                            <span className="absolute inset-0 flex items-center justify-center text-white">✓</span>
+                          )}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <Button 
+                onClick={handleSaveEdit}
+                disabled={updateCategory.isPending || !editingCategory?.name?.trim()}
+                className="w-full"
+              >
+                {updateCategory.isPending ? "Enregistrement..." : "Enregistrer les modifications"}
               </Button>
             </DialogContent>
           </Dialog>
