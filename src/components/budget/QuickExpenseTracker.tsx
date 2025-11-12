@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, TrendingDown, Zap, Sparkles, Check, ChevronsUpDown, Settings, Pin, PinOff } from "lucide-react";
+import { Plus, TrendingDown, Zap, Sparkles, Check, ChevronsUpDown, Settings, Pin, PinOff, GripVertical } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +12,23 @@ import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 const EMOJI_OPTIONS = ['🍔', '🚗', '🏠', '💡', '🎮', '👕', '📱', '💊', '🎓', '✈️', '🎬', '☕', '🛒', '🏋️', '📚'];
 const COLOR_OPTIONS = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6', '#8b5cf6', '#ec4899', '#64748b'];
@@ -36,6 +53,81 @@ const suggestCategory = (description: string, categories: any[]) => {
   }
   
   return null;
+};
+
+const SortableCategoryItem = ({ 
+  category, 
+  onTogglePin, 
+  isPending 
+}: { 
+  category: any, 
+  onTogglePin: (params: { categoryId: string, isPinned: boolean }) => void,
+  isPending: boolean 
+}) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: category.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="flex items-center gap-2 p-3 rounded-lg border bg-card transition-colors"
+    >
+      <div
+        {...attributes}
+        {...listeners}
+        className="cursor-grab active:cursor-grabbing touch-none"
+      >
+        <GripVertical className="h-5 w-5 text-muted-foreground" />
+      </div>
+      
+      <div className="flex items-center gap-3 flex-1">
+        <div 
+          className="w-10 h-10 rounded-full flex items-center justify-center text-xl"
+          style={{ backgroundColor: category.color + '20' }}
+        >
+          {category.icon}
+        </div>
+        <div>
+          <div className="font-medium">{category.name}</div>
+          <div className="text-xs text-muted-foreground">
+            {category.is_custom ? 'Personnalisée' : 'Par défaut'}
+          </div>
+        </div>
+      </div>
+      
+      <Button
+        variant={category.is_pinned ? "default" : "outline"}
+        size="sm"
+        onClick={() => onTogglePin({ categoryId: category.id, isPinned: category.is_pinned })}
+        disabled={isPending}
+      >
+        {category.is_pinned ? (
+          <>
+            <Pin className="h-4 w-4 mr-1" />
+            Épinglée
+          </>
+        ) : (
+          <>
+            <PinOff className="h-4 w-4 mr-1" />
+            Épingler
+          </>
+        )}
+      </Button>
+    </div>
+  );
 };
 
 export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: boolean }) => {
@@ -84,6 +176,51 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
       toast.success("✅ Catégories mises à jour!", { duration: 1500 });
     },
   });
+
+  // Reorder pinned categories
+  const reorderPinned = useMutation({
+    mutationFn: async (updates: { id: string, display_order: number }[]) => {
+      const promises = updates.map(({ id, display_order }) =>
+        supabase
+          .from('budget_categories')
+          .update({ display_order })
+          .eq('id', id)
+      );
+      
+      const results = await Promise.all(promises);
+      const error = results.find(r => r.error)?.error;
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['budget-categories'] });
+    },
+  });
+
+  // Drag and drop sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = categories.findIndex(c => c.id === active.id);
+    const newIndex = categories.findIndex(c => c.id === over.id);
+
+    const reordered = arrayMove(categories, oldIndex, newIndex);
+    
+    const updates = reordered.map((cat, index) => ({
+      id: cat.id,
+      display_order: index,
+    }));
+
+    reorderPinned.mutate(updates);
+  };
 
   // Quick add mutation
   const quickAdd = useMutation({
@@ -189,12 +326,25 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
         <div className="space-y-4">
           <div>
             <Label className="text-base font-medium mb-2 block">Montant</Label>
-            <CurrencyInput 
-              value={amount} 
-              onChange={setAmount}
-              placeholder="0 $"
-              className="text-2xl h-14 font-bold"
-            />
+            <div className="relative">
+              <CurrencyInput 
+                value={amount} 
+                onChange={setAmount}
+                placeholder="0 $"
+                className="text-2xl h-14 font-bold pr-12"
+              />
+              {amount && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8"
+                  onClick={() => setAmount("")}
+                >
+                  ✕
+                </Button>
+              )}
+            </div>
           </div>
           
           <div>
@@ -382,51 +532,31 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
                   Personnaliser les catégories rapides
                 </DialogTitle>
                 <DialogDescription>
-                  Épinglez vos catégories favorites pour y accéder rapidement
+                  Glissez pour réorganiser • Cliquez pour épingler/désépingler
                 </DialogDescription>
               </DialogHeader>
               
-              <div className="space-y-2 py-4">
-                {categories.map((cat: any) => (
-                  <div
-                    key={cat.id}
-                    className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div 
-                        className="w-10 h-10 rounded-full flex items-center justify-center text-xl"
-                        style={{ backgroundColor: cat.color + '20' }}
-                      >
-                        {cat.icon}
-                      </div>
-                      <div>
-                        <div className="font-medium">{cat.name}</div>
-                        <div className="text-xs text-muted-foreground">
-                          {cat.is_custom ? 'Personnalisée' : 'Par défaut'}
-                        </div>
-                      </div>
-                    </div>
-                    <Button
-                      variant={cat.is_pinned ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => togglePin.mutate({ categoryId: cat.id, isPinned: cat.is_pinned })}
-                      disabled={togglePin.isPending}
-                    >
-                      {cat.is_pinned ? (
-                        <>
-                          <Pin className="h-4 w-4 mr-1" />
-                          Épinglée
-                        </>
-                      ) : (
-                        <>
-                          <PinOff className="h-4 w-4 mr-1" />
-                          Épingler
-                        </>
-                      )}
-                    </Button>
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+              >
+                <SortableContext
+                  items={categories.map(c => c.id)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  <div className="space-y-2 py-4">
+                    {categories.map((cat: any) => (
+                      <SortableCategoryItem 
+                        key={cat.id} 
+                        category={cat} 
+                        onTogglePin={togglePin.mutate}
+                        isPending={togglePin.isPending}
+                      />
+                    ))}
                   </div>
-                ))}
-              </div>
+                </SortableContext>
+              </DndContext>
 
               <Button 
                 onClick={() => setEditPinnedOpen(false)}
