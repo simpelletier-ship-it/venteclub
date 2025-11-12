@@ -335,7 +335,18 @@ const BudgetCalculator = () => {
             </TabsContent>
 
             <TabsContent value="transactions">
-              <BudgetTransactions isAuthenticated={isAuthenticated} />
+              <div className="space-y-6">
+                <FinancialHealthScore 
+                  transactions={transactions}
+                  assets={assets}
+                  debts={debts}
+                />
+                <ExpensesByCategory 
+                  transactions={transactions}
+                  categories={categories}
+                />
+                <BudgetTransactions isAuthenticated={isAuthenticated} />
+              </div>
             </TabsContent>
 
             <TabsContent value="assets">
