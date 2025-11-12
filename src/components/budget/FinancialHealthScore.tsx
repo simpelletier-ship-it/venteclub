@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
+import { formatPrice } from "@/lib/priceFormat";
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -156,21 +157,91 @@ export const FinancialHealthScore = ({ transactions, assets, debts }: FinancialH
 
   const healthLevel = getHealthLevel(totalScore);
 
-  // Recommandations
+  // Recommandations personnalisées
   const getRecommendations = () => {
-    const recommendations = [];
+    const recommendations: Array<{ icon: string; title: string; description: string; priority: 'high' | 'medium' | 'low' }> = [];
     
-    if (regularityScore < 15) {
-      recommendations.push("Stabilisez vos dépenses mensuelles pour une meilleure prévisibilité");
+    const totalIncome = transactions
+      .filter(t => t.type === 'income')
+      .reduce((sum, t) => sum + t.amount, 0);
+    
+    const totalExpenses = transactions
+      .filter(t => t.type === 'expense')
+      .reduce((sum, t) => sum + t.amount, 0);
+    
+    const savingsRate = totalIncome > 0 ? ((totalIncome - totalExpenses) / totalIncome) * 100 : 0;
+    
+    const liquidAssets = assets
+      .filter(a => a.type === 'savings' || a.type === 'emergency_fund')
+      .reduce((sum, a) => sum + a.value, 0);
+    
+    const monthlyExpenses = totalExpenses / 3; // Moyenne sur 3 mois
+    const emergencyFundMonths = monthlyExpenses > 0 ? liquidAssets / monthlyExpenses : 0;
+    
+    // Priorité haute: Fonds d'urgence insuffisant
+    if (emergencyFundMonths < 3) {
+      recommendations.push({
+        icon: "🚨",
+        title: "Créez votre fonds d'urgence",
+        description: `Vous avez ${emergencyFundMonths.toFixed(1)} mois de dépenses de côté. Visez 3-6 mois (${formatPrice(monthlyExpenses * 3)} - ${formatPrice(monthlyExpenses * 6)}) pour être protégé en cas d'imprévu.`,
+        priority: 'high'
+      });
     }
-    if (stabilityScore < 15) {
-      recommendations.push("Diversifiez vos sources de revenus pour plus de stabilité");
+    
+    // Priorité haute: Taux d'épargne très faible
+    if (savingsRate < 10 && totalIncome > 0) {
+      const targetSavings = totalIncome * 0.15;
+      const currentSavings = totalIncome - totalExpenses;
+      const toSave = targetSavings - currentSavings;
+      
+      recommendations.push({
+        icon: "💰",
+        title: "Augmentez votre épargne",
+        description: `Vous épargnez ${savingsRate.toFixed(0)}% de vos revenus. Essayez d'économiser ${formatPrice(toSave)} de plus par mois pour atteindre 15%.`,
+        priority: 'high'
+      });
     }
-    if (structureScore < 15) {
-      recommendations.push("Augmentez votre taux d'épargne à au moins 15% de vos revenus");
+    
+    // Priorité moyenne: Dettes avec intérêts élevés
+    const highInterestDebts = debts.filter(d => d.interest_rate > 10);
+    if (highInterestDebts.length > 0) {
+      const totalHighInterest = highInterestDebts.reduce((sum, d) => sum + d.balance, 0);
+      recommendations.push({
+        icon: "📉",
+        title: "Remboursez vos dettes coûteuses",
+        description: `Vous avez ${formatPrice(totalHighInterest)} en dettes avec taux d'intérêt élevé (>10%). Priorisez leur remboursement pour économiser sur les intérêts.`,
+        priority: 'medium'
+      });
     }
-    if (assetsScore < 15) {
-      recommendations.push("Constituez un fonds d'urgence de 3-6 mois de dépenses");
+    
+    // Priorité moyenne: Dépenses irrégulières
+    if (regularityScore < 15 && transactions.length > 10) {
+      recommendations.push({
+        icon: "📊",
+        title: "Stabilisez vos dépenses",
+        description: "Vos dépenses varient beaucoup d'un mois à l'autre. Créez un budget mensuel pour mieux prévoir et contrôler vos dépenses.",
+        priority: 'medium'
+      });
+    }
+    
+    // Priorité faible: Diversification actifs
+    if (assets.length === 1 && assets[0].value > 10000) {
+      recommendations.push({
+        icon: "🌱",
+        title: "Diversifiez vos placements",
+        description: "Envisagez de diversifier vos actifs (REER, CELI, placements) pour optimiser votre croissance financière et réduire les risques.",
+        priority: 'low'
+      });
+    }
+    
+    // Priorité faible: Revenus stables
+    if (stabilityScore < 15 && transactions.filter(t => t.type === 'income').length > 5) {
+      recommendations.push({
+        icon: "💼",
+        title: "Stabilisez vos revenus",
+        description: "Vos revenus fluctuent. Cherchez des sources de revenus plus stables ou créez un coussin financier pour absorber les variations.",
+        priority: 'low'
+      });
     }
     
     return recommendations;
@@ -253,21 +324,35 @@ export const FinancialHealthScore = ({ transactions, assets, debts }: FinancialH
           </div>
         </div>
 
-        {/* Recommandations */}
+        {/* Recommandations personnalisées */}
         {recommendations.length > 0 && (
           <div className="space-y-3 pt-4 border-t">
-            <h4 className="text-sm font-semibold flex items-center gap-2">
-              <AlertCircle className="h-4 w-4 text-primary" />
-              Recommandations pour améliorer votre score
+            <h4 className="text-base font-semibold flex items-center gap-2">
+              <AlertCircle className="h-5 w-5 text-primary" />
+              Conseils personnalisés pour vous
             </h4>
-            <ul className="space-y-2">
+            <div className="space-y-3">
               {recommendations.map((rec, idx) => (
-                <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
-                  <CheckCircle className="h-4 w-4 mt-0.5 text-primary flex-shrink-0" />
-                  <span>{rec}</span>
-                </li>
+                <div 
+                  key={idx} 
+                  className={`p-4 rounded-lg border-l-4 ${
+                    rec.priority === 'high' ? 'bg-red-50 dark:bg-red-950/20 border-red-500' :
+                    rec.priority === 'medium' ? 'bg-yellow-50 dark:bg-yellow-950/20 border-yellow-500' :
+                    'bg-blue-50 dark:bg-blue-950/20 border-blue-500'
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    <span className="text-2xl flex-shrink-0">{rec.icon}</span>
+                    <div className="flex-1 space-y-1">
+                      <h5 className="font-semibold text-sm">{rec.title}</h5>
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        {rec.description}
+                      </p>
+                    </div>
+                  </div>
+                </div>
               ))}
-            </ul>
+            </div>
           </div>
         )}
 

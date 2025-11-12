@@ -299,14 +299,6 @@ const BudgetCalculator = () => {
                 
                 <NetWorthGamification netWorth={netWorth} isAuthenticated={isAuthenticated} />
                 
-                <ScenarioSimulator 
-                  transactions={transactions}
-                  categories={categories}
-                  goals={financialGoals}
-                  assets={assets}
-                  debts={debts}
-                />
-                
                 <ExpenseTrendsChart transactions={transactions} />
                 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -331,7 +323,16 @@ const BudgetCalculator = () => {
             </TabsContent>
 
             <TabsContent value="budget">
-              <BudgetPlanner isAuthenticated={isAuthenticated} />
+              <div className="space-y-6">
+                <ScenarioSimulator 
+                  transactions={transactions}
+                  categories={categories}
+                  goals={financialGoals}
+                  assets={assets}
+                  debts={debts}
+                />
+                <BudgetPlanner isAuthenticated={isAuthenticated} />
+              </div>
             </TabsContent>
 
             <TabsContent value="transactions">
