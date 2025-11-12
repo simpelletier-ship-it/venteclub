@@ -212,17 +212,19 @@ const BusinessCard = ({
         />
         
         {/* Image principale seulement */}
-        <div className="relative w-full h-56 sm:h-64 overflow-hidden bg-muted">
+        <div className="relative w-full h-56 sm:h-64 overflow-hidden">
           {!imageLoading && mainImageUrl ? (
             <OptimizedImage
               src={mainImageUrl}
               alt={title}
-              className="w-full h-full object-cover"
+              className="absolute inset-0 w-full h-full object-cover"
               objectFit="cover"
               width={600}
               quality={75}
             />
-          ) : null}
+          ) : (
+            <div className="w-full h-full bg-muted animate-pulse" />
+          )}
         </div>
 
       {/* Sold Diagonal Banner */}
