@@ -26,7 +26,7 @@ export const ExpensesByCategory = ({ transactions, categories, onAnalyze }: Expe
   // Calculate expenses by category for current month
   const currentMonth = new Date().toISOString().slice(0, 7);
   
-  const expensesByCategory = categories
+  const expensesByCategoryAll = categories
     .filter(cat => cat.type === 'expense')
     .map(category => {
       const categoryTransactions = transactions.filter(
@@ -48,6 +48,25 @@ export const ExpensesByCategory = ({ transactions, categories, onAnalyze }: Expe
     })
     .filter(item => item.value > 0)
     .sort((a, b) => b.value - a.value);
+  
+  // Grouper les petites catégories (<5% du total) en "Autres"
+  const threshold = 0.05;
+  const tempTotal = expensesByCategoryAll.reduce((sum, item) => sum + item.value, 0);
+  
+  const majorCategories = expensesByCategoryAll.filter(item => (item.value / tempTotal) >= threshold);
+  const minorCategories = expensesByCategoryAll.filter(item => (item.value / tempTotal) < threshold);
+  
+  const expensesByCategory = minorCategories.length > 0 ? [
+    ...majorCategories,
+    {
+      id: 'autres',
+      name: 'Autres',
+      value: minorCategories.reduce((sum, item) => sum + item.value, 0),
+      icon: '📋',
+      color: '#94a3b8',
+      transactions: minorCategories.flatMap(c => c.transactions),
+    }
+  ] : expensesByCategoryAll;
 
   const totalExpenses = expensesByCategory.reduce((sum, item) => sum + item.value, 0);
 

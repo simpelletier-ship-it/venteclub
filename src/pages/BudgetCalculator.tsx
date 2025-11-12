@@ -33,6 +33,7 @@ import { ExpensesByCategory } from "@/components/budget/ExpensesByCategory";
 import { ExpenseTrendsChart } from "@/components/budget/ExpenseTrendsChart";
 import { FinancialHealthScore } from "@/components/budget/FinancialHealthScore";
 import { ScenarioSimulator } from "@/components/budget/ScenarioSimulator";
+import { QuickNetWorthUpdate } from "@/components/budget/QuickNetWorthUpdate";
 
 const BudgetCalculator = () => {
   const navigate = useNavigate();
@@ -247,24 +248,88 @@ const BudgetCalculator = () => {
     <ErrorBoundary>
       <>
         <Helmet>
-        <title>Planificateur de Budget Québec | Outil Gratuit de Gestion Financière</title>
-        <meta name="description" content="Planificateur de budget intelligent et gratuit pour gérer vos finances personnelles au Québec. Suivi des dépenses, objectifs d'épargne, analyse des habitudes et coaching financier personnalisé." />
-        <meta name="keywords" content="budget québec, planificateur financier gratuit, gestion budget personnel, suivi dépenses, objectifs épargne, calculateur budget" />
+        <title>Planificateur Budget Québec Gratuit | Gestion Finances Personnelles 2025</title>
+        <meta name="description" content="Planificateur de budget intelligent gratuit pour gérer vos finances personnelles au Québec. Suivi dépenses en temps réel, objectifs épargne, analyse habitudes financières, coaching personnalisé et gamification. Outil complet REER, CELI, dettes." />
+        <meta name="keywords" content="planificateur budget québec, budget personnel gratuit, gestion finances québec, suivi dépenses, calculateur budget mensuel, objectifs épargne, REER CELI, coaching financier gratuit, outil budget intelligent, gestion dettes, calculateur salaire net québec" />
+        
+        {/* Canonical et alternates */}
         <link rel="canonical" href="https://vente.club/outils/budget" />
-        <meta property="og:title" content="Planificateur de Budget Québec | Outil Gratuit" />
-        <meta property="og:description" content="Gérez votre budget avec intelligence. Suivi automatique, recommandations personnalisées et gamification pour atteindre vos objectifs financiers." />
+        
+        {/* Open Graph */}
+        <meta property="og:title" content="Planificateur Budget Québec Gratuit | Gestion Finances 2025" />
+        <meta property="og:description" content="Gérez votre budget intelligemment avec notre planificateur gratuit. Suivi automatique, recommandations personnalisées, gamification et coaching financier pour atteindre vos objectifs au Québec." />
         <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://vente.club/outils/budget" />
+        <meta property="og:site_name" content="Vente.Club" />
+        
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Planificateur Budget Québec Gratuit | Gestion Finances 2025" />
+        <meta name="twitter:description" content="Outil gratuit de gestion budgétaire intelligent pour le Québec. Suivi dépenses, objectifs, coaching personnalisé." />
+        
+        {/* Structured Data */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            "name": "Planificateur Budget Québec",
+            "applicationCategory": "FinanceApplication",
+            "operatingSystem": "All",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "CAD"
+            },
+            "description": "Planificateur de budget intelligent et gratuit pour gérer vos finances personnelles au Québec. Suivi des dépenses en temps réel, objectifs d'épargne, analyse des habitudes financières et coaching personnalisé.",
+            "featureList": [
+              "Suivi des dépenses et revenus en temps réel",
+              "Gestion REER, CELI et autres actifs",
+              "Suivi des dettes avec calcul d'intérêts",
+              "Score de santé financière",
+              "Recommandations personnalisées",
+              "Graphiques d'évolution",
+              "Objectifs d'épargne avec progression",
+              "Gamification et récompenses"
+            ],
+            "author": {
+              "@type": "Organization",
+              "name": "Vente.Club"
+            }
+          })}
+        </script>
       </Helmet>
 
       <div className="min-h-screen bg-background py-8">
         <div className="container mx-auto px-4 max-w-7xl">
-          <div className="text-center mb-6">
-            <h1 className="text-3xl font-bold mb-2">
-              Mon Planificateur Budgétaire Intelligent
+          {/* SEO Content Section */}
+          <div className="text-center mb-8 space-y-4">
+            <h1 className="text-4xl font-bold mb-3">
+              Planificateur de Budget Québec Gratuit 2025
             </h1>
-            <p className="text-muted-foreground">
-              Suivi rapide • Recommandations personnalisées • Récompenses quotidiennes
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              Gérez vos finances personnelles intelligemment avec notre outil gratuit de planification budgétaire. 
+              Suivi des dépenses en temps réel, objectifs d'épargne, coaching financier personnalisé et gamification.
             </p>
+            
+            {/* SEO-optimized feature highlights */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto mt-6">
+              <div className="p-3 bg-muted/50 rounded-lg">
+                <div className="text-2xl mb-1">📊</div>
+                <div className="text-sm font-semibold">Suivi en temps réel</div>
+              </div>
+              <div className="p-3 bg-muted/50 rounded-lg">
+                <div className="text-2xl mb-1">💰</div>
+                <div className="text-sm font-semibold">REER & CELI</div>
+              </div>
+              <div className="p-3 bg-muted/50 rounded-lg">
+                <div className="text-2xl mb-1">🎯</div>
+                <div className="text-sm font-semibold">Objectifs épargne</div>
+              </div>
+              <div className="p-3 bg-muted/50 rounded-lg">
+                <div className="text-2xl mb-1">🤖</div>
+                <div className="text-sm font-semibold">Coach IA</div>
+              </div>
+            </div>
           </div>
 
           {/* Quick Add */}
@@ -298,6 +363,10 @@ const BudgetCalculator = () => {
                 />
                 
                 <NetWorthGamification netWorth={netWorth} isAuthenticated={isAuthenticated} />
+                
+                <div className="flex justify-center">
+                  <QuickNetWorthUpdate currentNetWorth={netWorth} isAuthenticated={isAuthenticated} />
+                </div>
                 
                 <ExpenseTrendsChart transactions={transactions} />
                 
@@ -344,6 +413,11 @@ const BudgetCalculator = () => {
                 <ExpensesByCategory 
                   transactions={transactions}
                   categories={categories}
+                  onAnalyze={() => {
+                    const tabsList = document.querySelector('[role="tablist"]');
+                    const transactionsTab = tabsList?.querySelector('[value="transactions"]') as HTMLButtonElement;
+                    transactionsTab?.click();
+                  }}
                 />
                 <BudgetTransactions isAuthenticated={isAuthenticated} />
               </div>
@@ -360,6 +434,103 @@ const BudgetCalculator = () => {
               </div>
             </TabsContent>
           </Tabs>
+
+          {/* SEO Content Section */}
+          <div className="mt-12 space-y-8">
+            <section className="prose prose-slate dark:prose-invert max-w-none">
+              <h2 className="text-3xl font-bold mb-4">Planificateur de Budget Gratuit pour le Québec</h2>
+              <p className="text-lg text-muted-foreground leading-relaxed">
+                Notre <strong>planificateur de budget en ligne gratuit</strong> est conçu spécifiquement pour les Québécois 
+                qui souhaitent prendre le contrôle de leurs finances personnelles. Que vous cherchiez à économiser pour 
+                l'achat d'une entreprise, à mieux gérer vos dépenses quotidiennes, ou à planifier votre retraite avec 
+                votre REER et CELI, notre outil vous accompagne à chaque étape.
+              </p>
+            </section>
+
+            <section className="grid md:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-xl">🎯 Fonctionnalités Principales</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2 text-sm">
+                  <p>✓ <strong>Suivi des dépenses en temps réel</strong> avec catégorisation automatique</p>
+                  <p>✓ <strong>Gestion REER, CELI et actifs</strong> avec historique complet</p>
+                  <p>✓ <strong>Suivi des dettes</strong> avec calcul des intérêts et planification remboursement</p>
+                  <p>✓ <strong>Score de santé financière</strong> basé sur vos habitudes réelles</p>
+                  <p>✓ <strong>Recommandations personnalisées</strong> par intelligence artificielle</p>
+                  <p>✓ <strong>Graphiques d'évolution</strong> pour visualiser vos progrès</p>
+                  <p>✓ <strong>Objectifs d'épargne</strong> avec suivi de progression automatique</p>
+                  <p>✓ <strong>Budget vs Réel</strong> pour comparer planifié et dépensé</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-xl">💡 Pourquoi Utiliser Notre Outil?</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2 text-sm">
+                  <p>✓ <strong>100% gratuit</strong> sans limitation ni publicité intrusive</p>
+                  <p>✓ <strong>Données sécurisées</strong> avec chiffrement de bout en bout</p>
+                  <p>✓ <strong>Facile à utiliser</strong> interface intuitive et minimaliste</p>
+                  <p>✓ <strong>Adapté au Québec</strong> REER, CELI, taux d'imposition QC</p>
+                  <p>✓ <strong>Accessible partout</strong> sur mobile, tablette et ordinateur</p>
+                  <p>✓ <strong>Sans inscription bancaire</strong> vos comptes restent privés</p>
+                  <p>✓ <strong>Coaching intelligent</strong> conseils personnalisés automatiques</p>
+                  <p>✓ <strong>Gamification motivante</strong> badges et récompenses quotidiennes</p>
+                </CardContent>
+              </Card>
+            </section>
+
+            <section className="prose prose-slate dark:prose-invert max-w-none">
+              <h3 className="text-2xl font-bold mb-3">Comment Utiliser le Planificateur de Budget?</h3>
+              <div className="space-y-4 text-muted-foreground">
+                <p>
+                  <strong>1. Ajoutez vos transactions rapidement</strong> - Utilisez le tracker express pour enregistrer 
+                  vos dépenses et revenus en quelques secondes. Les catégories s'appliquent automatiquement.
+                </p>
+                <p>
+                  <strong>2. Définissez votre budget mensuel</strong> - Établissez des limites par catégorie 
+                  (alimentation, logement, transport) pour mieux contrôler vos sorties d'argent.
+                </p>
+                <p>
+                  <strong>3. Suivez vos actifs et dettes</strong> - Enregistrez vos REER, CELI, placements, 
+                  hypothèque, prêts auto et cartes de crédit pour calculer votre valeur nette réelle.
+                </p>
+                <p>
+                  <strong>4. Consultez votre score de santé financière</strong> - Obtenez une évaluation objective 
+                  de votre situation financière avec des recommandations concrètes d'amélioration.
+                </p>
+                <p>
+                  <strong>5. Visualisez votre progression</strong> - Les graphiques d'évolution vous montrent 
+                  comment votre patrimoine évolue dans le temps et vous motivent à continuer.
+                </p>
+              </div>
+            </section>
+
+            <section className="bg-gradient-to-br from-primary/5 to-secondary/5 rounded-lg p-6">
+              <h3 className="text-2xl font-bold mb-4">Atteignez Vos Objectifs Financiers au Québec</h3>
+              <div className="grid md:grid-cols-3 gap-4 text-sm">
+                <div>
+                  <h4 className="font-semibold mb-2">💰 Épargner pour un projet</h4>
+                  <p className="text-muted-foreground">
+                    Maison, voyage, entreprise - définissez vos objectifs et suivez votre progression jour après jour.
+                  </p>
+                </div>
+                <div>
+                  <h4 className="font-semibold mb-2">📉 Rembourser vos dettes</h4>
+                  <p className="text-muted-foreground">
+                    Calculez l'impact des intérêts et créez un plan de remboursement accéléré pour vous libérer.
+                  </p>
+                </div>
+                <div>
+                  <h4 className="font-semibold mb-2">📈 Bâtir votre patrimoine</h4>
+                  <p className="text-muted-foreground">
+                    REER, CELI, placements - diversifiez intelligemment et suivez la croissance de vos actifs.
+                  </p>
+                </div>
+              </div>
+            </section>
+          </div>
 
           <Card className="mt-8 bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
             <CardHeader>

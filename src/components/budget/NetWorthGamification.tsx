@@ -1,4 +1,4 @@
-import { TrendingUp, TrendingDown, Sparkles, LineChart as LineChartIcon } from "lucide-react";
+import { TrendingUp, TrendingDown, Sparkles, LineChart as LineChartIcon, Plus, Calendar } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatPrice } from "@/lib/priceFormat";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Area, AreaChart } from "recharts";
@@ -13,7 +13,7 @@ interface NetWorthGamificationProps {
 }
 
 export const NetWorthGamification = ({ netWorth, isAuthenticated }: NetWorthGamificationProps) => {
-  const [showChart, setShowChart] = useState(false);
+  const [showChart, setShowChart] = useState(true);
   const [selectedPeriod, setSelectedPeriod] = useState<'7d' | '30d' | '90d' | '1y'>('30d');
 
   // Fetch historical data for chart using asset/debt history
@@ -351,12 +351,6 @@ export const NetWorthGamification = ({ netWorth, isAuthenticated }: NetWorthGami
             <LineChartIcon className="h-5 w-5 text-primary" />
             <CardTitle>Évolution de la valeur nette</CardTitle>
           </div>
-          <button
-            onClick={() => setShowChart(!showChart)}
-            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            {showChart ? 'Masquer' : 'Afficher'}
-          </button>
         </div>
       </CardHeader>
       

@@ -188,16 +188,16 @@ export const FinancialHealthScore = ({ transactions, assets, debts }: FinancialH
       recommendations.push({
         icon: "🎉",
         title: "Fonds d'urgence solide",
-        description: `${emergencyFundMonths.toFixed(1)} mois de dépenses de côté.`,
+        description: `Excellent! ${emergencyFundMonths.toFixed(1)} mois de dépenses de côté vous protègent des imprévus.`,
         priority: 'success'
       });
     }
     
-    if (savingsRate >= 15 && totalIncome > 0) {
+    if (savingsRate >= 20 && totalIncome > 0) {
       recommendations.push({
         icon: "🌟",
         title: "Excellent taux d'épargne",
-        description: `${savingsRate.toFixed(0)}% de vos revenus épargnés.`,
+        description: `Wow! ${savingsRate.toFixed(0)}% de vos revenus épargnés, c'est au-dessus de l'objectif de 15-20%.`,
         priority: 'success'
       });
     }
@@ -206,7 +206,7 @@ export const FinancialHealthScore = ({ transactions, assets, debts }: FinancialH
       recommendations.push({
         icon: "✨",
         title: "Aucune dette",
-        description: "Continuez sur cette lancée.",
+        description: "Superbe! Continuez à bâtir votre patrimoine sans fardeau d'endettement.",
         priority: 'success'
       });
     }
@@ -214,46 +214,60 @@ export const FinancialHealthScore = ({ transactions, assets, debts }: FinancialH
     if (regularityScore >= 20) {
       recommendations.push({
         icon: "👏",
-        title: "Dépenses régulières",
-        description: "Bon contrôle de vos finances.",
+        title: "Dépenses régulières et prévisibles",
+        description: "Excellent contrôle! Vos dépenses sont stables et prévisibles.",
         priority: 'success'
       });
     }
     
-    // Conseils d'amélioration - minimalistes
+    if (stabilityScore >= 20) {
+      recommendations.push({
+        icon: "💼",
+        title: "Revenus stables",
+        description: "Bravo! Vos revenus sont réguliers et fiables.",
+        priority: 'success'
+      });
+    }
+    
+    // Conseils d'amélioration détaillés
     if (emergencyFundMonths < 3) {
+      const needed = monthlyExpenses * 3 - liquidAssets;
       recommendations.push({
         icon: "🚨",
-        title: "Fonds d'urgence",
-        description: `Visez ${formatPrice(monthlyExpenses * 3)} (3 mois).`,
+        title: "Fonds d'urgence insuffisant",
+        description: `Épargnez ${formatPrice(needed)} de plus pour couvrir 3 mois de dépenses (protection essentielle).`,
         priority: 'high'
       });
     }
     
     if (savingsRate < 10 && totalIncome > 0) {
+      const targetSavings = totalIncome * 0.15;
+      const currentSavings = totalIncome - totalExpenses;
+      const gap = targetSavings - currentSavings;
       recommendations.push({
         icon: "💰",
-        title: "Épargne à améliorer",
-        description: `Cible: 15% de vos revenus.`,
+        title: "Augmentez votre épargne",
+        description: `Épargnez ${formatPrice(gap / 3)} de plus par mois pour atteindre 15% d'épargne.`,
         priority: 'high'
       });
     }
     
     const highInterestDebts = debts.filter(d => d.interest_rate > 10);
     if (highInterestDebts.length > 0) {
+      const totalHighInterest = highInterestDebts.reduce((sum, d) => sum + d.balance, 0);
       recommendations.push({
         icon: "📉",
-        title: "Dettes coûteuses",
-        description: `Priorisez les taux >10%.`,
-        priority: 'medium'
+        title: "Dettes à taux élevé détectées",
+        description: `${formatPrice(totalHighInterest)} en dettes >10%. Remboursez-les en priorité pour économiser sur les intérêts.`,
+        priority: 'high'
       });
     }
     
     if (regularityScore < 15 && transactions.length > 10) {
       recommendations.push({
         icon: "📊",
-        title: "Stabiliser dépenses",
-        description: "Créez un budget mensuel.",
+        title: "Dépenses irrégulières",
+        description: "Créez un budget mensuel détaillé pour mieux contrôler vos sorties d'argent.",
         priority: 'medium'
       });
     }
@@ -261,27 +275,68 @@ export const FinancialHealthScore = ({ transactions, assets, debts }: FinancialH
     if (stabilityScore < 15 && transactions.filter(t => t.type === 'income').length > 5) {
       recommendations.push({
         icon: "💼",
-        title: "Revenus irréguliers",
-        description: "Créez un coussin financier.",
-        priority: 'low'
+        title: "Revenus variables",
+        description: "Créez un coussin de sécurité de 6 mois pour absorber les variations de revenus.",
+        priority: 'medium'
+      });
+    }
+    
+    if (assets.length === 0) {
+      recommendations.push({
+        icon: "🏦",
+        title: "Commencez à épargner",
+        description: "Ouvrez un CELI ou compte épargne et automatisez vos transferts mensuels.",
+        priority: 'medium'
       });
     }
     
     if (assets.length === 1 && assets[0].value > 10000) {
       recommendations.push({
         icon: "🌱",
-        title: "Diversifier",
-        description: "REER, CELI, placements.",
+        title: "Diversifiez vos actifs",
+        description: "Répartissez entre REER, CELI et placements pour réduire les risques.",
         priority: 'low'
       });
     }
     
-    // Toujours avoir au moins 2 conseils
-    if (recommendations.length < 2) {
+    const totalDebts = debts.reduce((sum, d) => sum + d.balance, 0);
+    if (totalDebts > totalIncome * 0.5 && totalIncome > 0) {
+      recommendations.push({
+        icon: "⚠️",
+        title: "Endettement élevé",
+        description: "Vos dettes dépassent 50% de vos revenus annuels. Créez un plan de remboursement accéléré.",
+        priority: 'high'
+      });
+    }
+    
+    if (transactions.filter(t => t.type === 'expense').length > 30) {
+      const categories = [...new Set(transactions.filter(t => t.type === 'expense').map(t => t.category_id))];
+      if (categories.length > 10) {
+        recommendations.push({
+          icon: "🎯",
+          title: "Simplifiez vos catégories",
+          description: "Vous avez beaucoup de catégories. Consolidez-les pour faciliter le suivi.",
+          priority: 'low'
+        });
+      }
+    }
+    
+    // Message encourageant si score élevé
+    if (totalScore >= 80 && recommendations.filter(r => r.priority === 'success').length < 3) {
+      recommendations.push({
+        icon: "🏆",
+        title: "Santé financière exceptionnelle",
+        description: "Vous maîtrisez vos finances! Pensez à investir pour faire fructifier votre patrimoine.",
+        priority: 'success'
+      });
+    }
+    
+    // Toujours avoir au moins 3 conseils
+    if (recommendations.length < 3) {
       recommendations.push({
         icon: "💡",
         title: "Continuez vos efforts",
-        description: "Vous êtes sur la bonne voie.",
+        description: "Vous êtes sur la bonne voie. Trackez régulièrement pour maintenir le cap.",
         priority: 'success'
       });
     }
