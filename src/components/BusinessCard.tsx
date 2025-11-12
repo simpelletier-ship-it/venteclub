@@ -198,7 +198,7 @@ const BusinessCard = ({
       data-business-id={id}
     >
       <Card
-        className={`group relative overflow-hidden card-premium border-border/50 h-full flex flex-col transition-all duration-500 ${
+        className={`group relative overflow-hidden card-premium border-border/50 h-full flex flex-col transition-all duration-500 bg-white dark:bg-slate-800 ${
           status !== 'sold' ? 'hover:shadow-premium hover:border-primary/50 hover:shadow-primary/20 cursor-pointer' : 'cursor-default'
         } ${featured ? 'ring-2 ring-primary/40 shadow-lg shadow-primary/20' : ''}`}
         onClick={handleClick}
@@ -386,19 +386,19 @@ const BusinessCard = ({
           {(sale_type === 'property' || property_type) && (
             <>
               {year_built && (
-                <div className="bg-muted/30 p-2.5 rounded-lg border border-border/30">
+                <div className="bg-slate-100 dark:bg-slate-700/50 p-2.5 rounded-lg border border-slate-200 dark:border-slate-600">
                   <p className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-bold mb-0.5">Année</p>
                   <p className="text-base font-bold text-slate-900 dark:text-white">{year_built}</p>
                 </div>
               )}
               {square_footage && (
-                <div className="bg-muted/30 p-2.5 rounded-lg border border-border/30">
+                <div className="bg-slate-100 dark:bg-slate-700/50 p-2.5 rounded-lg border border-slate-200 dark:border-slate-600">
                   <p className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-bold mb-0.5">Superficie</p>
                   <p className="text-base font-bold text-secondary">{square_footage.toLocaleString('fr-CA')} pi²</p>
                 </div>
               )}
               {property_type && (
-                <div className="col-span-2 bg-muted/30 p-2.5 rounded-lg border border-border/30">
+                <div className="col-span-2 bg-slate-100 dark:bg-slate-700/50 p-2.5 rounded-lg border border-slate-200 dark:border-slate-600">
                   <p className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-bold mb-0.5">Type de propriété</p>
                   <p className="text-sm font-bold text-slate-900 dark:text-white">
                     {property_type === 'bureau' && 'Bureau commercial'}
@@ -416,7 +416,7 @@ const BusinessCard = ({
                   <p className="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold">Unités locatives</p>
                   <div className="space-y-1">
                     {rental_units.map((unit, idx) => (
-                      <div key={idx} className="flex justify-between items-center text-sm bg-muted/50 px-3 py-2 rounded-lg">
+                      <div key={idx} className="flex justify-between items-center text-sm bg-slate-100 dark:bg-slate-700/50 px-3 py-2 rounded-lg">
                         <span className="font-semibold text-slate-900 dark:text-white">{unit.count}x {unit.unit_type}</span>
                         {unit.monthly_rent && (
                           <span className="text-slate-600 dark:text-slate-300">{unit.monthly_rent.toLocaleString('fr-CA')} $/mois</span>
@@ -431,14 +431,14 @@ const BusinessCard = ({
           {/* Regular business listing */}
           {!sale_type && !property_type && !is_franchise && (
             <>
-              <div className="bg-muted/30 p-2.5 rounded-lg border border-border/30">
+              <div className="bg-slate-100 dark:bg-slate-700/50 p-2.5 rounded-lg border border-slate-200 dark:border-slate-600">
                 <p className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-bold mb-0.5">Revenus</p>
                 <p className="text-base font-bold text-[hsl(var(--success))] flex items-center gap-1">
                   <TrendingUp className="w-3.5 h-3.5 text-[hsl(var(--success-light))]" />
                   {displayRevenue}
                 </p>
               </div>
-              <div className="bg-muted/30 p-2.5 rounded-lg border border-border/30">
+              <div className="bg-slate-100 dark:bg-slate-700/50 p-2.5 rounded-lg border border-slate-200 dark:border-slate-600">
                 <p className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-bold mb-0.5">BAIIA</p>
                 <p className="text-base font-bold text-[hsl(var(--primary-pale-foreground))]">{displayBaiia}</p>
               </div>
@@ -446,11 +446,11 @@ const BusinessCard = ({
           )}
           {is_franchise && (
             <>
-              <div className="col-span-2 bg-muted/30 p-2.5 rounded-lg border border-border/30">
+              <div className="col-span-2 bg-slate-100 dark:bg-slate-700/50 p-2.5 rounded-lg border border-slate-200 dark:border-slate-600">
                 <p className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-bold mb-0.5">Type</p>
                 <p className="text-base font-bold text-slate-900 dark:text-white">Opportunité Franchise</p>
               </div>
-              <div className="col-span-2 bg-muted/30 p-2.5 rounded-lg border border-border/30">
+              <div className="col-span-2 bg-slate-100 dark:bg-slate-700/50 p-2.5 rounded-lg border border-slate-200 dark:border-slate-600">
                 <p className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-bold mb-0.5">Droit d'entrée</p>
                 <p className="text-base font-bold text-[#FF6B00]">{displayPrice}</p>
               </div>
