@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Trash2, PencilLine, CalendarDays, RotateCcw, FileDown, AlertTriangle } from "lucide-react";
+import { Plus, Trash2, PencilLine, CalendarDays, RotateCcw, FileDown, AlertTriangle, Loader2 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +13,9 @@ import { formatPrice } from "@/lib/priceFormat";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { useBudgetRealtime } from "@/hooks/useBudgetRealtime";
+import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Category {
   id: string;
@@ -30,12 +33,16 @@ interface BudgetGoal {
 }
 
 export const BudgetPlanner = ({ isAuthenticated }: { isAuthenticated: boolean }) => {
+  const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [editingGoal, setEditingGoal] = useState<{ categoryId: string; currentLimit: number; currentFrequency?: string } | null>(null);
   const [monthlyLimit, setMonthlyLimit] = useState("");
   const [frequency, setFrequency] = useState("monthly");
   
   const queryClient = useQueryClient();
+  
+  // Activer Supabase Realtime pour synchronisation automatique
+  useBudgetRealtime(user?.id);
 
   // Fetch categories
   const { data: categories = [] } = useQuery({
@@ -70,7 +77,7 @@ export const BudgetPlanner = ({ isAuthenticated }: { isAuthenticated: boolean })
   });
 
   // Fetch current month transactions to compare with budget
-  const { data: transactions = [] } = useQuery({
+  const { data: transactions = [], isFetching: isFetchingTransactions } = useQuery({
     queryKey: ['budget-transactions-current-month'],
     queryFn: async () => {
       const startOfMonth = new Date();
@@ -452,9 +459,17 @@ BALANCE: ${formatPrice(totalIncomeActual - totalExpenseActual)}
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div>
-          <h3 className="text-2xl font-bold">Mon Budget Mensuel</h3>
-          <p className="text-muted-foreground">Définissez vos objectifs par catégorie</p>
+        <div className="flex items-center gap-3">
+          <div>
+            <h3 className="text-2xl font-bold">Mon Budget Mensuel</h3>
+            <p className="text-muted-foreground">Définissez vos objectifs par catégorie</p>
+          </div>
+          {isFetchingTransactions && (
+            <Badge variant="outline" className="flex items-center gap-2">
+              <Loader2 className="h-3 w-3 animate-spin" />
+              Synchronisation...
+            </Badge>
+          )}
         </div>
         
         <DropdownMenu>
