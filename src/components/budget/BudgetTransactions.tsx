@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Trash2, Search, Calendar as CalendarIcon, List, Tag as TagIcon } from "lucide-react";
+import { Plus, Trash2, Search, Calendar as CalendarIcon, List, Tag as TagIcon, Pencil } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,10 +35,14 @@ interface Transaction {
   category_id: string;
   category: Category;
   tag_ids?: string[];
+  is_recurring?: boolean;
+  recurring_frequency?: string;
 }
 
 export const BudgetTransactions = ({ isAuthenticated }: { isAuthenticated: boolean }) => {
   const [open, setOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -241,6 +245,43 @@ export const BudgetTransactions = ({ isAuthenticated }: { isAuthenticated: boole
     },
   });
 
+  // Update transaction mutation
+  const updateTransaction = useMutation({
+    mutationFn: async () => {
+      if (!editingTransaction) throw new Error("Aucune transaction à modifier");
+      
+      const category = categories.find(c => c.id === selectedCategory);
+      if (!category) throw new Error("Catégorie introuvable");
+
+      const { error } = await supabase
+        .from('budget_transactions')
+        .update({
+          category_id: selectedCategory,
+          amount: parseFloat(amount),
+          description,
+          transaction_date: transactionDate,
+          type: category.type,
+          is_recurring: isRecurring,
+          recurring_frequency: isRecurring ? recurringFrequency : null,
+        })
+        .eq('id', editingTransaction.id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['budget-transactions'] });
+      toast.success("Transaction modifiée avec succès");
+      setEditOpen(false);
+      setEditingTransaction(null);
+      setAmount("");
+      setDescription("");
+      setSelectedCategory("");
+    },
+    onError: (error) => {
+      toast.error("Erreur: " + error.message);
+    },
+  });
+
   // Delete transaction mutation
   const deleteTransaction = useMutation({
     mutationFn: async (id: string) => {
@@ -298,6 +339,22 @@ export const BudgetTransactions = ({ isAuthenticated }: { isAuthenticated: boole
   const handleCategorySubmit = (e: React.FormEvent) => {
     e.preventDefault();
     addCategory.mutate();
+  };
+
+  const handleEditSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    updateTransaction.mutate();
+  };
+
+  const openEditDialog = (transaction: Transaction) => {
+    setEditingTransaction(transaction);
+    setAmount(transaction.amount.toString());
+    setDescription(transaction.description || "");
+    setSelectedCategory(transaction.category_id);
+    setTransactionDate(transaction.transaction_date);
+    setIsRecurring(transaction.is_recurring || false);
+    setRecurringFrequency(transaction.recurring_frequency || "monthly");
+    setEditOpen(true);
   };
 
   const incomeCategories = categories.filter(c => c.type === 'income');
@@ -468,6 +525,105 @@ export const BudgetTransactions = ({ isAuthenticated }: { isAuthenticated: boole
           </form>
         </DialogContent>
         </Dialog>
+
+        {/* Edit transaction dialog */}
+        <Dialog open={editOpen} onOpenChange={setEditOpen}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Modifier la transaction</DialogTitle>
+              <DialogDescription>Modifiez les détails de votre transaction</DialogDescription>
+            </DialogHeader>
+            <form onSubmit={handleEditSubmit} className="space-y-4">
+              <div>
+                <Label>Catégorie</Label>
+                <Select value={selectedCategory} onValueChange={setSelectedCategory} required>
+                  <SelectTrigger className="mt-1">
+                    <SelectValue placeholder="Sélectionner" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {incomeCategories.length > 0 && (
+                      <>
+                        <div className="px-2 py-1.5 text-sm font-semibold text-muted-foreground">Revenus</div>
+                        {incomeCategories.map(cat => (
+                          <SelectItem key={cat.id} value={cat.id}>
+                            {cat.icon} {cat.name}
+                          </SelectItem>
+                        ))}
+                      </>
+                    )}
+                    {expenseCategories.length > 0 && (
+                      <>
+                        <div className="px-2 py-1.5 text-sm font-semibold text-muted-foreground">Dépenses</div>
+                        {expenseCategories.map(cat => (
+                          <SelectItem key={cat.id} value={cat.id}>
+                            {cat.icon} {cat.name}
+                          </SelectItem>
+                        ))}
+                      </>
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label>Montant</Label>
+                <CurrencyInput value={amount} onChange={setAmount} className="mt-1" required />
+              </div>
+
+              <div>
+                <Label>Description (optionnel)</Label>
+                <Textarea 
+                  value={description} 
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Détails de la transaction..."
+                  className="mt-1"
+                  rows={2}
+                />
+              </div>
+
+              <div>
+                <Label>Date</Label>
+                <Input 
+                  type="date" 
+                  value={transactionDate}
+                  onChange={(e) => setTransactionDate(e.target.value)}
+                  className="mt-1"
+                  required
+                />
+              </div>
+
+              <div className="flex items-center justify-between">
+                <Label htmlFor="edit-recurring">Transaction récurrente</Label>
+                <Switch 
+                  id="edit-recurring"
+                  checked={isRecurring}
+                  onCheckedChange={setIsRecurring}
+                />
+              </div>
+
+              {isRecurring && (
+                <div>
+                  <Label>Fréquence</Label>
+                  <Select value={recurringFrequency} onValueChange={setRecurringFrequency}>
+                    <SelectTrigger className="mt-1">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="weekly">Hebdomadaire</SelectItem>
+                      <SelectItem value="biweekly">Aux 2 semaines</SelectItem>
+                      <SelectItem value="monthly">Mensuel</SelectItem>
+                      <SelectItem value="yearly">Annuel</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
+              <Button type="submit" className="w-full" disabled={updateTransaction.isPending}>
+                {updateTransaction.isPending ? "Modification..." : "Modifier"}
+              </Button>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
 
       {viewMode === 'calendar' ? (
@@ -579,9 +735,19 @@ export const BudgetTransactions = ({ isAuthenticated }: { isAuthenticated: boole
                     <Button
                       variant="ghost"
                       size="icon"
+                      onClick={() => openEditDialog(transaction)}
+                      className="h-8 w-8"
+                      title="Modifier"
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
                       onClick={() => deleteTransaction.mutate(transaction.id)}
                       disabled={deleteTransaction.isPending}
                       className="h-8 w-8"
+                      title="Supprimer"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>

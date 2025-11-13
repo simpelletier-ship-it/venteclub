@@ -400,7 +400,7 @@ const BudgetCalculator = () => {
                 📊 Tableau de bord
               </TabsTrigger>
               <TabsTrigger value="transactions" className="text-base py-3">
-                💳 Mes dépenses
+                💳 Historique
               </TabsTrigger>
               <TabsTrigger value="budget" className="text-base py-3">
                 💰 Mon budget
