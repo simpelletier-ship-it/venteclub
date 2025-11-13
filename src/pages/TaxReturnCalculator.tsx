@@ -14,6 +14,13 @@ const TaxReturnCalculator = () => {
   const [charitableDonations, setCharitableDonations] = useState("500");
   const [medicalExpenses, setMedicalExpenses] = useState("0");
   const [childcareCosts, setChildcareCosts] = useState("0");
+  
+  // Nouveaux crédits populaires
+  const [ftqRrsp, setFtqRrsp] = useState("0");
+  const [tuitionFees, setTuitionFees] = useState("0");
+  const [studentLoanInterest, setStudentLoanInterest] = useState("0");
+  const [homebuyers, setHomeBuyers] = useState(false);
+  const [transitPasses, setTransitPasses] = useState("0");
 
   const calculateTaxReturn = () => {
     const grossIncome = parseFloat(income) || 0;
@@ -22,6 +29,10 @@ const TaxReturnCalculator = () => {
     const donations = parseFloat(charitableDonations) || 0;
     const medical = parseFloat(medicalExpenses) || 0;
     const childcare = parseFloat(childcareCosts) || 0;
+    const ftq = parseFloat(ftqRrsp) || 0;
+    const tuition = parseFloat(tuitionFees) || 0;
+    const studentInterest = parseFloat(studentLoanInterest) || 0;
+    const transit = parseFloat(transitPasses) || 0;
 
     // Taux marginal provincial Québec 2025
     let provincialRate = 0.14;
@@ -65,14 +76,39 @@ const TaxReturnCalculator = () => {
     const childcareDeductionProvincial = childcare * provincialRate;
     const childcareDeductionFederal = childcare * federalRate;
 
+    // Crédit REER FTQ/Fondaction - 15% QC + 15% fédéral (max 5000$)
+    const ftqMax = Math.min(ftq, 5000);
+    const ftqCreditProvincial = ftqMax * 0.15;
+    const ftqCreditFederal = ftqMax * 0.15;
+
+    // Frais de scolarité - 8% QC, 15% fédéral
+    const tuitionCreditProvincial = tuition * 0.08;
+    const tuitionCreditFederal = tuition * 0.15;
+
+    // Intérêts prêts étudiants - 8% QC, 15% fédéral
+    const studentInterestCreditProvincial = studentInterest * 0.08;
+    const studentInterestCreditFederal = studentInterest * 0.15;
+
+    // Crédit achat première habitation - 750$ QC, 1500$ fédéral (montant fixe)
+    const homeBuyersCreditProvincial = homebuyers ? 750 : 0;
+    const homeBuyersCreditFederal = homebuyers ? 1500 : 0;
+
+    // Transport en commun - 20% QC (déduction basée sur montant)
+    const transitCreditProvincial = transit * 0.20;
+    const transitCreditFederal = 0; // Supprimé au fédéral mais gardé pour historique
+
     // Totaux par palier
     const totalProvincial = rrspSavingsProvincial + fhsaSavingsProvincial + 
                             donationCreditProvincial + medicalCreditProvincial + 
-                            childcareDeductionProvincial;
+                            childcareDeductionProvincial + ftqCreditProvincial +
+                            tuitionCreditProvincial + studentInterestCreditProvincial +
+                            homeBuyersCreditProvincial + transitCreditProvincial;
     
     const totalFederal = rrspSavingsFederal + fhsaSavingsFederal + 
                          donationCreditFederal + medicalCreditFederal + 
-                         childcareDeductionFederal;
+                         childcareDeductionFederal + ftqCreditFederal +
+                         tuitionCreditFederal + studentInterestCreditFederal +
+                         homeBuyersCreditFederal + transitCreditFederal;
 
     return {
       provincial: {
@@ -81,6 +117,11 @@ const TaxReturnCalculator = () => {
         donations: donationCreditProvincial,
         medical: medicalCreditProvincial,
         childcare: childcareDeductionProvincial,
+        ftq: ftqCreditProvincial,
+        tuition: tuitionCreditProvincial,
+        studentInterest: studentInterestCreditProvincial,
+        homeBuyers: homeBuyersCreditProvincial,
+        transit: transitCreditProvincial,
         total: totalProvincial,
         rate: provincialRate * 100
       },
@@ -90,6 +131,11 @@ const TaxReturnCalculator = () => {
         donations: donationCreditFederal,
         medical: medicalCreditFederal,
         childcare: childcareDeductionFederal,
+        ftq: ftqCreditFederal,
+        tuition: tuitionCreditFederal,
+        studentInterest: studentInterestCreditFederal,
+        homeBuyers: homeBuyersCreditFederal,
+        transit: transitCreditFederal,
         total: totalFederal,
         rate: federalRate * 100
       },
@@ -227,6 +273,82 @@ const TaxReturnCalculator = () => {
                   </div>
                 </div>
 
+                <div className="pt-4 border-t">
+                  <h3 className="font-semibold mb-3 text-primary">Autres crédits populaires</h3>
+                  
+                  <div className="space-y-4">
+                    <div>
+                      <Label>REER FTQ / Fondaction</Label>
+                      <CurrencyInput
+                        value={ftqRrsp}
+                        onChange={setFtqRrsp}
+                        showCurrency={false}
+                        className="mt-1"
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Crédit additionnel de 30% (15% QC + 15% fédéral), max 5 000$
+                      </p>
+                    </div>
+
+                    <div>
+                      <Label>Frais de scolarité</Label>
+                      <CurrencyInput
+                        value={tuitionFees}
+                        onChange={setTuitionFees}
+                        showCurrency={false}
+                        className="mt-1"
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Études postsecondaires (université, cégep, formation)
+                      </p>
+                    </div>
+
+                    <div>
+                      <Label>Intérêts prêts étudiants</Label>
+                      <CurrencyInput
+                        value={studentLoanInterest}
+                        onChange={setStudentLoanInterest}
+                        showCurrency={false}
+                        className="mt-1"
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Intérêts payés sur prêts AFE/gouvernementaux
+                      </p>
+                    </div>
+
+                    <div>
+                      <Label>Abonnements transport en commun</Label>
+                      <CurrencyInput
+                        value={transitPasses}
+                        onChange={setTransitPasses}
+                        showCurrency={false}
+                        className="mt-1"
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Passes mensuelles/annuelles STM, STL, RTL, etc.
+                      </p>
+                    </div>
+
+                    <div className="flex items-center justify-between p-3 rounded-lg bg-accent/30">
+                      <div className="flex-1">
+                        <Label htmlFor="homebuyers" className="cursor-pointer">
+                          Crédit achat première habitation
+                        </Label>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Montant fixe: 750$ QC + 1 500$ fédéral
+                        </p>
+                      </div>
+                      <input
+                        type="checkbox"
+                        id="homebuyers"
+                        checked={homebuyers}
+                        onChange={(e) => setHomeBuyers(e.target.checked)}
+                        className="h-5 w-5 rounded border-gray-300"
+                      />
+                    </div>
+                  </div>
+                </div>
+
                 <Button className="w-full mt-6" size="lg">
                   Calculer mes économies
                 </Button>
@@ -347,8 +469,73 @@ const TaxReturnCalculator = () => {
                         </div>
                       </div>
                     )}
-                    {[rrspContribution, fhsaContribution, charitableDonations, medicalExpenses, childcareCosts]
-                      .every(v => parseFloat(v) === 0) && (
+                    {parseFloat(ftqRrsp) > 0 && (
+                      <div className="flex justify-between items-center pb-3 border-b">
+                        <div>
+                          <div className="font-medium">REER FTQ/Fondaction</div>
+                          <div className="text-sm text-muted-foreground">
+                            Crédit additionnel 15%: {formatPrice(parseFloat(ftqRrsp))}
+                          </div>
+                        </div>
+                        <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                          {formatPrice(results.provincial.ftq)}
+                        </div>
+                      </div>
+                    )}
+                    {parseFloat(tuitionFees) > 0 && (
+                      <div className="flex justify-between items-center pb-3 border-b">
+                        <div>
+                          <div className="font-medium">Frais de scolarité</div>
+                          <div className="text-sm text-muted-foreground">
+                            Montant: {formatPrice(parseFloat(tuitionFees))}
+                          </div>
+                        </div>
+                        <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                          {formatPrice(results.provincial.tuition)}
+                        </div>
+                      </div>
+                    )}
+                    {parseFloat(studentLoanInterest) > 0 && (
+                      <div className="flex justify-between items-center pb-3 border-b">
+                        <div>
+                          <div className="font-medium">Intérêts prêts étudiants</div>
+                          <div className="text-sm text-muted-foreground">
+                            Intérêts: {formatPrice(parseFloat(studentLoanInterest))}
+                          </div>
+                        </div>
+                        <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                          {formatPrice(results.provincial.studentInterest)}
+                        </div>
+                      </div>
+                    )}
+                    {homebuyers && (
+                      <div className="flex justify-between items-center pb-3 border-b">
+                        <div>
+                          <div className="font-medium">Achat première habitation</div>
+                          <div className="text-sm text-muted-foreground">
+                            Crédit fixe de 750$
+                          </div>
+                        </div>
+                        <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                          {formatPrice(results.provincial.homeBuyers)}
+                        </div>
+                      </div>
+                    )}
+                    {parseFloat(transitPasses) > 0 && (
+                      <div className="flex justify-between items-center pb-3 border-b">
+                        <div>
+                          <div className="font-medium">Transport en commun</div>
+                          <div className="text-sm text-muted-foreground">
+                            Passes: {formatPrice(parseFloat(transitPasses))}
+                          </div>
+                        </div>
+                        <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                          {formatPrice(results.provincial.transit)}
+                        </div>
+                      </div>
+                    )}
+                    {[rrspContribution, fhsaContribution, charitableDonations, medicalExpenses, childcareCosts, ftqRrsp, tuitionFees, studentLoanInterest, transitPasses]
+                      .every(v => parseFloat(v) === 0) && !homebuyers && (
                       <div className="text-center py-6 text-muted-foreground">
                         Entrez vos contributions pour voir vos économies Québec
                       </div>
@@ -434,8 +621,60 @@ const TaxReturnCalculator = () => {
                         </div>
                       </div>
                     )}
-                    {[rrspContribution, fhsaContribution, charitableDonations, medicalExpenses, childcareCosts]
-                      .every(v => parseFloat(v) === 0) && (
+                    {parseFloat(ftqRrsp) > 0 && (
+                      <div className="flex justify-between items-center pb-3 border-b">
+                        <div>
+                          <div className="font-medium">REER FTQ/Fondaction</div>
+                          <div className="text-sm text-muted-foreground">
+                            Crédit additionnel 15%: {formatPrice(parseFloat(ftqRrsp))}
+                          </div>
+                        </div>
+                        <div className="text-2xl font-bold text-red-600 dark:text-red-400">
+                          {formatPrice(results.federal.ftq)}
+                        </div>
+                      </div>
+                    )}
+                    {parseFloat(tuitionFees) > 0 && (
+                      <div className="flex justify-between items-center pb-3 border-b">
+                        <div>
+                          <div className="font-medium">Frais de scolarité</div>
+                          <div className="text-sm text-muted-foreground">
+                            Montant: {formatPrice(parseFloat(tuitionFees))}
+                          </div>
+                        </div>
+                        <div className="text-2xl font-bold text-red-600 dark:text-red-400">
+                          {formatPrice(results.federal.tuition)}
+                        </div>
+                      </div>
+                    )}
+                    {parseFloat(studentLoanInterest) > 0 && (
+                      <div className="flex justify-between items-center pb-3 border-b">
+                        <div>
+                          <div className="font-medium">Intérêts prêts étudiants</div>
+                          <div className="text-sm text-muted-foreground">
+                            Intérêts: {formatPrice(parseFloat(studentLoanInterest))}
+                          </div>
+                        </div>
+                        <div className="text-2xl font-bold text-red-600 dark:text-red-400">
+                          {formatPrice(results.federal.studentInterest)}
+                        </div>
+                      </div>
+                    )}
+                    {homebuyers && (
+                      <div className="flex justify-between items-center pb-3 border-b">
+                        <div>
+                          <div className="font-medium">Achat première habitation</div>
+                          <div className="text-sm text-muted-foreground">
+                            Crédit fixe de 1 500$
+                          </div>
+                        </div>
+                        <div className="text-2xl font-bold text-red-600 dark:text-red-400">
+                          {formatPrice(results.federal.homeBuyers)}
+                        </div>
+                      </div>
+                    )}
+                    {[rrspContribution, fhsaContribution, charitableDonations, medicalExpenses, childcareCosts, ftqRrsp, tuitionFees, studentLoanInterest]
+                      .every(v => parseFloat(v) === 0) && !homebuyers && (
                       <div className="text-center py-6 text-muted-foreground">
                         Entrez vos contributions pour voir vos économies fédérales
                       </div>
@@ -512,6 +751,43 @@ const TaxReturnCalculator = () => {
                   de votre revenu imposable. Cette déduction réduit directement votre revenu imposable aux paliers provincial et fédéral, 
                   générant des économies d'impôt substantielles pour les familles québécoises.
                 </p>
+
+                <h3 className="text-xl font-semibold mt-6 mb-3">6. REER FTQ et Fondaction - Double crédit d'impôt</h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  Les actions du Fonds de solidarité FTQ et de Fondaction offrent un avantage fiscal exceptionnel : en plus de la déduction 
+                  REER classique, vous recevez un crédit d'impôt additionnel de 15% au provincial et 15% au fédéral, pour un total de 30% 
+                  de crédits supplémentaires. Avec un maximum de 5 000$ par année, vous pouvez obtenir jusqu'à 1 500$ en crédits d'impôt 
+                  additionnels tout en épargnant pour votre retraite et en soutenant l'économie québécoise.
+                </p>
+
+                <h3 className="text-xl font-semibold mt-6 mb-3">7. Frais de scolarité postsecondaire</h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  Les frais de scolarité pour études postsecondaires (université, cégep, formations professionnelles reconnues) donnent 
+                  droit à des crédits d'impôt de 8% au Québec et 15% au fédéral. Conservez tous vos reçus T2202 (fédéral) et Relevé 8 (Québec) 
+                  fournis par votre institution d'enseignement. Ces crédits peuvent être reportés aux années futures si vous n'avez pas 
+                  d'impôt à payer actuellement.
+                </p>
+
+                <h3 className="text-xl font-semibold mt-6 mb-3">8. Intérêts sur prêts étudiants</h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  Les intérêts payés sur vos prêts étudiants gouvernementaux (Aide financière aux études du Québec, prêts canadiens) 
+                  donnent droit à des crédits d'impôt de 8% (Québec) et 15% (fédéral). Vous pouvez reporter ces crédits jusqu'à 5 ans, 
+                  ce qui est particulièrement avantageux si vous êtes en début de carrière avec un faible revenu.
+                </p>
+
+                <h3 className="text-xl font-semibold mt-6 mb-3">9. Crédit pour l'achat d'une première habitation</h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  Si vous achetez votre première propriété en 2025, vous avez droit à un crédit d'impôt de 750$ au provincial (Québec) 
+                  et 1 500$ au fédéral. Ce montant fixe est accordé automatiquement lors de votre déclaration de revenus de l'année 
+                  d'acquisition. Assurez-vous de remplir les formulaires appropriés (Annexe H au fédéral).
+                </p>
+
+                <h3 className="text-xl font-semibold mt-6 mb-3">10. Transport en commun au Québec</h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  Le Québec offre un crédit d'impôt de 20% sur le coût des abonnements mensuels ou annuels de transport en commun 
+                  (STM, STL, RTL, etc.). Bien que ce crédit ait été aboli au fédéral, il demeure très avantageux au provincial. 
+                  Conservez tous vos reçus de passes mensuelles ou annuelles pour les réclamer lors de votre déclaration.
+                </p>
               </div>
 
               <div>
@@ -563,6 +839,18 @@ const TaxReturnCalculator = () => {
                     <strong className="text-foreground">Crédit d'impôt pour maintien à domicile:</strong> Au Québec, les personnes âgées de 70 ans 
                     et plus peuvent réclamer un crédit pour les services de maintien à domicile.
                   </p>
+                  <p className="leading-relaxed">
+                    <strong className="text-foreground">REER dans les fonds de travailleurs (FTQ/Fondaction):</strong> Obtenez un crédit d'impôt 
+                    additionnel de 30% (15% QC + 15% fédéral) en plus de la déduction REER régulière, jusqu'à 5 000$ par année.
+                  </p>
+                  <p className="leading-relaxed">
+                    <strong className="text-foreground">Frais de scolarité reportables:</strong> Si vous n'utilisez pas tous vos crédits de 
+                    scolarité l'année courante, vous pouvez les reporter indéfiniment aux années futures ou les transférer à vos parents.
+                  </p>
+                  <p className="leading-relaxed">
+                    <strong className="text-foreground">Crédit TPS/TVQ:</strong> Pour les personnes à faible revenu, des crédits trimestriels 
+                    remboursables sont disponibles pour compenser la taxe de vente payée sur les achats essentiels.
+                  </p>
                 </div>
               </div>
 
@@ -601,7 +889,28 @@ const TaxReturnCalculator = () => {
                     <p className="text-muted-foreground leading-relaxed">
                       Si vous êtes un futur acheteur d'une première propriété, priorisez le CELIAPP car il combine déduction fiscale ET 
                       retraits non imposables. Si vous avez déjà une propriété ou avez maximisé votre CELIAPP, le REER demeure un excellent 
-                      véhicule d'épargne-retraite avec déduction fiscale immédiate.
+                      véhicule d'épargne-retraite avec déduction fiscale immédiate. Considérez aussi le REER FTQ/Fondaction pour obtenir 
+                      un crédit d'impôt additionnel de 30% sur vos cotisations.
+                    </p>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2">Comment fonctionne le crédit REER FTQ/Fondaction?</h3>
+                    <p className="text-muted-foreground leading-relaxed">
+                      En achetant des actions du Fonds de solidarité FTQ ou de Fondaction CSN, vous obtenez une déduction REER classique 
+                      PLUS un crédit d'impôt additionnel de 15% au Québec et 15% au fédéral (30% total). Sur un investissement de 5 000$ 
+                      (maximum annuel), vous recevez donc 1 500$ en crédits d'impôt supplémentaires, en plus de l'économie d'impôt liée 
+                      à la déduction REER. C'est l'un des crédits les plus avantageux au Québec.
+                    </p>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2">Puis-je transférer mes crédits de scolarité inutilisés?</h3>
+                    <p className="text-muted-foreground leading-relaxed">
+                      Oui! Si vous ne payez pas d'impôt ou si vos crédits dépassent votre impôt à payer, vous pouvez : (1) Reporter 
+                      indéfiniment vos crédits inutilisés aux années futures, (2) Transférer jusqu'à 5 000$ par année à vos parents, 
+                      grands-parents, conjoint ou à leur conjoint. Le transfert doit être fait l'année même où les frais sont payés, 
+                      mais le report peut être fait n'importe quand dans le futur.
                     </p>
                   </div>
 
