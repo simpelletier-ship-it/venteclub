@@ -469,19 +469,23 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
 
   return (
     <Card className="shadow-lg">
-      <CardHeader className="pb-4">
+       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
           <div>
             <CardTitle className="text-2xl">
-              {transactionType === 'expense' ? '💸 Ajouter une dépense' : '💰 Ajouter un revenu'}
+              {transactionType === 'expense' ? '💸 Nouvelle dépense' : '💰 Nouveau revenu'}
             </CardTitle>
-            <CardDescription className="text-base">Simple et rapide</CardDescription>
+            <CardDescription className="text-base">
+              {transactionType === 'expense' 
+                ? 'Enregistrez rapidement votre achat' 
+                : 'Enregistrez vos gains'}
+            </CardDescription>
           </div>
           <div className="flex gap-2">
             <Button
               type="button"
               variant={transactionType === 'expense' ? 'default' : 'outline'}
-              size="sm"
+              size="lg"
               onClick={() => {
                 setTransactionType('expense');
                 setSelectedCategory("");
@@ -493,7 +497,7 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
             <Button
               type="button"
               variant={transactionType === 'income' ? 'default' : 'outline'}
-              size="sm"
+              size="lg"
               onClick={() => {
                 setTransactionType('income');
                 setSelectedCategory("");
@@ -508,12 +512,14 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
       <CardContent>
         <div className="space-y-4">
           <div>
-            <Label className="text-base font-medium mb-2 block">Montant</Label>
+            <Label className="text-base font-medium mb-2 block">
+              💰 Combien?
+            </Label>
             <div className="relative">
               <CurrencyInput 
                 value={amount} 
                 onChange={setAmount}
-                placeholder="0 $"
+                placeholder="Entrez le montant"
                 className="text-2xl h-14 font-bold pr-12"
               />
               {amount && (
@@ -523,16 +529,20 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
                   size="icon"
                   className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8"
                   onClick={() => setAmount("")}
+                  title="Effacer"
                 >
                   ✕
                 </Button>
               )}
             </div>
+            <p className="text-sm text-muted-foreground mt-1">Le montant doit être supérieur à 0$</p>
           </div>
           
           <div>
             <div className="flex items-center justify-between mb-2">
-              <Label className="text-base font-medium">Catégorie</Label>
+              <Label className="text-base font-medium">
+                📂 Pour quoi?
+              </Label>
               <Button
                 variant="ghost"
                 size="sm"
@@ -540,9 +550,12 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
                 className="h-8 px-2 text-xs"
               >
                 <Settings className="h-3.5 w-3.5 mr-1" />
-                Modifier
+                Organiser
               </Button>
             </div>
+            <p className="text-sm text-muted-foreground mb-3">
+              Choisissez dans quelle catégorie classer cette dépense
+            </p>
             
             {/* Pinned categories as large buttons */}
             <div className="grid grid-cols-3 gap-2 mb-3">
@@ -567,12 +580,13 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
                 variant="outline"
                 className="w-full h-11"
               >
+                <span className="text-lg mr-2">🔍</span>
                 Autre catégorie...
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-full p-0" align="start">
               <Command>
-                <CommandInput placeholder="Rechercher une catégorie..." />
+                <CommandInput placeholder="Rechercher..." className="text-base" />
                 <CommandList>
                   <CommandEmpty>Aucune catégorie trouvée.</CommandEmpty>
                   <CommandGroup>
@@ -580,22 +594,58 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
                       <CommandItem
                         key={cat.id}
                         value={cat.name}
+                        className="flex items-center justify-between cursor-pointer group"
                         onSelect={() => {
                           setSelectedCategory(cat.id);
                           setCategoryOpen(false);
                         }}
                       >
-                        <Check
-                          className={cn(
-                            "mr-2 h-4 w-4",
-                            (selectedCategory || suggestedCategory) === cat.id ? "opacity-100" : "opacity-0"
+                        <div className="flex items-center flex-1">
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              (selectedCategory || suggestedCategory) === cat.id ? "opacity-100" : "opacity-0"
+                            )}
+                          />
+                          <span className="mr-2 text-lg">{cat.icon}</span>
+                          <span className="font-medium">{cat.name}</span>
+                          {suggestedCategory === cat.id && !selectedCategory && (
+                            <span className="ml-2 text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">Suggéré ✨</span>
                           )}
-                        />
-                        <span className="mr-2">{cat.icon}</span>
-                        {cat.name}
-                        {suggestedCategory === cat.id && !selectedCategory && (
-                          <span className="ml-auto text-xs text-muted-foreground">Suggérée</span>
-                        )}
+                        </div>
+                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleEditCategory(cat);
+                              setCategoryOpen(false);
+                            }}
+                            title="Modifier"
+                          >
+                            <Pencil className="h-3.5 w-3.5" />
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              togglePin.mutate({ categoryId: cat.id, isPinned: cat.is_pinned });
+                            }}
+                            title={cat.is_pinned ? "Désépingler" : "Épingler"}
+                          >
+                            {cat.is_pinned ? (
+                              <Pin className="h-3.5 w-3.5 fill-primary text-primary" />
+                            ) : (
+                              <PinOff className="h-3.5 w-3.5" />
+                            )}
+                          </Button>
+                        </div>
                       </CommandItem>
                     ))}
                   </CommandGroup>
@@ -606,6 +656,7 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
                         setCategoryOpen(false);
                         setNewCategoryOpen(true);
                       }}
+                      className="text-primary font-medium"
                     >
                       <Plus className="mr-2 h-4 w-4" />
                       Créer une nouvelle catégorie
@@ -618,18 +669,20 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
           </div>
 
           <div>
-            <Label className="text-base font-medium mb-2 block">Date</Label>
+            <Label className="text-base font-medium mb-2 block">
+              📅 Quand?
+            </Label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
                   className={cn(
-                    "w-full h-11 justify-start text-left font-normal",
+                    "w-full h-11 justify-start text-left font-normal text-base",
                     !transactionDate && "text-muted-foreground"
                   )}
                 >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {transactionDate ? format(transactionDate, "d MMMM yyyy", { locale: fr }) : "Sélectionner une date"}
+                  <CalendarIcon className="mr-2 h-5 w-5" />
+                  {transactionDate ? format(transactionDate, "d MMMM yyyy", { locale: fr }) : "Choisir la date"}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
@@ -642,19 +695,24 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
                 />
               </PopoverContent>
             </Popover>
+            <p className="text-sm text-muted-foreground mt-1">
+              La date garde la dernière saisie pour faciliter l'ajout
+            </p>
           </div>
           
           <div>
-            <Label className="text-base font-medium mb-2 block">Description (optionnel)</Label>
+            <Label className="text-base font-medium mb-2 block">
+              📝 Détails (facultatif)
+            </Label>
             <Popover open={descriptionOpen} onOpenChange={setDescriptionOpen}>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
                   role="combobox"
                   aria-expanded={descriptionOpen}
-                  className="w-full h-11 justify-start text-left font-normal"
+                  className="w-full h-11 justify-start text-left font-normal text-base"
                 >
-                  {description || "Ex: Épicerie, Café..."}
+                  {description || "Ex: Épicerie IGA, Café Starbucks..."}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-full p-0" align="start">
@@ -663,10 +721,11 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
                     placeholder="Tapez une description..." 
                     value={description}
                     onValueChange={handleDescriptionChange}
+                    className="text-base"
                   />
                   <CommandList>
                     <CommandEmpty>Aucune suggestion.</CommandEmpty>
-                    <CommandGroup heading="Descriptions récentes">
+                    <CommandGroup heading="💡 Descriptions récentes">
                       {previousDescriptions
                         .filter(desc => desc.toLowerCase().includes(description.toLowerCase()))
                         .slice(0, 10)
@@ -679,6 +738,7 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
                               handleDescriptionChange(value);
                               setDescriptionOpen(false);
                             }}
+                            className="text-base"
                           >
                             {desc}
                           </CommandItem>
@@ -689,10 +749,16 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
               </PopoverContent>
             </Popover>
             {suggestedCategory && (
-              <p className="text-sm text-muted-foreground mt-1 flex items-center gap-1">
-                💡 {categories.find(c => c.id === suggestedCategory)?.name}
-              </p>
+              <div className="text-sm bg-primary/10 text-primary px-3 py-2 rounded-lg mt-2 flex items-center gap-2">
+                <span className="text-lg">✨</span>
+                <span className="font-medium">
+                  Suggestion: {categories.find(c => c.id === suggestedCategory)?.name}
+                </span>
+              </div>
             )}
+            <p className="text-sm text-muted-foreground mt-1">
+              Ajoutez plus de détails pour mieux suivre vos dépenses
+            </p>
           </div>
 
           {/* Transaction Tags */}
