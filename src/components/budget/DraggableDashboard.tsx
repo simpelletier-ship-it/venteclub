@@ -95,6 +95,8 @@ export const DraggableDashboard = ({
         return preferences.showExpenseTrends;
       case 'expensesByCategory':
         return preferences.showExpensesByCategory;
+      case 'monthComparison':
+        return true; // Always show month comparison
       case 'netWorthGamification':
         return preferences.showNetWorthGamification;
       case 'quickNetWorthUpdate':

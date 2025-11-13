@@ -214,9 +214,17 @@ export const ExpensesByCategory = ({ transactions, categories, onAnalyze }: Expe
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
-                <span className="text-sm font-medium px-3 min-w-[120px] text-center">
-                  {format(selectedMonth, 'MMMM yyyy', { locale: fr })}
-                </span>
+                <div className="flex items-center gap-2 px-3 min-w-[140px] justify-center">
+                  <span className="text-sm font-medium">
+                    {format(selectedMonth, 'MMMM yyyy', { locale: fr })}
+                  </span>
+                  {selectedMonth.getMonth() === new Date().getMonth() && 
+                   selectedMonth.getFullYear() === new Date().getFullYear() && (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-primary/20 text-primary border border-primary/30">
+                      Actuel
+                    </span>
+                  )}
+                </div>
                 <Button 
                   variant="ghost" 
                   size="icon" 

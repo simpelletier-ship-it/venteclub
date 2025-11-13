@@ -43,6 +43,7 @@ import { BalanceSheetManager } from "@/components/budget/BalanceSheetManager";
 import { MonthlySummaryWidget } from "@/components/budget/MonthlySummaryWidget";
 import { DashboardVisibilitySettings, useDashboardVisibility } from "@/components/budget/DashboardVisibilitySettings";
 import { DraggableDashboard } from "@/components/budget/DraggableDashboard";
+import { MonthComparisonChart } from "@/components/budget/MonthComparisonChart";
 
 const BudgetCalculator = () => {
   const navigate = useNavigate();
@@ -453,6 +454,12 @@ const BudgetCalculator = () => {
                             const transactionsTab = tabsList?.querySelector('[value="transactions"]') as HTMLButtonElement;
                             transactionsTab?.click();
                           }}
+                        />
+                      ),
+                      monthComparison: (
+                        <MonthComparisonChart 
+                          transactions={transactions}
+                          categories={categories}
                         />
                       ),
                       netWorthGamification: (
