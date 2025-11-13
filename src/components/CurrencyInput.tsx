@@ -42,6 +42,22 @@ export const CurrencyInput = forwardRef<HTMLInputElement, CurrencyInputProps>(
       onChange(rawValue);
     };
 
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+      // Allow backspace/delete even if cursor is after $ sign
+      if (e.key === 'Backspace' || e.key === 'Delete') {
+        const input = e.currentTarget;
+        const cursorPosition = input.selectionStart || 0;
+        const value = input.value;
+        
+        // If cursor is at the end (after $), clear the whole value
+        if (cursorPosition === value.length) {
+          e.preventDefault();
+          setDisplayValue("");
+          onChange("");
+        }
+      }
+    };
+
     return (
       <Input
         {...props}
@@ -49,6 +65,7 @@ export const CurrencyInput = forwardRef<HTMLInputElement, CurrencyInputProps>(
         type="text"
         value={displayValue}
         onChange={handleChange}
+        onKeyDown={handleKeyDown}
         placeholder={showCurrency ? "0 $" : "0"}
       />
     );

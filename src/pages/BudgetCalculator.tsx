@@ -16,6 +16,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { NetWorthGamification } from "@/components/budget/NetWorthGamification";
 import { BudgetTransactions } from "@/components/budget/BudgetTransactions";
+import { BudgetAssetsDebts } from "@/components/budget/BudgetAssetsDebts";
+import { FinancialCalculator } from "@/components/budget/FinancialCalculator";
 import { SimpleNetWorthTracker } from "@/components/budget/SimpleNetWorthTracker";
 import { BudgetPlanner } from "@/components/budget/BudgetPlanner";
 import { BudgetInsights } from "@/components/budget/BudgetInsights";
@@ -435,10 +437,11 @@ const BudgetCalculator = () => {
             isSyncing={isSyncing}
             onSync={triggerSync}
           />
-          <QuickExpenseTracker isAuthenticated={isAuthenticated} />
-
-          {/* Monthly Summary Widget */}
+          
+          {/* Monthly Summary - After Quick Tracker */}
           <MonthlySummaryWidget isAuthenticated={isAuthenticated} />
+          
+          <QuickExpenseTracker isAuthenticated={isAuthenticated} />
 
           <Tabs defaultValue="overview" className="space-y-6">
             {/* Desktop Tabs */}
@@ -594,8 +597,12 @@ const BudgetCalculator = () => {
 
             <TabsContent value="assets">
               <div className="space-y-6">
+                {/* New Financial Calculator */}
+                <FinancialCalculator isAuthenticated={isAuthenticated} />
+                
                 <SimpleNetWorthTracker currentNetWorth={netWorth} isAuthenticated={isAuthenticated} />
                 <NetWorthGamification netWorth={netWorth} isAuthenticated={isAuthenticated} />
+                <BudgetAssetsDebts isAuthenticated={isAuthenticated} />
               </div>
             </TabsContent>
 

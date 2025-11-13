@@ -92,6 +92,21 @@ const Tools = () => {
 
   const tools = [
     {
+      id: "budget",
+      title: "Planificateur de Budget Personnel",
+      description: "Planificateur de budget intelligent et gratuit pour gérer vos finances personnelles. Suivi des dépenses en temps réel, gestion des actifs et dettes, objectifs d'épargne, analyse des habitudes financières, score de santé financière et coaching personnalisé.",
+      features: [
+        "Suivi temps réel",
+        "Objectifs d'épargne",
+        "Coach IA personnalisé",
+        "Graphiques d'évolution"
+      ],
+      icon: Wallet,
+      color: "bg-purple-500",
+      link: "/outils/budget",
+      keywords: "budget, planification financière, épargne, dettes"
+    },
+    {
       id: "salary-calculator",
       title: "Calculateur de Salaire Net Québec",
       description: "Calculez précisément votre salaire net après impôts fédéral et provincial, RRQ, assurance-emploi et RQAP. Conversion automatique entre toutes les périodes de paie (annuel, mensuel, bihebdomadaire, hebdomadaire, horaire).",
@@ -120,21 +135,6 @@ const Tools = () => {
       color: "bg-green-500",
       link: "/outils/retour-impot",
       keywords: "retour impôt, REER, CELIAPP, crédit fiscal"
-    },
-    {
-      id: "budget",
-      title: "Planificateur de Budget Personnel",
-      description: "Planificateur de budget intelligent et gratuit pour gérer vos finances personnelles. Suivi des dépenses en temps réel, gestion REER/CELI, objectifs d'épargne, analyse des habitudes financières, score de santé financière et coaching personnalisé.",
-      features: [
-        "Suivi temps réel",
-        "Objectifs d'épargne",
-        "Coach IA personnalisé",
-        "Graphiques d'évolution"
-      ],
-      icon: Wallet,
-      color: "bg-purple-500",
-      link: "/outils/budget",
-      keywords: "budget, planification financière, épargne, dettes"
     }
   ];
 
