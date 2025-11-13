@@ -48,6 +48,7 @@ import { BudgetTutorial } from "@/components/budget/BudgetTutorial";
 import { BudgetOnboarding } from "@/components/budget/BudgetOnboarding";
 import { BudgetReminders } from "@/components/budget/BudgetReminders";
 import { BenchmarkComparison } from "@/components/budget/BenchmarkComparison";
+import { CreateDefaultCategories } from "@/components/budget/CreateDefaultCategories";
 
 const BudgetCalculator = () => {
   const navigate = useNavigate();
@@ -300,6 +301,7 @@ const BudgetCalculator = () => {
   return (
     <ErrorBoundary>
       <>
+        <CreateDefaultCategories />
         <BudgetOnboarding />
         <BudgetTutorial />
         <Helmet>
