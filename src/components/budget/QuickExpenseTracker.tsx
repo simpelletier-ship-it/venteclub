@@ -468,9 +468,9 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
   const displayCategories = pinnedCategories.length > 0 ? pinnedCategories : categories.slice(0, 6);
 
   return (
-    <Card className="shadow-lg">
+    <Card className="shadow-lg" id="quick-expense-tracker">
        <CardHeader className="pb-4">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between" id="transaction-type">
           <div>
             <CardTitle className="text-2xl">
               {transactionType === 'expense' ? '💸 Nouvelle dépense' : '💰 Nouveau revenu'}
@@ -511,7 +511,7 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          <div>
+          <div id="amount-input">
             <Label className="text-base font-medium mb-2 block">
               💰 Combien?
             </Label>
@@ -538,7 +538,7 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
             <p className="text-sm text-muted-foreground mt-1">Le montant doit être supérieur à 0$</p>
           </div>
           
-          <div>
+          <div id="category-buttons">
             <div className="flex items-center justify-between mb-2">
               <Label className="text-base font-medium">
                 📂 Pour quoi?
@@ -668,7 +668,7 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
           </Popover>
           </div>
 
-          <div>
+          <div id="date-picker">
             <Label className="text-base font-medium mb-2 block">
               📅 Quand?
             </Label>
@@ -700,7 +700,7 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
             </p>
           </div>
           
-          <div>
+          <div id="description-input">
             <Label className="text-base font-medium mb-2 block">
               📝 Détails (facultatif)
             </Label>
@@ -1029,6 +1029,7 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
           )}
 
           <Button 
+            id="add-button"
             className="w-full h-14 text-lg font-semibold"
             onClick={handleQuickAdd}
             disabled={quickAdd.isPending || !amount || parseFloat(amount) <= 0}

@@ -44,6 +44,7 @@ import { MonthlySummaryWidget } from "@/components/budget/MonthlySummaryWidget";
 import { DashboardVisibilitySettings, useDashboardVisibility } from "@/components/budget/DashboardVisibilitySettings";
 import { DraggableDashboard } from "@/components/budget/DraggableDashboard";
 import { MonthComparisonChart } from "@/components/budget/MonthComparisonChart";
+import { BudgetTutorial } from "@/components/budget/BudgetTutorial";
 
 const BudgetCalculator = () => {
   const navigate = useNavigate();
@@ -296,6 +297,7 @@ const BudgetCalculator = () => {
   return (
     <ErrorBoundary>
       <>
+        <BudgetTutorial />
         <Helmet>
         <title>Planificateur Budget Québec Gratuit | Gestion Finances Personnelles 2025</title>
         <meta name="description" content="Planificateur de budget intelligent gratuit pour gérer vos finances personnelles au Québec. Suivi dépenses en temps réel, objectifs épargne, analyse habitudes financières, coaching personnalisé et gamification. Outil complet REER, CELI, dettes." />
