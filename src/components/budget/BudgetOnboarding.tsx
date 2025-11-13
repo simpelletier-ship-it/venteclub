@@ -273,11 +273,21 @@ export function BudgetOnboarding() {
   };
 
   const toggleGoal = (goalId: string) => {
-    setSelectedGoals(prev =>
-      prev.includes(goalId)
+    setSelectedGoals(prev => {
+      const newSelection = prev.includes(goalId)
         ? prev.filter(id => id !== goalId)
-        : [...prev, goalId]
-    );
+        : [...prev, goalId];
+      
+      // Toast de félicitations au premier objectif sélectionné
+      if (prev.length === 0 && newSelection.length === 1) {
+        toast.success("🎯 Excellent début ! Vous êtes sur la bonne voie.", {
+          description: "Continuez à sélectionner vos objectifs financiers",
+          duration: 3000,
+        });
+      }
+      
+      return newSelection;
+    });
   };
 
   const toggleCategory = (categoryName: string) => {
@@ -504,7 +514,12 @@ export function BudgetOnboarding() {
                   <Button
                     onClick={handleNext}
                     disabled={!canProceed() || createInitialData.isPending}
-                    className="gap-2 min-w-[140px]"
+                    className={`gap-2 min-w-[140px] transition-all ${
+                      (step.id === "goals" && selectedGoals.length > 0) || 
+                      (step.id === "categories" && selectedCategories.length > 0)
+                        ? "animate-pulse shadow-lg shadow-primary/50"
+                        : ""
+                    }`}
                   >
                     {createInitialData.isPending ? (
                       "Configuration..."
