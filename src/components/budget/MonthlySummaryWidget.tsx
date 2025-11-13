@@ -67,48 +67,49 @@ export const MonthlySummaryWidget = ({ isAuthenticated }: MonthlySummaryWidgetPr
 
   return (
     <Card className="mb-6 bg-gradient-to-r from-primary/5 to-secondary/5 border-primary/20">
-      <CardContent className="p-4">
-        {/* Compact view - One line summary */}
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-6 flex-1">
+      <CardContent className="p-3 lg:p-4">
+        {/* Compact view - Responsive layout */}
+        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3 lg:gap-4">
+          <div className="flex flex-col lg:flex-row items-start lg:items-center gap-3 lg:gap-6 flex-1 w-full">
             <div className="flex items-center gap-2">
               <span className="text-xl">📅</span>
-              <span className="font-semibold capitalize">{currentMonth}</span>
+              <span className="font-semibold capitalize text-sm lg:text-base">{currentMonth}</span>
             </div>
 
-            <div className="flex items-center gap-1">
-              <TrendingUp className="h-4 w-4 text-green-600" />
-              <span className="text-sm text-muted-foreground">Revenus:</span>
-              <span className="font-semibold text-green-600">{formatPrice(totalIncome)}</span>
-            </div>
-
-            <div className="flex items-center gap-1">
-              <TrendingDown className="h-4 w-4 text-red-600" />
-              <span className="text-sm text-muted-foreground">Dépenses:</span>
-              <span className="font-semibold text-red-600">{formatPrice(totalExpenses)}</span>
-            </div>
-
-            <div className="flex items-center gap-1">
-              <span className="text-sm text-muted-foreground">Solde:</span>
-              <span className={`font-bold ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
-                {formatPrice(balance)}
-              </span>
-            </div>
-
-            {activeGoals.length > 0 && (
+            <div className="grid grid-cols-2 lg:flex lg:items-center gap-3 lg:gap-6 w-full lg:w-auto">
               <div className="flex items-center gap-1">
-                <span className="text-xl">🎯</span>
-                <span className="text-sm text-muted-foreground">Objectifs:</span>
-                <span className="font-semibold">{completedGoals.length}/{financialGoals.length}</span>
+                <TrendingUp className="h-3 w-3 lg:h-4 lg:w-4 text-green-600 shrink-0" />
+                <span className="text-xs lg:text-sm text-muted-foreground whitespace-nowrap">Revenus:</span>
+                <span className="font-semibold text-green-600 text-sm lg:text-base">{formatPrice(totalIncome)}</span>
               </div>
-            )}
+
+              <div className="flex items-center gap-1">
+                <TrendingDown className="h-3 w-3 lg:h-4 lg:w-4 text-red-600 shrink-0" />
+                <span className="text-xs lg:text-sm text-muted-foreground whitespace-nowrap">Dépenses:</span>
+                <span className="font-semibold text-red-600 text-sm lg:text-base">{formatPrice(totalExpenses)}</span>
+              </div>
+
+              <div className="flex items-center gap-1">
+                <span className="text-xs lg:text-sm text-muted-foreground whitespace-nowrap">Solde:</span>
+                <span className={`font-bold text-sm lg:text-base ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
+                  {formatPrice(balance)}
+                </span>
+              </div>
+
+              {activeGoals.length > 0 && (
+                <div className="flex items-center gap-1">
+                  <span className="text-xl">🎯</span>
+                  <span className="text-xs lg:text-sm text-muted-foreground whitespace-nowrap">{activeGoals.length} objectif{activeGoals.length > 1 ? 's' : ''}</span>
+                </div>
+              )}
+            </div>
           </div>
 
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setIsExpanded(!isExpanded)}
-            className="shrink-0"
+            className="shrink-0 h-8 w-8 lg:h-auto lg:w-auto p-0 lg:p-2"
           >
             {isExpanded ? (
               <ChevronUp className="h-4 w-4" />

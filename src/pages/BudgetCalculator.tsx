@@ -385,8 +385,8 @@ const BudgetCalculator = () => {
         </script>
       </Helmet>
 
-      <div className="min-h-screen bg-background py-8">
-        <div className="container mx-auto px-4 max-w-7xl">
+      <div className="min-h-screen bg-background py-8 pb-24 lg:pb-8">
+        <div className="container mx-auto px-3 lg:px-4 max-w-7xl">
           <Alert className="mb-6 border-yellow-500 bg-yellow-50 dark:bg-yellow-950/20">
             <AlertTriangle className="h-4 w-4 text-yellow-600 dark:text-yellow-500" />
             <AlertTitle className="text-yellow-800 dark:text-yellow-400">Confidentialité et Avertissement</AlertTitle>
@@ -396,30 +396,30 @@ const BudgetCalculator = () => {
           </Alert>
           
           {/* SEO Content Section */}
-          <div className="text-center mb-8 space-y-4">
-            <div className="flex items-center justify-center gap-4">
-              <h1 className="text-4xl font-bold mb-3">
+          <div className="text-center mb-6 lg:mb-8 space-y-3 lg:space-y-4">
+            <div className="flex flex-col lg:flex-row items-center justify-center gap-3 lg:gap-4">
+              <h1 className="text-2xl lg:text-4xl font-bold">
                 Planificateur de Budget Québec Gratuit 2025
               </h1>
               <BudgetResetDialog />
             </div>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            <p className="text-base lg:text-xl text-muted-foreground max-w-3xl mx-auto px-2">
               Gérez vos finances personnelles intelligemment avec notre outil gratuit de planification budgétaire. 
               Suivi des dépenses en temps réel, objectifs d'épargne, coaching financier personnalisé et gamification.
             </p>
             
-            {/* SEO-optimized feature highlights - Simple list style */}
-            <div className="flex flex-wrap justify-center gap-6 max-w-3xl mx-auto mt-6 text-sm">
+            {/* SEO-optimized feature highlights - Mobile optimized */}
+            <div className="flex flex-wrap justify-center gap-4 lg:gap-6 max-w-3xl mx-auto mt-4 lg:mt-6 text-xs lg:text-sm">
               <div className="flex items-center gap-2">
-                <span className="text-2xl">📊</span>
+                <span className="text-xl lg:text-2xl">📊</span>
                 <span className="text-muted-foreground">Suivi en temps réel</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-2xl">🎯</span>
+                <span className="text-xl lg:text-2xl">🎯</span>
                 <span className="text-muted-foreground">Objectifs épargne</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-2xl">🤖</span>
+                <span className="text-xl lg:text-2xl">🤖</span>
                 <span className="text-muted-foreground">Coach IA</span>
               </div>
             </div>
@@ -432,7 +432,8 @@ const BudgetCalculator = () => {
           <MonthlySummaryWidget isAuthenticated={isAuthenticated} />
 
           <Tabs defaultValue="overview" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6 gap-2 h-auto">
+            {/* Desktop Tabs */}
+            <TabsList className="hidden lg:grid w-full grid-cols-6 gap-2 h-auto">
               <TabsTrigger value="overview" className="text-base py-3">
                 📊 Tableau de bord
               </TabsTrigger>
@@ -453,6 +454,32 @@ const BudgetCalculator = () => {
               </TabsTrigger>
             </TabsList>
 
+            {/* Mobile Navigation - Fixed Bottom */}
+            <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-background border-t border-border z-50 pb-safe">
+              <TabsList className="grid w-full grid-cols-5 h-16 rounded-none bg-background">
+                <TabsTrigger value="overview" className="flex flex-col gap-1 data-[state=active]:bg-primary/10">
+                  <span className="text-xl">📊</span>
+                  <span className="text-xs">Accueil</span>
+                </TabsTrigger>
+                <TabsTrigger value="transactions" className="flex flex-col gap-1 data-[state=active]:bg-primary/10">
+                  <span className="text-xl">💳</span>
+                  <span className="text-xs">Historique</span>
+                </TabsTrigger>
+                <TabsTrigger value="budget" className="flex flex-col gap-1 data-[state=active]:bg-primary/10">
+                  <span className="text-xl">💰</span>
+                  <span className="text-xs">Budget</span>
+                </TabsTrigger>
+                <TabsTrigger value="assets" className="flex flex-col gap-1 data-[state=active]:bg-primary/10">
+                  <span className="text-xl">🏦</span>
+                  <span className="text-xs">Actifs</span>
+                </TabsTrigger>
+                <TabsTrigger value="analyses" className="flex flex-col gap-1 data-[state=active]:bg-primary/10">
+                  <span className="text-xl">📈</span>
+                  <span className="text-xs">Plus</span>
+                </TabsTrigger>
+              </TabsList>
+            </div>
+
             <TabsContent value="overview">
               <div className="flex justify-end mb-4">
                 <DashboardVisibilitySettings
@@ -463,9 +490,9 @@ const BudgetCalculator = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                {/* Score financier - Sticky sidebar */}
-                <div className="lg:col-span-1">
+              <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-6 pb-20 lg:pb-6">
+                {/* Score financier - Sidebar on desktop, full width on mobile */}
+                <div className="lg:col-span-1 order-2 lg:order-1">
                   <div className="lg:sticky lg:top-4">
                     <FinancialHealthScore 
                       transactions={transactions}
@@ -476,7 +503,7 @@ const BudgetCalculator = () => {
                 </div>
 
                 {/* Main content - Draggable widgets */}
-                <div className="lg:col-span-3">
+                <div className="lg:col-span-3 order-1 lg:order-2">
                   <DraggableDashboard
                     preferences={preferences}
                     onOrderChange={(newOrder) => {
@@ -548,11 +575,11 @@ const BudgetCalculator = () => {
               </div>
             </TabsContent>
 
-            <TabsContent value="budget">
+            <TabsContent value="budget" className="pb-20 lg:pb-6">
               <BudgetPlanner isAuthenticated={isAuthenticated} />
             </TabsContent>
 
-            <TabsContent value="transactions">
+            <TabsContent value="transactions" className="pb-20 lg:pb-6">
               <BudgetTransactions isAuthenticated={isAuthenticated} />
             </TabsContent>
 
