@@ -343,8 +343,15 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
       }
     },
     onSuccess: () => {
+      // Invalider TOUTES les queries liées au budget pour synchronisation complète
       queryClient.invalidateQueries({ queryKey: ['budget-transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['budget-transactions-all'] });
       queryClient.invalidateQueries({ queryKey: ['user-daily-streaks'] });
+      queryClient.invalidateQueries({ queryKey: ['user-assets'] });
+      queryClient.invalidateQueries({ queryKey: ['user-debts'] });
+      queryClient.invalidateQueries({ queryKey: ['financial-goals'] });
+      queryClient.invalidateQueries({ queryKey: ['asset-history'] });
+      queryClient.invalidateQueries({ queryKey: ['debt-history'] });
       toast.success(transactionType === 'expense' ? "✅ Dépense ajoutée!" : "✅ Revenu ajouté!", { duration: 2000 });
       setAmount("");
       setDescription("");

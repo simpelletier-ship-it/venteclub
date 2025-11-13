@@ -218,7 +218,12 @@ export const BudgetTransactions = ({ isAuthenticated }: { isAuthenticated: boole
       if (error) throw error;
     },
     onSuccess: () => {
+      // Invalider TOUTES les queries liées au budget pour synchronisation complète
       queryClient.invalidateQueries({ queryKey: ['budget-transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['budget-transactions-all'] });
+      queryClient.invalidateQueries({ queryKey: ['user-assets'] });
+      queryClient.invalidateQueries({ queryKey: ['user-debts'] });
+      queryClient.invalidateQueries({ queryKey: ['financial-goals'] });
       
       // Check if it was an income transaction for celebration
       const category = categories.find(c => c.id === selectedCategory);
@@ -269,7 +274,12 @@ export const BudgetTransactions = ({ isAuthenticated }: { isAuthenticated: boole
       if (error) throw error;
     },
     onSuccess: () => {
+      // Invalider TOUTES les queries liées au budget pour synchronisation complète
       queryClient.invalidateQueries({ queryKey: ['budget-transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['budget-transactions-all'] });
+      queryClient.invalidateQueries({ queryKey: ['user-assets'] });
+      queryClient.invalidateQueries({ queryKey: ['user-debts'] });
+      queryClient.invalidateQueries({ queryKey: ['financial-goals'] });
       toast.success("Transaction modifiée avec succès");
       setEditOpen(false);
       setEditingTransaction(null);
@@ -293,7 +303,12 @@ export const BudgetTransactions = ({ isAuthenticated }: { isAuthenticated: boole
       if (error) throw error;
     },
     onSuccess: () => {
+      // Invalider TOUTES les queries liées au budget pour synchronisation complète
       queryClient.invalidateQueries({ queryKey: ['budget-transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['budget-transactions-all'] });
+      queryClient.invalidateQueries({ queryKey: ['user-assets'] });
+      queryClient.invalidateQueries({ queryKey: ['user-debts'] });
+      queryClient.invalidateQueries({ queryKey: ['financial-goals'] });
       toast.success("Transaction supprimée");
     },
   });
