@@ -3,8 +3,28 @@ import { Calculator, TrendingUp, Wallet, ArrowRight, CheckCircle } from "lucide-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { useState, useEffect, useRef } from "react";
 
 const Tools = () => {
+  const [activeCardIndex, setActiveCardIndex] = useState(0);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // Détecter quelle carte est visible pendant le scroll
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      const scrollLeft = container.scrollLeft;
+      const cardWidth = container.offsetWidth * 0.85; // 85vw par carte
+      const index = Math.round(scrollLeft / cardWidth);
+      setActiveCardIndex(index);
+    };
+
+    container.addEventListener('scroll', handleScroll);
+    return () => container.removeEventListener('scroll', handleScroll);
+  }, []);
+
   const tools = [
     {
       id: "salary-calculator",
@@ -178,45 +198,129 @@ const Tools = () => {
 
           {/* Tools Grid */}
           <section className="mb-16">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto px-2 md:px-0">
-              {tools.map((tool) => {
+            {/* Mobile: Scroll horizontal avec snap */}
+            <div 
+              ref={scrollContainerRef}
+              className="md:hidden flex overflow-x-auto snap-x snap-mandatory gap-4 px-4 pb-4 scrollbar-hide"
+              style={{
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none',
+                WebkitOverflowScrolling: 'touch'
+              }}
+            >
+              {tools.map((tool, index) => {
                 const Icon = tool.icon;
                 return (
                   <Card 
-                    key={tool.id} 
-                    className="flex flex-col h-full hover:shadow-xl transition-all duration-300 hover:scale-[1.02] md:hover:scale-[1.03] border-2 hover:border-primary group animate-fade-in touch-manipulation"
+                    key={tool.id}
+                    className="flex flex-col snap-center flex-shrink-0 w-[85vw] border-2 hover:border-primary group animate-fade-in touch-manipulation shadow-lg"
+                    style={{ animationDelay: `${index * 100}ms` }}
                   >
                     <CardHeader className="flex-grow pb-4">
-                      <div className={`w-14 h-14 md:w-16 md:h-16 ${tool.color} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
-                        <Icon className="w-7 h-7 md:w-8 md:h-8 text-white" />
+                      <div className={`w-16 h-16 ${tool.color} rounded-xl flex items-center justify-center mb-4 group-active:scale-95 transition-transform duration-200`}>
+                        <Icon className="w-8 h-8 text-white" />
                       </div>
-                      <CardTitle className="text-lg md:text-xl mb-2 leading-tight">{tool.title}</CardTitle>
-                      <CardDescription className="text-sm md:text-base leading-relaxed mb-4">
+                      <CardTitle className="text-xl mb-2 leading-tight">{tool.title}</CardTitle>
+                      <CardDescription className="text-sm leading-relaxed mb-4">
                         {tool.description}
                       </CardDescription>
                       
                       {/* Features list */}
                       <ul className="space-y-2 mb-4">
                         {tool.features.map((feature, idx) => (
-                          <li key={idx} className="flex items-start gap-2 text-xs md:text-sm text-muted-foreground">
-                            <CheckCircle className="h-3.5 w-3.5 md:h-4 md:w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                          <li key={idx} className="flex items-start gap-2 text-xs text-muted-foreground">
+                            <CheckCircle className="h-3.5 w-3.5 text-green-500 mt-0.5 flex-shrink-0" />
                             <span>{feature}</span>
                           </li>
                         ))}
                       </ul>
                       
-                      <p className="text-[10px] md:text-xs text-muted-foreground italic">
+                      <p className="text-[10px] text-muted-foreground italic">
                         Mots-clés: {tool.keywords}
                       </p>
                     </CardHeader>
                     <CardContent className="pt-0 mt-auto">
                       <Link to={tool.link} className="block">
                         <Button 
-                          className="w-full group/btn text-base md:text-lg active:scale-95 transition-transform" 
+                          className="w-full group/btn text-base active:scale-95 transition-transform" 
                           size="lg"
                         >
                           Accéder à l'outil
-                          <ArrowRight className="ml-2 h-4 w-4 md:h-5 md:w-5 group-hover/btn:translate-x-1 transition-transform" />
+                          <ArrowRight className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
+                        </Button>
+                      </Link>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+
+            {/* Indicateurs de scroll (points) - Mobile uniquement */}
+            <div className="flex justify-center gap-2 mt-4 md:hidden">
+              {tools.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => {
+                    const container = scrollContainerRef.current;
+                    if (container) {
+                      const cardWidth = container.offsetWidth * 0.85;
+                      container.scrollTo({
+                        left: cardWidth * index,
+                        behavior: 'smooth'
+                      });
+                    }
+                  }}
+                  className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                    activeCardIndex === index 
+                      ? 'bg-primary w-6' 
+                      : 'bg-muted-foreground/30'
+                  }`}
+                  aria-label={`Aller à l'outil ${index + 1}`}
+                />
+              ))}
+            </div>
+
+            {/* Desktop: Grid classique */}
+            <div className="hidden md:grid grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto">
+              {tools.map((tool, index) => {
+                const Icon = tool.icon;
+                return (
+                  <Card 
+                    key={tool.id} 
+                    className="flex flex-col h-full hover:shadow-xl transition-all duration-300 hover:scale-[1.03] border-2 hover:border-primary group animate-fade-in"
+                    style={{ animationDelay: `${index * 100}ms` }}
+                  >
+                    <CardHeader className="flex-grow pb-4">
+                      <div className={`w-16 h-16 ${tool.color} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                        <Icon className="w-8 h-8 text-white" />
+                      </div>
+                      <CardTitle className="text-xl mb-2 leading-tight">{tool.title}</CardTitle>
+                      <CardDescription className="text-base leading-relaxed mb-4">
+                        {tool.description}
+                      </CardDescription>
+                      
+                      {/* Features list */}
+                      <ul className="space-y-2 mb-4">
+                        {tool.features.map((feature, idx) => (
+                          <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
+                            <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                            <span>{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      
+                      <p className="text-xs text-muted-foreground italic">
+                        Mots-clés: {tool.keywords}
+                      </p>
+                    </CardHeader>
+                    <CardContent className="pt-0 mt-auto">
+                      <Link to={tool.link} className="block">
+                        <Button 
+                          className="w-full group/btn text-lg" 
+                          size="lg"
+                        >
+                          Accéder à l'outil
+                          <ArrowRight className="ml-2 h-5 w-5 group-hover/btn:translate-x-1 transition-transform" />
                         </Button>
                       </Link>
                     </CardContent>
