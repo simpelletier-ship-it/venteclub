@@ -306,9 +306,22 @@ export const FinancialGoals = ({ isAuthenticated }: { isAuthenticated: boolean }
                           </CardDescription>
                         </div>
                       </div>
-                      <Button variant="ghost" size="icon" onClick={() => deleteGoal.mutate(goal.id)}>
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button 
+                          variant="default" 
+                          size="sm"
+                          onClick={() => {
+                            setSelectedGoal(goal);
+                            setUpdateDialogOpen(true);
+                          }}
+                        >
+                          <Plus className="h-4 w-4 mr-1" />
+                          Ajouter
+                        </Button>
+                        <Button variant="ghost" size="icon" onClick={() => deleteGoal.mutate(goal.id)}>
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </div>
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-4">
@@ -447,27 +460,58 @@ export const FinancialGoals = ({ isAuthenticated }: { isAuthenticated: boolean }
       <Dialog open={updateDialogOpen} onOpenChange={setUpdateDialogOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Mettre à jour la progression</DialogTitle>
+            <DialogTitle>💰 Ajouter de l'argent vers l'objectif</DialogTitle>
             <DialogDescription>
-              Ajoutez un montant à votre objectif: {selectedGoal?.name}
+              {selectedGoal && (
+                <div className="space-y-1 mt-2">
+                  <div className="font-medium text-foreground">{selectedGoal.name}</div>
+                  <div className="text-sm">
+                    Progression: <span className="font-semibold text-primary">{formatPrice(selectedGoal.current_amount)}</span> / {formatPrice(selectedGoal.target_amount)}
+                  </div>
+                </div>
+              )}
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={(e) => {
             e.preventDefault();
+            if (!amountToAdd || parseFloat(amountToAdd) <= 0) {
+              toast.error("⚠️ Veuillez entrer un montant supérieur à 0$");
+              return;
+            }
             if (selectedGoal) {
               updateProgress.mutate({ goalId: selectedGoal.id, newAmount: parseFloat(amountToAdd) });
             }
-          }} className="space-y-4">
+          }} className="space-y-4 pt-4">
             <div>
-              <Label>Montant à ajouter</Label>
-              <CurrencyInput value={amountToAdd} onChange={setAmountToAdd} className="mt-1" required />
-              <p className="text-xs text-muted-foreground mt-1">
-                Progression actuelle: {formatPrice(selectedGoal?.current_amount || 0)} / {formatPrice(selectedGoal?.target_amount || 0)}
+              <Label className="text-base mb-2 block">Combien ajoutez-vous aujourd'hui?</Label>
+              <CurrencyInput 
+                value={amountToAdd} 
+                onChange={setAmountToAdd} 
+                placeholder="Ex: 100"
+                className="mt-1 h-12 text-lg"
+                required 
+              />
+              <p className="text-xs text-muted-foreground mt-2 flex items-start gap-1">
+                <span>💡</span>
+                <span>Chaque petit montant vous rapproche de votre objectif! L'important c'est la constance.</span>
               </p>
             </div>
-            <Button type="submit" className="w-full" disabled={updateProgress.isPending}>
-              {updateProgress.isPending ? "Mise à jour..." : "Mettre à jour"}
-            </Button>
+            <div className="flex justify-end gap-2 pt-2">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => { 
+                  setUpdateDialogOpen(false); 
+                  setSelectedGoal(null); 
+                  setAmountToAdd(""); 
+                }}
+              >
+                Annuler
+              </Button>
+              <Button type="submit" disabled={updateProgress.isPending}>
+                {updateProgress.isPending ? "Enregistrement..." : "✅ Confirmer"}
+              </Button>
+            </div>
           </form>
         </DialogContent>
       </Dialog>

@@ -167,6 +167,8 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
   const [editingCategory, setEditingCategory] = useState<any>(null);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [templatesOpen, setTemplatesOpen] = useState(false);
+  const [isRecurring, setIsRecurring] = useState(false);
+  const [recurringFrequency, setRecurringFrequency] = useState<'weekly' | 'biweekly' | 'monthly' | 'yearly'>('monthly');
 
   // Offline sync hook
   const { isOnline, addOfflineTransaction } = useOfflineSync(isAuthenticated);
@@ -313,7 +315,11 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
 
       const amountValue = parseFloat(amount);
       if (isNaN(amountValue) || amountValue <= 0) {
-        throw new Error("Le montant doit être supérieur à 0");
+        throw new Error("Veuillez saisir un montant supérieur à 0");
+      }
+      
+      if (!transactionDate) {
+        throw new Error("Veuillez sélectionner une date");
       }
 
       // Get selected tag names for offline storage
@@ -347,6 +353,8 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
           description: description || null,
           transaction_date: format(transactionDate, 'yyyy-MM-dd'),
           type: transactionType,
+          is_recurring: isRecurring,
+          recurring_frequency: isRecurring ? recurringFrequency : null,
         })
         .select()
         .single();
@@ -390,6 +398,7 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
       setSuggestedCategory(null);
       setSelectedCategory("");
       setSelectedTags([]);
+      setIsRecurring(false);
       // Keep transactionDate for next transaction
     },
   });
@@ -485,11 +494,24 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
   };
 
   const handleQuickAdd = () => {
+    // Validation détaillée avec messages spécifiques
     const numAmount = parseFloat(amount);
     if (!amount || isNaN(numAmount) || numAmount <= 0) {
-      toast.error("Le montant doit être supérieur à 0$");
+      toast.error("⚠️ Veuillez saisir un montant supérieur à 0$");
       return;
     }
+    
+    const categoryToUse = selectedCategory || suggestedCategory;
+    if (!categoryToUse) {
+      toast.error("⚠️ Veuillez sélectionner une catégorie");
+      return;
+    }
+    
+    if (!transactionDate) {
+      toast.error("⚠️ Veuillez sélectionner une date");
+      return;
+    }
+    
     quickAdd.mutate();
   };
 
@@ -745,7 +767,9 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
                 value={description}
                 onChange={(e) => handleDescriptionChange(e.target.value)}
                 onFocus={() => previousDescriptions.length > 0 && setDescriptionOpen(true)}
-                placeholder="Ex: Épicerie IGA, Café Starbucks..."
+                placeholder={transactionType === 'expense' 
+                  ? "Ex: Épicerie IGA, Café Starbucks, Essence Shell..." 
+                  : "Ex: Salaire, Bonus, Freelance, Intérêts..."}
                 className="text-base h-11"
               />
               {previousDescriptions.length > 0 && (
@@ -797,6 +821,66 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
             selectedTags={selectedTags}
             onTagsChange={setSelectedTags}
           />
+
+          {/* Recurring transaction option - only for expenses */}
+          {transactionType === 'expense' && (
+            <div className="flex items-start gap-3 p-4 bg-muted/30 rounded-lg border" id="recurring-expense">
+              <input
+                type="checkbox"
+                id="is-recurring"
+                checked={isRecurring}
+                onChange={(e) => setIsRecurring(e.target.checked)}
+                className="mt-1 h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+              />
+              <div className="flex-1">
+                <Label htmlFor="is-recurring" className="text-base font-medium cursor-pointer">
+                  🔁 Dépense récurrente
+                </Label>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Cochez si cette dépense se répète régulièrement (loyer, Netflix, gym, etc.)
+                </p>
+                {isRecurring && (
+                  <div className="mt-3">
+                    <Label className="text-sm mb-2 block">À quelle fréquence?</Label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <Button
+                        type="button"
+                        variant={recurringFrequency === 'weekly' ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setRecurringFrequency('weekly')}
+                      >
+                        Chaque semaine
+                      </Button>
+                      <Button
+                        type="button"
+                        variant={recurringFrequency === 'biweekly' ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setRecurringFrequency('biweekly')}
+                      >
+                        Aux 2 semaines
+                      </Button>
+                      <Button
+                        type="button"
+                        variant={recurringFrequency === 'monthly' ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setRecurringFrequency('monthly')}
+                      >
+                        Chaque mois
+                      </Button>
+                      <Button
+                        type="button"
+                        variant={recurringFrequency === 'yearly' ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setRecurringFrequency('yearly')}
+                      >
+                        Chaque année
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Dialog for creating new category */}
           <Dialog open={newCategoryOpen} onOpenChange={setNewCategoryOpen}>

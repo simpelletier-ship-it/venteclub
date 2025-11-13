@@ -9,10 +9,11 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Calculator, Plus, Calendar as CalendarIcon, TrendingUp, TrendingDown, Home, Car, Building2, Edit, Trash2, Save, X } from "lucide-react";
+import { Calculator, Plus, Calendar as CalendarIcon, TrendingUp, TrendingDown, Home, Car, Building2, Edit, Trash2, Save, X, Lightbulb, Sparkles } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { cn } from "@/lib/utils";
@@ -194,6 +195,38 @@ export const FinancialCalculator = ({ isAuthenticated }: FinancialCalculatorProp
   const totalDebts = existingDebtsTotal + newDebtsTotal;
   const netWorth = totalAssets - totalDebts;
 
+  // Smart asset suggestions based on debts
+  const getAssetSuggestions = () => {
+    const suggestions: string[] = [];
+    const allDebts = [...existingDebts, ...debts.filter(d => d.type)];
+    const allAssets = [...existingAssets, ...assets.filter(a => a.type)];
+    
+    // If has mortgage, suggest property
+    const hasMortgage = allDebts.some(d => d.type === 'mortgage');
+    const hasProperty = allAssets.some(a => a.type === 'property');
+    if (hasMortgage && !hasProperty) {
+      suggestions.push("Vous avez une hypothèque - n'oubliez pas d'ajouter la valeur de votre maison dans les actifs! 🏠");
+    }
+    
+    // If has car loan, suggest vehicle
+    const hasCarLoan = allDebts.some(d => d.type === 'car_loan');
+    const hasVehicle = allAssets.some(a => a.type === 'vehicle');
+    if (hasCarLoan && !hasVehicle) {
+      suggestions.push("Vous avez un prêt auto - ajoutez la valeur actuelle de votre véhicule dans les actifs! 🚗");
+    }
+    
+    // If has debts but no RRSP/TFSA
+    const hasRRSP = allAssets.some(a => a.type === 'rrsp');
+    const hasTFSA = allAssets.some(a => a.type === 'tfsa');
+    if (allDebts.length > 0 && !hasRRSP && !hasTFSA) {
+      suggestions.push("Pensez à ajouter vos REER ou CELI si vous en avez - c'est important pour votre valeur nette! 💰");
+    }
+    
+    return suggestions;
+  };
+
+  const assetSuggestions = getAssetSuggestions();
+
   // Save snapshot mutation
   const saveSnapshot = useMutation({
     mutationFn: async () => {
@@ -368,6 +401,27 @@ export const FinancialCalculator = ({ isAuthenticated }: FinancialCalculatorProp
                 </PopoverContent>
               </Popover>
             </div>
+            
+            {/* Smart Suggestions */}
+            {assetSuggestions.length > 0 && (
+              <Alert className="bg-primary/5 border-primary/20">
+                <Lightbulb className="h-5 w-5 text-primary" />
+                <AlertDescription>
+                  <div className="font-semibold mb-2 flex items-center gap-2">
+                    <Sparkles className="h-4 w-4" />
+                    Suggestions intelligentes
+                  </div>
+                  <ul className="space-y-1.5">
+                    {assetSuggestions.map((suggestion, index) => (
+                      <li key={index} className="text-sm flex items-start gap-2">
+                        <span className="text-primary mt-0.5">•</span>
+                        <span>{suggestion}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </AlertDescription>
+              </Alert>
+            )}
 
             {/* Existing Assets/Debts Tab */}
             <TabsContent value="existing" className="space-y-4">

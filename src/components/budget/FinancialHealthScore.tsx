@@ -2,6 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, AlertCircle, CheckCircle, Trophy, Target, Zap } from "lucide-react";
+import { InfoTooltip } from "@/components/ui/info-tooltip";
 
 interface FinancialHealthScoreProps {
   transactions: any[];
@@ -136,41 +137,53 @@ export const FinancialHealthScore = ({
           </div>
         )}
 
-        <div className="space-y-3">
-          <h4 className="font-semibold">Détails du score</h4>
-          
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span>Taux d'épargne</span>
-              <span className="font-medium">{savingsRate.toFixed(1)}%</span>
+          <div className="space-y-3">
+            <h4 className="font-semibold">Détails du score</h4>
+            
+            <div className="space-y-2">
+              <div className="flex justify-between items-center text-sm">
+                <span className="flex items-center gap-1">
+                  Taux d'épargne
+                  <InfoTooltip content="Pourcentage de vos revenus que vous économisez chaque mois. Un taux de 20% ou plus est excellent!" />
+                </span>
+                <span className="font-medium">{savingsRate.toFixed(1)}%</span>
+              </div>
+              <Progress value={Math.min(savingsRate, 100)} className="h-2" />
             </div>
-            <Progress value={Math.min(savingsRate, 100)} className="h-2" />
-          </div>
 
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span>Ratio dette/actifs</span>
-              <span className="font-medium">{debtToAssetRatio.toFixed(1)}%</span>
+            <div className="space-y-2">
+              <div className="flex justify-between items-center text-sm">
+                <span className="flex items-center gap-1">
+                  Ratio dette/actifs
+                  <InfoTooltip content="Mesure combien vous devez par rapport à ce que vous possédez. Plus ce ratio est bas, mieux c'est! Idéalement moins de 30%." />
+                </span>
+                <span className="font-medium">{debtToAssetRatio.toFixed(1)}%</span>
+              </div>
+              <Progress value={Math.max(100 - debtToAssetRatio, 0)} className="h-2" />
             </div>
-            <Progress value={Math.max(100 - debtToAssetRatio, 0)} className="h-2" />
-          </div>
 
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span>Fonds d'urgence</span>
-              <span className="font-medium">{emergencyFundScore.toFixed(0)}%</span>
+            <div className="space-y-2">
+              <div className="flex justify-between items-center text-sm">
+                <span className="flex items-center gap-1">
+                  Fonds d'urgence
+                  <InfoTooltip content="Montant d'argent liquide disponible pour couvrir 3 mois de dépenses en cas d'imprévu (perte d'emploi, urgence médicale, etc.)" />
+                </span>
+                <span className="font-medium">{emergencyFundScore.toFixed(0)}%</span>
+              </div>
+              <Progress value={emergencyFundScore} className="h-2" />
             </div>
-            <Progress value={emergencyFundScore} className="h-2" />
-          </div>
 
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span>Diversification</span>
-              <span className="font-medium">{diversityScore.toFixed(0)}%</span>
+            <div className="space-y-2">
+              <div className="flex justify-between items-center text-sm">
+                <span className="flex items-center gap-1">
+                  Diversification
+                  <InfoTooltip content="Nombre de sources de revenus différentes. Avoir plusieurs sources de revenus réduit le risque financier si vous perdez une source." />
+                </span>
+                <span className="font-medium">{diversityScore.toFixed(0)}%</span>
+              </div>
+              <Progress value={diversityScore} className="h-2" />
             </div>
-            <Progress value={diversityScore} className="h-2" />
           </div>
-        </div>
 
         {recommendations.length > 0 && (
           <div className="space-y-2">
