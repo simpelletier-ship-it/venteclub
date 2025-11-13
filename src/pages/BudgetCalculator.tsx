@@ -376,10 +376,6 @@ const BudgetCalculator = () => {
                 <span className="text-muted-foreground">Suivi en temps réel</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-2xl">💰</span>
-                <span className="text-muted-foreground">REER & CELI</span>
-              </div>
-              <div className="flex items-center gap-2">
                 <span className="text-2xl">🎯</span>
                 <span className="text-muted-foreground">Objectifs épargne</span>
               </div>
@@ -475,43 +471,6 @@ const BudgetCalculator = () => {
                         <div className="flex justify-center">
                           <QuickNetWorthUpdate currentNetWorth={netWorth} isAuthenticated={isAuthenticated} />
                         </div>
-                      ),
-                      reerCeli: (
-                        <Card>
-                          <CardHeader className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent">
-                            <CardTitle className="flex items-center gap-2">
-                              <span className="text-2xl">💰</span>
-                              REER & CELI
-                            </CardTitle>
-                          </CardHeader>
-                          <CardContent className="p-6">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                              {assets.filter(a => a.type === 'REER' || a.type === 'CELI').length > 0 ? (
-                                assets
-                                  .filter(a => a.type === 'REER' || a.type === 'CELI')
-                                  .map(asset => (
-                                    <div key={asset.id} className="p-4 bg-muted/50 rounded-lg">
-                                      <div className="flex items-center justify-between">
-                                        <div>
-                                          <p className="text-sm text-muted-foreground">{asset.type}</p>
-                                          <p className="text-xl font-bold">{formatPrice(asset.value)}</p>
-                                        </div>
-                                        <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                                          <span className="text-2xl">
-                                            {asset.type === 'REER' ? '🏦' : '💎'}
-                                          </span>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  ))
-                              ) : (
-                                <div className="col-span-2 p-4 bg-muted/30 rounded-lg text-center text-sm text-muted-foreground">
-                                  Aucun REER ou CELI enregistré. Ajoutez-les dans l'onglet "Mes actifs".
-                                </div>
-                              )}
-                            </div>
-                          </CardContent>
-                        </Card>
                       ),
                       coachIA: (
                         <Card>

@@ -101,8 +101,6 @@ export const DraggableDashboard = ({
         return preferences.showNetWorthGamification;
       case 'quickNetWorthUpdate':
         return preferences.showQuickNetWorthUpdate;
-      case 'reerCeli':
-        return preferences.showReerCeli;
       case 'coachIA':
         return preferences.showCoachIA;
       case 'financialGoals':

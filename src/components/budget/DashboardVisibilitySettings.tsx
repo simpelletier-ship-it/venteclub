@@ -19,7 +19,6 @@ export interface VisibilityPreferences {
   showExpensesByCategory: boolean;
   showNetWorthGamification: boolean;
   showQuickNetWorthUpdate: boolean;
-  showReerCeli: boolean;
   showCoachIA: boolean;
   showFinancialGoals: boolean;
   widgetOrder: string[];
@@ -42,7 +41,6 @@ const DEFAULT_PREFERENCES: VisibilityPreferences = {
   showExpensesByCategory: true,
   showNetWorthGamification: true,
   showQuickNetWorthUpdate: true,
-  showReerCeli: false,
   showCoachIA: true,
   showFinancialGoals: true,
   widgetOrder: DEFAULT_WIDGET_ORDER,
@@ -55,7 +53,6 @@ const VIEW_PROFILES: Record<ViewProfile, VisibilityPreferences> = {
     showExpensesByCategory: true,
     showNetWorthGamification: true,
     showQuickNetWorthUpdate: true,
-    showReerCeli: false,
     showCoachIA: true,
     showFinancialGoals: true,
     widgetOrder: DEFAULT_WIDGET_ORDER,
@@ -65,7 +62,6 @@ const VIEW_PROFILES: Record<ViewProfile, VisibilityPreferences> = {
     showExpensesByCategory: true,
     showNetWorthGamification: false,
     showQuickNetWorthUpdate: true,
-    showReerCeli: false,
     showCoachIA: false,
     showFinancialGoals: false,
     widgetOrder: DEFAULT_WIDGET_ORDER,
@@ -75,7 +71,6 @@ const VIEW_PROFILES: Record<ViewProfile, VisibilityPreferences> = {
     showExpensesByCategory: false,
     showNetWorthGamification: true,
     showQuickNetWorthUpdate: true,
-    showReerCeli: false,
     showCoachIA: true,
     showFinancialGoals: true,
     widgetOrder: DEFAULT_WIDGET_ORDER,
@@ -85,7 +80,6 @@ const VIEW_PROFILES: Record<ViewProfile, VisibilityPreferences> = {
     showExpensesByCategory: true,
     showNetWorthGamification: true,
     showQuickNetWorthUpdate: false,
-    showReerCeli: false,
     showCoachIA: true,
     showFinancialGoals: false,
     widgetOrder: DEFAULT_WIDGET_ORDER,
@@ -287,17 +281,6 @@ export const DashboardVisibilitySettings = ({
             </div>
 
             <Separator />
-
-            <div className="flex items-center justify-between">
-              <Label htmlFor="reer-celi" className="text-sm cursor-pointer">
-                💰 REER & CELI
-              </Label>
-              <Switch
-                id="reer-celi"
-                checked={preferences.showReerCeli}
-                onCheckedChange={() => togglePreference('showReerCeli')}
-              />
-            </div>
 
             <div className="flex items-center justify-between">
               <Label htmlFor="coach-ia" className="text-sm cursor-pointer">
