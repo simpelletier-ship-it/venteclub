@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -78,7 +78,6 @@ export function BudgetOnboarding() {
   const [monthlyIncome, setMonthlyIncome] = useState("");
   const [selectedGoals, setSelectedGoals] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const actionsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const checkOnboarding = async () => {
@@ -109,19 +108,6 @@ export function BudgetOnboarding() {
 
     checkOnboarding();
   }, []);
-
-  // Auto-scroll to actions when on goals or categories step
-  useEffect(() => {
-    const step = ONBOARDING_STEPS[currentStep];
-    if ((step.id === "goals" || step.id === "categories") && actionsRef.current) {
-      setTimeout(() => {
-        actionsRef.current?.scrollIntoView({ 
-          behavior: "smooth", 
-          block: "end" 
-        });
-      }, 300);
-    }
-  }, [currentStep]);
 
   const createInitialData = useMutation({
     mutationFn: async () => {
@@ -490,7 +476,7 @@ export function BudgetOnboarding() {
               </div>
 
               {/* Actions */}
-              <div ref={actionsRef} className="flex items-center justify-between gap-4 shrink-0">
+              <div className="flex items-center justify-between gap-4 shrink-0">
                 <Button
                   variant="ghost"
                   onClick={handleSkip}
