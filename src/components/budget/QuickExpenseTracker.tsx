@@ -701,50 +701,45 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
             <Label className="text-base font-medium mb-2 block">
               📝 Détails (facultatif)
             </Label>
-            <Popover open={descriptionOpen} onOpenChange={setDescriptionOpen}>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  role="combobox"
-                  aria-expanded={descriptionOpen}
-                  className="w-full h-11 justify-start text-left font-normal text-base"
-                >
-                  {description || "Ex: Épicerie IGA, Café Starbucks..."}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-full p-0" align="start">
-                <Command>
-                  <CommandInput 
-                    placeholder="Tapez une description..." 
-                    value={description}
-                    onValueChange={handleDescriptionChange}
-                    className="text-base"
-                  />
-                  <CommandList>
-                    <CommandEmpty>Aucune suggestion.</CommandEmpty>
-                    <CommandGroup heading="💡 Descriptions récentes">
-                      {previousDescriptions
-                        .filter(desc => desc.toLowerCase().includes(description.toLowerCase()))
-                        .slice(0, 10)
-                        .map((desc) => (
-                          <CommandItem
-                            key={desc}
-                            value={desc}
-                            onSelect={(value) => {
-                              setDescription(value);
-                              handleDescriptionChange(value);
-                              setDescriptionOpen(false);
-                            }}
-                            className="text-base"
-                          >
-                            {desc}
-                          </CommandItem>
-                        ))}
-                    </CommandGroup>
-                  </CommandList>
-                </Command>
-              </PopoverContent>
-            </Popover>
+            <div className="relative">
+              <Input
+                value={description}
+                onChange={(e) => handleDescriptionChange(e.target.value)}
+                onFocus={() => previousDescriptions.length > 0 && setDescriptionOpen(true)}
+                placeholder="Ex: Épicerie IGA, Café Starbucks..."
+                className="text-base h-11"
+              />
+              {previousDescriptions.length > 0 && (
+                <Popover open={descriptionOpen} onOpenChange={setDescriptionOpen}>
+                  <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
+                    <Command>
+                      <CommandList>
+                        <CommandEmpty>Aucune suggestion.</CommandEmpty>
+                        <CommandGroup heading="💡 Descriptions récentes">
+                          {previousDescriptions
+                            .filter(desc => desc.toLowerCase().includes(description.toLowerCase()))
+                            .slice(0, 10)
+                            .map((desc) => (
+                              <CommandItem
+                                key={desc}
+                                value={desc}
+                                onSelect={(value) => {
+                                  setDescription(value);
+                                  handleDescriptionChange(value);
+                                  setDescriptionOpen(false);
+                                }}
+                                className="text-base cursor-pointer"
+                              >
+                                {desc}
+                              </CommandItem>
+                            ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+              )}
+            </div>
             {suggestedCategory && (
               <div className="text-sm bg-primary/10 text-primary px-3 py-2 rounded-lg mt-2 flex items-center gap-2">
                 <span className="text-lg">✨</span>
