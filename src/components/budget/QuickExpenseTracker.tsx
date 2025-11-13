@@ -391,6 +391,13 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
       
       if (isOnline) {
         toast.success(transactionType === 'expense' ? "✅ Dépense ajoutée!" : "✅ Revenu ajouté!", { duration: 2000 });
+      } else {
+        toast.success(
+          transactionType === 'expense' 
+            ? "💾 Dépense enregistrée hors ligne - Sera synchronisée à la reconnexion" 
+            : "💾 Revenu enregistré hors ligne - Sera synchronisé à la reconnexion", 
+          { duration: 3000 }
+        );
       }
       
       setAmount("");
