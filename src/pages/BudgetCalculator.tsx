@@ -19,6 +19,9 @@ import { BudgetTransactions } from "@/components/budget/BudgetTransactions";
 import { BudgetAssetsDebts } from "@/components/budget/BudgetAssetsDebts";
 import { FinancialCalculator } from "@/components/budget/FinancialCalculator";
 import { SimpleNetWorthTracker } from "@/components/budget/SimpleNetWorthTracker";
+import { BudgetTemplates } from "@/components/budget/BudgetTemplates";
+import { AIFinancialCoach } from "@/components/budget/AIFinancialCoach";
+import { BudgetAlertsManager } from "@/components/budget/BudgetAlertsManager";
 import { BudgetPlanner } from "@/components/budget/BudgetPlanner";
 import { BudgetInsights } from "@/components/budget/BudgetInsights";
 import { DebtCalculator } from "@/components/budget/DebtCalculator";
@@ -607,6 +610,15 @@ const BudgetCalculator = () => {
                             <FinancialGoals isAuthenticated={isAuthenticated} />
                           </CardContent>
                         </Card>
+                      ),
+                      budgetTemplates: (
+                        <BudgetTemplates />
+                      ),
+                      aiCoach: (
+                        <AIFinancialCoach />
+                      ),
+                      budgetAlerts: (
+                        <BudgetAlertsManager />
                       ),
                     }}
                   />
