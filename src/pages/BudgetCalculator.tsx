@@ -46,6 +46,8 @@ import { DraggableDashboard } from "@/components/budget/DraggableDashboard";
 import { MonthComparisonChart } from "@/components/budget/MonthComparisonChart";
 import { BudgetTutorial } from "@/components/budget/BudgetTutorial";
 import { BudgetOnboarding } from "@/components/budget/BudgetOnboarding";
+import { BudgetReminders } from "@/components/budget/BudgetReminders";
+import { BenchmarkComparison } from "@/components/budget/BenchmarkComparison";
 
 const BudgetCalculator = () => {
   const navigate = useNavigate();
@@ -572,6 +574,10 @@ const BudgetCalculator = () => {
 
             <TabsContent value="analyses">
               <div className="space-y-6">
+                <BudgetReminders isAuthenticated={isAuthenticated} />
+                
+                <BenchmarkComparison isAuthenticated={isAuthenticated} />
+
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">

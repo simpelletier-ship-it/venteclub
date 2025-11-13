@@ -204,6 +204,56 @@ export type Database = {
           },
         ]
       }
+      budget_insights: {
+        Row: {
+          action_taken: boolean | null
+          created_at: string | null
+          description: string
+          id: string
+          insight_type: string
+          is_dismissed: boolean | null
+          is_read: boolean | null
+          priority: string
+          related_category_id: string | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          action_taken?: boolean | null
+          created_at?: string | null
+          description: string
+          id?: string
+          insight_type: string
+          is_dismissed?: boolean | null
+          is_read?: boolean | null
+          priority: string
+          related_category_id?: string | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          action_taken?: boolean | null
+          created_at?: string | null
+          description?: string
+          id?: string
+          insight_type?: string
+          is_dismissed?: boolean | null
+          is_read?: boolean | null
+          priority?: string
+          related_category_id?: string | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "budget_insights_related_category_id_fkey"
+            columns: ["related_category_id"]
+            isOneToOne: false
+            referencedRelation: "budget_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       budget_monthly_summaries: {
         Row: {
           created_at: string
@@ -236,6 +286,78 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      budget_reminders: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          description: string | null
+          email_sent: boolean | null
+          id: string
+          is_completed: boolean | null
+          is_recurring: boolean | null
+          push_sent: boolean | null
+          recurrence_frequency: string | null
+          related_goal_id: string | null
+          related_transaction_id: string | null
+          reminder_date: string
+          reminder_type: string
+          title: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          description?: string | null
+          email_sent?: boolean | null
+          id?: string
+          is_completed?: boolean | null
+          is_recurring?: boolean | null
+          push_sent?: boolean | null
+          recurrence_frequency?: string | null
+          related_goal_id?: string | null
+          related_transaction_id?: string | null
+          reminder_date: string
+          reminder_type: string
+          title: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          description?: string | null
+          email_sent?: boolean | null
+          id?: string
+          is_completed?: boolean | null
+          is_recurring?: boolean | null
+          push_sent?: boolean | null
+          recurrence_frequency?: string | null
+          related_goal_id?: string | null
+          related_transaction_id?: string | null
+          reminder_date?: string
+          reminder_type?: string
+          title?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "budget_reminders_related_goal_id_fkey"
+            columns: ["related_goal_id"]
+            isOneToOne: false
+            referencedRelation: "financial_goals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "budget_reminders_related_transaction_id_fkey"
+            columns: ["related_transaction_id"]
+            isOneToOne: false
+            referencedRelation: "budget_transactions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       budget_transactions: {
         Row: {
@@ -1728,6 +1850,42 @@ export type Database = {
         }
         Relationships: []
       }
+      user_benchmarks: {
+        Row: {
+          avg_monthly_amount: number
+          category_name: string
+          id: string
+          income_bracket: string
+          last_updated: string | null
+          median_monthly_amount: number
+          percentile_25: number
+          percentile_75: number
+          sample_size: number
+        }
+        Insert: {
+          avg_monthly_amount: number
+          category_name: string
+          id?: string
+          income_bracket: string
+          last_updated?: string | null
+          median_monthly_amount: number
+          percentile_25: number
+          percentile_75: number
+          sample_size: number
+        }
+        Update: {
+          avg_monthly_amount?: number
+          category_name?: string
+          id?: string
+          income_bracket?: string
+          last_updated?: string | null
+          median_monthly_amount?: number
+          percentile_25?: number
+          percentile_75?: number
+          sample_size?: number
+        }
+        Relationships: []
+      }
       user_challenges: {
         Row: {
           category_id: string | null
@@ -2018,6 +2176,7 @@ export type Database = {
       cleanup_old_rate_limits: { Args: never; Returns: undefined }
       create_demo_businesses: { Args: never; Returns: undefined }
       create_sample_businesses: { Args: never; Returns: undefined }
+      generate_goal_deadline_reminders: { Args: never; Returns: undefined }
       generate_slug: { Args: { title: string }; Returns: string }
       get_next_access_time: { Args: { user_uuid: string }; Returns: Json }
       get_public_stats: {
@@ -2039,6 +2198,7 @@ export type Database = {
           id: string
         }[]
       }
+      get_user_income_bracket: { Args: { p_user_id: string }; Returns: string }
       has_contact_access: { Args: { business_uuid: string }; Returns: boolean }
       has_role: {
         Args: {
