@@ -5,6 +5,7 @@ interface SwipeGestureOptions {
   onSwipeRight?: (velocity: number) => void;
   threshold?: number; // Distance minimale pour déclencher un swipe (px)
   velocityThreshold?: number; // Vélocité minimale pour un swipe rapide (px/ms)
+  enableHapticFeedback?: boolean; // Activer le feedback haptique
 }
 
 interface TouchInfo {
@@ -23,8 +24,28 @@ export const useSwipeGesture = (
     onSwipeLeft,
     onSwipeRight,
     threshold = 50,
-    velocityThreshold = 0.3
+    velocityThreshold = 0.3,
+    enableHapticFeedback = false
   } = options;
+
+  // Fonction pour déclencher une vibration haptique
+  const triggerHapticFeedback = (intensity: 'light' | 'medium' | 'heavy' = 'light') => {
+    if (!enableHapticFeedback || !('vibrate' in navigator)) return;
+
+    // Patterns de vibration selon l'intensité
+    const patterns = {
+      light: 10,   // Vibration très légère
+      medium: 20,  // Vibration moyenne
+      heavy: 30    // Vibration plus prononcée
+    };
+
+    try {
+      navigator.vibrate(patterns[intensity]);
+    } catch (error) {
+      // Ignorer les erreurs silencieusement (certains navigateurs ne supportent pas)
+      console.debug('Haptic feedback not supported');
+    }
+  };
 
   const touchInfo = useRef<TouchInfo | null>(null);
   const [velocity, setVelocity] = useState(0);
@@ -86,6 +107,15 @@ export const useSwipeGesture = (
       // Mettre à jour la vélocité pour l'affichage
       setVelocity(velocityX);
 
+      // Déclencher le feedback haptique selon la vélocité
+      if (velocityX > 1.0) {
+        triggerHapticFeedback('heavy'); // Swipe rapide = vibration forte
+      } else if (velocityX > 0.5) {
+        triggerHapticFeedback('medium'); // Swipe moyen = vibration moyenne
+      } else {
+        triggerHapticFeedback('light'); // Swipe lent = vibration légère
+      }
+
       // Déclencher les callbacks appropriés
       if (deltaX < 0 && onSwipeLeft) {
         onSwipeLeft(velocityX);
@@ -111,7 +141,7 @@ export const useSwipeGesture = (
       element.removeEventListener('touchend', handleTouchEnd);
       element.removeEventListener('touchcancel', handleTouchCancel);
     };
-  }, [elementRef, onSwipeLeft, onSwipeRight, threshold, velocityThreshold]);
+  }, [elementRef, onSwipeLeft, onSwipeRight, threshold, velocityThreshold, enableHapticFeedback]);
 
   return { velocity };
 };

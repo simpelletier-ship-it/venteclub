@@ -73,6 +73,7 @@ const Tools = () => {
     },
     threshold: 30, // Distance minimale pour déclencher un swipe
     velocityThreshold: 0.3, // Vélocité minimale pour un swipe rapide
+    enableHapticFeedback: true, // Activer le feedback haptique
   });
 
   const tools = [
@@ -323,7 +324,7 @@ const Tools = () => {
 
             {/* Indicateur visuel de vélocité (pour feedback utilisateur) */}
             <p className="text-center text-xs text-muted-foreground mt-2 md:hidden">
-              💨 Swipez rapidement pour naviguer entre plusieurs outils
+              💨 Swipez rapidement pour naviguer • {'vibrate' in navigator ? '📳 Vibration activée' : ''}
             </p>
 
             {/* Desktop: Grid classique */}
