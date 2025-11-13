@@ -42,12 +42,13 @@ import { TagComparison } from "@/components/budget/TagComparison";
 import { BalanceSheetManager } from "@/components/budget/BalanceSheetManager";
 import { MonthlySummaryWidget } from "@/components/budget/MonthlySummaryWidget";
 import { DashboardVisibilitySettings, useDashboardVisibility } from "@/components/budget/DashboardVisibilitySettings";
+import { DraggableDashboard } from "@/components/budget/DraggableDashboard";
 
 const BudgetCalculator = () => {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
   const isAuthenticated = !!user;
-  const { preferences, setPreferences } = useDashboardVisibility();
+  const { preferences, setPreferences, currentProfile, applyProfile } = useDashboardVisibility();
 
   useEffect(() => {
     console.log('BudgetCalculator - Auth state:', { user: !!user, loading, isAuthenticated });
@@ -415,6 +416,8 @@ const BudgetCalculator = () => {
                 <DashboardVisibilitySettings
                   preferences={preferences}
                   onChange={setPreferences}
+                  currentProfile={currentProfile}
+                  onProfileChange={applyProfile}
                 />
               </div>
 
@@ -430,116 +433,106 @@ const BudgetCalculator = () => {
                   </div>
                 </div>
 
-                {/* Main content */}
-                <div className="lg:col-span-3 space-y-6">
-                  {/* Vue d'ensemble visuelle */}
-                  {preferences.showExpenseTrends && (
-                    <ExpenseTrendsChart transactions={transactions} />
-                  )}
-                  
-                  {preferences.showExpensesByCategory && (
-                    <ExpensesByCategory 
-                      transactions={transactions}
-                      categories={categories}
-                      onAnalyze={() => {
-                        const tabsList = document.querySelector('[role="tablist"]');
-                        const transactionsTab = tabsList?.querySelector('[value="transactions"]') as HTMLButtonElement;
-                        transactionsTab?.click();
-                      }}
-                    />
-                  )}
-
-                  {preferences.showNetWorthGamification && (
-                    <NetWorthGamification netWorth={netWorth} isAuthenticated={isAuthenticated} />
-                  )}
-                  
-                  {preferences.showQuickNetWorthUpdate && (
-                    <div className="flex justify-center">
-                      <QuickNetWorthUpdate currentNetWorth={netWorth} isAuthenticated={isAuthenticated} />
-                    </div>
-                  )}
-
-                  {/* Suivi en temps réel */}
-                  {(preferences.showReerCeli || preferences.showCoachIA) && (
-                    <Card>
-                    <CardHeader className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent">
-                      <CardTitle className="flex items-center gap-2">
-                        <span className="text-2xl">📊</span>
-                        Suivi en temps réel
-                      </CardTitle>
-                      <CardDescription>
-                        Vos actifs et recommandations
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="p-6 space-y-6">
-                      {/* REER & CELI */}
-                      {preferences.showReerCeli && (
-                        <div>
-                          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                            <span>💰</span>
-                            REER & CELI
-                          </h3>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {assets.filter(a => a.type === 'REER' || a.type === 'CELI').length > 0 ? (
-                              assets
-                                .filter(a => a.type === 'REER' || a.type === 'CELI')
-                                .map(asset => (
-                                  <div key={asset.id} className="p-4 bg-muted/50 rounded-lg">
-                                    <div className="flex items-center justify-between">
-                                      <div>
-                                        <p className="text-sm text-muted-foreground">{asset.type}</p>
-                                        <p className="text-xl font-bold">{formatPrice(asset.value)}</p>
-                                      </div>
-                                      <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                                        <span className="text-2xl">
-                                          {asset.type === 'REER' ? '🏦' : '💎'}
-                                        </span>
+                {/* Main content - Draggable widgets */}
+                <div className="lg:col-span-3">
+                  <DraggableDashboard
+                    preferences={preferences}
+                    onOrderChange={(newOrder) => {
+                      setPreferences({ ...preferences, widgetOrder: newOrder });
+                    }}
+                    children={{
+                      expenseTrends: (
+                        <ExpenseTrendsChart transactions={transactions} />
+                      ),
+                      expensesByCategory: (
+                        <ExpensesByCategory 
+                          transactions={transactions}
+                          categories={categories}
+                          onAnalyze={() => {
+                            const tabsList = document.querySelector('[role="tablist"]');
+                            const transactionsTab = tabsList?.querySelector('[value="transactions"]') as HTMLButtonElement;
+                            transactionsTab?.click();
+                          }}
+                        />
+                      ),
+                      netWorthGamification: (
+                        <NetWorthGamification netWorth={netWorth} isAuthenticated={isAuthenticated} />
+                      ),
+                      quickNetWorthUpdate: (
+                        <div className="flex justify-center">
+                          <QuickNetWorthUpdate currentNetWorth={netWorth} isAuthenticated={isAuthenticated} />
+                        </div>
+                      ),
+                      reerCeli: (
+                        <Card>
+                          <CardHeader className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent">
+                            <CardTitle className="flex items-center gap-2">
+                              <span className="text-2xl">💰</span>
+                              REER & CELI
+                            </CardTitle>
+                          </CardHeader>
+                          <CardContent className="p-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              {assets.filter(a => a.type === 'REER' || a.type === 'CELI').length > 0 ? (
+                                assets
+                                  .filter(a => a.type === 'REER' || a.type === 'CELI')
+                                  .map(asset => (
+                                    <div key={asset.id} className="p-4 bg-muted/50 rounded-lg">
+                                      <div className="flex items-center justify-between">
+                                        <div>
+                                          <p className="text-sm text-muted-foreground">{asset.type}</p>
+                                          <p className="text-xl font-bold">{formatPrice(asset.value)}</p>
+                                        </div>
+                                        <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+                                          <span className="text-2xl">
+                                            {asset.type === 'REER' ? '🏦' : '💎'}
+                                          </span>
+                                        </div>
                                       </div>
                                     </div>
-                                  </div>
-                                ))
-                            ) : (
-                              <div className="col-span-2 p-4 bg-muted/30 rounded-lg text-center text-sm text-muted-foreground">
-                                Aucun REER ou CELI enregistré. Ajoutez-les dans l'onglet "Mes actifs".
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Coach IA */}
-                      {preferences.showCoachIA && (
-                        <div>
-                          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                            <span>🤖</span>
-                            Coach IA
-                          </h3>
-                          <BudgetInsights 
-                            transactions={transactions}
-                            categories={categories}
-                            debts={debts}
-                            assets={assets}
-                          />
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                  )}
-
-                  {/* Objectifs d'épargne */}
-                  {preferences.showFinancialGoals && (
-                    <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <span className="text-2xl">🎯</span>
-                        Objectifs d'épargne
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <FinancialGoals isAuthenticated={isAuthenticated} />
-                    </CardContent>
-                  </Card>
-                  )}
+                                  ))
+                              ) : (
+                                <div className="col-span-2 p-4 bg-muted/30 rounded-lg text-center text-sm text-muted-foreground">
+                                  Aucun REER ou CELI enregistré. Ajoutez-les dans l'onglet "Mes actifs".
+                                </div>
+                              )}
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ),
+                      coachIA: (
+                        <Card>
+                          <CardHeader className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent">
+                            <CardTitle className="flex items-center gap-2">
+                              <span className="text-2xl">🤖</span>
+                              Coach IA
+                            </CardTitle>
+                          </CardHeader>
+                          <CardContent className="p-6">
+                            <BudgetInsights 
+                              transactions={transactions}
+                              categories={categories}
+                              debts={debts}
+                              assets={assets}
+                            />
+                          </CardContent>
+                        </Card>
+                      ),
+                      financialGoals: (
+                        <Card>
+                          <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                              <span className="text-2xl">🎯</span>
+                              Objectifs d'épargne
+                            </CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <FinancialGoals isAuthenticated={isAuthenticated} />
+                          </CardContent>
+                        </Card>
+                      ),
+                    }}
+                  />
                 </div>
               </div>
             </TabsContent>
