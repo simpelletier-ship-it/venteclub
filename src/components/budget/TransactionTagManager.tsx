@@ -105,14 +105,14 @@ export const TransactionTagManager = ({ selectedTags, onTagsChange }: Transactio
   };
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-1.5">
       <div className="flex items-center justify-between">
-        <label className="text-sm font-medium">Tags (facultatif)</label>
+        <label className="text-sm font-medium">🏷️ Tags</label>
         <Dialog open={isCreating} onOpenChange={setIsCreating}>
           <DialogTrigger asChild>
-            <Button variant="outline" size="sm">
-              <Plus className="h-4 w-4 mr-1" />
-              Nouveau tag
+            <Button variant="ghost" size="sm" className="h-7 px-2 text-xs">
+              <Plus className="h-3 w-3 mr-1" />
+              Nouveau
             </Button>
           </DialogTrigger>
           <DialogContent>
@@ -148,16 +148,16 @@ export const TransactionTagManager = ({ selectedTags, onTagsChange }: Transactio
       </div>
 
       {tags.length === 0 ? (
-        <p className="text-sm text-muted-foreground">
-          Aucun tag créé. Créez votre premier tag pour commencer.
+        <p className="text-xs text-muted-foreground italic">
+          Aucun tag. Créez-en un pour classifier vos transactions.
         </p>
       ) : (
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-1.5">
           {tags.map((tag) => (
             <Badge
               key={tag.id}
               variant={selectedTags.includes(tag.id) ? "default" : "outline"}
-              className="cursor-pointer hover:opacity-80 transition-opacity px-3 py-1"
+              className="cursor-pointer hover:opacity-80 transition-opacity px-2 py-0.5 text-xs"
               onClick={() => toggleTag(tag.id)}
             >
               <span className="mr-1">{tag.icon}</span>
@@ -174,12 +174,6 @@ export const TransactionTagManager = ({ selectedTags, onTagsChange }: Transactio
             </Badge>
           ))}
         </div>
-      )}
-
-      {tags.length > 0 && selectedTags.length > 0 && (
-        <p className="text-xs text-muted-foreground">
-          {selectedTags.length} tag(s) sélectionné(s)
-        </p>
       )}
     </div>
   );

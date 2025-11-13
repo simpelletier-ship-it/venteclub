@@ -167,8 +167,6 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
   const [editingCategory, setEditingCategory] = useState<any>(null);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [templatesOpen, setTemplatesOpen] = useState(false);
-  const [isRecurring, setIsRecurring] = useState(false);
-  const [recurringFrequency, setRecurringFrequency] = useState<'weekly' | 'biweekly' | 'monthly' | 'yearly'>('monthly');
 
   // Offline sync hook
   const { isOnline, addOfflineTransaction } = useOfflineSync(isAuthenticated);
@@ -353,8 +351,6 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
           description: description || null,
           transaction_date: format(transactionDate, 'yyyy-MM-dd'),
           type: transactionType,
-          is_recurring: isRecurring,
-          recurring_frequency: isRecurring ? recurringFrequency : null,
         })
         .select()
         .single();
@@ -405,7 +401,6 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
       setSuggestedCategory(null);
       setSelectedCategory("");
       setSelectedTags([]);
-      setIsRecurring(false);
       // Keep transactionDate for next transaction
     },
   });
@@ -537,23 +532,16 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
 
   return (
     <Card className="shadow-lg" id="quick-expense-tracker">
-       <CardHeader className="pb-4">
+       <CardHeader className="pb-2 pt-4">
         <div className="flex items-center justify-between" id="transaction-type">
-          <div>
-            <CardTitle className="text-2xl">
-              {transactionType === 'expense' ? '💸 Nouvelle dépense' : '💰 Nouveau revenu'}
-            </CardTitle>
-            <CardDescription className="text-base">
-              {transactionType === 'expense' 
-                ? 'Enregistrez rapidement votre achat' 
-                : 'Enregistrez vos gains'}
-            </CardDescription>
-          </div>
-          <div className="flex gap-2">
+          <CardTitle className="text-xl">
+            {transactionType === 'expense' ? '💸 Nouvelle dépense' : '💰 Nouveau revenu'}
+          </CardTitle>
+          <div className="flex gap-1.5">
             <Button
               type="button"
               variant={transactionType === 'expense' ? 'default' : 'outline'}
-              size="lg"
+              size="sm"
               onClick={() => {
                 setTransactionType('expense');
                 setSelectedCategory("");
@@ -565,7 +553,7 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
             <Button
               type="button"
               variant={transactionType === 'income' ? 'default' : 'outline'}
-              size="lg"
+              size="sm"
               onClick={() => {
                 setTransactionType('income');
                 setSelectedCategory("");
@@ -577,10 +565,10 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
           </div>
         </div>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
+      <CardContent className="pt-2">
+        <div className="space-y-2.5">
           <div id="amount-input">
-            <Label className="text-base font-medium mb-2 block">
+            <Label className="text-sm font-medium mb-1.5 block">
               💰 Combien?
             </Label>
             <div className="relative">
@@ -588,14 +576,14 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
                 value={amount} 
                 onChange={setAmount}
                 placeholder="Entrez le montant"
-                className="text-2xl h-14 font-bold pr-12"
+                className="text-xl h-11 font-bold pr-12"
               />
               {amount && (
                 <Button
                   type="button"
                   variant="ghost"
                   size="icon"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 h-7 w-7"
                   onClick={() => setAmount("")}
                   title="Effacer"
                 >
@@ -603,40 +591,36 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
                 </Button>
               )}
             </div>
-            <p className="text-sm text-muted-foreground mt-1">Le montant doit être supérieur à 0$</p>
           </div>
           
           <div id="category-buttons">
-            <div className="flex items-center justify-between mb-2">
-              <Label className="text-base font-medium">
+            <div className="flex items-center justify-between mb-1.5">
+              <Label className="text-sm font-medium">
                 📂 Pour quoi?
               </Label>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setEditPinnedOpen(true)}
-                className="h-8 px-2 text-xs"
+                className="h-7 px-2 text-xs"
               >
-                <Settings className="h-3.5 w-3.5 mr-1" />
+                <Settings className="h-3 w-3 mr-1" />
                 Organiser
               </Button>
             </div>
-            <p className="text-sm text-muted-foreground mb-3">
-              Choisissez dans quelle catégorie classer cette dépense
-            </p>
             
             {/* Pinned categories as large buttons */}
-            <div className="grid grid-cols-3 gap-2 mb-3">
+            <div className="grid grid-cols-3 gap-1.5 mb-2">
               {displayCategories.map((cat: any) => (
                 <Button
                   key={cat.id}
                   type="button"
                   variant={selectedCategory === cat.id ? "default" : "outline"}
-                  className="h-16 flex flex-col gap-1 text-sm"
+                  className="h-14 flex flex-col gap-0.5 text-sm p-1"
                   onClick={() => setSelectedCategory(cat.id)}
                 >
-                  <span className="text-2xl">{cat.icon}</span>
-                  <span className="text-xs">{cat.name}</span>
+                  <span className="text-xl">{cat.icon}</span>
+                  <span className="text-[10px] leading-tight">{cat.name}</span>
                 </Button>
               ))}
             </div>
@@ -646,9 +630,9 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
-                className="w-full h-11"
+                className="w-full h-9 text-sm"
               >
-                <span className="text-lg mr-2">🔍</span>
+                <span className="text-base mr-1.5">🔍</span>
                 Autre catégorie...
               </Button>
             </PopoverTrigger>
@@ -737,7 +721,7 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
           </div>
 
           <div id="date-picker">
-            <Label className="text-base font-medium mb-2 block">
+            <Label className="text-sm font-medium mb-1.5 block">
               📅 Quand?
             </Label>
             <Popover>
@@ -745,11 +729,11 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
                 <Button
                   variant="outline"
                   className={cn(
-                    "w-full h-11 justify-start text-left font-normal text-base",
+                    "w-full h-9 justify-start text-left font-normal text-sm",
                     !transactionDate && "text-muted-foreground"
                   )}
                 >
-                  <CalendarIcon className="mr-2 h-5 w-5" />
+                  <CalendarIcon className="mr-2 h-4 w-4" />
                   {transactionDate ? format(transactionDate, "d MMMM yyyy", { locale: fr }) : "Choisir la date"}
                 </Button>
               </PopoverTrigger>
@@ -766,7 +750,7 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
           </div>
           
           <div id="description-input">
-            <Label className="text-base font-medium mb-2 block">
+            <Label className="text-sm font-medium mb-1.5 block">
               📝 Détails (facultatif)
             </Label>
             <div className="relative">
@@ -775,9 +759,9 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
                 onChange={(e) => handleDescriptionChange(e.target.value)}
                 onFocus={() => previousDescriptions.length > 0 && setDescriptionOpen(true)}
                 placeholder={transactionType === 'expense' 
-                  ? "Ex: Épicerie IGA, Café Starbucks, Essence Shell..." 
-                  : "Ex: Salaire, Bonus, Freelance, Intérêts..."}
-                className="text-base h-11"
+                  ? "Ex: Épicerie IGA, Café Starbucks..." 
+                  : "Ex: Salaire, Bonus, Intérêts..."}
+                className="text-sm h-9"
               />
               {previousDescriptions.length > 0 && (
                 <Popover open={descriptionOpen} onOpenChange={setDescriptionOpen}>
@@ -811,83 +795,22 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
               )}
             </div>
             {suggestedCategory && (
-              <div className="text-sm bg-primary/10 text-primary px-3 py-2 rounded-lg mt-2 flex items-center gap-2">
-                <span className="text-lg">✨</span>
+              <div className="text-xs bg-primary/10 text-primary px-2 py-1.5 rounded-md mt-1.5 flex items-center gap-1.5">
+                <span>✨</span>
                 <span className="font-medium">
-                  Suggestion: {categories.find(c => c.id === suggestedCategory)?.name}
+                  {categories.find(c => c.id === suggestedCategory)?.name}
                 </span>
               </div>
             )}
-            <p className="text-sm text-muted-foreground mt-1">
-              Ajoutez plus de détails pour mieux suivre vos dépenses
-            </p>
           </div>
 
           {/* Transaction Tags */}
-          <TransactionTagManager 
-            selectedTags={selectedTags}
-            onTagsChange={setSelectedTags}
-          />
-
-          {/* Recurring transaction option - only for expenses */}
-          {transactionType === 'expense' && (
-            <div className="flex items-start gap-3 p-4 bg-muted/30 rounded-lg border" id="recurring-expense">
-              <input
-                type="checkbox"
-                id="is-recurring"
-                checked={isRecurring}
-                onChange={(e) => setIsRecurring(e.target.checked)}
-                className="mt-1 h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
-              />
-              <div className="flex-1">
-                <Label htmlFor="is-recurring" className="text-base font-medium cursor-pointer">
-                  🔁 Dépense récurrente
-                </Label>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Cochez si cette dépense se répète régulièrement (loyer, Netflix, gym, etc.)
-                </p>
-                {isRecurring && (
-                  <div className="mt-3">
-                    <Label className="text-sm mb-2 block">À quelle fréquence?</Label>
-                    <div className="grid grid-cols-2 gap-2">
-                      <Button
-                        type="button"
-                        variant={recurringFrequency === 'weekly' ? 'default' : 'outline'}
-                        size="sm"
-                        onClick={() => setRecurringFrequency('weekly')}
-                      >
-                        Chaque semaine
-                      </Button>
-                      <Button
-                        type="button"
-                        variant={recurringFrequency === 'biweekly' ? 'default' : 'outline'}
-                        size="sm"
-                        onClick={() => setRecurringFrequency('biweekly')}
-                      >
-                        Aux 2 semaines
-                      </Button>
-                      <Button
-                        type="button"
-                        variant={recurringFrequency === 'monthly' ? 'default' : 'outline'}
-                        size="sm"
-                        onClick={() => setRecurringFrequency('monthly')}
-                      >
-                        Chaque mois
-                      </Button>
-                      <Button
-                        type="button"
-                        variant={recurringFrequency === 'yearly' ? 'default' : 'outline'}
-                        size="sm"
-                        onClick={() => setRecurringFrequency('yearly')}
-                      >
-                        Chaque année
-                      </Button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
+          <div className="pt-0.5">
+            <TransactionTagManager 
+              selectedTags={selectedTags}
+              onTagsChange={setSelectedTags}
+            />
+          </div>
 
           {/* Dialog for creating new category */}
           <Dialog open={newCategoryOpen} onOpenChange={setNewCategoryOpen}>
@@ -1090,11 +1013,11 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className="w-full h-12 mb-2"
+                  className="w-full h-8 text-xs"
                   type="button"
                 >
-                  <Rocket className="h-4 w-4 mr-2" />
-                  Utiliser un template ({templates.length})
+                  <Rocket className="h-3.5 w-3.5 mr-1.5" />
+                  Templates ({templates.length})
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-[400px] p-0" align="center">
@@ -1152,12 +1075,12 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
 
           <Button 
             id="add-button"
-            className="w-full h-14 text-lg font-semibold"
+            className="w-full h-11 text-base font-bold mt-1"
             onClick={handleQuickAdd}
             disabled={quickAdd.isPending || !amount || parseFloat(amount) <= 0}
-            size="lg"
+            size="default"
           >
-            {quickAdd.isPending ? "⏳ Ajout en cours..." : transactionType === 'income' ? "✅ Ajouter le revenu" : "✅ Ajouter la dépense"}
+            {quickAdd.isPending ? "⏳ Ajout..." : transactionType === 'income' ? "✅ Ajouter le revenu" : "✅ Ajouter la dépense"}
           </Button>
         </div>
       </CardContent>
