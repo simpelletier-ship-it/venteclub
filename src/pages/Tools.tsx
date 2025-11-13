@@ -1,14 +1,28 @@
 import { Helmet } from "react-helmet";
-import { Calculator, TrendingUp, Wallet, ArrowRight, CheckCircle } from "lucide-react";
+import { Calculator, TrendingUp, Wallet, ArrowRight, CheckCircle, RefreshCw } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect, useRef } from "react";
 import { useSwipeGesture } from "@/hooks/useSwipeGesture";
+import { usePullToRefresh } from "@/hooks/usePullToRefresh";
+import { toast } from "sonner";
 
 const Tools = () => {
   const [activeCardIndex, setActiveCardIndex] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // Pull-to-refresh pour recharger la page
+  const { isPulling, isRefreshing, pullDistance, progress, canRefresh } = usePullToRefresh({
+    onRefresh: async () => {
+      // Simuler un rechargement (en production, ça pourrait recharger des données)
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      toast.success("✅ Outils financiers à jour !", { duration: 2000 });
+    },
+    threshold: 80,
+    maxPullDistance: 150,
+    enabled: true
+  });
 
   // Fonction pour naviguer vers une carte spécifique
   const scrollToCard = (index: number, behavior: 'smooth' | 'auto' = 'smooth') => {
@@ -149,6 +163,48 @@ const Tools = () => {
 
   return (
     <>
+      {/* Indicateur Pull-to-Refresh */}
+      <div
+        className="fixed top-0 left-0 right-0 z-50 flex justify-center pointer-events-none"
+        style={{
+          transform: `translateY(${Math.min(pullDistance - 60, 0)}px)`,
+          transition: isPulling ? 'none' : 'transform 0.3s ease-out'
+        }}
+      >
+        <div 
+          className={`mt-4 bg-background/95 backdrop-blur-sm border-2 rounded-full px-6 py-3 shadow-lg transition-all duration-300 ${
+            isPulling ? 'scale-100 opacity-100' : 'scale-90 opacity-0'
+          }`}
+        >
+          <div className="flex items-center gap-3">
+            <RefreshCw 
+              className={`h-5 w-5 ${isRefreshing ? 'animate-spin' : ''} ${
+                canRefresh ? 'text-green-500' : 'text-muted-foreground'
+              }`}
+              style={{
+                transform: !isRefreshing ? `rotate(${progress * 3.6}deg)` : undefined
+              }}
+            />
+            <span className="text-sm font-medium">
+              {isRefreshing 
+                ? 'Actualisation...' 
+                : canRefresh 
+                  ? 'Relâchez pour actualiser' 
+                  : 'Tirez pour actualiser'
+              }
+            </span>
+            {!isRefreshing && (
+              <div className="w-12 h-1.5 bg-muted rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-primary transition-all duration-100"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
       <Helmet>
         <title>Outils Financiers Gratuits Québec 2025 | Calculateurs Budget Salaire Impôt</title>
         <meta name="description" content="Suite complète d'outils financiers gratuits pour le Québec : calculateur de salaire net, retour d'impôt avec REER/CELIAPP, planificateur de budget intelligent. Taux 2025 à jour, calculs précis, interface intuitive. Gérez vos finances personnelles efficacement." />
