@@ -69,25 +69,33 @@
     <priority>0.7</priority>
   </url>
   
+  <!-- Page Outils -->
+  <url>
+    <loc>https://vente.club/outils</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <lastmod>2025-01-13</lastmod>
+  </url>
+  
   <!-- Outils Financiers Québécois -->
   <url>
     <loc>https://vente.club/outils/salaire</loc>
     <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
+    <priority>0.95</priority>
     <lastmod>2025-01-13</lastmod>
   </url>
   
   <url>
     <loc>https://vente.club/outils/retour-impot</loc>
     <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
+    <priority>0.95</priority>
     <lastmod>2025-01-13</lastmod>
   </url>
   
   <url>
     <loc>https://vente.club/outils/budget</loc>
     <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
+    <priority>0.95</priority>
     <lastmod>2025-01-13</lastmod>
   </url>
   

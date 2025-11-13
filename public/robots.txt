@@ -14,6 +14,7 @@ Allow: /faq
 Allow: /blog
 Allow: /businesses
 Allow: /city/*
+Allow: /outils/*
 
 # Sitemap location - UPDATED FOR LOVABLE CLOUD
 Sitemap: https://vente.club/sitemap.xml
