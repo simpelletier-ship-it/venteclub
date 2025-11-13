@@ -151,26 +151,26 @@ const Tools = () => {
       </Helmet>
 
       <div className="min-h-screen bg-background">
-        <div className="container mx-auto px-4 py-12">
+        <div className="container mx-auto px-2 md:px-4 py-8 md:py-12">
           {/* Hero Section */}
-          <header className="text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4 text-foreground">
+          <header className="text-center mb-12 md:mb-16 px-4 animate-fade-in">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 text-foreground leading-tight">
               Outils Financiers Gratuits pour le Québec
             </h1>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-6">
+            <p className="text-base md:text-lg lg:text-xl text-muted-foreground max-w-3xl mx-auto mb-6 leading-relaxed">
               Des calculateurs professionnels et un planificateur de budget intelligent pour vous aider à prendre des décisions financières éclairées. Taux 2025 à jour, calculs précis, 100% gratuit.
             </p>
-            <div className="flex flex-wrap justify-center gap-4 text-sm text-muted-foreground">
+            <div className="flex flex-wrap justify-center gap-3 md:gap-4 text-xs md:text-sm text-muted-foreground">
               <span className="inline-flex items-center gap-2">
-                <CheckCircle className="h-4 w-4 text-green-500" />
+                <CheckCircle className="h-3.5 w-3.5 md:h-4 md:w-4 text-green-500" />
                 Taux 2025 à jour
               </span>
               <span className="inline-flex items-center gap-2">
-                <CheckCircle className="h-4 w-4 text-green-500" />
+                <CheckCircle className="h-3.5 w-3.5 md:h-4 md:w-4 text-green-500" />
                 100% gratuit
               </span>
               <span className="inline-flex items-center gap-2">
-                <CheckCircle className="h-4 w-4 text-green-500" />
+                <CheckCircle className="h-3.5 w-3.5 md:h-4 md:w-4 text-green-500" />
                 Confidentialité garantie
               </span>
             </div>
@@ -178,39 +178,45 @@ const Tools = () => {
 
           {/* Tools Grid */}
           <section className="mb-16">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto px-2 md:px-0">
               {tools.map((tool) => {
                 const Icon = tool.icon;
                 return (
-                  <Card key={tool.id} className="h-full hover:shadow-xl transition-all duration-300 hover:scale-[1.02] border-2 hover:border-primary group">
-                    <CardHeader>
-                      <div className={`w-14 h-14 ${tool.color} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-                        <Icon className="w-7 h-7 text-white" />
+                  <Card 
+                    key={tool.id} 
+                    className="flex flex-col h-full hover:shadow-xl transition-all duration-300 hover:scale-[1.02] md:hover:scale-[1.03] border-2 hover:border-primary group animate-fade-in touch-manipulation"
+                  >
+                    <CardHeader className="flex-grow pb-4">
+                      <div className={`w-14 h-14 md:w-16 md:h-16 ${tool.color} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                        <Icon className="w-7 h-7 md:w-8 md:h-8 text-white" />
                       </div>
-                      <CardTitle className="text-xl mb-2">{tool.title}</CardTitle>
-                      <CardDescription className="text-base leading-relaxed mb-4">
+                      <CardTitle className="text-lg md:text-xl mb-2 leading-tight">{tool.title}</CardTitle>
+                      <CardDescription className="text-sm md:text-base leading-relaxed mb-4">
                         {tool.description}
                       </CardDescription>
                       
                       {/* Features list */}
                       <ul className="space-y-2 mb-4">
                         {tool.features.map((feature, idx) => (
-                          <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
-                            <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                          <li key={idx} className="flex items-start gap-2 text-xs md:text-sm text-muted-foreground">
+                            <CheckCircle className="h-3.5 w-3.5 md:h-4 md:w-4 text-green-500 mt-0.5 flex-shrink-0" />
                             <span>{feature}</span>
                           </li>
                         ))}
                       </ul>
                       
-                      <p className="text-xs text-muted-foreground italic">
+                      <p className="text-[10px] md:text-xs text-muted-foreground italic">
                         Mots-clés: {tool.keywords}
                       </p>
                     </CardHeader>
-                    <CardContent>
-                      <Link to={tool.link}>
-                        <Button className="w-full group/btn" size="lg">
+                    <CardContent className="pt-0 mt-auto">
+                      <Link to={tool.link} className="block">
+                        <Button 
+                          className="w-full group/btn text-base md:text-lg active:scale-95 transition-transform" 
+                          size="lg"
+                        >
                           Accéder à l'outil
-                          <ArrowRight className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
+                          <ArrowRight className="ml-2 h-4 w-4 md:h-5 md:w-5 group-hover/btn:translate-x-1 transition-transform" />
                         </Button>
                       </Link>
                     </CardContent>
@@ -221,23 +227,27 @@ const Tools = () => {
           </section>
 
           {/* Benefits Section */}
-          <section className="mb-16">
-            <h2 className="text-3xl font-bold text-center mb-8">
+          <section className="mb-16 px-4 md:px-0">
+            <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 animate-fade-in">
               Pourquoi utiliser nos outils financiers?
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 max-w-6xl mx-auto">
               {benefits.map((benefit, idx) => {
                 const Icon = benefit.icon;
                 return (
-                  <Card key={idx} className="text-center">
-                    <CardHeader>
+                  <Card 
+                    key={idx} 
+                    className="text-center hover:shadow-lg transition-all duration-300 animate-fade-in touch-manipulation"
+                    style={{ animationDelay: `${idx * 100}ms` }}
+                  >
+                    <CardHeader className="pb-3">
                       <div className="flex justify-center mb-3">
-                        <Icon className="h-10 w-10 text-green-500" />
+                        <Icon className="h-8 w-8 md:h-10 md:w-10 text-green-500" />
                       </div>
-                      <CardTitle className="text-lg">{benefit.title}</CardTitle>
+                      <CardTitle className="text-base md:text-lg">{benefit.title}</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-sm text-muted-foreground leading-relaxed">
+                      <p className="text-xs md:text-sm text-muted-foreground leading-relaxed">
                         {benefit.description}
                       </p>
                     </CardContent>
