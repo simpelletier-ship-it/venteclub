@@ -17,6 +17,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { TransactionTagManager } from "./TransactionTagManager";
 import { formatPrice } from "@/lib/priceFormat";
+import { useOfflineSync } from "@/hooks/useOfflineSync";
 import {
   DndContext,
   closestCenter,
@@ -167,6 +168,9 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [templatesOpen, setTemplatesOpen] = useState(false);
 
+  // Offline sync hook
+  const { isOnline, addOfflineTransaction } = useOfflineSync(isAuthenticated);
+
   // Fetch categories
   const { data: categories = [] } = useQuery({
     queryKey: ['budget-categories', transactionType],
@@ -304,18 +308,42 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
   // Quick add mutation
   const quickAdd = useMutation({
     mutationFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Non authentifié");
-
       const categoryToUse = selectedCategory || suggestedCategory;
       if (!categoryToUse) throw new Error("Veuillez sélectionner une catégorie");
+
+      const amountValue = parseFloat(amount);
+      if (isNaN(amountValue) || amountValue <= 0) {
+        throw new Error("Le montant doit être supérieur à 0");
+      }
+
+      // Get selected tag names for offline storage
+      const tagNames = allTags
+        .filter(t => selectedTags.includes(t.id))
+        .map(t => t.name);
+
+      // If offline, save locally
+      if (!isOnline) {
+        await addOfflineTransaction({
+          amount: amountValue,
+          description: description || '',
+          category_id: categoryToUse,
+          type: transactionType,
+          transaction_date: format(transactionDate, 'yyyy-MM-dd'),
+          tags: tagNames,
+        });
+        return;
+      }
+
+      // If online, proceed with normal Supabase insert
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Non authentifié");
 
       const { data: transaction, error } = await supabase
         .from('budget_transactions')
         .insert({
           user_id: user.id,
           category_id: categoryToUse,
-          amount: parseFloat(amount),
+          amount: amountValue,
           description: description || null,
           transaction_date: format(transactionDate, 'yyyy-MM-dd'),
           type: transactionType,
@@ -352,7 +380,11 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
       queryClient.invalidateQueries({ queryKey: ['financial-goals'] });
       queryClient.invalidateQueries({ queryKey: ['asset-history'] });
       queryClient.invalidateQueries({ queryKey: ['debt-history'] });
-      toast.success(transactionType === 'expense' ? "✅ Dépense ajoutée!" : "✅ Revenu ajouté!", { duration: 2000 });
+      
+      if (isOnline) {
+        toast.success(transactionType === 'expense' ? "✅ Dépense ajoutée!" : "✅ Revenu ajouté!", { duration: 2000 });
+      }
+      
       setAmount("");
       setDescription("");
       setSuggestedCategory(null);

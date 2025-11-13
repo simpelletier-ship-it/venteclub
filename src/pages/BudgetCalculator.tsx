@@ -49,12 +49,15 @@ import { BudgetOnboarding } from "@/components/budget/BudgetOnboarding";
 import { BudgetReminders } from "@/components/budget/BudgetReminders";
 import { BenchmarkComparison } from "@/components/budget/BenchmarkComparison";
 import { CreateDefaultCategories } from "@/components/budget/CreateDefaultCategories";
+import { OfflineIndicator } from "@/components/budget/OfflineIndicator";
+import { useOfflineSync } from "@/hooks/useOfflineSync";
 
 const BudgetCalculator = () => {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
   const isAuthenticated = !!user;
   const { preferences, setPreferences, currentProfile, applyProfile } = useDashboardVisibility();
+  const { isOnline, pendingCount, isSyncing, triggerSync } = useOfflineSync(isAuthenticated);
 
   useEffect(() => {
     console.log('BudgetCalculator - Auth state:', { user: !!user, loading, isAuthenticated });
@@ -426,6 +429,12 @@ const BudgetCalculator = () => {
           </div>
 
           {/* Quick Add */}
+          <OfflineIndicator 
+            isOnline={isOnline}
+            pendingCount={pendingCount}
+            isSyncing={isSyncing}
+            onSync={triggerSync}
+          />
           <QuickExpenseTracker isAuthenticated={isAuthenticated} />
 
           {/* Monthly Summary Widget */}
