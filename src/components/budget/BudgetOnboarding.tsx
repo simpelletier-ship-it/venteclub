@@ -313,9 +313,9 @@ export function BudgetOnboarding() {
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: -20 }}
         transition={{ type: "spring", damping: 25, stiffness: 300 }}
-        className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-[10000] w-full max-w-2xl px-4 max-h-[90vh] overflow-hidden"
+        className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-[10000] w-full max-w-2xl px-4"
       >
-        <Card className="p-8 shadow-2xl border-primary/30 bg-background flex flex-col max-h-[85vh]">
+        <Card className="shadow-2xl border-primary/30 bg-background flex flex-col max-h-[90vh]">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentStep}
@@ -323,9 +323,10 @@ export function BudgetOnboarding() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.3 }}
+              className="flex flex-col max-h-[90vh]"
             >
-              {/* Header */}
-              <div className="flex items-start gap-4 mb-6 shrink-0">
+              {/* Header - Always visible */}
+              <div className="flex items-start gap-4 p-8 pb-4 shrink-0">
                 <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0">
                   <StepIcon className="w-7 h-7 text-primary" />
                 </div>
@@ -336,7 +337,7 @@ export function BudgetOnboarding() {
               </div>
 
               {/* Content - Scrollable */}
-              <div className="mb-8 overflow-y-auto flex-1 pr-2" style={{ maxHeight: 'calc(85vh - 280px)' }}>
+              <div className="flex-1 overflow-y-auto px-8 py-4">
                 {step.id === "welcome" && (
                   <div className="space-y-4 text-center py-8">
                     <p className="text-lg">
@@ -463,20 +464,22 @@ export function BudgetOnboarding() {
                 )}
               </div>
 
-              {/* Progress */}
-              <div className="flex gap-1.5 mb-6 shrink-0">
-                {ONBOARDING_STEPS.map((_, index) => (
-                  <div
-                    key={index}
-                    className={`h-2 flex-1 rounded-full transition-all duration-300 ${
-                      index <= currentStep ? "bg-primary" : "bg-muted"
-                    }`}
-                  />
-                ))}
-              </div>
+              {/* Footer - Always visible */}
+              <div className="shrink-0 px-8 py-6 border-t bg-background">
+                {/* Progress */}
+                <div className="flex gap-1.5 mb-6">
+                  {ONBOARDING_STEPS.map((_, index) => (
+                    <div
+                      key={index}
+                      className={`h-2 flex-1 rounded-full transition-all duration-300 ${
+                        index <= currentStep ? "bg-primary" : "bg-muted"
+                      }`}
+                    />
+                  ))}
+                </div>
 
-              {/* Actions */}
-              <div className="flex items-center justify-between gap-4 shrink-0">
+                {/* Actions */}
+                <div className="flex items-center justify-between gap-4">
                 <Button
                   variant="ghost"
                   onClick={handleSkip}
@@ -533,6 +536,7 @@ export function BudgetOnboarding() {
                   </Button>
                 </div>
               </div>
+            </div>
             </motion.div>
           </AnimatePresence>
         </Card>
