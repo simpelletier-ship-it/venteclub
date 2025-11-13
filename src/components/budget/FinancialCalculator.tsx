@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -8,10 +8,11 @@ import { CurrencyInput } from "@/components/CurrencyInput";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Calculator, Plus, Calendar as CalendarIcon, TrendingUp, TrendingDown, Home, Car, Building2 } from "lucide-react";
+import { Calculator, Plus, Calendar as CalendarIcon, TrendingUp, TrendingDown, Home, Car, Building2, Edit, Trash2, Save, X } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { cn } from "@/lib/utils";
@@ -44,15 +45,46 @@ export const FinancialCalculator = ({ isAuthenticated }: FinancialCalculatorProp
   const queryClient = useQueryClient();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [calculationDate, setCalculationDate] = useState<Date>(new Date());
+  const [editingAssetId, setEditingAssetId] = useState<string | null>(null);
+  const [editingDebtId, setEditingDebtId] = useState<string | null>(null);
 
-  // Assets state
+  // Fetch existing assets
+  const { data: existingAssets = [] } = useQuery({
+    queryKey: ['user-assets'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('user_assets')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: isAuthenticated && dialogOpen,
+  });
+
+  // Fetch existing debts
+  const { data: existingDebts = [] } = useQuery({
+    queryKey: ['user-debts'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('user_debts')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: isAuthenticated && dialogOpen,
+  });
+
+  // New assets/debts to add
   const [assets, setAssets] = useState<Array<{
     type: string;
     name: string;
     value: string;
   }>>([]);
 
-  // Debts state  
   const [debts, setDebts] = useState<Array<{
     type: string;
     name: string;
@@ -67,7 +99,7 @@ export const FinancialCalculator = ({ isAuthenticated }: FinancialCalculatorProp
     setAssets(assets.filter((_, i) => i !== index));
   };
 
-  const updateAsset = (index: number, field: string, value: string) => {
+  const updateNewAsset = (index: number, field: string, value: string) => {
     const updated = [...assets];
     updated[index] = { ...updated[index], [field]: value };
     setAssets(updated);
@@ -81,15 +113,85 @@ export const FinancialCalculator = ({ isAuthenticated }: FinancialCalculatorProp
     setDebts(debts.filter((_, i) => i !== index));
   };
 
-  const updateDebt = (index: number, field: string, value: string) => {
+  const updateNewDebt = (index: number, field: string, value: string) => {
     const updated = [...debts];
     updated[index] = { ...updated[index], [field]: value };
     setDebts(updated);
   };
 
-  // Calculate totals
-  const totalAssets = assets.reduce((sum, asset) => sum + (parseFloat(asset.value) || 0), 0);
-  const totalDebts = debts.reduce((sum, debt) => sum + (parseFloat(debt.balance) || 0), 0);
+  // Update asset mutation
+  const updateAssetMutation = useMutation({
+    mutationFn: async ({ id, name, value }: { id: string, name: string, value: number }) => {
+      const { error } = await supabase
+        .from('user_assets')
+        .update({ name, value })
+        .eq('id', id);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user-assets'] });
+      toast.success("Actif mis à jour avec succès");
+      setEditingAssetId(null);
+    },
+  });
+
+  // Delete asset mutation
+  const deleteAssetMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('user_assets')
+        .delete()
+        .eq('id', id);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user-assets'] });
+      toast.success("Actif supprimé");
+    },
+  });
+
+  // Update debt mutation
+  const updateDebtMutation = useMutation({
+    mutationFn: async ({ id, name, balance }: { id: string, name: string, balance: number }) => {
+      const { error } = await supabase
+        .from('user_debts')
+        .update({ name, balance })
+        .eq('id', id);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user-debts'] });
+      toast.success("Dette mise à jour avec succès");
+      setEditingDebtId(null);
+    },
+  });
+
+  // Delete debt mutation
+  const deleteDebtMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('user_debts')
+        .delete()
+        .eq('id', id);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user-debts'] });
+      toast.success("Dette supprimée");
+    },
+  });
+
+  // Calculate totals (existing + new)
+  const existingAssetsTotal = existingAssets.reduce((sum, asset) => sum + Number(asset.value), 0);
+  const existingDebtsTotal = existingDebts.reduce((sum, debt) => sum + Number(debt.balance), 0);
+  const newAssetsTotal = assets.reduce((sum, asset) => sum + (parseFloat(asset.value) || 0), 0);
+  const newDebtsTotal = debts.reduce((sum, debt) => sum + (parseFloat(debt.balance) || 0), 0);
+  const totalAssets = existingAssetsTotal + newAssetsTotal;
+  const totalDebts = existingDebtsTotal + newDebtsTotal;
   const netWorth = totalAssets - totalDebts;
 
   // Save snapshot mutation
@@ -229,7 +331,16 @@ export const FinancialCalculator = ({ isAuthenticated }: FinancialCalculatorProp
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-6">
+          <Tabs defaultValue="existing" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="existing">
+                Mes actifs/dettes ({existingAssets.length + existingDebts.length})
+              </TabsTrigger>
+              <TabsTrigger value="new">
+                Ajouter nouveaux
+              </TabsTrigger>
+            </TabsList>
+
             {/* Date Selection */}
             <div>
               <Label>Date du calcul</Label>
@@ -258,6 +369,200 @@ export const FinancialCalculator = ({ isAuthenticated }: FinancialCalculatorProp
               </Popover>
             </div>
 
+            {/* Existing Assets/Debts Tab */}
+            <TabsContent value="existing" className="space-y-4">
+              {/* Existing Assets */}
+              <div className="space-y-3">
+                <Label className="text-base font-semibold">💰 Actifs existants</Label>
+                {existingAssets.length === 0 ? (
+                  <p className="text-sm text-muted-foreground text-center py-4">
+                    Aucun actif enregistré
+                  </p>
+                ) : (
+                  existingAssets.map((asset: any) => (
+                    <div key={asset.id} className="grid grid-cols-12 gap-2 p-3 bg-muted/30 rounded-lg items-center">
+                      {editingAssetId === asset.id ? (
+                        <>
+                          <div className="col-span-5">
+                            <Input
+                              defaultValue={asset.name}
+                              id={`asset-name-${asset.id}`}
+                              className="h-9"
+                            />
+                          </div>
+                          <div className="col-span-4">
+                            <Input
+                              type="text"
+                              defaultValue={formatPrice(asset.value)}
+                              id={`asset-value-${asset.id}`}
+                              className="h-9"
+                            />
+                          </div>
+                          <div className="col-span-3 flex gap-1">
+                            <Button
+                              type="button"
+                              variant="default"
+                              size="sm"
+                              onClick={() => {
+                                const nameInput = document.getElementById(`asset-name-${asset.id}`) as HTMLInputElement;
+                                const valueInput = document.getElementById(`asset-value-${asset.id}`) as HTMLInputElement;
+                                updateAssetMutation.mutate({
+                                  id: asset.id,
+                                  name: nameInput.value,
+                                  value: parseFloat(valueInput.value.replace(/\D/g, ''))
+                                });
+                              }}
+                            >
+                              <Save className="h-3 w-3" />
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setEditingAssetId(null)}
+                            >
+                              <X className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="col-span-5">
+                            <div className="font-medium text-sm">{asset.name}</div>
+                            <div className="text-xs text-muted-foreground">
+                              {ASSET_TYPES.find(t => t.value === asset.type)?.label}
+                            </div>
+                          </div>
+                          <div className="col-span-4">
+                            <div className="font-semibold text-green-600">{formatPrice(asset.value)}</div>
+                          </div>
+                          <div className="col-span-3 flex gap-1">
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setEditingAssetId(asset.id)}
+                            >
+                              <Edit className="h-3 w-3" />
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                if (confirm(`Supprimer ${asset.name} ?`)) {
+                                  deleteAssetMutation.mutate(asset.id);
+                                }
+                              }}
+                            >
+                              <Trash2 className="h-3 w-3 text-destructive" />
+                            </Button>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  ))
+                )}
+              </div>
+
+              {/* Existing Debts */}
+              <div className="space-y-3">
+                <Label className="text-base font-semibold">💳 Dettes existantes</Label>
+                {existingDebts.length === 0 ? (
+                  <p className="text-sm text-muted-foreground text-center py-4">
+                    Aucune dette enregistrée
+                  </p>
+                ) : (
+                  existingDebts.map((debt: any) => (
+                    <div key={debt.id} className="grid grid-cols-12 gap-2 p-3 bg-muted/30 rounded-lg items-center">
+                      {editingDebtId === debt.id ? (
+                        <>
+                          <div className="col-span-5">
+                            <Input
+                              defaultValue={debt.name}
+                              id={`debt-name-${debt.id}`}
+                              className="h-9"
+                            />
+                          </div>
+                          <div className="col-span-4">
+                            <Input
+                              type="text"
+                              defaultValue={formatPrice(debt.balance)}
+                              id={`debt-balance-${debt.id}`}
+                              className="h-9"
+                            />
+                          </div>
+                          <div className="col-span-3 flex gap-1">
+                            <Button
+                              type="button"
+                              variant="default"
+                              size="sm"
+                              onClick={() => {
+                                const nameInput = document.getElementById(`debt-name-${debt.id}`) as HTMLInputElement;
+                                const balanceInput = document.getElementById(`debt-balance-${debt.id}`) as HTMLInputElement;
+                                updateDebtMutation.mutate({
+                                  id: debt.id,
+                                  name: nameInput.value,
+                                  balance: parseFloat(balanceInput.value.replace(/\D/g, ''))
+                                });
+                              }}
+                            >
+                              <Save className="h-3 w-3" />
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setEditingDebtId(null)}
+                            >
+                              <X className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="col-span-5">
+                            <div className="font-medium text-sm">{debt.name}</div>
+                            <div className="text-xs text-muted-foreground">
+                              {DEBT_TYPES.find(t => t.value === debt.type)?.label}
+                            </div>
+                          </div>
+                          <div className="col-span-4">
+                            <div className="font-semibold text-red-600">{formatPrice(debt.balance)}</div>
+                          </div>
+                          <div className="col-span-3 flex gap-1">
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setEditingDebtId(debt.id)}
+                            >
+                              <Edit className="h-3 w-3" />
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                if (confirm(`Supprimer ${debt.name} ?`)) {
+                                  deleteDebtMutation.mutate(debt.id);
+                                }
+                              }}
+                            >
+                              <Trash2 className="h-3 w-3 text-destructive" />
+                            </Button>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  ))
+                )}
+              </div>
+            </TabsContent>
+
+            {/* New Assets/Debts Tab */}
+            <TabsContent value="new" className="space-y-4">
+
             {/* Assets Section */}
             <div className="space-y-3">
               <div className="flex items-center justify-between">
@@ -271,7 +576,7 @@ export const FinancialCalculator = ({ isAuthenticated }: FinancialCalculatorProp
               {assets.map((asset, index) => (
                 <div key={index} className="grid grid-cols-12 gap-2 p-3 bg-muted/30 rounded-lg">
                   <div className="col-span-4">
-                    <Select value={asset.type} onValueChange={(value) => updateAsset(index, 'type', value)}>
+                    <Select value={asset.type} onValueChange={(value) => updateNewAsset(index, 'type', value)}>
                       <SelectTrigger className="h-9">
                         <SelectValue placeholder="Type" />
                       </SelectTrigger>
@@ -285,7 +590,7 @@ export const FinancialCalculator = ({ isAuthenticated }: FinancialCalculatorProp
                   <div className="col-span-4">
                     <Input
                       value={asset.name}
-                      onChange={(e) => updateAsset(index, 'name', e.target.value)}
+                      onChange={(e) => updateNewAsset(index, 'name', e.target.value)}
                       placeholder="Nom (optionnel)"
                       className="h-9"
                     />
@@ -293,7 +598,7 @@ export const FinancialCalculator = ({ isAuthenticated }: FinancialCalculatorProp
                   <div className="col-span-3">
                     <CurrencyInput
                       value={asset.value}
-                      onChange={(value) => updateAsset(index, 'value', value)}
+                      onChange={(value) => updateNewAsset(index, 'value', value)}
                       placeholder="Valeur"
                       className="h-9"
                     />
@@ -332,7 +637,7 @@ export const FinancialCalculator = ({ isAuthenticated }: FinancialCalculatorProp
               {debts.map((debt, index) => (
                 <div key={index} className="grid grid-cols-12 gap-2 p-3 bg-muted/30 rounded-lg">
                   <div className="col-span-4">
-                    <Select value={debt.type} onValueChange={(value) => updateDebt(index, 'type', value)}>
+                    <Select value={debt.type} onValueChange={(value) => updateNewDebt(index, 'type', value)}>
                       <SelectTrigger className="h-9">
                         <SelectValue placeholder="Type" />
                       </SelectTrigger>
@@ -346,7 +651,7 @@ export const FinancialCalculator = ({ isAuthenticated }: FinancialCalculatorProp
                   <div className="col-span-4">
                     <Input
                       value={debt.name}
-                      onChange={(e) => updateDebt(index, 'name', e.target.value)}
+                      onChange={(e) => updateNewDebt(index, 'name', e.target.value)}
                       placeholder="Nom (optionnel)"
                       className="h-9"
                     />
@@ -354,7 +659,7 @@ export const FinancialCalculator = ({ isAuthenticated }: FinancialCalculatorProp
                   <div className="col-span-3">
                     <CurrencyInput
                       value={debt.balance}
-                      onChange={(value) => updateDebt(index, 'balance', value)}
+                      onChange={(value) => updateNewDebt(index, 'balance', value)}
                       placeholder="Solde"
                       className="h-9"
                     />
@@ -380,6 +685,8 @@ export const FinancialCalculator = ({ isAuthenticated }: FinancialCalculatorProp
               )}
             </div>
 
+            </TabsContent>
+
             {/* Summary Preview */}
             <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg p-4 space-y-2">
               <div className="flex items-center justify-between text-sm">
@@ -389,12 +696,18 @@ export const FinancialCalculator = ({ isAuthenticated }: FinancialCalculatorProp
                 </span>
                 <span className="font-semibold text-green-600">{formatPrice(totalAssets)}</span>
               </div>
+              <div className="text-xs text-muted-foreground ml-6">
+                Existants: {formatPrice(existingAssetsTotal)} • Nouveaux: {formatPrice(newAssetsTotal)}
+              </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="flex items-center gap-2">
                   <TrendingDown className="h-4 w-4 text-red-600" />
                   Total dettes
                 </span>
                 <span className="font-semibold text-red-600">{formatPrice(totalDebts)}</span>
+              </div>
+              <div className="text-xs text-muted-foreground ml-6">
+                Existantes: {formatPrice(existingDebtsTotal)} • Nouvelles: {formatPrice(newDebtsTotal)}
               </div>
               <div className="pt-2 border-t flex items-center justify-between">
                 <span className="font-semibold">Valeur nette</span>
@@ -412,7 +725,7 @@ export const FinancialCalculator = ({ isAuthenticated }: FinancialCalculatorProp
             >
               {saveSnapshot.isPending ? "Enregistrement..." : `Calculer ma valeur nette en date du ${format(calculationDate, 'd MMMM yyyy', { locale: fr })}`}
             </Button>
-          </div>
+          </Tabs>
         </DialogContent>
       </Dialog>
     </Card>
