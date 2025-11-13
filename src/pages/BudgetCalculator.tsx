@@ -324,12 +324,41 @@ const BudgetCalculator = () => {
         <meta name="twitter:title" content="Planificateur Budget Québec Gratuit | Gestion Finances 2025" />
         <meta name="twitter:description" content="Outil gratuit de gestion budgétaire intelligent pour le Québec. Suivi dépenses, objectifs, coaching personnalisé." />
         
-        {/* Structured Data */}
+        {/* Breadcrumb Schema */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Accueil",
+                "item": "https://vente.club"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Outils Financiers",
+                "item": "https://vente.club/outils"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "Planificateur de Budget",
+                "item": "https://vente.club/outils/budget"
+              }
+            ]
+          })}
+        </script>
+        
+        {/* WebApplication Schema */}
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "WebApplication",
             "name": "Planificateur Budget Québec",
+            "url": "https://vente.club/outils/budget",
             "applicationCategory": "FinanceApplication",
             "operatingSystem": "All",
             "offers": {

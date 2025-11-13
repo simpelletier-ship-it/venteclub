@@ -159,7 +159,35 @@ const TaxReturnCalculator = () => {
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://vente.club/outils/retour-impot" />
         
-        {/* Structured Data */}
+        {/* Breadcrumb Schema */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Accueil",
+                "item": "https://vente.club"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Outils Financiers",
+                "item": "https://vente.club/outils"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "Calculateur de Retour d'Impôt",
+                "item": "https://vente.club/outils/retour-impot"
+              }
+            ]
+          })}
+        </script>
+        
+        {/* WebApplication Schema */}
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",

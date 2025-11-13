@@ -279,12 +279,42 @@ const SalaryCalculator = () => {
         <meta property="og:url" content="https://vente.club/outils/salaire" />
         
         {/* Schema.org markup for Google */}
+        {/* Breadcrumb Schema */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Accueil",
+                "item": "https://vente.club"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Outils Financiers",
+                "item": "https://vente.club/outils"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "Calculateur de Salaire Net",
+                "item": "https://vente.club/outils/salaire"
+              }
+            ]
+          })}
+        </script>
+        
+        {/* WebApplication Schema */}
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "WebApplication",
             "name": "Calculateur de Salaire Net Québec",
             "description": "Calculateur gratuit de salaire net après impôts pour le Québec avec les taux d'imposition 2025",
+            "url": "https://vente.club/outils/salaire",
             "applicationCategory": "FinanceApplication",
             "operatingSystem": "Any",
             "offers": {

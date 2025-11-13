@@ -143,7 +143,7 @@ const App = () => (
                 
                 {/* Tools Routes */}
                 <Route path="/outils" element={<EmailVerificationGuard><Tools /></EmailVerificationGuard>} />
-                <Route path="/outils/calculateur-salaire" element={<EmailVerificationGuard><SalaryCalculator /></EmailVerificationGuard>} />
+                <Route path="/outils/salaire" element={<EmailVerificationGuard><SalaryCalculator /></EmailVerificationGuard>} />
                 <Route path="/outils/retour-impot" element={<EmailVerificationGuard><TaxReturnCalculator /></EmailVerificationGuard>} />
                 <Route path="/outils/budget" element={<BudgetCalculator />} />
                 
