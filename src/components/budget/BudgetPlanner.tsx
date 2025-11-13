@@ -274,8 +274,12 @@ BALANCE: ${formatPrice(totalIncomeActual - totalExpenseActual)}
   };
 
   const getCategorySpent = (categoryId: string) => {
+    const category = categories.find(c => c.id === categoryId);
+    if (!category) return 0;
+    
+    // Filter transactions by category AND by matching type (income/expense)
     return transactions
-      .filter(t => t.category_id === categoryId)
+      .filter(t => t.category_id === categoryId && t.type === category.type)
       .reduce((sum, t) => sum + Number(t.amount), 0);
   };
 
