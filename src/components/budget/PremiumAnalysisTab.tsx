@@ -3,6 +3,7 @@ import { InterestAnalyzer } from "./InterestAnalyzer";
 import { SavingsOpportunitiesDetector } from "./SavingsOpportunitiesDetector";
 import { ScenarioSimulator } from "./ScenarioSimulator";
 import { MonthlyComparisonChart } from "./MonthlyComparisonChart";
+import { RetirementProjection } from "./RetirementProjection";
 
 interface PremiumAnalysisTabProps {
   transactions: any[];
@@ -31,6 +32,8 @@ export const PremiumAnalysisTab = ({ transactions, categories, debts, assets }: 
       )}
       
       <SavingsOpportunitiesDetector transactions={transactions} categories={categories} />
+
+      <RetirementProjection />
     </div>
   );
 };
