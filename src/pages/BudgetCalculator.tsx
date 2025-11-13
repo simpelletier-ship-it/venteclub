@@ -462,7 +462,7 @@ const BudgetCalculator = () => {
                 💰 Mon budget
               </TabsTrigger>
               <TabsTrigger value="assets" className="text-base py-3">
-                🏦 Mes actifs
+                🏦 Ma valeur nette
               </TabsTrigger>
               <TabsTrigger value="analyses" className="text-base py-3">
                 📈 Analyses
@@ -489,7 +489,7 @@ const BudgetCalculator = () => {
                 </TabsTrigger>
                 <TabsTrigger value="assets" className="flex flex-col gap-1 data-[state=active]:bg-primary/10">
                   <span className="text-xl">🏦</span>
-                  <span className="text-xs">Actifs</span>
+                  <span className="text-xs">Valeur</span>
                 </TabsTrigger>
                 <TabsTrigger value="analyses" className="flex flex-col gap-1 data-[state=active]:bg-primary/10">
                   <span className="text-xl">📈</span>
@@ -548,20 +548,12 @@ const BudgetCalculator = () => {
                           categories={categories}
                         />
                       ),
-                      netWorthGamification: (
-                        <NetWorthGamification netWorth={netWorth} isAuthenticated={isAuthenticated} />
-                      ),
-                      quickNetWorthUpdate: (
-                        <div className="flex justify-center">
-                          <QuickNetWorthUpdate currentNetWorth={netWorth} isAuthenticated={isAuthenticated} />
-                        </div>
-                      ),
                       coachIA: (
                         <Card>
                           <CardHeader className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent">
                             <CardTitle className="flex items-center gap-2">
                               <span className="text-2xl">🤖</span>
-                              Coach IA
+                              Coach financier
                             </CardTitle>
                           </CardHeader>
                           <CardContent className="p-6">
@@ -613,28 +605,24 @@ const BudgetCalculator = () => {
               <div className="space-y-6">
                 <BudgetTransactions isAuthenticated={isAuthenticated} />
                 
-                {/* Fixed Costs Section */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      🔁 Mes coûts fixes
-                    </CardTitle>
-                    <CardDescription>
-                      Toutes vos dépenses récurrentes en un coup d'œil
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
+                {/* Compact Fixed Costs Section */}
+                <details className="group">
+                  <summary className="flex items-center gap-2 cursor-pointer list-none p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors">
+                    <span className="text-lg">🔁</span>
+                    <span className="font-medium">Mes coûts fixes</span>
+                    <span className="ml-auto text-xs text-muted-foreground">
+                      Cliquez pour voir vos dépenses récurrentes
+                    </span>
+                  </summary>
+                  <div className="mt-2 p-4 rounded-lg border bg-card">
                     <RecurringExpenses isAuthenticated={isAuthenticated} />
-                  </CardContent>
-                </Card>
+                  </div>
+                </details>
               </div>
             </TabsContent>
 
             <TabsContent value="assets">
               <div className="space-y-6">
-                {/* New Financial Calculator */}
-                <FinancialCalculator isAuthenticated={isAuthenticated} />
-                
                 <SimpleNetWorthTracker currentNetWorth={netWorth} isAuthenticated={isAuthenticated} />
                 <NetWorthGamification netWorth={netWorth} isAuthenticated={isAuthenticated} />
                 <BudgetAssetsDebts isAuthenticated={isAuthenticated} />

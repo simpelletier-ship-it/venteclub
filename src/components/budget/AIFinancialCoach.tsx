@@ -218,7 +218,7 @@ export const AIFinancialCoach = () => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Sparkles className="h-5 w-5 text-primary" />
-          Coach financier IA
+          Coach financier
         </CardTitle>
         <CardDescription>
           Recevez des conseils personnalisés basés sur vos habitudes financières
