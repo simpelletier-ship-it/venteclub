@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { Pencil, Trash2, Plus, GripVertical } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Pencil, Trash2, Plus, GripVertical, Pin } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useSwipeGesture } from "@/hooks/useSwipeGesture";
 import {
   DndContext,
   closestCenter,
