@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, TrendingDown, Zap, Sparkles, Check, ChevronsUpDown, Settings, Pin, PinOff, GripVertical, Calendar as CalendarIcon, Pencil } from "lucide-react";
+import { Plus, TrendingDown, Zap, Sparkles, Check, ChevronsUpDown, Settings, Pin, PinOff, GripVertical, Calendar as CalendarIcon, Pencil, Rocket } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,6 +16,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { TransactionTagManager } from "./TransactionTagManager";
+import { formatPrice } from "@/lib/priceFormat";
 import {
   DndContext,
   closestCenter,
@@ -164,6 +165,7 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
   const [editCategoryOpen, setEditCategoryOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<any>(null);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [templatesOpen, setTemplatesOpen] = useState(false);
 
   // Fetch categories
   const { data: categories = [] } = useQuery({
@@ -200,6 +202,39 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
       // Get unique descriptions
       const unique = [...new Set(data.map(t => t.description))];
       return unique;
+    },
+    enabled: isAuthenticated,
+    retry: 1,
+  });
+
+  // Fetch templates
+  const { data: templates = [] } = useQuery({
+    queryKey: ['transaction-templates', transactionType],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('transaction_templates')
+        .select('*, category:budget_categories(*)')
+        .eq('type', transactionType)
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: isAuthenticated,
+    retry: 1,
+  });
+
+  // Fetch tags for templates
+  const { data: allTags = [] } = useQuery({
+    queryKey: ['transaction-tags'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('transaction_tags')
+        .select('*')
+        .order('name');
+      
+      if (error) throw error;
+      return data || [];
     },
     enabled: isAuthenticated,
     retry: 1,
@@ -417,6 +452,15 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
       return;
     }
     quickAdd.mutate();
+  };
+
+  const applyTemplate = (template: any) => {
+    setAmount(template.amount.toString());
+    setDescription(template.description || "");
+    setSelectedCategory(template.category_id);
+    setSelectedTags(template.tag_ids || []);
+    setTemplatesOpen(false);
+    toast.success(`✨ Template "${template.name}" appliqué!`, { duration: 1500 });
   };
 
   // Get pinned categories (fallback to first 6 if none pinned)
@@ -851,6 +895,72 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
               </Button>
             </DialogContent>
           </Dialog>
+
+          {/* Templates Dropdown */}
+          {templates.length > 0 && (
+            <Popover open={templatesOpen} onOpenChange={setTemplatesOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="w-full h-12 mb-2"
+                  type="button"
+                >
+                  <Rocket className="h-4 w-4 mr-2" />
+                  Utiliser un template ({templates.length})
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[400px] p-0" align="center">
+                <Command>
+                  <CommandInput placeholder="Rechercher un template..." />
+                  <CommandList>
+                    <CommandEmpty>Aucun template trouvé.</CommandEmpty>
+                    <CommandGroup heading="Templates disponibles">
+                      {templates.map((template: any) => (
+                        <CommandItem
+                          key={template.id}
+                          value={template.name}
+                          onSelect={() => applyTemplate(template)}
+                          className="cursor-pointer"
+                        >
+                          <div className="flex items-center gap-3 w-full">
+                            <div 
+                              className="w-10 h-10 rounded-full flex items-center justify-center text-xl shrink-0"
+                              style={{ backgroundColor: template.category?.color + '20' }}
+                            >
+                              {template.category?.icon}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="font-medium truncate">{template.name}</div>
+                              <div className="text-sm text-muted-foreground">
+                                {template.category?.name} • {formatPrice(template.amount)}
+                              </div>
+                              {template.tag_ids && template.tag_ids.length > 0 && (
+                                <div className="flex gap-1 mt-1 flex-wrap">
+                                  {template.tag_ids.slice(0, 3).map((tagId: string) => {
+                                    const tag = allTags.find(t => t.id === tagId);
+                                    if (!tag) return null;
+                                    return (
+                                      <span key={tagId} className="text-xs">
+                                        {tag.icon}
+                                      </span>
+                                    );
+                                  })}
+                                  {template.tag_ids.length > 3 && (
+                                    <span className="text-xs text-muted-foreground">+{template.tag_ids.length - 3}</span>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                            <Zap className="h-4 w-4 text-primary shrink-0" />
+                          </div>
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
+          )}
 
           <Button 
             className="w-full h-14 text-lg font-semibold"

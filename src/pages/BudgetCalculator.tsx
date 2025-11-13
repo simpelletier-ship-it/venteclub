@@ -38,6 +38,7 @@ import { PremiumAnalysisTab } from "@/components/budget/PremiumAnalysisTab";
 import { BudgetResetDialog } from "@/components/budget/BudgetResetDialog";
 import { TagStatistics } from "@/components/budget/TagStatistics";
 import { TransactionTemplates } from "@/components/budget/TransactionTemplates";
+import { TagComparison } from "@/components/budget/TagComparison";
 
 const BudgetCalculator = () => {
   const navigate = useNavigate();
@@ -422,6 +423,9 @@ const BudgetCalculator = () => {
 
                 {/* Tag Statistics */}
                 <TagStatistics isAuthenticated={isAuthenticated} />
+
+                {/* Tag Comparison */}
+                <TagComparison isAuthenticated={isAuthenticated} />
 
                 {/* Transaction Templates */}
                 <TransactionTemplates 
