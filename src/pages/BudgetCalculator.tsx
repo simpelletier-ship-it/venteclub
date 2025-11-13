@@ -383,7 +383,7 @@ const BudgetCalculator = () => {
           <QuickExpenseTracker isAuthenticated={isAuthenticated} />
 
           <Tabs defaultValue="overview" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-2 lg:grid-cols-5 gap-2 h-auto">
+            <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6 gap-2 h-auto">
               <TabsTrigger value="overview" className="text-base py-3">
                 📊 Tableau de bord
               </TabsTrigger>
@@ -396,133 +396,121 @@ const BudgetCalculator = () => {
               <TabsTrigger value="assets" className="text-base py-3">
                 🏦 Mes actifs
               </TabsTrigger>
+              <TabsTrigger value="analyses" className="text-base py-3">
+                📈 Analyses
+              </TabsTrigger>
               <TabsTrigger value="customize" className="text-base py-3">
                 🎨 Personnaliser
               </TabsTrigger>
             </TabsList>
 
             <TabsContent value="overview">
-              <div className="space-y-6">
-                {/* Vue d'ensemble visuelle - En premier */}
-                <ExpenseTrendsChart transactions={transactions} />
-                
-                <ExpensesByCategory 
-                  transactions={transactions}
-                  categories={categories}
-                  onAnalyze={() => {
-                    const tabsList = document.querySelector('[role="tablist"]');
-                    const transactionsTab = tabsList?.querySelector('[value="transactions"]') as HTMLButtonElement;
-                    transactionsTab?.click();
-                  }}
-                />
-
-                {/* Score de Santé Financière */}
-                <FinancialHealthScore 
-                  transactions={transactions}
-                  debts={debts}
-                  assets={assets}
-                />
-
-                <NetWorthGamification netWorth={netWorth} isAuthenticated={isAuthenticated} />
-                
-                <div className="flex justify-center">
-                  <QuickNetWorthUpdate currentNetWorth={netWorth} isAuthenticated={isAuthenticated} />
+              <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                {/* Score financier - Sticky sidebar */}
+                <div className="lg:col-span-1">
+                  <div className="lg:sticky lg:top-4">
+                    <FinancialHealthScore 
+                      transactions={transactions}
+                      debts={debts}
+                      assets={assets}
+                    />
+                  </div>
                 </div>
 
-                {/* Tag Statistics */}
-                <TagStatistics isAuthenticated={isAuthenticated} />
-
-                {/* Tag Comparison */}
-                <TagComparison isAuthenticated={isAuthenticated} />
-
-                {/* Transaction Templates */}
-                <TransactionTemplates 
-                  isAuthenticated={isAuthenticated}
-                  categories={categories}
-                />
-
-                {/* Suivi en temps réel */}
-                <Card className="overflow-hidden">
-                  <CardHeader className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent">
-                    <CardTitle className="flex items-center gap-2">
-                      <span className="text-2xl">📊</span>
-                      Suivi en temps réel
-                    </CardTitle>
-                    <CardDescription>
-                      Vos actifs et recommandations personnalisées
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="p-6 space-y-6">
-                    {/* REER & CELI */}
-                    <div>
-                      <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                        <span>💰</span>
-                        REER & CELI
-                      </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {assets.filter(a => a.type === 'REER' || a.type === 'CELI').length > 0 ? (
-                          assets
-                            .filter(a => a.type === 'REER' || a.type === 'CELI')
-                            .map(asset => (
-                              <div key={asset.id} className="p-4 bg-muted/50 rounded-lg">
-                                <div className="flex items-center justify-between">
-                                  <div>
-                                    <p className="text-sm text-muted-foreground">{asset.type}</p>
-                                    <p className="text-xl font-bold">{formatPrice(asset.value)}</p>
-                                  </div>
-                                  <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                                    <span className="text-2xl">
-                                      {asset.type === 'REER' ? '🏦' : '💎'}
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-                            ))
-                        ) : (
-                          <div className="col-span-2 p-4 bg-muted/30 rounded-lg text-center text-sm text-muted-foreground">
-                            Aucun REER ou CELI enregistré. Ajoutez-les dans l'onglet "Mes actifs".
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Coach IA */}
-                    <div>
-                      <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                        <span>🤖</span>
-                        Coach IA
-                      </h3>
-                      <BudgetInsights 
-                        transactions={transactions}
-                        categories={categories}
-                        debts={debts}
-                        assets={assets}
-                      />
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Objectifs d'épargne */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <span className="text-2xl">🎯</span>
-                      Objectifs d'épargne
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <FinancialGoals isAuthenticated={isAuthenticated} />
-                  </CardContent>
-                </Card>
-
-                {/* Analyses avancées - Sans titre */}
-                <div className="space-y-6">
-                  <PremiumAnalysisTab 
+                {/* Main content */}
+                <div className="lg:col-span-3 space-y-6">
+                  {/* Vue d'ensemble visuelle */}
+                  <ExpenseTrendsChart transactions={transactions} />
+                  
+                  <ExpensesByCategory 
                     transactions={transactions}
                     categories={categories}
-                    debts={debts}
-                    assets={assets}
+                    onAnalyze={() => {
+                      const tabsList = document.querySelector('[role="tablist"]');
+                      const transactionsTab = tabsList?.querySelector('[value="transactions"]') as HTMLButtonElement;
+                      transactionsTab?.click();
+                    }}
                   />
+
+                  <NetWorthGamification netWorth={netWorth} isAuthenticated={isAuthenticated} />
+                  
+                  <div className="flex justify-center">
+                    <QuickNetWorthUpdate currentNetWorth={netWorth} isAuthenticated={isAuthenticated} />
+                  </div>
+
+                  {/* Suivi en temps réel */}
+                  <Card>
+                    <CardHeader className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent">
+                      <CardTitle className="flex items-center gap-2">
+                        <span className="text-2xl">📊</span>
+                        Suivi en temps réel
+                      </CardTitle>
+                      <CardDescription>
+                        Vos actifs et recommandations
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="p-6 space-y-6">
+                      {/* REER & CELI */}
+                      <div>
+                        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                          <span>💰</span>
+                          REER & CELI
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {assets.filter(a => a.type === 'REER' || a.type === 'CELI').length > 0 ? (
+                            assets
+                              .filter(a => a.type === 'REER' || a.type === 'CELI')
+                              .map(asset => (
+                                <div key={asset.id} className="p-4 bg-muted/50 rounded-lg">
+                                  <div className="flex items-center justify-between">
+                                    <div>
+                                      <p className="text-sm text-muted-foreground">{asset.type}</p>
+                                      <p className="text-xl font-bold">{formatPrice(asset.value)}</p>
+                                    </div>
+                                    <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+                                      <span className="text-2xl">
+                                        {asset.type === 'REER' ? '🏦' : '💎'}
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+                              ))
+                          ) : (
+                            <div className="col-span-2 p-4 bg-muted/30 rounded-lg text-center text-sm text-muted-foreground">
+                              Aucun REER ou CELI enregistré. Ajoutez-les dans l'onglet "Mes actifs".
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Coach IA */}
+                      <div>
+                        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                          <span>🤖</span>
+                          Coach IA
+                        </h3>
+                        <BudgetInsights 
+                          transactions={transactions}
+                          categories={categories}
+                          debts={debts}
+                          assets={assets}
+                        />
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Objectifs d'épargne */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <span className="text-2xl">🎯</span>
+                        Objectifs d'épargne
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <FinancialGoals isAuthenticated={isAuthenticated} />
+                    </CardContent>
+                  </Card>
                 </div>
               </div>
             </TabsContent>
@@ -546,6 +534,59 @@ const BudgetCalculator = () => {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <CategoryManager isAuthenticated={isAuthenticated} />
                 <ThemeCustomizer />
+              </div>
+            </TabsContent>
+
+            <TabsContent value="analyses">
+              <div className="space-y-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <span className="text-2xl">🏷️</span>
+                      Statistiques par tag
+                    </CardTitle>
+                    <CardDescription>Analysez vos dépenses par étiquettes</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <TagStatistics isAuthenticated={isAuthenticated} />
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <span className="text-2xl">📊</span>
+                      Comparaison par tag
+                    </CardTitle>
+                    <CardDescription>Comparez vos dépenses entre périodes</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <TagComparison isAuthenticated={isAuthenticated} />
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <span className="text-2xl">⚡</span>
+                      Templates de transactions
+                    </CardTitle>
+                    <CardDescription>Transactions fréquentes sauvegardées</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <TransactionTemplates 
+                      isAuthenticated={isAuthenticated}
+                      categories={categories}
+                    />
+                  </CardContent>
+                </Card>
+
+                <PremiumAnalysisTab 
+                  transactions={transactions}
+                  categories={categories}
+                  debts={debts}
+                  assets={assets}
+                />
               </div>
             </TabsContent>
           </Tabs>

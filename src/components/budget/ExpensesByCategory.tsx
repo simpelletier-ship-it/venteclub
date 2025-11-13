@@ -4,13 +4,15 @@ import { formatPrice } from "@/lib/priceFormat";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Trash2, TrendingUp, List, Grid3x3, ArrowUpDown, PieChartIcon, BarChart3 } from "lucide-react";
+import { Trash2, TrendingUp, List, Grid3x3, ArrowUpDown, PieChartIcon, BarChart3, ChevronLeft, ChevronRight } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { format } from "date-fns";
+import { fr } from "date-fns/locale";
 
 interface ExpensesByCategoryProps {
   transactions: any[];
@@ -22,37 +24,43 @@ export const ExpensesByCategory = ({ transactions, categories, onAnalyze }: Expe
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
-  const [period, setPeriod] = useState<string>("month");
+  const [selectedMonth, setSelectedMonth] = useState<Date>(new Date());
   const [sortBy, setSortBy] = useState<string>("date");
   const [chartType, setChartType] = useState<string>("pie");
   const queryClient = useQueryClient();
 
-  // Calculate date range based on selected period
-  const getDateRange = () => {
-    const now = new Date();
-    let startDate = new Date();
-    
-    switch (period) {
-      case "week":
-        startDate.setDate(now.getDate() - 7);
-        break;
-      case "month":
-        startDate.setMonth(now.getMonth() - 1);
-        break;
-      case "3months":
-        startDate.setMonth(now.getMonth() - 3);
-        break;
-      case "year":
-        startDate.setFullYear(now.getFullYear() - 1);
-        break;
-      default:
-        startDate.setMonth(now.getMonth() - 1);
-    }
-    
-    return startDate.toISOString().split('T')[0];
+  // Navigate months
+  const goToPreviousMonth = () => {
+    setSelectedMonth(prev => {
+      const newDate = new Date(prev);
+      newDate.setMonth(newDate.getMonth() - 1);
+      return newDate;
+    });
   };
 
-  const startDate = getDateRange();
+  const goToNextMonth = () => {
+    const now = new Date();
+    setSelectedMonth(prev => {
+      const newDate = new Date(prev);
+      newDate.setMonth(newDate.getMonth() + 1);
+      // Don't go beyond current month
+      if (newDate > now) return prev;
+      return newDate;
+    });
+  };
+
+  // Calculate date range based on selected month
+  const getDateRange = () => {
+    const startDate = new Date(selectedMonth.getFullYear(), selectedMonth.getMonth(), 1);
+    const endDate = new Date(selectedMonth.getFullYear(), selectedMonth.getMonth() + 1, 0);
+    
+    return {
+      start: startDate.toISOString().split('T')[0],
+      end: endDate.toISOString().split('T')[0]
+    };
+  };
+
+  const { start: startDate, end: endDate } = getDateRange();
   
   const expensesByCategoryAll = categories
     .filter(cat => cat.type === 'expense')
@@ -60,7 +68,8 @@ export const ExpensesByCategory = ({ transactions, categories, onAnalyze }: Expe
       const categoryTransactions = transactions.filter(
         t => t.category_id === category.id && 
         t.type === 'expense' && 
-        t.transaction_date >= startDate
+        t.transaction_date >= startDate &&
+        t.transaction_date <= endDate
       );
       
       const total = categoryTransactions.reduce((sum, t) => sum + Number(t.amount), 0);
@@ -206,17 +215,31 @@ export const ExpensesByCategory = ({ transactions, categories, onAnalyze }: Expe
                   <BarChart3 className="h-4 w-4" />
                 </ToggleGroupItem>
               </ToggleGroup>
-              <Select value={period} onValueChange={setPeriod}>
-                <SelectTrigger className="w-[140px]">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="week">Cette semaine</SelectItem>
-                  <SelectItem value="month">Ce mois</SelectItem>
-                  <SelectItem value="3months">3 mois</SelectItem>
-                  <SelectItem value="year">Cette année</SelectItem>
-                </SelectContent>
-              </Select>
+              
+              {/* Month navigation */}
+              <div className="flex items-center gap-1 bg-muted/50 rounded-md p-1">
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-8 w-8"
+                  onClick={goToPreviousMonth}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <span className="text-sm font-medium px-3 min-w-[120px] text-center">
+                  {format(selectedMonth, 'MMMM yyyy', { locale: fr })}
+                </span>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-8 w-8"
+                  onClick={goToNextMonth}
+                  disabled={selectedMonth.getMonth() === new Date().getMonth() && selectedMonth.getFullYear() === new Date().getFullYear()}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+              
               {onAnalyze && (
                 <Button variant="outline" size="sm" onClick={onAnalyze}>
                   <TrendingUp className="mr-2 h-4 w-4" />
