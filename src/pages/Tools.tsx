@@ -4,10 +4,26 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect, useRef } from "react";
+import { useSwipeGesture } from "@/hooks/useSwipeGesture";
 
 const Tools = () => {
   const [activeCardIndex, setActiveCardIndex] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // Fonction pour naviguer vers une carte spécifique
+  const scrollToCard = (index: number, behavior: 'smooth' | 'auto' = 'smooth') => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const cardWidth = container.offsetWidth * 0.85;
+    const gap = 16; // 4 de Tailwind = 16px
+    const scrollPosition = index * (cardWidth + gap);
+
+    container.scrollTo({
+      left: scrollPosition,
+      behavior,
+    });
+  };
 
   // Détecter quelle carte est visible pendant le scroll
   useEffect(() => {
@@ -16,14 +32,48 @@ const Tools = () => {
 
     const handleScroll = () => {
       const scrollLeft = container.scrollLeft;
-      const cardWidth = container.offsetWidth * 0.85; // 85vw par carte
-      const index = Math.round(scrollLeft / cardWidth);
-      setActiveCardIndex(index);
+      const cardWidth = container.offsetWidth * 0.85;
+      const gap = 16;
+      const index = Math.round(scrollLeft / (cardWidth + gap));
+      setActiveCardIndex(Math.max(0, Math.min(index, 2))); // 3 cartes (0-2)
     };
 
     container.addEventListener('scroll', handleScroll);
     return () => container.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Gestes de swipe avancés avec détection de vélocité
+  useSwipeGesture(scrollContainerRef, {
+    onSwipeLeft: (velocity) => {
+      // Calculer combien de cartes sauter en fonction de la vélocité
+      // Vélocité faible (< 0.5): 1 carte
+      // Vélocité moyenne (0.5-1.0): 2 cartes
+      // Vélocité élevée (> 1.0): toutes les cartes restantes
+      let cardsToSkip = 1;
+      if (velocity > 1.0) {
+        cardsToSkip = 3; // Aller jusqu'à la fin
+      } else if (velocity > 0.5) {
+        cardsToSkip = 2;
+      }
+
+      const newIndex = Math.min(activeCardIndex + cardsToSkip, 2);
+      scrollToCard(newIndex);
+    },
+    onSwipeRight: (velocity) => {
+      // Même logique pour swipe vers la droite
+      let cardsToSkip = 1;
+      if (velocity > 1.0) {
+        cardsToSkip = 3;
+      } else if (velocity > 0.5) {
+        cardsToSkip = 2;
+      }
+
+      const newIndex = Math.max(activeCardIndex - cardsToSkip, 0);
+      scrollToCard(newIndex);
+    },
+    threshold: 30, // Distance minimale pour déclencher un swipe
+    velocityThreshold: 0.3, // Vélocité minimale pour un swipe rapide
+  });
 
   const tools = [
     {
@@ -260,17 +310,8 @@ const Tools = () => {
               {tools.map((_, index) => (
                 <button
                   key={index}
-                  onClick={() => {
-                    const container = scrollContainerRef.current;
-                    if (container) {
-                      const cardWidth = container.offsetWidth * 0.85;
-                      container.scrollTo({
-                        left: cardWidth * index,
-                        behavior: 'smooth'
-                      });
-                    }
-                  }}
-                  className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                  onClick={() => scrollToCard(index)}
+                  className={`w-2 h-2 rounded-full transition-all duration-300 active:scale-90 ${
                     activeCardIndex === index 
                       ? 'bg-primary w-6' 
                       : 'bg-muted-foreground/30'
@@ -279,6 +320,11 @@ const Tools = () => {
                 />
               ))}
             </div>
+
+            {/* Indicateur visuel de vélocité (pour feedback utilisateur) */}
+            <p className="text-center text-xs text-muted-foreground mt-2 md:hidden">
+              💨 Swipez rapidement pour naviguer entre plusieurs outils
+            </p>
 
             {/* Desktop: Grid classique */}
             <div className="hidden md:grid grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto">
