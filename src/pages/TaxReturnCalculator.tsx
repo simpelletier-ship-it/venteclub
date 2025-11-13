@@ -5,7 +5,8 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { CurrencyInput } from "@/components/CurrencyInput";
 import { formatPrice } from "@/lib/priceFormat";
-import { TrendingUp, TrendingDown } from "lucide-react";
+import { TrendingUp, TrendingDown, AlertTriangle } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const TaxReturnCalculator = () => {
   const [income, setIncome] = useState("60000");
@@ -184,6 +185,14 @@ const TaxReturnCalculator = () => {
 
       <div className="min-h-screen bg-background py-12">
         <div className="container mx-auto px-4 max-w-5xl">
+          <Alert className="mb-6 border-yellow-500 bg-yellow-50 dark:bg-yellow-950/20">
+            <AlertTriangle className="h-4 w-4 text-yellow-600 dark:text-yellow-500" />
+            <AlertTitle className="text-yellow-800 dark:text-yellow-400">Avertissement important</AlertTitle>
+            <AlertDescription className="text-yellow-700 dark:text-yellow-300">
+              Ce calculateur fournit une estimation de votre retour d'impôt basée sur les taux et crédits de 2025. Les résultats sont approximatifs et peuvent varier selon votre situation fiscale complète. Consultez toujours un comptable ou un fiscaliste qualifié pour une évaluation précise et des conseils fiscaux personnalisés.
+            </AlertDescription>
+          </Alert>
+          
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold mb-2 text-foreground">
               Calculateur de Retour d'Impôt

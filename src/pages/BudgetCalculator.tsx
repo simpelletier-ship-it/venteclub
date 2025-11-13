@@ -1,14 +1,14 @@
 import { Helmet } from "react-helmet";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertTriangle, AlertCircle, CheckCircle, TrendingUp, Loader2 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { CurrencyInput } from "@/components/CurrencyInput";
 import { formatPrice } from "@/lib/priceFormat";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
-import { AlertCircle, CheckCircle, TrendingUp, Loader2 } from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
@@ -358,6 +358,14 @@ const BudgetCalculator = () => {
 
       <div className="min-h-screen bg-background py-8">
         <div className="container mx-auto px-4 max-w-7xl">
+          <Alert className="mb-6 border-yellow-500 bg-yellow-50 dark:bg-yellow-950/20">
+            <AlertTriangle className="h-4 w-4 text-yellow-600 dark:text-yellow-500" />
+            <AlertTitle className="text-yellow-800 dark:text-yellow-400">Confidentialité et Avertissement</AlertTitle>
+            <AlertDescription className="text-yellow-700 dark:text-yellow-300">
+              Toutes vos données financières sont stockées de manière sécurisée et privée. Ce planificateur est un outil d'aide à la décision financière personnelle. Pour des conseils financiers professionnels adaptés à votre situation, consultez toujours un conseiller financier ou un comptable qualifié.
+            </AlertDescription>
+          </Alert>
+          
           {/* SEO Content Section */}
           <div className="text-center mb-8 space-y-4">
             <div className="flex items-center justify-center gap-4">

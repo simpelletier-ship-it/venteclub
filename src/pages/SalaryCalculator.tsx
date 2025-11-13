@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { CurrencyInput } from "@/components/CurrencyInput";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 import { formatPrice } from "@/lib/priceFormat";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertTriangle } from "lucide-react";
 
 const PROVINCES = [
   { value: "QC", label: "Québec" },
@@ -303,6 +305,14 @@ const SalaryCalculator = () => {
 
       <div className="min-h-screen bg-background py-8">
         <div className="container mx-auto px-4 max-w-6xl">
+          <Alert className="mb-6 border-yellow-500 bg-yellow-50 dark:bg-yellow-950/20">
+            <AlertTriangle className="h-4 w-4 text-yellow-600 dark:text-yellow-500" />
+            <AlertTitle className="text-yellow-800 dark:text-yellow-400">Avertissement important</AlertTitle>
+            <AlertDescription className="text-yellow-700 dark:text-yellow-300">
+              Ce calculateur fournit une estimation basée sur les taux d'imposition de 2025. Les résultats sont approximatifs et ne doivent pas être considérés comme des conseils fiscaux professionnels. Consultez toujours un comptable ou un fiscaliste pour une évaluation précise de votre situation.
+            </AlertDescription>
+          </Alert>
+          
           {/* SEO-optimized header section */}
           <header className="text-center mb-8">
             <h1 className="text-3xl md:text-4xl font-bold mb-3 text-foreground">
