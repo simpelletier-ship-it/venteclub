@@ -138,21 +138,7 @@ export const ExpensesByCategory = ({ transactions, categories, onAnalyze }: Expe
     },
   });
 
-  if (expensesByCategory.length === 0) {
-    return (
-      <Card className="shadow-lg">
-        <CardHeader>
-          <CardTitle className="text-xl">📊 Dépenses par catégorie</CardTitle>
-          <CardDescription>Ce mois-ci</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="text-center text-muted-foreground py-8">
-            Aucune dépense enregistrée ce mois-ci
-          </p>
-        </CardContent>
-      </Card>
-    );
-  }
+  const hasData = expensesByCategory.length > 0;
 
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
@@ -204,7 +190,9 @@ export const ExpensesByCategory = ({ transactions, categories, onAnalyze }: Expe
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <CardTitle className="text-xl">📊 Dépenses par catégorie</CardTitle>
-              <CardDescription>{formatPrice(totalExpenses)} total</CardDescription>
+              <CardDescription>
+                {hasData ? `${formatPrice(totalExpenses)} total` : '0 $ dépensé'}
+              </CardDescription>
             </div>
             <div className="flex items-center gap-2">
               <ToggleGroup type="single" value={chartType} onValueChange={(v) => v && setChartType(v)}>
@@ -250,6 +238,22 @@ export const ExpensesByCategory = ({ transactions, categories, onAnalyze }: Expe
           </div>
         </CardHeader>
         <CardContent>
+          {!hasData ? (
+            <div className="flex items-center justify-center h-[300px] text-center">
+              <div className="space-y-2">
+                <p className="text-4xl">📊</p>
+                <p className="text-lg font-semibold">Aucune dépense</p>
+                <p className="text-sm text-muted-foreground">
+                  Aucune transaction enregistrée pour {format(selectedMonth, 'MMMM yyyy', { locale: fr })}
+                </p>
+                <div className="text-sm text-muted-foreground space-y-1 pt-4">
+                  <p>💰 Dépenses: 0 $</p>
+                  <p>📈 Revenus: 0 $</p>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <>
           <ResponsiveContainer width="100%" height={300}>
             {chartType === "pie" ? (
               <PieChart>
@@ -308,6 +312,7 @@ export const ExpensesByCategory = ({ transactions, categories, onAnalyze }: Expe
           </ResponsiveContainer>
 
           {/* Legend - Clickable */}
+          {hasData && (
           <div className="grid grid-cols-2 gap-2 mt-4">
             {expensesByCategory.slice(0, 6).map((category) => (
               <button
@@ -332,6 +337,9 @@ export const ExpensesByCategory = ({ transactions, categories, onAnalyze }: Expe
               </button>
             ))}
           </div>
+          )}
+          </>
+          )}
         </CardContent>
       </Card>
 
