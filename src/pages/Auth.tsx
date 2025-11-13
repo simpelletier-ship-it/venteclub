@@ -51,10 +51,14 @@ const Auth = () => {
   const [pendingUserId, setPendingUserId] = useState<string | null>(null);
 
   useEffect(() => {
+    // Récupérer la page d'origine depuis sessionStorage
+    const returnUrl = sessionStorage.getItem('authReturnUrl') || '/';
+    
     // Vérifier la session existante
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
-        navigate("/");
+        sessionStorage.removeItem('authReturnUrl');
+        navigate(returnUrl);
       }
     });
 
@@ -65,7 +69,9 @@ const Auth = () => {
           title: "Connexion réussie !",
           description: "Bienvenue sur Vente.Club",
         });
-        navigate("/");
+        const returnUrl = sessionStorage.getItem('authReturnUrl') || '/';
+        sessionStorage.removeItem('authReturnUrl');
+        navigate(returnUrl);
       }
     });
 

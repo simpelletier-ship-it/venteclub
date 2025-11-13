@@ -53,6 +53,7 @@ import { BudgetTutorial } from "@/components/budget/BudgetTutorial";
 import { BudgetOnboarding } from "@/components/budget/BudgetOnboarding";
 import { BudgetReminders } from "@/components/budget/BudgetReminders";
 import { BenchmarkComparison } from "@/components/budget/BenchmarkComparison";
+import { BudgetExplanation } from "@/components/budget/BudgetExplanation";
 import { CreateDefaultCategories } from "@/components/budget/CreateDefaultCategories";
 import { OfflineIndicator } from "@/components/budget/OfflineIndicator";
 import { useOfflineSync } from "@/hooks/useOfflineSync";
@@ -303,7 +304,10 @@ const BudgetCalculator = () => {
 
   // Require authentication
   if (!isAuthenticated) {
-    return null; // Will redirect via useEffect
+    // Sauvegarder l'URL actuelle pour redirection après login
+    sessionStorage.setItem('authReturnUrl', '/outils/budget');
+    navigate("/auth");
+    return null;
   }
 
   return (
@@ -415,34 +419,6 @@ const BudgetCalculator = () => {
               Gérez vos finances personnelles intelligemment avec notre outil gratuit de planification budgétaire. 
               Suivi des dépenses en temps réel, objectifs d'épargne, coaching financier personnalisé et gamification.
             </p>
-            
-            {/* What is a Budget - Pedagogical Section */}
-            <Card className="max-w-4xl mx-auto mt-6 lg:mt-8 text-left">
-              <CardContent className="p-4 lg:p-6">
-                <h2 className="text-lg lg:text-xl font-semibold mb-3">💡 C'est quoi un budget et pourquoi c'est important?</h2>
-                <div className="space-y-3 text-sm lg:text-base text-muted-foreground">
-                  <p>
-                    <strong>Un budget</strong> est simplement un plan qui vous montre <strong>où va votre argent</strong> chaque mois. 
-                    C'est comme une carte routière pour vos finances : vous voyez d'où vient votre argent (salaire, revenus) 
-                    et où il part (loyer, épicerie, sorties, etc.).
-                  </p>
-                  <p>
-                    <strong>Pourquoi faire un budget?</strong> Parce que ça vous permet de <strong>reprendre le contrôle</strong> de votre argent! 
-                    Vous saurez exactement combien vous pouvez dépenser sans stress, combien vous économisez pour vos projets 
-                    (vacances, maison, auto) et vous éviterez les mauvaises surprises en fin de mois.
-                  </p>
-                  <p className="flex items-start gap-2">
-                    <span>🎯</span>
-                    <span>
-                      <strong>Notre planificateur vous aide</strong> en suivant automatiquement vos dépenses, 
-                      en vous montrant des graphiques clairs, en vous donnant des conseils personnalisés et en rendant 
-                      la gestion de vos finances amusante avec des objectifs et des récompenses!
-                    </span>
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-            
             {/* SEO-optimized feature highlights - Mobile optimized */}
             <div className="flex flex-wrap justify-center gap-4 lg:gap-6 max-w-3xl mx-auto mt-4 lg:mt-6 text-xs lg:text-sm">
               <div className="flex items-center gap-2">
@@ -627,7 +603,10 @@ const BudgetCalculator = () => {
             </TabsContent>
 
             <TabsContent value="budget" className="pb-20 lg:pb-6">
-              <BudgetPlanner isAuthenticated={isAuthenticated} />
+              <div className="space-y-6">
+                <BudgetExplanation />
+                <BudgetPlanner isAuthenticated={isAuthenticated} />
+              </div>
             </TabsContent>
 
             <TabsContent value="transactions" className="pb-20 lg:pb-6">
