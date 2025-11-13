@@ -39,6 +39,7 @@ import { BudgetResetDialog } from "@/components/budget/BudgetResetDialog";
 import { TagStatistics } from "@/components/budget/TagStatistics";
 import { TransactionTemplates } from "@/components/budget/TransactionTemplates";
 import { TagComparison } from "@/components/budget/TagComparison";
+import { BalanceSheetManager } from "@/components/budget/BalanceSheetManager";
 
 const BudgetCalculator = () => {
   const navigate = useNavigate();
@@ -535,7 +536,10 @@ const BudgetCalculator = () => {
             </TabsContent>
 
             <TabsContent value="assets">
-              <BudgetAssetsDebts isAuthenticated={isAuthenticated} />
+              <div className="space-y-6">
+                <BalanceSheetManager isAuthenticated={isAuthenticated} />
+                <BudgetAssetsDebts isAuthenticated={isAuthenticated} />
+              </div>
             </TabsContent>
 
             <TabsContent value="customize">
