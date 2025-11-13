@@ -45,6 +45,7 @@ import { DashboardVisibilitySettings, useDashboardVisibility } from "@/component
 import { DraggableDashboard } from "@/components/budget/DraggableDashboard";
 import { MonthComparisonChart } from "@/components/budget/MonthComparisonChart";
 import { BudgetTutorial } from "@/components/budget/BudgetTutorial";
+import { BudgetOnboarding } from "@/components/budget/BudgetOnboarding";
 
 const BudgetCalculator = () => {
   const navigate = useNavigate();
@@ -297,6 +298,7 @@ const BudgetCalculator = () => {
   return (
     <ErrorBoundary>
       <>
+        <BudgetOnboarding />
         <BudgetTutorial />
         <Helmet>
         <title>Planificateur Budget Québec Gratuit | Gestion Finances Personnelles 2025</title>

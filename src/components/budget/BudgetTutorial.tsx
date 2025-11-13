@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { X, ArrowRight, ArrowLeft, CheckCircle2, Sparkles } from "lucide-react";
@@ -73,17 +73,58 @@ export function BudgetTutorial() {
   const [isActive, setIsActive] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [hasCompletedTutorial, setHasCompletedTutorial] = useState(false);
+  const [highlightRect, setHighlightRect] = useState<DOMRect | null>(null);
+  const highlightIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  const step = TUTORIAL_STEPS[currentStep];
 
   useEffect(() => {
-    // Vérifier si l'utilisateur a déjà vu le tutoriel
+    // Vérifier si l'utilisateur a déjà vu le tutoriel et l'onboarding
     const completed = localStorage.getItem("budget-tutorial-completed");
-    if (!completed) {
+    const onboardingCompleted = localStorage.getItem("budget-onboarding-completed");
+    
+    if (!completed && onboardingCompleted) {
       // Petit délai pour que la page se charge complètement
-      setTimeout(() => setIsActive(true), 1000);
-    } else {
+      setTimeout(() => setIsActive(true), 2000);
+    } else if (completed) {
       setHasCompletedTutorial(true);
     }
   }, []);
+
+  // Update highlight position when step changes
+  useEffect(() => {
+    if (!isActive || !step.highlight) {
+      setHighlightRect(null);
+      if (highlightIntervalRef.current) {
+        clearInterval(highlightIntervalRef.current);
+        highlightIntervalRef.current = null;
+      }
+      return;
+    }
+
+    const updateHighlight = () => {
+      const element = document.getElementById(step.target);
+      if (element) {
+        const rect = element.getBoundingClientRect();
+        setHighlightRect(rect);
+      } else {
+        setHighlightRect(null);
+      }
+    };
+
+    // Update immediately
+    updateHighlight();
+
+    // Update periodically in case layout changes
+    highlightIntervalRef.current = setInterval(updateHighlight, 500);
+
+    return () => {
+      if (highlightIntervalRef.current) {
+        clearInterval(highlightIntervalRef.current);
+        highlightIntervalRef.current = null;
+      }
+    };
+  }, [isActive, currentStep, step.highlight, step.target]);
 
   const handleNext = () => {
     if (currentStep < TUTORIAL_STEPS.length - 1) {
@@ -116,8 +157,6 @@ export function BudgetTutorial() {
     setIsActive(true);
   };
 
-  const step = TUTORIAL_STEPS[currentStep];
-
   if (!isActive && !hasCompletedTutorial) return null;
 
   return (
@@ -134,20 +173,115 @@ export function BudgetTutorial() {
               onClick={skipTutorial}
             />
 
-            {/* Highlight de l'élément cible */}
-            {step.highlight && step.target !== "welcome" && step.target !== "complete" && (
+            {/* Highlight de l'élément cible avec pulsation */}
+            {step.highlight && highlightRect && step.target !== "welcome" && step.target !== "complete" && (
               <motion.div
                 key={step.target}
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
                 className="fixed z-[9999] pointer-events-none"
                 style={{
-                  boxShadow: "0 0 0 4px hsl(var(--primary)), 0 0 0 9999px rgba(0,0,0,0.6)",
-                  borderRadius: "8px",
+                  left: highlightRect.left - 8,
+                  top: highlightRect.top - 8,
+                  width: highlightRect.width + 16,
+                  height: highlightRect.height + 16,
                 }}
-                id={`tutorial-highlight-${step.target}`}
-              />
+              >
+                {/* Animated border with pulse */}
+                <motion.div
+                  className="absolute inset-0 rounded-lg border-4 border-primary"
+                  animate={{
+                    boxShadow: [
+                      "0 0 0 0px hsla(var(--primary), 0.4)",
+                      "0 0 0 8px hsla(var(--primary), 0)",
+                      "0 0 0 0px hsla(var(--primary), 0.4)",
+                    ],
+                    scale: [1, 1.02, 1],
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                />
+                
+                {/* Corner sparkles */}
+                <motion.div
+                  className="absolute -top-2 -left-2"
+                  animate={{
+                    rotate: [0, 15, 0],
+                    scale: [1, 1.2, 1],
+                  }}
+                  transition={{
+                    duration: 1.5,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                >
+                  <Sparkles className="w-5 h-5 text-primary" />
+                </motion.div>
+
+                <motion.div
+                  className="absolute -top-2 -right-2"
+                  animate={{
+                    rotate: [0, -15, 0],
+                    scale: [1, 1.2, 1],
+                  }}
+                  transition={{
+                    duration: 1.5,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                    delay: 0.3,
+                  }}
+                >
+                  <Sparkles className="w-5 h-5 text-primary" />
+                </motion.div>
+
+                <motion.div
+                  className="absolute -bottom-2 -left-2"
+                  animate={{
+                    rotate: [0, 15, 0],
+                    scale: [1, 1.2, 1],
+                  }}
+                  transition={{
+                    duration: 1.5,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                    delay: 0.6,
+                  }}
+                >
+                  <Sparkles className="w-5 h-5 text-primary" />
+                </motion.div>
+
+                <motion.div
+                  className="absolute -bottom-2 -right-2"
+                  animate={{
+                    rotate: [0, -15, 0],
+                    scale: [1, 1.2, 1],
+                  }}
+                  transition={{
+                    duration: 1.5,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                    delay: 0.9,
+                  }}
+                >
+                  <Sparkles className="w-5 h-5 text-primary" />
+                </motion.div>
+
+                {/* Dark overlay around highlighted element */}
+                <div 
+                  className="fixed inset-0 pointer-events-none"
+                  style={{
+                    boxShadow: `0 0 0 9999px rgba(0,0,0,0.6)`,
+                    left: highlightRect.left - 8,
+                    top: highlightRect.top - 8,
+                    width: highlightRect.width + 16,
+                    height: highlightRect.height + 16,
+                  }}
+                />
+              </motion.div>
             )}
 
             {/* Bulle de tutoriel */}
