@@ -102,8 +102,38 @@ const TaxReturnCalculator = () => {
   return (
     <>
       <Helmet>
-        <title>Calculateur de Retour d'Impôt Québec 2025 | Vente.Club</title>
-        <meta name="description" content="Estimez votre retour d'impôt avec REER, CELIAPP, dons de charité et autres déductions. Calculateur gratuit avec les taux 2025 du Québec." />
+        <title>Calculateur de Retour d'Impôt Québec et Fédéral 2025 | Gratuit</title>
+        <meta name="description" content="Calculez votre retour d'impôt provincial (Québec) et fédéral 2025 avec REER, CELIAPP, dons de charité, frais médicaux et garde d'enfants. Outil gratuit avec taux à jour." />
+        <meta name="keywords" content="calculateur retour impôt québec, remboursement impôt 2025, REER économie impôt, CELIAPP déduction fiscale, calculer retour impôt fédéral, dons charité crédit impôt" />
+        
+        {/* Open Graph */}
+        <meta property="og:title" content="Calculateur de Retour d'Impôt Québec et Fédéral 2025" />
+        <meta property="og:description" content="Estimez votre retour d'impôt provincial et fédéral 2025 avec toutes vos déductions fiscales. Outil gratuit et précis." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://vente.club/outils/retour-impot" />
+        
+        {/* Structured Data */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            "name": "Calculateur de Retour d'Impôt Québec 2025",
+            "description": "Calculateur gratuit pour estimer votre retour d'impôt provincial (Québec) et fédéral avec REER, CELIAPP, dons de charité et autres déductions fiscales.",
+            "url": "https://vente.club/outils/retour-impot",
+            "applicationCategory": "FinanceApplication",
+            "operatingSystem": "Any",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "CAD"
+            },
+            "provider": {
+              "@type": "Organization",
+              "name": "Vente.Club",
+              "url": "https://vente.club"
+            }
+          })}
+        </script>
       </Helmet>
 
       <div className="min-h-screen bg-background py-12">
@@ -429,6 +459,185 @@ const TaxReturnCalculator = () => {
                   <p>• Consultez un comptable pour optimiser votre situation fiscale</p>
                 </CardContent>
               </Card>
+            </div>
+          </div>
+
+          {/* SEO Content Section */}
+          <div className="mt-16 prose prose-slate dark:prose-invert max-w-none">
+            <div className="bg-card rounded-lg p-8 space-y-8">
+              <div>
+                <h2 className="text-3xl font-bold mb-4">Calculateur de Retour d'Impôt Québec et Fédéral 2025</h2>
+                <p className="text-lg text-muted-foreground leading-relaxed">
+                  Notre calculateur de retour d'impôt gratuit vous permet d'estimer précisément vos économies fiscales pour l'année 2025, 
+                  en tenant compte des taux d'imposition provincial (Québec) et fédéral les plus récents. Calculez instantanément l'impact 
+                  de vos cotisations REER, CELIAPP, dons de charité, frais médicaux et frais de garde d'enfants sur votre remboursement d'impôt.
+                </p>
+              </div>
+
+              <div>
+                <h2 className="text-2xl font-bold mb-4">Comment maximiser votre retour d'impôt au Québec en 2025</h2>
+                
+                <h3 className="text-xl font-semibold mt-6 mb-3">1. Cotisations REER (Régime enregistré d'épargne-retraite)</h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  Les cotisations REER sont l'une des stratégies les plus efficaces pour réduire votre impôt. Pour 2025, vous pouvez cotiser 
+                  jusqu'à 18% de votre revenu gagné de l'année précédente, avec un maximum de 31 560$. Chaque dollar cotisé réduit votre revenu 
+                  imposable, générant des économies d'impôt importantes selon votre taux marginal d'imposition provincial et fédéral. 
+                  N'oubliez pas la date limite du 29 février 2025 pour cotiser et réclamer la déduction sur votre déclaration de revenus 2024.
+                </p>
+
+                <h3 className="text-xl font-semibold mt-6 mb-3">2. CELIAPP (Compte d'épargne libre d'impôt pour l'achat d'une première propriété)</h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  Le CELIAPP offre le meilleur des deux mondes : une déduction fiscale immédiate comme le REER (jusqu'à 8 000$ par année) 
+                  ET des retraits non imposables lors de l'achat de votre première maison. C'est un outil exceptionnel pour les futurs 
+                  propriétaires québécois qui permet d'accumuler jusqu'à 40 000$ tout en maximisant votre remboursement d'impôt annuel.
+                </p>
+
+                <h3 className="text-xl font-semibold mt-6 mb-3">3. Dons de charité et crédits d'impôt</h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  Les dons aux organismes de bienfaisance enregistrés donnent droit à des crédits d'impôt généreux au Québec et au fédéral. 
+                  Les premiers 200$ de dons génèrent un crédit de base (20% provincial, 15% fédéral), tandis que les dons excédentaires 
+                  bénéficient de taux plus élevés basés sur votre taux marginal. Conservez tous vos reçus officiels pour maximiser vos crédits.
+                </p>
+
+                <h3 className="text-xl font-semibold mt-6 mb-3">4. Frais médicaux admissibles</h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  Les frais médicaux dépassant un certain seuil (environ 3% de votre revenu net) peuvent être réclamés pour obtenir des 
+                  crédits d'impôt. Cela inclut les médicaments sur ordonnance, les soins dentaires, l'optométrie, la physiothérapie, 
+                  les appareils médicaux et bien plus. Vous pouvez réclamer vos frais et ceux de votre conjoint(e) et enfants à charge.
+                </p>
+
+                <h3 className="text-xl font-semibold mt-6 mb-3">5. Frais de garde d'enfants déductibles</h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  Les frais de garde d'enfants admissibles (garderie, camp de jour, service de garde scolaire) sont entièrement déductibles 
+                  de votre revenu imposable. Cette déduction réduit directement votre revenu imposable aux paliers provincial et fédéral, 
+                  générant des économies d'impôt substantielles pour les familles québécoises.
+                </p>
+              </div>
+
+              <div>
+                <h2 className="text-2xl font-bold mb-4">Taux d'imposition Québec et fédéral 2025</h2>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  Notre calculateur utilise les derniers taux d'imposition pour 2025 afin de vous fournir une estimation précise de votre 
+                  retour d'impôt. Les taux provinciaux du Québec varient de 14% à 25,75% selon votre revenu imposable, tandis que les taux 
+                  fédéraux s'échelonnent de 15% à 33%. Votre économie fiscale réelle dépend de votre taux marginal d'imposition combiné.
+                </p>
+
+                <h3 className="text-xl font-semibold mt-6 mb-3">Taux marginaux provinciaux (Québec) 2025</h3>
+                <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
+                  <li>14% sur les premiers 51 780$ de revenu imposable</li>
+                  <li>19% de 51 781$ à 103 545$</li>
+                  <li>24% de 103 546$ à 126 000$</li>
+                  <li>25,75% au-delà de 126 000$</li>
+                </ul>
+
+                <h3 className="text-xl font-semibold mt-6 mb-3">Taux marginaux fédéraux 2025</h3>
+                <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
+                  <li>15% sur les premiers 55 867$ de revenu imposable</li>
+                  <li>20,5% de 55 868$ à 111 733$</li>
+                  <li>26% de 111 734$ à 173 205$</li>
+                  <li>29% de 173 206$ à 246 752$</li>
+                  <li>33% au-delà de 246 752$</li>
+                </ul>
+              </div>
+
+              <div>
+                <h2 className="text-2xl font-bold mb-4">Stratégies fiscales pour augmenter votre retour d'impôt</h2>
+                <div className="space-y-4 text-muted-foreground">
+                  <p className="leading-relaxed">
+                    <strong className="text-foreground">Fractionnement de revenu:</strong> Si vous avez un conjoint dans une tranche d'imposition 
+                    inférieure, envisagez le fractionnement de revenu de pension pour réduire votre impôt familial global.
+                  </p>
+                  <p className="leading-relaxed">
+                    <strong className="text-foreground">Crédits d'impôt pour intérêts payés sur prêts étudiants:</strong> Les intérêts payés sur 
+                    vos prêts étudiants donnent droit à un crédit d'impôt non remboursable.
+                  </p>
+                  <p className="leading-relaxed">
+                    <strong className="text-foreground">Crédit d'impôt pour activités des enfants:</strong> Les activités physiques, artistiques 
+                    et culturelles de vos enfants peuvent donner droit à des crédits d'impôt au Québec.
+                  </p>
+                  <p className="leading-relaxed">
+                    <strong className="text-foreground">Frais de déménagement:</strong> Si vous avez déménagé pour vous rapprocher d'un nouveau 
+                    lieu de travail ou d'études (40 km ou plus), vos frais de déménagement peuvent être déductibles.
+                  </p>
+                  <p className="leading-relaxed">
+                    <strong className="text-foreground">Crédit d'impôt pour maintien à domicile:</strong> Au Québec, les personnes âgées de 70 ans 
+                    et plus peuvent réclamer un crédit pour les services de maintien à domicile.
+                  </p>
+                </div>
+              </div>
+
+              <div>
+                <h2 className="text-2xl font-bold mb-4">Questions fréquentes sur le retour d'impôt au Québec</h2>
+                
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2">Quand vais-je recevoir mon remboursement d'impôt?</h3>
+                    <p className="text-muted-foreground leading-relaxed">
+                      Si vous produisez votre déclaration électroniquement et optez pour le dépôt direct, Revenu Québec traite généralement 
+                      votre remboursement en 2 semaines environ. Le fédéral (ARC) traite les déclarations électroniques en 8 à 10 jours ouvrables. 
+                      Les déclarations papier prennent beaucoup plus de temps.
+                    </p>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2">Puis-je modifier ma déclaration après l'avoir envoyée?</h3>
+                    <p className="text-muted-foreground leading-relaxed">
+                      Oui, vous pouvez demander un ajustement à votre déclaration via le service en ligne "Mon dossier" de Revenu Québec 
+                      ou "Mon dossier pour les particuliers" de l'ARC. Vous avez généralement jusqu'à 10 ans pour demander un ajustement.
+                    </p>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2">Le calculateur est-il précis?</h3>
+                    <p className="text-muted-foreground leading-relaxed">
+                      Notre calculateur utilise les taux d'imposition officiels de 2025 et fournit une estimation fiable de votre retour d'impôt. 
+                      Cependant, il s'agit d'un outil de planification fiscale simplifié. Votre situation personnelle peut inclure d'autres 
+                      déductions ou crédits non couverts par ce calculateur. Pour un calcul définitif, consultez un comptable professionnel.
+                    </p>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2">Dois-je cotiser au REER ou au CELIAPP en premier?</h3>
+                    <p className="text-muted-foreground leading-relaxed">
+                      Si vous êtes un futur acheteur d'une première propriété, priorisez le CELIAPP car il combine déduction fiscale ET 
+                      retraits non imposables. Si vous avez déjà une propriété ou avez maximisé votre CELIAPP, le REER demeure un excellent 
+                      véhicule d'épargne-retraite avec déduction fiscale immédiate.
+                    </p>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2">Que faire si je dois de l'impôt au lieu de recevoir un remboursement?</h3>
+                    <p className="text-muted-foreground leading-relaxed">
+                      Si votre employeur n'a pas retenu suffisamment d'impôt à la source ou si vous avez d'autres revenus non déclarés, 
+                      vous pourriez devoir payer de l'impôt. Vous pouvez demander à votre employeur d'augmenter les retenues à la source 
+                      ou faire des acomptes provisionnels. Consultez un fiscaliste pour optimiser votre situation.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-blue-50 dark:bg-blue-950/20 rounded-lg p-6 border border-blue-200 dark:border-blue-800">
+                <h2 className="text-2xl font-bold mb-4 text-blue-900 dark:text-blue-100">
+                  Autres outils financiers gratuits
+                </h2>
+                <p className="text-blue-800 dark:text-blue-200 mb-4">
+                  Découvrez nos autres calculateurs pour optimiser vos finances au Québec:
+                </p>
+                <ul className="space-y-2 text-blue-800 dark:text-blue-200">
+                  <li>
+                    <a href="/outils/salaire" className="font-semibold hover:underline">
+                      📊 Calculateur de Salaire Net Québec
+                    </a>
+                    {" - Calculez votre salaire net après impôts, RRQ, RQAP et AE avec les taux 2025"}
+                  </li>
+                  <li>
+                    <a href="/outils/budget" className="font-semibold hover:underline">
+                      💰 Planificateur de Budget Personnel
+                    </a>
+                    {" - Gérez vos finances, suivez vos dépenses et atteignez vos objectifs d'épargne"}
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>
