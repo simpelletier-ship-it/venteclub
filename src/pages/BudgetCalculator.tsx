@@ -415,6 +415,13 @@ const BudgetCalculator = () => {
                   }}
                 />
 
+                {/* Score de Santé Financière */}
+                <FinancialHealthScore 
+                  transactions={transactions}
+                  debts={debts}
+                  assets={assets}
+                />
+
                 <NetWorthGamification netWorth={netWorth} isAuthenticated={isAuthenticated} />
                 
                 <div className="flex justify-center">
@@ -507,26 +514,15 @@ const BudgetCalculator = () => {
                   </CardContent>
                 </Card>
 
-                {/* Analyses avancées */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <span className="text-2xl">✨</span>
-                      Analyses avancées
-                    </CardTitle>
-                    <CardDescription>
-                      Insights et recommandations intelligentes pour optimiser vos finances
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    <PremiumAnalysisTab 
-                      transactions={transactions}
-                      categories={categories}
-                      debts={debts}
-                      assets={assets}
-                    />
-                  </CardContent>
-                </Card>
+                {/* Analyses avancées - Sans titre */}
+                <div className="space-y-6">
+                  <PremiumAnalysisTab 
+                    transactions={transactions}
+                    categories={categories}
+                    debts={debts}
+                    assets={assets}
+                  />
+                </div>
               </div>
             </TabsContent>
 
