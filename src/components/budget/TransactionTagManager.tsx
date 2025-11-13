@@ -107,7 +107,7 @@ export const TransactionTagManager = ({ selectedTags, onTagsChange }: Transactio
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <label className="text-sm font-medium">Tags</label>
+        <label className="text-sm font-medium">Tags (facultatif)</label>
         <Dialog open={isCreating} onOpenChange={setIsCreating}>
           <DialogTrigger asChild>
             <Button variant="outline" size="sm">

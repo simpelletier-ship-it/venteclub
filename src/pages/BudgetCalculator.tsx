@@ -16,7 +16,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { NetWorthGamification } from "@/components/budget/NetWorthGamification";
 import { BudgetTransactions } from "@/components/budget/BudgetTransactions";
-import { BudgetAssetsDebts } from "@/components/budget/BudgetAssetsDebts";
+import { SimpleNetWorthTracker } from "@/components/budget/SimpleNetWorthTracker";
 import { BudgetPlanner } from "@/components/budget/BudgetPlanner";
 import { BudgetInsights } from "@/components/budget/BudgetInsights";
 import { DebtCalculator } from "@/components/budget/DebtCalculator";
@@ -560,8 +560,8 @@ const BudgetCalculator = () => {
 
             <TabsContent value="assets">
               <div className="space-y-6">
-                <BalanceSheetManager isAuthenticated={isAuthenticated} />
-                <BudgetAssetsDebts isAuthenticated={isAuthenticated} />
+                <SimpleNetWorthTracker currentNetWorth={netWorth} isAuthenticated={isAuthenticated} />
+                <NetWorthGamification netWorth={netWorth} isAuthenticated={isAuthenticated} />
               </div>
             </TabsContent>
 

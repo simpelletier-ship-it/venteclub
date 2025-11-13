@@ -695,9 +695,6 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
                 />
               </PopoverContent>
             </Popover>
-            <p className="text-sm text-muted-foreground mt-1">
-              La date garde la dernière saisie pour faciliter l'ajout
-            </p>
           </div>
           
           <div id="description-input">
