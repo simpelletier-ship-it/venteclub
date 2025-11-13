@@ -492,8 +492,8 @@ const BudgetCalculator = () => {
                           categories={categories}
                           onAnalyze={() => {
                             const tabsList = document.querySelector('[role="tablist"]');
-                            const transactionsTab = tabsList?.querySelector('[value="transactions"]') as HTMLButtonElement;
-                            transactionsTab?.click();
+                            const analysesTab = tabsList?.querySelector('[value="analyses"]') as HTMLButtonElement;
+                            analysesTab?.click();
                           }}
                         />
                       ),
