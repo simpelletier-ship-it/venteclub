@@ -16,12 +16,12 @@ export const LocationScore = ({ city, region }: LocationScoreProps) => {
 
     return {
       overall: isMajorCity ? 85 : 70,
-      walkability: isMajorCity ? 80 : 65,
-      transit: isMajorCity ? 85 : 55,
-      shopping: isMajorCity ? 90 : 70,
-      restaurants: isMajorCity ? 88 : 72,
-      schools: isMajorCity ? 82 : 75,
-      healthcare: isMajorCity ? 90 : 78,
+      visibility: isMajorCity ? 88 : 68,
+      transit: isMajorCity ? 85 : 60,
+      parking: isMajorCity ? 75 : 85,
+      customerProximity: isMajorCity ? 90 : 72,
+      zoneAttractiveness: isMajorCity ? 82 : 70,
+      nearbyServices: isMajorCity ? 88 : 75,
     };
   };
 
@@ -37,12 +37,12 @@ export const LocationScore = ({ city, region }: LocationScoreProps) => {
   const overallScore = getScoreLabel(scores.overall);
 
   const categories = [
-    { icon: MapPin, label: 'Marchabilité', score: scores.walkability, color: 'text-blue-500' },
-    { icon: Bus, label: 'Transport en commun', score: scores.transit, color: 'text-green-500' },
-    { icon: ShoppingBag, label: 'Magasins', score: scores.shopping, color: 'text-purple-500' },
-    { icon: Coffee, label: 'Restaurants', score: scores.restaurants, color: 'text-orange-500' },
-    { icon: School, label: 'Écoles', score: scores.schools, color: 'text-indigo-500' },
-    { icon: Hospital, label: 'Santé', score: scores.healthcare, color: 'text-red-500' },
+    { icon: MapPin, label: 'Visibilité & Achalandage', score: scores.visibility, color: 'text-blue-500' },
+    { icon: Bus, label: 'Accès Transport', score: scores.transit, color: 'text-green-500' },
+    { icon: Car, label: 'Stationnement', score: scores.parking, color: 'text-purple-500' },
+    { icon: ShoppingBag, label: 'Proximité Clientèle', score: scores.customerProximity, color: 'text-orange-500' },
+    { icon: Star, label: 'Attractivité Zone', score: scores.zoneAttractiveness, color: 'text-indigo-500' },
+    { icon: Coffee, label: 'Services à Proximité', score: scores.nearbyServices, color: 'text-red-500' },
   ];
 
   return (
@@ -97,7 +97,7 @@ export const LocationScore = ({ city, region }: LocationScoreProps) => {
 
         {/* Nearby Highlights */}
         <div className="pt-4 border-t border-border">
-          <h4 className="font-semibold mb-3 text-sm">À proximité</h4>
+          <h4 className="font-semibold mb-3 text-sm">Atouts de l'emplacement</h4>
           <div className="grid grid-cols-2 gap-2 text-xs">
             <div className="flex items-center gap-2 text-muted-foreground">
               <Car className="h-3 w-3" />
@@ -105,21 +105,21 @@ export const LocationScore = ({ city, region }: LocationScoreProps) => {
             </div>
             <div className="flex items-center gap-2 text-muted-foreground">
               <ShoppingBag className="h-3 w-3" />
-              <span>Centres commerciaux: 3</span>
+              <span>Zone commerciale</span>
             </div>
             <div className="flex items-center gap-2 text-muted-foreground">
-              <Coffee className="h-3 w-3" />
-              <span>Restaurants: 20+</span>
+              <Bus className="h-3 w-3" />
+              <span>Transport accessible</span>
             </div>
             <div className="flex items-center gap-2 text-muted-foreground">
-              <School className="h-3 w-3" />
-              <span>Écoles: 5</span>
+              <MapPin className="h-3 w-3" />
+              <span>Forte visibilité</span>
             </div>
           </div>
         </div>
 
         <p className="text-xs text-muted-foreground pt-2 border-t border-border">
-          * Scores calculés en fonction de la densité et de la qualité des services à proximité
+          * Scores calculés en fonction de l'attractivité commerciale et de l'accessibilité de la zone
         </p>
       </CardContent>
     </Card>
