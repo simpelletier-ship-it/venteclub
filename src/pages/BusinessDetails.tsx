@@ -29,6 +29,7 @@ import { SimilarBusinesses } from "@/components/SimilarBusinesses";
 import { LocationScore } from "@/components/LocationScore";
 import { ScheduleVisitDialog } from "@/components/ScheduleVisitDialog";
 import { MarketEstimate } from "@/components/MarketEstimate";
+import { DemographicInsights } from "@/components/DemographicInsights";
 
 const BusinessDetails = () => {
   const { slug } = useParams();
@@ -1585,6 +1586,14 @@ const BusinessDetails = () => {
               {/* Location Score - Zillow Style */}
               <div className="mt-6">
                 <LocationScore
+                  city={business.city}
+                  region={business.region}
+                />
+              </div>
+
+              {/* Demographic Insights */}
+              <div className="mt-6">
+                <DemographicInsights
                   city={business.city}
                   region={business.region}
                 />
