@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { useBudgetRealtime } from "@/hooks/useBudgetRealtime";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
+import { AIBudgetGenerator } from "./AIBudgetGenerator";
 
 interface Category {
   id: string;
@@ -211,6 +212,99 @@ export const BudgetPlanner = ({ isAuthenticated }: { isAuthenticated: boolean })
     },
   });
 
+  // Apply AI-generated budget
+  const handleAIBudgetApplied = async (budget: {
+    income: Array<{ name: string; amount: number; icon: string }>;
+    expenses: Array<{ name: string; amount: number; icon: string }>;
+    explanation: string;
+  }) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Non authentifié");
+
+      // Create or find categories and add budget goals
+      const budgetGoals = [];
+
+      // Process income categories
+      for (const item of budget.income) {
+        let category = categories.find(c => c.name === item.name && c.type === 'income');
+        
+        if (!category) {
+          // Create new category
+          const { data: newCat, error } = await supabase
+            .from('budget_categories')
+            .insert({
+              user_id: user.id,
+              name: item.name,
+              icon: item.icon,
+              type: 'income',
+              is_custom: true,
+            })
+            .select()
+            .single();
+          
+          if (error) throw error;
+          category = newCat as Category;
+        }
+
+        budgetGoals.push({
+          user_id: user.id,
+          category_id: category.id,
+          monthly_limit: item.amount,
+          frequency: 'monthly',
+        });
+      }
+
+      // Process expense categories
+      for (const item of budget.expenses) {
+        let category = categories.find(c => c.name === item.name && c.type === 'expense');
+        
+        if (!category) {
+          // Create new category
+          const { data: newCat, error } = await supabase
+            .from('budget_categories')
+            .insert({
+              user_id: user.id,
+              name: item.name,
+              icon: item.icon,
+              type: 'expense',
+              is_custom: true,
+            })
+            .select()
+            .single();
+          
+          if (error) throw error;
+          category = newCat as Category;
+        }
+
+        budgetGoals.push({
+          user_id: user.id,
+          category_id: category.id,
+          monthly_limit: item.amount,
+          frequency: 'monthly',
+        });
+      }
+
+      // Delete existing goals and insert new ones
+      await supabase.from('budget_goals').delete().eq('user_id', user.id);
+      
+      const { error: insertError } = await supabase
+        .from('budget_goals')
+        .insert(budgetGoals);
+
+      if (insertError) throw insertError;
+
+      // Refresh data
+      queryClient.invalidateQueries({ queryKey: ['budget-goals'] });
+      queryClient.invalidateQueries({ queryKey: ['budget-categories'] });
+      
+      toast.success("✨ Budget IA appliqué avec succès!", { duration: 3000 });
+    } catch (error: any) {
+      console.error("Error applying AI budget:", error);
+      toast.error("Erreur: " + error.message);
+    }
+  };
+
   const exportPDF = () => {
     // First compute the values we need
     const incomeData = incomeCategories.map(cat => ({
@@ -319,137 +413,46 @@ BALANCE: ${formatPrice(totalIncomeActual - totalExpenseActual)}
     const remaining = budget - spent;
     const percentage = budget > 0 ? (spent / budget) * 100 : 0;
     const freq = getCategoryFrequency(category.id);
+    const isIncome = category.type === 'income';
+
+    // For income: good if earned more than budget (surplus)
+    // For expense: good if spent less than budget (remaining)
+    const isOverBudget = isIncome ? spent < budget : spent > budget;
+    const statusLabel = isIncome 
+      ? (spent >= budget ? 'Surplus' : 'Manque')
+      : 'Restant';
 
     return (
       <Card key={category.id} className="hover:shadow-md transition-shadow">
         <CardContent className="p-4">
-          <div className="flex items-start justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <span className="text-2xl">{category.icon}</span>
-              <div>
-                <div className="font-medium">{category.name}</div>
-                {budget > 0 && (
-                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                    <CalendarDays className="h-3 w-3" />
-                    <span>{formatPrice(budget)}/mois ({getFrequencyLabel(freq)})</span>
-                  </div>
-                )}
-              </div>
-            </div>
-            <div className="flex gap-1">
-              {budget > 0 ? (
-                <>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8"
-                    onClick={() => handleEdit(category.id, budget, freq)}
-                  >
-                    <PencilLine className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8"
-                    onClick={() => deleteGoal.mutate(category.id)}
-                  >
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                  </Button>
-                </>
-              ) : (
-                <Dialog open={open && editingGoal?.categoryId === category.id} onOpenChange={(isOpen) => {
-                  setOpen(isOpen);
-                  if (!isOpen) {
-                    setEditingGoal(null);
-                    setMonthlyLimit("");
-                  }
-                }}>
-                  <DialogTrigger asChild>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        setEditingGoal({ categoryId: category.id, currentLimit: 0 });
-                        setOpen(true);
-                      }}
-                    >
-                      <Plus className="h-3 w-3 mr-1" />
-                      Définir
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-md">
-                    <DialogHeader>
-                      <DialogTitle>Définir le budget</DialogTitle>
-                      <DialogDescription>
-                        Pour {category.icon} {category.name}
-                      </DialogDescription>
-                    </DialogHeader>
-                    <form onSubmit={(e) => handleSubmit(e, category.id)} className="space-y-4">
-                      <div>
-                        <Label>Fréquence</Label>
-                        <Select value={frequency} onValueChange={setFrequency}>
-                          <SelectTrigger className="mt-1">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="weekly">📅 Hebdomadaire (par semaine)</SelectItem>
-                            <SelectItem value="biweekly">📆 Aux 2 semaines</SelectItem>
-                            <SelectItem value="monthly">🗓️ Mensuel (par mois)</SelectItem>
-                            <SelectItem value="yearly">📊 Annuel (par année)</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      <div>
-                        <Label>Montant {frequency === 'weekly' ? 'hebdomadaire' : frequency === 'biweekly' ? 'aux 2 semaines' : frequency === 'yearly' ? 'annuel' : 'mensuel'}</Label>
-                        <CurrencyInput 
-                          value={monthlyLimit} 
-                          onChange={setMonthlyLimit} 
-                          className="mt-1" 
-                          required 
-                          placeholder={frequency === 'weekly' ? 'Ex: 500 $/semaine' : frequency === 'biweekly' ? 'Ex: 1000 $/2 sem.' : frequency === 'yearly' ? 'Ex: 60000 $/an' : 'Ex: 2000 $/mois'}
-                        />
-                        {frequency !== 'monthly' && monthlyLimit && (
-                          <p className="text-xs text-muted-foreground mt-1">
-                            ≈ {formatPrice(
-                              frequency === 'weekly' ? parseFloat(monthlyLimit) * 4.33 :
-                              frequency === 'biweekly' ? parseFloat(monthlyLimit) * 2.17 :
-                              parseFloat(monthlyLimit) / 12
-                            )}/mois
-                          </p>
-                        )}
-                      </div>
-                      <Button type="submit" className="w-full" disabled={saveGoal.isPending}>
-                        {saveGoal.isPending ? "Enregistrement..." : "Enregistrer"}
-                      </Button>
-                    </form>
-                  </DialogContent>
-                </Dialog>
-              )}
-            </div>
-          </div>
-
+...
           {budget > 0 && (
             <>
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Dépensé</span>
-                  <span className={spent > budget ? 'text-red-600 font-semibold' : 'text-foreground'}>
+                  <span className="text-muted-foreground">{isIncome ? 'Gagné' : 'Dépensé'}</span>
+                  <span className={isOverBudget ? 'text-red-600 font-semibold' : 'text-foreground'}>
                     {formatPrice(spent)}
                   </span>
                 </div>
                 <div className="h-2 bg-muted rounded-full overflow-hidden">
                   <div 
                     className={`h-full transition-all duration-500 ${
-                      percentage > 100 ? 'bg-red-500' : percentage > 80 ? 'bg-yellow-500' : 'bg-green-500'
+                      isIncome 
+                        ? (percentage > 100 ? 'bg-green-500' : percentage > 80 ? 'bg-yellow-500' : 'bg-red-500')
+                        : (percentage > 100 ? 'bg-red-500' : percentage > 80 ? 'bg-yellow-500' : 'bg-green-500')
                     }`}
                     style={{ width: `${Math.min(percentage, 100)}%` }}
                   />
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Restant</span>
-                  <span className={remaining < 0 ? 'text-red-600 font-semibold' : 'text-green-600'}>
-                    {formatPrice(remaining)}
+                  <span className="text-muted-foreground">{statusLabel}</span>
+                  <span className={
+                    isIncome 
+                      ? (remaining >= 0 ? 'text-green-600 font-semibold' : 'text-red-600')
+                      : (remaining >= 0 ? 'text-green-600' : 'text-red-600 font-semibold')
+                  }>
+                    {formatPrice(Math.abs(remaining))}
                   </span>
                 </div>
               </div>
@@ -476,12 +479,15 @@ BALANCE: ${formatPrice(totalIncomeActual - totalExpenseActual)}
           )}
         </div>
         
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm">
-              Actions
-            </Button>
-          </DropdownMenuTrigger>
+        <div className="flex items-center gap-2">
+          <AIBudgetGenerator onBudgetGenerated={handleAIBudgetApplied} />
+          
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm">
+                Actions
+              </Button>
+            </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48">
             <DropdownMenuItem onClick={exportPDF}>
               <FileDown className="h-4 w-4 mr-2" />
@@ -518,6 +524,7 @@ BALANCE: ${formatPrice(totalIncomeActual - totalExpenseActual)}
             </AlertDialog>
           </DropdownMenuContent>
         </DropdownMenu>
+        </div>
       </div>
 
       {/* Summary cards */}
