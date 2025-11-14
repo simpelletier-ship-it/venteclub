@@ -4,13 +4,17 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import BusinessCard from "@/components/BusinessCard";
 import BusinessListItem from "@/components/BusinessListItem";
-import FilterBar from "@/components/FilterBar";
+import { AdvancedFilterBar } from "@/components/AdvancedFilterBar";
 import { BusinessCardSkeleton } from "@/components/BusinessCardSkeleton";
-import { ArrowRight, Grid3x3, List, TrendingUp, Sparkles, Search } from "lucide-react";
+import { BusinessComparison } from "@/components/BusinessComparison";
+import { MapClusterView } from "@/components/MapClusterView";
+import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
+import { ArrowRight, Grid3x3, List, TrendingUp, Sparkles, Search, Map, GitCompare } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { SEO } from "@/components/SEO";
 import { CircuitBackground } from "@/components/CircuitBackground";
 import { useScrollParallax } from "@/hooks/useScrollParallax";
+import { Badge } from "@/components/ui/badge";
 
 const Businesses = () => {
   const navigate = useNavigate();
@@ -18,9 +22,21 @@ const Businesses = () => {
   const [featuredBusinesses, setFeaturedBusinesses] = useState<any[]>([]);
   const [allBusinesses, setAllBusinesses] = useState<any[]>([]);
   const [filteredBusinesses, setFilteredBusinesses] = useState<any[]>([]);
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
+  const [displayedBusinesses, setDisplayedBusinesses] = useState<any[]>([]);
+  const [viewMode, setViewMode] = useState<'grid' | 'list' | 'map'>('list');
   const [loading, setLoading] = useState(true);
+  const [compareMode, setCompareMode] = useState(false);
+  const [selectedForComparison, setSelectedForComparison] = useState<string[]>([]);
+  const [displayCount, setDisplayCount] = useState(20);
   const scrollY = useScrollParallax();
+  
+  const hasMore = displayCount < filteredBusinesses.length;
+  const { targetRef } = useInfiniteScroll(
+    () => {
+      setDisplayCount(prev => Math.min(prev + 20, filteredBusinesses.length));
+    },
+    hasMore
+  );
   
   useEffect(() => {
     fetchBusinesses();
@@ -48,6 +64,7 @@ const Businesses = () => {
         setFeaturedBusinesses(featured);
         setAllBusinesses(regular);
         setFilteredBusinesses(regular);
+        setDisplayedBusinesses(regular.slice(0, 20));
       }
     } catch (error) {
       console.error('[FETCH-BUSINESSES] Error:', error);
@@ -56,13 +73,7 @@ const Businesses = () => {
     }
   };
 
-  const handleFilter = (filters: {
-    cities?: string[];
-    industries?: string[];
-    listingTypes?: string[];
-    minPrice?: number;
-    maxPrice?: number;
-  }) => {
+  const handleFilter = (filters: any) => {
     let filtered = [...allBusinesses];
     
     if (filters.listingTypes && filters.listingTypes.length > 0) {
@@ -98,8 +109,67 @@ const Businesses = () => {
     if (filters.maxPrice !== undefined) {
       filtered = filtered.filter(business => business.asking_price <= filters.maxPrice!);
     }
+    if (filters.minRevenue !== undefined) {
+      filtered = filtered.filter(business => business.annual_revenue >= filters.minRevenue!);
+    }
+    if (filters.maxRevenue !== undefined) {
+      filtered = filtered.filter(business => business.annual_revenue <= filters.maxRevenue!);
+    }
+    if (filters.minBaiia !== undefined) {
+      filtered = filtered.filter(business => business.baiia >= filters.minBaiia!);
+    }
+    if (filters.maxBaiia !== undefined) {
+      filtered = filtered.filter(business => business.baiia <= filters.maxBaiia!);
+    }
+    if (filters.featured) {
+      filtered = filtered.filter(business => business.featured);
+    }
+    if (filters.franchise) {
+      filtered = filtered.filter(business => business.is_franchise);
+    }
+    
     setFilteredBusinesses(filtered);
+    setDisplayedBusinesses(filtered.slice(0, 20));
+    setDisplayCount(20);
   };
+
+  const handleSaveSearch = (filters: any, name: string) => {
+    const savedSearches = JSON.parse(localStorage.getItem('savedSearches') || '[]');
+    savedSearches.push({ name, filters, createdAt: new Date().toISOString() });
+    localStorage.setItem('savedSearches', JSON.stringify(savedSearches));
+  };
+
+  const handleCreateAlert = (filters: any) => {
+    const alerts = JSON.parse(localStorage.getItem('searchAlerts') || '[]');
+    alerts.push({ filters, createdAt: new Date().toISOString(), active: true });
+    localStorage.setItem('searchAlerts', JSON.stringify(alerts));
+  };
+
+  const toggleCompareMode = () => {
+    setCompareMode(!compareMode);
+    setSelectedForComparison([]);
+  };
+
+  const toggleBusinessForComparison = (businessId: string) => {
+    setSelectedForComparison(prev => {
+      if (prev.includes(businessId)) {
+        return prev.filter(id => id !== businessId);
+      }
+      if (prev.length >= 4) {
+        toast({
+          title: "Limite atteinte",
+          description: "Vous pouvez comparer jusqu'à 4 entreprises",
+          variant: "destructive",
+        });
+        return prev;
+      }
+      return [...prev, businessId];
+    });
+  };
+
+  useEffect(() => {
+    setDisplayedBusinesses(filteredBusinesses.slice(0, displayCount));
+  }, [filteredBusinesses, displayCount]);
 
   const structuredData = {
     "@context": "https://schema.org",
@@ -188,7 +258,11 @@ const Businesses = () => {
       {/* Filter Section */}
       <section className="py-8 bg-background border-b border-border">
         <div className="container mx-auto px-4">
-          <FilterBar onFilter={handleFilter} />
+          <AdvancedFilterBar 
+            onFilter={handleFilter}
+            onSaveSearch={handleSaveSearch}
+            onCreateAlert={handleCreateAlert}
+          />
         </div>
       </section>
 
