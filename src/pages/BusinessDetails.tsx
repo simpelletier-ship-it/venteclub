@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Lock, MapPin, TrendingUp, Users, Calendar, Eye, Calculator, Phone, Mail, UserCircle, ChevronLeft, ChevronRight, ZoomIn, ZoomOut, X, ChevronDown, MessageSquare, Share2, Star, User, Briefcase, Globe, Linkedin } from "lucide-react";
+import { ArrowLeft, Lock, MapPin, TrendingUp, Users, Calendar, Eye, Calculator, Phone, Mail, UserCircle, ChevronLeft, ChevronRight, ZoomIn, ZoomOut, X, ChevronDown, MessageSquare, Share2, Star, User, Briefcase, Globe, Linkedin, CalendarCheck } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { FavoriteButton } from "@/components/FavoriteButton";
@@ -25,6 +25,10 @@ import { PremiumUpgradeModal } from "@/components/PremiumUpgradeModal";
 import { sanitizeHtml } from "@/lib/htmlUtils";
 import { BusinessDetailsSkeleton } from "@/components/BusinessDetailsSkeleton";
 import { SellerProfileCard } from "@/components/SellerProfileCard";
+import { SimilarBusinesses } from "@/components/SimilarBusinesses";
+import { LocationScore } from "@/components/LocationScore";
+import { ScheduleVisitDialog } from "@/components/ScheduleVisitDialog";
+import { MarketEstimate } from "@/components/MarketEstimate";
 
 const BusinessDetails = () => {
   const { slug } = useParams();
@@ -56,6 +60,7 @@ const BusinessDetails = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [imageZoom, setImageZoom] = useState(1);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [showVisitDialog, setShowVisitDialog] = useState(false);
 
   useEffect(() => {
     const initialize = async () => {
@@ -1564,6 +1569,42 @@ const BusinessDetails = () => {
                   </div>
                 )}
 
+              {/* Market Estimate - Zillow Style */}
+              {!business.property_type && business.asking_price > 0 && business.annual_revenue > 0 && (
+                <div className="mt-6">
+                  <MarketEstimate
+                    askingPrice={business.asking_price}
+                    revenue={business.annual_revenue || 0}
+                    baiia={business.baiia || 0}
+                    industry={business.industry}
+                    city={business.city}
+                  />
+                </div>
+              )}
+
+              {/* Location Score - Zillow Style */}
+              <div className="mt-6">
+                <LocationScore
+                  city={business.city}
+                  region={business.region}
+                />
+              </div>
+
+              {/* Similar Businesses - Zillow Style */}
+              {businessId && (
+                <div className="mt-6">
+                  <SimilarBusinesses
+                    currentBusinessId={businessId}
+                    industry={business.industry}
+                    city={business.city}
+                    priceRange={[
+                      Math.max(0, business.asking_price - 500000),
+                      business.asking_price + 500000
+                    ]}
+                  />
+                </div>
+              )}
+
               </div>
             </div>
 
@@ -1670,6 +1711,31 @@ const BusinessDetails = () => {
                       className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
                     >
                       Se connecter
+                    </Button>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Schedule Visit Button - Zillow Style */}
+              {!isSeller && businessId && business.seller_id && (
+                <Card className="border-primary/20 shadow-lg">
+                  <CardHeader>
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <CalendarCheck className="w-5 h-5 text-primary" />
+                      Planifier une visite
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <p className="text-sm text-muted-foreground">
+                      Organisez une rencontre pour visiter l'entreprise et discuter avec le vendeur
+                    </p>
+                    <Button
+                      onClick={() => setShowVisitDialog(true)}
+                      className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
+                      size="lg"
+                    >
+                      <CalendarCheck className="w-4 h-4 mr-2" />
+                      Demander une visite
                     </Button>
                   </CardContent>
                 </Card>
@@ -1825,6 +1891,17 @@ const BusinessDetails = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Schedule Visit Dialog - Zillow Style */}
+      {businessId && business.seller_id && (
+        <ScheduleVisitDialog
+          open={showVisitDialog}
+          onOpenChange={setShowVisitDialog}
+          businessId={businessId}
+          businessTitle={business.title}
+          sellerId={business.seller_id}
+        />
+      )}
 
       {/* Premium Upgrade Modal */}
       <PremiumUpgradeModal
