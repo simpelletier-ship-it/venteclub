@@ -112,10 +112,21 @@ export const CategoryManager = ({ isAuthenticated }: { isAuthenticated: boolean 
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    const allDefaults = [
-      ...DEFAULT_EXPENSE_CATEGORIES.map(cat => ({ ...cat, type: 'expense' as const, is_custom: false })),
-      ...DEFAULT_INCOME_CATEGORIES.map(cat => ({ ...cat, type: 'income' as const, is_custom: false })),
-    ];
+    const expenseDefaults = DEFAULT_EXPENSE_CATEGORIES.map((cat, index) => ({ 
+      ...cat, 
+      type: 'expense' as const, 
+      is_custom: false,
+      display_order: index 
+    }));
+    
+    const incomeDefaults = DEFAULT_INCOME_CATEGORIES.map((cat, index) => ({ 
+      ...cat, 
+      type: 'income' as const, 
+      is_custom: false,
+      display_order: index 
+    }));
+
+    const allDefaults = [...expenseDefaults, ...incomeDefaults];
 
     const { error } = await supabase
       .from('budget_categories')
@@ -127,6 +138,7 @@ export const CategoryManager = ({ isAuthenticated }: { isAuthenticated: boolean 
           color: cat.color,
           type: cat.type,
           is_custom: cat.is_custom,
+          display_order: cat.display_order,
         }))
       );
 
@@ -143,6 +155,12 @@ export const CategoryManager = ({ isAuthenticated }: { isAuthenticated: boolean 
       if (!user) throw new Error("Non authentifié");
       if (!name.trim()) throw new Error("Le nom est requis");
 
+      // Get the highest display_order for this type
+      const existingCategories = categories.filter(c => c.type === categoryType);
+      const maxDisplayOrder = existingCategories.length > 0 
+        ? Math.max(...existingCategories.map(c => c.display_order || 0))
+        : -1;
+
       const { data, error } = await supabase
         .from('budget_categories')
         .insert({
@@ -152,6 +170,7 @@ export const CategoryManager = ({ isAuthenticated }: { isAuthenticated: boolean 
           color,
           type: categoryType,
           is_custom: true,
+          display_order: maxDisplayOrder + 1,
         })
         .select()
         .single();
