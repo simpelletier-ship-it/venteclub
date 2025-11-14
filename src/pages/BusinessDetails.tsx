@@ -1365,8 +1365,8 @@ const BusinessDetails = () => {
                   </div>
                 )}
 
-                {/* Informations du vendeur - Affichées UNIQUEMENT pour les membres Club Select */}
-                {!isSeller && user && hasPremium && sellerContact && (
+              {/* Informations du vendeur - Affichées UNIQUEMENT pour les membres Club Select ET si chat activé */}
+              {!isSeller && user && hasPremium && sellerContact && !business.chat_disabled && (
                   <div className="border-t pt-6 mt-6">
                     <div className="bg-gradient-to-br from-primary/5 to-secondary/5 border-2 border-primary/20 rounded-xl p-6">
                       <div className="text-center mb-6">
@@ -1515,8 +1515,8 @@ const BusinessDetails = () => {
                 </div>
               )}
 
-              {/* Profil vendeur enrichi */}
-              {hasAccess && sellerContact && business.seller_id && (
+              {/* Profil vendeur enrichi - masqué si chat désactivé */}
+              {hasAccess && sellerContact && business.seller_id && !business.chat_disabled && (
                 <div className="mt-6">
                   <SellerProfileCard
                     sellerId={business.seller_id}
@@ -1741,8 +1741,8 @@ const BusinessDetails = () => {
                 </Card>
               )}
 
-              {/* Display seller contact info - always visible but content varies by access */}
-              {(business.seller_name || business.seller_email || business.seller_phone) && (
+              {/* Display seller contact info - masqué si chat désactivé */}
+              {(business.seller_name || business.seller_email || business.seller_phone) && !business.chat_disabled && (
                 <Card className="border-secondary/20 bg-gradient-to-br from-secondary/5 to-primary/5 shadow-lg">
                   <CardHeader>
                     <CardTitle className="text-lg flex items-center gap-2">
