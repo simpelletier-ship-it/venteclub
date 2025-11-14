@@ -1024,7 +1024,7 @@ const BusinessDetails = () => {
                   <div className="p-8">
                     <h2 className="text-2xl font-bold text-foreground mb-3">Description</h2>
                     <div 
-                      className="text-card-foreground/90 leading-relaxed text-base prose prose-slate dark:prose-invert max-w-none"
+                      className="text-foreground leading-relaxed text-base prose prose-slate dark:prose-invert max-w-none"
                       dangerouslySetInnerHTML={{ __html: sanitizeHtml(business.description) }}
                     />
                   </div>
