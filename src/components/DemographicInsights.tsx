@@ -72,10 +72,30 @@ export const DemographicInsights = ({ city, region }: DemographicInsightsProps) 
 
   const getCommercialPotential = () => {
     const score = (data.businessDensity + data.consumerSpending + data.employmentRate) / 3;
-    if (score >= 85) return { label: 'Excellent', color: 'text-green-600 dark:text-green-400', variant: 'default' as const };
-    if (score >= 75) return { label: 'Très bon', color: 'text-blue-600 dark:text-blue-400', variant: 'secondary' as const };
-    if (score >= 65) return { label: 'Bon', color: 'text-yellow-600 dark:text-yellow-400', variant: 'outline' as const };
-    return { label: 'Moyen', color: 'text-orange-600 dark:text-orange-400', variant: 'outline' as const };
+    if (score >= 85) return { 
+      label: 'Excellent', 
+      bgColor: 'bg-green-100 dark:bg-green-900/30',
+      textColor: 'text-green-800 dark:text-green-200',
+      borderColor: 'border-green-300 dark:border-green-700'
+    };
+    if (score >= 75) return { 
+      label: 'Très bon', 
+      bgColor: 'bg-blue-100 dark:bg-blue-900/30',
+      textColor: 'text-blue-800 dark:text-blue-200',
+      borderColor: 'border-blue-300 dark:border-blue-700'
+    };
+    if (score >= 65) return { 
+      label: 'Bon', 
+      bgColor: 'bg-yellow-100 dark:bg-yellow-900/30',
+      textColor: 'text-yellow-800 dark:text-yellow-200',
+      borderColor: 'border-yellow-300 dark:border-yellow-700'
+    };
+    return { 
+      label: 'Moyen', 
+      bgColor: 'bg-orange-100 dark:bg-orange-900/30',
+      textColor: 'text-orange-800 dark:text-orange-200',
+      borderColor: 'border-orange-300 dark:border-orange-700'
+    };
   };
 
   const potential = getCommercialPotential();
@@ -97,9 +117,9 @@ export const DemographicInsights = ({ city, region }: DemographicInsightsProps) 
           <div className="text-sm font-medium text-muted-foreground mb-1">
             Potentiel Commercial
           </div>
-          <Badge variant={potential.variant} className={`${potential.color} text-lg px-4 py-1`}>
+          <div className={`inline-flex items-center justify-center rounded-full text-lg font-semibold px-6 py-2 border ${potential.bgColor} ${potential.textColor} ${potential.borderColor}`}>
             {potential.label}
-          </Badge>
+          </div>
         </div>
 
         {/* Statistiques principales */}
