@@ -11,7 +11,7 @@ serve(async (req) => {
   }
 
   try {
-    const { income, dependents, location, expenses } = await req.json();
+    const { income, grossIncome, incomeType, hoursPerWeek, dependents, location, expenses } = await req.json();
     
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
@@ -33,14 +33,27 @@ Retourne UNIQUEMENT un objet JSON valide avec cette structure exacte (pas de tex
   "explanation": "Brève explication du budget"
 }`;
 
-    const userPrompt = `Crée un budget mensuel pour:
-- Revenu mensuel: ${income}$
+    let incomeDescription = `Revenu mensuel net: ${income}$`;
+    if (grossIncome && incomeType) {
+      if (incomeType === "hourly") {
+        incomeDescription = `Salaire horaire brut: ${grossIncome}$/h (${hoursPerWeek}h/sem) → Net mensuel: ${income}$`;
+      } else if (incomeType === "yearly") {
+        incomeDescription = `Salaire annuel brut: ${grossIncome}$/an → Net mensuel: ${income}$`;
+      } else {
+        incomeDescription = `Salaire mensuel brut: ${grossIncome}$/mois → Net mensuel: ${income}$`;
+      }
+    }
+
+    const userPrompt = `Crée un budget mensuel réaliste pour le Québec:
+- ${incomeDescription}
 - Nombre de personnes à charge: ${dependents}
 - Région: ${location}
 - Dépenses actuelles connues: ${expenses || 'Aucune'}
 
-Utilise la règle 50/30/20 comme guide (50% besoins, 30% envies, 20% épargne).
-Inclus des catégories pertinentes selon la situation (logement, alimentation, transport, services publics, épargne, divertissement, etc.).`;
+IMPORTANT: Base tes calculs sur le revenu NET mensuel de ${income}$. 
+Utilise la règle 50/30/20 adaptée au Québec (50% besoins essentiels, 30% loisirs/envies, 20% épargne).
+Tiens compte du coût de la vie à ${location}.
+Inclus des catégories réalistes: logement, alimentation, transport, services publics, télécommunications, assurances, épargne, loisirs, etc.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",

@@ -22,22 +22,55 @@ export const AIBudgetGenerator = ({ onBudgetGenerated }: AIBudgetGeneratorProps)
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [income, setIncome] = useState("");
+  const [incomeType, setIncomeType] = useState<"hourly" | "monthly" | "yearly">("monthly");
+  const [hoursPerWeek, setHoursPerWeek] = useState("40");
   const [dependents, setDependents] = useState("0");
   const [location, setLocation] = useState("Montréal");
   const [expenses, setExpenses] = useState("");
   const [generatedBudget, setGeneratedBudget] = useState<any>(null);
 
+  // Calculate monthly net income from gross
+  const calculateMonthlyNet = () => {
+    if (!income || parseFloat(income) <= 0) return 0;
+    
+    const grossAmount = parseFloat(income);
+    let monthlyGross = 0;
+
+    if (incomeType === "hourly") {
+      const hours = parseFloat(hoursPerWeek) || 40;
+      monthlyGross = grossAmount * hours * 4.33; // 4.33 weeks per month average
+    } else if (incomeType === "yearly") {
+      monthlyGross = grossAmount / 12;
+    } else {
+      monthlyGross = grossAmount;
+    }
+
+    // Rough Quebec tax estimation (approximately 30% for average earner)
+    const netMonthly = monthlyGross * 0.70;
+    return Math.round(netMonthly);
+  };
+
   const handleGenerate = async () => {
     if (!income || parseFloat(income) <= 0) {
-      toast.error("Veuillez entrer un revenu valide");
+      toast.error("Veuillez entrer un salaire valide");
       return;
     }
+
+    if (incomeType === "hourly" && (!hoursPerWeek || parseFloat(hoursPerWeek) <= 0)) {
+      toast.error("Veuillez entrer le nombre d'heures par semaine");
+      return;
+    }
+
+    const monthlyNetIncome = calculateMonthlyNet();
 
     setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke('generate-budget', {
         body: {
-          income: parseFloat(income),
+          income: monthlyNetIncome,
+          grossIncome: parseFloat(income),
+          incomeType,
+          hoursPerWeek: incomeType === "hourly" ? parseFloat(hoursPerWeek) : undefined,
           dependents: parseInt(dependents),
           location,
           expenses,
@@ -69,6 +102,8 @@ export const AIBudgetGenerator = ({ onBudgetGenerated }: AIBudgetGeneratorProps)
       setOpen(false);
       setGeneratedBudget(null);
       setIncome("");
+      setIncomeType("monthly");
+      setHoursPerWeek("40");
       setDependents("0");
       setExpenses("");
     }
@@ -104,15 +139,60 @@ export const AIBudgetGenerator = ({ onBudgetGenerated }: AIBudgetGeneratorProps)
 
         {!generatedBudget ? (
           <div className="space-y-4 py-4">
-            <div>
-              <Label htmlFor="income">Revenu mensuel net</Label>
-              <CurrencyInput
-                id="income"
-                value={income}
-                onChange={setIncome}
-                placeholder="Ex: 4000"
-                className="mt-1.5"
-              />
+            <div className="space-y-3 p-4 rounded-lg bg-muted/50 border">
+              <div>
+                <Label htmlFor="incomeType">Type de salaire</Label>
+                <Select value={incomeType} onValueChange={(value: any) => setIncomeType(value)}>
+                  <SelectTrigger id="incomeType" className="mt-1.5">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="hourly">💼 Horaire ($/heure)</SelectItem>
+                    <SelectItem value="monthly">📅 Mensuel ($/mois)</SelectItem>
+                    <SelectItem value="yearly">📊 Annuel ($/année)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label htmlFor="income">
+                  Salaire brut {incomeType === "hourly" ? "($/heure)" : incomeType === "yearly" ? "($/année)" : "($/mois)"}
+                </Label>
+                <CurrencyInput
+                  id="income"
+                  value={income}
+                  onChange={setIncome}
+                  placeholder={incomeType === "hourly" ? "Ex: 25" : incomeType === "yearly" ? "Ex: 65000" : "Ex: 5000"}
+                  className="mt-1.5"
+                />
+              </div>
+
+              {incomeType === "hourly" && (
+                <div>
+                  <Label htmlFor="hoursPerWeek">Heures par semaine</Label>
+                  <Input
+                    id="hoursPerWeek"
+                    type="number"
+                    value={hoursPerWeek}
+                    onChange={(e) => setHoursPerWeek(e.target.value)}
+                    placeholder="Ex: 40"
+                    className="mt-1.5"
+                    min="1"
+                    max="80"
+                  />
+                </div>
+              )}
+
+              {income && parseFloat(income) > 0 && (
+                <div className="p-3 rounded bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800">
+                  <p className="text-sm font-medium text-green-800 dark:text-green-200">
+                    💰 Revenu net mensuel estimé: <span className="font-bold">{formatPrice(calculateMonthlyNet())}</span>
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    (Estimation après déductions fiscales ~30%)
+                  </p>
+                </div>
+              )}
             </div>
 
             <div>
@@ -231,6 +311,8 @@ export const AIBudgetGenerator = ({ onBudgetGenerated }: AIBudgetGeneratorProps)
                 onClick={() => {
                   setGeneratedBudget(null);
                   setIncome("");
+                  setIncomeType("monthly");
+                  setHoursPerWeek("40");
                   setDependents("0");
                   setExpenses("");
                 }}
