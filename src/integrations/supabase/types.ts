@@ -1578,6 +1578,51 @@ export type Database = {
           },
         ]
       }
+      sitemap_cache: {
+        Row: {
+          entry_count: number
+          generated_at: string
+          id: string
+          xml_content: string
+        }
+        Insert: {
+          entry_count?: number
+          generated_at?: string
+          id?: string
+          xml_content: string
+        }
+        Update: {
+          entry_count?: number
+          generated_at?: string
+          id?: string
+          xml_content?: string
+        }
+        Relationships: []
+      }
+      sitemap_generation_log: {
+        Row: {
+          entry_count: number
+          generated_at: string
+          generation_time_ms: number
+          id: string
+          trigger_source: string
+        }
+        Insert: {
+          entry_count: number
+          generated_at?: string
+          generation_time_ms: number
+          id?: string
+          trigger_source: string
+        }
+        Update: {
+          entry_count?: number
+          generated_at?: string
+          generation_time_ms?: number
+          id?: string
+          trigger_source?: string
+        }
+        Relationships: []
+      }
       subscription_plans: {
         Row: {
           created_at: string | null
@@ -2239,6 +2284,10 @@ export type Database = {
         Returns: undefined
       }
       trigger_auto_blog_generation: { Args: never; Returns: undefined }
+      trigger_sitemap_regeneration: {
+        Args: { p_source?: string }
+        Returns: Json
+      }
       update_business_featured_status: { Args: never; Returns: undefined }
       use_token_for_access: { Args: { business_uuid: string }; Returns: Json }
     }

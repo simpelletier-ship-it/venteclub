@@ -222,83 +222,84 @@ export const BudgetPlanner = ({ isAuthenticated }: { isAuthenticated: boolean })
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Non authentifié");
 
-      // Create or find categories and add budget goals
-      const budgetGoals = [];
+      // Helper function to find best matching category
+      const findBestMatch = (itemName: string, type: 'income' | 'expense') => {
+        const itemNameLower = itemName.toLowerCase();
+        
+        return categories?.find(cat => {
+          if (cat.type !== type) return false;
+          const catNameLower = cat.name.toLowerCase();
+          
+          // Exact match
+          if (catNameLower === itemNameLower) return true;
+          
+          // Partial match with keywords (min 3 chars)
+          const keywords = itemNameLower.split(' ');
+          return keywords.some(keyword => 
+            keyword.length > 3 && catNameLower.includes(keyword)
+          );
+        });
+      };
+
+      let matchedCount = 0;
 
       // Process income categories
       for (const item of budget.income) {
-        let category = categories.find(c => c.name === item.name && c.type === 'income');
+        const category = findBestMatch(item.name, 'income');
         
-        if (!category) {
-          // Create new category
-          const { data: newCat, error } = await supabase
-            .from('budget_categories')
-            .insert({
-              user_id: user.id,
-              name: item.name,
-              icon: item.icon,
-              type: 'income',
-              is_custom: true,
-            })
-            .select()
-            .single();
+        if (category) {
+          matchedCount++;
+          const existingGoal = goals?.find(g => g.category_id === category.id);
           
-          if (error) throw error;
-          category = newCat as Category;
+          if (existingGoal) {
+            await supabase
+              .from('budget_goals')
+              .update({ monthly_limit: item.amount })
+              .eq('id', existingGoal.id);
+          } else {
+            await supabase
+              .from('budget_goals')
+              .insert({
+                user_id: user.id,
+                category_id: category.id,
+                monthly_limit: item.amount,
+                frequency: 'monthly',
+              });
+          }
         }
-
-        budgetGoals.push({
-          user_id: user.id,
-          category_id: category.id,
-          monthly_limit: item.amount,
-          frequency: 'monthly',
-        });
       }
 
       // Process expense categories
       for (const item of budget.expenses) {
-        let category = categories.find(c => c.name === item.name && c.type === 'expense');
+        const category = findBestMatch(item.name, 'expense');
         
-        if (!category) {
-          // Create new category
-          const { data: newCat, error } = await supabase
-            .from('budget_categories')
-            .insert({
-              user_id: user.id,
-              name: item.name,
-              icon: item.icon,
-              type: 'expense',
-              is_custom: true,
-            })
-            .select()
-            .single();
+        if (category) {
+          matchedCount++;
+          const existingGoal = goals?.find(g => g.category_id === category.id);
           
-          if (error) throw error;
-          category = newCat as Category;
+          if (existingGoal) {
+            await supabase
+              .from('budget_goals')
+              .update({ monthly_limit: item.amount })
+              .eq('id', existingGoal.id);
+          } else {
+            await supabase
+              .from('budget_goals')
+              .insert({
+                user_id: user.id,
+                category_id: category.id,
+                monthly_limit: item.amount,
+                frequency: 'monthly',
+              });
+          }
         }
-
-        budgetGoals.push({
-          user_id: user.id,
-          category_id: category.id,
-          monthly_limit: item.amount,
-          frequency: 'monthly',
-        });
       }
-
-      // Delete existing goals and insert new ones
-      await supabase.from('budget_goals').delete().eq('user_id', user.id);
-      
-      const { error: insertError } = await supabase
-        .from('budget_goals')
-        .insert(budgetGoals);
-
-      if (insertError) throw insertError;
 
       // Refresh data
       queryClient.invalidateQueries({ queryKey: ['budget-goals'] });
       queryClient.invalidateQueries({ queryKey: ['budget-categories'] });
       
-      toast.success("✨ Budget IA appliqué avec succès!", { duration: 3000 });
+      toast.success(`✨ Budget IA appliqué! ${matchedCount} catégories mises à jour.`, { duration: 3000 });
     } catch (error: any) {
       console.error("Error applying AI budget:", error);
       toast.error("Erreur: " + error.message);

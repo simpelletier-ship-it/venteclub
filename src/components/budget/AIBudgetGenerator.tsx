@@ -28,6 +28,7 @@ export const AIBudgetGenerator = ({ onBudgetGenerated }: AIBudgetGeneratorProps)
   const [location, setLocation] = useState("Montréal");
   const [expenses, setExpenses] = useState("");
   const [generatedBudget, setGeneratedBudget] = useState<any>(null);
+  const [editedBudget, setEditedBudget] = useState<any>(null);
 
   // Calculate monthly net income from gross
   const calculateMonthlyNet = () => {
@@ -87,6 +88,7 @@ export const AIBudgetGenerator = ({ onBudgetGenerated }: AIBudgetGeneratorProps)
       }
 
       setGeneratedBudget(data);
+      setEditedBudget(JSON.parse(JSON.stringify(data))); // Deep copy
       toast.success("✨ Budget généré avec succès!");
     } catch (error) {
       console.error("Error generating budget:", error);
@@ -97,16 +99,24 @@ export const AIBudgetGenerator = ({ onBudgetGenerated }: AIBudgetGeneratorProps)
   };
 
   const handleApply = () => {
-    if (generatedBudget) {
-      onBudgetGenerated(generatedBudget);
+    if (editedBudget) {
+      onBudgetGenerated(editedBudget);
       setOpen(false);
       setGeneratedBudget(null);
+      setEditedBudget(null);
       setIncome("");
       setIncomeType("monthly");
       setHoursPerWeek("40");
       setDependents("0");
       setExpenses("");
     }
+  };
+
+  const updateBudgetItem = (type: 'income' | 'expenses', index: number, field: 'amount', value: number) => {
+    if (!editedBudget) return;
+    const newBudget = { ...editedBudget };
+    newBudget[type][index][field] = value;
+    setEditedBudget(newBudget);
   };
 
   const formatPrice = (amount: number) => {
@@ -272,34 +282,44 @@ export const AIBudgetGenerator = ({ onBudgetGenerated }: AIBudgetGeneratorProps)
 
             <div className="space-y-4">
               <div>
-                <h4 className="font-semibold mb-2 text-green-600 flex items-center gap-2">
+                <h4 className="font-semibold mb-3 text-green-600 flex items-center gap-2">
                   💰 Revenus
                 </h4>
                 <div className="space-y-2">
-                  {generatedBudget.income?.map((item: any, index: number) => (
-                    <div key={index} className="flex justify-between items-center p-2 rounded bg-green-50 dark:bg-green-950/20">
-                      <span className="flex items-center gap-2">
-                        <span>{item.icon}</span>
-                        <span>{item.name}</span>
+                  {editedBudget?.income?.map((item: any, index: number) => (
+                    <div key={index} className="flex justify-between items-center gap-3 p-3 rounded-lg bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800">
+                      <span className="flex items-center gap-2 flex-1">
+                        <span className="text-lg">{item.icon}</span>
+                        <span className="font-medium">{item.name}</span>
                       </span>
-                      <span className="font-semibold">{formatPrice(item.amount)}</span>
+                      <Input
+                        type="number"
+                        value={item.amount}
+                        onChange={(e) => updateBudgetItem('income', index, 'amount', parseFloat(e.target.value) || 0)}
+                        className="w-32 text-right font-semibold"
+                      />
                     </div>
                   ))}
                 </div>
               </div>
 
               <div>
-                <h4 className="font-semibold mb-2 text-red-600 flex items-center gap-2">
+                <h4 className="font-semibold mb-3 text-red-600 flex items-center gap-2">
                   💳 Dépenses recommandées
                 </h4>
                 <div className="space-y-2">
-                  {generatedBudget.expenses?.map((item: any, index: number) => (
-                    <div key={index} className="flex justify-between items-center p-2 rounded bg-red-50 dark:bg-red-950/20">
-                      <span className="flex items-center gap-2">
-                        <span>{item.icon}</span>
-                        <span>{item.name}</span>
+                  {editedBudget?.expenses?.map((item: any, index: number) => (
+                    <div key={index} className="flex justify-between items-center gap-3 p-3 rounded-lg bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800">
+                      <span className="flex items-center gap-2 flex-1">
+                        <span className="text-lg">{item.icon}</span>
+                        <span className="font-medium">{item.name}</span>
                       </span>
-                      <span className="font-semibold">{formatPrice(item.amount)}</span>
+                      <Input
+                        type="number"
+                        value={item.amount}
+                        onChange={(e) => updateBudgetItem('expenses', index, 'amount', parseFloat(e.target.value) || 0)}
+                        className="w-32 text-right font-semibold"
+                      />
                     </div>
                   ))}
                 </div>
@@ -310,6 +330,7 @@ export const AIBudgetGenerator = ({ onBudgetGenerated }: AIBudgetGeneratorProps)
               <Button 
                 onClick={() => {
                   setGeneratedBudget(null);
+                  setEditedBudget(null);
                   setIncome("");
                   setIncomeType("monthly");
                   setHoursPerWeek("40");
