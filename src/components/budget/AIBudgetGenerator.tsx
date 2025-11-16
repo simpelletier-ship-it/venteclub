@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sparkles, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -39,14 +40,13 @@ export const AIBudgetGenerator = ({ onBudgetGenerated }: AIBudgetGeneratorProps)
 
     if (incomeType === "hourly") {
       const hours = parseFloat(hoursPerWeek) || 40;
-      monthlyGross = grossAmount * hours * 4.33; // 4.33 weeks per month average
+      monthlyGross = grossAmount * hours * 4.33;
     } else if (incomeType === "yearly") {
       monthlyGross = grossAmount / 12;
     } else {
       monthlyGross = grossAmount;
     }
 
-    // Rough Quebec tax estimation (approximately 30% for average earner)
     const netMonthly = monthlyGross * 0.70;
     return Math.round(netMonthly);
   };
@@ -78,17 +78,14 @@ export const AIBudgetGenerator = ({ onBudgetGenerated }: AIBudgetGeneratorProps)
         }
       });
 
-      if (error) {
-        throw error;
-      }
-
+      if (error) throw error;
       if (data.error) {
         toast.error(data.error);
         return;
       }
 
       setGeneratedBudget(data);
-      setEditedBudget(JSON.parse(JSON.stringify(data))); // Deep copy
+      setEditedBudget(JSON.parse(JSON.stringify(data)));
       toast.success("✨ Budget généré avec succès!");
     } catch (error) {
       console.error("Error generating budget:", error);
@@ -112,237 +109,252 @@ export const AIBudgetGenerator = ({ onBudgetGenerated }: AIBudgetGeneratorProps)
     }
   };
 
-  const updateBudgetItem = (type: 'income' | 'expenses', index: number, field: 'amount', value: number) => {
+  const handleEdit = (type: 'income' | 'expenses', index: number, newAmount: number) => {
     if (!editedBudget) return;
-    const newBudget = { ...editedBudget };
-    newBudget[type][index][field] = value;
-    setEditedBudget(newBudget);
+    const updatedBudget = { ...editedBudget };
+    updatedBudget[type][index].amount = newAmount;
+    setEditedBudget(updatedBudget);
   };
 
-  const formatPrice = (amount: number) => {
-    return new Intl.NumberFormat('fr-CA', {
-      style: 'currency',
-      currency: 'CAD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(amount);
-  };
+  const monthlyNetIncome = calculateMonthlyNet();
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="gap-2">
-          <Sparkles className="h-4 w-4" />
-          Générer avec IA
+        <Button variant="outline" className="w-full h-11 border-dashed hover:border-primary/50 hover:bg-primary/5 transition-colors">
+          <Sparkles className="mr-2 h-4 w-4" />
+          Assistant Budget IA
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-primary" />
-            Assistant Budget IA
-          </DialogTitle>
-          <DialogDescription>
-            Répondez à quelques questions pour générer un budget personnalisé
-          </DialogDescription>
+        <DialogHeader className="space-y-3 pb-6 border-b">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
+              <Sparkles className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <DialogTitle className="text-2xl font-semibold">Assistant Budget</DialogTitle>
+              <DialogDescription className="text-sm">
+                Créez un budget personnalisé en quelques étapes
+              </DialogDescription>
+            </div>
+          </div>
         </DialogHeader>
 
         {!generatedBudget ? (
-          <div className="space-y-4 py-4">
-            <div className="space-y-3 p-4 rounded-lg bg-muted/50 border">
-              <div>
-                <Label htmlFor="incomeType">Type de salaire</Label>
-                <Select value={incomeType} onValueChange={(value: any) => setIncomeType(value)}>
-                  <SelectTrigger id="incomeType" className="mt-1.5">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="hourly">💼 Horaire ($/heure)</SelectItem>
-                    <SelectItem value="monthly">📅 Mensuel ($/mois)</SelectItem>
-                    <SelectItem value="yearly">📊 Annuel ($/année)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label htmlFor="income">
-                  Salaire brut {incomeType === "hourly" ? "($/heure)" : incomeType === "yearly" ? "($/année)" : "($/mois)"}
+          <div className="space-y-6 py-2">
+            <div className="space-y-5">
+              <div className="space-y-2.5">
+                <Label htmlFor="income" className="text-sm font-medium">
+                  Salaire brut
                 </Label>
-                <CurrencyInput
+                <Input
                   id="income"
+                  type="number"
                   value={income}
-                  onChange={setIncome}
-                  placeholder={incomeType === "hourly" ? "Ex: 25" : incomeType === "yearly" ? "Ex: 65000" : "Ex: 5000"}
-                  className="mt-1.5"
+                  onChange={(e) => setIncome(e.target.value)}
+                  placeholder="50 000"
+                  className="h-11"
                 />
               </div>
 
-              {incomeType === "hourly" && (
-                <div>
-                  <Label htmlFor="hoursPerWeek">Heures par semaine</Label>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2.5">
+                  <Label htmlFor="incomeType" className="text-sm font-medium">
+                    Période
+                  </Label>
+                  <Select value={incomeType} onValueChange={(value: any) => setIncomeType(value)}>
+                    <SelectTrigger id="incomeType" className="h-11">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="hourly">Par heure</SelectItem>
+                      <SelectItem value="monthly">Par mois</SelectItem>
+                      <SelectItem value="yearly">Par année</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {incomeType === "hourly" && (
+                  <div className="space-y-2.5">
+                    <Label htmlFor="hoursPerWeek" className="text-sm font-medium">
+                      Heures / semaine
+                    </Label>
+                    <Input
+                      id="hoursPerWeek"
+                      type="number"
+                      value={hoursPerWeek}
+                      onChange={(e) => setHoursPerWeek(e.target.value)}
+                      placeholder="40"
+                      className="h-11"
+                    />
+                  </div>
+                )}
+              </div>
+
+              {monthlyNetIncome > 0 && (
+                <div className="p-5 bg-primary/5 border border-primary/10 rounded-xl">
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-3xl font-semibold">
+                      {new Intl.NumberFormat('fr-CA', {
+                        style: 'currency',
+                        currency: 'CAD',
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0
+                      }).format(monthlyNetIncome)}
+                    </span>
+                    <span className="text-sm text-muted-foreground">/mois net</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Estimation après déductions fiscales (~30%)
+                  </p>
+                </div>
+              )}
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2.5">
+                  <Label htmlFor="dependents" className="text-sm font-medium">
+                    Personnes à charge
+                  </Label>
                   <Input
-                    id="hoursPerWeek"
+                    id="dependents"
                     type="number"
-                    value={hoursPerWeek}
-                    onChange={(e) => setHoursPerWeek(e.target.value)}
-                    placeholder="Ex: 40"
-                    className="mt-1.5"
-                    min="1"
-                    max="80"
+                    value={dependents}
+                    onChange={(e) => setDependents(e.target.value)}
+                    min="0"
+                    placeholder="0"
+                    className="h-11"
                   />
                 </div>
-              )}
 
-              {income && parseFloat(income) > 0 && (
-                <div className="p-3 rounded bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800">
-                  <p className="text-sm font-medium text-green-800 dark:text-green-200">
-                    💰 Revenu net mensuel estimé: <span className="font-bold">{formatPrice(calculateMonthlyNet())}</span>
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    (Estimation après déductions fiscales ~30%)
-                  </p>
+                <div className="space-y-2.5">
+                  <Label htmlFor="location" className="text-sm font-medium">
+                    Ville
+                  </Label>
+                  <Input
+                    id="location"
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    placeholder="Montréal, QC"
+                    className="h-11"
+                  />
                 </div>
-              )}
+              </div>
+
+              <div className="space-y-2.5">
+                <Label htmlFor="expenses" className="text-sm font-medium">
+                  Dépenses fixes <span className="text-muted-foreground font-normal">(optionnel)</span>
+                </Label>
+                <Textarea
+                  id="expenses"
+                  value={expenses}
+                  onChange={(e) => setExpenses(e.target.value)}
+                  placeholder="Loyer 1200$, Voiture 450$, Internet 80$..."
+                  rows={4}
+                  className="resize-none"
+                />
+              </div>
             </div>
 
-            <div>
-              <Label htmlFor="dependents">Nombre de personnes à charge</Label>
-              <Select value={dependents} onValueChange={setDependents}>
-                <SelectTrigger id="dependents" className="mt-1.5">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="0">Aucune</SelectItem>
-                  <SelectItem value="1">1 personne</SelectItem>
-                  <SelectItem value="2">2 personnes</SelectItem>
-                  <SelectItem value="3">3 personnes</SelectItem>
-                  <SelectItem value="4">4 personnes ou plus</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <Label htmlFor="location">Région</Label>
-              <Select value={location} onValueChange={setLocation}>
-                <SelectTrigger id="location" className="mt-1.5">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Montréal">Montréal</SelectItem>
-                  <SelectItem value="Québec">Québec</SelectItem>
-                  <SelectItem value="Laval">Laval</SelectItem>
-                  <SelectItem value="Gatineau">Gatineau</SelectItem>
-                  <SelectItem value="Sherbrooke">Sherbrooke</SelectItem>
-                  <SelectItem value="Saguenay">Saguenay</SelectItem>
-                  <SelectItem value="Trois-Rivières">Trois-Rivières</SelectItem>
-                  <SelectItem value="Autre région">Autre région</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <Label htmlFor="expenses">Dépenses actuelles connues (optionnel)</Label>
-              <Input
-                id="expenses"
-                value={expenses}
-                onChange={(e) => setExpenses(e.target.value)}
-                placeholder="Ex: Loyer 1200$, Auto 400$"
-                className="mt-1.5"
-              />
-              <p className="text-xs text-muted-foreground mt-1">
-                Entrez vos dépenses principales si vous les connaissez
-              </p>
-            </div>
-
-            <Button 
-              onClick={handleGenerate} 
-              disabled={loading} 
-              className="w-full"
+            <Button
+              onClick={handleGenerate}
+              disabled={loading || !income}
+              className="w-full h-12 text-base font-medium"
+              size="lg"
             >
               {loading ? (
                 <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                   Génération en cours...
                 </>
               ) : (
                 <>
-                  <Sparkles className="h-4 w-4 mr-2" />
-                  Générer mon budget
+                  <Sparkles className="mr-2 h-5 w-5" />
+                  Générer mon budget personnalisé
                 </>
               )}
             </Button>
           </div>
         ) : (
-          <div className="space-y-4 py-4">
-            <Card className="bg-muted/50">
-              <CardContent className="p-4">
-                <p className="text-sm">{generatedBudget.explanation}</p>
-              </CardContent>
-            </Card>
+          <div className="space-y-6 py-2">
+            <div className="space-y-6">
+              <Card className="border-0 bg-muted/30">
+                <CardContent className="p-5">
+                  <h3 className="font-semibold text-base mb-3">Revenus</h3>
+                  <div className="space-y-3">
+                    {editedBudget.income.map((item: any, index: number) => (
+                      <div key={index} className="flex items-center justify-between p-3 bg-background rounded-lg">
+                        <span className="text-sm font-medium">{item.name}</span>
+                        <CurrencyInput
+                          value={item.amount}
+                          onChange={(value) => handleEdit('income', index, parseFloat(value) || 0)}
+                          className="w-32 text-right h-9"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
 
-            <div className="space-y-4">
-              <div>
-                <h4 className="font-semibold mb-3 text-green-600 flex items-center gap-2">
-                  💰 Revenus
-                </h4>
-                <div className="space-y-2">
-                  {editedBudget?.income?.map((item: any, index: number) => (
-                    <div key={index} className="flex justify-between items-center gap-3 p-3 rounded-lg bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800">
-                      <span className="flex items-center gap-2 flex-1">
-                        <span className="text-lg">{item.icon}</span>
-                        <span className="font-medium">{item.name}</span>
-                      </span>
-                      <Input
-                        type="number"
-                        value={item.amount}
-                        onChange={(e) => updateBudgetItem('income', index, 'amount', parseFloat(e.target.value) || 0)}
-                        className="w-32 text-right font-semibold"
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <Card className="border-0 bg-muted/30">
+                <CardContent className="p-5">
+                  <h3 className="font-semibold text-base mb-3">Dépenses</h3>
+                  <div className="space-y-3">
+                    {editedBudget.expenses.map((item: any, index: number) => (
+                      <div key={index} className="flex items-center justify-between p-3 bg-background rounded-lg">
+                        <span className="text-sm font-medium">{item.name}</span>
+                        <CurrencyInput
+                          value={item.amount}
+                          onChange={(value) => handleEdit('expenses', index, parseFloat(value) || 0)}
+                          className="w-32 text-right h-9"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
 
-              <div>
-                <h4 className="font-semibold mb-3 text-red-600 flex items-center gap-2">
-                  💳 Dépenses recommandées
-                </h4>
-                <div className="space-y-2">
-                  {editedBudget?.expenses?.map((item: any, index: number) => (
-                    <div key={index} className="flex justify-between items-center gap-3 p-3 rounded-lg bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800">
-                      <span className="flex items-center gap-2 flex-1">
-                        <span className="text-lg">{item.icon}</span>
-                        <span className="font-medium">{item.name}</span>
-                      </span>
-                      <Input
-                        type="number"
-                        value={item.amount}
-                        onChange={(e) => updateBudgetItem('expenses', index, 'amount', parseFloat(e.target.value) || 0)}
-                        className="w-32 text-right font-semibold"
-                      />
-                    </div>
-                  ))}
+              <div className="p-5 bg-primary/5 border border-primary/10 rounded-xl">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Total revenus</p>
+                    <p className="text-2xl font-semibold mt-1">
+                      {new Intl.NumberFormat('fr-CA', {
+                        style: 'currency',
+                        currency: 'CAD',
+                        minimumFractionDigits: 0
+                      }).format(editedBudget.income.reduce((sum: number, item: any) => sum + item.amount, 0))}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm text-muted-foreground">Total dépenses</p>
+                    <p className="text-2xl font-semibold mt-1">
+                      {new Intl.NumberFormat('fr-CA', {
+                        style: 'currency',
+                        currency: 'CAD',
+                        minimumFractionDigits: 0
+                      }).format(editedBudget.expenses.reduce((sum: number, item: any) => sum + item.amount, 0))}
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div className="flex gap-2 pt-4">
-              <Button 
+            <div className="flex gap-3 pt-2">
+              <Button
+                variant="outline"
                 onClick={() => {
                   setGeneratedBudget(null);
                   setEditedBudget(null);
-                  setIncome("");
-                  setIncomeType("monthly");
-                  setHoursPerWeek("40");
-                  setDependents("0");
-                  setExpenses("");
                 }}
-                variant="outline"
                 className="flex-1"
               >
                 Recommencer
               </Button>
-              <Button onClick={handleApply} className="flex-1">
+              <Button
+                onClick={handleApply}
+                className="flex-1 h-11 text-base font-medium"
+              >
                 Appliquer ce budget
               </Button>
             </div>
