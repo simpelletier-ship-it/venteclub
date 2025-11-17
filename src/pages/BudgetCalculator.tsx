@@ -41,9 +41,6 @@ import { ScenarioSimulator } from "@/components/budget/ScenarioSimulator";
 import { QuickNetWorthUpdate } from "@/components/budget/QuickNetWorthUpdate";
 import { PremiumAnalysisTab } from "@/components/budget/PremiumAnalysisTab";
 import { BudgetResetDialog } from "@/components/budget/BudgetResetDialog";
-import { TagStatistics } from "@/components/budget/TagStatistics";
-import { TransactionTemplates } from "@/components/budget/TransactionTemplates";
-import { TagComparison } from "@/components/budget/TagComparison";
 import { BalanceSheetManager } from "@/components/budget/BalanceSheetManager";
 import { MonthlySummaryWidget } from "@/components/budget/MonthlySummaryWidget";
 import { DashboardVisibilitySettings, useDashboardVisibility } from "@/components/budget/DashboardVisibilitySettings";
@@ -641,48 +638,6 @@ const BudgetCalculator = () => {
                 <BudgetReminders isAuthenticated={isAuthenticated} />
                 
                 <BenchmarkComparison isAuthenticated={isAuthenticated} />
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <span className="text-2xl">🏷️</span>
-                      Statistiques par tag
-                    </CardTitle>
-                    <CardDescription>Analysez vos dépenses par étiquettes</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <TagStatistics isAuthenticated={isAuthenticated} />
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <span className="text-2xl">📊</span>
-                      Comparaison par tag
-                    </CardTitle>
-                    <CardDescription>Comparez vos dépenses entre périodes</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <TagComparison isAuthenticated={isAuthenticated} />
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <span className="text-2xl">⚡</span>
-                      Templates de transactions
-                    </CardTitle>
-                    <CardDescription>Transactions fréquentes sauvegardées</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <TransactionTemplates 
-                      isAuthenticated={isAuthenticated}
-                      categories={categories}
-                    />
-                  </CardContent>
-                </Card>
 
                 <PremiumAnalysisTab 
                   transactions={transactions}

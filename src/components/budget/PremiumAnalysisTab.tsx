@@ -4,6 +4,7 @@ import { SavingsOpportunitiesDetector } from "./SavingsOpportunitiesDetector";
 import { ScenarioSimulator } from "./ScenarioSimulator";
 import { MonthlyComparisonChart } from "./MonthlyComparisonChart";
 import { RetirementProjection } from "./RetirementProjection";
+import RecurringExpenses from "./RecurringExpenses";
 
 interface PremiumAnalysisTabProps {
   transactions: any[];
@@ -15,6 +16,12 @@ interface PremiumAnalysisTabProps {
 export const PremiumAnalysisTab = ({ transactions, categories, debts, assets }: PremiumAnalysisTabProps) => {
   return (
     <div className="space-y-6">
+      {debts.length > 0 && (
+        <InterestAnalyzer debts={debts} />
+      )}
+
+      <RecurringExpenses isAuthenticated={true} />
+
       <ScenarioSimulator 
         transactions={transactions}
         assets={assets}
@@ -26,10 +33,6 @@ export const PremiumAnalysisTab = ({ transactions, categories, debts, assets }: 
       <MonthlyComparisonChart transactions={transactions} />
 
       <SubscriptionDetector transactions={transactions} categories={categories} />
-      
-      {debts.length > 0 && (
-        <InterestAnalyzer debts={debts} />
-      )}
       
       <SavingsOpportunitiesDetector transactions={transactions} categories={categories} />
 

@@ -15,7 +15,6 @@ import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { TransactionTagManager } from "./TransactionTagManager";
 import { formatPrice } from "@/lib/priceFormat";
 import { useOfflineSync } from "@/hooks/useOfflineSync";
 import {
@@ -165,7 +164,6 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
   const [transactionDate, setTransactionDate] = useState<Date>(new Date());
   const [editCategoryOpen, setEditCategoryOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<any>(null);
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [templatesOpen, setTemplatesOpen] = useState(false);
 
   // Offline sync hook
@@ -220,22 +218,6 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
         .select('*, category:budget_categories(*)')
         .eq('type', transactionType)
         .order('created_at', { ascending: false });
-      
-      if (error) throw error;
-      return data || [];
-    },
-    enabled: isAuthenticated,
-    retry: 1,
-  });
-
-  // Fetch tags for templates
-  const { data: allTags = [] } = useQuery({
-    queryKey: ['transaction-tags'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('transaction_tags')
-        .select('*')
-        .order('name');
       
       if (error) throw error;
       return data || [];
@@ -320,11 +302,6 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
         throw new Error("Veuillez sélectionner une date");
       }
 
-      // Get selected tag names for offline storage
-      const tagNames = allTags
-        .filter(t => selectedTags.includes(t.id))
-        .map(t => t.name);
-
       // If offline, save locally
       if (!isOnline) {
         await addOfflineTransaction({
@@ -333,7 +310,6 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
           category_id: categoryToUse,
           type: transactionType,
           transaction_date: format(transactionDate, 'yyyy-MM-dd'),
-          tags: tagNames,
         });
         return;
       }
@@ -356,23 +332,6 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
         .single();
 
       if (error) throw error;
-
-      // Add tag links if tags were selected
-      if (selectedTags.length > 0 && transaction) {
-        const tagLinks = selectedTags.map(tagId => ({
-          transaction_id: transaction.id,
-          tag_id: tagId,
-        }));
-
-        const { error: tagError } = await supabase
-          .from('transaction_tag_links')
-          .insert(tagLinks);
-
-        if (tagError) {
-          console.error("Error adding tags:", tagError);
-          // Don't throw, transaction was successful
-        }
-      }
     },
     onSuccess: () => {
       // Invalider TOUTES les queries liées au budget pour synchronisation complète
@@ -400,7 +359,6 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
       setDescription("");
       setSuggestedCategory(null);
       setSelectedCategory("");
-      setSelectedTags([]);
       // Keep transactionDate for next transaction
     },
   });
@@ -521,7 +479,6 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
     setAmount(template.amount.toString());
     setDescription(template.description || "");
     setSelectedCategory(template.category_id);
-    setSelectedTags(template.tag_ids || []);
     setTemplatesOpen(false);
     toast.success(`✨ Template "${template.name}" appliqué!`, { duration: 1500 });
   };
@@ -804,14 +761,6 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
             )}
           </div>
 
-          {/* Transaction Tags */}
-          <div className="pt-0.5">
-            <TransactionTagManager 
-              selectedTags={selectedTags}
-              onTagsChange={setSelectedTags}
-            />
-          </div>
-
           {/* Dialog for creating new category */}
           <Dialog open={newCategoryOpen} onOpenChange={setNewCategoryOpen}>
             <DialogContent>
@@ -1045,22 +994,6 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
                               <div className="text-sm text-muted-foreground">
                                 {template.category?.name} • {formatPrice(template.amount)}
                               </div>
-                              {template.tag_ids && template.tag_ids.length > 0 && (
-                                <div className="flex gap-1 mt-1 flex-wrap">
-                                  {template.tag_ids.slice(0, 3).map((tagId: string) => {
-                                    const tag = allTags.find(t => t.id === tagId);
-                                    if (!tag) return null;
-                                    return (
-                                      <span key={tagId} className="text-xs">
-                                        {tag.icon}
-                                      </span>
-                                    );
-                                  })}
-                                  {template.tag_ids.length > 3 && (
-                                    <span className="text-xs text-muted-foreground">+{template.tag_ids.length - 3}</span>
-                                  )}
-                                </div>
-                              )}
                             </div>
                             <Zap className="h-4 w-4 text-primary shrink-0" />
                           </div>
