@@ -126,27 +126,28 @@ export const AIBudgetGenerator = ({ onBudgetGenerated }: AIBudgetGeneratorProps)
           Assistant Budget IA
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader className="space-y-3 pb-6 border-b">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
-              <Sparkles className="h-5 w-5 text-primary" />
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader className="space-y-4 pb-8 border-b border-border/50">
+          <div className="flex items-start gap-4">
+            <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center ring-1 ring-primary/10">
+              <Sparkles className="h-6 w-6 text-primary" />
             </div>
-            <div>
-              <DialogTitle className="text-2xl font-semibold">Assistant Budget</DialogTitle>
-              <DialogDescription className="text-sm">
-                Créez un budget personnalisé en quelques étapes
+            <div className="flex-1">
+              <DialogTitle className="text-2xl font-semibold tracking-tight">Assistant Budget IA</DialogTitle>
+              <DialogDescription className="text-sm text-muted-foreground mt-1.5">
+                Générez un budget personnalisé basé sur votre situation financière
               </DialogDescription>
             </div>
           </div>
         </DialogHeader>
 
         {!generatedBudget ? (
-          <div className="space-y-6 py-2">
-            <div className="space-y-5">
-              <div className="space-y-2.5">
-                <Label htmlFor="income" className="text-sm font-medium">
+          <div className="space-y-8 py-6">
+            <div className="space-y-6">
+              <div className="space-y-3">
+                <Label htmlFor="income" className="text-sm font-medium flex items-center gap-2">
                   Salaire brut
+                  <span className="text-xs text-muted-foreground font-normal">(avant impôts)</span>
                 </Label>
                 <Input
                   id="income"
@@ -154,17 +155,17 @@ export const AIBudgetGenerator = ({ onBudgetGenerated }: AIBudgetGeneratorProps)
                   value={income}
                   onChange={(e) => setIncome(e.target.value)}
                   placeholder="50 000"
-                  className="h-11"
+                  className="h-12 text-base"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2.5">
+              <div className="grid grid-cols-2 gap-5">
+                <div className="space-y-3">
                   <Label htmlFor="incomeType" className="text-sm font-medium">
-                    Période
+                    Période de paie
                   </Label>
                   <Select value={incomeType} onValueChange={(value: any) => setIncomeType(value)}>
-                    <SelectTrigger id="incomeType" className="h-11">
+                    <SelectTrigger id="incomeType" className="h-12">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -176,7 +177,7 @@ export const AIBudgetGenerator = ({ onBudgetGenerated }: AIBudgetGeneratorProps)
                 </div>
 
                 {incomeType === "hourly" && (
-                  <div className="space-y-2.5">
+                  <div className="space-y-3">
                     <Label htmlFor="hoursPerWeek" className="text-sm font-medium">
                       Heures / semaine
                     </Label>
@@ -186,33 +187,36 @@ export const AIBudgetGenerator = ({ onBudgetGenerated }: AIBudgetGeneratorProps)
                       value={hoursPerWeek}
                       onChange={(e) => setHoursPerWeek(e.target.value)}
                       placeholder="40"
-                      className="h-11"
+                      className="h-12 text-base"
                     />
                   </div>
                 )}
               </div>
 
               {monthlyNetIncome > 0 && (
-                <div className="p-5 bg-primary/5 border border-primary/10 rounded-xl">
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-3xl font-semibold">
-                      {new Intl.NumberFormat('fr-CA', {
-                        style: 'currency',
-                        currency: 'CAD',
-                        minimumFractionDigits: 0,
-                        maximumFractionDigits: 0
-                      }).format(monthlyNetIncome)}
-                    </span>
-                    <span className="text-sm text-muted-foreground">/mois net</span>
+                <div className="p-6 bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 rounded-2xl">
+                  <div className="space-y-2">
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Revenu net estimé</p>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-4xl font-bold tracking-tight">
+                        {new Intl.NumberFormat('fr-CA', {
+                          style: 'currency',
+                          currency: 'CAD',
+                          minimumFractionDigits: 0,
+                          maximumFractionDigits: 0
+                        }).format(monthlyNetIncome)}
+                      </span>
+                      <span className="text-base text-muted-foreground font-medium">/mois</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Estimation après déductions fiscales (~30%)
+                    </p>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    Estimation après déductions fiscales (~30%)
-                  </p>
                 </div>
               )}
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2.5">
+              <div className="grid grid-cols-2 gap-5">
+                <div className="space-y-3">
                   <Label htmlFor="dependents" className="text-sm font-medium">
                     Personnes à charge
                   </Label>
@@ -223,11 +227,11 @@ export const AIBudgetGenerator = ({ onBudgetGenerated }: AIBudgetGeneratorProps)
                     onChange={(e) => setDependents(e.target.value)}
                     min="0"
                     placeholder="0"
-                    className="h-11"
+                    className="h-12 text-base"
                   />
                 </div>
 
-                <div className="space-y-2.5">
+                <div className="space-y-3">
                   <Label htmlFor="location" className="text-sm font-medium">
                     Ville
                   </Label>
@@ -236,30 +240,33 @@ export const AIBudgetGenerator = ({ onBudgetGenerated }: AIBudgetGeneratorProps)
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
                     placeholder="Montréal, QC"
-                    className="h-11"
+                    className="h-12 text-base"
                   />
                 </div>
               </div>
 
-              <div className="space-y-2.5">
+              <div className="space-y-3">
                 <Label htmlFor="expenses" className="text-sm font-medium">
-                  Dépenses fixes <span className="text-muted-foreground font-normal">(optionnel)</span>
+                  Dépenses fixes mensuelles <span className="text-muted-foreground font-normal">(optionnel)</span>
                 </Label>
                 <Textarea
                   id="expenses"
                   value={expenses}
                   onChange={(e) => setExpenses(e.target.value)}
-                  placeholder="Loyer 1200$, Voiture 450$, Internet 80$..."
+                  placeholder="Ex: Loyer 1200$, Voiture 450$, Internet 80$..."
                   rows={4}
-                  className="resize-none"
+                  className="resize-none text-base"
                 />
+                <p className="text-xs text-muted-foreground">
+                  Listez vos dépenses récurrentes pour un budget plus précis
+                </p>
               </div>
             </div>
 
             <Button
               onClick={handleGenerate}
               disabled={loading || !income}
-              className="w-full h-12 text-base font-medium"
+              className="w-full h-14 text-base font-semibold shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all"
               size="lg"
             >
               {loading ? (
@@ -276,19 +283,24 @@ export const AIBudgetGenerator = ({ onBudgetGenerated }: AIBudgetGeneratorProps)
             </Button>
           </div>
         ) : (
-          <div className="space-y-6 py-2">
-            <div className="space-y-6">
-              <Card className="border-0 bg-muted/30">
-                <CardContent className="p-5">
-                  <h3 className="font-semibold text-base mb-3">Revenus</h3>
+          <div className="space-y-8 py-6">
+            <div className="space-y-7">
+              <Card className="border border-border/50 bg-card/50 backdrop-blur-sm">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-3 mb-5">
+                    <div className="h-8 w-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+                      <span className="text-lg">💰</span>
+                    </div>
+                    <h3 className="font-semibold text-lg">Revenus mensuels</h3>
+                  </div>
                   <div className="space-y-3">
                     {editedBudget.income.map((item: any, index: number) => (
-                      <div key={index} className="flex items-center justify-between p-3 bg-background rounded-lg">
+                      <div key={index} className="flex items-center justify-between p-4 bg-background/60 rounded-xl border border-border/40 hover:border-primary/30 transition-colors">
                         <span className="text-sm font-medium">{item.name}</span>
                         <CurrencyInput
                           value={item.amount}
                           onChange={(value) => handleEdit('income', index, parseFloat(value) || 0)}
-                          className="w-32 text-right h-9"
+                          className="w-36 text-right h-10 text-base"
                         />
                       </div>
                     ))}
@@ -296,17 +308,22 @@ export const AIBudgetGenerator = ({ onBudgetGenerated }: AIBudgetGeneratorProps)
                 </CardContent>
               </Card>
 
-              <Card className="border-0 bg-muted/30">
-                <CardContent className="p-5">
-                  <h3 className="font-semibold text-base mb-3">Dépenses</h3>
+              <Card className="border border-border/50 bg-card/50 backdrop-blur-sm">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-3 mb-5">
+                    <div className="h-8 w-8 rounded-lg bg-rose-500/10 flex items-center justify-center">
+                      <span className="text-lg">💸</span>
+                    </div>
+                    <h3 className="font-semibold text-lg">Dépenses mensuelles</h3>
+                  </div>
                   <div className="space-y-3">
                     {editedBudget.expenses.map((item: any, index: number) => (
-                      <div key={index} className="flex items-center justify-between p-3 bg-background rounded-lg">
+                      <div key={index} className="flex items-center justify-between p-4 bg-background/60 rounded-xl border border-border/40 hover:border-primary/30 transition-colors">
                         <span className="text-sm font-medium">{item.name}</span>
                         <CurrencyInput
                           value={item.amount}
                           onChange={(value) => handleEdit('expenses', index, parseFloat(value) || 0)}
-                          className="w-32 text-right h-9"
+                          className="w-36 text-right h-10 text-base"
                         />
                       </div>
                     ))}
@@ -314,11 +331,11 @@ export const AIBudgetGenerator = ({ onBudgetGenerated }: AIBudgetGeneratorProps)
                 </CardContent>
               </Card>
 
-              <div className="p-5 bg-primary/5 border border-primary/10 rounded-xl">
-                <div className="flex justify-between items-center">
+              <div className="p-6 bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 rounded-2xl">
+                <div className="grid grid-cols-2 gap-6">
                   <div>
-                    <p className="text-sm text-muted-foreground">Total revenus</p>
-                    <p className="text-2xl font-semibold mt-1">
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Total revenus</p>
+                    <p className="text-3xl font-bold tracking-tight">
                       {new Intl.NumberFormat('fr-CA', {
                         style: 'currency',
                         currency: 'CAD',
@@ -327,8 +344,8 @@ export const AIBudgetGenerator = ({ onBudgetGenerated }: AIBudgetGeneratorProps)
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm text-muted-foreground">Total dépenses</p>
-                    <p className="text-2xl font-semibold mt-1">
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Total dépenses</p>
+                    <p className="text-3xl font-bold tracking-tight">
                       {new Intl.NumberFormat('fr-CA', {
                         style: 'currency',
                         currency: 'CAD',
@@ -340,20 +357,20 @@ export const AIBudgetGenerator = ({ onBudgetGenerated }: AIBudgetGeneratorProps)
               </div>
             </div>
 
-            <div className="flex gap-3 pt-2">
+            <div className="flex gap-4 pt-4">
               <Button
                 variant="outline"
                 onClick={() => {
                   setGeneratedBudget(null);
                   setEditedBudget(null);
                 }}
-                className="flex-1"
+                className="flex-1 h-12 text-base font-medium border-border/50"
               >
                 Recommencer
               </Button>
               <Button
                 onClick={handleApply}
-                className="flex-1 h-11 text-base font-medium"
+                className="flex-1 h-12 text-base font-semibold shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all"
               >
                 Appliquer ce budget
               </Button>
