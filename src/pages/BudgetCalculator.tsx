@@ -1,6 +1,8 @@
 import { Helmet } from "react-helmet";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { SEO } from "@/components/SEO";
+import { BreadcrumbSchema } from "@/components/BreadcrumbSchema";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertTriangle, AlertCircle, CheckCircle, TrendingUp, Loader2 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -313,86 +315,61 @@ const BudgetCalculator = () => {
         <CreateDefaultCategories />
         <BudgetOnboarding />
         <BudgetTutorial />
-        <Helmet>
-        <title>Planificateur Budget Québec Gratuit | Gestion Finances Personnelles 2025</title>
-        <meta name="description" content="Planificateur de budget intelligent gratuit pour gérer vos finances personnelles au Québec. Suivi dépenses en temps réel, objectifs épargne, analyse habitudes financières, coaching personnalisé et gamification. Outil complet REER, CELI, dettes." />
-        <meta name="keywords" content="planificateur budget québec, budget personnel gratuit, gestion finances québec, suivi dépenses, calculateur budget mensuel, objectifs épargne, REER CELI, coaching financier gratuit, outil budget intelligent, gestion dettes, calculateur salaire net québec" />
-        
-        {/* Canonical et alternates */}
-        <link rel="canonical" href="https://vente.club/outils/budget" />
-        
-        {/* Open Graph */}
-        <meta property="og:title" content="Planificateur Budget Québec Gratuit | Gestion Finances 2025" />
-        <meta property="og:description" content="Gérez votre budget intelligemment avec notre planificateur gratuit. Suivi automatique, recommandations personnalisées, gamification et coaching financier pour atteindre vos objectifs au Québec." />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://vente.club/outils/budget" />
-        <meta property="og:site_name" content="Vente.Club" />
-        
-        {/* Twitter Card */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Planificateur Budget Québec Gratuit | Gestion Finances 2025" />
-        <meta name="twitter:description" content="Outil gratuit de gestion budgétaire intelligent pour le Québec. Suivi dépenses, objectifs, coaching personnalisé." />
-        
-        {/* Breadcrumb Schema */}
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            "itemListElement": [
-              {
-                "@type": "ListItem",
-                "position": 1,
-                "name": "Accueil",
-                "item": "https://vente.club"
-              },
-              {
-                "@type": "ListItem",
-                "position": 2,
-                "name": "Outils Financiers",
-                "item": "https://vente.club/outils"
-              },
-              {
-                "@type": "ListItem",
-                "position": 3,
-                "name": "Planificateur de Budget",
-                "item": "https://vente.club/outils/budget"
-              }
-            ]
-          })}
-        </script>
-        
-        {/* WebApplication Schema */}
-        <script type="application/ld+json">
-          {JSON.stringify({
+        <SEO
+          title="Planificateur Budget Personnel Gratuit Québec | Gestion Finances 2025"
+          description="Planificateur de budget intelligent gratuit pour gérer vos finances au Québec. Suivi dépenses temps réel, objectifs épargne REER CELI, analyse habitudes, coach financier IA personnalisé. Outil complet gestion budget familial et personnel."
+          keywords="planificateur budget québec gratuit, gestion budget personnel québec, suivi dépenses temps réel, calculateur budget mensuel, objectifs épargne REER CELI, coach financier gratuit, outil budget intelligent québec, gestion finances personnelles, budget familial québec, calculateur salaire net, planification financière québec, gestionnaire dépenses, application budget gratuite"
+          canonical="/outils/budget"
+          type="website"
+          structuredData={{
             "@context": "https://schema.org",
             "@type": "WebApplication",
-            "name": "Planificateur Budget Québec",
+            "name": "Planificateur de Budget Personnel Québec",
+            "description": "Planificateur de budget intelligent et gratuit pour gérer vos finances personnelles au Québec. Suivi des dépenses en temps réel, objectifs d'épargne, analyse des habitudes financières, coaching personnalisé IA, et gamification.",
             "url": "https://vente.club/outils/budget",
             "applicationCategory": "FinanceApplication",
-            "operatingSystem": "All",
+            "operatingSystem": "Web",
             "offers": {
               "@type": "Offer",
               "price": "0",
               "priceCurrency": "CAD"
             },
-            "description": "Planificateur de budget intelligent et gratuit pour gérer vos finances personnelles au Québec. Suivi des dépenses en temps réel, objectifs d'épargne, analyse des habitudes financières et coaching personnalisé.",
             "featureList": [
               "Suivi des dépenses et revenus en temps réel",
-              "Gestion REER, CELI et autres actifs",
-              "Suivi des dettes avec calcul d'intérêts",
-              "Score de santé financière",
-              "Recommandations personnalisées",
-              "Graphiques d'évolution",
-              "Objectifs d'épargne avec progression",
-              "Gamification et récompenses"
+              "Gestion REER, CELI et autres actifs financiers",
+              "Suivi des dettes avec calcul automatique d'intérêts",
+              "Calcul et évolution de la valeur nette",
+              "Score de santé financière personnalisé",
+              "Coach financier IA avec recommandations intelligentes",
+              "Graphiques d'évolution et analyses avancées",
+              "Objectifs d'épargne avec suivi de progression",
+              "Détection automatique d'abonnements",
+              "Mode hors ligne avec synchronisation",
+              "Export PDF des rapports mensuels",
+              "Gamification et récompenses motivantes"
             ],
             "author": {
               "@type": "Organization",
-              "name": "Vente.Club"
-            }
-          })}
-        </script>
-      </Helmet>
+              "name": "Vente.Club",
+              "url": "https://vente.club"
+            },
+            "audience": {
+              "@type": "Audience",
+              "geographicArea": {
+                "@type": "Place",
+                "name": "Québec, Canada"
+              }
+            },
+            "inLanguage": "fr-CA"
+          }}
+        />
+        <BreadcrumbSchema
+          items={[
+            { name: "Accueil", url: "/" },
+            { name: "Outils Financiers Québec", url: "/outils" },
+            { name: "Planificateur Budget Personnel", url: "/outils/budget" }
+          ]}
+        />
 
       <div className="min-h-screen bg-background py-8 pb-24 lg:pb-8">
         <div className="container mx-auto px-3 lg:px-4 max-w-7xl">
@@ -407,14 +384,21 @@ const BudgetCalculator = () => {
           {/* SEO Content Section */}
           <div className="text-center mb-6 lg:mb-8 space-y-3 lg:space-y-4">
             <div className="flex flex-col lg:flex-row items-center justify-center gap-3 lg:gap-4">
-              <h1 className="text-2xl lg:text-4xl font-bold">
-                Planificateur de Budget Québec Gratuit 2025
+              <h1 className="text-2xl lg:text-4xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
+                Planificateur de Budget Personnel Gratuit au Québec
               </h1>
               <BudgetResetDialog />
             </div>
-            <p className="text-base lg:text-xl text-muted-foreground max-w-3xl mx-auto px-2">
-              Gérez vos finances personnelles intelligemment avec notre outil gratuit de planification budgétaire. 
-              Suivi des dépenses en temps réel, objectifs d'épargne, coaching financier personnalisé et gamification.
+            <p className="text-base lg:text-xl text-muted-foreground max-w-4xl mx-auto px-2 leading-relaxed">
+              Prenez le contrôle de vos finances personnelles avec notre planificateur de budget intelligent 100% gratuit. 
+              Conçu spécialement pour les Québécois, suivez vos dépenses en temps réel, gérez vos actifs REER et CELI, 
+              fixez des objectifs d'épargne réalistes et bénéficiez d'un coach financier IA personnalisé pour atteindre 
+              la liberté financière.
+            </p>
+            <p className="text-sm lg:text-base text-muted-foreground max-w-3xl mx-auto px-2">
+              Que vous souhaitiez créer votre premier budget familial, optimiser vos dépenses mensuelles, 
+              planifier un achat important ou simplement mieux gérer votre argent au quotidien, notre outil 
+              de gestion budgétaire vous accompagne avec des analyses avancées 100% gratuites et accessibles.
             </p>
             {/* SEO-optimized feature highlights - Mobile optimized */}
             <div className="flex flex-wrap justify-center gap-4 lg:gap-6 max-w-3xl mx-auto mt-4 lg:mt-6 text-xs lg:text-sm">
@@ -745,6 +729,71 @@ const BudgetCalculator = () => {
               </div>
             </section>
           </div>
+
+          {/* SEO-Rich Educational Content Section */}
+          <Card className="mt-8 bg-gradient-to-br from-primary/5 to-purple-500/5 border-primary/20">
+            <CardHeader>
+              <CardTitle className="text-2xl">Pourquoi utiliser un planificateur de budget au Québec?</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6 text-muted-foreground">
+              <div>
+                <h2 className="text-xl font-semibold text-foreground mb-3">Gestion de Budget Personnel Simplifiée</h2>
+                <p className="leading-relaxed">
+                  Un planificateur de budget est un outil essentiel pour prendre le contrôle de vos finances personnelles. 
+                  Que vous soyez un jeune professionnel qui débute, une famille québécoise qui souhaite épargner pour l'achat 
+                  d'une maison, ou un travailleur autonome qui gère des revenus variables, notre planificateur budgétaire gratuit 
+                  vous aide à visualiser clairement où va votre argent chaque mois et à prendre de meilleures décisions financières.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-semibold text-foreground mb-2">Fonctionnalités principales de notre outil de gestion budgétaire</h3>
+                <ul className="space-y-2 list-disc list-inside">
+                  <li><strong>Suivi automatique des dépenses et revenus</strong> - Enregistrez toutes vos transactions en quelques secondes</li>
+                  <li><strong>Gestion REER et CELI</strong> - Suivez l'évolution de vos placements et épargne-retraite</li>
+                  <li><strong>Calculateur de valeur nette</strong> - Visualisez votre patrimoine total (actifs moins dettes)</li>
+                  <li><strong>Objectifs d'épargne personnalisés</strong> - Fixez des buts financiers et suivez votre progression</li>
+                  <li><strong>Coach financier IA intelligent</strong> - Recevez des recommandations adaptées à votre situation</li>
+                  <li><strong>Analyses avancées gratuites</strong> - Détection d'abonnements, calcul d'intérêts sur dettes, prévisions</li>
+                  <li><strong>Mode hors ligne</strong> - Accédez à votre budget même sans connexion internet</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-semibold text-foreground mb-2">Comment créer un budget mensuel efficace au Québec?</h3>
+                <p className="leading-relaxed mb-3">
+                  Créer un budget familial ou personnel efficace commence par comprendre vos revenus nets mensuels (après impôts et cotisations). 
+                  Notre calculateur de salaire net intégré vous aide à déterminer précisément combien vous gagnez réellement chaque mois. 
+                  Ensuite, catégorisez vos dépenses en différentes sections : logement (loyer/hypothèque), alimentation (épicerie), 
+                  transport (auto, essence, transport en commun), divertissement, épargne, et remboursement de dettes.
+                </p>
+                <p className="leading-relaxed">
+                  La règle populaire du 50/30/20 suggère d'allouer 50% de vos revenus aux besoins essentiels, 30% aux envies et loisirs, 
+                  et 20% à l'épargne et au remboursement de dettes. Notre planificateur vous aide à visualiser si vous respectez ces proportions 
+                  et à identifier les opportunités d'optimisation de vos finances personnelles.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-semibold text-foreground mb-2">Épargne et Planification Financière pour les Québécois</h3>
+                <p className="leading-relaxed">
+                  Au Québec, maximiser vos contributions REER (Régime enregistré d'épargne-retraite) et CELI (Compte d'épargne libre d'impôt) 
+                  est crucial pour bâtir votre richesse à long terme. Notre planificateur budgétaire vous aide à suivre l'évolution de ces 
+                  placements et à calculer combien vous pouvez épargner mensuellement selon vos objectifs financiers. Que vous épargniez 
+                  pour la mise de fonds d'une propriété, un voyage, l'éducation de vos enfants, ou votre retraite, notre outil vous 
+                  accompagne dans l'atteinte de vos buts avec des prévisions réalistes et un suivi motivant.
+                </p>
+              </div>
+
+              <div className="bg-primary/10 p-4 rounded-lg border border-primary/20">
+                <p className="text-sm text-foreground">
+                  <strong>Débutez gratuitement aujourd'hui :</strong> Aucune carte de crédit requise. 
+                  Créez votre compte et commencez à suivre vos finances en moins de 2 minutes. 
+                  Rejoignez des milliers de Québécois qui ont repris le contrôle de leur budget personnel avec notre planificateur intelligent.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
 
           <Card className="mt-8 bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
             <CardHeader>
