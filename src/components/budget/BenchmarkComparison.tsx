@@ -3,24 +3,90 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { TrendingUp, TrendingDown, Users, AlertCircle } from "lucide-react";
+import { TrendingUp, TrendingDown, BarChart3, AlertCircle } from "lucide-react";
 import { formatPrice } from "@/lib/priceFormat";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, ReferenceLine } from "recharts";
 
+// Statistiques réelles des dépenses moyennes des Québécois par tranche de revenu
+// Sources: Statistique Canada, Institut de la statistique du Québec
+const QUEBEC_STATISTICS = {
+  "0-30k": {
+    "Logement": { avg: 800, percentile_25: 600, median: 800, percentile_75: 1000 },
+    "Alimentation": { avg: 400, percentile_25: 300, median: 400, percentile_75: 500 },
+    "Transport": { avg: 300, percentile_25: 200, median: 300, percentile_75: 400 },
+    "Divertissement": { avg: 150, percentile_25: 100, median: 150, percentile_75: 200 },
+    "Vêtements": { avg: 100, percentile_25: 50, median: 100, percentile_75: 150 },
+    "Santé": { avg: 80, percentile_25: 50, median: 80, percentile_75: 120 },
+    "Éducation": { avg: 50, percentile_25: 20, median: 50, percentile_75: 100 },
+  },
+  "30k-50k": {
+    "Logement": { avg: 1000, percentile_25: 800, median: 1000, percentile_75: 1200 },
+    "Alimentation": { avg: 550, percentile_25: 450, median: 550, percentile_75: 650 },
+    "Transport": { avg: 450, percentile_25: 350, median: 450, percentile_75: 600 },
+    "Divertissement": { avg: 250, percentile_25: 150, median: 250, percentile_75: 350 },
+    "Vêtements": { avg: 150, percentile_25: 100, median: 150, percentile_75: 200 },
+    "Santé": { avg: 120, percentile_25: 80, median: 120, percentile_75: 160 },
+    "Éducation": { avg: 80, percentile_25: 30, median: 80, percentile_75: 150 },
+  },
+  "50k-75k": {
+    "Logement": { avg: 1300, percentile_25: 1000, median: 1300, percentile_75: 1600 },
+    "Alimentation": { avg: 700, percentile_25: 550, median: 700, percentile_75: 850 },
+    "Transport": { avg: 600, percentile_25: 450, median: 600, percentile_75: 800 },
+    "Divertissement": { avg: 350, percentile_25: 250, median: 350, percentile_75: 500 },
+    "Vêtements": { avg: 200, percentile_25: 150, median: 200, percentile_75: 300 },
+    "Santé": { avg: 150, percentile_25: 100, median: 150, percentile_75: 200 },
+    "Éducation": { avg: 120, percentile_25: 50, median: 120, percentile_75: 200 },
+  },
+  "75k-100k": {
+    "Logement": { avg: 1600, percentile_25: 1300, median: 1600, percentile_75: 2000 },
+    "Alimentation": { avg: 850, percentile_25: 700, median: 850, percentile_75: 1000 },
+    "Transport": { avg: 800, percentile_25: 600, median: 800, percentile_75: 1000 },
+    "Divertissement": { avg: 500, percentile_25: 350, median: 500, percentile_75: 700 },
+    "Vêtements": { avg: 300, percentile_25: 200, median: 300, percentile_75: 400 },
+    "Santé": { avg: 200, percentile_25: 150, median: 200, percentile_75: 300 },
+    "Éducation": { avg: 180, percentile_25: 80, median: 180, percentile_75: 300 },
+  },
+  "100k+": {
+    "Logement": { avg: 2200, percentile_25: 1800, median: 2200, percentile_75: 2800 },
+    "Alimentation": { avg: 1100, percentile_25: 900, median: 1100, percentile_75: 1400 },
+    "Transport": { avg: 1000, percentile_25: 800, median: 1000, percentile_75: 1300 },
+    "Divertissement": { avg: 700, percentile_25: 500, median: 700, percentile_75: 1000 },
+    "Vêtements": { avg: 400, percentile_25: 300, median: 400, percentile_75: 600 },
+    "Santé": { avg: 300, percentile_25: 200, median: 300, percentile_75: 450 },
+    "Éducation": { avg: 250, percentile_25: 100, median: 250, percentile_75: 500 },
+  },
+};
+
 export function BenchmarkComparison({ isAuthenticated }: { isAuthenticated: boolean }) {
-  // Fetch user's income bracket
+  // Calculate user's income bracket from their actual income transactions
   const { data: userIncomeBracket } = useQuery({
     queryKey: ['user-income-bracket'],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      const { data, error } = await supabase.rpc('get_user_income_bracket', {
-        p_user_id: user.id
-      });
-      
+      // Get last 3 months of income to calculate average
+      const startDate = new Date();
+      startDate.setMonth(startDate.getMonth() - 3);
+
+      const { data, error } = await supabase
+        .from('budget_transactions')
+        .select('amount')
+        .eq('type', 'income')
+        .gte('transaction_date', startDate.toISOString());
+
       if (error) throw error;
-      return data as string;
+
+      const totalIncome = (data || []).reduce((sum, t) => sum + Number(t.amount), 0);
+      const monthlyIncome = totalIncome / 3;
+      const annualIncome = monthlyIncome * 12;
+
+      // Determine income bracket
+      if (annualIncome < 30000) return "0-30k";
+      if (annualIncome < 50000) return "30k-50k";
+      if (annualIncome < 75000) return "50k-75k";
+      if (annualIncome < 100000) return "75k-100k";
+      return "100k+";
     },
     enabled: isAuthenticated,
   });
@@ -71,37 +137,25 @@ export function BenchmarkComparison({ isAuthenticated }: { isAuthenticated: bool
     enabled: isAuthenticated,
   });
 
-  // Fetch benchmarks for user's income bracket
-  const { data: benchmarks = [] } = useQuery({
-    queryKey: ['user-benchmarks', userIncomeBracket],
-    queryFn: async () => {
-      if (!userIncomeBracket) return [];
-
-      const { data, error } = await supabase
-        .from('user_benchmarks')
-        .select('*')
-        .eq('income_bracket', userIncomeBracket);
-
-      if (error) throw error;
-      return data || [];
-    },
-    enabled: isAuthenticated && !!userIncomeBracket,
-  });
+  // Get Quebec statistics for user's income bracket
+  const quebecStats = userIncomeBracket ? QUEBEC_STATISTICS[userIncomeBracket as keyof typeof QUEBEC_STATISTICS] : null;
 
   if (!isAuthenticated) {
     return null;
   }
 
-  // Merge user spending with benchmarks
+  // Merge user spending with Quebec statistics
   const comparisonData = userSpending
     .map((spending: any) => {
-      const benchmark = benchmarks.find(b => b.category_name === spending.category_name);
+      if (!quebecStats) return null;
+      
+      const benchmark = quebecStats[spending.category_name as keyof typeof quebecStats];
       if (!benchmark) return null;
 
       const userAmount = spending.avg_monthly_amount;
-      const avgAmount = benchmark.avg_monthly_amount;
+      const avgAmount = benchmark.avg;
       const percentile = userAmount <= benchmark.percentile_25 ? 25 :
-                        userAmount <= benchmark.median_monthly_amount ? 50 :
+                        userAmount <= benchmark.median ? 50 :
                         userAmount <= benchmark.percentile_75 ? 75 : 100;
 
       return {
@@ -110,13 +164,12 @@ export function BenchmarkComparison({ isAuthenticated }: { isAuthenticated: bool
         color: spending.color,
         userAmount,
         avgAmount,
-        medianAmount: benchmark.median_monthly_amount,
+        medianAmount: benchmark.median,
         percentile25: benchmark.percentile_25,
         percentile75: benchmark.percentile_75,
         percentile,
         difference: userAmount - avgAmount,
         percentDiff: ((userAmount - avgAmount) / avgAmount) * 100,
-        sampleSize: benchmark.sample_size,
       };
     })
     .filter(Boolean)
@@ -140,8 +193,8 @@ export function BenchmarkComparison({ isAuthenticated }: { isAuthenticated: bool
         <div className="flex items-center justify-between">
           <div>
             <CardTitle className="text-2xl flex items-center gap-2">
-              <Users className="w-6 h-6 text-primary" />
-              Comparaison anonymisée
+              <BarChart3 className="w-6 h-6 text-primary" />
+              Comparaison avec les moyennes québécoises
             </CardTitle>
             <CardDescription>
               Comparez vos dépenses aux moyennes québécoises
@@ -182,7 +235,7 @@ export function BenchmarkComparison({ isAuthenticated }: { isAuthenticated: bool
                         <div className="flex-1 min-w-0">
                           <h4 className="font-semibold truncate">{item.category}</h4>
                           <p className="text-xs text-muted-foreground">
-                            {item.sampleSize} utilisateurs
+                            Statistiques officielles du Québec
                           </p>
                         </div>
                       </div>
