@@ -31,7 +31,7 @@ import { FinancialGoals } from "@/components/budget/FinancialGoals";
 import { AchievementsBadges } from "@/components/budget/AchievementsBadges";
 import { ThemeCustomizer } from "@/components/budget/ThemeCustomizer";
 import { CategoryManager } from "@/components/budget/CategoryManager";
-import { QuickExpenseTracker } from "@/components/budget/QuickExpenseTracker";
+import { QuickExpenseTracker } from "@/components/budget/QuickExpenseTrackerPro";
 import { SpendingHabitsStats } from "@/components/budget/SpendingHabitsStats";
 import { GoalRecommendations } from "@/components/budget/GoalRecommendations";
 import { DailyStreakReward } from "@/components/budget/DailyStreakReward";
