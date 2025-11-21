@@ -430,7 +430,7 @@ const BudgetCalculator = () => {
           
           <QuickExpenseTracker isAuthenticated={isAuthenticated} />
 
-          <Tabs defaultValue="overview" className="space-y-6">
+          <Tabs defaultValue="overview" className="space-y-6 mt-12 lg:mt-16">
             {/* Desktop Tabs */}
             <TabsList className="hidden lg:grid w-full grid-cols-6 gap-2 h-auto">
               <TabsTrigger value="overview" className="text-base py-3">
