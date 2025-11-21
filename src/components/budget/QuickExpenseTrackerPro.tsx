@@ -49,10 +49,7 @@ export const QuickExpenseTracker = ({ isAuthenticated }: QuickExpenseTrackerProp
   const [showCategoryManager, setShowCategoryManager] = useState(false);
   
   const queryClient = useQueryClient();
-  const { addOfflineTransaction } = useOfflineSync(
-    queryClient,
-    () => queryClient.invalidateQueries({ queryKey: ['budget-transactions'] })
-  );
+  const { addOfflineTransaction } = useOfflineSync(isAuthenticated);
 
   const { data: categories = [] } = useQuery({
     queryKey: ['budget-categories'],
@@ -79,7 +76,7 @@ export const QuickExpenseTracker = ({ isAuthenticated }: QuickExpenseTrackerProp
           description: description || null,
           transaction_date: format(selectedDate, 'yyyy-MM-dd'),
           type: transactionType,
-        })
+        } as any)
         .select()
         .single();
 
