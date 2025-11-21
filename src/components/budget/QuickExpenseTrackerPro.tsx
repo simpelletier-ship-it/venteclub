@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Check, Settings, Calendar as CalendarIcon } from "lucide-react";
+import { Check, Settings, Calendar as CalendarIcon, GripVertical } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,6 +15,23 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useOfflineSync } from "@/hooks/useOfflineSync";
 import { CategoryManager } from "./CategoryManager";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  horizontalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 interface QuickExpenseTrackerProps {
   isAuthenticated: boolean;
@@ -36,6 +53,53 @@ const suggestCategory = (description: string, categories: any[]) => {
     }
   }
   return null;
+};
+
+interface SortableCategoryButtonProps {
+  category: any;
+  isSelected: boolean;
+  onSelect: () => void;
+}
+
+const SortableCategoryButton = ({ category, isSelected, onSelect }: SortableCategoryButtonProps) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: category.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} className="relative group">
+      <button
+        type="button"
+        onClick={onSelect}
+        className={`w-full flex flex-col items-center gap-1 p-3 rounded-lg border-2 transition-all hover:scale-105 ${
+          isSelected
+            ? 'border-primary bg-primary/10'
+            : 'border-border bg-muted/30 hover:border-primary/50'
+        }`}
+      >
+        <span className="text-2xl">{category.icon}</span>
+        <span className="text-xs font-medium text-center line-clamp-1">{category.name}</span>
+      </button>
+      <div
+        {...attributes}
+        {...listeners}
+        className="absolute -top-1 -right-1 opacity-0 group-hover:opacity-100 cursor-grab active:cursor-grabbing bg-muted border rounded p-0.5 transition-opacity"
+      >
+        <GripVertical className="h-3 w-3" />
+      </div>
+    </div>
+  );
 };
 
 export const QuickExpenseTracker = ({ isAuthenticated }: QuickExpenseTrackerProps) => {
@@ -62,7 +126,45 @@ export const QuickExpenseTracker = ({ isAuthenticated }: QuickExpenseTrackerProp
     enabled: isAuthenticated,
   });
 
-  const filteredCategories = categories.filter(c => c.type === transactionType);
+  const filteredCategories = categories.filter(c => c.type === transactionType && !c.is_hidden);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const reorderMutation = useMutation({
+    mutationFn: async (updates: { id: string; display_order: number }[]) => {
+      for (const update of updates) {
+        const { error } = await supabase
+          .from('budget_categories')
+          .update({ display_order: update.display_order })
+          .eq('id', update.id);
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['budget-categories'] });
+    },
+  });
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = filteredCategories.findIndex(c => c.id === active.id);
+    const newIndex = filteredCategories.findIndex(c => c.id === over.id);
+
+    const reorderedCategories = arrayMove(filteredCategories, oldIndex, newIndex);
+    const updates = reorderedCategories.map((category, index) => ({
+      id: category.id,
+      display_order: index,
+    }));
+
+    reorderMutation.mutate(updates);
+  };
 
   const addMutation = useMutation({
     mutationFn: async () => {
@@ -214,23 +316,27 @@ export const QuickExpenseTracker = ({ isAuthenticated }: QuickExpenseTrackerProp
             </Dialog>
           </div>
 
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2">
-            {filteredCategories.map((category) => (
-              <button
-                key={category.id}
-                type="button"
-                onClick={() => setSelectedCategoryId(category.id)}
-                className={`flex flex-col items-center gap-1 p-3 rounded-lg border-2 transition-all hover:scale-105 ${
-                  selectedCategoryId === category.id
-                    ? 'border-primary bg-primary/10'
-                    : 'border-border bg-muted/30 hover:border-primary/50'
-                }`}
-              >
-                <span className="text-2xl">{category.icon}</span>
-                <span className="text-xs font-medium text-center line-clamp-1">{category.name}</span>
-              </button>
-            ))}
-          </div>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={filteredCategories.map(c => c.id)}
+              strategy={horizontalListSortingStrategy}
+            >
+              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2">
+                {filteredCategories.map((category) => (
+                  <SortableCategoryButton
+                    key={category.id}
+                    category={category}
+                    isSelected={selectedCategoryId === category.id}
+                    onSelect={() => setSelectedCategoryId(category.id)}
+                  />
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
         </div>
 
         <div className="space-y-2">
