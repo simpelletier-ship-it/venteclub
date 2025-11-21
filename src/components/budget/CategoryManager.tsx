@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Pencil, Trash2, Plus, GripVertical, Pin } from "lucide-react";
+import { Pencil, Trash2, Plus, GripVertical, Pin, Eye, EyeOff } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -254,6 +254,22 @@ export const CategoryManager = ({ isAuthenticated }: { isAuthenticated: boolean 
     });
   };
 
+  // Toggle hidden mutation
+  const toggleHidden = useMutation({
+    mutationFn: async ({ id, isHidden }: { id: string, isHidden: boolean }) => {
+      const { error } = await supabase
+        .from('budget_categories')
+        .update({ is_hidden: !isHidden })
+        .eq('id', id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['budget-categories'] });
+      toast.success("✅ Visibilité modifiée!");
+    },
+  });
+
   // Reorder mutation
   const reorderCategories = useMutation({
     mutationFn: async (updates: { id: string, display_order: number }[]) => {
@@ -419,6 +435,18 @@ export const CategoryManager = ({ isAuthenticated }: { isAuthenticated: boolean 
               </div>
             </div>
             <div className="flex gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => toggleHidden.mutate({ id: category.id, isHidden: category.is_hidden })}
+                title={category.is_hidden ? "Afficher" : "Masquer"}
+              >
+                {category.is_hidden ? (
+                  <EyeOff className="h-4 w-4 text-muted-foreground" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+              </Button>
               <Button
                 variant="ghost"
                 size="icon"
