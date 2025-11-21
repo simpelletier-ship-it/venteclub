@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Check, ChevronsUpDown, Settings, Calendar as CalendarIcon } from "lucide-react";
+import { Check, Settings, Calendar as CalendarIcon } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,7 +9,6 @@ import { CurrencyInput } from "@/components/CurrencyInput";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -44,7 +43,6 @@ export const QuickExpenseTracker = ({ isAuthenticated }: QuickExpenseTrackerProp
   const [description, setDescription] = useState("");
   const [selectedCategoryId, setSelectedCategoryId] = useState("");
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [openCategory, setOpenCategory] = useState(false);
   const [transactionType, setTransactionType] = useState<'expense' | 'income'>('expense');
   const [showCategoryManager, setShowCategoryManager] = useState(false);
   
@@ -131,20 +129,18 @@ export const QuickExpenseTracker = ({ isAuthenticated }: QuickExpenseTrackerProp
   };
 
   return (
-    <Card className="border-0 shadow-2xl bg-gradient-to-br from-card via-card/95 to-primary/5 overflow-hidden backdrop-blur-sm">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,hsl(var(--primary))_0%,transparent_50%)] opacity-5" />
-      
-      <CardHeader className="pb-6 relative z-10 space-y-6">
+    <Card className="border-0 shadow-lg bg-card overflow-hidden">
+      <CardHeader className="pb-4 space-y-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-2xl font-semibold tracking-tight">
-            {transactionType === 'expense' ? '💸 Nouvelle dépense' : '💰 Nouveau revenu'}
+          <CardTitle className="text-xl font-semibold">
+            {transactionType === 'expense' ? '💸 Entrez vos dépenses' : '💰 Entrez vos revenus'}
           </CardTitle>
-          <div className="flex gap-1 p-1 bg-muted/40 rounded-xl backdrop-blur-sm border border-border/40">
+          <div className="flex gap-1 p-1 bg-muted/50 rounded-lg">
             <Button
               variant={transactionType === 'expense' ? 'default' : 'ghost'}
               size="sm"
               onClick={() => { setTransactionType('expense'); setSelectedCategoryId(''); }}
-              className="rounded-lg transition-all font-medium"
+              className="rounded-md transition-all text-sm h-8"
             >
               Dépense
             </Button>
@@ -152,7 +148,7 @@ export const QuickExpenseTracker = ({ isAuthenticated }: QuickExpenseTrackerProp
               variant={transactionType === 'income' ? 'default' : 'ghost'}
               size="sm"
               onClick={() => { setTransactionType('income'); setSelectedCategoryId(''); }}
-              className="rounded-lg transition-all font-medium"
+              className="rounded-md transition-all text-sm h-8"
             >
               Revenu
             </Button>
@@ -160,33 +156,51 @@ export const QuickExpenseTracker = ({ isAuthenticated }: QuickExpenseTrackerProp
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-6 relative z-10 pb-8">
-        <div className="space-y-3">
-          <Label htmlFor="amount" className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
-            Montant
-          </Label>
-          <CurrencyInput
-            id="amount"
-            value={amount}
-            onChange={setAmount}
-            placeholder="0 $"
-            className="text-4xl font-light h-16 border-0 bg-muted/30 focus-visible:ring-2 focus-visible:ring-primary/20 transition-all rounded-xl"
-          />
+      <CardContent className="space-y-4 pb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="amount" className="text-sm font-medium">
+              Montant
+            </Label>
+            <CurrencyInput
+              id="amount"
+              value={amount}
+              onChange={setAmount}
+              placeholder="0 $"
+              className="text-2xl font-light h-12 rounded-lg"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-sm font-medium">Date</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="w-full justify-start text-left h-12 font-normal rounded-lg"
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {format(selectedDate, "d MMM yyyy", { locale: fr })}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar mode="single" selected={selectedDate} onSelect={(date) => date && setSelectedDate(date)} initialFocus className="pointer-events-auto" />
+              </PopoverContent>
+            </Popover>
+          </div>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <Label className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
-              Catégorie
-            </Label>
+            <Label className="text-sm font-medium">Catégorie</Label>
             <Dialog open={showCategoryManager} onOpenChange={setShowCategoryManager}>
               <DialogTrigger asChild>
                 <Button 
                   variant="ghost" 
                   size="sm" 
-                  className="h-8 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                  className="h-7 text-xs"
                 >
-                  <Settings className="h-3.5 w-3.5 mr-1.5" />
+                  <Settings className="h-3 w-3 mr-1" />
                   Gérer
                 </Button>
               </DialogTrigger>
@@ -200,71 +214,28 @@ export const QuickExpenseTracker = ({ isAuthenticated }: QuickExpenseTrackerProp
             </Dialog>
           </div>
 
-          <Popover open={openCategory} onOpenChange={setOpenCategory}>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                role="combobox"
-                aria-expanded={openCategory}
-                className="w-full justify-between h-14 border-border/50 bg-muted/30 hover:bg-muted/50 transition-all rounded-xl"
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2">
+            {filteredCategories.map((category) => (
+              <button
+                key={category.id}
+                type="button"
+                onClick={() => setSelectedCategoryId(category.id)}
+                className={`flex flex-col items-center gap-1 p-3 rounded-lg border-2 transition-all hover:scale-105 ${
+                  selectedCategoryId === category.id
+                    ? 'border-primary bg-primary/10'
+                    : 'border-border bg-muted/30 hover:border-primary/50'
+                }`}
               >
-                {selectedCategoryId ? (
-                  <div className="flex items-center gap-3">
-                    <span className="text-2xl">{filteredCategories.find(c => c.id === selectedCategoryId)?.icon}</span>
-                    <span className="font-medium">{filteredCategories.find(c => c.id === selectedCategoryId)?.name}</span>
-                  </div>
-                ) : (
-                  <span className="text-muted-foreground">Choisir une catégorie</span>
-                )}
-                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-30" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-[400px] p-0" align="start">
-              <Command>
-                <CommandInput placeholder="Rechercher..." />
-                <CommandEmpty>Aucune catégorie trouvée.</CommandEmpty>
-                <CommandList>
-                  <CommandGroup>
-                    {filteredCategories.map((category) => (
-                      <CommandItem
-                        key={category.id}
-                        value={category.name}
-                        onSelect={() => { setSelectedCategoryId(category.id); setOpenCategory(false); }}
-                        className="flex items-center gap-3 py-3"
-                      >
-                        <span className="text-2xl">{category.icon}</span>
-                        <span className="flex-1 font-medium">{category.name}</span>
-                        {selectedCategoryId === category.id && <Check className="h-4 w-4 text-primary" />}
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </CommandList>
-              </Command>
-            </PopoverContent>
-          </Popover>
+                <span className="text-2xl">{category.icon}</span>
+                <span className="text-xs font-medium text-center line-clamp-1">{category.name}</span>
+              </button>
+            ))}
+          </div>
         </div>
 
-        <div className="space-y-3">
-          <Label className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Date</Label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className="w-full justify-start text-left h-14 font-normal border-border/50 bg-muted/30 hover:bg-muted/50 transition-all rounded-xl"
-              >
-                <CalendarIcon className="mr-3 h-4 w-4 opacity-50" />
-                {format(selectedDate, "d MMMM yyyy", { locale: fr })}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar mode="single" selected={selectedDate} onSelect={(date) => date && setSelectedDate(date)} initialFocus className="pointer-events-auto" />
-            </PopoverContent>
-          </Popover>
-        </div>
-
-        <div className="space-y-3">
-          <Label htmlFor="description" className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
-            Description <span className="text-xs lowercase normal-case">(optionnel)</span>
+        <div className="space-y-2">
+          <Label htmlFor="description" className="text-sm font-medium">
+            Description <span className="text-xs text-muted-foreground">(optionnel)</span>
           </Label>
           <Input
             id="description"
@@ -275,14 +246,14 @@ export const QuickExpenseTracker = ({ isAuthenticated }: QuickExpenseTrackerProp
               if (suggestedId && !selectedCategoryId) setSelectedCategoryId(suggestedId);
             }}
             placeholder="Ex: Épicerie, Restaurant, Essence..."
-            className="h-14 border-border/50 bg-muted/30 focus-visible:ring-2 focus-visible:ring-primary/20 transition-all rounded-xl"
+            className="h-10 rounded-lg"
           />
         </div>
 
         <Button
           onClick={handleSubmit}
           disabled={addMutation.isPending || !amount || amount === '0'}
-          className="w-full h-14 text-base font-medium gap-2 bg-primary hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 rounded-xl"
+          className="w-full h-11 text-base font-medium gap-2 rounded-lg"
         >
           {addMutation.isPending ? (
             <>
