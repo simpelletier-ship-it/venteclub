@@ -426,7 +426,137 @@ BALANCE: ${formatPrice(totalIncomeActual - totalExpenseActual)}
     return (
       <Card key={category.id} className="hover:shadow-md transition-shadow">
         <CardContent className="p-4">
-...
+          <div className="flex items-start justify-between mb-4">
+            <div className="flex items-center gap-3 flex-1">
+              <div className="text-3xl" style={{ color: category.color }}>
+                {category.icon}
+              </div>
+              <div className="flex-1">
+                <h4 className="font-semibold text-base">{category.name}</h4>
+                {budget > 0 && (
+                  <p className="text-sm text-muted-foreground">
+                    Budget: {formatPrice(budget)} / {getFrequencyLabel(freq)}
+                  </p>
+                )}
+                {budget === 0 && (
+                  <p className="text-xs text-muted-foreground italic">
+                    Aucun budget défini
+                  </p>
+                )}
+              </div>
+            </div>
+            <div className="flex items-center gap-1">
+              {budget > 0 && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleEdit(category.id, budget, freq)}
+                >
+                  <PencilLine className="h-4 w-4" />
+                </Button>
+              )}
+              <Dialog open={open && (!editingGoal || editingGoal.categoryId === category.id)} onOpenChange={(isOpen) => {
+                setOpen(isOpen);
+                if (!isOpen) {
+                  setEditingGoal(null);
+                  setMonthlyLimit("");
+                  setFrequency("monthly");
+                }
+              }}>
+                <DialogTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      if (budget > 0) {
+                        handleEdit(category.id, budget, freq);
+                      } else {
+                        setEditingGoal({ categoryId: category.id, currentLimit: 0 });
+                        setOpen(true);
+                      }
+                    }}
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>
+                      {editingGoal?.currentLimit ? 'Modifier' : 'Définir'} le budget - {category.name}
+                    </DialogTitle>
+                    <DialogDescription>
+                      Définissez un montant limite pour cette catégorie
+                    </DialogDescription>
+                  </DialogHeader>
+                  <form onSubmit={(e) => handleSubmit(e, category.id)} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="limit">Montant</Label>
+                      <CurrencyInput
+                        id="limit"
+                        value={monthlyLimit}
+                        onChange={setMonthlyLimit}
+                        placeholder="0 $"
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="frequency">Fréquence</Label>
+                      <Select value={frequency} onValueChange={setFrequency}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="weekly">Hebdomadaire</SelectItem>
+                          <SelectItem value="biweekly">Aux 2 semaines</SelectItem>
+                          <SelectItem value="monthly">Mensuel</SelectItem>
+                          <SelectItem value="yearly">Annuel</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="flex justify-end gap-2">
+                      <Button type="button" variant="outline" onClick={() => {
+                        setOpen(false);
+                        setEditingGoal(null);
+                        setMonthlyLimit("");
+                        setFrequency("monthly");
+                      }}>
+                        Annuler
+                      </Button>
+                      <Button type="submit">
+                        {editingGoal?.currentLimit ? 'Modifier' : 'Créer'}
+                      </Button>
+                    </div>
+                  </form>
+                </DialogContent>
+              </Dialog>
+              {budget > 0 && (
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="ghost" size="sm">
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Supprimer ce budget?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Le budget pour "{category.name}" sera supprimé définitivement.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Annuler</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() => deleteGoal.mutate(category.id)}
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      >
+                        Supprimer
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              )}
+            </div>
+          </div>
           {budget > 0 && (
             <>
               <div className="space-y-2">
