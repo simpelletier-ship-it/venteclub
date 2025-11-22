@@ -15,6 +15,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useOfflineSync } from "@/hooks/useOfflineSync";
 import { CategoryManager } from "./CategoryManager";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   DndContext,
   closestCenter,
@@ -103,6 +104,7 @@ const SortableCategoryButton = ({ category, isSelected, onSelect }: SortableCate
 };
 
 export const QuickExpenseTracker = ({ isAuthenticated }: QuickExpenseTrackerProps) => {
+  const { user } = useAuth();
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
   const [selectedCategoryId, setSelectedCategoryId] = useState("");
@@ -176,6 +178,7 @@ export const QuickExpenseTracker = ({ isAuthenticated }: QuickExpenseTrackerProp
           description: description || null,
           transaction_date: format(selectedDate, 'yyyy-MM-dd'),
           type: transactionType,
+          user_id: user?.id,
         } as any);
 
       if (error) throw error;
@@ -209,7 +212,8 @@ export const QuickExpenseTracker = ({ isAuthenticated }: QuickExpenseTrackerProp
         setDescription("");
         setSelectedCategoryId("");
       } else {
-        toast.error('❌ Erreur');
+        console.error('Erreur ajout transaction', error);
+        toast.error("❌ Erreur lors de l'enregistrement de la transaction");
       }
     },
   });
@@ -222,6 +226,10 @@ export const QuickExpenseTracker = ({ isAuthenticated }: QuickExpenseTrackerProp
     }
     if (!selectedCategoryId) {
       toast.error("Choisir une catégorie");
+      return;
+    }
+    if (!user?.id) {
+      toast.error("Connectez-vous pour enregistrer vos transactions");
       return;
     }
     addMutation.mutate();
