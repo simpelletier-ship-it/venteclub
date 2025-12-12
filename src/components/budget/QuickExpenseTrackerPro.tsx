@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Check, Settings, Calendar as CalendarIcon, Plus, Minus } from "lucide-react";
+import { Check, Settings, Calendar as CalendarIcon, Plus, Minus, X, GripVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -16,6 +16,23 @@ import { useOfflineSync } from "@/hooks/useOfflineSync";
 import { CategoryManager } from "./CategoryManager";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  rectSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 interface QuickExpenseTrackerProps {
   isAuthenticated: boolean;
@@ -39,6 +56,79 @@ const suggestCategory = (description: string, categories: any[]) => {
   return null;
 };
 
+// Sortable Category Item Component
+const SortableCategoryItem = ({ 
+  category, 
+  isSelected, 
+  onSelect, 
+  onHide,
+  isEditMode 
+}: { 
+  category: any; 
+  isSelected: boolean; 
+  onSelect: () => void;
+  onHide: () => void;
+  isEditMode: boolean;
+}) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: category.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="relative"
+    >
+      {isEditMode && (
+        <>
+          <button
+            onClick={onHide}
+            className="absolute -top-1 -right-1 z-10 w-5 h-5 rounded-full bg-red-500 text-white flex items-center justify-center shadow-sm hover:bg-red-600 transition-colors"
+          >
+            <X className="h-3 w-3" />
+          </button>
+          <div
+            {...attributes}
+            {...listeners}
+            className="absolute -top-1 -left-1 z-10 w-5 h-5 rounded-full bg-muted text-muted-foreground flex items-center justify-center cursor-grab active:cursor-grabbing"
+          >
+            <GripVertical className="h-3 w-3" />
+          </div>
+        </>
+      )}
+      <button
+        type="button"
+        onClick={onSelect}
+        disabled={isEditMode}
+        className={cn(
+          "w-full flex flex-col items-center gap-1.5 p-3 rounded-xl transition-all",
+          isSelected
+            ? "bg-primary/10 ring-2 ring-primary"
+            : "bg-muted/30 hover:bg-muted/50",
+          isEditMode && "pointer-events-none"
+        )}
+      >
+        <span className="text-2xl">{category.icon}</span>
+        <span className="text-[10px] font-medium text-center line-clamp-1 text-muted-foreground">
+          {category.name}
+        </span>
+      </button>
+    </div>
+  );
+};
+
 export const QuickExpenseTracker = ({ isAuthenticated }: QuickExpenseTrackerProps) => {
   const { user } = useAuth();
   const [amount, setAmount] = useState("");
@@ -47,9 +137,21 @@ export const QuickExpenseTracker = ({ isAuthenticated }: QuickExpenseTrackerProp
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [transactionType, setTransactionType] = useState<'expense' | 'income'>('expense');
   const [showCategoryManager, setShowCategoryManager] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
   
   const queryClient = useQueryClient();
   const { addOfflineTransaction } = useOfflineSync(isAuthenticated);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   const { data: categories = [] } = useQuery({
     queryKey: ['budget-categories'],
@@ -65,6 +167,48 @@ export const QuickExpenseTracker = ({ isAuthenticated }: QuickExpenseTrackerProp
   });
 
   const filteredCategories = categories.filter(c => c.type === transactionType && !c.is_hidden);
+
+  const updateCategoryMutation = useMutation({
+    mutationFn: async ({ id, updates }: { id: string; updates: any }) => {
+      const { error } = await supabase
+        .from('budget_categories')
+        .update(updates)
+        .eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['budget-categories'] });
+    },
+  });
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    
+    if (over && active.id !== over.id) {
+      const oldIndex = filteredCategories.findIndex(c => c.id === active.id);
+      const newIndex = filteredCategories.findIndex(c => c.id === over.id);
+      
+      const newOrder = arrayMove(filteredCategories, oldIndex, newIndex);
+      
+      // Update display_order for all reordered categories
+      newOrder.forEach((cat, index) => {
+        updateCategoryMutation.mutate({
+          id: cat.id,
+          updates: { display_order: index }
+        });
+      });
+    }
+  };
+
+  const handleHideCategory = (categoryId: string) => {
+    updateCategoryMutation.mutate({
+      id: categoryId,
+      updates: { is_hidden: true }
+    });
+    toast.success("Catégorie masquée", {
+      description: "Réactivez-la dans les paramètres"
+    });
+  };
 
   const addMutation = useMutation({
     mutationFn: async () => {
@@ -163,12 +307,13 @@ export const QuickExpenseTracker = ({ isAuthenticated }: QuickExpenseTrackerProp
         </button>
       </div>
 
-      {/* Amount Input - Prominent */}
+      {/* Amount Input - Prominent with decimals support */}
       <div className="text-center mb-6">
         <CurrencyInput
           value={amount}
           onChange={setAmount}
-          placeholder="0"
+          allowDecimals={true}
+          placeholder="0,00"
           className="text-4xl lg:text-5xl font-light h-16 text-center border-0 bg-transparent focus:ring-0 focus-visible:ring-0 placeholder:text-muted-foreground/30"
         />
       </div>
@@ -197,47 +342,66 @@ export const QuickExpenseTracker = ({ isAuthenticated }: QuickExpenseTrackerProp
         </Popover>
       </div>
 
-      {/* Categories Grid */}
+      {/* Categories Grid with Drag & Drop */}
       <div className="mb-6">
         <div className="flex items-center justify-between mb-3">
           <Label className="text-sm font-medium text-muted-foreground">Catégorie</Label>
-          <Dialog open={showCategoryManager} onOpenChange={setShowCategoryManager}>
-            <DialogTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-7 text-xs text-muted-foreground">
-                <Settings className="h-3 w-3 mr-1" />
-                Gérer
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>Gérer les catégories</DialogTitle>
-                <DialogDescription>Organisez vos catégories de transactions</DialogDescription>
-              </DialogHeader>
-              <CategoryManager isAuthenticated={isAuthenticated} />
-            </DialogContent>
-          </Dialog>
+          <div className="flex gap-2">
+            <Button
+              variant={isEditMode ? "default" : "ghost"}
+              size="sm"
+              className="h-7 text-xs"
+              onClick={() => setIsEditMode(!isEditMode)}
+            >
+              {isEditMode ? "Terminé" : "Réorganiser"}
+            </Button>
+            <Dialog open={showCategoryManager} onOpenChange={setShowCategoryManager}>
+              <DialogTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-7 text-xs text-muted-foreground">
+                  <Settings className="h-3 w-3 mr-1" />
+                  Gérer
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>Gérer les catégories</DialogTitle>
+                  <DialogDescription>Organisez vos catégories de transactions</DialogDescription>
+                </DialogHeader>
+                <CategoryManager isAuthenticated={isAuthenticated} />
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
 
-        <div className="grid grid-cols-4 sm:grid-cols-5 lg:grid-cols-6 gap-2">
-          {filteredCategories.slice(0, 12).map((category) => (
-            <button
-              key={category.id}
-              type="button"
-              onClick={() => setSelectedCategoryId(category.id)}
-              className={cn(
-                "flex flex-col items-center gap-1.5 p-3 rounded-xl transition-all",
-                selectedCategoryId === category.id
-                  ? "bg-primary/10 ring-2 ring-primary"
-                  : "bg-muted/30 hover:bg-muted/50"
-              )}
-            >
-              <span className="text-2xl">{category.icon}</span>
-              <span className="text-[10px] font-medium text-center line-clamp-1 text-muted-foreground">
-                {category.name}
-              </span>
-            </button>
-          ))}
-        </div>
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext
+            items={filteredCategories.map(c => c.id)}
+            strategy={rectSortingStrategy}
+          >
+            <div className="grid grid-cols-4 sm:grid-cols-5 lg:grid-cols-6 gap-2">
+              {filteredCategories.slice(0, 12).map((category) => (
+                <SortableCategoryItem
+                  key={category.id}
+                  category={category}
+                  isSelected={selectedCategoryId === category.id}
+                  onSelect={() => setSelectedCategoryId(category.id)}
+                  onHide={() => handleHideCategory(category.id)}
+                  isEditMode={isEditMode}
+                />
+              ))}
+            </div>
+          </SortableContext>
+        </DndContext>
+        
+        {isEditMode && (
+          <p className="text-xs text-muted-foreground text-center mt-3">
+            Glissez pour réorganiser • Cliquez sur X pour masquer
+          </p>
+        )}
       </div>
 
       {/* Description Input */}
