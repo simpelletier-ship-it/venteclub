@@ -48,6 +48,7 @@ const BudgetHistory = lazy(() => import("./pages/BudgetHistory"));
 const BudgetGoals = lazy(() => import("./pages/BudgetGoals"));
 const BudgetNetWorth = lazy(() => import("./pages/BudgetNetWorth"));
 const BudgetAnalytics = lazy(() => import("./pages/BudgetAnalytics"));
+const TaxSimulator = lazy(() => import("./pages/TaxSimulator"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -112,6 +113,7 @@ const App = () => (
                   <Route path="/outils" element={<EmailVerificationGuard><Tools /></EmailVerificationGuard>} />
                   <Route path="/outils/salaire" element={<EmailVerificationGuard><SalaryCalculator /></EmailVerificationGuard>} />
                   <Route path="/outils/retour-impot" element={<EmailVerificationGuard><TaxReturnCalculator /></EmailVerificationGuard>} />
+                  <Route path="/impots" element={<TaxSimulator />} />
                   
                   {/* Blog */}
                   <Route path="/blog" element={<EmailVerificationGuard><Blog /></EmailVerificationGuard>} />
