@@ -2,7 +2,11 @@ import {
   Utensils, Car, Home, Film, HeartPulse, Shirt, GraduationCap, UtensilsCrossed,
   ShoppingCart, Lightbulb, Shield, Smartphone, Wifi, Tv, Dumbbell, Gift,
   PawPrint, Sparkles, Plane, Box, Banknote, Briefcase, TrendingUp, Coins,
-  Building, Building2, Undo, PartyPopper, Circle, type LucideIcon
+  Building, Building2, Undo, PartyPopper, Circle, CreditCard, Wallet, PiggyBank,
+  Receipt, Coffee, Music, Beer, Baby, Wrench, Heart, Book, Gamepad2,
+  Zap, Fuel, Bus, Train, Bike, Pizza, Apple, Scissors, Pill, Stethoscope,
+  GraduationCap as Education, Landmark, Calculator, FileText, Users, Percent,
+  type LucideIcon
 } from "lucide-react";
 
 const ICON_MAP: Record<string, LucideIcon> = {
@@ -36,6 +40,35 @@ const ICON_MAP: Record<string, LucideIcon> = {
   'building-2': Building2,
   'undo': Undo,
   'party-popper': PartyPopper,
+  // Additional icons
+  'credit-card': CreditCard,
+  'wallet': Wallet,
+  'piggy-bank': PiggyBank,
+  'receipt': Receipt,
+  'coffee': Coffee,
+  'music': Music,
+  'beer': Beer,
+  'baby': Baby,
+  'wrench': Wrench,
+  'heart': Heart,
+  'book': Book,
+  'gamepad-2': Gamepad2,
+  'zap': Zap,
+  'fuel': Fuel,
+  'bus': Bus,
+  'train': Train,
+  'bike': Bike,
+  'pizza': Pizza,
+  'apple': Apple,
+  'scissors': Scissors,
+  'pill': Pill,
+  'stethoscope': Stethoscope,
+  'education': Education,
+  'landmark': Landmark,
+  'calculator': Calculator,
+  'file-text': FileText,
+  'users': Users,
+  'percent': Percent,
 };
 
 interface CategoryIconProps {
@@ -63,12 +96,7 @@ export function CategoryIcon({ icon, color, className = '', size = 'md' }: Categ
     );
   }
 
-  // If it's an emoji (fallback for existing data)
-  if (icon && icon.length <= 4) {
-    return <span className={`${size === 'sm' ? 'text-sm' : size === 'lg' ? 'text-lg' : 'text-base'} ${className}`}>{icon}</span>;
-  }
-
-  // Default fallback
+  // Default fallback - use Circle icon instead of emoji
   return <Circle className={`${sizeClasses[size]} ${className} text-muted-foreground`} />;
 }
 

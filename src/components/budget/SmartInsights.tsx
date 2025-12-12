@@ -17,6 +17,7 @@ import {
   Calendar
 } from "lucide-react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 interface Insight {
   id: string;
@@ -24,11 +25,14 @@ interface Insight {
   title: string;
   description: string;
   action?: string;
+  actionRoute?: string;
   potentialSavings?: number;
   priority: "high" | "medium" | "low";
 }
 
 export const SmartInsights = () => {
+  const navigate = useNavigate();
+
   const insights: Insight[] = [
     {
       id: "1",
@@ -36,6 +40,7 @@ export const SmartInsights = () => {
       title: "Abonnements inutilisés détectés",
       description: "Vous avez 2 abonnements que vous n'avez pas utilisés depuis 60+ jours: Netflix, Spotify.",
       action: "Réviser mes abonnements",
+      actionRoute: "/outils/budget?tab=analyses",
       potentialSavings: 32,
       priority: "high",
     },
@@ -44,7 +49,8 @@ export const SmartInsights = () => {
       type: "opportunity",
       title: "Opportunité d'épargne automatique",
       description: "Basé sur vos habitudes, vous pourriez épargner 150$/mois sans affecter votre style de vie.",
-      action: "Configurer l'épargne auto",
+      action: "Configurer l'épargne",
+      actionRoute: "/outils/budget?tab=objectifs",
       potentialSavings: 150,
       priority: "high",
     },
@@ -54,6 +60,7 @@ export const SmartInsights = () => {
       title: "Dépenses restaurants en hausse",
       description: "Vos dépenses restaurants ont augmenté de 45% par rapport au mois dernier.",
       action: "Voir les détails",
+      actionRoute: "/outils/budget?tab=historique&category=restaurant",
       priority: "medium",
     },
     {
@@ -61,6 +68,8 @@ export const SmartInsights = () => {
       type: "achievement",
       title: "Objectif épargne atteint!",
       description: "Félicitations! Vous avez atteint 75% de votre objectif 'Fonds d'urgence'.",
+      action: "Voir mes objectifs",
+      actionRoute: "/outils/budget?tab=objectifs",
       priority: "low",
     },
     {
@@ -68,6 +77,8 @@ export const SmartInsights = () => {
       type: "saving",
       title: "Meilleur moment pour payer",
       description: "Payez votre carte de crédit le 25 du mois pour économiser 12$ en intérêts.",
+      action: "Gérer mes dettes",
+      actionRoute: "/budget/valeur-nette",
       potentialSavings: 12,
       priority: "medium",
     },
@@ -96,6 +107,12 @@ export const SmartInsights = () => {
         return "bg-primary/10 border-primary/20";
       case "achievement":
         return "bg-chart-4/10 border-chart-4/20";
+    }
+  };
+
+  const handleActionClick = (insight: Insight) => {
+    if (insight.actionRoute) {
+      navigate(insight.actionRoute);
     }
   };
 
@@ -145,7 +162,12 @@ export const SmartInsights = () => {
                   {insight.description}
                 </p>
                 {insight.action && (
-                  <Button size="sm" variant="ghost" className="h-8 px-3 gap-1">
+                  <Button 
+                    size="sm" 
+                    variant="ghost" 
+                    className="h-8 px-3 gap-1"
+                    onClick={() => handleActionClick(insight)}
+                  >
                     {insight.action}
                     <ArrowRight className="w-3 h-3" />
                   </Button>

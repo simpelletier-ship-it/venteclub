@@ -115,6 +115,12 @@ export const NotificationBell = ({ userId }: NotificationBellProps) => {
   const handleNotificationClick = async (notification: Notification) => {
     markAsRead(notification.id);
     
+    // Budget insights - redirect to budget tools
+    if (notification.type === 'budget_insight' || notification.type === 'budget_alert') {
+      navigate('/outils/budget');
+      return;
+    }
+    
     // Pour les notifications de nouvelle annonce créée par le vendeur, aller au dashboard
     if (notification.type === 'new_listing' || notification.type === 'approved') {
       navigate('/dashboard');
@@ -189,24 +195,27 @@ export const NotificationBell = ({ userId }: NotificationBellProps) => {
             ) : (
               <div className="space-y-3 pr-2">
                 {notifications.filter(n => !n.read).map((notification) => {
-                  const getNotificationStyle = (type: string) => {
-                    switch (type) {
-                      case 'approved':
-                        return 'bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 border-green-200 dark:border-green-800';
-                      case 'new_listing':
-                        return 'bg-gradient-to-r from-blue-50 to-sky-50 dark:from-blue-950/20 dark:to-sky-950/20 border-blue-200 dark:border-blue-800';
-                      case 'price_drop':
-                        return 'bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-950/20 dark:to-amber-950/20 border-orange-200 dark:border-orange-800';
-                      case 'sold':
-                        return 'bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20 border-purple-200 dark:border-purple-800';
-                      case 'contact_purchased':
-                        return 'bg-gradient-to-r from-cyan-50 to-teal-50 dark:from-cyan-950/20 dark:to-teal-950/20 border-cyan-200 dark:border-cyan-800';
-                      case 'high_views':
-                        return 'bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-950/20 dark:to-orange-950/20 border-yellow-200 dark:border-yellow-800';
-                      default:
-                        return 'bg-gradient-to-r from-slate-50 to-gray-50 dark:from-slate-950/20 dark:to-gray-950/20 border-slate-200 dark:border-slate-800';
-                    }
-                  };
+                    const getNotificationStyle = (type: string) => {
+                      switch (type) {
+                        case 'approved':
+                          return 'bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 border-green-200 dark:border-green-800';
+                        case 'new_listing':
+                          return 'bg-gradient-to-r from-blue-50 to-sky-50 dark:from-blue-950/20 dark:to-sky-950/20 border-blue-200 dark:border-blue-800';
+                        case 'price_drop':
+                          return 'bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-950/20 dark:to-amber-950/20 border-orange-200 dark:border-orange-800';
+                        case 'sold':
+                          return 'bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20 border-purple-200 dark:border-purple-800';
+                        case 'contact_purchased':
+                          return 'bg-gradient-to-r from-cyan-50 to-teal-50 dark:from-cyan-950/20 dark:to-teal-950/20 border-cyan-200 dark:border-cyan-800';
+                        case 'high_views':
+                          return 'bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-950/20 dark:to-orange-950/20 border-yellow-200 dark:border-yellow-800';
+                        case 'budget_insight':
+                        case 'budget_alert':
+                          return 'bg-gradient-to-r from-indigo-50 to-violet-50 dark:from-indigo-950/20 dark:to-violet-950/20 border-indigo-200 dark:border-indigo-800';
+                        default:
+                          return 'bg-gradient-to-r from-slate-50 to-gray-50 dark:from-slate-950/20 dark:to-gray-950/20 border-slate-200 dark:border-slate-800';
+                      }
+                    };
 
                   // Extract business name from message (text between quotes)
                   const businessNameMatch = notification.message.match(/"([^"]+)"/);
