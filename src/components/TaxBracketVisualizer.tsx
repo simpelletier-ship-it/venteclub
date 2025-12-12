@@ -2,16 +2,16 @@ import { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { Info, TrendingUp, TrendingDown, ChevronDown, ChevronUp, Sparkles, AlertCircle } from "lucide-react";
+import { Info, TrendingUp, TrendingDown, ChevronDown, ChevronUp, Sparkles } from "lucide-react";
 import { formatPrice } from "@/lib/priceFormat";
 import { cn } from "@/lib/utils";
 
 // Tranches d'imposition 2025 - Québec
 const QUEBEC_BRACKETS = [
-  { min: 0, max: 51780, rate: 14, color: "bg-blue-500" },
-  { min: 51780, max: 103545, rate: 19, color: "bg-blue-600" },
-  { min: 103545, max: 126000, rate: 24, color: "bg-blue-700" },
-  { min: 126000, max: Infinity, rate: 25.75, color: "bg-blue-800" },
+  { min: 0, max: 51780, rate: 14, color: "bg-blue-400" },
+  { min: 51780, max: 103545, rate: 19, color: "bg-blue-500" },
+  { min: 103545, max: 126000, rate: 24, color: "bg-blue-600" },
+  { min: 126000, max: Infinity, rate: 25.75, color: "bg-blue-700" },
 ];
 
 // Tranches d'imposition 2025 - Fédéral (avec abattement Québec 16.5%)
@@ -25,14 +25,14 @@ const FEDERAL_BRACKETS = [
 
 // Tranches combinées Québec + Fédéral 2025
 const COMBINED_BRACKETS = [
-  { min: 0, max: 51780, qcRate: 14, fedRate: 12.525, combinedRate: 26.525 },
-  { min: 51780, max: 55867, qcRate: 19, fedRate: 12.525, combinedRate: 31.525 },
-  { min: 55867, max: 103545, qcRate: 19, fedRate: 17.12, combinedRate: 36.12 },
-  { min: 103545, max: 111733, qcRate: 24, fedRate: 17.12, combinedRate: 41.12 },
-  { min: 111733, max: 126000, qcRate: 24, fedRate: 21.71, combinedRate: 45.71 },
-  { min: 126000, max: 173205, qcRate: 25.75, fedRate: 21.71, combinedRate: 47.46 },
-  { min: 173205, max: 246752, qcRate: 25.75, fedRate: 24.22, combinedRate: 49.97 },
-  { min: 246752, max: Infinity, qcRate: 25.75, fedRate: 27.56, combinedRate: 53.31 },
+  { min: 0, max: 51780, qcRate: 14, fedRate: 12.525, combinedRate: 26.525, color: "bg-slate-400" },
+  { min: 51780, max: 55867, qcRate: 19, fedRate: 12.525, combinedRate: 31.525, color: "bg-slate-450" },
+  { min: 55867, max: 103545, qcRate: 19, fedRate: 17.12, combinedRate: 36.12, color: "bg-slate-500" },
+  { min: 103545, max: 111733, qcRate: 24, fedRate: 17.12, combinedRate: 41.12, color: "bg-slate-550" },
+  { min: 111733, max: 126000, qcRate: 24, fedRate: 21.71, combinedRate: 45.71, color: "bg-slate-600" },
+  { min: 126000, max: 173205, qcRate: 25.75, fedRate: 21.71, combinedRate: 47.46, color: "bg-slate-650" },
+  { min: 173205, max: 246752, qcRate: 25.75, fedRate: 24.22, combinedRate: 49.97, color: "bg-slate-700" },
+  { min: 246752, max: Infinity, qcRate: 25.75, fedRate: 27.56, combinedRate: 53.31, color: "bg-slate-800" },
 ];
 
 // Montant personnel de base 2025
@@ -149,6 +149,9 @@ export const TaxBracketVisualizer = ({
     return Math.min((value / max) * 100, 100);
   };
 
+  const currentTax = totalDeductions > 0 ? adjustedTax : originalTax;
+  const currentIncome = totalDeductions > 0 ? adjustedIncome : income;
+
   return (
     <Card className="border-border">
       <CardHeader className="pb-4">
@@ -157,7 +160,7 @@ export const TaxBracketVisualizer = ({
           Votre position fiscale 2025
         </CardTitle>
         <p className="text-sm text-muted-foreground mt-1">
-          Visualisez exactement où vous vous situez dans les tranches d'imposition combinées
+          Visualisez exactement où vous vous situez dans les tranches d'imposition
         </p>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -220,7 +223,7 @@ export const TaxBracketVisualizer = ({
           <div className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-lg p-3 text-center border border-primary/20">
             <div className="text-xs text-muted-foreground mb-1">Taux marginal combiné</div>
             <div className="text-2xl font-bold text-primary">
-              {(totalDeductions > 0 ? adjustedTax : originalTax).combinedMarginalRate.toFixed(2)}%
+              {currentTax.combinedMarginalRate.toFixed(2)}%
             </div>
             <Tooltip>
               <TooltipTrigger>
@@ -235,7 +238,7 @@ export const TaxBracketVisualizer = ({
           <div className="bg-muted/50 rounded-lg p-3 text-center">
             <div className="text-xs text-muted-foreground mb-1">Taux effectif</div>
             <div className="text-2xl font-bold text-foreground">
-              {(totalDeductions > 0 ? adjustedTax : originalTax).effectiveRate.toFixed(2)}%
+              {currentTax.effectiveRate.toFixed(2)}%
             </div>
             <Tooltip>
               <TooltipTrigger>
@@ -250,54 +253,21 @@ export const TaxBracketVisualizer = ({
           <div className="bg-muted/50 rounded-lg p-3 text-center">
             <div className="text-xs text-muted-foreground mb-1">Impôt total</div>
             <div className="text-2xl font-bold text-destructive">
-              {formatPrice((totalDeductions > 0 ? adjustedTax : originalTax).totalTax)}
+              {formatPrice(currentTax.totalTax)}
             </div>
           </div>
           
           <div className="bg-muted/50 rounded-lg p-3 text-center">
             <div className="text-xs text-muted-foreground mb-1">Revenu net</div>
             <div className="text-2xl font-bold text-success">
-              {formatPrice((totalDeductions > 0 ? adjustedTax : originalTax).netIncome)}
+              {formatPrice(currentTax.netIncome)}
             </div>
           </div>
-        </div>
-
-        {/* Tranche combinée mise en évidence */}
-        <div className="bg-accent/50 rounded-lg p-4 border border-accent">
-          <div className="flex items-center justify-between mb-3">
-            <h4 className="font-semibold text-foreground flex items-center gap-2">
-              <AlertCircle className="h-4 w-4 text-primary" />
-              Votre tranche combinée actuelle
-            </h4>
-          </div>
-          <div className="grid grid-cols-3 gap-4 text-center">
-            <div>
-              <div className="text-xs text-muted-foreground mb-1">Québec</div>
-              <div className="text-lg font-bold text-blue-500">
-                {(totalDeductions > 0 ? adjustedTax : originalTax).currentCombinedBracket.qcRate}%
-              </div>
-            </div>
-            <div>
-              <div className="text-xs text-muted-foreground mb-1">Fédéral</div>
-              <div className="text-lg font-bold text-red-500">
-                {(totalDeductions > 0 ? adjustedTax : originalTax).currentCombinedBracket.fedRate}%
-              </div>
-            </div>
-            <div className="bg-primary/10 rounded-lg p-2">
-              <div className="text-xs text-muted-foreground mb-1">Combiné</div>
-              <div className="text-xl font-bold text-primary">
-                {(totalDeductions > 0 ? adjustedTax : originalTax).currentCombinedBracket.combinedRate}%
-              </div>
-            </div>
-          </div>
-          <p className="text-xs text-muted-foreground mt-3 text-center">
-            Pour chaque 100$ supplémentaire gagné, vous payez {((totalDeductions > 0 ? adjustedTax : originalTax).currentCombinedBracket.combinedRate).toFixed(0)}$ en impôts
-          </p>
         </div>
 
         {/* Visualisation des tranches */}
         <div className="space-y-4">
-          {/* Québec */}
+          {/* Québec - Barre entièrement bleue */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -306,19 +276,18 @@ export const TaxBracketVisualizer = ({
               </div>
               <div className="text-sm">
                 <span className="text-muted-foreground">Taux: </span>
-                <span className="font-semibold text-blue-500">{(totalDeductions > 0 ? adjustedTax : originalTax).currentQCBracket.rate}%</span>
+                <span className="font-semibold text-blue-500">{currentTax.currentQCBracket.rate}%</span>
                 <span className="text-muted-foreground ml-2">Impôt: </span>
-                <span className="font-semibold">{formatPrice((totalDeductions > 0 ? adjustedTax : originalTax).quebecTax)}</span>
+                <span className="font-semibold">{formatPrice(currentTax.quebecTax)}</span>
               </div>
             </div>
             
-            {/* Barre de progression Québec - CORRIGÉE */}
-            <div className="relative h-8 rounded-lg overflow-hidden flex bg-muted">
+            {/* Barre de progression Québec - Entièrement bleue */}
+            <div className="relative h-8 rounded-lg overflow-hidden flex">
               {QUEBEC_BRACKETS.map((bracket, i) => {
                 const width = bracket.max === Infinity 
                   ? 25 
                   : ((bracket.max - bracket.min) / 300000) * 100;
-                const currentIncome = totalDeductions > 0 ? adjustedIncome : income;
                 const isActive = currentIncome >= bracket.min && (bracket.max === Infinity || currentIncome < bracket.max);
                 
                 return (
@@ -349,14 +318,14 @@ export const TaxBracketVisualizer = ({
               {/* Indicateur de position */}
               <div 
                 className="absolute top-0 bottom-0 w-0.5 bg-white shadow-lg"
-                style={{ left: `${getPositionPercentage(totalDeductions > 0 ? adjustedIncome : income, 300000)}%` }}
+                style={{ left: `${getPositionPercentage(currentIncome, 300000)}%` }}
               >
                 <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-3 h-3 bg-white rounded-full border-2 border-foreground" />
               </div>
             </div>
           </div>
 
-          {/* Fédéral */}
+          {/* Fédéral - Barre entièrement rouge */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -365,19 +334,18 @@ export const TaxBracketVisualizer = ({
               </div>
               <div className="text-sm">
                 <span className="text-muted-foreground">Taux: </span>
-                <span className="font-semibold text-red-500">{(totalDeductions > 0 ? adjustedTax : originalTax).currentFedBracket.rate}%</span>
+                <span className="font-semibold text-red-500">{currentTax.currentFedBracket.rate}%</span>
                 <span className="text-muted-foreground ml-2">Impôt: </span>
-                <span className="font-semibold">{formatPrice((totalDeductions > 0 ? adjustedTax : originalTax).federalTax)}</span>
+                <span className="font-semibold">{formatPrice(currentTax.federalTax)}</span>
               </div>
             </div>
             
-            {/* Barre de progression Fédéral */}
-            <div className="relative h-8 rounded-lg overflow-hidden flex bg-muted">
+            {/* Barre de progression Fédéral - Entièrement rouge */}
+            <div className="relative h-8 rounded-lg overflow-hidden flex">
               {FEDERAL_BRACKETS.map((bracket, i) => {
                 const width = bracket.max === Infinity 
                   ? 20 
                   : ((bracket.max - bracket.min) / 300000) * 100;
-                const currentIncome = totalDeductions > 0 ? adjustedIncome : income;
                 const isActive = currentIncome >= bracket.min && (bracket.max === Infinity || currentIncome < bracket.max);
                 
                 return (
@@ -409,7 +377,81 @@ export const TaxBracketVisualizer = ({
               {/* Indicateur de position */}
               <div 
                 className="absolute top-0 bottom-0 w-0.5 bg-white shadow-lg"
-                style={{ left: `${getPositionPercentage(totalDeductions > 0 ? adjustedIncome : income, 300000)}%` }}
+                style={{ left: `${getPositionPercentage(currentIncome, 300000)}%` }}
+              >
+                <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-3 h-3 bg-white rounded-full border-2 border-foreground" />
+              </div>
+            </div>
+          </div>
+
+          {/* Combiné - Nouvelle barre grise */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-slate-500" />
+                <span className="text-sm font-medium">Combiné (QC + Fédéral)</span>
+              </div>
+              <div className="text-sm">
+                <span className="text-muted-foreground">Taux: </span>
+                <span className="font-semibold text-slate-500">{currentTax.combinedMarginalRate.toFixed(2)}%</span>
+                <span className="text-muted-foreground ml-2">Impôt: </span>
+                <span className="font-semibold">{formatPrice(currentTax.totalTax)}</span>
+              </div>
+            </div>
+            
+            {/* Barre de progression Combiné - Gris */}
+            <div className="relative h-8 rounded-lg overflow-hidden flex">
+              {COMBINED_BRACKETS.map((bracket, i) => {
+                const width = bracket.max === Infinity 
+                  ? 20 
+                  : ((bracket.max - bracket.min) / 300000) * 100;
+                const isActive = currentIncome >= bracket.min && (bracket.max === Infinity || currentIncome < bracket.max);
+                
+                // Couleurs grises progressives
+                const grayColors = [
+                  "bg-slate-400",
+                  "bg-slate-450",
+                  "bg-slate-500",
+                  "bg-slate-550",
+                  "bg-slate-600",
+                  "bg-slate-650",
+                  "bg-slate-700",
+                  "bg-slate-800"
+                ];
+                
+                return (
+                  <Tooltip key={i}>
+                    <TooltipTrigger asChild>
+                      <div 
+                        className={cn(
+                          grayColors[i] || "bg-slate-600",
+                          "h-full flex items-center justify-center text-xs font-medium text-white cursor-pointer transition-all",
+                          isActive && "ring-2 ring-white ring-inset"
+                        )}
+                        style={{ width: `${Math.max(width, 8)}%`, minWidth: '35px' }}
+                      >
+                        {bracket.combinedRate.toFixed(1)}%
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <div className="text-sm">
+                        <p className="font-semibold">Tranche combinée {bracket.combinedRate}%</p>
+                        <p>De {formatPrice(bracket.min)} à {bracket.max === Infinity ? '∞' : formatPrice(bracket.max)}</p>
+                        <div className="flex gap-2 mt-1 text-xs">
+                          <span className="text-blue-400">QC: {bracket.qcRate}%</span>
+                          <span className="text-red-400">Fed: {bracket.fedRate}%</span>
+                        </div>
+                        {isActive && <p className="text-primary mt-1">Vous êtes ici</p>}
+                      </div>
+                    </TooltipContent>
+                  </Tooltip>
+                );
+              })}
+              
+              {/* Indicateur de position */}
+              <div 
+                className="absolute top-0 bottom-0 w-0.5 bg-white shadow-lg"
+                style={{ left: `${getPositionPercentage(currentIncome, 300000)}%` }}
               >
                 <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-3 h-3 bg-white rounded-full border-2 border-foreground" />
               </div>
@@ -450,12 +492,11 @@ export const TaxBracketVisualizer = ({
                       <th className="text-left py-2 text-muted-foreground font-medium">Revenu imposable</th>
                       <th className="text-center py-2 text-blue-500 font-medium">Québec</th>
                       <th className="text-center py-2 text-red-500 font-medium">Fédéral</th>
-                      <th className="text-center py-2 text-primary font-medium">Combiné</th>
+                      <th className="text-center py-2 text-slate-500 font-medium">Combiné</th>
                     </tr>
                   </thead>
                   <tbody>
                     {COMBINED_BRACKETS.map((bracket, i) => {
-                      const currentIncome = totalDeductions > 0 ? adjustedIncome : income;
                       const isActive = currentIncome >= bracket.min && (bracket.max === Infinity || currentIncome < bracket.max);
                       return (
                         <tr 
@@ -471,7 +512,7 @@ export const TaxBracketVisualizer = ({
                           </td>
                           <td className="text-center py-2 text-blue-500">{bracket.qcRate}%</td>
                           <td className="text-center py-2 text-red-500">{bracket.fedRate}%</td>
-                          <td className="text-center py-2 font-bold text-primary">{bracket.combinedRate}%</td>
+                          <td className="text-center py-2 font-bold text-slate-500">{bracket.combinedRate}%</td>
                         </tr>
                       );
                     })}
@@ -489,7 +530,7 @@ export const TaxBracketVisualizer = ({
               <div className="space-y-2 text-sm text-muted-foreground">
                 <p>
                   <strong className="text-foreground">Taux marginal:</strong> C'est le taux d'imposition appliqué à votre dernier dollar gagné. 
-                  Si vous gagnez 1 000$ de plus, vous paierez {((totalDeductions > 0 ? adjustedTax : originalTax).combinedMarginalRate * 10).toFixed(0)}$ en impôts supplémentaires.
+                  Si vous gagnez 1 000$ de plus, vous paierez {(currentTax.combinedMarginalRate * 10).toFixed(0)}$ en impôts supplémentaires.
                 </p>
                 <p>
                   <strong className="text-foreground">Taux effectif:</strong> C'est le pourcentage réel de votre revenu total payé en impôts. 
