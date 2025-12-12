@@ -43,9 +43,6 @@ const Admin = () => {
     city: "",
     province: "",
     industry: "",
-    seller_name: "",
-    seller_phone: "",
-    seller_email: "",
     chat_disabled: false,
     source_url: "",
   });
@@ -117,24 +114,9 @@ const Admin = () => {
 
       if (error) throw error;
 
-      // Get all unique seller IDs
-      const sellerIds = [...new Set(businessesData?.map(b => b.seller_id) || [])];
-      
-      // Fetch all seller contacts in one query
-      const { data: contactsData } = await supabase
-        .from('seller_contacts')
-        .select('seller_id, email')
-        .in('seller_id', sellerIds);
-
-      // Create a map of seller_id -> email
-      const contactsMap = new Map(
-        contactsData?.map(c => [c.seller_id, c.email]) || []
-      );
-
-      // Map businesses with their details (no need for is_business_featured, use featured column)
+      // Map businesses with their details
       const businessesWithDetails = (businessesData || []).map(business => ({
         ...business,
-        seller_email: contactsMap.get(business.seller_id) || null,
         is_featured: business.featured
       }));
 
@@ -418,9 +400,6 @@ const Admin = () => {
       city: business.city || "",
       province: business.province || "Québec",
       industry: business.industry || "",
-      seller_name: business.seller_name || "",
-      seller_phone: business.seller_phone || "",
-      seller_email: business.seller_email || "",
       chat_disabled: business.chat_disabled || false,
       source_url: business.source_url || "",
     });
@@ -2190,41 +2169,6 @@ const Admin = () => {
               </div>
 
               <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="edit-seller-name">Nom du contact</Label>
-                    <Input
-                      id="edit-seller-name"
-                      value={editFormData.seller_name}
-                      onChange={(e) => setEditFormData({ ...editFormData, seller_name: e.target.value })}
-                      placeholder="Jean Dupont"
-                      className="mt-2"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="edit-seller-phone">Téléphone du contact</Label>
-                    <Input
-                      id="edit-seller-phone"
-                      value={editFormData.seller_phone}
-                      onChange={(e) => setEditFormData({ ...editFormData, seller_phone: e.target.value })}
-                      placeholder="514-555-1234"
-                      className="mt-2"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <Label htmlFor="edit-seller-email">Email du contact</Label>
-                  <Input
-                    id="edit-seller-email"
-                    type="email"
-                    value={editFormData.seller_email}
-                    onChange={(e) => setEditFormData({ ...editFormData, seller_email: e.target.value })}
-                    placeholder="contact@entreprise.com"
-                    className="mt-2"
-                  />
-                </div>
-
                 <div>
                   <Label htmlFor="edit-source-url">Lien source de l&apos;annonce</Label>
                   <Input
