@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { SEO } from "@/components/SEO";
 import { BreadcrumbSchema } from "@/components/BreadcrumbSchema";
-import { Loader2, TrendingUp, TrendingDown, Wallet, ArrowUpRight, ArrowDownRight, Plus, ChevronRight, Target } from "lucide-react";
+import { Loader2, TrendingUp, TrendingDown, Wallet, ArrowUpRight, ArrowDownRight, Plus, ChevronRight, Target, Calendar, Clock, CreditCard, PiggyBank, LineChart, Bell, BarChart3, Lightbulb } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
@@ -16,11 +16,20 @@ import { BudgetOnboarding } from "@/components/budget/BudgetOnboarding";
 import { CreateDefaultCategories } from "@/components/budget/CreateDefaultCategories";
 import { OfflineIndicator } from "@/components/budget/OfflineIndicator";
 import { useOfflineSync } from "@/hooks/useOfflineSync";
+import { BillCalendar } from "@/components/budget/BillCalendar";
+import { AgeOfMoney } from "@/components/budget/AgeOfMoney";
+import { DebtPayoffPlanner } from "@/components/budget/DebtPayoffPlanner";
+import { SavingsChallenges } from "@/components/budget/SavingsChallenges";
+import { CashFlowForecast } from "@/components/budget/CashFlowForecast";
+import { SpendingLimitsAlerts } from "@/components/budget/SpendingLimitsAlerts";
+import { InvestmentTracker } from "@/components/budget/InvestmentTracker";
+import { FinancialProductComparison } from "@/components/budget/FinancialProductComparison";
+import { SmartInsights } from "@/components/budget/SmartInsights";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatPrice } from "@/lib/priceFormat";
 import { cn } from "@/lib/utils";
-
 const BudgetCalculator = () => {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
@@ -324,12 +333,83 @@ const BudgetCalculator = () => {
             </Card>
 
             {/* Budget Planner */}
-            <Card className="border-border">
+            <Card className="border-border mb-6">
               <CardHeader className="pb-2 border-b border-border">
                 <CardTitle className="text-sm font-medium">Planification budgétaire</CardTitle>
               </CardHeader>
               <CardContent className="pt-4">
                 <BudgetPlanner isAuthenticated={isAuthenticated} />
+              </CardContent>
+            </Card>
+
+            {/* Advanced Features Tabs */}
+            <Card className="border-border">
+              <CardHeader className="pb-2 border-b border-border">
+                <div className="flex items-center gap-2">
+                  <Lightbulb className="h-4 w-4 text-primary" />
+                  <CardTitle className="text-sm font-medium">Analyses avancées</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-4">
+                <Tabs defaultValue="insights" className="w-full">
+                  <TabsList className="grid grid-cols-3 lg:grid-cols-5 gap-1 h-auto p-1 mb-4">
+                    <TabsTrigger value="insights" className="text-xs py-2 px-2 gap-1">
+                      <Lightbulb className="h-3 w-3" />
+                      <span className="hidden sm:inline">Insights</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="calendar" className="text-xs py-2 px-2 gap-1">
+                      <Calendar className="h-3 w-3" />
+                      <span className="hidden sm:inline">Factures</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="cashflow" className="text-xs py-2 px-2 gap-1">
+                      <LineChart className="h-3 w-3" />
+                      <span className="hidden sm:inline">Trésorerie</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="debts" className="text-xs py-2 px-2 gap-1">
+                      <CreditCard className="h-3 w-3" />
+                      <span className="hidden sm:inline">Dettes</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="savings" className="text-xs py-2 px-2 gap-1">
+                      <PiggyBank className="h-3 w-3" />
+                      <span className="hidden sm:inline">Épargne</span>
+                    </TabsTrigger>
+                  </TabsList>
+
+                  <TabsContent value="insights" className="mt-0 space-y-4">
+                    <SmartInsights />
+                    <AgeOfMoney 
+                      monthlyIncome={monthlyIncome}
+                      monthlyExpenses={monthlyExpenses}
+                      currentBalance={monthlyBalance > 0 ? monthlyBalance : 0}
+                    />
+                  </TabsContent>
+
+                  <TabsContent value="calendar" className="mt-0 space-y-4">
+                    <BillCalendar />
+                    <SpendingLimitsAlerts />
+                  </TabsContent>
+
+                  <TabsContent value="cashflow" className="mt-0">
+                    <CashFlowForecast 
+                      currentBalance={netWorth > 0 ? netWorth : 5000}
+                      monthlyIncome={monthlyIncome || 4000}
+                      monthlyExpenses={monthlyExpenses || 3000}
+                      upcomingBills={[]}
+                    />
+                  </TabsContent>
+
+                  <TabsContent value="debts" className="mt-0">
+                    <DebtPayoffPlanner />
+                  </TabsContent>
+
+                  <TabsContent value="savings" className="mt-0 space-y-4">
+                    <SavingsChallenges />
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                      <InvestmentTracker />
+                      <FinancialProductComparison />
+                    </div>
+                  </TabsContent>
+                </Tabs>
               </CardContent>
             </Card>
           </div>
