@@ -89,8 +89,8 @@ const App = () => (
             <Layout>
               <Suspense fallback={<div className="flex items-center justify-center min-h-screen bg-slate-950"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div></div>}>
               <Routes>
-                  {/* Homepage */}
-                  <Route path="/" element={<Home />} />
+                  {/* Homepage - Redirect to Budget */}
+                  <Route path="/" element={<Navigate to="/budget" replace />} />
                   
                   {/* Auth pages */}
                   <Route path="/auth" element={<Auth />} />
