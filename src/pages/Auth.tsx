@@ -555,20 +555,20 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/20 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold mb-2 cursor-pointer" onClick={() => navigate("/")}>
-            Vente<span className="text-accent">.Club</span>
+          <h1 className="text-2xl font-semibold mb-2 cursor-pointer text-foreground" onClick={() => navigate("/budget")}>
+            Budget<span className="text-primary">.club</span>
           </h1>
-          <p className="text-muted-foreground">
-            Achetez et vendez des entreprises en toute confiance
+          <p className="text-sm text-muted-foreground">
+            Gérez votre budget personnel
           </p>
         </div>
 
         {showResetPassword ? (
-          <div className="bg-card p-8 rounded-2xl shadow-elegant border border-border/50">
-            <h2 className="text-2xl font-bold mb-6 text-center">Réinitialiser le mot de passe</h2>
+          <div className="bg-card p-8 rounded border border-border">
+            <h2 className="text-xl font-semibold mb-6 text-center text-foreground">Réinitialiser le mot de passe</h2>
             <p className="text-sm text-muted-foreground mb-6 text-center">
               Entrez votre email pour recevoir un lien de réinitialisation
             </p>
@@ -599,7 +599,7 @@ const Auth = () => {
             </form>
           </div>
         ) : (
-          <div className="bg-card p-8 rounded-2xl shadow-elegant border border-border/50">
+          <div className="bg-card p-8 rounded border border-border">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="grid w-full grid-cols-2 mb-6">
                 <TabsTrigger value="login">Connexion</TabsTrigger>
