@@ -46,16 +46,6 @@ export const AgeOfMoney = ({
               <Clock className="w-5 h-5 text-violet-600" />
             </div>
             Âge de votre argent
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger>
-                  <Info className="w-4 h-4 text-muted-foreground" />
-                </TooltipTrigger>
-                <TooltipContent className="max-w-xs">
-                  <p>L'âge de votre argent représente le nombre de jours entre le moment où vous gagnez de l'argent et celui où vous le dépensez. Plus c'est élevé, mieux c'est!</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
           </CardTitle>
           <Badge className={status.bgColor + " " + status.color + " border-0"}>
             {status.label}
@@ -63,8 +53,25 @@ export const AgeOfMoney = ({
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
+        {/* Explanation Card */}
+        <div className="p-4 rounded-xl bg-white/60 dark:bg-slate-800/60 border border-violet-200/50 dark:border-violet-800/30">
+          <div className="flex items-start gap-3">
+            <Info className="w-5 h-5 text-violet-600 mt-0.5 shrink-0" />
+            <div>
+              <p className="text-sm font-medium text-foreground mb-1">C'est quoi l'âge de l'argent?</p>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                C'est le nombre de jours que votre argent reste dans votre compte avant d'être dépensé. 
+                Plus ce nombre est élevé, plus vous avez une marge de sécurité financière.
+              </p>
+              <p className="text-xs text-violet-600 dark:text-violet-400 mt-2 font-medium">
+                Calcul: Solde actuel ÷ Dépenses quotidiennes moyennes
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* Main metric */}
-        <div className="text-center py-6">
+        <div className="text-center py-4">
           <motion.div
             initial={{ scale: 0.5, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
