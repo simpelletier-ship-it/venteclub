@@ -2213,6 +2213,10 @@ export type Database = {
         Args: { p_business_id: string; p_user_id: string }
         Returns: Json
       }
+      can_view_seller_contact: {
+        Args: { business_uuid: string }
+        Returns: boolean
+      }
       check_business_access: {
         Args: { business_uuid: string }
         Returns: boolean
@@ -2226,6 +2230,82 @@ export type Database = {
       create_sample_businesses: { Args: never; Returns: undefined }
       generate_goal_deadline_reminders: { Args: never; Returns: undefined }
       generate_slug: { Args: { title: string }; Returns: string }
+      get_business_with_secure_contact: {
+        Args: { business_uuid: string }
+        Returns: {
+          address: string
+          annual_revenue: number
+          approval_status: string
+          asking_price: number
+          asking_price_max: number
+          baiia: number
+          baiia_margin: number
+          city: string
+          created_at: string
+          currency: string
+          description: string
+          employees_count: number
+          featured: boolean
+          id: string
+          industry: string
+          is_demo: boolean
+          is_franchise: boolean
+          is_premium: boolean
+          latitude: number
+          location: string
+          longitude: number
+          net_profit: number
+          net_profit_margin: number
+          profit_margin: number
+          province: string
+          region: string
+          sale_type: string
+          seller_email: string
+          seller_id: string
+          seller_name: string
+          seller_phone: string
+          slug: string
+          sold_at: string
+          status: string
+          title: string
+          updated_at: string
+          views_count: number
+          year_established: number
+        }[]
+      }
+      get_businesses_public: {
+        Args: never
+        Returns: {
+          annual_revenue: number
+          approval_status: string
+          asking_price: number
+          asking_price_max: number
+          baiia: number
+          city: string
+          created_at: string
+          currency: string
+          description: string
+          employees_count: number
+          featured: boolean
+          id: string
+          industry: string
+          is_franchise: boolean
+          is_premium: boolean
+          latitude: number
+          location: string
+          longitude: number
+          net_profit: number
+          profit_margin: number
+          province: string
+          region: string
+          seller_id: string
+          slug: string
+          status: string
+          title: string
+          views_count: number
+          year_established: number
+        }[]
+      }
       get_next_access_time: { Args: { user_uuid: string }; Returns: Json }
       get_public_stats: {
         Args: never
