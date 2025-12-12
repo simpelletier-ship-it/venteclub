@@ -100,7 +100,7 @@ export function CreateDefaultCategories() {
       
       const { data, error } = await supabase
         .from("budget_categories")
-        .select("id, icon")
+        .select("id, icon, name, type")
         .eq("user_id", user.id);
 
       if (error) throw error;
@@ -109,39 +109,52 @@ export function CreateDefaultCategories() {
     enabled: !!user?.id,
   });
 
-  // Mutation pour créer les catégories par défaut
+  // Mutation pour créer les catégories par défaut (seulement celles qui n'existent pas)
   const createDefaultCategories = useMutation({
     mutationFn: async () => {
       if (!user?.id) throw new Error("Non authentifié");
 
-      // Créer les catégories de dépenses
-      const expenseCategories = DEFAULT_EXPENSE_CATEGORIES.map((cat) => ({
-        user_id: user.id,
-        name: cat.name,
-        icon: cat.icon,
-        color: cat.color,
-        type: "expense",
-        is_custom: false,
-        is_pinned: cat.display_order < 6,
-        display_order: cat.display_order,
-      }));
+      // Get existing category names (case-insensitive)
+      const existingNames = new Set(
+        (existingCategories || []).map(cat => cat.name?.toLowerCase())
+      );
 
-      // Créer les catégories de revenus
-      const incomeCategories = DEFAULT_INCOME_CATEGORIES.map((cat) => ({
-        user_id: user.id,
-        name: cat.name,
-        icon: cat.icon,
-        color: cat.color,
-        type: "income",
-        is_custom: false,
-        is_pinned: cat.display_order === 0,
-        display_order: cat.display_order,
-      }));
+      // Créer les catégories de dépenses (seulement si n'existe pas déjà)
+      const expenseCategories = DEFAULT_EXPENSE_CATEGORIES
+        .filter(cat => !existingNames.has(cat.name.toLowerCase()))
+        .map((cat) => ({
+          user_id: user.id,
+          name: cat.name,
+          icon: cat.icon,
+          color: cat.color,
+          type: "expense",
+          is_custom: false,
+          is_pinned: cat.display_order < 6,
+          display_order: cat.display_order,
+        }));
+
+      // Créer les catégories de revenus (seulement si n'existe pas déjà)
+      const incomeCategories = DEFAULT_INCOME_CATEGORIES
+        .filter(cat => !existingNames.has(cat.name.toLowerCase()))
+        .map((cat) => ({
+          user_id: user.id,
+          name: cat.name,
+          icon: cat.icon,
+          color: cat.color,
+          type: "income",
+          is_custom: false,
+          is_pinned: cat.display_order === 0,
+          display_order: cat.display_order,
+        }));
+
+      const allNewCategories = [...expenseCategories, ...incomeCategories];
+      
+      if (allNewCategories.length === 0) return; // Rien à créer
 
       // Insérer toutes les catégories
       const { error } = await supabase
         .from("budget_categories")
-        .insert([...expenseCategories, ...incomeCategories]);
+        .insert(allNewCategories);
 
       if (error) throw error;
     },
