@@ -14,6 +14,7 @@ import { useBudgetRealtime } from "@/hooks/useBudgetRealtime";
 import { FinancialHealthScore } from "@/components/budget/FinancialHealthScore";
 import { ExpensesByCategory } from "@/components/budget/ExpensesByCategory";
 import { SmartBudgetInsights } from "@/components/budget/SmartBudgetInsights";
+import { FinancialSummaryBoxes } from "@/components/budget/FinancialSummaryBoxes";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const BudgetExpenses = () => {
@@ -212,6 +213,18 @@ const BudgetExpenses = () => {
                     transactions={transactions} 
                     categories={categories}
                   />
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Financial Summary Boxes */}
+            <div className="mb-6">
+              <Card className="border-border">
+                <CardHeader className="pb-3 border-b border-border">
+                  <CardTitle className="text-sm font-medium">Résumé financier</CardTitle>
+                </CardHeader>
+                <CardContent className="pt-4">
+                  <FinancialSummaryBoxes transactions={transactions} />
                 </CardContent>
               </Card>
             </div>
