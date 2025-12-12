@@ -71,6 +71,7 @@ export const SimpleNetWorthTracker = ({ currentNetWorth, isAuthenticated }: Simp
   const queryClient = useQueryClient();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editValue, setEditValue] = useState("");
+  const [editInterestRate, setEditInterestRate] = useState("");
   const [editDate, setEditDate] = useState<Date>(new Date());
   const [showAddAsset, setShowAddAsset] = useState(false);
   const [showAddDebt, setShowAddDebt] = useState(false);
@@ -143,9 +144,9 @@ export const SimpleNetWorthTracker = ({ currentNetWorth, isAuthenticated }: Simp
     },
   });
 
-  // Quick update debt balance with date selection
+  // Quick update debt balance and interest rate with date selection
   const updateDebt = useMutation({
-    mutationFn: async ({ id, balance, date }: { id: string; balance: number; date: Date }) => {
+    mutationFn: async ({ id, balance, interestRate, date }: { id: string; balance: number; interestRate: number; date: Date }) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Non authentifié");
 
@@ -153,7 +154,7 @@ export const SimpleNetWorthTracker = ({ currentNetWorth, isAuthenticated }: Simp
 
       const { error } = await supabase
         .from('user_debts')
-        .update({ balance, updated_at: new Date().toISOString() })
+        .update({ balance, interest_rate: interestRate, updated_at: new Date().toISOString() })
         .eq('id', id);
 
       if (error) throw error;
@@ -174,6 +175,7 @@ export const SimpleNetWorthTracker = ({ currentNetWorth, isAuthenticated }: Simp
       toast.success("Solde mis à jour");
       setEditingId(null);
       setEditValue("");
+      setEditInterestRate("");
       setEditDate(new Date());
     },
   });
@@ -536,14 +538,17 @@ export const SimpleNetWorthTracker = ({ currentNetWorth, isAuthenticated }: Simp
             {debts.map((debt: any) => {
               const Icon = ACCOUNT_ICONS[debt.type] || CreditCard;
               const isEditing = editingId === `debt-${debt.id}`;
-              const monthlyInterest = calculateMonthlyInterest(Number(debt.balance), Number(debt.interest_rate || 0));
+              // Calculate interest dynamically based on current edit values or stored values
+              const currentBalance = isEditing ? (parseFloat(editValue) || 0) : Number(debt.balance);
+              const currentRate = isEditing ? (parseFloat(editInterestRate) || 0) : Number(debt.interest_rate || 0);
+              const monthlyInterest = calculateMonthlyInterest(currentBalance, currentRate);
               
               return (
                 <div key={debt.id} className="flex items-center gap-2 p-2 rounded-lg hover:bg-muted/50 group">
                   <Icon className="w-4 h-4 text-red-600 shrink-0" />
                   <div className="flex-1 min-w-0">
                     <span className="text-sm truncate block">{debt.name}</span>
-                    {monthlyInterest > 0 && (
+                    {(monthlyInterest > 0 || isEditing) && (
                       <div className="flex items-center gap-1">
                         <AlertCircle className="w-3 h-3 text-orange-500" />
                         <span className="text-xs text-orange-500">
@@ -562,6 +567,19 @@ export const SimpleNetWorthTracker = ({ currentNetWorth, isAuthenticated }: Simp
                         allowDecimals
                         autoFocus
                       />
+                      <div className="flex items-center gap-0.5">
+                        <Input
+                          type="number"
+                          step="0.1"
+                          min="0"
+                          max="100"
+                          value={editInterestRate}
+                          onChange={(e) => setEditInterestRate(e.target.value)}
+                          className="h-7 text-sm w-16 text-center"
+                          placeholder="0"
+                        />
+                        <Percent className="w-3 h-3 text-muted-foreground" />
+                      </div>
                       <Popover>
                         <PopoverTrigger asChild>
                           <Button variant="outline" size="sm" className="h-7 px-2 text-xs">
@@ -581,7 +599,12 @@ export const SimpleNetWorthTracker = ({ currentNetWorth, isAuthenticated }: Simp
                       <Button 
                         size="sm" 
                         className="h-7 px-2"
-                        onClick={() => updateDebt.mutate({ id: debt.id, balance: parseFloat(editValue) || 0, date: editDate })}
+                        onClick={() => updateDebt.mutate({ 
+                          id: debt.id, 
+                          balance: parseFloat(editValue) || 0, 
+                          interestRate: parseFloat(editInterestRate) || 0,
+                          date: editDate 
+                        })}
                       >
                         ✓
                       </Button>
@@ -589,19 +612,32 @@ export const SimpleNetWorthTracker = ({ currentNetWorth, isAuthenticated }: Simp
                         variant="ghost" 
                         size="sm" 
                         className="h-7 px-2"
-                        onClick={() => { setEditingId(null); setEditValue(""); setEditDate(new Date()); }}
+                        onClick={() => { setEditingId(null); setEditValue(""); setEditInterestRate(""); setEditDate(new Date()); }}
                       >
                         ✕
                       </Button>
                     </div>
                   ) : (
                     <>
-                      <span 
-                        className="text-sm font-medium text-red-600 cursor-pointer hover:underline"
-                        onClick={() => { setEditingId(`debt-${debt.id}`); setEditValue(debt.balance.toString()); }}
-                      >
-                        {formatPrice(debt.balance)}
-                      </span>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span 
+                              className="text-sm font-medium text-red-600 cursor-pointer hover:underline"
+                              onClick={() => { 
+                                setEditingId(`debt-${debt.id}`); 
+                                setEditValue(debt.balance.toString()); 
+                                setEditInterestRate((debt.interest_rate || 0).toString());
+                              }}
+                            >
+                              {formatPrice(debt.balance)}
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Cliquez pour modifier le solde et le taux d'intérêt</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                       <Button 
                         variant="ghost" 
                         size="sm" 

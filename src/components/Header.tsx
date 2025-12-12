@@ -192,7 +192,7 @@ const Header = () => {
                 isActive('/impots') && "bg-muted text-foreground"
               )}
             >
-              Impôts
+              Impôt – Estimation
             </Button>
 
           </div>
