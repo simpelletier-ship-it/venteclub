@@ -157,27 +157,6 @@ const Header = () => {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {/* Business Dropdown - Secondary */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="text-muted-foreground hover:text-foreground font-semibold gap-1">
-                  <Building2 className="w-4 h-4" />
-                  Entreprises
-                  <ChevronDown className="w-4 h-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="center" className="w-56">
-                <DropdownMenuItem onClick={() => navigate("/entreprises")} className="cursor-pointer py-3">
-                  Acheter une entreprise
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate("/sell")} className="cursor-pointer py-3">
-                  Vendre mon entreprise
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate("/immeubles-commerciaux")} className="cursor-pointer py-3">
-                  Immeubles commerciaux
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
           </div>
 
           {/* Right Side Actions */}
@@ -321,27 +300,6 @@ const Header = () => {
               Retour d'impôt
             </button>
             
-            <div className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide mt-4">
-              Entreprises
-            </div>
-            <button
-              onClick={() => {
-                navigate("/entreprises");
-                setMobileMenuOpen(false);
-              }}
-              className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors"
-            >
-              Acheter une entreprise
-            </button>
-            <button
-              onClick={() => {
-                navigate("/sell");
-                setMobileMenuOpen(false);
-              }}
-              className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors"
-            >
-              Vendre mon entreprise
-            </button>
             
             {user && (
               <>
