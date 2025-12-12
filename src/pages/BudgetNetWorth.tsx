@@ -9,6 +9,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { SimpleNetWorthTracker } from "@/components/budget/SimpleNetWorthTracker";
 import { NetWorthChart } from "@/components/budget/NetWorthChart";
+import { EmergencyFundTracker } from "@/components/budget/EmergencyFundTracker";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -204,6 +205,11 @@ const BudgetNetWorth = () => {
               debtNames={debtNames}
               isAuthenticated={isAuthenticated}
             />
+          </div>
+
+          {/* Fonds d'urgence */}
+          <div className="mb-6">
+            <EmergencyFundTracker isAuthenticated={isAuthenticated} />
           </div>
 
           {/* Formulaires d'ajout rapide */}
