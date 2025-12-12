@@ -42,36 +42,15 @@ const Home = () => {
   };
 
   const features = [
-    {
-      icon: Wallet,
-      title: "Suivi des dépenses",
-      description: "Catégorisez automatiquement vos transactions et visualisez où va votre argent"
-    },
-    {
-      icon: Target,
-      title: "Objectifs financiers",
-      description: "Définissez des objectifs d'épargne et suivez votre progression en temps réel"
-    },
-    {
-      icon: TrendingUp,
-      title: "Valeur nette",
-      description: "Suivez l'évolution de votre patrimoine avec actifs et passifs"
-    },
-    {
-      icon: BarChart3,
-      title: "Analyses avancées",
-      description: "Graphiques et statistiques pour comprendre vos habitudes financières"
-    },
-    {
-      icon: Receipt,
-      title: "Dépenses récurrentes",
-      description: "Détectez et gérez vos abonnements et paiements réguliers"
-    },
-    {
-      icon: Sparkles,
-      title: "Coach IA",
-      description: "Recommandations personnalisées pour optimiser votre budget"
-    }
+    { icon: Wallet, title: "Suivi des dépenses", description: "Catégorisez automatiquement vos transactions" },
+    { icon: Target, title: "Objectifs financiers", description: "Définissez et suivez vos objectifs d'épargne" },
+    { icon: TrendingUp, title: "Prévisions trésorerie", description: "Anticipez votre solde sur 90 jours" },
+    { icon: BarChart3, title: "Âge de l'argent (YNAB)", description: "Mesurez votre santé financière" },
+    { icon: Receipt, title: "Calendrier factures", description: "Ne manquez plus aucune échéance" },
+    { icon: Sparkles, title: "Insights IA", description: "Recommandations personnalisées intelligentes" },
+    { icon: PiggyBank, title: "Épargne arrondie (Moka)", description: "Épargnez automatiquement vos arrondis" },
+    { icon: Calculator, title: "Plan remboursement dettes", description: "Stratégies avalanche et boule de neige" },
+    { icon: Target, title: "Défis d'épargne", description: "Défi 52 semaines et plus" },
   ];
 
   const tools = [
