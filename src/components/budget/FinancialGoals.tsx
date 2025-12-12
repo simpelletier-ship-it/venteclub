@@ -436,21 +436,42 @@ export const FinancialGoals = ({ isAuthenticated }: { isAuthenticated: boolean }
             <p className="text-sm text-muted-foreground mb-6">Commencez par définir vos objectifs financiers!</p>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-2xl mx-auto text-left">
-              <div className="p-4 bg-muted/30 rounded-lg border border-border">
+              <button 
+                onClick={() => {
+                  setType('vacation');
+                  setName('Voyage');
+                  setDialogOpen(true);
+                }}
+                className="p-4 bg-muted/30 rounded-lg border border-border hover:border-primary hover:bg-primary/5 transition-all cursor-pointer text-left"
+              >
                 <div className="text-2xl mb-2">✈️</div>
                 <div className="font-semibold mb-1">Voyage</div>
                 <div className="text-xs text-muted-foreground">Économisez pour vos prochaines vacances de rêve</div>
-              </div>
-              <div className="p-4 bg-muted/30 rounded-lg border border-border">
+              </button>
+              <button 
+                onClick={() => {
+                  setType('house_downpayment');
+                  setName('Mise de fond maison');
+                  setDialogOpen(true);
+                }}
+                className="p-4 bg-muted/30 rounded-lg border border-border hover:border-primary hover:bg-primary/5 transition-all cursor-pointer text-left"
+              >
                 <div className="text-2xl mb-2">🏠</div>
                 <div className="font-semibold mb-1">Mise de fond</div>
                 <div className="text-xs text-muted-foreground">Accumulez votre mise de fond pour votre première maison</div>
-              </div>
-              <div className="p-4 bg-muted/30 rounded-lg border border-border">
+              </button>
+              <button 
+                onClick={() => {
+                  setType('car');
+                  setName('Voiture');
+                  setDialogOpen(true);
+                }}
+                className="p-4 bg-muted/30 rounded-lg border border-border hover:border-primary hover:bg-primary/5 transition-all cursor-pointer text-left"
+              >
                 <div className="text-2xl mb-2">🚗</div>
                 <div className="font-semibold mb-1">Voiture</div>
                 <div className="text-xs text-muted-foreground">Préparez l'achat de votre prochaine voiture</div>
-              </div>
+              </button>
             </div>
           </CardContent>
         </Card>
