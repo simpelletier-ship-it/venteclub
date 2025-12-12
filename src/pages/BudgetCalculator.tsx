@@ -203,64 +203,90 @@ const BudgetCalculator = () => {
               </div>
             )}
 
-            {/* KPI Cards - Banking Style */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-              <Card className="border-border">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Revenus</span>
-                    <TrendingUp className="h-4 w-4 text-success" />
-                  </div>
-                  <p className="text-xl font-semibold text-foreground">{formatPrice(monthlyIncome)}</p>
-                </CardContent>
-              </Card>
-
-              <Card className="border-border">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Dépenses</span>
-                    <TrendingDown className="h-4 w-4 text-destructive" />
-                  </div>
-                  <p className="text-xl font-semibold text-foreground">{formatPrice(monthlyExpenses)}</p>
-                  {expenseChange !== 0 && (
-                    <div className={cn(
-                      "flex items-center gap-1 mt-1 text-xs",
-                      expenseChange > 0 ? "text-destructive" : "text-success"
-                    )}>
-                      {expenseChange > 0 ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
-                      <span>{Math.abs(expenseChange).toFixed(0)}% vs mois dernier</span>
+            {/* KPI Cards - Premium Banking Style */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+              {/* Revenus */}
+              <Card className="border-0 shadow-md hover:shadow-lg transition-all duration-300 bg-card min-h-[130px]">
+                <CardContent className="p-5">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-widest">Revenus</span>
+                      <p className="text-2xl lg:text-3xl font-bold text-foreground mt-2 tracking-tight">{formatPrice(monthlyIncome)}</p>
                     </div>
-                  )}
+                    <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center">
+                      <TrendingUp className="h-5 w-5 text-primary" />
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
 
-              <Card className="border-border">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Solde</span>
-                    <Wallet className="h-4 w-4 text-primary" />
+              {/* Dépenses */}
+              <Card className="border-0 shadow-md hover:shadow-lg transition-all duration-300 bg-card min-h-[130px]">
+                <CardContent className="p-5">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-widest">Dépenses</span>
+                      <p className="text-2xl lg:text-3xl font-bold text-foreground mt-2 tracking-tight">{formatPrice(monthlyExpenses)}</p>
+                      {expenseChange !== 0 && (
+                        <div className={cn(
+                          "flex items-center gap-1.5 mt-2 text-xs font-medium",
+                          expenseChange > 0 ? "text-amber-600 dark:text-amber-400" : "text-primary"
+                        )}>
+                          {expenseChange > 0 ? <ArrowUpRight className="h-3.5 w-3.5" /> : <ArrowDownRight className="h-3.5 w-3.5" />}
+                          <span>{Math.abs(expenseChange).toFixed(0)}%</span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="w-11 h-11 rounded-xl bg-slate-500/10 flex items-center justify-center">
+                      <TrendingDown className="h-5 w-5 text-slate-500" />
+                    </div>
                   </div>
-                  <p className={cn(
-                    "text-xl font-semibold",
-                    monthlyBalance >= 0 ? "text-success" : "text-destructive"
-                  )}>
-                    {monthlyBalance >= 0 ? '+' : ''}{formatPrice(monthlyBalance)}
-                  </p>
                 </CardContent>
               </Card>
 
-              <Card className="border-border cursor-pointer hover:border-primary/20 transition-colors" onClick={() => navigate('/budget/valeur-nette')}>
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Patrimoine</span>
-                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
+              {/* Solde */}
+              <Card className="border-0 shadow-md hover:shadow-lg transition-all duration-300 bg-card min-h-[130px]">
+                <CardContent className="p-5">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-widest">Solde</span>
+                      <p className={cn(
+                        "text-2xl lg:text-3xl font-bold mt-2 tracking-tight",
+                        monthlyBalance >= 0 ? "text-primary" : "text-amber-600 dark:text-amber-400"
+                      )}>
+                        {monthlyBalance >= 0 ? '+' : ''}{formatPrice(monthlyBalance)}
+                      </p>
+                    </div>
+                    <div className={cn(
+                      "w-11 h-11 rounded-xl flex items-center justify-center",
+                      monthlyBalance >= 0 ? "bg-primary/10" : "bg-amber-500/10"
+                    )}>
+                      <Wallet className={cn("h-5 w-5", monthlyBalance >= 0 ? "text-primary" : "text-amber-500")} />
+                    </div>
                   </div>
-                  <p className={cn(
-                    "text-xl font-semibold",
-                    netWorth >= 0 ? "text-foreground" : "text-destructive"
-                  )}>
-                    {formatPrice(netWorth)}
-                  </p>
+                </CardContent>
+              </Card>
+
+              {/* Patrimoine */}
+              <Card 
+                className="border-0 shadow-md hover:shadow-lg transition-all duration-300 bg-card min-h-[130px] cursor-pointer group" 
+                onClick={() => navigate('/budget/valeur-nette')}
+              >
+                <CardContent className="p-5">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-widest">Patrimoine</span>
+                      <p className={cn(
+                        "text-2xl lg:text-3xl font-bold mt-2 tracking-tight",
+                        netWorth >= 0 ? "text-foreground" : "text-amber-600 dark:text-amber-400"
+                      )}>
+                        {formatPrice(netWorth)}
+                      </p>
+                    </div>
+                    <div className="w-11 h-11 rounded-xl bg-violet-500/10 flex items-center justify-center group-hover:bg-violet-500/20 transition-colors">
+                      <ChevronRight className="h-5 w-5 text-violet-500" />
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             </div>

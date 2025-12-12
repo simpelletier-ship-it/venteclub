@@ -109,19 +109,24 @@ const SortableCategoryItem = ({
         onClick={onSelect}
         disabled={isEditMode}
         className={cn(
-          "w-full flex flex-col items-center gap-1.5 p-3 rounded-md transition-all border",
+          "w-full flex flex-col items-center gap-2 p-3.5 rounded-xl transition-all duration-200 border-2",
           isSelected
-            ? "bg-primary/10 border-primary ring-1 ring-primary"
-            : "bg-muted/50 border-border hover:border-muted-foreground/30 hover:bg-muted",
+            ? "bg-primary/10 border-primary ring-2 ring-primary/20 ring-offset-2 ring-offset-background shadow-md"
+            : "bg-muted/30 border-transparent hover:border-muted-foreground/20 hover:bg-muted/50 hover:shadow-sm",
           isEditMode && "pointer-events-none"
         )}
       >
-        <div className="w-8 h-8 rounded-md flex items-center justify-center" style={{ backgroundColor: `${category.color}15` }}>
+        <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${category.color}15` }}>
           <CategoryIcon icon={category.icon} color={category.color} size="lg" />
         </div>
-        <span className="text-[10px] font-medium text-center line-clamp-1 text-muted-foreground">
+        <span className="text-[11px] font-semibold text-center line-clamp-1 text-muted-foreground">
           {category.name}
         </span>
+        {isSelected && (
+          <div className="absolute -top-1 -right-1 w-5 h-5 bg-primary rounded-full flex items-center justify-center shadow-md">
+            <Check className="h-3 w-3 text-primary-foreground" />
+          </div>
+        )}
       </button>
     </div>
   );
@@ -247,21 +252,22 @@ export const QuickExpenseTracker = ({ isAuthenticated }: QuickExpenseTrackerProp
   };
 
   return (
-    <div className="bg-card border border-border rounded-md overflow-hidden">
-      {/* Header */}
-      <div className="bg-muted/50 px-6 py-4 border-b border-border">
-        <h2 className="text-base font-semibold text-foreground">Nouvelle transaction</h2>
+    <div className="bg-card border-0 shadow-lg rounded-2xl overflow-hidden">
+      {/* Premium Header */}
+      <div className="bg-gradient-to-r from-muted/80 to-muted/40 px-6 py-5 border-b border-border/50">
+        <h2 className="text-lg font-semibold text-foreground tracking-tight">Nouvelle transaction</h2>
+        <p className="text-xs text-muted-foreground mt-0.5">Ajoutez vos revenus et dépenses</p>
       </div>
 
-      <div className="p-6">
-        {/* Type Toggle */}
-        <div className="flex gap-2 p-1 bg-muted rounded-md mb-6">
+      <div className="p-6 lg:p-8">
+        {/* Type Toggle - Revolut Pill Style */}
+        <div className="flex p-1.5 bg-muted/60 rounded-xl mb-8 max-w-md mx-auto">
           <button
             onClick={() => { setTransactionType('expense'); setSelectedCategoryId(''); }}
             className={cn(
-              "flex-1 flex items-center justify-center gap-2 py-3 rounded-md font-medium text-sm transition-all",
+              "flex-1 flex items-center justify-center gap-2.5 py-3.5 rounded-lg font-semibold text-sm transition-all duration-300",
               transactionType === 'expense' 
-                ? "bg-destructive text-destructive-foreground" 
+                ? "bg-slate-600 text-white shadow-md" 
                 : "text-muted-foreground hover:text-foreground"
             )}
           >
@@ -271,9 +277,9 @@ export const QuickExpenseTracker = ({ isAuthenticated }: QuickExpenseTrackerProp
           <button
             onClick={() => { setTransactionType('income'); setSelectedCategoryId(''); }}
             className={cn(
-              "flex-1 flex items-center justify-center gap-2 py-3 rounded-md font-medium text-sm transition-all",
+              "flex-1 flex items-center justify-center gap-2.5 py-3.5 rounded-lg font-semibold text-sm transition-all duration-300",
               transactionType === 'income' 
-                ? "bg-success text-success-foreground" 
+                ? "bg-primary text-primary-foreground shadow-md" 
                 : "text-muted-foreground hover:text-foreground"
             )}
           >
@@ -282,46 +288,55 @@ export const QuickExpenseTracker = ({ isAuthenticated }: QuickExpenseTrackerProp
           </button>
         </div>
 
-        <div className="text-center mb-6">
-          <CurrencyInput
-            value={amount}
-            onChange={setAmount}
-            allowDecimals={true}
-            placeholder="0,00"
-            className="text-4xl lg:text-5xl font-semibold h-16 text-center border-0 bg-transparent focus:ring-0 focus-visible:ring-0 placeholder:text-muted-foreground/30 text-foreground"
-          />
+        {/* Amount Input - XXL Premium */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-baseline justify-center gap-1">
+            <span className="text-3xl lg:text-4xl font-light text-muted-foreground/50">$</span>
+            <CurrencyInput
+              value={amount}
+              onChange={setAmount}
+              allowDecimals={true}
+              placeholder="0,00"
+              className="text-5xl lg:text-6xl font-bold h-20 text-center border-0 bg-transparent focus:ring-0 focus-visible:ring-0 placeholder:text-muted-foreground/20 text-foreground w-auto min-w-[180px] max-w-[320px] tracking-tight"
+            />
+          </div>
         </div>
 
-        <div className="flex justify-center mb-6">
+        {/* Date Picker - Premium Style */}
+        <div className="flex justify-center mb-8">
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="outline" className="rounded-md px-4 h-9">
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {format(selectedDate, "d MMMM yyyy", { locale: fr })}
+              <Button 
+                variant="outline" 
+                className="rounded-xl px-5 h-11 border-border/60 hover:border-primary/40 hover:bg-muted/50 transition-all shadow-sm"
+              >
+                <CalendarIcon className="mr-2.5 h-4 w-4 text-muted-foreground" />
+                <span className="font-medium">{format(selectedDate, "d MMMM yyyy", { locale: fr })}</span>
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="center">
+            <PopoverContent className="w-auto p-0 rounded-xl shadow-xl border-border/50" align="center">
               <Calendar 
                 mode="single" 
                 selected={selectedDate} 
                 onSelect={(date) => date && setSelectedDate(date)} 
                 initialFocus 
+                className="rounded-xl"
               />
             </PopoverContent>
           </Popover>
         </div>
 
-        {/* Categories */}
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-3">
-            <Label className="text-sm font-medium text-muted-foreground">Catégorie</Label>
+        {/* Categories - Premium Grid */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <Label className="text-sm font-semibold text-foreground">Catégorie</Label>
             <div className="flex gap-2">
               <Button
                 variant={isEditMode ? "default" : "ghost"}
                 size="sm"
                 className={cn(
-                  "h-7 text-xs",
-                  isEditMode ? "bg-primary hover:bg-primary-light" : "text-muted-foreground hover:text-foreground"
+                  "h-8 text-xs rounded-lg",
+                  isEditMode ? "bg-primary hover:bg-primary/90" : "text-muted-foreground hover:text-foreground"
                 )}
                 onClick={() => setIsEditMode(!isEditMode)}
               >
@@ -329,12 +344,12 @@ export const QuickExpenseTracker = ({ isAuthenticated }: QuickExpenseTrackerProp
               </Button>
               <Dialog open={showCategoryManager} onOpenChange={setShowCategoryManager}>
                 <DialogTrigger asChild>
-                  <Button variant="ghost" size="sm" className="h-7 text-xs text-muted-foreground hover:text-foreground">
-                    <Settings className="h-3 w-3 mr-1" />
+                  <Button variant="ghost" size="sm" className="h-8 text-xs text-muted-foreground hover:text-foreground rounded-lg">
+                    <Settings className="h-3.5 w-3.5 mr-1.5" />
                     Gérer
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+                <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto rounded-2xl">
                   <DialogHeader>
                     <DialogTitle>Gérer les catégories</DialogTitle>
                     <DialogDescription>Organisez vos catégories de transactions</DialogDescription>
@@ -347,7 +362,7 @@ export const QuickExpenseTracker = ({ isAuthenticated }: QuickExpenseTrackerProp
 
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
             <SortableContext items={filteredCategories.map(c => c.id)} strategy={rectSortingStrategy}>
-              <div className="grid grid-cols-4 sm:grid-cols-5 lg:grid-cols-6 gap-2">
+              <div className="grid grid-cols-4 sm:grid-cols-5 lg:grid-cols-6 gap-3">
                 {filteredCategories.slice(0, 12).map((category) => (
                   <SortableCategoryItem
                     key={category.id}
@@ -363,13 +378,14 @@ export const QuickExpenseTracker = ({ isAuthenticated }: QuickExpenseTrackerProp
           </DndContext>
           
           {isEditMode && (
-            <p className="text-xs text-muted-foreground text-center mt-3">
+            <p className="text-xs text-muted-foreground text-center mt-4">
               Glissez pour réorganiser • Cliquez sur X pour masquer
             </p>
           )}
         </div>
 
-        <div className="mb-6">
+        {/* Description Input - Premium Style */}
+        <div className="mb-8">
           <Input
             value={description}
             onChange={(e) => {
@@ -378,29 +394,32 @@ export const QuickExpenseTracker = ({ isAuthenticated }: QuickExpenseTrackerProp
               if (suggestedId && !selectedCategoryId) setSelectedCategoryId(suggestedId);
             }}
             placeholder="Description (optionnel)"
-            className="h-11 rounded-md"
+            className="h-12 rounded-xl border-border/60 focus:border-primary/40 shadow-sm"
           />
         </div>
 
-        <Button
-          onClick={handleSubmit}
-          disabled={addMutation.isPending || !amount || amount === '0' || !selectedCategoryId}
-          className={cn(
-            "w-full h-12 text-sm font-medium rounded-md transition-all",
-            transactionType === 'expense' 
-              ? "bg-destructive hover:bg-destructive/90 text-destructive-foreground" 
-              : "bg-success hover:bg-success/90 text-success-foreground"
-          )}
-        >
-          {addMutation.isPending ? (
-            <div className="h-4 w-4 border-2 border-current/30 border-t-current rounded-full animate-spin" />
-          ) : (
-            <>
-              <Check className="h-4 w-4 mr-2" />
-              {transactionType === 'expense' ? 'Ajouter la dépense' : 'Ajouter le revenu'}
-            </>
-          )}
-        </Button>
+        {/* Submit Button - Premium CTA */}
+        <div className="flex justify-center">
+          <Button
+            onClick={handleSubmit}
+            disabled={addMutation.isPending || !amount || amount === '0' || !selectedCategoryId}
+            className={cn(
+              "h-14 px-12 text-base font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl",
+              transactionType === 'expense' 
+                ? "bg-slate-700 hover:bg-slate-600 text-white" 
+                : "bg-primary hover:bg-primary/90 text-primary-foreground"
+            )}
+          >
+            {addMutation.isPending ? (
+              <div className="h-5 w-5 border-2 border-current/30 border-t-current rounded-full animate-spin" />
+            ) : (
+              <>
+                <Check className="h-5 w-5 mr-2.5" />
+                {transactionType === 'expense' ? 'Ajouter la dépense' : 'Ajouter le revenu'}
+              </>
+            )}
+          </Button>
+        </div>
       </div>
     </div>
   );
