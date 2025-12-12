@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Plus, Trash2, PencilLine, ChevronDown, ChevronUp } from "lucide-react";
+import { CategoryIcon } from "@/components/budget/CategoryIcon";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -168,7 +169,7 @@ export const BudgetPlanner = ({ isAuthenticated }: { isAuthenticated: boolean })
         key={category.id} 
         className="flex items-center gap-4 py-3 px-4 rounded-xl hover:bg-muted/50 transition-colors group"
       >
-        <span className="text-xl">{category.icon}</span>
+        <CategoryIcon icon={category.icon} color={category.color} size="lg" />
         <div className="flex-1 min-w-0">
           <p className="font-medium text-sm truncate">{category.name}</p>
           {hasBudget && (
@@ -227,7 +228,7 @@ export const BudgetPlanner = ({ isAuthenticated }: { isAuthenticated: boolean })
             <DialogContent className="max-w-sm">
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-2">
-                  <span>{category.icon}</span>
+                  <CategoryIcon icon={category.icon} color={category.color} size="md" />
                   {category.name}
                 </DialogTitle>
                 <DialogDescription>Définir un budget mensuel</DialogDescription>
