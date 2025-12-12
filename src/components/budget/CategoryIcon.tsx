@@ -9,6 +9,54 @@ import {
   type LucideIcon
 } from "lucide-react";
 
+// Mapping emoji → Lucide icon key
+const EMOJI_TO_LUCIDE: Record<string, string> = {
+  '🍔': 'utensils', '🍽️': 'utensils-crossed', '🥗': 'utensils', '🍕': 'pizza',
+  '🚗': 'car', '🚙': 'car', '🚕': 'car', '⛽': 'fuel',
+  '🏠': 'home', '🏡': 'home', '🏢': 'building', '🏦': 'landmark',
+  '💊': 'pill', '💉': 'stethoscope', '🏥': 'heart-pulse', '❤️': 'heart',
+  '👕': 'shirt', '👗': 'shirt', '👔': 'shirt', '✂️': 'scissors',
+  '📚': 'graduation-cap', '🎓': 'graduation-cap', '📖': 'book',
+  '✈️': 'plane', '🛫': 'plane', '🧳': 'plane',
+  '🎬': 'film', '🎥': 'film', '🎮': 'gamepad-2', '🎵': 'music',
+  '☕': 'coffee', '🍺': 'beer', '🍻': 'beer',
+  '💡': 'lightbulb', '🔌': 'zap', '⚡': 'zap',
+  '🛡️': 'shield', '🔒': 'shield', '🔐': 'shield',
+  '📱': 'smartphone', '💻': 'smartphone', '📲': 'smartphone',
+  '📶': 'wifi', '🌐': 'wifi',
+  '📺': 'tv', '🎧': 'music',
+  '🏋️': 'dumbbell', '💪': 'dumbbell', '🏃': 'dumbbell',
+  '🎁': 'gift', '🎀': 'gift',
+  '🐕': 'paw-print', '🐈': 'paw-print', '🐾': 'paw-print',
+  '✨': 'sparkles', '💅': 'sparkles',
+  '💳': 'credit-card', '💵': 'banknote', '💰': 'banknote', '🪙': 'coins',
+  '📦': 'box', '🛒': 'shopping-cart', '🛍️': 'shopping-cart',
+  '💼': 'briefcase', '👨‍💼': 'briefcase',
+  '📈': 'trending-up', '📊': 'trending-up', '💹': 'coins',
+  '🔄': 'undo', '↩️': 'undo',
+  '🎉': 'party-popper', '🥳': 'party-popper',
+  '👶': 'baby', '🍼': 'baby',
+  '🔧': 'wrench', '🛠️': 'wrench',
+  '🚌': 'bus', '🚆': 'train', '🚲': 'bike',
+  '🍎': 'apple',
+  '📄': 'file-text', '📝': 'file-text',
+  '👥': 'users', '👨‍👩‍👧': 'users',
+  '💲': 'banknote', '🏧': 'landmark',
+  '%': 'percent', '📉': 'trending-up',
+  '🧮': 'calculator',
+  '💸': 'banknote', '🤑': 'banknote',
+  '🏬': 'building-2', '🏗️': 'building-2',
+  '💝': 'heart', '🩺': 'stethoscope',
+  '🎈': 'party-popper', '🎊': 'party-popper',
+  '🥤': 'coffee', '🍩': 'utensils',
+  '🧴': 'sparkles', '💆': 'sparkles',
+  '🐶': 'paw-print', '🐱': 'paw-print',
+  '🚴': 'bike', '🏊': 'dumbbell',
+  '📻': 'music', '🎤': 'music',
+  '🎰': 'coins', '🎲': 'gamepad-2',
+  '🧾': 'receipt'
+};
+
 const ICON_MAP: Record<string, LucideIcon> = {
   // Expense categories
   'utensils': Utensils,
@@ -96,7 +144,21 @@ export function CategoryIcon({ icon, color, className = '', size = 'md' }: Categ
     );
   }
 
-  // Default fallback - use Circle icon instead of emoji
+  // If it's an emoji, convert to Lucide icon
+  if (icon && EMOJI_TO_LUCIDE[icon]) {
+    const lucideKey = EMOJI_TO_LUCIDE[icon];
+    const IconComponent = ICON_MAP[lucideKey];
+    if (IconComponent) {
+      return (
+        <IconComponent 
+          className={`${sizeClasses[size]} ${className}`} 
+          style={color ? { color } : undefined}
+        />
+      );
+    }
+  }
+
+  // Default fallback - use Circle icon
   return <Circle className={`${sizeClasses[size]} ${className} text-muted-foreground`} />;
 }
 
