@@ -1,14 +1,12 @@
-import { lazy, Suspense, useEffect } from "react";
+import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { Layout } from "@/components/Layout";
 import { EmailVerificationGuard } from "@/components/EmailVerificationGuard";
-import { trackPageView } from "@/lib/analytics";
-import { useWebVitals } from "@/hooks/usePerformanceMonitoring";
 import { MobileNotificationsContainer } from "@/components/MobileNotificationsContainer";
 import { ThemeProvider } from "next-themes";
 
@@ -55,18 +53,6 @@ const queryClient = new QueryClient({
   },
 });
 
-const AnalyticsTracker = () => {
-  const location = useLocation();
-
-  useEffect(() => {
-    trackPageView(location.pathname + location.search);
-  }, [location]);
-
-  useWebVitals();
-
-  return null;
-};
-
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
@@ -76,7 +62,6 @@ const App = () => (
           <Sonner />
           <MobileNotificationsContainer />
           <BrowserRouter>
-            <AnalyticsTracker />
             <Layout>
               <Suspense fallback={<div className="flex items-center justify-center min-h-screen bg-slate-950"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div></div>}>
               <Routes>

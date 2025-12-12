@@ -1,22 +1,20 @@
-# Vente.club - Robots.txt
+# Budget.club - Robots.txt
 User-agent: *
 Allow: /
 Disallow: /admin
 Disallow: /settings
-Disallow: /dashboard/
-Disallow: /messages
 Disallow: /auth
 
 # High-value pages
-Allow: /marche
+Allow: /budget
+Allow: /budget/*
+Allow: /outils
+Allow: /outils/*
 Allow: /ressources
 Allow: /faq
 Allow: /blog
-Allow: /businesses
-Allow: /city/*
-Allow: /outils/*
 
-# Sitemap location - UPDATED FOR LOVABLE CLOUD
+# Sitemap location
 Sitemap: https://vente.club/sitemap.xml
 
 # Specific bot rules
