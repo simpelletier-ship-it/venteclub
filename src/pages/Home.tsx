@@ -16,7 +16,13 @@ import {
   Lock,
   Smartphone,
   LineChart,
-  Users
+  Users,
+  CreditCard,
+  Home as HomeIcon,
+  ShoppingCart,
+  Car,
+  Utensils,
+  Zap
 } from "lucide-react";
 import { SEO } from "@/components/SEO";
 import { useAuth } from "@/contexts/AuthContext";
@@ -120,24 +126,220 @@ const Home = () => {
     }
   ];
 
+  // Mockup 1: Dépenses par catégorie (Pie chart simulé)
+  const MockupDepenses = () => (
+    <div className="bg-card rounded-2xl shadow-2xl p-6 border border-border">
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <p className="text-xs text-muted-foreground uppercase tracking-wider">Ce mois</p>
+          <h3 className="text-xl font-bold text-foreground">Dépenses</h3>
+        </div>
+        <span className="text-2xl font-bold text-foreground">2 847 $</span>
+      </div>
+      
+      {/* Simulated pie chart */}
+      <div className="flex items-center gap-6 mb-6">
+        <div className="relative w-32 h-32">
+          <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 36 36">
+            <circle cx="18" cy="18" r="15" fill="none" stroke="hsl(var(--muted))" strokeWidth="3"/>
+            <circle cx="18" cy="18" r="15" fill="none" stroke="hsl(var(--primary))" strokeWidth="3" 
+              strokeDasharray="35 65" strokeLinecap="round"/>
+            <circle cx="18" cy="18" r="15" fill="none" stroke="hsl(var(--warning))" strokeWidth="3" 
+              strokeDasharray="25 75" strokeDashoffset="-35" strokeLinecap="round"/>
+            <circle cx="18" cy="18" r="15" fill="none" stroke="hsl(var(--chart-5))" strokeWidth="3" 
+              strokeDasharray="20 80" strokeDashoffset="-60" strokeLinecap="round"/>
+            <circle cx="18" cy="18" r="15" fill="none" stroke="hsl(var(--destructive))" strokeWidth="3" 
+              strokeDasharray="12 88" strokeDashoffset="-80" strokeLinecap="round"/>
+          </svg>
+        </div>
+        <div className="flex-1 space-y-2">
+          <div className="flex items-center gap-2">
+            <HomeIcon className="w-4 h-4 text-primary" />
+            <span className="text-sm text-foreground flex-1">Logement</span>
+            <span className="text-sm font-medium text-foreground">1 200 $</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Utensils className="w-4 h-4 text-warning" />
+            <span className="text-sm text-foreground flex-1">Alimentation</span>
+            <span className="text-sm font-medium text-foreground">650 $</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Car className="w-4 h-4 text-chart-5" />
+            <span className="text-sm text-foreground flex-1">Transport</span>
+            <span className="text-sm font-medium text-foreground">425 $</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <ShoppingCart className="w-4 h-4 text-destructive" />
+            <span className="text-sm text-foreground flex-1">Achats</span>
+            <span className="text-sm font-medium text-foreground">320 $</span>
+          </div>
+        </div>
+      </div>
+      
+      <div className="bg-accent/50 rounded-lg p-3">
+        <div className="flex items-center gap-2">
+          <TrendingUp className="w-4 h-4 text-primary" />
+          <span className="text-sm text-foreground">12% de moins que le mois dernier</span>
+        </div>
+      </div>
+    </div>
+  );
+
+  // Mockup 2: Objectifs d'épargne
+  const MockupObjectifs = () => (
+    <div className="bg-card rounded-2xl shadow-2xl p-6 border border-border">
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-xl font-bold text-foreground">Mes objectifs</h3>
+        <span className="text-sm text-primary font-medium">3 actifs</span>
+      </div>
+      
+      <div className="space-y-4">
+        {/* Objectif 1 */}
+        <div className="bg-muted/50 rounded-xl p-4">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+              <span className="text-lg">✈️</span>
+            </div>
+            <div className="flex-1">
+              <p className="font-semibold text-foreground">Voyage Europe</p>
+              <p className="text-xs text-muted-foreground">Objectif: 5 000 $</p>
+            </div>
+            <span className="text-lg font-bold text-primary">68%</span>
+          </div>
+          <div className="w-full bg-muted rounded-full h-2">
+            <div className="bg-primary rounded-full h-2" style={{ width: '68%' }}></div>
+          </div>
+          <p className="text-xs text-muted-foreground mt-2">3 400 $ / 5 000 $ • 1 600 $ restant</p>
+        </div>
+        
+        {/* Objectif 2 */}
+        <div className="bg-muted/50 rounded-xl p-4">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-10 h-10 rounded-full bg-warning/20 flex items-center justify-center">
+              <span className="text-lg">🏠</span>
+            </div>
+            <div className="flex-1">
+              <p className="font-semibold text-foreground">Mise de fond</p>
+              <p className="text-xs text-muted-foreground">Objectif: 40 000 $</p>
+            </div>
+            <span className="text-lg font-bold text-warning">45%</span>
+          </div>
+          <div className="w-full bg-muted rounded-full h-2">
+            <div className="bg-warning rounded-full h-2" style={{ width: '45%' }}></div>
+          </div>
+          <p className="text-xs text-muted-foreground mt-2">18 000 $ / 40 000 $ • Encore 22 mois</p>
+        </div>
+        
+        {/* Objectif 3 */}
+        <div className="bg-muted/50 rounded-xl p-4">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-10 h-10 rounded-full bg-chart-5/20 flex items-center justify-center">
+              <span className="text-lg">🚗</span>
+            </div>
+            <div className="flex-1">
+              <p className="font-semibold text-foreground">Nouvelle auto</p>
+              <p className="text-xs text-muted-foreground">Objectif: 15 000 $</p>
+            </div>
+            <span className="text-lg font-bold text-chart-5">25%</span>
+          </div>
+          <div className="w-full bg-muted rounded-full h-2">
+            <div className="bg-chart-5 rounded-full h-2" style={{ width: '25%' }}></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  // Mockup 3: Évolution patrimoine net
+  const MockupPatrimoine = () => (
+    <div className="bg-card rounded-2xl shadow-2xl p-6 border border-border">
+      <div className="flex items-center justify-between mb-2">
+        <div>
+          <p className="text-xs text-muted-foreground uppercase tracking-wider">Patrimoine net</p>
+          <h3 className="text-3xl font-bold text-foreground">87 450 $</h3>
+        </div>
+        <div className="text-right">
+          <span className="inline-flex items-center gap-1 text-sm font-medium text-primary bg-primary/10 px-2 py-1 rounded-full">
+            <TrendingUp className="w-3 h-3" />
+            +12.4%
+          </span>
+          <p className="text-xs text-muted-foreground mt-1">vs année dernière</p>
+        </div>
+      </div>
+      
+      {/* Simulated line chart */}
+      <div className="h-32 mt-4 mb-4 relative">
+        <svg className="w-full h-full" viewBox="0 0 300 80" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.3"/>
+              <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0"/>
+            </linearGradient>
+          </defs>
+          <path
+            d="M0,60 Q30,55 60,50 T120,45 T180,35 T240,25 T300,15 V80 H0 Z"
+            fill="url(#chartGradient)"
+          />
+          <path
+            d="M0,60 Q30,55 60,50 T120,45 T180,35 T240,25 T300,15"
+            fill="none"
+            stroke="hsl(var(--primary))"
+            strokeWidth="2"
+          />
+          <circle cx="300" cy="15" r="4" fill="hsl(var(--primary))"/>
+        </svg>
+        <div className="absolute bottom-0 left-0 right-0 flex justify-between text-xs text-muted-foreground">
+          <span>Jan</span>
+          <span>Avr</span>
+          <span>Juil</span>
+          <span>Oct</span>
+          <span>Déc</span>
+        </div>
+      </div>
+      
+      {/* Assets/Debts summary */}
+      <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border">
+        <div>
+          <p className="text-xs text-muted-foreground mb-1">Actifs</p>
+          <p className="text-lg font-bold text-primary">142 800 $</p>
+          <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
+            <CreditCard className="w-3 h-3" />
+            <span>CELI, REER, Maison</span>
+          </div>
+        </div>
+        <div>
+          <p className="text-xs text-muted-foreground mb-1">Passifs</p>
+          <p className="text-lg font-bold text-destructive">55 350 $</p>
+          <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
+            <HomeIcon className="w-3 h-3" />
+            <span>Hypothèque, Prêt auto</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   const features = [
     {
       title: "Suivez vos dépenses en un coup d'œil",
       description: "Catégorisez automatiquement vos transactions et visualisez où va votre argent avec des graphiques interactifs clairs et détaillés.",
       icon: Wallet,
-      features: ["Catégories personnalisables", "Graphiques interactifs", "Historique complet"]
+      features: ["Catégories personnalisables", "Graphiques interactifs", "Historique complet"],
+      mockup: MockupDepenses
     },
     {
       title: "Atteignez vos objectifs d'épargne",
       description: "Définissez des objectifs financiers (voyage, mise de fond, fonds d'urgence) et suivez votre progression avec des indicateurs visuels motivants.",
       icon: Target,
-      features: ["Objectifs personnalisés", "Suivi de progression", "Recommandations"]
+      features: ["Objectifs personnalisés", "Suivi de progression", "Recommandations intelligentes"],
+      mockup: MockupObjectifs
     },
     {
-      title: "Anticipez votre avenir financier",
-      description: "Visualisez l'évolution de votre patrimoine net et prévoyez votre flux de trésorerie sur les 90 prochains jours.",
+      title: "Suivez votre patrimoine net",
+      description: "Visualisez l'évolution de votre richesse totale incluant vos actifs (CELI, REER, propriété) et vos passifs (hypothèque, dettes).",
       icon: LineChart,
-      features: ["Prévisions 90 jours", "Évolution patrimoine", "Alertes intelligentes"]
+      features: ["Évolution historique", "Actifs vs Passifs", "Prévisions financières"],
+      mockup: MockupPatrimoine
     }
   ];
 
@@ -145,8 +347,8 @@ const Home = () => {
     <>
       <SEO 
         title="Planificateur Budgétaire Gratuit Québec | Calculateur Salaire Net 2025" 
-        description="Le planificateur budgétaire gratuit pour le Québec. Suivez vos dépenses, calculez votre salaire net après impôts, estimez votre retour d'impôt 2025 et atteignez vos objectifs financiers."
-        keywords="budget personnel Québec, planificateur budget gratuit, calculateur salaire net Québec, retour impôt 2025, gestion finances personnelles, économiser argent"
+        description="Le planificateur budgétaire gratuit #1 au Québec. Suivez vos dépenses, calculez votre salaire net après impôts, estimez votre retour d'impôt 2025 et atteignez vos objectifs financiers."
+        keywords="budget personnel Québec, planificateur budget gratuit, calculateur salaire net Québec 2025, retour impôt Québec, gestion finances personnelles, économiser argent, suivi dépenses"
         canonical="/" 
         structuredData={[structuredData, faqStructuredData]} 
       />
@@ -255,28 +457,37 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Features Section - Zigzag style Mint */}
+      {/* Features Section - Zigzag avec mockups uniques */}
       <section id="features" className="py-20 bg-background">
         <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-4">
+              Tout ce dont vous avez besoin
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Des outils puissants et intuitifs pour reprendre le contrôle de vos finances personnelles
+            </p>
+          </div>
+          
           {features.map((feature, index) => (
             <div 
               key={feature.title}
               className={`flex flex-col ${
                 index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'
-              } items-center gap-12 lg:gap-20 mb-20 last:mb-0`}
+              } items-center gap-12 lg:gap-20 mb-24 last:mb-0`}
             >
               {/* Contenu texte */}
               <div className="flex-1 text-center lg:text-left">
                 <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-6 mx-auto lg:mx-0">
                   <feature.icon className="w-7 h-7 text-primary" />
                 </div>
-                <h2 className="text-2xl lg:text-3xl font-bold text-foreground mb-4">
+                <h3 className="text-2xl lg:text-3xl font-bold text-foreground mb-4">
                   {feature.title}
-                </h2>
+                </h3>
                 <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
                   {feature.description}
                 </p>
-                <ul className="space-y-3">
+                <ul className="space-y-3 mb-6">
                   {feature.features.map((item) => (
                     <li key={item} className="flex items-center gap-3 justify-center lg:justify-start">
                       <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0" />
@@ -284,39 +495,23 @@ const Home = () => {
                     </li>
                   ))}
                 </ul>
+                <Button 
+                  variant="outline" 
+                  className="mt-2"
+                  onClick={() => navigate("/outils/budget")}
+                >
+                  Essayer gratuitement
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
               </div>
               
-              {/* Mockup visuel */}
-              <div className="flex-1">
-                <div className={`relative ${
-                  index % 2 === 0 ? 'lg:ml-auto' : 'lg:mr-auto'
-                }`}>
-                  <div className="bg-gradient-to-br from-primary/20 via-primary/10 to-accent/30 rounded-3xl p-8 lg:p-12">
-                    <div className="bg-card rounded-2xl shadow-xl p-6 space-y-4">
-                      {/* Simulated UI elements */}
-                      <div className="flex items-center gap-3 mb-4">
-                        <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-                          <feature.icon className="w-5 h-5 text-primary" />
-                        </div>
-                        <div className="flex-1">
-                          <div className="h-3 bg-muted rounded-full w-24 mb-1"></div>
-                          <div className="h-2 bg-muted rounded-full w-16"></div>
-                        </div>
-                      </div>
-                      <div className="space-y-2">
-                        <div className="h-8 bg-primary/20 rounded-lg"></div>
-                        <div className="flex gap-2">
-                          <div className="h-16 bg-primary/10 rounded-lg flex-1"></div>
-                          <div className="h-16 bg-accent rounded-lg flex-1"></div>
-                        </div>
-                        <div className="h-3 bg-muted rounded-full"></div>
-                        <div className="h-3 bg-muted rounded-full w-3/4"></div>
-                      </div>
-                    </div>
-                  </div>
-                  {/* Floating elements */}
-                  <div className="absolute -top-4 -right-4 w-16 h-16 bg-primary/20 rounded-2xl flex items-center justify-center animate-pulse">
-                    <TrendingUp className="w-8 h-8 text-primary" />
+              {/* Mockup visuel unique */}
+              <div className="flex-1 w-full max-w-md lg:max-w-none">
+                <div className={`relative ${index % 2 === 0 ? 'lg:ml-auto' : 'lg:mr-auto'}`}>
+                  <feature.mockup />
+                  {/* Floating badge */}
+                  <div className="absolute -top-3 -right-3 w-12 h-12 bg-primary rounded-xl flex items-center justify-center shadow-lg">
+                    <Zap className="w-6 h-6 text-primary-foreground" />
                   </div>
                 </div>
               </div>
@@ -371,16 +566,16 @@ const Home = () => {
           
           <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
             {testimonials.map((testimonial) => (
-              <Card key={testimonial.name} className="p-6 bg-card">
+              <Card key={testimonial.name} className="p-6 bg-card hover:shadow-lg transition-shadow">
                 <div className="flex gap-1 mb-4">
                   {[...Array(testimonial.rating)].map((_, i) => (
                     <Star key={i} className="w-5 h-5 fill-warning text-warning" />
                   ))}
                 </div>
-                <p className="text-foreground mb-4 leading-relaxed">
+                <p className="text-foreground mb-6 leading-relaxed">
                   "{testimonial.content}"
                 </p>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 pt-4 border-t border-border">
                   <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
                     <span className="text-primary font-semibold text-sm">
                       {testimonial.name.charAt(0)}
