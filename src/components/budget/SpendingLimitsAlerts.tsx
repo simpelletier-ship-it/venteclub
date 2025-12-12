@@ -161,21 +161,11 @@ export const SpendingLimitsAlerts = () => {
                       Limite: {limit.limit}$
                     </span>
                   </div>
-                  <div className="relative">
+                  <div className="overflow-hidden rounded-full">
                     <Progress 
                       value={Math.min(percentage, 100)} 
                       className={`h-2 ${percentage >= 100 ? "[&>div]:bg-red-500" : percentage >= 80 ? "[&>div]:bg-amber-500" : "[&>div]:bg-emerald-500"}`}
                     />
-                    {isExceeded && (
-                      <div 
-                        className="absolute top-0 h-2 bg-red-300 dark:bg-red-700 rounded-r-full"
-                        style={{ 
-                          left: "100%", 
-                          width: `${Math.min((percentage - 100), 50)}%`,
-                          marginLeft: "-1px"
-                        }}
-                      />
-                    )}
                   </div>
                   {isExceeded && (
                     <p className="text-xs text-red-600">
