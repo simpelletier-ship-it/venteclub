@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Clock, TrendingUp, Info, Target } from "lucide-react";
+import { Clock, TrendingUp, Info, Target, Lightbulb } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { motion } from "framer-motion";
 
@@ -104,9 +104,12 @@ export const AgeOfMoney = ({
 
         {/* Tips */}
         <div className="p-4 rounded-xl bg-violet-100/50 dark:bg-violet-900/20 space-y-2">
-          <p className="text-sm font-medium text-violet-700 dark:text-violet-300">
-            💡 Conseil pour augmenter l'âge de votre argent
-          </p>
+          <div className="flex items-center gap-2">
+            <Lightbulb className="w-4 h-4 text-violet-700 dark:text-violet-300" />
+            <p className="text-sm font-medium text-violet-700 dark:text-violet-300">
+              Conseil pour augmenter l'âge de votre argent
+            </p>
+          </div>
           <p className="text-xs text-violet-600/80 dark:text-violet-400/80">
             {ageOfMoney < 7 
               ? "Essayez de réduire vos dépenses non-essentielles pour créer un coussin financier."
