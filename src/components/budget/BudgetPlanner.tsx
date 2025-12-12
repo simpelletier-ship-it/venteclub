@@ -165,14 +165,14 @@ const InlineBudgetInput = ({ category, budget, spent, onSave, onDelete, hasBudge
             onKeyDown={handleKeyDown}
             placeholder="0"
             className={cn(
-              "w-20 sm:w-24 h-10 px-2 sm:px-3 pr-5 text-right text-sm font-medium rounded-lg",
+              "w-24 sm:w-28 h-10 pl-2 sm:pl-3 pr-7 text-right text-sm font-medium rounded-lg",
               "bg-muted/50 border border-border/50",
               "focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50",
               "placeholder:text-muted-foreground/50 tabular-nums",
               "transition-all"
             )}
           />
-          <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground pointer-events-none">$</span>
+          <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground pointer-events-none font-medium">$</span>
         </div>
         
         {/* Frequency selector */}
