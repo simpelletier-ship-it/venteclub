@@ -83,17 +83,17 @@ const SortableBudgetRow = ({ category, budget, spent, onEdit, onDelete, hasBudge
       ref={setNodeRef}
       style={style}
       className={cn(
-        "flex items-center gap-3 py-3 px-3 rounded-lg bg-card border border-border/50",
-        "hover:border-border hover:shadow-sm transition-all group",
-        isDragging && "shadow-lg border-primary/50"
+        "flex items-center gap-2.5 py-2.5 px-3 rounded-xl",
+        "hover:bg-muted/30 transition-all group",
+        isDragging && "bg-muted/50 shadow-lg"
       )}
     >
       <div
         {...attributes}
         {...listeners}
-        className="cursor-grab active:cursor-grabbing touch-none opacity-40 group-hover:opacity-100 transition-opacity"
+        className="cursor-grab active:cursor-grabbing touch-none opacity-0 group-hover:opacity-60 transition-opacity"
       >
-        <GripVertical className="h-4 w-4 text-muted-foreground" />
+        <GripVertical className="h-3.5 w-3.5 text-muted-foreground" />
       </div>
       
       <CategoryIcon icon={category.icon} color={category.color} size="md" />
@@ -101,8 +101,8 @@ const SortableBudgetRow = ({ category, budget, spent, onEdit, onDelete, hasBudge
       <div className="flex-1 min-w-0">
         <p className="font-medium text-sm truncate">{category.name}</p>
         {hasBudget && (
-          <div className="flex items-center gap-2 mt-1.5">
-            <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden max-w-[120px]">
+          <div className="flex items-center gap-2 mt-1">
+            <div className="flex-1 h-1 bg-muted rounded-full overflow-hidden max-w-[100px]">
               <div 
                 className={cn(
                   "h-full transition-all rounded-full",
@@ -113,43 +113,39 @@ const SortableBudgetRow = ({ category, budget, spent, onEdit, onDelete, hasBudge
                 style={{ width: `${Math.min(percentage, 100)}%` }}
               />
             </div>
-            <span className="text-xs text-muted-foreground tabular-nums">
+            <span className="text-[11px] text-muted-foreground tabular-nums">
               {Math.round(percentage)}%
             </span>
           </div>
         )}
       </div>
       
-      <div className="text-right min-w-[90px]">
+      <div className="text-right">
         <p className={cn(
-          "font-semibold text-sm tabular-nums",
+          "font-medium text-sm tabular-nums",
           hasBudget && isOver && category.type === 'expense' && "text-red-500"
         )}>
           {formatPrice(spent)}
         </p>
         {hasBudget && (
-          <p className="text-xs text-muted-foreground tabular-nums">/ {formatPrice(budget)}</p>
+          <p className="text-[11px] text-muted-foreground tabular-nums">/ {formatPrice(budget)}</p>
         )}
       </div>
       
-      <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-7 w-7"
+      <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
+        <button
+          className="p-1.5 rounded-lg hover:bg-muted transition-colors"
           onClick={onEdit}
         >
-          {hasBudget ? <PencilLine className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5" />}
-        </Button>
+          {hasBudget ? <PencilLine className="h-3.5 w-3.5 text-muted-foreground" /> : <Plus className="h-3.5 w-3.5 text-muted-foreground" />}
+        </button>
         {hasBudget && (
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="h-7 w-7 text-muted-foreground hover:text-destructive"
+          <button 
+            className="p-1.5 rounded-lg hover:bg-red-500/10 transition-colors"
             onClick={onDelete}
           >
-            <Trash2 className="h-3.5 w-3.5" />
-          </Button>
+            <Trash2 className="h-3.5 w-3.5 text-muted-foreground hover:text-red-500" />
+          </button>
         )}
       </div>
     </div>
@@ -336,134 +332,120 @@ export const BudgetPlanner = ({ isAuthenticated }: { isAuthenticated: boolean })
 
   return (
     <div className="space-y-6">
-      {/* Summary Cards */}
+      {/* Summary Cards - Minimal */}
       <div className="grid grid-cols-3 gap-3">
-        <Card className="bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 border-emerald-500/20">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <TrendingUp className="h-4 w-4 text-emerald-600" />
-              <span className="text-xs font-medium text-emerald-700 dark:text-emerald-400">Revenus</span>
-            </div>
-            <p className="text-xl font-bold text-emerald-600 tabular-nums">{formatPrice(totalIncomeActual)}</p>
-            {totalIncomeBudget > 0 && (
-              <p className="text-xs text-muted-foreground mt-1">sur {formatPrice(totalIncomeBudget)}</p>
-            )}
-          </CardContent>
-        </Card>
+        <div className="p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/10">
+          <div className="flex items-center gap-2 mb-3">
+            <TrendingUp className="h-4 w-4 text-emerald-600" />
+            <span className="text-xs font-medium text-muted-foreground">Revenus</span>
+          </div>
+          <p className="text-lg sm:text-xl font-semibold text-emerald-600 tabular-nums">{formatPrice(totalIncomeActual)}</p>
+          {totalIncomeBudget > 0 && (
+            <p className="text-xs text-muted-foreground mt-1.5">sur {formatPrice(totalIncomeBudget)}</p>
+          )}
+        </div>
 
-        <Card className="bg-gradient-to-br from-red-500/10 to-red-500/5 border-red-500/20">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <TrendingDown className="h-4 w-4 text-red-600" />
-              <span className="text-xs font-medium text-red-700 dark:text-red-400">Dépenses</span>
-            </div>
-            <p className="text-xl font-bold text-red-600 tabular-nums">{formatPrice(totalExpenseActual)}</p>
-            {totalExpenseBudget > 0 && (
-              <p className="text-xs text-muted-foreground mt-1">sur {formatPrice(totalExpenseBudget)}</p>
-            )}
-          </CardContent>
-        </Card>
+        <div className="p-4 rounded-xl bg-red-500/5 border border-red-500/10">
+          <div className="flex items-center gap-2 mb-3">
+            <TrendingDown className="h-4 w-4 text-red-500" />
+            <span className="text-xs font-medium text-muted-foreground">Dépenses</span>
+          </div>
+          <p className="text-lg sm:text-xl font-semibold text-red-500 tabular-nums">{formatPrice(totalExpenseActual)}</p>
+          {totalExpenseBudget > 0 && (
+            <p className="text-xs text-muted-foreground mt-1.5">sur {formatPrice(totalExpenseBudget)}</p>
+          )}
+        </div>
 
-        <Card className={cn(
-          "bg-gradient-to-br border",
+        <div className={cn(
+          "p-4 rounded-xl border",
           balance >= 0 
-            ? "from-blue-500/10 to-blue-500/5 border-blue-500/20" 
-            : "from-orange-500/10 to-orange-500/5 border-orange-500/20"
+            ? "bg-blue-500/5 border-blue-500/10" 
+            : "bg-orange-500/5 border-orange-500/10"
         )}>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-xs font-medium text-muted-foreground">Balance</span>
-            </div>
-            <p className={cn(
-              "text-xl font-bold tabular-nums",
-              balance >= 0 ? "text-blue-600" : "text-orange-600"
-            )}>
-              {balance >= 0 ? '+' : ''}{formatPrice(balance)}
-            </p>
-            <p className="text-xs text-muted-foreground mt-1">ce mois</p>
-          </CardContent>
-        </Card>
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-xs font-medium text-muted-foreground">Balance</span>
+          </div>
+          <p className={cn(
+            "text-lg sm:text-xl font-semibold tabular-nums",
+            balance >= 0 ? "text-blue-600" : "text-orange-500"
+          )}>
+            {balance >= 0 ? '+' : ''}{formatPrice(balance)}
+          </p>
+          <p className="text-xs text-muted-foreground mt-1.5">ce mois</p>
+        </div>
       </div>
 
       {/* Two Column Layout */}
       <div className="grid md:grid-cols-2 gap-4">
         {/* Expenses */}
-        <Card>
-          <CardHeader className="pb-3 pt-4 px-4">
-            <CardTitle className="text-base font-semibold flex items-center gap-2">
+        <section className="bg-card rounded-2xl border border-border/50 p-4 sm:p-5">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-red-500" />
-              Dépenses
-              <span className="text-xs font-normal text-muted-foreground ml-auto">
-                Glissez pour réorganiser
-              </span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-3 pt-0">
-            <DndContext
-              sensors={sensors}
-              collisionDetection={closestCenter}
-              onDragEnd={(e) => handleDragEnd(e, 'expense')}
+              <h3 className="font-medium">Dépenses</h3>
+            </div>
+            <span className="text-xs text-muted-foreground">Glissez pour réorganiser</span>
+          </div>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={(e) => handleDragEnd(e, 'expense')}
+          >
+            <SortableContext
+              items={expenseCategories.map(c => c.id)}
+              strategy={verticalListSortingStrategy}
             >
-              <SortableContext
-                items={expenseCategories.map(c => c.id)}
-                strategy={verticalListSortingStrategy}
-              >
-                <div className="space-y-2 max-h-[400px] overflow-y-auto pr-1">
-                  {expenseCategories.map(category => (
-                    <SortableBudgetRow
-                      key={category.id}
-                      category={category}
-                      budget={getCategoryBudget(category.id)}
-                      spent={getCategorySpent(category.id)}
-                      hasBudget={getCategoryBudget(category.id) > 0}
-                      onEdit={() => openEditDialog(category)}
-                      onDelete={() => setDeleteConfirm(category.id)}
-                    />
-                  ))}
-                </div>
-              </SortableContext>
-            </DndContext>
-          </CardContent>
-        </Card>
+              <div className="space-y-1.5 max-h-[380px] overflow-y-auto">
+                {expenseCategories.map(category => (
+                  <SortableBudgetRow
+                    key={category.id}
+                    category={category}
+                    budget={getCategoryBudget(category.id)}
+                    spent={getCategorySpent(category.id)}
+                    hasBudget={getCategoryBudget(category.id) > 0}
+                    onEdit={() => openEditDialog(category)}
+                    onDelete={() => setDeleteConfirm(category.id)}
+                  />
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
+        </section>
 
         {/* Income */}
-        <Card>
-          <CardHeader className="pb-3 pt-4 px-4">
-            <CardTitle className="text-base font-semibold flex items-center gap-2">
+        <section className="bg-card rounded-2xl border border-border/50 p-4 sm:p-5">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-emerald-500" />
-              Revenus
-              <span className="text-xs font-normal text-muted-foreground ml-auto">
-                Glissez pour réorganiser
-              </span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-3 pt-0">
-            <DndContext
-              sensors={sensors}
-              collisionDetection={closestCenter}
-              onDragEnd={(e) => handleDragEnd(e, 'income')}
+              <h3 className="font-medium">Revenus</h3>
+            </div>
+            <span className="text-xs text-muted-foreground">Glissez pour réorganiser</span>
+          </div>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={(e) => handleDragEnd(e, 'income')}
+          >
+            <SortableContext
+              items={incomeCategories.map(c => c.id)}
+              strategy={verticalListSortingStrategy}
             >
-              <SortableContext
-                items={incomeCategories.map(c => c.id)}
-                strategy={verticalListSortingStrategy}
-              >
-                <div className="space-y-2 max-h-[400px] overflow-y-auto pr-1">
-                  {incomeCategories.map(category => (
-                    <SortableBudgetRow
-                      key={category.id}
-                      category={category}
-                      budget={getCategoryBudget(category.id)}
-                      spent={getCategorySpent(category.id)}
-                      hasBudget={getCategoryBudget(category.id) > 0}
-                      onEdit={() => openEditDialog(category)}
-                      onDelete={() => setDeleteConfirm(category.id)}
-                    />
-                  ))}
-                </div>
-              </SortableContext>
-            </DndContext>
-          </CardContent>
-        </Card>
+              <div className="space-y-1.5 max-h-[380px] overflow-y-auto">
+                {incomeCategories.map(category => (
+                  <SortableBudgetRow
+                    key={category.id}
+                    category={category}
+                    budget={getCategoryBudget(category.id)}
+                    spent={getCategorySpent(category.id)}
+                    hasBudget={getCategoryBudget(category.id) > 0}
+                    onEdit={() => openEditDialog(category)}
+                    onDelete={() => setDeleteConfirm(category.id)}
+                  />
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
+        </section>
       </div>
 
       {/* Edit Budget Dialog */}

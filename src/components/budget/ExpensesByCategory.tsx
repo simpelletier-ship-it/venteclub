@@ -186,54 +186,57 @@ export const ExpensesByCategory = ({ transactions, categories, onAnalyze }: Expe
 
   return (
     <>
-      <div className="space-y-4">
-        {/* Header compact */}
+      <div className="space-y-5">
+        {/* Header - Ultra Clean */}
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1.5 bg-muted/50 rounded-lg p-1">
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="h-7 w-7"
-                onClick={goToPreviousMonth}
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <span className="text-xs font-medium px-2 min-w-[100px] text-center">
-                {format(selectedMonth, 'MMM yyyy', { locale: fr })}
-              </span>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="h-7 w-7"
-                onClick={goToNextMonth}
-                disabled={selectedMonth.getMonth() === new Date().getMonth() && selectedMonth.getFullYear() === new Date().getFullYear()}
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
-            <ToggleGroup type="single" value={chartType} onValueChange={(v) => v && setChartType(v)} className="bg-muted/50 p-0.5 rounded-lg">
-              <ToggleGroupItem value="pie" className="h-7 w-7 p-0">
-                <PieChartIcon className="h-3.5 w-3.5" />
-              </ToggleGroupItem>
-              <ToggleGroupItem value="bar" className="h-7 w-7 p-0">
-                <BarChart3 className="h-3.5 w-3.5" />
-              </ToggleGroupItem>
-            </ToggleGroup>
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={goToPreviousMonth}
+              className="p-1.5 rounded-lg hover:bg-muted/50 transition-colors"
+            >
+              <ChevronLeft className="h-4 w-4 text-muted-foreground" />
+            </button>
+            <span className="text-sm font-medium min-w-[90px] text-center">
+              {format(selectedMonth, 'MMM yyyy', { locale: fr })}
+            </span>
+            <button 
+              onClick={goToNextMonth}
+              disabled={selectedMonth.getMonth() === new Date().getMonth() && selectedMonth.getFullYear() === new Date().getFullYear()}
+              className="p-1.5 rounded-lg hover:bg-muted/50 transition-colors disabled:opacity-30"
+            >
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            </button>
           </div>
-          <span className="text-lg font-bold text-foreground">{formatPrice(totalExpenses)}</span>
+          
+          <div className="flex items-center gap-3">
+            <div className="flex bg-muted/30 rounded-lg p-0.5">
+              <button 
+                onClick={() => setChartType("pie")}
+                className={`p-1.5 rounded-md transition-colors ${chartType === "pie" ? "bg-background shadow-sm" : ""}`}
+              >
+                <PieChartIcon className="h-3.5 w-3.5" />
+              </button>
+              <button 
+                onClick={() => setChartType("bar")}
+                className={`p-1.5 rounded-md transition-colors ${chartType === "bar" ? "bg-background shadow-sm" : ""}`}
+              >
+                <BarChart3 className="h-3.5 w-3.5" />
+              </button>
+            </div>
+            <span className="text-lg font-semibold tabular-nums">{formatPrice(totalExpenses)}</span>
+          </div>
         </div>
 
         {!hasData ? (
-          <div className="flex items-center justify-center h-[200px] text-center">
-            <div className="space-y-2">
-              <LayoutGrid className="h-10 w-10 mx-auto text-muted-foreground/30" />
-              <p className="text-sm text-muted-foreground">Aucune dépense</p>
+          <div className="flex flex-col items-center justify-center h-[200px] text-center">
+            <div className="w-12 h-12 rounded-full bg-muted/30 flex items-center justify-center mb-3">
+              <LayoutGrid className="h-5 w-5 text-muted-foreground/50" />
             </div>
+            <p className="text-sm text-muted-foreground">Aucune dépense ce mois</p>
           </div>
         ) : (
           <>
-            <ResponsiveContainer width="100%" height={220}>
+            <ResponsiveContainer width="100%" height={200}>
               {chartType === "pie" ? (
                 <PieChart>
                   <Pie
@@ -241,8 +244,8 @@ export const ExpensesByCategory = ({ transactions, categories, onAnalyze }: Expe
                     cx="50%"
                     cy="50%"
                     labelLine={false}
-                    outerRadius={85}
-                    innerRadius={50}
+                    outerRadius={80}
+                    innerRadius={55}
                     fill="#8884d8"
                     dataKey="value"
                     onClick={handleCategoryClick}
@@ -251,7 +254,7 @@ export const ExpensesByCategory = ({ transactions, categories, onAnalyze }: Expe
                     activeIndex={activeIndex ?? undefined}
                     activeShape={renderActiveShape}
                     cursor="pointer"
-                    strokeWidth={2}
+                    strokeWidth={3}
                     stroke="hsl(var(--background))"
                   >
                     {expensesByCategory.map((entry, index) => (
@@ -261,15 +264,14 @@ export const ExpensesByCategory = ({ transactions, categories, onAnalyze }: Expe
                   <Tooltip content={<CustomTooltip />} />
                 </PieChart>
               ) : (
-                <BarChart data={expensesByCategory} layout="vertical">
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted/30" horizontal={false} />
+                <BarChart data={expensesByCategory} layout="vertical" margin={{ left: 0, right: 0 }}>
                   <XAxis type="number" hide />
                   <YAxis 
                     type="category"
                     dataKey="name" 
-                    className="text-[10px]"
-                    tick={{ fill: 'currentColor' }}
-                    width={70}
+                    className="text-[11px]"
+                    tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                    width={75}
                     tickLine={false}
                     axisLine={false}
                   />
@@ -278,7 +280,7 @@ export const ExpensesByCategory = ({ transactions, categories, onAnalyze }: Expe
                     dataKey="value" 
                     onClick={handleCategoryClick}
                     cursor="pointer"
-                    radius={[0, 4, 4, 0]}
+                    radius={[0, 6, 6, 0]}
                   >
                     {expensesByCategory.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
@@ -288,8 +290,8 @@ export const ExpensesByCategory = ({ transactions, categories, onAnalyze }: Expe
               )}
             </ResponsiveContainer>
 
-            {/* Legend compact */}
-            <div className="grid grid-cols-2 gap-1.5">
+            {/* Legend - Clean Grid */}
+            <div className="grid grid-cols-2 gap-2">
               {expensesByCategory.slice(0, 6).map((category) => (
                 <button
                   key={category.name}
@@ -297,14 +299,14 @@ export const ExpensesByCategory = ({ transactions, categories, onAnalyze }: Expe
                     setSelectedCategory(category.id);
                     setDialogOpen(true);
                   }}
-                  className="flex items-center gap-2 p-2 rounded-lg hover:bg-muted/50 transition-colors text-left"
+                  className="flex items-center gap-2.5 py-2 px-2.5 rounded-lg hover:bg-muted/30 transition-colors text-left group"
                 >
                   <div
-                    className="w-2.5 h-2.5 rounded-full shrink-0"
+                    className="w-2 h-2 rounded-full shrink-0"
                     style={{ backgroundColor: category.color }}
                   />
-                  <span className="text-xs font-medium truncate flex-1">{category.name}</span>
-                  <span className="text-xs font-semibold shrink-0 text-muted-foreground">
+                  <span className="text-sm truncate flex-1 group-hover:text-foreground transition-colors">{category.name}</span>
+                  <span className="text-sm font-medium text-muted-foreground tabular-nums">
                     {((category.value / totalExpenses) * 100).toFixed(0)}%
                   </span>
                 </button>

@@ -1,10 +1,10 @@
 import { useMemo, useState } from "react";
-import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { TrendingUp, TrendingDown, Wallet, PiggyBank, Calendar } from "lucide-react";
+import { TrendingUp, TrendingDown, Wallet, PiggyBank } from "lucide-react";
 import { formatPrice } from "@/lib/priceFormat";
-import { startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, subMonths, subWeeks, format } from "date-fns";
+import { startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, subMonths, format } from "date-fns";
 import { fr } from "date-fns/locale";
+import { cn } from "@/lib/utils";
 
 interface FinancialSummaryBoxesProps {
   transactions: any[];
@@ -16,10 +16,9 @@ const periodOptions: { value: PeriodType; label: string }[] = [
   { value: "this-week", label: "Cette semaine" },
   { value: "this-month", label: "Ce mois" },
   { value: "last-month", label: "Mois dernier" },
-  { value: "3-months", label: "3 derniers mois" },
-  { value: "6-months", label: "6 derniers mois" },
+  { value: "3-months", label: "3 mois" },
+  { value: "6-months", label: "6 mois" },
   { value: "ytd", label: "Année à date" },
-  { value: "this-year", label: "Cette année" },
   { value: "all", label: "Tout" },
 ];
 
@@ -59,17 +58,12 @@ export const FinancialSummaryBoxes = ({ transactions }: FinancialSummaryBoxesPro
         break;
       case "ytd":
         startDate = startOfYear(now);
-        label = `Depuis le 1er janvier ${now.getFullYear()}`;
-        break;
-      case "this-year":
-        startDate = startOfYear(now);
-        endDate = new Date(now.getFullYear(), 11, 31);
-        label = `Année ${now.getFullYear()}`;
+        label = `Depuis janvier ${now.getFullYear()}`;
         break;
       case "all":
       default:
         startDate = new Date(0);
-        label = "Depuis le début";
+        label = "Tout l'historique";
         break;
     }
 
@@ -100,20 +94,17 @@ export const FinancialSummaryBoxes = ({ transactions }: FinancialSummaryBoxesPro
   const savingsRate = totalIncome > 0 ? ((netSavings / totalIncome) * 100) : 0;
 
   return (
-    <div className="space-y-4">
-      {/* Period Selector */}
+    <div className="space-y-5">
+      {/* Period Selector - Clean */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Calendar className="h-4 w-4" />
-          <span className="font-medium capitalize">{periodLabel}</span>
-        </div>
+        <p className="text-sm font-medium text-foreground capitalize">{periodLabel}</p>
         <Select value={period} onValueChange={(v) => setPeriod(v as PeriodType)}>
-          <SelectTrigger className="w-[160px] h-9">
+          <SelectTrigger className="w-[130px] h-8 text-xs border-0 bg-muted/50">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
             {periodOptions.map(option => (
-              <SelectItem key={option.value} value={option.value}>
+              <SelectItem key={option.value} value={option.value} className="text-sm">
                 {option.label}
               </SelectItem>
             ))}
@@ -121,59 +112,62 @@ export const FinancialSummaryBoxes = ({ transactions }: FinancialSummaryBoxesPro
         </Select>
       </div>
 
-      {/* Summary Boxes */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        {/* Total Revenus */}
-        <Card className="p-4 bg-emerald-500/10 border-emerald-500/20">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="p-1.5 rounded-lg bg-emerald-500/20">
-              <TrendingUp className="h-4 w-4 text-emerald-500" />
-            </div>
+      {/* Summary Grid - Minimal Design */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {/* Revenus */}
+        <div className="p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/10">
+          <div className="flex items-center gap-2 mb-3">
+            <TrendingUp className="h-4 w-4 text-emerald-600" />
             <span className="text-xs font-medium text-muted-foreground">Revenus</span>
           </div>
-          <p className="text-xl font-bold text-emerald-500">
+          <p className="text-lg sm:text-xl font-semibold text-emerald-600 tabular-nums">
             {formatPrice(totalIncome)}
           </p>
-        </Card>
+        </div>
 
-        {/* Total Dépenses */}
-        <Card className="p-4 bg-red-500/10 border-red-500/20">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="p-1.5 rounded-lg bg-red-500/20">
-              <TrendingDown className="h-4 w-4 text-red-500" />
-            </div>
+        {/* Dépenses */}
+        <div className="p-4 rounded-xl bg-red-500/5 border border-red-500/10">
+          <div className="flex items-center gap-2 mb-3">
+            <TrendingDown className="h-4 w-4 text-red-500" />
             <span className="text-xs font-medium text-muted-foreground">Dépenses</span>
           </div>
-          <p className="text-xl font-bold text-red-500">
+          <p className="text-lg sm:text-xl font-semibold text-red-500 tabular-nums">
             {formatPrice(totalExpenses)}
           </p>
-        </Card>
+        </div>
 
-        {/* Net / Économies */}
-        <Card className={`p-4 ${netSavings >= 0 ? 'bg-primary/10 border-primary/20' : 'bg-orange-500/10 border-orange-500/20'}`}>
-          <div className="flex items-center gap-2 mb-2">
-            <div className={`p-1.5 rounded-lg ${netSavings >= 0 ? 'bg-primary/20' : 'bg-orange-500/20'}`}>
-              <PiggyBank className={`h-4 w-4 ${netSavings >= 0 ? 'text-primary' : 'text-orange-500'}`} />
-            </div>
+        {/* Économies */}
+        <div className={cn(
+          "p-4 rounded-xl border",
+          netSavings >= 0 
+            ? "bg-blue-500/5 border-blue-500/10" 
+            : "bg-orange-500/5 border-orange-500/10"
+        )}>
+          <div className="flex items-center gap-2 mb-3">
+            <PiggyBank className={cn("h-4 w-4", netSavings >= 0 ? "text-blue-600" : "text-orange-500")} />
             <span className="text-xs font-medium text-muted-foreground">Économies</span>
           </div>
-          <p className={`text-xl font-bold ${netSavings >= 0 ? 'text-primary' : 'text-orange-500'}`}>
+          <p className={cn(
+            "text-lg sm:text-xl font-semibold tabular-nums",
+            netSavings >= 0 ? "text-blue-600" : "text-orange-500"
+          )}>
             {netSavings >= 0 ? '+' : ''}{formatPrice(netSavings)}
           </p>
-        </Card>
+        </div>
 
         {/* Taux d'épargne */}
-        <Card className="p-4 bg-muted/50 border-border">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="p-1.5 rounded-lg bg-muted">
-              <Wallet className="h-4 w-4 text-muted-foreground" />
-            </div>
-            <span className="text-xs font-medium text-muted-foreground">Taux épargne</span>
+        <div className="p-4 rounded-xl bg-muted/30 border border-border/50">
+          <div className="flex items-center gap-2 mb-3">
+            <Wallet className="h-4 w-4 text-muted-foreground" />
+            <span className="text-xs font-medium text-muted-foreground">Taux</span>
           </div>
-          <p className={`text-xl font-bold ${savingsRate >= 20 ? 'text-emerald-500' : savingsRate >= 10 ? 'text-primary' : 'text-muted-foreground'}`}>
-            {savingsRate.toFixed(1)}%
+          <p className={cn(
+            "text-lg sm:text-xl font-semibold tabular-nums",
+            savingsRate >= 20 ? "text-emerald-600" : savingsRate >= 10 ? "text-blue-600" : "text-muted-foreground"
+          )}>
+            {savingsRate.toFixed(0)}%
           </p>
-        </Card>
+        </div>
       </div>
     </div>
   );

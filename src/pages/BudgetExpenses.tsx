@@ -2,7 +2,7 @@ import { useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { SEO } from "@/components/SEO";
 import { BreadcrumbSchema } from "@/components/BreadcrumbSchema";
-import { Loader2, Receipt } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
@@ -15,7 +15,6 @@ import { FinancialHealthScore } from "@/components/budget/FinancialHealthScore";
 import { ExpensesByCategory } from "@/components/budget/ExpensesByCategory";
 import { SmartBudgetInsights } from "@/components/budget/SmartBudgetInsights";
 import { FinancialSummaryBoxes } from "@/components/budget/FinancialSummaryBoxes";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const BudgetExpenses = () => {
   const navigate = useNavigate();
@@ -168,94 +167,62 @@ const BudgetExpenses = () => {
         />
 
         <div className="min-h-screen bg-background">
-          <div className="container mx-auto px-6 py-6">
-            {/* Header */}
-            <div className="mb-6">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                  <Receipt className="h-5 w-5 text-primary" />
-                </div>
-                <div>
-                  <h1 className="text-2xl font-bold text-foreground">Mes dépenses</h1>
-                  <p className="text-sm text-muted-foreground">Entrez vos transactions et suivez votre budget</p>
-                </div>
-              </div>
-            </div>
+          <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 max-w-6xl">
+            {/* Header - Clean & Minimal */}
+            <header className="mb-8">
+              <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-foreground">Dépenses</h1>
+              <p className="text-muted-foreground mt-1">Suivez vos transactions</p>
+            </header>
 
-            {/* Quick Add Transaction */}
-            <div className="mb-6">
+            {/* Quick Add - Top Priority */}
+            <section className="mb-8">
               <QuickExpenseTracker isAuthenticated={isAuthenticated} />
-            </div>
+            </section>
 
-            {/* Score & Charts Row */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-              {/* Financial Health Score */}
-              <Card className="border-border">
-                <CardHeader className="pb-3 border-b border-border">
-                  <CardTitle className="text-sm font-medium">Score de santé financière</CardTitle>
-                </CardHeader>
-                <CardContent className="pt-4">
-                  <FinancialHealthScore 
-                    transactions={formattedTransactions}
-                    debts={formattedDebts}
-                    assets={formattedAssets}
-                  />
-                </CardContent>
-              </Card>
+            {/* Financial Summary - Full Width, Clean */}
+            <section className="mb-8">
+              <FinancialSummaryBoxes transactions={transactions} />
+            </section>
 
+            {/* Two Column Grid */}
+            <div className="grid lg:grid-cols-2 gap-6 mb-8">
               {/* Expenses by Category */}
-              <Card className="border-border">
-                <CardHeader className="pb-3 border-b border-border">
-                  <CardTitle className="text-sm font-medium">Dépenses par catégorie</CardTitle>
-                </CardHeader>
-                <CardContent className="pt-4">
-                  <ExpensesByCategory 
-                    transactions={transactions} 
-                    categories={categories}
-                  />
-                </CardContent>
-              </Card>
-            </div>
+              <section className="bg-card rounded-2xl border border-border/50 p-5 sm:p-6">
+                <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-4">Par catégorie</h2>
+                <ExpensesByCategory 
+                  transactions={transactions} 
+                  categories={categories}
+                />
+              </section>
 
-            {/* Financial Summary Boxes */}
-            <div className="mb-6">
-              <Card className="border-border">
-                <CardHeader className="pb-3 border-b border-border">
-                  <CardTitle className="text-sm font-medium">Résumé financier</CardTitle>
-                </CardHeader>
-                <CardContent className="pt-4">
-                  <FinancialSummaryBoxes transactions={transactions} />
-                </CardContent>
-              </Card>
+              {/* Financial Health Score */}
+              <section className="bg-card rounded-2xl border border-border/50 p-5 sm:p-6">
+                <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-4">Santé financière</h2>
+                <FinancialHealthScore 
+                  transactions={formattedTransactions}
+                  debts={formattedDebts}
+                  assets={formattedAssets}
+                />
+              </section>
             </div>
 
             {/* Smart Insights */}
-            <div className="mb-6">
-              <Card className="border-border">
-                <CardHeader className="pb-3 border-b border-border">
-                  <CardTitle className="text-sm font-medium">Conseils personnalisés</CardTitle>
-                </CardHeader>
-                <CardContent className="pt-4">
-                  <SmartBudgetInsights 
-                    transactions={transactions}
-                    categories={categories}
-                    goals={goals}
-                    monthlyIncome={monthlyIncome}
-                    monthlyExpenses={monthlyExpenses}
-                  />
-                </CardContent>
-              </Card>
-            </div>
+            <section className="mb-8 bg-card rounded-2xl border border-border/50 p-5 sm:p-6">
+              <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-4">Conseils</h2>
+              <SmartBudgetInsights 
+                transactions={transactions}
+                categories={categories}
+                goals={goals}
+                monthlyIncome={monthlyIncome}
+                monthlyExpenses={monthlyExpenses}
+              />
+            </section>
 
             {/* Transactions List */}
-            <Card className="border-border">
-              <CardHeader className="pb-3 border-b border-border">
-                <CardTitle className="text-sm font-medium">Historique des transactions</CardTitle>
-              </CardHeader>
-              <CardContent className="pt-4">
-                <BudgetTransactions isAuthenticated={isAuthenticated} />
-              </CardContent>
-            </Card>
+            <section className="bg-card rounded-2xl border border-border/50 p-5 sm:p-6">
+              <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-4">Historique</h2>
+              <BudgetTransactions isAuthenticated={isAuthenticated} />
+            </section>
           </div>
         </div>
       </>
