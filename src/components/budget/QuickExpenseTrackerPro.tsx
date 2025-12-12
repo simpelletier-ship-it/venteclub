@@ -14,6 +14,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useOfflineSync } from "@/hooks/useOfflineSync";
 import { CategoryManager } from "./CategoryManager";
+import { CategoryIcon } from "./CategoryIcon";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
 import {
@@ -115,7 +116,9 @@ const SortableCategoryItem = ({
           isEditMode && "pointer-events-none"
         )}
       >
-        <span className="text-2xl">{category.icon}</span>
+        <div className="w-8 h-8 rounded-md flex items-center justify-center" style={{ backgroundColor: `${category.color}15` }}>
+          <CategoryIcon icon={category.icon} color={category.color} size="lg" />
+        </div>
         <span className="text-[10px] font-medium text-center line-clamp-1 text-muted-foreground">
           {category.name}
         </span>
