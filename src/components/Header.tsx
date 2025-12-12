@@ -123,7 +123,7 @@ const Header = () => {
             onClick={() => navigate("/")}
           >
             <span className="font-semibold text-foreground text-base tracking-tight">
-              Budget<span className="text-primary font-semibold">.club</span>
+              Vente<span className="text-primary font-semibold">.club</span>
             </span>
           </div>
 
