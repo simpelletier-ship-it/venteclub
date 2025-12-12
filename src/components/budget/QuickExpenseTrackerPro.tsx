@@ -97,7 +97,7 @@ const SortableCategoryItem = ({
           <div
             {...attributes}
             {...listeners}
-            className="absolute -top-1 -left-1 z-10 w-5 h-5 rounded-full bg-slate-600 text-slate-300 flex items-center justify-center cursor-grab active:cursor-grabbing"
+            className="absolute -top-1 -left-1 z-10 w-5 h-5 rounded-full bg-muted text-muted-foreground flex items-center justify-center cursor-grab active:cursor-grabbing"
           >
             <GripVertical className="h-3 w-3" />
           </div>
@@ -108,15 +108,15 @@ const SortableCategoryItem = ({
         onClick={onSelect}
         disabled={isEditMode}
         className={cn(
-          "w-full flex flex-col items-center gap-1.5 p-3 rounded-xl transition-all border",
+          "w-full flex flex-col items-center gap-1.5 p-3 rounded-md transition-all border",
           isSelected
-            ? "bg-emerald-500/20 border-emerald-500 ring-1 ring-emerald-500"
-            : "bg-slate-800/50 border-slate-700 hover:border-slate-600 hover:bg-slate-800",
+            ? "bg-primary/10 border-primary ring-1 ring-primary"
+            : "bg-muted/50 border-border hover:border-muted-foreground/30 hover:bg-muted",
           isEditMode && "pointer-events-none"
         )}
       >
         <span className="text-2xl">{category.icon}</span>
-        <span className="text-[10px] font-medium text-center line-clamp-1 text-slate-400">
+        <span className="text-[10px] font-medium text-center line-clamp-1 text-muted-foreground">
           {category.name}
         </span>
       </button>
@@ -244,22 +244,22 @@ export const QuickExpenseTracker = ({ isAuthenticated }: QuickExpenseTrackerProp
   };
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
+    <div className="bg-card border border-border rounded-md overflow-hidden">
       {/* Header */}
-      <div className="bg-slate-800/50 px-6 py-4 border-b border-slate-800">
-        <h2 className="text-lg font-semibold text-white">Nouvelle transaction</h2>
+      <div className="bg-muted/50 px-6 py-4 border-b border-border">
+        <h2 className="text-base font-semibold text-foreground">Nouvelle transaction</h2>
       </div>
 
       <div className="p-6">
         {/* Type Toggle */}
-        <div className="flex gap-2 p-1 bg-slate-800 rounded-xl mb-6">
+        <div className="flex gap-2 p-1 bg-muted rounded-md mb-6">
           <button
             onClick={() => { setTransactionType('expense'); setSelectedCategoryId(''); }}
             className={cn(
-              "flex-1 flex items-center justify-center gap-2 py-3 rounded-lg font-semibold text-sm transition-all",
+              "flex-1 flex items-center justify-center gap-2 py-3 rounded-md font-medium text-sm transition-all",
               transactionType === 'expense' 
-                ? "bg-red-500 text-white shadow-lg shadow-red-500/25" 
-                : "text-slate-400 hover:text-white"
+                ? "bg-destructive text-destructive-foreground" 
+                : "text-muted-foreground hover:text-foreground"
             )}
           >
             <Minus className="h-4 w-4" />
@@ -268,10 +268,10 @@ export const QuickExpenseTracker = ({ isAuthenticated }: QuickExpenseTrackerProp
           <button
             onClick={() => { setTransactionType('income'); setSelectedCategoryId(''); }}
             className={cn(
-              "flex-1 flex items-center justify-center gap-2 py-3 rounded-lg font-semibold text-sm transition-all",
+              "flex-1 flex items-center justify-center gap-2 py-3 rounded-md font-medium text-sm transition-all",
               transactionType === 'income' 
-                ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/25" 
-                : "text-slate-400 hover:text-white"
+                ? "bg-success text-success-foreground" 
+                : "text-muted-foreground hover:text-foreground"
             )}
           >
             <Plus className="h-4 w-4" />
@@ -279,33 +279,30 @@ export const QuickExpenseTracker = ({ isAuthenticated }: QuickExpenseTrackerProp
           </button>
         </div>
 
-        {/* Amount Input */}
         <div className="text-center mb-6">
           <CurrencyInput
             value={amount}
             onChange={setAmount}
             allowDecimals={true}
             placeholder="0,00"
-            className="text-5xl lg:text-6xl font-bold h-20 text-center border-0 bg-transparent focus:ring-0 focus-visible:ring-0 placeholder:text-slate-700 text-white"
+            className="text-4xl lg:text-5xl font-semibold h-16 text-center border-0 bg-transparent focus:ring-0 focus-visible:ring-0 placeholder:text-muted-foreground/30 text-foreground"
           />
         </div>
 
-        {/* Date Selector */}
         <div className="flex justify-center mb-6">
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="outline" className="rounded-full px-5 h-10 bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700 hover:text-white">
+              <Button variant="outline" className="rounded-md px-4 h-9">
                 <CalendarIcon className="mr-2 h-4 w-4" />
                 {format(selectedDate, "d MMMM yyyy", { locale: fr })}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0 bg-slate-900 border-slate-700" align="center">
+            <PopoverContent className="w-auto p-0" align="center">
               <Calendar 
                 mode="single" 
                 selected={selectedDate} 
                 onSelect={(date) => date && setSelectedDate(date)} 
                 initialFocus 
-                className="bg-slate-900"
               />
             </PopoverContent>
           </Popover>
@@ -314,14 +311,14 @@ export const QuickExpenseTracker = ({ isAuthenticated }: QuickExpenseTrackerProp
         {/* Categories */}
         <div className="mb-6">
           <div className="flex items-center justify-between mb-3">
-            <Label className="text-sm font-medium text-slate-400">Catégorie</Label>
+            <Label className="text-sm font-medium text-muted-foreground">Catégorie</Label>
             <div className="flex gap-2">
               <Button
                 variant={isEditMode ? "default" : "ghost"}
                 size="sm"
                 className={cn(
                   "h-7 text-xs",
-                  isEditMode ? "bg-emerald-600 hover:bg-emerald-700" : "text-slate-400 hover:text-white"
+                  isEditMode ? "bg-primary hover:bg-primary-light" : "text-muted-foreground hover:text-foreground"
                 )}
                 onClick={() => setIsEditMode(!isEditMode)}
               >
@@ -329,15 +326,15 @@ export const QuickExpenseTracker = ({ isAuthenticated }: QuickExpenseTrackerProp
               </Button>
               <Dialog open={showCategoryManager} onOpenChange={setShowCategoryManager}>
                 <DialogTrigger asChild>
-                  <Button variant="ghost" size="sm" className="h-7 text-xs text-slate-500 hover:text-white">
+                  <Button variant="ghost" size="sm" className="h-7 text-xs text-muted-foreground hover:text-foreground">
                     <Settings className="h-3 w-3 mr-1" />
                     Gérer
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto bg-slate-900 border-slate-700">
+                <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
                   <DialogHeader>
-                    <DialogTitle className="text-white">Gérer les catégories</DialogTitle>
-                    <DialogDescription className="text-slate-400">Organisez vos catégories de transactions</DialogDescription>
+                    <DialogTitle>Gérer les catégories</DialogTitle>
+                    <DialogDescription>Organisez vos catégories de transactions</DialogDescription>
                   </DialogHeader>
                   <CategoryManager isAuthenticated={isAuthenticated} />
                 </DialogContent>
@@ -363,13 +360,12 @@ export const QuickExpenseTracker = ({ isAuthenticated }: QuickExpenseTrackerProp
           </DndContext>
           
           {isEditMode && (
-            <p className="text-xs text-slate-500 text-center mt-3">
+            <p className="text-xs text-muted-foreground text-center mt-3">
               Glissez pour réorganiser • Cliquez sur X pour masquer
             </p>
           )}
         </div>
 
-        {/* Description */}
         <div className="mb-6">
           <Input
             value={description}
@@ -379,26 +375,25 @@ export const QuickExpenseTracker = ({ isAuthenticated }: QuickExpenseTrackerProp
               if (suggestedId && !selectedCategoryId) setSelectedCategoryId(suggestedId);
             }}
             placeholder="Description (optionnel)"
-            className="h-12 rounded-xl bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus-visible:ring-emerald-500 focus-visible:border-emerald-500"
+            className="h-11 rounded-md"
           />
         </div>
 
-        {/* Submit */}
         <Button
           onClick={handleSubmit}
           disabled={addMutation.isPending || !amount || amount === '0' || !selectedCategoryId}
           className={cn(
-            "w-full h-14 text-base font-semibold rounded-xl transition-all",
+            "w-full h-12 text-sm font-medium rounded-md transition-all",
             transactionType === 'expense' 
-              ? "bg-red-500 hover:bg-red-600 shadow-lg shadow-red-500/25" 
-              : "bg-emerald-500 hover:bg-emerald-600 shadow-lg shadow-emerald-500/25"
+              ? "bg-destructive hover:bg-destructive/90 text-destructive-foreground" 
+              : "bg-success hover:bg-success/90 text-success-foreground"
           )}
         >
           {addMutation.isPending ? (
-            <div className="h-5 w-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            <div className="h-4 w-4 border-2 border-current/30 border-t-current rounded-full animate-spin" />
           ) : (
             <>
-              <Check className="h-5 w-5 mr-2" />
+              <Check className="h-4 w-4 mr-2" />
               {transactionType === 'expense' ? 'Ajouter la dépense' : 'Ajouter le revenu'}
             </>
           )}

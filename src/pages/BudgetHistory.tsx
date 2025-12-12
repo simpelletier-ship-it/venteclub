@@ -10,6 +10,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { BudgetTransactions } from "@/components/budget/BudgetTransactions";
 import RecurringExpenses from "@/components/budget/RecurringExpenses";
 import { ExpenseTrendsChart } from "@/components/budget/ExpenseTrendsChart";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const BudgetHistory = () => {
   const navigate = useNavigate();
@@ -38,8 +39,8 @@ const BudgetHistory = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-950">
-        <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="h-6 w-6 animate-spin text-primary" />
       </div>
     );
   }
@@ -60,23 +61,34 @@ const BudgetHistory = () => {
         ]}
       />
 
-      <div className="min-h-screen bg-slate-950 text-white pb-8">
-        <div className="container mx-auto px-4 py-6">
-          <h1 className="text-2xl font-bold mb-6">Historique des transactions</h1>
+      <div className="min-h-screen bg-background pb-8">
+        <div className="container mx-auto px-6 py-6">
+          <h1 className="text-xl font-semibold text-foreground mb-6">Historique des transactions</h1>
           
-          <div className="space-y-6">
-            <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
-              <BudgetTransactions isAuthenticated={isAuthenticated} />
-            </div>
+          <div className="space-y-4">
+            <Card className="border-border">
+              <CardContent className="p-6">
+                <BudgetTransactions isAuthenticated={isAuthenticated} />
+              </CardContent>
+            </Card>
             
-            <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
-              <h3 className="text-lg font-semibold text-white mb-4">Dépenses récurrentes</h3>
-              <RecurringExpenses isAuthenticated={isAuthenticated} />
-            </div>
+            <Card className="border-border">
+              <CardHeader className="pb-3 border-b border-border">
+                <CardTitle className="text-sm font-medium">Dépenses récurrentes</CardTitle>
+              </CardHeader>
+              <CardContent className="pt-4">
+                <RecurringExpenses isAuthenticated={isAuthenticated} />
+              </CardContent>
+            </Card>
             
-            <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
-              <ExpenseTrendsChart transactions={transactions} />
-            </div>
+            <Card className="border-border">
+              <CardHeader className="pb-3 border-b border-border">
+                <CardTitle className="text-sm font-medium">Tendances</CardTitle>
+              </CardHeader>
+              <CardContent className="pt-4">
+                <ExpenseTrendsChart transactions={transactions} />
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>

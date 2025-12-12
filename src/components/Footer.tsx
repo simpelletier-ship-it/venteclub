@@ -3,14 +3,14 @@ import { Mail, Shield, Lock, PiggyBank, Calculator, Receipt, Building2 } from "l
 
 export const Footer = () => {
   return (
-    <footer className="bg-slate-50 dark:bg-slate-900 border-t border-border mt-auto">
+    <footer className="bg-muted border-t border-border mt-auto">
       <div className="container mx-auto px-4 py-12 sm:py-16">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 lg:gap-12">
           {/* Brand */}
           <div className="md:col-span-1">
             <Link to="/" className="inline-block mb-4">
-              <span className="font-display font-bold text-xl">
-                Budget<span className="text-emerald-600">.club</span>
+              <span className="font-semibold text-base text-foreground">
+                Budget<span className="text-primary">.club</span>
               </span>
             </Link>
             <p className="text-sm text-muted-foreground leading-relaxed">
@@ -24,19 +24,19 @@ export const Footer = () => {
             <ul className="space-y-3">
               <li>
                 <Link to="/outils/budget" className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-2">
-                  <PiggyBank className="w-4 h-4 text-emerald-600" />
+                  <PiggyBank className="w-4 h-4 text-primary" />
                   Planificateur de budget
                 </Link>
               </li>
               <li>
                 <Link to="/outils/salaire" className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-2">
-                  <Calculator className="w-4 h-4 text-blue-600" />
+                  <Calculator className="w-4 h-4 text-primary" />
                   Calculateur de salaire
                 </Link>
               </li>
               <li>
                 <Link to="/outils/retour-impot" className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-2">
-                  <Receipt className="w-4 h-4 text-purple-600" />
+                  <Receipt className="w-4 h-4 text-primary" />
                   Retour d'impôt
                 </Link>
               </li>
@@ -96,12 +96,12 @@ export const Footer = () => {
               <p className="text-sm text-muted-foreground">
                 © {new Date().getFullYear()} Budget.club. Tous droits réservés.
               </p>
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-100 dark:bg-emerald-900/30">
-                <Shield className="h-4 w-4 text-emerald-600" />
-                <span className="text-xs font-medium text-emerald-700 dark:text-emerald-400">
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-success/10">
+                <Shield className="h-4 w-4 text-success" />
+                <span className="text-xs font-medium text-success">
                   Données sécurisées
                 </span>
-                <Lock className="h-3 w-3 text-emerald-600" />
+                <Lock className="h-3 w-3 text-success" />
               </div>
             </div>
             <div className="flex gap-6">

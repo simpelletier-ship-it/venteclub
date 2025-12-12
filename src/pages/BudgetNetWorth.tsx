@@ -8,6 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { SimpleNetWorthTracker } from "@/components/budget/SimpleNetWorthTracker";
+import { Card, CardContent } from "@/components/ui/card";
 
 const BudgetNetWorth = () => {
   const navigate = useNavigate();
@@ -48,8 +49,8 @@ const BudgetNetWorth = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-950">
-        <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="h-6 w-6 animate-spin text-primary" />
       </div>
     );
   }
@@ -70,13 +71,15 @@ const BudgetNetWorth = () => {
         ]}
       />
 
-      <div className="min-h-screen bg-slate-950 text-white pb-8">
-        <div className="container mx-auto px-4 py-6">
-          <h1 className="text-2xl font-bold mb-6">Ma valeur nette</h1>
+      <div className="min-h-screen bg-background pb-8">
+        <div className="container mx-auto px-6 py-6">
+          <h1 className="text-xl font-semibold text-foreground mb-6">Ma valeur nette</h1>
           
-          <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
-            <SimpleNetWorthTracker currentNetWorth={netWorth} isAuthenticated={isAuthenticated} />
-          </div>
+          <Card className="border-border">
+            <CardContent className="p-6">
+              <SimpleNetWorthTracker currentNetWorth={netWorth} isAuthenticated={isAuthenticated} />
+            </CardContent>
+          </Card>
         </div>
       </div>
     </ErrorBoundary>
