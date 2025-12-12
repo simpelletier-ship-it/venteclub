@@ -6,13 +6,15 @@ import { CurrencyInput } from "@/components/CurrencyInput";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Plus, Trash2, TrendingUp, TrendingDown, Wallet, CreditCard, Building, PiggyBank, Car, GraduationCap, RefreshCw, Calendar } from "lucide-react";
+import { Plus, Trash2, TrendingUp, TrendingDown, Wallet, CreditCard, Building, PiggyBank, Car, GraduationCap, RefreshCw, Calendar, Percent, AlertCircle } from "lucide-react";
 import { formatPrice } from "@/lib/priceFormat";
 import confetti from "canvas-confetti";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import { Badge } from "@/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface SimpleNetWorthTrackerProps {
   currentNetWorth: number;
@@ -32,21 +34,37 @@ const ACCOUNT_ICONS: Record<string, any> = {
   student_loan: GraduationCap,
   credit_card: CreditCard,
   personal_loan: CreditCard,
+  reer: PiggyBank,
+  celi: PiggyBank,
+  checking: Wallet,
+  vehicle: Car,
+  line_of_credit: CreditCard,
 };
 
 const ACCOUNT_LABELS: Record<string, string> = {
   rrsp: 'REER',
   tfsa: 'CELI',
+  reer: 'REER',
+  celi: 'CELI',
   savings: 'Épargne',
+  checking: 'Compte chèques',
   property: 'Propriété',
   investment: 'Placements',
   emergency_fund: 'Fonds urgence',
+  vehicle: 'Véhicule',
   other: 'Autre',
   mortgage: 'Hypothèque',
   car_loan: 'Prêt auto',
   student_loan: 'Prêt étudiant',
   credit_card: 'Carte crédit',
   personal_loan: 'Prêt perso',
+  line_of_credit: 'Marge crédit',
+};
+
+// Calculate monthly interest for a debt
+const calculateMonthlyInterest = (balance: number, interestRate: number): number => {
+  if (!interestRate || interestRate <= 0) return 0;
+  return (balance * (interestRate / 100)) / 12;
 };
 
 export const SimpleNetWorthTracker = ({ currentNetWorth, isAuthenticated }: SimpleNetWorthTrackerProps) => {
@@ -60,6 +78,7 @@ export const SimpleNetWorthTracker = ({ currentNetWorth, isAuthenticated }: Simp
   const [newValue, setNewValue] = useState("");
   const [newType, setNewType] = useState("savings");
   const [newDate, setNewDate] = useState<Date>(new Date());
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Fetch assets
   const { data: assets = [], refetch: refetchAssets } = useQuery({
@@ -232,10 +251,58 @@ export const SimpleNetWorthTracker = ({ currentNetWorth, isAuthenticated }: Simp
   const totalDebts = debts.reduce((sum: number, d: any) => sum + Number(d.balance), 0);
   const netWorth = totalAssets - totalDebts;
 
-  const handleRefreshAll = () => {
-    refetchAssets();
-    refetchDebts();
-    toast.success("Données actualisées");
+  // Calculate total monthly interest
+  const totalMonthlyInterest = debts.reduce((sum: number, d: any) => {
+    return sum + calculateMonthlyInterest(Number(d.balance), Number(d.interest_rate || 0));
+  }, 0);
+
+  const handleRefreshAll = async () => {
+    setIsRefreshing(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast.error("Non authentifié");
+        return;
+      }
+
+      const today = new Date().toISOString().split('T')[0];
+
+      // Record history for all assets with today's date
+      for (const asset of assets) {
+        await supabase.from('asset_history').insert({
+          user_id: user.id,
+          asset_id: asset.id,
+          value: asset.value,
+          recorded_at: today,
+        });
+      }
+
+      // Record history for all debts with today's date
+      for (const debt of debts) {
+        await supabase.from('debt_history').insert({
+          user_id: user.id,
+          debt_id: debt.id,
+          balance: debt.balance,
+          recorded_at: today,
+        });
+      }
+
+      // Refresh all queries
+      await Promise.all([
+        refetchAssets(),
+        refetchDebts(),
+        queryClient.invalidateQueries({ queryKey: ['net-worth-history'] }),
+        queryClient.invalidateQueries({ queryKey: ['asset-history'] }),
+        queryClient.invalidateQueries({ queryKey: ['debt-history'] }),
+      ]);
+
+      toast.success(`Données mises à jour au ${format(new Date(), 'dd MMM yyyy', { locale: fr })}`);
+    } catch (error) {
+      console.error('Error refreshing data:', error);
+      toast.error("Erreur lors de la mise à jour");
+    } finally {
+      setIsRefreshing(false);
+    }
   };
 
   return (
@@ -251,6 +318,23 @@ export const SimpleNetWorthTracker = ({ currentNetWorth, isAuthenticated }: Simp
           <TrendingDown className="w-5 h-5 text-red-600 mx-auto mb-1" />
           <div className="text-xs text-muted-foreground">Passifs</div>
           <div className="text-lg font-bold text-red-600">{formatPrice(totalDebts)}</div>
+          {totalMonthlyInterest > 0 && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center justify-center gap-1 mt-1">
+                    <Percent className="w-3 h-3 text-orange-500" />
+                    <span className="text-xs text-orange-500 font-medium">
+                      {formatPrice(totalMonthlyInterest)}/mois
+                    </span>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Intérêts mensuels estimés sur vos dettes</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
         </div>
         <div className={`rounded-xl p-4 text-center ${netWorth >= 0 ? 'bg-blue-500/10' : 'bg-orange-500/10'}`}>
           <Wallet className={`w-5 h-5 mx-auto mb-1 ${netWorth >= 0 ? 'text-blue-600' : 'text-orange-600'}`} />
@@ -266,9 +350,23 @@ export const SimpleNetWorthTracker = ({ currentNetWorth, isAuthenticated }: Simp
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
             <CardTitle className="text-base font-medium">Mes comptes</CardTitle>
-            <Button variant="ghost" size="sm" onClick={handleRefreshAll}>
-              <RefreshCw className="w-4 h-4" />
-            </Button>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={handleRefreshAll}
+                    disabled={isRefreshing}
+                  >
+                    <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Mettre à jour toutes les valeurs à la date d'aujourd'hui</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -426,11 +524,22 @@ export const SimpleNetWorthTracker = ({ currentNetWorth, isAuthenticated }: Simp
             {debts.map((debt: any) => {
               const Icon = ACCOUNT_ICONS[debt.type] || CreditCard;
               const isEditing = editingId === `debt-${debt.id}`;
+              const monthlyInterest = calculateMonthlyInterest(Number(debt.balance), Number(debt.interest_rate || 0));
               
               return (
                 <div key={debt.id} className="flex items-center gap-2 p-2 rounded-lg hover:bg-muted/50 group">
                   <Icon className="w-4 h-4 text-red-600 shrink-0" />
-                  <span className="text-sm flex-1 truncate">{debt.name}</span>
+                  <div className="flex-1 min-w-0">
+                    <span className="text-sm truncate block">{debt.name}</span>
+                    {monthlyInterest > 0 && (
+                      <div className="flex items-center gap-1">
+                        <AlertCircle className="w-3 h-3 text-orange-500" />
+                        <span className="text-xs text-orange-500">
+                          ~{formatPrice(monthlyInterest)}/mois en intérêts
+                        </span>
+                      </div>
+                    )}
+                  </div>
                   
                   {isEditing ? (
                     <div className="flex items-center gap-1 flex-wrap">

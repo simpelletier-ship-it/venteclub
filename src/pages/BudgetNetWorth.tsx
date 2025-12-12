@@ -376,13 +376,13 @@ const BudgetNetWorth = () => {
             </Card>
           </div>
 
-          {/* Graphique d'évolution de la valeur nette */}
-          <div className="mb-6">
-            <NetWorthGamification netWorth={netWorth} isAuthenticated={isAuthenticated} />
-          </div>
-
           {/* Gestion des actifs et passifs */}
           <SimpleNetWorthTracker currentNetWorth={netWorth} isAuthenticated={isAuthenticated} />
+
+          {/* Graphique d'évolution de la valeur nette - en bas */}
+          <div className="mt-6">
+            <NetWorthGamification netWorth={netWorth} isAuthenticated={isAuthenticated} />
+          </div>
         </div>
       </div>
     </ErrorBoundary>
