@@ -2348,6 +2348,17 @@ export type Database = {
         Args: { p_details?: Json; p_event_type: string }
         Returns: undefined
       }
+      register_device_fingerprint: {
+        Args: {
+          p_fingerprint_hash: string
+          p_language?: string
+          p_platform?: string
+          p_screen_resolution?: string
+          p_timezone?: string
+          p_user_agent?: string
+        }
+        Returns: string
+      }
       reject_pending_changes: {
         Args: { business_uuid: string; rejection_reason: string }
         Returns: undefined
