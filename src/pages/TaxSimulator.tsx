@@ -156,11 +156,11 @@ const TaxSimulator = () => {
   return (
     <>
       <Helmet>
-        <title>Simulateur d'Impôts Québec 2025 | Tranches et Crédits d'Impôt</title>
-        <meta name="description" content="Simulateur d'impôts Québec et fédéral 2025. Visualisez vos tranches d'imposition, calculez votre retour d'impôt avec REER, CELIAPP, et découvrez tous les crédits d'impôt auxquels vous avez droit." />
+        <title>Simulateur d'Impôt Québec 2025 | Calcul et Tranches d'imposition</title>
+        <meta name="description" content="Simulateur d'impôt Québec et fédéral 2025. Visualisez vos tranches d'imposition, calculez votre retour d'impôt avec REER, CELIAPP, et découvrez tous les crédits d'impôt auxquels vous avez droit." />
         <meta name="keywords" content="simulateur impôt québec 2025, tranches imposition québec, crédit impôt québec, REER déduction, CELIAPP, retour impôt fédéral, calculateur fiscal" />
         
-        <meta property="og:title" content="Simulateur d'Impôts Québec et Fédéral 2025" />
+        <meta property="og:title" content="Simulateur d'Impôt Québec et Fédéral 2025" />
         <meta property="og:description" content="Visualisez exactement où vous vous situez dans les tranches d'imposition et maximisez votre retour d'impôt. Outil gratuit et précis." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://budget.club/impots" />
@@ -171,7 +171,8 @@ const TaxSimulator = () => {
             "@type": "BreadcrumbList",
             "itemListElement": [
               { "@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://budget.club" },
-              { "@type": "ListItem", "position": 2, "name": "Simulateur d'Impôts", "item": "https://budget.club/impots" }
+              { "@type": "ListItem", "position": 2, "name": "Outils", "item": "https://budget.club/outils" },
+              { "@type": "ListItem", "position": 3, "name": "Simulateur d'Impôt", "item": "https://budget.club/impots" }
             ]
           })}
         </script>
@@ -180,7 +181,7 @@ const TaxSimulator = () => {
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "WebApplication",
-            "name": "Simulateur d'Impôts Québec 2025",
+            "name": "Simulateur d'Impôt Québec 2025",
             "description": "Simulateur complet pour visualiser vos tranches d'imposition Québec et fédéral, calculer votre retour d'impôt, et découvrir les crédits d'impôt disponibles.",
             "url": "https://budget.club/impots",
             "applicationCategory": "FinanceApplication",
@@ -195,7 +196,7 @@ const TaxSimulator = () => {
           
           <div className="text-center mb-8">
             <h1 className="text-3xl lg:text-4xl font-bold mb-3 text-foreground">
-              Simulateur d'Impôts 2025
+              Simulateur d'Impôt 2025
             </h1>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
               Visualisez vos tranches d'imposition Québec et fédéral, calculez votre retour d'impôt 
@@ -203,34 +204,20 @@ const TaxSimulator = () => {
             </p>
           </div>
 
-          <Tabs defaultValue="tranches" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-3 max-w-lg mx-auto">
-              <TabsTrigger value="tranches" className="flex items-center gap-2">
-                <TrendingUp className="h-4 w-4" />
-                <span className="hidden sm:inline">Tranches</span>
-              </TabsTrigger>
-              <TabsTrigger value="calcul" className="flex items-center gap-2">
+          <Tabs defaultValue="simulation" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto">
+              <TabsTrigger value="simulation" className="flex items-center gap-2">
                 <Calculator className="h-4 w-4" />
-                <span className="hidden sm:inline">Calcul</span>
+                <span>Simulation</span>
               </TabsTrigger>
               <TabsTrigger value="credits" className="flex items-center gap-2">
                 <Sparkles className="h-4 w-4" />
-                <span className="hidden sm:inline">Crédits</span>
+                <span>Crédits</span>
               </TabsTrigger>
             </TabsList>
 
-            {/* Onglet Tranches d'imposition */}
-            <TabsContent value="tranches" className="space-y-6">
-              <TaxBracketVisualizer 
-                income={incomeValue}
-                onIncomeChange={(val) => setIncome(val.toString())}
-                celiappContribution={fhsaValue}
-                rrspContribution={rrspValue}
-              />
-            </TabsContent>
-
-            {/* Onglet Calcul du retour */}
-            <TabsContent value="calcul" className="space-y-6">
+            {/* Onglet Simulation (fusion Tranches + Calcul) */}
+            <TabsContent value="simulation" className="space-y-6">
               <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
                 {/* Input Section */}
                 <Card className="lg:col-span-2">
@@ -420,6 +407,14 @@ const TaxSimulator = () => {
                       </div>
                     </CardContent>
                   </Card>
+
+                  {/* Visualisation des tranches */}
+                  <TaxBracketVisualizer 
+                    income={incomeValue}
+                    onIncomeChange={(val) => setIncome(val.toString())}
+                    celiappContribution={fhsaValue}
+                    rrspContribution={rrspValue}
+                  />
 
                   {/* Breakdown Cards */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
