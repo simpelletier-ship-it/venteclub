@@ -13,7 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { CheckCircle, XCircle, Eye, ArrowLeft, Trash2, Star, Edit, Upload, UserX, Shield, X, ChevronUp, ChevronDown, ImageIcon } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { VisualRichTextEditor } from "@/components/VisualRichTextEditor";
+import { RichTextEditor } from "@/components/RichTextEditor";
 import { z } from "zod";
 import { QUEBEC_INDUSTRIES } from "@/lib/constants";
 import { BlogManager } from "@/components/BlogManager";
@@ -2068,7 +2068,7 @@ const Admin = () => {
 
             <div>
               <Label htmlFor="edit-description">Description *</Label>
-              <VisualRichTextEditor
+              <RichTextEditor
                 content={editFormData.description}
                 onChange={(content) => setEditFormData({ ...editFormData, description: content })}
                 placeholder="Description détaillée de l'entreprise"

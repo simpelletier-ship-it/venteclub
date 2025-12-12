@@ -28,7 +28,7 @@ import {
   User,
   Heart
 } from "lucide-react";
-import { NotificationBell } from "./NotificationBell";
+
 import { ThemeToggle } from "./ThemeToggle";
 import { cn } from "@/lib/utils";
 
@@ -221,7 +221,6 @@ const Header = () => {
           {/* Right Side Actions */}
           <div className="flex items-center gap-2">
             <ThemeToggle />
-            {user && <NotificationBell userId={user.id} />}
             
             {isAdmin && (
               <Button 
