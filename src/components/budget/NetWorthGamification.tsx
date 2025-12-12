@@ -2,9 +2,9 @@ import { TrendingUp, TrendingDown, Sparkles, LineChart as LineChartIcon, Plus, C
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatPrice } from "@/lib/priceFormat";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Area, AreaChart } from "recharts";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface NetWorthGamificationProps {
@@ -15,14 +15,41 @@ interface NetWorthGamificationProps {
 export const NetWorthGamification = ({ netWorth, isAuthenticated }: NetWorthGamificationProps) => {
   const [showChart, setShowChart] = useState(true);
   const [selectedPeriod, setSelectedPeriod] = useState<'7d' | '30d' | '90d' | '1y'>('30d');
+  const queryClient = useQueryClient();
+
+  // Subscribe to realtime changes for assets and debts
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    const channel = supabase
+      .channel('net-worth-changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'user_assets' }, () => {
+        queryClient.invalidateQueries({ queryKey: ['net-worth-history'] });
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'user_debts' }, () => {
+        queryClient.invalidateQueries({ queryKey: ['net-worth-history'] });
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'asset_history' }, () => {
+        queryClient.invalidateQueries({ queryKey: ['net-worth-history'] });
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'debt_history' }, () => {
+        queryClient.invalidateQueries({ queryKey: ['net-worth-history'] });
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [isAuthenticated, queryClient]);
 
   // Fetch historical data for chart using asset/debt history
-  const { data: historicalData = [], refetch: refetchHistory } = useQuery({
+  const { data: historicalData = [] } = useQuery({
     queryKey: ['net-worth-history', selectedPeriod],
     enabled: isAuthenticated,
     retry: 1,
-    staleTime: 0, // Always refetch when invalidated
-    refetchOnMount: true,
+    staleTime: 0,
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: true,
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return [];
@@ -73,47 +100,37 @@ export const NetWorthGamification = ({ netWorth, isAuthenticated }: NetWorthGami
         .select('balance, id, name')
         .eq('user_id', user.id);
 
-      // Collect all unique dates from history
-      const allDates = new Set<string>();
-      
-      assetHistory?.forEach(entry => {
-        allDates.add(new Date(entry.recorded_at).toISOString().split('T')[0]);
-      });
-      
-      debtHistory?.forEach(entry => {
-        allDates.add(new Date(entry.recorded_at).toISOString().split('T')[0]);
-      });
-
-      // Always add today's date with current values
+      // Build chart data with only current state (no duplicates)
       const today = new Date().toISOString().split('T')[0];
-      allDates.add(today);
+      
+      // Get unique history dates
+      const historyDates = new Set<string>();
+      assetHistory?.forEach(entry => {
+        const date = new Date(entry.recorded_at).toISOString().split('T')[0];
+        if (date !== today) historyDates.add(date);
+      });
+      debtHistory?.forEach(entry => {
+        const date = new Date(entry.recorded_at).toISOString().split('T')[0];
+        if (date !== today) historyDates.add(date);
+      });
 
-      // Sort dates chronologically
-      const sortedDates = Array.from(allDates).sort();
-
-      // Track latest value for each asset/debt up to each date
+      const sortedDates = Array.from(historyDates).sort();
+      
+      // Track latest value for each asset/debt
       const assetLatestValues = new Map<string, number>();
       const debtLatestValues = new Map<string, number>();
 
-      // Initialize with zeros for assets/debts that have history
+      // Initialize with zeros
       assets?.forEach(a => assetLatestValues.set(a.id, 0));
       debts?.forEach(d => debtLatestValues.set(d.id, 0));
 
-      // Build chart data
+      // Build chart data for historical dates
       const chartData = sortedDates.map(date => {
-        // Update asset values from history entries on or before this date
         assetHistory?.filter(h => new Date(h.recorded_at).toISOString().split('T')[0] <= date)
           .forEach(h => assetLatestValues.set(h.asset_id, Number(h.value)));
 
-        // Update debt values from history entries on or before this date
         debtHistory?.filter(h => new Date(h.recorded_at).toISOString().split('T')[0] <= date)
           .forEach(h => debtLatestValues.set(h.debt_id, Number(h.balance)));
-
-        // For today, use current actual values
-        if (date === today) {
-          assets?.forEach(a => assetLatestValues.set(a.id, Number(a.value)));
-          debts?.forEach(d => debtLatestValues.set(d.id, Number(d.balance)));
-        }
 
         const totalAssets = Array.from(assetLatestValues.values()).reduce((sum, v) => sum + v, 0);
         const totalDebts = Array.from(debtLatestValues.values()).reduce((sum, v) => sum + v, 0);
@@ -124,6 +141,17 @@ export const NetWorthGamification = ({ netWorth, isAuthenticated }: NetWorthGami
           dettes: totalDebts,
           valeurNette: totalAssets - totalDebts,
         };
+      });
+
+      // Add today's current values as the last point
+      const currentTotalAssets = assets?.reduce((sum, a) => sum + Number(a.value), 0) || 0;
+      const currentTotalDebts = debts?.reduce((sum, d) => sum + Number(d.balance), 0) || 0;
+      
+      chartData.push({
+        date: new Date(today).toLocaleDateString('fr-CA', { day: 'numeric', month: 'short' }),
+        actifs: currentTotalAssets,
+        dettes: currentTotalDebts,
+        valeurNette: currentTotalAssets - currentTotalDebts,
       });
 
       return chartData;
