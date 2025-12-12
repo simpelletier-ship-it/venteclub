@@ -17,10 +17,12 @@ export const NetWorthGamification = ({ netWorth, isAuthenticated }: NetWorthGami
   const [selectedPeriod, setSelectedPeriod] = useState<'7d' | '30d' | '90d' | '1y'>('30d');
 
   // Fetch historical data for chart using asset/debt history
-  const { data: historicalData = [] } = useQuery({
+  const { data: historicalData = [], refetch: refetchHistory } = useQuery({
     queryKey: ['net-worth-history', selectedPeriod],
     enabled: isAuthenticated,
     retry: 1,
+    staleTime: 0, // Always refetch when invalidated
+    refetchOnMount: true,
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return [];
@@ -48,6 +50,7 @@ export const NetWorthGamification = ({ netWorth, isAuthenticated }: NetWorthGami
       const { data: assetHistory } = await supabase
         .from('asset_history')
         .select('*, asset:user_assets(name)')
+        .eq('user_id', user.id)
         .gte('recorded_at', startDate.toISOString())
         .order('recorded_at');
 
@@ -55,55 +58,65 @@ export const NetWorthGamification = ({ netWorth, isAuthenticated }: NetWorthGami
       const { data: debtHistory } = await supabase
         .from('debt_history')
         .select('*, debt:user_debts(name)')
+        .eq('user_id', user.id)
         .gte('recorded_at', startDate.toISOString())
         .order('recorded_at');
 
-      // Get current values
+      // Get current values for assets and debts
       const { data: assets } = await supabase
         .from('user_assets')
-        .select('value, id, name');
+        .select('value, id, name')
+        .eq('user_id', user.id);
       
       const { data: debts } = await supabase
         .from('user_debts')
-        .select('balance, id, name');
+        .select('balance, id, name')
+        .eq('user_id', user.id);
 
-      // Group history by date
-      const dateMap = new Map<string, { assets: number; debts: number }>();
-
-      // Add asset history
+      // Collect all unique dates from history
+      const allDates = new Set<string>();
+      
       assetHistory?.forEach(entry => {
-        const date = new Date(entry.recorded_at).toISOString().split('T')[0];
-        if (!dateMap.has(date)) {
-          dateMap.set(date, { assets: 0, debts: 0 });
-        }
+        allDates.add(new Date(entry.recorded_at).toISOString().split('T')[0]);
       });
-
-      // Add debt history
+      
       debtHistory?.forEach(entry => {
-        const date = new Date(entry.recorded_at).toISOString().split('T')[0];
-        if (!dateMap.has(date)) {
-          dateMap.set(date, { assets: 0, debts: 0 });
-        }
+        allDates.add(new Date(entry.recorded_at).toISOString().split('T')[0]);
       });
 
-      // Sort dates
-      const sortedDates = Array.from(dateMap.keys()).sort();
+      // Always add today's date with current values
+      const today = new Date().toISOString().split('T')[0];
+      allDates.add(today);
 
-      // Calculate cumulative values for each date
-      const currentAssetValues = new Map(assets?.map(a => [a.id, Number(a.value)]) || []);
-      const currentDebtValues = new Map(debts?.map(d => [d.id, Number(d.balance)]) || []);
+      // Sort dates chronologically
+      const sortedDates = Array.from(allDates).sort();
 
-      return sortedDates.map(date => {
-        // Update asset values based on history
-        assetHistory?.filter(h => new Date(h.recorded_at).toISOString().split('T')[0] === date)
-          .forEach(h => currentAssetValues.set(h.asset_id, Number(h.value)));
+      // Track latest value for each asset/debt up to each date
+      const assetLatestValues = new Map<string, number>();
+      const debtLatestValues = new Map<string, number>();
 
-        // Update debt values based on history
-        debtHistory?.filter(h => new Date(h.recorded_at).toISOString().split('T')[0] === date)
-          .forEach(h => currentDebtValues.set(h.debt_id, Number(h.balance)));
+      // Initialize with zeros for assets/debts that have history
+      assets?.forEach(a => assetLatestValues.set(a.id, 0));
+      debts?.forEach(d => debtLatestValues.set(d.id, 0));
 
-        const totalAssets = Array.from(currentAssetValues.values()).reduce((sum, v) => sum + v, 0);
-        const totalDebts = Array.from(currentDebtValues.values()).reduce((sum, v) => sum + v, 0);
+      // Build chart data
+      const chartData = sortedDates.map(date => {
+        // Update asset values from history entries on or before this date
+        assetHistory?.filter(h => new Date(h.recorded_at).toISOString().split('T')[0] <= date)
+          .forEach(h => assetLatestValues.set(h.asset_id, Number(h.value)));
+
+        // Update debt values from history entries on or before this date
+        debtHistory?.filter(h => new Date(h.recorded_at).toISOString().split('T')[0] <= date)
+          .forEach(h => debtLatestValues.set(h.debt_id, Number(h.balance)));
+
+        // For today, use current actual values
+        if (date === today) {
+          assets?.forEach(a => assetLatestValues.set(a.id, Number(a.value)));
+          debts?.forEach(d => debtLatestValues.set(d.id, Number(d.balance)));
+        }
+
+        const totalAssets = Array.from(assetLatestValues.values()).reduce((sum, v) => sum + v, 0);
+        const totalDebts = Array.from(debtLatestValues.values()).reduce((sum, v) => sum + v, 0);
 
         return {
           date: new Date(date).toLocaleDateString('fr-CA', { day: 'numeric', month: 'short' }),
@@ -112,6 +125,8 @@ export const NetWorthGamification = ({ netWorth, isAuthenticated }: NetWorthGami
           valeurNette: totalAssets - totalDebts,
         };
       });
+
+      return chartData;
     },
   });
 
