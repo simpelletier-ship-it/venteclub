@@ -213,13 +213,6 @@ const TaxReturnCalculator = () => {
 
       <div className="min-h-screen bg-background py-12">
         <div className="container mx-auto px-4 max-w-5xl">
-          <Alert className="mb-6 border-yellow-500 bg-yellow-50 dark:bg-yellow-950/20">
-            <AlertTriangle className="h-4 w-4 text-yellow-600 dark:text-yellow-500" />
-            <AlertTitle className="text-yellow-800 dark:text-yellow-400">Avertissement important</AlertTitle>
-            <AlertDescription className="text-yellow-700 dark:text-yellow-300">
-              Ce calculateur fournit une estimation de votre retour d'impôt basée sur les taux et crédits de 2025. Les résultats sont approximatifs et peuvent varier selon votre situation fiscale complète. Consultez toujours un comptable ou un fiscaliste qualifié pour une évaluation précise et des conseils fiscaux personnalisés.
-            </AlertDescription>
-          </Alert>
           
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold mb-2 text-foreground">
@@ -408,7 +401,7 @@ const TaxReturnCalculator = () => {
                   </div>
                   <div className="grid grid-cols-2 gap-4 bg-white/10 rounded-lg p-4">
                     <div>
-                      <div className="text-sm text-green-100 mb-1">Québec (bleu)</div>
+                      <div className="text-sm text-green-100 mb-1">Québec</div>
                       <div className="text-2xl font-bold text-blue-200">
                         {formatPrice(results.provincial.total)}
                       </div>
@@ -417,7 +410,7 @@ const TaxReturnCalculator = () => {
                       </div>
                     </div>
                     <div>
-                      <div className="text-sm text-green-100 mb-1">Fédéral (rouge)</div>
+                      <div className="text-sm text-green-100 mb-1">Fédéral</div>
                       <div className="text-2xl font-bold text-red-200">
                         {formatPrice(results.federal.total)}
                       </div>
@@ -432,8 +425,9 @@ const TaxReturnCalculator = () => {
               {/* Québec Breakdown */}
               <Card className="border-blue-200 dark:border-blue-800">
                 <CardHeader className="bg-blue-50 dark:bg-blue-950/20">
-                  <CardTitle className="text-blue-900 dark:text-blue-100">
-                    🔵 Retour d'impôt Québec
+                  <CardTitle className="text-blue-900 dark:text-blue-100 flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+                    Retour d'impôt Québec
                   </CardTitle>
                   <CardDescription className="text-blue-700 dark:text-blue-300">
                     Portion provinciale de vos économies
@@ -584,8 +578,9 @@ const TaxReturnCalculator = () => {
               {/* Federal Breakdown */}
               <Card className="border-red-200 dark:border-red-800">
                 <CardHeader className="bg-red-50 dark:bg-red-950/20">
-                  <CardTitle className="text-red-900 dark:text-red-100">
-                    🔴 Retour d'impôt fédéral
+                  <CardTitle className="text-red-900 dark:text-red-100 flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                    Retour d'impôt fédéral
                   </CardTitle>
                   <CardDescription className="text-red-700 dark:text-red-300">
                     Portion fédérale de vos économies
@@ -985,6 +980,15 @@ const TaxReturnCalculator = () => {
                 </ul>
               </div>
             </div>
+
+            {/* Avertissement en bas de page */}
+            <Alert className="mt-8 border-yellow-500 bg-yellow-50 dark:bg-yellow-950/20">
+              <AlertTriangle className="h-4 w-4 text-yellow-600 dark:text-yellow-500" />
+              <AlertTitle className="text-yellow-800 dark:text-yellow-400">Avertissement important</AlertTitle>
+              <AlertDescription className="text-yellow-700 dark:text-yellow-300">
+                Ce calculateur fournit une estimation de votre retour d'impôt basée sur les taux et crédits de 2025. Les résultats sont approximatifs et peuvent varier selon votre situation fiscale complète. Consultez toujours un comptable ou un fiscaliste qualifié pour une évaluation précise et des conseils fiscaux personnalisés.
+              </AlertDescription>
+            </Alert>
           </div>
         </div>
       </div>

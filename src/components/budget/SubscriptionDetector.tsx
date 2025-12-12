@@ -2,6 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { AlertCircle, Calendar, DollarSign, TrendingUp, X } from "lucide-react";
+import { CategoryIcon } from "@/components/budget/CategoryIcon";
 import { formatPrice } from "@/lib/priceFormat";
 import { useState } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -91,7 +92,7 @@ export const SubscriptionDetector = ({ transactions, categories }: SubscriptionD
           daysSinceLastTransaction,
           isPotentiallyCancelled,
           category: category?.name || 'Non catégorisé',
-          categoryIcon: category?.icon || '📄',
+          categoryIcon: category?.icon || 'box',
         };
       })
       .filter(Boolean)
@@ -183,7 +184,7 @@ export const SubscriptionDetector = ({ transactions, categories }: SubscriptionD
                 <div key={sub.id} className="flex items-center justify-between p-4 border border-orange-200 bg-orange-50/50 dark:bg-orange-950/10 rounded-lg">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="text-lg">{sub.categoryIcon}</span>
+                      <CategoryIcon icon={sub.categoryIcon} size="md" />
                       <span className="font-semibold">{sub.description}</span>
                       <Badge variant="outline" className="text-xs">{sub.frequency}</Badge>
                     </div>
@@ -219,7 +220,7 @@ export const SubscriptionDetector = ({ transactions, categories }: SubscriptionD
                 <div key={sub.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/30 transition-colors">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="text-lg">{sub.categoryIcon}</span>
+                      <CategoryIcon icon={sub.categoryIcon} size="md" />
                       <span className="font-semibold">{sub.description}</span>
                       <Badge variant="secondary" className="text-xs">{sub.frequency}</Badge>
                       <Badge variant="outline" className="text-xs">{sub.category}</Badge>

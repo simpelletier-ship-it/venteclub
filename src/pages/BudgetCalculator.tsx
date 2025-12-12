@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { SEO } from "@/components/SEO";
 import { BreadcrumbSchema } from "@/components/BreadcrumbSchema";
-import { Loader2, TrendingUp, TrendingDown, Wallet, ArrowUpRight, ArrowDownRight, Plus, ChevronRight, Target, Calendar, Clock, CreditCard, PiggyBank, LineChart, Bell, BarChart3, Lightbulb } from "lucide-react";
+import { Loader2, TrendingUp, TrendingDown, Wallet, ArrowUpRight, ArrowDownRight, Plus, ChevronRight, Target, Calendar, Clock, CreditCard, PiggyBank, LineChart, Bell, BarChart3, Lightbulb, ReceiptText } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
@@ -25,6 +25,7 @@ import { SpendingLimitsAlerts } from "@/components/budget/SpendingLimitsAlerts";
 import { InvestmentTracker } from "@/components/budget/InvestmentTracker";
 import { FinancialProductComparison } from "@/components/budget/FinancialProductComparison";
 import { SmartInsights } from "@/components/budget/SmartInsights";
+import { SubscriptionDetector } from "@/components/budget/SubscriptionDetector";
 import { CategoryIcon } from "@/components/budget/CategoryIcon";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -178,6 +179,87 @@ const BudgetCalculator = () => {
                 />
               </div>
             )}
+
+            {/* Analyses avancées - Section principale en haut */}
+            <Card className="border-border mb-6">
+              <CardHeader className="pb-2 border-b border-border">
+                <div className="flex items-center gap-2">
+                  <Lightbulb className="h-4 w-4 text-primary" />
+                  <CardTitle className="text-sm font-medium">Analyses avancées</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-4">
+                <Tabs defaultValue="insights" className="w-full">
+                  <TabsList className="grid grid-cols-3 lg:grid-cols-6 gap-1 h-auto p-1 mb-4">
+                    <TabsTrigger value="insights" className="text-xs py-2 px-2 gap-1">
+                      <Lightbulb className="h-3 w-3" />
+                      <span className="hidden sm:inline">Insights</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="subscriptions" className="text-xs py-2 px-2 gap-1">
+                      <ReceiptText className="h-3 w-3" />
+                      <span className="hidden sm:inline">Abonnements</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="calendar" className="text-xs py-2 px-2 gap-1">
+                      <Calendar className="h-3 w-3" />
+                      <span className="hidden sm:inline">Factures</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="cashflow" className="text-xs py-2 px-2 gap-1">
+                      <LineChart className="h-3 w-3" />
+                      <span className="hidden sm:inline">Trésorerie</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="debts" className="text-xs py-2 px-2 gap-1">
+                      <CreditCard className="h-3 w-3" />
+                      <span className="hidden sm:inline">Dettes</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="savings" className="text-xs py-2 px-2 gap-1">
+                      <PiggyBank className="h-3 w-3" />
+                      <span className="hidden sm:inline">Épargne</span>
+                    </TabsTrigger>
+                  </TabsList>
+
+                  <TabsContent value="insights" className="mt-0 space-y-4">
+                    <SmartInsights />
+                    <AgeOfMoney 
+                      monthlyIncome={monthlyIncome}
+                      monthlyExpenses={monthlyExpenses}
+                      currentBalance={monthlyBalance > 0 ? monthlyBalance : 0}
+                    />
+                  </TabsContent>
+
+                  <TabsContent value="subscriptions" className="mt-0">
+                    <SubscriptionDetector 
+                      transactions={transactions}
+                      categories={categories}
+                    />
+                  </TabsContent>
+
+                  <TabsContent value="calendar" className="mt-0 space-y-4">
+                    <BillCalendar />
+                    <SpendingLimitsAlerts />
+                  </TabsContent>
+
+                  <TabsContent value="cashflow" className="mt-0">
+                    <CashFlowForecast 
+                      currentBalance={netWorth > 0 ? netWorth : 5000}
+                      monthlyIncome={monthlyIncome || 4000}
+                      monthlyExpenses={monthlyExpenses || 3000}
+                      upcomingBills={[]}
+                    />
+                  </TabsContent>
+
+                  <TabsContent value="debts" className="mt-0 space-y-4">
+                    <DebtPayoffPlanner />
+                    <FinancialProductComparison />
+                  </TabsContent>
+
+                  <TabsContent value="savings" className="mt-0 space-y-4">
+                    <SavingsChallenges />
+                    <InvestmentTracker />
+                  </TabsContent>
+                </Tabs>
+              </CardContent>
+            </Card>
+
             {/* KPI Cards - Banking Style */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
               <Card className="border-border">
@@ -344,76 +426,6 @@ const BudgetCalculator = () => {
               </CardContent>
             </Card>
 
-            {/* Advanced Features Tabs */}
-            <Card className="border-border">
-              <CardHeader className="pb-2 border-b border-border">
-                <div className="flex items-center gap-2">
-                  <Lightbulb className="h-4 w-4 text-primary" />
-                  <CardTitle className="text-sm font-medium">Analyses avancées</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className="pt-4">
-                <Tabs defaultValue="insights" className="w-full">
-                  <TabsList className="grid grid-cols-3 lg:grid-cols-5 gap-1 h-auto p-1 mb-4">
-                    <TabsTrigger value="insights" className="text-xs py-2 px-2 gap-1">
-                      <Lightbulb className="h-3 w-3" />
-                      <span className="hidden sm:inline">Insights</span>
-                    </TabsTrigger>
-                    <TabsTrigger value="calendar" className="text-xs py-2 px-2 gap-1">
-                      <Calendar className="h-3 w-3" />
-                      <span className="hidden sm:inline">Factures</span>
-                    </TabsTrigger>
-                    <TabsTrigger value="cashflow" className="text-xs py-2 px-2 gap-1">
-                      <LineChart className="h-3 w-3" />
-                      <span className="hidden sm:inline">Trésorerie</span>
-                    </TabsTrigger>
-                    <TabsTrigger value="debts" className="text-xs py-2 px-2 gap-1">
-                      <CreditCard className="h-3 w-3" />
-                      <span className="hidden sm:inline">Dettes</span>
-                    </TabsTrigger>
-                    <TabsTrigger value="savings" className="text-xs py-2 px-2 gap-1">
-                      <PiggyBank className="h-3 w-3" />
-                      <span className="hidden sm:inline">Épargne</span>
-                    </TabsTrigger>
-                  </TabsList>
-
-                  <TabsContent value="insights" className="mt-0 space-y-4">
-                    <SmartInsights />
-                    <AgeOfMoney 
-                      monthlyIncome={monthlyIncome}
-                      monthlyExpenses={monthlyExpenses}
-                      currentBalance={monthlyBalance > 0 ? monthlyBalance : 0}
-                    />
-                  </TabsContent>
-
-                  <TabsContent value="calendar" className="mt-0 space-y-4">
-                    <BillCalendar />
-                    <SpendingLimitsAlerts />
-                  </TabsContent>
-
-                  <TabsContent value="cashflow" className="mt-0">
-                    <CashFlowForecast 
-                      currentBalance={netWorth > 0 ? netWorth : 5000}
-                      monthlyIncome={monthlyIncome || 4000}
-                      monthlyExpenses={monthlyExpenses || 3000}
-                      upcomingBills={[]}
-                    />
-                  </TabsContent>
-
-                  <TabsContent value="debts" className="mt-0">
-                    <DebtPayoffPlanner />
-                  </TabsContent>
-
-                  <TabsContent value="savings" className="mt-0 space-y-4">
-                    <SavingsChallenges />
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                      <InvestmentTracker />
-                      <FinancialProductComparison />
-                    </div>
-                  </TabsContent>
-                </Tabs>
-              </CardContent>
-            </Card>
           </div>
         </div>
       </>
