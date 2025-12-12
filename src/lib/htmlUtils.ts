@@ -1,3 +1,5 @@
+import DOMPurify from 'dompurify';
+
 /**
  * Extract plain text from HTML string
  * Removes all HTML tags and returns clean text
@@ -27,7 +29,7 @@ export const decodeHtml = (html: string): string => {
 
 /**
  * Sanitize and prepare HTML for safe rendering
- * Decodes entities and returns clean HTML
+ * Uses DOMPurify to prevent XSS attacks while allowing safe formatting tags
  */
 export const sanitizeHtml = (html: string): string => {
   if (!html) return '';
@@ -35,8 +37,16 @@ export const sanitizeHtml = (html: string): string => {
   // First decode any HTML entities
   const decoded = decodeHtml(html);
   
-  // Return the decoded HTML
-  return decoded;
+  // Sanitize with DOMPurify - only allow safe formatting tags
+  const clean = DOMPurify.sanitize(decoded, {
+    ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'b', 'i', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'blockquote', 'a', 'span', 'div'],
+    ALLOWED_ATTR: ['href', 'target', 'rel', 'class'],
+    ALLOW_DATA_ATTR: false,
+    ADD_ATTR: ['target'],
+    FORCE_BODY: true
+  });
+  
+  return clean;
 };
 
 /**
