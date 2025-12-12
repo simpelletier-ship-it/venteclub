@@ -23,7 +23,7 @@ export const Footer = () => {
             <h3 className="font-semibold text-foreground mb-4">Outils financiers</h3>
             <ul className="space-y-3">
               <li>
-                <Link to="/outils/budget" className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-2">
+                <Link to="/budget" className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-2">
                   <PiggyBank className="w-4 h-4 text-primary" />
                   Planificateur de budget
                 </Link>

@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Home, Search, Heart, MessageSquare, User } from "lucide-react";
+import { Home, Target, Receipt, Wallet, User } from "lucide-react";
 import { motion } from "framer-motion";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Badge } from "./ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 
 export const MobileBottomNav = () => {
@@ -12,7 +11,6 @@ export const MobileBottomNav = () => {
   const isMobile = useIsMobile();
   const [isVisible, setIsVisible] = useState(true);
   const [lastScroll, setLastScroll] = useState(0);
-  const [unreadCount, setUnreadCount] = useState(0);
   const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -20,39 +18,6 @@ export const MobileBottomNav = () => {
       setUserId(session?.user?.id || null);
     });
   }, []);
-
-  useEffect(() => {
-    if (!userId) return;
-
-    const fetchUnreadCount = async () => {
-      const { count } = await supabase
-        .from('messages')
-        .select('*', { count: 'exact', head: true })
-        .eq('receiver_id', userId)
-        .eq('read', false);
-      setUnreadCount(count || 0);
-    };
-
-    fetchUnreadCount();
-
-    const channel = supabase
-      .channel('mobile-nav-messages')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'messages',
-          filter: `receiver_id=eq.${userId}`
-        },
-        () => fetchUnreadCount()
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [userId]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -69,10 +34,10 @@ export const MobileBottomNav = () => {
 
   const navItems = [
     { icon: Home, label: 'Accueil', path: '/' },
-    { icon: Search, label: 'Recherche', path: '/entreprises' },
-    { icon: Heart, label: 'Favoris', path: '/favorites' },
-    { icon: MessageSquare, label: 'Messages', path: '/messages', badge: unreadCount },
-    { icon: User, label: 'Profil', path: userId ? '/dashboard' : '/auth' },
+    { icon: Target, label: 'Budget', path: '/budget/planifier' },
+    { icon: Receipt, label: 'Dépenses', path: '/budget/depenses' },
+    { icon: Wallet, label: 'Valeur nette', path: '/budget/valeur-nette' },
+    { icon: User, label: 'Compte', path: userId ? '/settings' : '/auth' },
   ];
 
   const isActive = (path: string) => location.pathname === path;
@@ -110,13 +75,6 @@ export const MobileBottomNav = () => {
                   }`} 
                   strokeWidth={active ? 2.5 : 2}
                 />
-                {item.badge !== undefined && item.badge > 0 && (
-                  <Badge 
-                    className="absolute -top-1.5 -right-1.5 h-4 w-4 rounded-full p-0 flex items-center justify-center bg-destructive text-white text-[9px] font-bold border-2 border-card"
-                  >
-                    {item.badge > 9 ? '9+' : item.badge}
-                  </Badge>
-                )}
               </div>
               <span className={`text-[10px] font-medium transition-colors leading-tight ${
                 active ? 'text-primary' : 'text-muted-foreground'

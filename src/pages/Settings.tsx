@@ -11,11 +11,10 @@ import { Switch } from "@/components/ui/switch";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { User, CreditCard, Bell, Mail, Save, Upload, Shield, MapPin, Globe } from "lucide-react";
-import { AlertsManager } from "@/components/AlertsManager";
 import { TwoFactorAuth } from "@/components/TwoFactorAuth";
 import { TrustedDevices } from "@/components/TrustedDevices";
 import { PaymentHistory } from "@/components/PaymentHistory";
-import { PremiumSubscription } from "@/components/PremiumSubscription";
+
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -600,7 +599,6 @@ const Settings = () => {
             </TabsContent>
 
             <TabsContent value="payments" className="space-y-6">
-              <PremiumSubscription userId={user?.id} />
               <PaymentHistory userId={user?.id} />
             </TabsContent>
 
@@ -631,7 +629,15 @@ const Settings = () => {
             </TabsContent>
 
             <TabsContent value="alerts">
-              <AlertsManager userId={user?.id} />
+              <Card>
+                <CardHeader>
+                  <CardTitle>Alertes</CardTitle>
+                  <CardDescription>Gérez vos préférences d'alertes</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">Fonctionnalité en cours de développement.</p>
+                </CardContent>
+              </Card>
             </TabsContent>
 
             <TabsContent value="newsletter" className="space-y-6">

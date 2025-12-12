@@ -16,17 +16,8 @@ import { ThemeProvider } from "next-themes";
 const Home = lazy(() => import("./pages/Home"));
 const Auth = lazy(() => import("./pages/Auth"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
-const Sell = lazy(() => import("./pages/Sell"));
-const ListBusiness = lazy(() => import("./pages/ListBusiness"));
-const ListFranchise = lazy(() => import("./pages/ListFranchise"));
-const ListProperty = lazy(() => import("./pages/ListProperty"));
-const Dashboard = lazy(() => import("./pages/Dashboard"));
-const BusinessDetails = lazy(() => import("./pages/BusinessDetails"));
-const Map = lazy(() => import("./pages/Map"));
 const Admin = lazy(() => import("./pages/Admin"));
 const Settings = lazy(() => import("./pages/Settings"));
-const Favorites = lazy(() => import("./pages/Favorites"));
-const Messages = lazy(() => import("./pages/Messages"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const LogoutSuccess = lazy(() => import("./pages/LogoutSuccess"));
 const About = lazy(() => import("./pages/About"));
@@ -34,8 +25,6 @@ const Contact = lazy(() => import("./pages/Contact"));
 const Blog = lazy(() => import("./pages/Blog"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
 const Terms = lazy(() => import("./pages/Terms"));
-const Profile = lazy(() => import("./pages/Profile"));
-const SellerProfile = lazy(() => import("./pages/SellerProfile"));
 const Resources = lazy(() => import("./pages/Resources"));
 const FAQ = lazy(() => import("./pages/FAQ"));
 const EmailConfirmed = lazy(() => import("./pages/EmailConfirmed"));
@@ -52,6 +41,8 @@ const BudgetNetWorth = lazy(() => import("./pages/BudgetNetWorth"));
 const BudgetAnalytics = lazy(() => import("./pages/BudgetAnalytics"));
 const TaxSimulator = lazy(() => import("./pages/TaxSimulator"));
 const Support = lazy(() => import("./pages/Support"));
+const AdminSecurity = lazy(() => import("./pages/AdminSecurity"));
+const SecurityCompliance = lazy(() => import("./pages/SecurityCompliance"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -63,9 +54,6 @@ const queryClient = new QueryClient({
     },
   },
 });
-
-const AdminSecurity = lazy(() => import("./pages/AdminSecurity"));
-const SecurityCompliance = lazy(() => import("./pages/SecurityCompliance"));
 
 const AnalyticsTracker = () => {
   const location = useLocation();
@@ -134,7 +122,6 @@ const App = () => (
                   
                   {/* User pages */}
                   <Route path="/settings" element={<EmailVerificationGuard><Settings /></EmailVerificationGuard>} />
-                  <Route path="/profile/:userId" element={<EmailVerificationGuard><Profile /></EmailVerificationGuard>} />
                   
                   {/* Admin */}
                   <Route path="/admin" element={<EmailVerificationGuard><Admin /></EmailVerificationGuard>} />
