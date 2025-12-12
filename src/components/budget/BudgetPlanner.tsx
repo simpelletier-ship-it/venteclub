@@ -58,51 +58,49 @@ interface SortableBudgetRowProps {
   hasBudget: boolean;
 }
 
-const SortableBudgetRow = ({ category, budget, spent, onEdit, onDelete, hasBudget }: SortableBudgetRowProps) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: category.id });
+interface InlineBudgetInputProps {
+  category: Category;
+  budget: number;
+  spent: number;
+  onSave: (categoryId: string, amount: number) => void;
+  onDelete: (categoryId: string) => void;
+  hasBudget: boolean;
+}
 
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : 1,
-    zIndex: isDragging ? 50 : 'auto',
-  };
-
+const InlineBudgetInput = ({ category, budget, spent, onSave, onDelete, hasBudget }: InlineBudgetInputProps) => {
+  const [localValue, setLocalValue] = useState(budget > 0 ? budget.toString() : "");
+  const [isFocused, setIsFocused] = useState(false);
+  
   const percentage = budget > 0 ? (spent / budget) * 100 : 0;
   const isOver = category.type === 'expense' ? spent > budget : spent < budget;
 
+  const handleSave = () => {
+    const amount = parseFloat(localValue.replace(/[^\d.]/g, ''));
+    if (amount > 0) {
+      onSave(category.id, amount);
+    }
+    setIsFocused(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSave();
+    }
+  };
+
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className={cn(
-        "flex items-center gap-2.5 py-2.5 px-3 rounded-xl",
-        "hover:bg-muted/30 transition-all group",
-        isDragging && "bg-muted/50 shadow-lg"
-      )}
-    >
-      <div
-        {...attributes}
-        {...listeners}
-        className="cursor-grab active:cursor-grabbing touch-none opacity-0 group-hover:opacity-60 transition-opacity"
-      >
-        <GripVertical className="h-3.5 w-3.5 text-muted-foreground" />
-      </div>
-      
+    <div className={cn(
+      "flex items-center gap-3 py-3 px-4 rounded-xl transition-all",
+      "hover:bg-muted/40",
+      isFocused && "bg-muted/50 ring-1 ring-primary/20"
+    )}>
       <CategoryIcon icon={category.icon} color={category.color} size="md" />
       
       <div className="flex-1 min-w-0">
-        <p className="font-medium text-sm truncate">{category.name}</p>
+        <p className="font-medium text-sm">{category.name}</p>
         {hasBudget && (
-          <div className="flex items-center gap-2 mt-1">
-            <div className="flex-1 h-1 bg-muted rounded-full overflow-hidden max-w-[100px]">
+          <div className="flex items-center gap-2 mt-1.5">
+            <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden max-w-[120px]">
               <div 
                 className={cn(
                   "h-full transition-all rounded-full",
@@ -113,38 +111,59 @@ const SortableBudgetRow = ({ category, budget, spent, onEdit, onDelete, hasBudge
                 style={{ width: `${Math.min(percentage, 100)}%` }}
               />
             </div>
-            <span className="text-[11px] text-muted-foreground tabular-nums">
+            <span className={cn(
+              "text-xs tabular-nums font-medium",
+              category.type === 'expense'
+                ? percentage > 100 ? 'text-red-500' : percentage > 80 ? 'text-amber-500' : 'text-emerald-600'
+                : percentage >= 100 ? 'text-emerald-600' : 'text-amber-500'
+            )}>
               {Math.round(percentage)}%
             </span>
           </div>
         )}
       </div>
-      
-      <div className="text-right">
+
+      <div className="text-right mr-2">
         <p className={cn(
-          "font-medium text-sm tabular-nums",
+          "font-semibold text-sm tabular-nums",
           hasBudget && isOver && category.type === 'expense' && "text-red-500"
         )}>
           {formatPrice(spent)}
         </p>
-        {hasBudget && (
-          <p className="text-[11px] text-muted-foreground tabular-nums">/ {formatPrice(budget)}</p>
-        )}
+        <p className="text-[11px] text-muted-foreground">dépensé</p>
       </div>
       
-      <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
-        <button
-          className="p-1.5 rounded-lg hover:bg-muted transition-colors"
-          onClick={onEdit}
-        >
-          {hasBudget ? <PencilLine className="h-3.5 w-3.5 text-muted-foreground" /> : <Plus className="h-3.5 w-3.5 text-muted-foreground" />}
-        </button>
+      <div className="flex items-center gap-2">
+        <div className="relative">
+          <input
+            type="text"
+            inputMode="decimal"
+            value={localValue}
+            onChange={(e) => {
+              const val = e.target.value.replace(/[^\d.]/g, '');
+              setLocalValue(val);
+            }}
+            onFocus={() => setIsFocused(true)}
+            onBlur={handleSave}
+            onKeyDown={handleKeyDown}
+            placeholder="0"
+            className={cn(
+              "w-24 h-10 px-3 pr-6 text-right text-sm font-medium rounded-lg",
+              "bg-muted/50 border border-border/50",
+              "focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50",
+              "placeholder:text-muted-foreground/50 tabular-nums",
+              "transition-all"
+            )}
+          />
+          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground pointer-events-none">$</span>
+        </div>
+        
         {hasBudget && (
           <button 
-            className="p-1.5 rounded-lg hover:bg-red-500/10 transition-colors"
-            onClick={onDelete}
+            onClick={() => onDelete(category.id)}
+            className="p-2 rounded-lg hover:bg-red-500/10 transition-colors"
           >
-            <Trash2 className="h-3.5 w-3.5 text-muted-foreground hover:text-red-500" />
+            <Trash2 className="h-4 w-4 text-muted-foreground hover:text-red-500" />
           </button>
         )}
       </div>
@@ -319,6 +338,10 @@ export const BudgetPlanner = ({ isAuthenticated }: { isAuthenticated: boolean })
     setFrequency(goals.find(g => g.category_id === category.id)?.frequency || "monthly");
   };
 
+  const handleInlineSave = (categoryId: string, amount: number) => {
+    saveGoal.mutate({ categoryId, limit: amount, freq: "monthly" });
+  };
+
   const incomeCategories = useMemo(() => 
     categories.filter(c => c.type === 'income'), [categories]);
   const expenseCategories = useMemo(() => 
@@ -384,32 +407,21 @@ export const BudgetPlanner = ({ isAuthenticated }: { isAuthenticated: boolean })
               <div className="w-2 h-2 rounded-full bg-red-500" />
               <h3 className="font-medium">Dépenses</h3>
             </div>
-            <span className="text-xs text-muted-foreground">Glissez pour réorganiser</span>
+            <span className="text-xs text-muted-foreground">Budget mensuel</span>
           </div>
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={(e) => handleDragEnd(e, 'expense')}
-          >
-            <SortableContext
-              items={expenseCategories.map(c => c.id)}
-              strategy={verticalListSortingStrategy}
-            >
-              <div className="space-y-1.5 max-h-[380px] overflow-y-auto">
-                {expenseCategories.map(category => (
-                  <SortableBudgetRow
-                    key={category.id}
-                    category={category}
-                    budget={getCategoryBudget(category.id)}
-                    spent={getCategorySpent(category.id)}
-                    hasBudget={getCategoryBudget(category.id) > 0}
-                    onEdit={() => openEditDialog(category)}
-                    onDelete={() => setDeleteConfirm(category.id)}
-                  />
-                ))}
-              </div>
-            </SortableContext>
-          </DndContext>
+          <div className="space-y-1 max-h-[420px] overflow-y-auto">
+            {expenseCategories.map(category => (
+              <InlineBudgetInput
+                key={category.id}
+                category={category}
+                budget={getCategoryBudget(category.id)}
+                spent={getCategorySpent(category.id)}
+                hasBudget={getCategoryBudget(category.id) > 0}
+                onSave={handleInlineSave}
+                onDelete={(id) => setDeleteConfirm(id)}
+              />
+            ))}
+          </div>
         </section>
 
         {/* Income */}
@@ -419,32 +431,21 @@ export const BudgetPlanner = ({ isAuthenticated }: { isAuthenticated: boolean })
               <div className="w-2 h-2 rounded-full bg-emerald-500" />
               <h3 className="font-medium">Revenus</h3>
             </div>
-            <span className="text-xs text-muted-foreground">Glissez pour réorganiser</span>
+            <span className="text-xs text-muted-foreground">Budget mensuel</span>
           </div>
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={(e) => handleDragEnd(e, 'income')}
-          >
-            <SortableContext
-              items={incomeCategories.map(c => c.id)}
-              strategy={verticalListSortingStrategy}
-            >
-              <div className="space-y-1.5 max-h-[380px] overflow-y-auto">
-                {incomeCategories.map(category => (
-                  <SortableBudgetRow
-                    key={category.id}
-                    category={category}
-                    budget={getCategoryBudget(category.id)}
-                    spent={getCategorySpent(category.id)}
-                    hasBudget={getCategoryBudget(category.id) > 0}
-                    onEdit={() => openEditDialog(category)}
-                    onDelete={() => setDeleteConfirm(category.id)}
-                  />
-                ))}
-              </div>
-            </SortableContext>
-          </DndContext>
+          <div className="space-y-1 max-h-[420px] overflow-y-auto">
+            {incomeCategories.map(category => (
+              <InlineBudgetInput
+                key={category.id}
+                category={category}
+                budget={getCategoryBudget(category.id)}
+                spent={getCategorySpent(category.id)}
+                hasBudget={getCategoryBudget(category.id) > 0}
+                onSave={handleInlineSave}
+                onDelete={(id) => setDeleteConfirm(id)}
+              />
+            ))}
+          </div>
         </section>
       </div>
 
