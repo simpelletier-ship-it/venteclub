@@ -10,12 +10,10 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { BillCalendar } from "@/components/budget/BillCalendar";
 import { AgeOfMoney } from "@/components/budget/AgeOfMoney";
 import { DebtPayoffPlanner } from "@/components/budget/DebtPayoffPlanner";
-import { SavingsChallenges } from "@/components/budget/SavingsChallenges";
+import { SavingsTracker } from "@/components/budget/SavingsTracker";
 import { CashFlowForecast } from "@/components/budget/CashFlowForecast";
 import { SpendingLimitsAlerts } from "@/components/budget/SpendingLimitsAlerts";
-import { InvestmentTracker } from "@/components/budget/InvestmentTracker";
 
-import { SmartInsights } from "@/components/budget/SmartInsights";
 import { SubscriptionDetector } from "@/components/budget/SubscriptionDetector";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -189,9 +187,8 @@ const BudgetAnalytics = () => {
                   />
                 </TabsContent>
 
-                <TabsContent value="savings" className="mt-0 space-y-6">
-                  <SavingsChallenges />
-                  <InvestmentTracker />
+                <TabsContent value="savings" className="mt-0">
+                  <SavingsTracker />
                 </TabsContent>
 
                 <TabsContent value="age" className="mt-0">
