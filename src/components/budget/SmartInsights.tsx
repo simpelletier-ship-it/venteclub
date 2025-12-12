@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { 
@@ -10,13 +10,14 @@ import {
   AlertTriangle,
   Sparkles,
   X,
-  ChevronLeft,
-  ChevronRight
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Insight {
   id: string;
@@ -31,58 +32,221 @@ interface Insight {
 
 export const SmartInsights = () => {
   const navigate = useNavigate();
-  const [dismissedIds, setDismissedIds] = useState<string[]>([]);
+  const { user } = useAuth();
+  const [dismissedIds, setDismissedIds] = useState<string[]>(() => {
+    const saved = localStorage.getItem('dismissed-insights');
+    return saved ? JSON.parse(saved) : [];
+  });
 
-  const allInsights: Insight[] = [
-    {
-      id: "1",
-      type: "saving",
-      title: "Abonnements inutilisés",
-      description: "2 abonnements non utilisés depuis 60+ jours",
-      action: "Réviser",
-      actionRoute: "/budget/analyses?section=abonnements",
-      potentialSavings: 32,
-      priority: "high",
+  // Fetch transactions
+  const { data: transactions = [] } = useQuery({
+    queryKey: ['budget-transactions-all'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('budget_transactions')
+        .select('*')
+        .order('transaction_date', { ascending: false });
+      if (error) throw error;
+      return data || [];
     },
-    {
-      id: "2",
-      type: "opportunity",
-      title: "Épargne automatique",
-      description: "Potentiel de 150$/mois sans impact",
-      action: "Configurer",
-      actionRoute: "/budget/objectifs",
-      potentialSavings: 150,
-      priority: "high",
+    enabled: !!user,
+  });
+
+  // Fetch goals
+  const { data: goals = [] } = useQuery({
+    queryKey: ['financial-goals'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('financial_goals')
+        .select('*');
+      if (error) throw error;
+      return data || [];
     },
-    {
-      id: "3",
-      type: "warning",
-      title: "Restaurants en hausse",
-      description: "+45% vs mois dernier",
-      action: "Détails",
-      actionRoute: "/budget/historique?category=restaurant",
-      priority: "medium",
+    enabled: !!user,
+  });
+
+  // Fetch categories
+  const { data: categories = [] } = useQuery({
+    queryKey: ['budget-categories'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('budget_categories').select('*');
+      if (error) throw error;
+      return data || [];
     },
-    {
-      id: "4",
-      type: "achievement",
-      title: "Objectif atteint!",
-      description: "75% du fonds d'urgence",
-      action: "Voir",
-      actionRoute: "/budget/objectifs",
-      priority: "low",
-    },
-    {
-      id: "5",
-      type: "saving",
-      title: "Optimiser paiement",
-      description: "Payez le 25 pour économiser 12$",
-      action: "Gérer",
-      actionRoute: "/budget/valeur-nette",
-      potentialSavings: 12,
-      priority: "medium",
-    },
-  ];
+    enabled: !!user,
+  });
+
+  // Generate real insights based on data
+  const allInsights = useMemo(() => {
+    const insights: Insight[] = [];
+
+    // 1. Detect unused/dormant subscriptions
+    const detectSubscriptions = () => {
+      const transactionsByDescription = transactions
+        .filter((t: any) => t.type === 'expense')
+        .reduce((acc: any, t: any) => {
+          const desc = t.description?.toLowerCase().trim() || '';
+          if (!desc) return acc;
+          if (!acc[desc]) acc[desc] = [];
+          acc[desc].push(t);
+          return acc;
+        }, {});
+
+      let dormantCount = 0;
+      let potentialSavings = 0;
+
+      Object.entries(transactionsByDescription).forEach(([description, txs]: [string, any]) => {
+        if (txs.length < 2) return;
+
+        const sorted = txs.sort((a: any, b: any) => 
+          new Date(a.transaction_date).getTime() - new Date(b.transaction_date).getTime()
+        );
+
+        const intervals = [];
+        for (let i = 1; i < sorted.length; i++) {
+          const days = Math.round(
+            (new Date(sorted[i].transaction_date).getTime() - 
+             new Date(sorted[i - 1].transaction_date).getTime()) / 
+            (1000 * 60 * 60 * 24)
+          );
+          intervals.push(days);
+        }
+
+        if (intervals.length === 0) return;
+
+        const avgInterval = intervals.reduce((a, b) => a + b, 0) / intervals.length;
+        const isMonthly = avgInterval >= 28 && avgInterval <= 35;
+
+        if (!isMonthly) return;
+
+        const lastTransaction = sorted[sorted.length - 1];
+        const daysSinceLast = Math.round(
+          (Date.now() - new Date(lastTransaction.transaction_date).getTime()) / (1000 * 60 * 60 * 24)
+        );
+
+        // If no transaction in 60+ days for a monthly subscription
+        if (daysSinceLast > 60) {
+          dormantCount++;
+          potentialSavings += Number(lastTransaction.amount);
+        }
+      });
+
+      if (dormantCount > 0) {
+        insights.push({
+          id: "subscriptions-unused",
+          type: "saving",
+          title: "Abonnements inutilisés",
+          description: `${dormantCount} abonnement${dormantCount > 1 ? 's' : ''} non utilisé${dormantCount > 1 ? 's' : ''} depuis 60+ jours`,
+          action: "Réviser",
+          actionRoute: "/budget/analyses",
+          potentialSavings: Math.round(potentialSavings),
+          priority: "high",
+        });
+      }
+
+      return { dormantCount, potentialSavings };
+    };
+
+    detectSubscriptions();
+
+    // 2. Detect spending increase by category
+    const currentMonth = new Date().toISOString().slice(0, 7);
+    const prevMonth = new Date();
+    prevMonth.setMonth(prevMonth.getMonth() - 1);
+    const prevMonthStr = prevMonth.toISOString().slice(0, 7);
+
+    const currentMonthExpenses = transactions.filter((t: any) => 
+      t.type === 'expense' && t.transaction_date?.startsWith(currentMonth)
+    );
+    const prevMonthExpenses = transactions.filter((t: any) => 
+      t.type === 'expense' && t.transaction_date?.startsWith(prevMonthStr)
+    );
+
+    // Group by category
+    const currentByCategory: Record<string, number> = {};
+    const prevByCategory: Record<string, number> = {};
+
+    currentMonthExpenses.forEach((t: any) => {
+      const catId = t.category_id || 'other';
+      currentByCategory[catId] = (currentByCategory[catId] || 0) + Number(t.amount);
+    });
+
+    prevMonthExpenses.forEach((t: any) => {
+      const catId = t.category_id || 'other';
+      prevByCategory[catId] = (prevByCategory[catId] || 0) + Number(t.amount);
+    });
+
+    // Find significant increases
+    Object.entries(currentByCategory).forEach(([catId, currentAmount]) => {
+      const prevAmount = prevByCategory[catId] || 0;
+      if (prevAmount > 0) {
+        const increase = ((currentAmount - prevAmount) / prevAmount) * 100;
+        if (increase >= 30 && currentAmount >= 50) {
+          const category = categories.find((c: any) => c.id === catId);
+          insights.push({
+            id: `increase-${catId}`,
+            type: "warning",
+            title: `${category?.name || 'Catégorie'} en hausse`,
+            description: `+${Math.round(increase)}% vs mois dernier`,
+            action: "Détails",
+            actionRoute: "/budget/historique",
+            priority: "medium",
+          });
+        }
+      }
+    });
+
+    // 3. Goal achievements
+    goals.forEach((goal: any) => {
+      const progress = (Number(goal.current_amount) / Number(goal.target_amount)) * 100;
+      if (progress >= 75 && progress < 100) {
+        insights.push({
+          id: `goal-progress-${goal.id}`,
+          type: "achievement",
+          title: "Objectif proche!",
+          description: `${Math.round(progress)}% de "${goal.name}" atteint`,
+          action: "Voir",
+          actionRoute: "/budget/objectifs",
+          priority: "low",
+        });
+      }
+      if (goal.completed) {
+        insights.push({
+          id: `goal-done-${goal.id}`,
+          type: "achievement",
+          title: "Objectif atteint!",
+          description: `"${goal.name}" complété`,
+          action: "Voir",
+          actionRoute: "/budget/objectifs",
+          priority: "low",
+        });
+      }
+    });
+
+    // 4. Savings opportunity based on income vs expenses
+    const currentMonthIncome = transactions
+      .filter((t: any) => t.type === 'income' && t.transaction_date?.startsWith(currentMonth))
+      .reduce((sum: number, t: any) => sum + Number(t.amount), 0);
+    
+    const currentMonthExpenseTotal = currentMonthExpenses
+      .reduce((sum: number, t: any) => sum + Number(t.amount), 0);
+
+    const surplus = currentMonthIncome - currentMonthExpenseTotal;
+    if (surplus > 100) {
+      insights.push({
+        id: "savings-opportunity",
+        type: "opportunity",
+        title: "Épargne possible",
+        description: `${Math.round(surplus)}$ disponible ce mois`,
+        action: "Objectifs",
+        actionRoute: "/budget/objectifs",
+        potentialSavings: Math.round(surplus),
+        priority: "high",
+      });
+    }
+
+    return insights;
+  }, [transactions, goals, categories]);
 
   const insights = allInsights.filter(i => !dismissedIds.includes(i.id));
 
@@ -113,7 +277,9 @@ export const SmartInsights = () => {
   };
 
   const handleDismiss = (id: string) => {
-    setDismissedIds(prev => [...prev, id]);
+    const newDismissed = [...dismissedIds, id];
+    setDismissedIds(newDismissed);
+    localStorage.setItem('dismissed-insights', JSON.stringify(newDismissed));
   };
 
   const totalPotentialSavings = insights
@@ -134,10 +300,12 @@ export const SmartInsights = () => {
       {/* Header compact */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Badge variant="secondary" className="bg-primary/10 text-primary border-0 text-xs">
-            <PiggyBank className="w-3 h-3 mr-1" />
-            {totalPotentialSavings}$/mois
-          </Badge>
+          {totalPotentialSavings > 0 && (
+            <Badge variant="secondary" className="bg-primary/10 text-primary border-0 text-xs">
+              <PiggyBank className="w-3 h-3 mr-1" />
+              {totalPotentialSavings}$/mois
+            </Badge>
+          )}
         </div>
         <span className="text-xs text-muted-foreground">{insights.length} conseil(s)</span>
       </div>
