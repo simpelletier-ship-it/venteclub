@@ -279,7 +279,7 @@ export const QuickExpenseTracker = ({ isAuthenticated }: QuickExpenseTrackerProp
             className={cn(
               "flex-1 flex items-center justify-center gap-2.5 py-3.5 rounded-lg font-semibold text-sm transition-all duration-300",
               transactionType === 'income' 
-                ? "bg-primary text-primary-foreground shadow-md" 
+                ? "bg-sky-600 text-white shadow-md" 
                 : "text-muted-foreground hover:text-foreground"
             )}
           >
@@ -407,7 +407,7 @@ export const QuickExpenseTracker = ({ isAuthenticated }: QuickExpenseTrackerProp
               "h-14 px-12 text-base font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl",
               transactionType === 'expense' 
                 ? "bg-slate-700 hover:bg-slate-600 text-white" 
-                : "bg-primary hover:bg-primary/90 text-primary-foreground"
+                : "bg-sky-600 hover:bg-sky-500 text-white"
             )}
           >
             {addMutation.isPending ? (
