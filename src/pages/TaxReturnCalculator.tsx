@@ -7,6 +7,7 @@ import { CurrencyInput } from "@/components/CurrencyInput";
 import { formatPrice } from "@/lib/priceFormat";
 import { TrendingUp, TrendingDown, AlertTriangle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { TaxBracketVisualizer } from "@/components/TaxBracketVisualizer";
 
 const TaxReturnCalculator = () => {
   const [income, setIncome] = useState("60000");
@@ -421,6 +422,12 @@ const TaxReturnCalculator = () => {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Visualisateur interactif des tranches d'imposition */}
+              <TaxBracketVisualizer 
+                income={parseFloat(income) || 0}
+                onIncomeChange={(val) => setIncome(val.toString())}
+              />
 
               {/* Québec Breakdown */}
               <Card className="border-blue-200 dark:border-blue-800">
