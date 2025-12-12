@@ -2,6 +2,7 @@ import { SEO } from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Calendar, Clock, AlertCircle } from "lucide-react";
+import DOMPurify from "dompurify";
 import { Badge } from "@/components/ui/badge";
 import { OptimizedImage } from "@/components/OptimizedImage";
 import { useState, useEffect } from "react";
@@ -224,7 +225,7 @@ const BlogPost = () => {
             {/* Article Content with Professional Formatting */}
             <div 
               className="blog-content"
-              dangerouslySetInnerHTML={{ __html: post.content }}
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content) }}
             />
 
             {/* Author/CTA Section */}
