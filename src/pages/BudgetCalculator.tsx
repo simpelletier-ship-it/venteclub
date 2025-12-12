@@ -154,14 +154,10 @@ const BudgetCalculator = () => {
         />
 
         <div className="min-h-screen bg-background">
-          {/* Page Header */}
-          <div className="border-b border-border bg-card">
-            <div className="container mx-auto px-6 py-5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h1 className="text-lg font-semibold text-foreground">Tableau de bord</h1>
-                  <p className="text-sm text-muted-foreground capitalize">{currentMonthName}</p>
-                </div>
+          <div className="container mx-auto px-6 py-6">
+            {/* Offline indicator - subtle positioning */}
+            {(!isOnline || pendingCount > 0) && (
+              <div className="mb-4">
                 <OfflineIndicator 
                   isOnline={isOnline}
                   pendingCount={pendingCount}
@@ -169,10 +165,7 @@ const BudgetCalculator = () => {
                   onSync={triggerSync}
                 />
               </div>
-            </div>
-          </div>
-
-          <div className="container mx-auto px-6 py-6">
+            )}
             {/* KPI Cards - Banking Style */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
               <Card className="border-border">
