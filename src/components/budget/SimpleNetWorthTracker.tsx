@@ -321,44 +321,6 @@ export const SimpleNetWorthTracker = ({ currentNetWorth, isAuthenticated }: Simp
 
   return (
     <div className="space-y-4">
-      {/* Net Worth Summary */}
-      <div className="grid grid-cols-3 gap-3">
-        <div className="bg-emerald-500/10 rounded-xl p-4 text-center">
-          <TrendingUp className="w-5 h-5 text-emerald-600 mx-auto mb-1" />
-          <div className="text-xs text-muted-foreground">Ce que je possède</div>
-          <div className="text-lg font-bold text-emerald-600">{formatPrice(totalAssets)}</div>
-        </div>
-        <div className="bg-red-500/10 rounded-xl p-4 text-center">
-          <TrendingDown className="w-5 h-5 text-red-600 mx-auto mb-1" />
-          <div className="text-xs text-muted-foreground">Ce que je dois</div>
-          <div className="text-lg font-bold text-red-600">{formatPrice(totalDebts)}</div>
-          {totalMonthlyInterest > 0 && (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="flex items-center justify-center gap-1 mt-1">
-                    <CreditCard className="w-3 h-3 text-orange-500" />
-                    <span className="text-xs text-orange-500 font-medium">
-                      {formatPrice(totalMonthlyInterest)}/mois intérêts
-                    </span>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Intérêts mensuels estimés sur vos dettes</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          )}
-        </div>
-        <div className={`rounded-xl p-4 text-center ${netWorth >= 0 ? 'bg-blue-500/10' : 'bg-orange-500/10'}`}>
-          <Wallet className={`w-5 h-5 mx-auto mb-1 ${netWorth >= 0 ? 'text-blue-600' : 'text-orange-600'}`} />
-          <div className="text-xs text-muted-foreground">Valeur nette</div>
-          <div className={`text-lg font-bold ${netWorth >= 0 ? 'text-blue-600' : 'text-orange-600'}`}>
-            {formatPrice(netWorth)}
-          </div>
-        </div>
-      </div>
-
       {/* Quick Update All Accounts */}
       <Card className="border-0 shadow-sm">
         <CardHeader className="pb-2">
