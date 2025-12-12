@@ -1,31 +1,37 @@
 import { SEO } from "@/components/SEO";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { useNavigate, Link } from "react-router-dom";
-import { HelpCircle, BookOpen } from "lucide-react";
+import { HelpCircle, BookOpen, Calculator, PiggyBank, TrendingUp } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 const FAQ = () => {
-  const navigate = useNavigate();
-
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
     "mainEntity": [
       {
         "@type": "Question",
-        "name": "Qu'est-ce qu'une opportunité d'affaires ?",
+        "name": "C'est quoi un budget personnel ?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Une opportunité d'affaires désigne une entreprise établie disponible à l'achat, offrant un potentiel de revenus immédiat avec une clientèle existante et des opérations en cours."
+          "text": "Un budget personnel est un plan financier qui vous aide à suivre vos revenus et dépenses. Il vous permet de savoir exactement où va votre argent et de prendre le contrôle de vos finances."
         }
       },
       {
         "@type": "Question",
-        "name": "Comment évaluer le prix d'une entreprise ?",
+        "name": "Comment calculer mon salaire net au Québec ?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Le prix d'une entreprise s'évalue généralement selon plusieurs méthodes : multiple du BAIIA (2-5×), flux de trésorerie actualisés, valeur des actifs, ou comparables de marché dans le même secteur."
+          "text": "Utilisez notre calculateur de salaire gratuit qui prend en compte les impôts fédéraux et provinciaux du Québec, le RRQ, le RQAP et l'assurance-emploi pour obtenir votre salaire net exact."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "C'est quoi la valeur nette ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "La valeur nette est la différence entre ce que vous possédez (actifs) et ce que vous devez (dettes). C'est un indicateur clé de votre santé financière globale."
         }
       }
     ]
@@ -34,9 +40,9 @@ const FAQ = () => {
   return (
     <div className="min-h-screen bg-background">
       <SEO 
-        title="FAQ et Glossaire | Questions sur l'Achat-Vente d'Entreprises"
-        description="Réponses aux questions fréquentes sur l'achat et la vente d'entreprises au Québec. Glossaire complet des termes : opportunité affaires, cession entreprise, reprise commerce, due diligence."
-        keywords="FAQ achat entreprise, questions vente entreprise, glossaire affaires, opportunité affaires, cession entreprise, reprise commerce, due diligence"
+        title="FAQ Outils Financiers | Questions sur Budget, Salaire et Impôts Québec"
+        description="Réponses aux questions fréquentes sur la gestion de budget, le calcul de salaire net au Québec, les retours d'impôt et la valeur nette. Guides pratiques pour gérer vos finances personnelles."
+        keywords="FAQ budget personnel, questions calcul salaire Québec, aide retour impôt, valeur nette expliquée, gestion finances personnelles, outils financiers gratuits"
         canonical="/faq"
         structuredData={structuredData}
       />
@@ -47,10 +53,10 @@ const FAQ = () => {
           <div className="max-w-3xl mx-auto text-center">
             <HelpCircle className="w-16 h-16 text-accent mx-auto mb-6" />
             <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
-              FAQ et Glossaire
+              FAQ et Glossaire Financier
             </h1>
             <p className="text-xl text-muted-foreground">
-              Trouvez des réponses à vos questions et familiarisez-vous avec les termes clés de l'achat-vente d'entreprises
+              Trouvez des réponses à vos questions sur la gestion de budget, le calcul de salaire et les impôts au Québec
             </p>
           </div>
         </div>
@@ -63,153 +69,240 @@ const FAQ = () => {
             <h2 className="text-3xl font-bold mb-8">Questions Fréquentes</h2>
             
             <Accordion type="single" collapsible className="space-y-4">
-              <AccordionItem value="premium" className="border rounded-lg px-6">
+              {/* Budget Questions */}
+              <AccordionItem value="budget-1" className="border rounded-lg px-6">
                 <AccordionTrigger className="text-left">
-                  À quoi sert l'abonnement Club Select ?
+                  C'est quoi un budget personnel et pourquoi c'est important ?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground">
                   <p className="mb-3">
-                    L'abonnement Club Select à 19,99$/mois vous permet d'avoir des conversations illimitées (vs 1 par 24h gratuit), d'accéder aux coordonnées de TOUS les vendeurs sans restriction, et de bénéficier d'un chat illimité. 
-                  </p>
-                  <p className="mb-3">
-                    <strong>Pourquoi un abonnement payant ?</strong> Le Club Select garantit des acheteurs sérieux et engagés, ce qui permet aux vendeurs de recevoir des demandes de qualité. Cela filtre le spam, les robots automatiques et réduit au maximum les courtiers opportunistes.
+                    Un budget personnel est un plan simple qui montre combien d'argent vous gagnez et combien vous dépensez chaque mois. 
+                    C'est comme une photo de vos finances qui vous aide à voir où va votre argent.
                   </p>
                   <p className="mb-4">
-                    C'est l'outil idéal pour les acheteurs actifs recherchant plusieurs opportunités et souhaitant être pris au sérieux par les vendeurs.
+                    <strong>Pourquoi c'est important ?</strong> Un budget vous permet de :
                   </p>
-                  <Link to="/club-select">
+                  <ul className="list-disc pl-6 space-y-2 mb-4">
+                    <li>Éviter de dépenser plus que ce que vous gagnez</li>
+                    <li>Économiser pour vos projets (voyage, maison, retraite)</li>
+                    <li>Réduire le stress lié à l'argent</li>
+                    <li>Atteindre vos objectifs financiers plus rapidement</li>
+                  </ul>
+                  <Link to="/budget">
                     <Button className="w-full sm:w-auto">
-                      Découvrez tous les avantages du Club Select
+                      Créer mon budget gratuitement
                     </Button>
                   </Link>
                 </AccordionContent>
               </AccordionItem>
 
-              <AccordionItem value="free-limit" className="border rounded-lg px-6">
+              <AccordionItem value="budget-2" className="border rounded-lg px-6">
                 <AccordionTrigger className="text-left">
-                  Combien de conversations puis-je avoir gratuitement ?
+                  Comment commencer à faire un budget ?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground">
-                  Le plan gratuit vous permet de démarrer 1 nouvelle conversation toutes les 24 heures avec un vendeur différent. Une fois une conversation démarrée, vous pouvez continuer à échanger sans limite avec ce vendeur. La limite se réinitialise 24 heures après votre dernière conversation. Pour des conversations illimitées et accès aux coordonnées complètes, rejoignez le Club Select à 19,99$/mois.
+                  <p className="mb-3">
+                    Commencer un budget est plus simple qu'on le pense. Voici les étapes de base :
+                  </p>
+                  <ol className="list-decimal pl-6 space-y-2 mb-4">
+                    <li><strong>Notez vos revenus</strong> : salaire, allocations, autres sources</li>
+                    <li><strong>Listez vos dépenses fixes</strong> : loyer, téléphone, assurances</li>
+                    <li><strong>Suivez vos dépenses variables</strong> : épicerie, essence, sorties</li>
+                    <li><strong>Calculez la différence</strong> : revenus - dépenses = ce qui reste</li>
+                  </ol>
+                  <p>
+                    Notre planificateur de budget fait tout ça automatiquement pour vous. Il suffit d'entrer vos transactions et il s'occupe du reste!
+                  </p>
                 </AccordionContent>
               </AccordionItem>
 
-              <AccordionItem value="item-1" className="border rounded-lg px-6">
+              <AccordionItem value="budget-3" className="border rounded-lg px-6">
                 <AccordionTrigger className="text-left">
-                  Comment fonctionne l'achat d'une entreprise sur Vente.Club ?
+                  C'est quoi la règle 50/30/20 ?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground">
-                  Sur Vente.Club, vous pouvez explorer des centaines d'opportunités d'affaires au Québec. 
-                  Créez votre compte gratuitement, parcourez les annonces, configurez des alertes selon vos critères, 
-                  et contactez directement les vendeurs pour les opportunités qui vous intéressent. Un paiement unique 
-                  débloque les coordonnées du vendeur pour initier les discussions.
+                  <p className="mb-3">
+                    La règle 50/30/20 est une méthode simple pour diviser votre argent :
+                  </p>
+                  <ul className="list-disc pl-6 space-y-2 mb-4">
+                    <li><strong>50% pour les besoins</strong> : loyer, épicerie, factures, transport</li>
+                    <li><strong>30% pour les envies</strong> : restaurants, loisirs, magasinage</li>
+                    <li><strong>20% pour l'épargne</strong> : fonds d'urgence, REER, CELI, dettes</li>
+                  </ul>
+                  <p>
+                    C'est un bon point de départ, mais chaque situation est unique. Notre outil vous aide à trouver la répartition qui vous convient.
+                  </p>
                 </AccordionContent>
               </AccordionItem>
 
-              <AccordionItem value="item-2" className="border rounded-lg px-6">
+              <AccordionItem value="budget-4" className="border rounded-lg px-6">
                 <AccordionTrigger className="text-left">
-                  Quel est le prix moyen d'une entreprise à vendre au Québec ?
+                  C'est quoi un fonds d'urgence et combien devrais-je avoir ?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground">
-                  Le prix varie considérablement selon le secteur, la taille et la localisation. En 2025, 
-                  les entreprises se vendent généralement entre 100K$ et 1M$ au Québec. Les commerces de détail 
-                  et restaurants sont souvent dans la fourchette 150K$-500K$, tandis que les entreprises de services 
-                  professionnels peuvent atteindre 500K$-2M$. Le prix est typiquement un multiple de 2-5× le BAIIA annuel.
+                  <p className="mb-3">
+                    Un fonds d'urgence est de l'argent mis de côté pour les imprévus : perte d'emploi, réparation de voiture, urgence médicale. 
+                    C'est votre filet de sécurité financier.
+                  </p>
+                  <p className="mb-3">
+                    <strong>Combien avoir ?</strong> L'idéal est d'avoir 3 à 6 mois de dépenses essentielles. Par exemple, si vos dépenses mensuelles sont de 2 500$, visez entre 7 500$ et 15 000$.
+                  </p>
+                  <p>
+                    Commencez petit : même 1 000$ peut vous aider à éviter les dettes en cas d'imprévu. Notre outil vous aide à calculer et suivre votre objectif.
+                  </p>
                 </AccordionContent>
               </AccordionItem>
 
-              <AccordionItem value="item-3" className="border rounded-lg px-6">
+              {/* Salary Calculator Questions */}
+              <AccordionItem value="salary-1" className="border rounded-lg px-6">
                 <AccordionTrigger className="text-left">
-                  Combien de temps prend la vente d'une entreprise ?
+                  Comment calculer mon salaire net au Québec ?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground">
-                  Le processus de vente prend généralement 6 à 12 mois du début à la fin. Cela inclut la préparation 
-                  de l'annonce (1-2 mois), la recherche d'acheteurs (2-4 mois), la négociation et due diligence (2-3 mois), 
-                  et la finalisation légale (1-2 mois). Les entreprises bien préparées avec des finances claires se vendent plus rapidement.
+                  <p className="mb-3">
+                    Votre salaire net est ce qui reste après les déductions. Au Québec, les principales déductions sont :
+                  </p>
+                  <ul className="list-disc pl-6 space-y-2 mb-4">
+                    <li><strong>Impôt fédéral</strong> : calculé selon les paliers du Canada</li>
+                    <li><strong>Impôt provincial</strong> : calculé selon les paliers du Québec</li>
+                    <li><strong>RRQ</strong> : Régime de rentes du Québec (retraite)</li>
+                    <li><strong>RQAP</strong> : Régime québécois d'assurance parentale</li>
+                    <li><strong>Assurance-emploi</strong> : cotisation fédérale</li>
+                  </ul>
+                  <Link to="/outils/calculateur-salaire">
+                    <Button className="w-full sm:w-auto">
+                      Calculer mon salaire net
+                    </Button>
+                  </Link>
                 </AccordionContent>
               </AccordionItem>
 
-              <AccordionItem value="item-4" className="border rounded-lg px-6">
+              <AccordionItem value="salary-2" className="border rounded-lg px-6">
                 <AccordionTrigger className="text-left">
-                  Ai-je besoin d'un avocat pour acheter ou vendre une entreprise ?
+                  Quelle est la différence entre salaire brut et salaire net ?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground">
-                  Oui, fortement recommandé. Un avocat spécialisé en droit des affaires est essentiel pour rédiger 
-                  ou réviser le contrat d'achat, vérifier les aspects légaux (baux, permis, contrats), et protéger 
-                  vos intérêts. Un comptable est également recommandé pour l'analyse financière et l'optimisation fiscale. 
-                  Ces professionnels représentent un investissement de 3-5% du prix de vente mais évitent des erreurs coûteuses.
+                  <p className="mb-3">
+                    <strong>Salaire brut</strong> : C'est le montant total avant les déductions. C'est souvent ce qu'on voit dans une offre d'emploi (ex: "60 000$/an").
+                  </p>
+                  <p className="mb-3">
+                    <strong>Salaire net</strong> : C'est ce qui arrive vraiment dans votre compte bancaire après les impôts et cotisations. C'est l'argent que vous pouvez réellement dépenser.
+                  </p>
+                  <p>
+                    Au Québec, le salaire net représente environ 65-75% du salaire brut selon votre niveau de revenu. Plus vous gagnez, plus le pourcentage de déductions augmente.
+                  </p>
                 </AccordionContent>
               </AccordionItem>
 
-              <AccordionItem value="item-5" className="border rounded-lg px-6">
+              {/* Tax Questions */}
+              <AccordionItem value="tax-1" className="border rounded-lg px-6">
                 <AccordionTrigger className="text-left">
-                  Quels documents dois-je préparer pour vendre mon entreprise ?
+                  Comment augmenter mon retour d'impôt au Québec ?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground">
-                  Documents essentiels : états financiers des 3 dernières années, déclarations fiscales, 
-                  liste détaillée des actifs et inventaire, contrats en cours (fournisseurs, clients, employés), 
-                  bail commercial, permis et licences, organigramme et description des opérations. 
-                  Plus vos documents sont organisés et transparents, plus les acheteurs seront confiants.
+                  <p className="mb-3">
+                    Voici les moyens les plus efficaces pour maximiser votre retour d'impôt :
+                  </p>
+                  <ul className="list-disc pl-6 space-y-2 mb-4">
+                    <li><strong>Cotiser au REER</strong> : Chaque dollar cotisé réduit votre revenu imposable</li>
+                    <li><strong>Cotiser au CELIAPP</strong> : Pour l'achat d'une première maison</li>
+                    <li><strong>Frais médicaux</strong> : Déductibles au-delà d'un certain seuil</li>
+                    <li><strong>Dons de charité</strong> : Crédit d'impôt généreux</li>
+                    <li><strong>Frais de garde</strong> : Déductibles si vous avez des enfants</li>
+                    <li><strong>Frais de déménagement</strong> : Si vous déménagez pour le travail ou les études</li>
+                  </ul>
+                  <Link to="/outils/calculateur-impot">
+                    <Button className="w-full sm:w-auto">
+                      Estimer mon retour d'impôt
+                    </Button>
+                  </Link>
                 </AccordionContent>
               </AccordionItem>
 
-              <AccordionItem value="item-6" className="border rounded-lg px-6">
+              <AccordionItem value="tax-2" className="border rounded-lg px-6">
                 <AccordionTrigger className="text-left">
-                  Comment financer l'achat d'une entreprise au Québec ?
+                  C'est quoi la différence entre REER, CELI et CELIAPP ?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground">
-                  Plusieurs options : prêt bancaire (généralement 60-80% avec apport de 20-30%), financement BDC 
-                  (Banque de développement du Canada), financement du vendeur (10-40% sur 3-5 ans), programmes 
-                  gouvernementaux (Investissement Québec), ou capital-investissement pour grandes acquisitions. 
-                  La plupart des acheteurs combinent 2-3 sources de financement.
+                  <p className="mb-3">
+                    Ce sont trois comptes d'épargne avec des avantages fiscaux différents :
+                  </p>
+                  <ul className="list-disc pl-6 space-y-2 mb-4">
+                    <li>
+                      <strong>REER (Régime enregistré d'épargne-retraite)</strong> : 
+                      Vos cotisations réduisent votre revenu imposable maintenant. Vous payez l'impôt au retrait (idéalement à la retraite quand vos revenus sont plus bas).
+                    </li>
+                    <li>
+                      <strong>CELI (Compte d'épargne libre d'impôt)</strong> : 
+                      Pas de déduction à la cotisation, mais tous les gains sont libres d'impôt au retrait. Parfait pour l'épargne à court et moyen terme.
+                    </li>
+                    <li>
+                      <strong>CELIAPP (Compte d'épargne libre d'impôt pour l'achat d'une première propriété)</strong> : 
+                      Combine les avantages des deux! Déduction à la cotisation ET retraits libres d'impôt pour acheter votre première maison.
+                    </li>
+                  </ul>
                 </AccordionContent>
               </AccordionItem>
 
-              <AccordionItem value="item-7" className="border rounded-lg px-6">
+              {/* Net Worth Questions */}
+              <AccordionItem value="networth-1" className="border rounded-lg px-6">
                 <AccordionTrigger className="text-left">
-                  Qu'est-ce que la due diligence et pourquoi est-elle importante ?
+                  C'est quoi la valeur nette et comment la calculer ?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground">
-                  La due diligence est une vérification approfondie de tous les aspects de l'entreprise avant l'achat : 
-                  finances (révision des états financiers, vérification des revenus), juridique (contrats, litiges, conformité), 
-                  opérationnel (processus, équipements, employés), et commercial (clients, concurrence, marché). 
-                  Elle permet d'identifier les risques et de négocier le prix en conséquence. Comptez 4-8 semaines pour une due diligence complète.
+                  <p className="mb-3">
+                    Votre valeur nette est un chiffre simple qui résume votre situation financière :
+                  </p>
+                  <p className="mb-3 text-lg font-medium">
+                    Valeur nette = Ce que vous possédez (actifs) - Ce que vous devez (dettes)
+                  </p>
+                  <p className="mb-3">
+                    <strong>Actifs</strong> : argent en banque, REER, CELI, valeur de votre maison, auto, placements
+                  </p>
+                  <p className="mb-3">
+                    <strong>Dettes</strong> : hypothèque, prêt auto, cartes de crédit, prêt étudiant
+                  </p>
+                  <p>
+                    Une valeur nette négative n'est pas rare au début de la vie adulte (prêt étudiant, hypothèque). L'objectif est de la faire augmenter avec le temps!
+                  </p>
                 </AccordionContent>
               </AccordionItem>
 
-              <AccordionItem value="item-8" className="border rounded-lg px-6">
+              <AccordionItem value="networth-2" className="border rounded-lg px-6">
                 <AccordionTrigger className="text-left">
-                  Comment protéger la confidentialité lors de la vente ?
+                  Mes données financières sont-elles en sécurité ?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground">
-                  Sur Vente.Club, les informations sensibles (nom exact, adresse précise) sont masquées jusqu'à ce 
-                  que l'acheteur paie pour débloquer les coordonnées. Utilisez des accords de confidentialité (NDA) 
-                  avant de partager des informations détaillées. Ne divulguez la vente ni aux employés ni aux clients 
-                  tant que la transaction n'est pas finalisée, sauf si nécessaire.
+                  <p className="mb-3">
+                    Oui, la sécurité de vos données est notre priorité absolue :
+                  </p>
+                  <ul className="list-disc pl-6 space-y-2">
+                    <li>Vos données sont chiffrées et stockées de manière sécurisée</li>
+                    <li>Nous ne partageons jamais vos informations avec des tiers</li>
+                    <li>Vous êtes le seul à avoir accès à vos données financières</li>
+                    <li>Vous pouvez supprimer votre compte et vos données à tout moment</li>
+                  </ul>
                 </AccordionContent>
               </AccordionItem>
 
-              <AccordionItem value="item-9" className="border rounded-lg px-6">
+              <AccordionItem value="tools-1" className="border rounded-lg px-6">
                 <AccordionTrigger className="text-left">
-                  Puis-je acheter une entreprise sans expérience dans le secteur ?
+                  Les outils sont-ils vraiment gratuits ?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground">
-                  Oui, mais avec prudence. Privilégiez des entreprises avec des opérations bien documentées, 
-                  une équipe en place, et idéalement un vendeur disposé à former. Certains secteurs comme la restauration 
-                  ou le commerce de détail sont plus accessibles aux débutants. Envisagez de garder le vendeur comme consultant 
-                  pendant 3-6 mois de transition. Une formation préalable ou un partenariat avec quelqu'un d'expérimenté est recommandé.
-                </AccordionContent>
-              </AccordionItem>
-
-              <AccordionItem value="item-10" className="border rounded-lg px-6">
-                <AccordionTrigger className="text-left">
-                  Quels sont les coûts cachés lors de l'achat d'une entreprise ?
-                </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground">
-                  Au-delà du prix d'achat, prévoyez : frais juridiques et comptables (3-5%), taxes de transfert, 
-                  mise à niveau d'équipements ou rénovations, fonds de roulement supplémentaire (2-3 mois d'opérations), 
-                  formation et recrutement, marketing pour la transition, et systèmes informatiques. 
-                  Budgétisez 10-20% du prix d'achat pour ces frais additionnels.
+                  <p className="mb-3">
+                    Oui! Tous nos outils financiers sont 100% gratuits :
+                  </p>
+                  <ul className="list-disc pl-6 space-y-2 mb-4">
+                    <li>Calculateur de salaire net québécois</li>
+                    <li>Calculateur de retour d'impôt</li>
+                    <li>Planificateur de budget complet</li>
+                    <li>Suivi de valeur nette</li>
+                    <li>Objectifs d'épargne</li>
+                  </ul>
+                  <p>
+                    Pas de frais cachés, pas d'abonnement obligatoire. Notre mission est d'aider les Québécois à mieux gérer leurs finances.
+                  </p>
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
@@ -223,255 +316,157 @@ const FAQ = () => {
           <div className="max-w-4xl mx-auto">
             <div className="flex items-center gap-3 mb-8">
               <BookOpen className="w-8 h-8 text-primary" />
-              <h2 className="text-3xl font-bold">Glossaire des Termes Clés</h2>
+              <h2 className="text-3xl font-bold">Glossaire Financier</h2>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>Opportunité d'affaires</CardTitle>
+                  <CardTitle className="flex items-center gap-2">
+                    <PiggyBank className="h-5 w-5 text-primary" />
+                    Budget
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground">
-                    Une entreprise établie disponible à l'achat, offrant un potentiel de revenus immédiat 
-                    avec une clientèle existante et des opérations en cours. Contrairement à une startup, 
-                    l'opportunité d'affaires a un historique prouvé.
+                    Plan qui organise vos revenus et dépenses pour une période donnée (généralement un mois). 
+                    Un bon budget vous aide à vivre selon vos moyens et atteindre vos objectifs financiers.
                   </p>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader>
-                  <CardTitle>Cession d'entreprise</CardTitle>
+                  <CardTitle className="flex items-center gap-2">
+                    <TrendingUp className="h-5 w-5 text-primary" />
+                    Valeur nette
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground">
-                    Processus de transfert de propriété d'une entreprise du vendeur (cédant) à l'acheteur (cessionnaire). 
-                    La cession peut être partielle (actions) ou totale (actifs). Implique aspects juridiques, 
-                    financiers et opérationnels.
+                    La différence entre vos actifs (ce que vous possédez) et vos passifs (ce que vous devez). 
+                    C'est le meilleur indicateur de votre santé financière globale.
                   </p>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader>
-                  <CardTitle>Reprise de commerce</CardTitle>
+                  <CardTitle>Salaire brut</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground">
-                    Action d'acquérir une entreprise existante plutôt que d'en créer une nouvelle. 
-                    La reprise permet de bénéficier immédiatement d'une clientèle, de revenus, 
-                    d'une équipe et d'une réputation établie, réduisant les risques du démarrage.
+                    Le montant total de votre rémunération avant les déductions (impôts, cotisations sociales). 
+                    C'est généralement le montant indiqué dans votre contrat de travail.
                   </p>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader>
-                  <CardTitle>BAIIA (EBITDA)</CardTitle>
+                  <CardTitle>Salaire net</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground">
-                    Bénéfice Avant Intérêts, Impôts et Amortissement. Indicateur financier clé mesurant 
-                    la rentabilité opérationnelle d'une entreprise. Utilisé pour calculer la valeur d'une entreprise 
-                    via les multiples (ex: 3× BAIIA).
+                    Le montant que vous recevez réellement dans votre compte bancaire après toutes les déductions. 
+                    C'est l'argent que vous pouvez dépenser ou épargner.
                   </p>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader>
-                  <CardTitle>Due Diligence</CardTitle>
+                  <CardTitle>REER</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground">
-                    Vérification approfondie et systématique de tous les aspects d'une entreprise avant l'achat. 
-                    Inclut analyse financière, juridique, opérationnelle et commerciale. Essentielle pour identifier 
-                    les risques et confirmer la valeur.
+                    Régime enregistré d'épargne-retraite. Compte qui permet de reporter l'impôt sur vos cotisations 
+                    jusqu'au retrait (idéalement à la retraite quand vos revenus sont plus bas).
                   </p>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader>
-                  <CardTitle>Actif net</CardTitle>
+                  <CardTitle>CELI</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground">
-                    Valeur comptable de l'entreprise calculée en soustrayant le total des passifs (dettes) 
-                    du total des actifs. Représente la valeur nette de l'entreprise sur le papier, 
-                    mais souvent différente de la valeur marchande.
+                    Compte d'épargne libre d'impôt. Les gains réalisés dans ce compte ne sont jamais imposés. 
+                    Parfait pour épargner pour des projets à court ou moyen terme.
                   </p>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader>
-                  <CardTitle>Clause de non-concurrence</CardTitle>
+                  <CardTitle>RRQ</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground">
-                    Disposition contractuelle empêchant le vendeur d'ouvrir une entreprise concurrente 
-                    dans un territoire et délai définis (généralement 2-5 ans). Protège l'acheteur 
-                    et la valeur de l'acquisition, notamment la clientèle.
+                    Régime de rentes du Québec. Cotisation obligatoire prélevée sur votre salaire qui vous donnera 
+                    droit à une rente de retraite. Équivalent du RPC pour le reste du Canada.
                   </p>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader>
-                  <CardTitle>Fonds de roulement</CardTitle>
+                  <CardTitle>RQAP</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground">
-                    Ressources financières nécessaires pour les opérations quotidiennes : stocks, 
-                    comptes à recevoir, trésorerie moins comptes à payer. Essentiel pour maintenir 
-                    les activités. Souvent négocié séparément du prix d'achat.
+                    Régime québécois d'assurance parentale. Cotisation obligatoire qui finance les congés parentaux 
+                    au Québec (maternité, paternité, adoption).
                   </p>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader>
-                  <CardTitle>Achat d'actions vs actifs</CardTitle>
+                  <CardTitle>Fonds d'urgence</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground">
-                    Deux structures de transaction : l'achat d'actions transfère la société avec tous ses actifs 
-                    et passifs (y compris obligations cachées). L'achat d'actifs permet de choisir ce qu'on achète, 
-                    limitant les risques mais souvent moins avantageux fiscalement pour le vendeur.
+                    Argent mis de côté pour les imprévus (perte d'emploi, réparations, urgences). 
+                    Recommandé : 3 à 6 mois de dépenses essentielles dans un compte facilement accessible.
                   </p>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader>
-                  <CardTitle>Multiple de valorisation</CardTitle>
+                  <CardTitle>Taux d'épargne</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground">
-                    Coefficient appliqué à une métrique financière (BAIIA, revenus) pour déterminer la valeur d'une entreprise. 
-                    Varie selon le secteur, la croissance, et les risques. Par exemple, un restaurant peut se vendre 
-                    à 2-3× BAIIA, une tech à 4-6× BAIIA.
+                    Pourcentage de vos revenus que vous épargnez chaque mois. Un bon objectif est de viser 
+                    au moins 20% de vos revenus, mais tout montant d'épargne est un bon début.
                   </p>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader>
-                  <CardTitle>Earnout (paiement conditionnel)</CardTitle>
+                  <CardTitle>Dépenses fixes</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground">
-                    Structure de paiement où une partie du prix est conditionnelle aux performances futures 
-                    de l'entreprise (revenus, profits). Utilisé pour combler un écart de valorisation entre 
-                    acheteur et vendeur ou lors d'incertitude sur la croissance.
+                    Dépenses qui reviennent chaque mois au même montant : loyer/hypothèque, assurances, 
+                    abonnements, paiements de dettes. Plus faciles à budgéter.
                   </p>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader>
-                  <CardTitle>Période de transition</CardTitle>
+                  <CardTitle>Dépenses variables</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground">
-                    Phase durant laquelle le vendeur forme l'acheteur et facilite le transfert des opérations. 
-                    Généralement 1-6 mois selon la complexité. Inclut présentation aux clients, fournisseurs, 
-                    formation sur les systèmes et processus. Souvent rémunérée ou incluse dans le contrat.
+                    Dépenses qui changent d'un mois à l'autre : épicerie, essence, restaurants, loisirs. 
+                    C'est généralement là où vous pouvez ajuster pour économiser plus.
                   </p>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Regional Terms Section */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl font-bold mb-8">Termes par Région du Québec</h2>
-            
-            <div className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Achat commerce Montréal</CardTitle>
-                  <CardDescription>Acquisition d'entreprises dans la métropole québécoise</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    L'achat d'un commerce à Montréal offre accès au plus grand marché du Québec avec 4+ millions d'habitants. 
-                    Secteurs dynamiques : technologie, restauration, commerce de détail, services professionnels. 
-                    Prix généralement 20-30% plus élevés qu'en région mais avec potentiel de revenus supérieur.
-                  </p>
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <p className="font-semibold">Prix médian</p>
-                      <p className="text-muted-foreground">450K$ - 600K$</p>
-                    </div>
-                    <div>
-                      <p className="font-semibold">Secteurs populaires</p>
-                      <p className="text-muted-foreground">Tech, restauration, services</p>
-                    </div>
-                  </div>
-                  <Button className="w-full mt-4" variant="outline" onClick={() => navigate("/entreprises-a-vendre-montreal")}>
-                    Voir les entreprises à Montréal
-                  </Button>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Vente entreprise Québec</CardTitle>
-                  <CardDescription>Cession d'entreprises dans la capitale nationale</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    La ville de Québec offre un marché stable avec une économie diversifiée (fonction publique, tourisme, technologie). 
-                    Les entreprises se vendent généralement 10-15% moins cher qu'à Montréal mais avec une concurrence moindre 
-                    et une qualité de vie appréciée.
-                  </p>
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <p className="font-semibold">Prix médian</p>
-                      <p className="text-muted-foreground">350K$ - 500K$</p>
-                    </div>
-                    <div>
-                      <p className="font-semibold">Délai de vente moyen</p>
-                      <p className="text-muted-foreground">8-10 mois</p>
-                    </div>
-                  </div>
-                  <Button className="w-full mt-4" variant="outline" onClick={() => navigate("/entreprises-a-vendre-quebec")}>
-                    Voir les entreprises à Québec
-                  </Button>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Opportunités d'affaires régionales</CardTitle>
-                  <CardDescription>Entreprises à vendre dans les régions du Québec</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Les régions du Québec (Saguenay, Mauricie, Estrie, Outaouais, etc.) offrent des prix d'acquisition 
-                    plus accessibles avec moins de concurrence. Idéal pour primo-acquéreurs ou ceux recherchant 
-                    un meilleur équilibre vie-travail. Attention à la démographie et au bassin de main-d'œuvre.
-                  </p>
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <p className="font-semibold">Prix médian</p>
-                      <p className="text-muted-foreground">175K$ - 350K$</p>
-                    </div>
-                    <div>
-                      <p className="font-semibold">Avantages</p>
-                      <p className="text-muted-foreground">Prix bas, moins de concurrence</p>
-                    </div>
-                  </div>
-                  <Button className="w-full mt-4" variant="outline" onClick={() => navigate("/entreprises")}>
-                    Explorer toutes les régions
-                  </Button>
                 </CardContent>
               </Card>
             </div>
@@ -480,22 +475,26 @@ const FAQ = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-gradient-to-br from-accent/10 to-primary/10">
+      <section className="py-16">
         <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl font-bold text-foreground mb-6">
-              Vous avez d'autres questions ?
-            </h2>
-            <p className="text-lg text-muted-foreground mb-8">
-              Notre équipe est là pour vous aider à naviguer dans votre projet d'acquisition ou de vente.
+          <div className="max-w-3xl mx-auto text-center space-y-6">
+            <Calculator className="w-16 h-16 text-primary mx-auto" />
+            <h2 className="text-3xl font-bold">Prêt à prendre le contrôle de vos finances ?</h2>
+            <p className="text-lg text-muted-foreground">
+              Nos outils gratuits vous aident à calculer votre salaire net, estimer votre retour d'impôt 
+              et créer un budget personnalisé.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" onClick={() => navigate("/contact")}>
-                Contactez-nous
-              </Button>
-              <Button size="lg" variant="outline" onClick={() => navigate("/ressources")}>
-                Guides et Ressources
-              </Button>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+              <Link to="/outils">
+                <Button size="lg" className="w-full sm:w-auto">
+                  Découvrir les outils gratuits
+                </Button>
+              </Link>
+              <Link to="/budget">
+                <Button size="lg" variant="outline" className="w-full sm:w-auto">
+                  Créer mon budget
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
