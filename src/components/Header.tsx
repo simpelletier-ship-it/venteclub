@@ -173,28 +173,27 @@ const Header = () => {
               Analyses
             </Button>
 
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="ghost" 
-                  className={cn(
-                    "h-9 px-4 font-medium text-sm rounded-md gap-1 text-muted-foreground hover:text-foreground hover:bg-muted",
-                    (isActive('/outils/salaire') || isActive('/outils/retour-impot')) && "bg-muted text-foreground"
-                  )}
-                >
-                  Outils
-                  <ChevronDown className="w-3.5 h-3.5" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="center" className="w-52 rounded-md border border-border bg-card">
-                <DropdownMenuItem onClick={() => navigate("/outils/salaire")} className="cursor-pointer py-2.5 text-sm">
-                  Calculateur de salaire
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate("/outils/retour-impot")} className="cursor-pointer py-2.5 text-sm">
-                  Retour d'impôt
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <Button 
+              variant="ghost"
+              onClick={() => navigate("/outils/salaire")} 
+              className={cn(
+                "h-9 px-4 font-medium text-sm rounded-md text-muted-foreground hover:text-foreground hover:bg-muted",
+                isActive('/outils/salaire') && "bg-muted text-foreground"
+              )}
+            >
+              Salaire
+            </Button>
+
+            <Button 
+              variant="ghost"
+              onClick={() => navigate("/impots")} 
+              className={cn(
+                "h-9 px-4 font-medium text-sm rounded-md text-muted-foreground hover:text-foreground hover:bg-muted",
+                isActive('/impots') && "bg-muted text-foreground"
+              )}
+            >
+              Impôts
+            </Button>
 
           </div>
 
@@ -362,15 +361,15 @@ const Header = () => {
             
             <button
               onClick={() => {
-                navigate("/outils/retour-impot");
+                navigate("/impots");
                 setMobileMenuOpen(false);
               }}
               className={cn(
                 "w-full text-left px-4 py-2.5 rounded-md transition-colors text-sm font-medium",
-                isActive('/outils/retour-impot') ? "bg-muted text-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                isActive('/impots') ? "bg-muted text-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"
               )}
             >
-              Retour d'impôt
+              Simulateur d'impôts
             </button>
             
             
