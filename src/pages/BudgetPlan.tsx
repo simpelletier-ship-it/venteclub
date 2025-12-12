@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { SEO } from "@/components/SEO";
 import { BreadcrumbSchema } from "@/components/BreadcrumbSchema";
-import { Loader2, Target, Settings2, Info, X, BookOpen, CheckCircle2 } from "lucide-react";
+import { Loader2, Settings2, X, BookOpen, CheckCircle2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { BudgetPlanner } from "@/components/budget/BudgetPlanner";
@@ -11,10 +11,8 @@ import { CategoryManager } from "@/components/budget/CategoryManager";
 import { CreateDefaultCategories } from "@/components/budget/CreateDefaultCategories";
 import { BudgetOnboarding } from "@/components/budget/BudgetOnboarding";
 import { BudgetTips } from "@/components/budget/BudgetTips";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const BUDGET_FEATURES = [
   "Définissez un budget pour chaque catégorie de dépense",
@@ -95,85 +93,68 @@ const BudgetPlan = () => {
         </Helmet>
 
         <div className="min-h-screen bg-background">
-          <div className="container mx-auto px-4 md:px-6 py-4 md:py-6">
-            {/* Header */}
-            <div className="mb-4 md:mb-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                    <Target className="h-4 w-4 md:h-5 md:w-5 text-primary" />
-                  </div>
-                  <div>
-                    <h1 className="text-xl md:text-2xl font-bold text-foreground">Mon budget</h1>
-                    <p className="text-xs md:text-sm text-muted-foreground">Glissez-déposez pour réorganiser</p>
-                  </div>
-                </div>
-                
-                {/* Manage Categories Button */}
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button variant="outline" size="sm" className="gap-2">
-                      <Settings2 className="h-4 w-4" />
-                      <span className="hidden sm:inline">Catégories</span>
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
-                    <DialogHeader>
-                      <DialogTitle className="flex items-center gap-2">
-                        <Settings2 className="h-5 w-5" />
-                        Gérer les catégories
-                      </DialogTitle>
-                    </DialogHeader>
-                    <CategoryManager isAuthenticated={isAuthenticated} />
-                  </DialogContent>
-                </Dialog>
+          <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 max-w-6xl">
+            {/* Header - Clean & Minimal */}
+            <header className="flex items-center justify-between mb-8">
+              <div>
+                <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-foreground">Budget</h1>
+                <p className="text-muted-foreground mt-1">Planifiez vos dépenses</p>
               </div>
-            </div>
+              
+              {/* Manage Categories Button */}
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="sm" className="gap-2 rounded-full">
+                    <Settings2 className="h-4 w-4" />
+                    <span className="hidden sm:inline">Catégories</span>
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Gérer les catégories</DialogTitle>
+                  </DialogHeader>
+                  <CategoryManager isAuthenticated={isAuthenticated} />
+                </DialogContent>
+              </Dialog>
+            </header>
 
             {/* Info card about budgeting - dismissible */}
             {showInfo && (
-              <Card className="mb-6 border-blue-500/20 bg-gradient-to-br from-blue-500/5 to-transparent">
-                <CardHeader className="pb-2">
-                  <div className="flex items-start justify-between">
-                    <CardTitle className="text-base font-semibold flex items-center gap-2">
-                      <BookOpen className="h-5 w-5 text-blue-600" />
-                      C'est quoi un budget?
-                    </CardTitle>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="h-7 w-7 -mt-1 -mr-2"
-                      onClick={dismissInfo}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
+              <section className="mb-8 p-5 sm:p-6 rounded-2xl bg-blue-500/5 border border-blue-500/10">
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <BookOpen className="h-5 w-5 text-blue-600" />
+                    <h2 className="font-semibold text-foreground">C'est quoi un budget?</h2>
                   </div>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <p className="text-sm text-muted-foreground">
-                    Un budget est un plan qui vous aide à <strong>contrôler où va votre argent</strong>. 
-                    Au lieu de vous demander "où est passé mon argent?", vous décidez à l'avance 
-                    combien vous voulez dépenser dans chaque catégorie.
-                  </p>
-                  <div className="grid sm:grid-cols-2 gap-2">
-                    {BUDGET_FEATURES.map((feature, index) => (
-                      <div key={index} className="flex items-start gap-2 text-sm">
-                        <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
-                        <span className="text-muted-foreground">{feature}</span>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+                  <button 
+                    onClick={dismissInfo}
+                    className="p-1.5 rounded-lg hover:bg-muted/50 transition-colors"
+                  >
+                    <X className="h-4 w-4 text-muted-foreground" />
+                  </button>
+                </div>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Un budget vous aide à <strong className="text-foreground">contrôler où va votre argent</strong>. 
+                  Décidez à l'avance combien dépenser dans chaque catégorie.
+                </p>
+                <div className="grid sm:grid-cols-2 gap-2">
+                  {BUDGET_FEATURES.slice(0, 4).map((feature, index) => (
+                    <div key={index} className="flex items-center gap-2 text-sm">
+                      <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
+                      <span className="text-muted-foreground">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+              </section>
             )}
 
-            {/* Budget Planner - Everything on one page */}
+            {/* Budget Planner */}
             <BudgetPlanner isAuthenticated={isAuthenticated} />
 
             {/* Budget Tips Section */}
-            <div className="mt-8">
+            <section className="mt-8">
               <BudgetTips />
-            </div>
+            </section>
           </div>
         </div>
       </>
