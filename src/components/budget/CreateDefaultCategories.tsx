@@ -3,6 +3,51 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
+// Mapping emoji → Lucide icon key for migration
+const EMOJI_TO_LUCIDE: Record<string, string> = {
+  '🍔': 'utensils', '🍽️': 'utensils-crossed', '🥗': 'utensils', '🍕': 'pizza',
+  '🚗': 'car', '🚙': 'car', '🚕': 'car', '⛽': 'fuel',
+  '🏠': 'home', '🏡': 'home', '🏢': 'building', '🏦': 'landmark',
+  '💊': 'pill', '💉': 'stethoscope', '🏥': 'heart-pulse', '❤️': 'heart',
+  '👕': 'shirt', '👗': 'shirt', '👔': 'shirt', '✂️': 'scissors',
+  '📚': 'graduation-cap', '🎓': 'graduation-cap', '📖': 'book',
+  '✈️': 'plane', '🛫': 'plane', '🧳': 'plane',
+  '🎬': 'film', '🎥': 'film', '🎮': 'gamepad-2', '🎵': 'music',
+  '☕': 'coffee', '🍺': 'beer', '🍻': 'beer',
+  '💡': 'lightbulb', '🔌': 'zap', '⚡': 'zap',
+  '🛡️': 'shield', '🔒': 'shield', '🔐': 'shield',
+  '📱': 'smartphone', '💻': 'smartphone', '📲': 'smartphone',
+  '📶': 'wifi', '🌐': 'wifi',
+  '📺': 'tv', '🎧': 'music',
+  '🏋️': 'dumbbell', '💪': 'dumbbell', '🏃': 'dumbbell',
+  '🎁': 'gift', '🎀': 'gift',
+  '🐕': 'paw-print', '🐈': 'paw-print', '🐾': 'paw-print',
+  '✨': 'sparkles', '💅': 'sparkles',
+  '💳': 'credit-card', '💵': 'banknote', '💰': 'banknote', '🪙': 'coins',
+  '📦': 'box', '🛒': 'shopping-cart', '🛍️': 'shopping-cart',
+  '💼': 'briefcase', '👨‍💼': 'briefcase',
+  '📈': 'trending-up', '📊': 'trending-up', '💹': 'coins',
+  '🔄': 'undo', '↩️': 'undo',
+  '🎉': 'party-popper', '🥳': 'party-popper',
+  '👶': 'baby', '🍼': 'baby',
+  '🔧': 'wrench', '🛠️': 'wrench',
+  '🚌': 'bus', '🚆': 'train', '🚲': 'bike',
+  '🍎': 'apple',
+  '📄': 'file-text', '📝': 'file-text',
+  '👥': 'users', '👨‍👩‍👧': 'users',
+  '💲': 'banknote', '🏧': 'landmark',
+  '💸': 'banknote', '🤑': 'banknote',
+  '🏬': 'building-2', '🏗️': 'building-2',
+  '💝': 'heart', '🩺': 'stethoscope',
+  '🎈': 'party-popper', '🎊': 'party-popper',
+  '🥤': 'coffee', '🍩': 'utensils',
+  '🧴': 'sparkles', '💆': 'sparkles',
+  '🐶': 'paw-print', '🐱': 'paw-print',
+  '🚴': 'bike', '🏊': 'dumbbell',
+  '📻': 'music', '🎤': 'music',
+  '🧾': 'receipt'
+};
+
 const DEFAULT_EXPENSE_CATEGORIES = [
   { name: "Alimentation", icon: "utensils", color: "#ef4444", display_order: 0 },
   { name: "Transport", icon: "car", color: "#f59e0b", display_order: 1 },
@@ -41,6 +86,7 @@ const DEFAULT_INCOME_CATEGORIES = [
 /**
  * Composant qui crée automatiquement les catégories par défaut
  * pour les nouveaux utilisateurs du planificateur budgétaire
+ * et migre les catégories avec emojis vers des icônes Lucide
  */
 export function CreateDefaultCategories() {
   const { user } = useAuth();
@@ -54,9 +100,8 @@ export function CreateDefaultCategories() {
       
       const { data, error } = await supabase
         .from("budget_categories")
-        .select("id")
-        .eq("user_id", user.id)
-        .limit(1);
+        .select("id, icon")
+        .eq("user_id", user.id);
 
       if (error) throw error;
       return data || [];
@@ -77,7 +122,7 @@ export function CreateDefaultCategories() {
         color: cat.color,
         type: "expense",
         is_custom: false,
-        is_pinned: cat.display_order < 6, // Épingler les 6 premières
+        is_pinned: cat.display_order < 6,
         display_order: cat.display_order,
       }));
 
@@ -89,7 +134,7 @@ export function CreateDefaultCategories() {
         color: cat.color,
         type: "income",
         is_custom: false,
-        is_pinned: cat.display_order === 0, // Épingler "Salaire" par défaut
+        is_pinned: cat.display_order === 0,
         display_order: cat.display_order,
       }));
 
@@ -101,15 +146,48 @@ export function CreateDefaultCategories() {
       if (error) throw error;
     },
     onSuccess: () => {
-      // Rafraîchir les catégories
+      queryClient.invalidateQueries({ queryKey: ["budget-categories"] });
+    },
+  });
+
+  // Mutation pour migrer les emojis vers Lucide
+  const migrateEmojiIcons = useMutation({
+    mutationFn: async (categoriesToMigrate: { id: string; icon: string }[]) => {
+      if (!user?.id) throw new Error("Non authentifié");
+
+      // Mettre à jour chaque catégorie avec un emoji
+      for (const cat of categoriesToMigrate) {
+        const lucideIcon = EMOJI_TO_LUCIDE[cat.icon];
+        if (lucideIcon) {
+          await supabase
+            .from("budget_categories")
+            .update({ icon: lucideIcon })
+            .eq("id", cat.id)
+            .eq("user_id", user.id);
+        }
+      }
+    },
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["budget-categories"] });
     },
   });
 
   // Créer automatiquement les catégories si l'utilisateur n'en a pas
+  // ou migrer les emojis vers Lucide
   useEffect(() => {
-    if (!isLoading && existingCategories && existingCategories.length === 0) {
-      createDefaultCategories.mutate();
+    if (!isLoading && existingCategories) {
+      if (existingCategories.length === 0) {
+        createDefaultCategories.mutate();
+      } else {
+        // Vérifier s'il y a des catégories avec des emojis à migrer
+        const categoriesToMigrate = existingCategories.filter(
+          (cat) => cat.icon && EMOJI_TO_LUCIDE[cat.icon]
+        );
+        
+        if (categoriesToMigrate.length > 0) {
+          migrateEmojiIcons.mutate(categoriesToMigrate as { id: string; icon: string }[]);
+        }
+      }
     }
   }, [isLoading, existingCategories]);
 
