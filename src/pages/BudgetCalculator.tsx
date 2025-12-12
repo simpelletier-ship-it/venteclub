@@ -2,65 +2,38 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { SEO } from "@/components/SEO";
 import { BreadcrumbSchema } from "@/components/BreadcrumbSchema";
-import { Loader2, TrendingUp, TrendingDown, Wallet, ArrowUpRight, ArrowDownRight, Plus, ChevronRight, Target, Calendar, Clock, CreditCard, PiggyBank, LineChart, Bell, BarChart3, Lightbulb, ReceiptText, Trash2, Pencil, X } from "lucide-react";
+import { Loader2, Home, Target, ReceiptText, CreditCard, Lightbulb, HelpCircle, ChevronRight, TrendingUp, TrendingDown, Wallet, ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { BudgetPlanner } from "@/components/budget/BudgetPlanner";
-import { QuickExpenseTracker } from "@/components/budget/QuickExpenseTrackerPro";
-import { ExpensesByCategory } from "@/components/budget/ExpensesByCategory";
-import { FinancialHealthScore } from "@/components/budget/FinancialHealthScore";
-import { FinancialGoals } from "@/components/budget/FinancialGoals";
+import { BudgetQuestionnaire } from "@/components/budget/BudgetQuestionnaire";
+import { DebtManager } from "@/components/budget/DebtManager";
+import { ExpenseTracker } from "@/components/budget/ExpenseTracker";
+import { BudgetVsActual } from "@/components/budget/BudgetVsActual";
 import { BudgetOnboarding } from "@/components/budget/BudgetOnboarding";
 import { CreateDefaultCategories } from "@/components/budget/CreateDefaultCategories";
 import { OfflineIndicator } from "@/components/budget/OfflineIndicator";
 import { useOfflineSync } from "@/hooks/useOfflineSync";
-import { BillCalendar } from "@/components/budget/BillCalendar";
-import { AgeOfMoney } from "@/components/budget/AgeOfMoney";
-import { DebtPayoffPlanner } from "@/components/budget/DebtPayoffPlanner";
-import { SavingsChallenges } from "@/components/budget/SavingsChallenges";
-import { CashFlowForecast } from "@/components/budget/CashFlowForecast";
-import { SpendingLimitsAlerts } from "@/components/budget/SpendingLimitsAlerts";
-import { InvestmentTracker } from "@/components/budget/InvestmentTracker";
-import { FinancialProductComparison } from "@/components/budget/FinancialProductComparison";
 import { SmartInsights } from "@/components/budget/SmartInsights";
-import { SubscriptionDetector } from "@/components/budget/SubscriptionDetector";
-import { InterestAnalyzer } from "@/components/budget/InterestAnalyzer";
-import { CategoryIcon } from "@/components/budget/CategoryIcon";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { ExpensesByCategory } from "@/components/budget/ExpensesByCategory";
+import { FinancialHealthScore } from "@/components/budget/FinancialHealthScore";
+import { FinancialGoals } from "@/components/budget/FinancialGoals";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatPrice } from "@/lib/priceFormat";
 import { cn } from "@/lib/utils";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const BudgetCalculator = () => {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const { user, loading } = useAuth();
   const isAuthenticated = !!user;
   const { isOnline, pendingCount, isSyncing, triggerSync } = useOfflineSync(isAuthenticated);
-
-  // Delete transaction mutation
-  const deleteTransaction = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from('budget_transactions')
-        .delete()
-        .eq('id', id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['budget-transactions-all'] });
-      queryClient.invalidateQueries({ queryKey: ['budget-transactions'] });
-      toast.success("Transaction supprimée");
-    },
-    onError: () => {
-      toast.error("Erreur lors de la suppression");
-    },
-  });
+  const [activeTab, setActiveTab] = useState("dashboard");
+  const [showQuestionnaire, setShowQuestionnaire] = useState(false);
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -124,6 +97,17 @@ const BudgetCalculator = () => {
     retry: 1,
   });
 
+  const { data: goals = [] } = useQuery({
+    queryKey: ['budget-goals'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('budget_goals').select('*');
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: isAuthenticated,
+    retry: 1,
+  });
+
   const totalAssets = assets.reduce((sum, asset) => sum + Number(asset.value), 0);
   const totalDebts = debts.reduce((sum, debt) => sum + Number(debt.balance), 0);
   const netWorth = totalAssets - totalDebts;
@@ -143,19 +127,8 @@ const BudgetCalculator = () => {
   
   const monthlyBalance = monthlyIncome - monthlyExpenses;
 
-  const prevMonth = new Date();
-  prevMonth.setMonth(prevMonth.getMonth() - 1);
-  const prevMonthStr = prevMonth.toISOString().slice(0, 7);
-  const prevMonthTransactions = transactions.filter(t => 
-    t.transaction_date?.startsWith(prevMonthStr)
-  );
-  const prevMonthExpenses = prevMonthTransactions
-    .filter(t => t.type === 'expense')
-    .reduce((sum, t) => sum + Number(t.amount), 0);
-  
-  const expenseChange = prevMonthExpenses > 0 
-    ? ((monthlyExpenses - prevMonthExpenses) / prevMonthExpenses) * 100 
-    : 0;
+  // Check if user has any budget goals set
+  const hasNoBudget = goals.length === 0;
 
   if (loading) {
     return (
@@ -171,17 +144,15 @@ const BudgetCalculator = () => {
     return null;
   }
 
-  const currentMonthName = new Date().toLocaleDateString('fr-CA', { month: 'long', year: 'numeric' });
-
   return (
     <ErrorBoundary>
       <>
         <CreateDefaultCategories />
         <BudgetOnboarding />
         <SEO
-          title="Tableau de bord | Budget"
-          description="Gérez votre budget personnel. Suivi des dépenses, objectifs d'épargne et analyses financières."
-          keywords="budget personnel, gestion finances, suivi dépenses, épargne"
+          title="Planificateur Budget | Gestion finances personnelles"
+          description="Gérez votre budget personnel facilement. Suivi des dépenses, gestion des dettes, objectifs d'épargne et analyses financières."
+          keywords="budget personnel, gestion finances, suivi dépenses, épargne, dettes"
           canonical="/budget"
           type="website"
         />
@@ -190,8 +161,8 @@ const BudgetCalculator = () => {
         />
 
         <div className="min-h-screen bg-background">
-          <div className="container mx-auto px-6 py-6">
-            {/* Offline indicator - subtle positioning */}
+          <div className="container mx-auto px-4 py-6 max-w-6xl">
+            {/* Offline indicator */}
             {(!isOnline || pendingCount > 0) && (
               <div className="mb-4">
                 <OfflineIndicator 
@@ -203,233 +174,246 @@ const BudgetCalculator = () => {
               </div>
             )}
 
-            {/* KPI Cards - Premium Banking Style */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
-              {/* Revenus */}
-              <Card className="border-0 shadow-md hover:shadow-lg transition-all duration-300 bg-card min-h-[130px]">
-                <CardContent className="p-5">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-widest">Revenus</span>
-                      <p className="text-2xl lg:text-3xl font-bold text-foreground mt-2 tracking-tight">{formatPrice(monthlyIncome)}</p>
-                    </div>
-                    <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center">
-                      <TrendingUp className="h-5 w-5 text-primary" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Dépenses */}
-              <Card className="border-0 shadow-md hover:shadow-lg transition-all duration-300 bg-card min-h-[130px]">
-                <CardContent className="p-5">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-widest">Dépenses</span>
-                      <p className="text-2xl lg:text-3xl font-bold text-foreground mt-2 tracking-tight">{formatPrice(monthlyExpenses)}</p>
-                      {expenseChange !== 0 && (
-                        <div className={cn(
-                          "flex items-center gap-1.5 mt-2 text-xs font-medium",
-                          expenseChange > 0 ? "text-amber-600 dark:text-amber-400" : "text-primary"
-                        )}>
-                          {expenseChange > 0 ? <ArrowUpRight className="h-3.5 w-3.5" /> : <ArrowDownRight className="h-3.5 w-3.5" />}
-                          <span>{Math.abs(expenseChange).toFixed(0)}%</span>
-                        </div>
-                      )}
-                    </div>
-                    <div className="w-11 h-11 rounded-xl bg-slate-500/10 flex items-center justify-center">
-                      <TrendingDown className="h-5 w-5 text-slate-500" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Solde */}
-              <Card className="border-0 shadow-md hover:shadow-lg transition-all duration-300 bg-card min-h-[130px]">
-                <CardContent className="p-5">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-widest">Solde</span>
-                      <p className={cn(
-                        "text-2xl lg:text-3xl font-bold mt-2 tracking-tight",
-                        monthlyBalance >= 0 ? "text-primary" : "text-[#C7463D]"
-                      )}>
-                        {monthlyBalance >= 0 ? '+' : ''}{formatPrice(monthlyBalance)}
-                      </p>
-                    </div>
-                    <div className={cn(
-                      "w-11 h-11 rounded-xl flex items-center justify-center",
-                      monthlyBalance >= 0 ? "bg-primary/10" : "bg-[#C7463D]/10"
-                    )}>
-                      <Wallet className={cn("h-5 w-5", monthlyBalance >= 0 ? "text-primary" : "text-[#C7463D]")} />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Patrimoine */}
-              <Card 
-                className="border-0 shadow-md hover:shadow-lg transition-all duration-300 bg-card min-h-[130px] cursor-pointer group" 
-                onClick={() => navigate('/budget/valeur-nette')}
-              >
-                <CardContent className="p-5">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-widest">Patrimoine</span>
-                      <p className={cn(
-                        "text-2xl lg:text-3xl font-bold mt-2 tracking-tight",
-                        netWorth >= 0 ? "text-foreground" : "text-amber-600 dark:text-amber-400"
-                      )}>
-                        {formatPrice(netWorth)}
-                      </p>
-                    </div>
-                    <div className="w-11 h-11 rounded-xl bg-violet-500/10 flex items-center justify-center group-hover:bg-violet-500/20 transition-colors">
-                      <ChevronRight className="h-5 w-5 text-violet-500" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+            {/* Header with Help */}
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h1 className="text-2xl font-bold">Mon Budget</h1>
+                <p className="text-muted-foreground">Gère ton argent simplement</p>
+              </div>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="outline" size="icon">
+                      <HelpCircle className="w-5 h-5" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="left" className="max-w-xs">
+                    <p className="font-medium mb-1">Comment utiliser?</p>
+                    <ul className="text-sm space-y-1">
+                      <li><strong>Tableau de bord:</strong> Vue d'ensemble rapide</li>
+                      <li><strong>Mon Budget:</strong> Planifie combien tu veux dépenser</li>
+                      <li><strong>Mes Dépenses:</strong> Entre tes dépenses réelles</li>
+                      <li><strong>Mes Dettes:</strong> Suis et gère tes dettes</li>
+                    </ul>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
 
-            {/* Quick Add Section */}
-            <div className="mb-6">
-              <QuickExpenseTracker isAuthenticated={isAuthenticated} />
-            </div>
-
-            {/* Recent Transactions */}
-            <Card className="mb-6 border-border">
-              <CardHeader className="pb-3 flex flex-row items-center justify-between border-b border-border">
-                <CardTitle className="text-sm font-medium">Transactions récentes</CardTitle>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={() => navigate('/budget/historique')}
-                  className="text-xs text-muted-foreground hover:text-foreground"
+            {/* Main Navigation Tabs */}
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+              <TabsList className="grid grid-cols-4 h-auto p-1 bg-muted/50">
+                <TabsTrigger 
+                  value="dashboard" 
+                  className="flex flex-col gap-1 py-3 data-[state=active]:bg-background"
                 >
-                  Voir tout <ChevronRight className="h-3.5 w-3.5 ml-1" />
-                </Button>
-              </CardHeader>
-              <CardContent className="p-0">
-                <div className="divide-y divide-border">
-                  {transactions.slice(0, 5).map((t) => {
-                    const category = categories.find(c => c.id === t.category_id);
-                    return (
-                      <div key={t.id} className="flex items-center justify-between px-5 py-3.5 hover:bg-muted/30 transition-colors group">
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-md bg-muted flex items-center justify-center">
-                            <CategoryIcon icon={category?.icon} size="md" />
-                          </div>
-                          <div>
-                            <p className="text-sm font-medium text-foreground">{t.description || category?.name || 'Transaction'}</p>
-                            <p className="text-xs text-muted-foreground">
-                              {new Date(t.transaction_date).toLocaleDateString('fr-CA', { day: 'numeric', month: 'short' })}
-                            </p>
-                          </div>
+                  <Home className="w-5 h-5" />
+                  <span className="text-xs font-medium">Tableau de bord</span>
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="budget" 
+                  className="flex flex-col gap-1 py-3 data-[state=active]:bg-background"
+                >
+                  <Target className="w-5 h-5" />
+                  <span className="text-xs font-medium">Mon Budget</span>
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="expenses" 
+                  className="flex flex-col gap-1 py-3 data-[state=active]:bg-background"
+                >
+                  <ReceiptText className="w-5 h-5" />
+                  <span className="text-xs font-medium">Mes Dépenses</span>
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="debts" 
+                  className="flex flex-col gap-1 py-3 data-[state=active]:bg-background"
+                >
+                  <CreditCard className="w-5 h-5" />
+                  <span className="text-xs font-medium">Mes Dettes</span>
+                </TabsTrigger>
+              </TabsList>
+
+              {/* DASHBOARD TAB */}
+              <TabsContent value="dashboard" className="space-y-6">
+                {/* KPI Cards */}
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                  <Card className="border-0 shadow-sm">
+                    <CardContent className="pt-5">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+                          <TrendingUp className="w-5 h-5 text-emerald-600" />
                         </div>
-                        <div className="flex items-center gap-2">
-                          <span className={cn(
-                            "text-sm font-medium",
-                            t.type === 'income' ? "text-success" : "text-foreground"
-                          )}>
-                            {t.type === 'income' ? '+' : '-'}{formatPrice(Number(t.amount))}
-                          </span>
-                          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              className="h-7 w-7 p-0"
-                              onClick={() => navigate(`/budget/historique?edit=${t.id}`)}
-                            >
-                              <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
-                            </Button>
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              className="h-7 w-7 p-0 hover:bg-destructive/10"
-                              onClick={() => deleteTransaction.mutate(t.id)}
-                            >
-                              <X className="h-3.5 w-3.5 text-destructive" />
-                            </Button>
-                          </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground uppercase tracking-wide">Revenus</p>
+                          <p className="text-xl font-bold">{formatPrice(monthlyIncome)}</p>
                         </div>
                       </div>
-                    );
-                  })}
-                  {transactions.length === 0 && (
-                    <div className="px-5 py-8 text-center">
-                      <p className="text-sm text-muted-foreground">Aucune transaction</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-0 shadow-sm">
+                    <CardContent className="pt-5">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center">
+                          <TrendingDown className="w-5 h-5 text-red-600" />
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground uppercase tracking-wide">Dépenses</p>
+                          <p className="text-xl font-bold">{formatPrice(monthlyExpenses)}</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-0 shadow-sm">
+                    <CardContent className="pt-5">
+                      <div className="flex items-center gap-3">
+                        <div className={cn(
+                          "w-10 h-10 rounded-xl flex items-center justify-center",
+                          monthlyBalance >= 0 ? "bg-primary/10" : "bg-amber-500/10"
+                        )}>
+                          <Wallet className={cn("w-5 h-5", monthlyBalance >= 0 ? "text-primary" : "text-amber-600")} />
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground uppercase tracking-wide">Solde</p>
+                          <p className={cn(
+                            "text-xl font-bold",
+                            monthlyBalance >= 0 ? "text-primary" : "text-amber-600"
+                          )}>
+                            {monthlyBalance >= 0 ? '+' : ''}{formatPrice(monthlyBalance)}
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card 
+                    className="border-0 shadow-sm cursor-pointer hover:shadow-md transition-shadow"
+                    onClick={() => navigate('/budget/valeur-nette')}
+                  >
+                    <CardContent className="pt-5">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-violet-500/10 flex items-center justify-center">
+                          <ChevronRight className="w-5 h-5 text-violet-600" />
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground uppercase tracking-wide">Patrimoine</p>
+                          <p className={cn(
+                            "text-xl font-bold",
+                            netWorth >= 0 ? "text-foreground" : "text-amber-600"
+                          )}>
+                            {formatPrice(netWorth)}
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Insights */}
+                <div className="flex items-center gap-2 mb-2">
+                  <Lightbulb className="w-4 h-4 text-primary" />
+                  <span className="text-sm font-semibold">Conseils personnalisés</span>
+                </div>
+                <SmartInsights />
+
+                {/* Budget vs Actual Summary */}
+                <Card>
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-base">Budget vs Réel ce mois</CardTitle>
+                      <Button variant="ghost" size="sm" onClick={() => setActiveTab('budget')}>
+                        Voir détails <ChevronRight className="w-4 h-4 ml-1" />
+                      </Button>
                     </div>
+                  </CardHeader>
+                  <CardContent>
+                    <BudgetVsActual isAuthenticated={isAuthenticated} />
+                  </CardContent>
+                </Card>
+
+                {/* Expenses by Category */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base">Dépenses par catégorie</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ExpensesByCategory 
+                        transactions={transactions}
+                        categories={categories}
+                        onAnalyze={() => {}}
+                      />
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base">Objectifs financiers</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <FinancialGoals isAuthenticated={isAuthenticated} />
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
+
+              {/* BUDGET TAB */}
+              <TabsContent value="budget" className="space-y-6">
+                {/* Help Banner */}
+                <div className="flex items-start gap-3 p-4 rounded-lg bg-primary/5 border border-primary/20">
+                  <Target className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="font-medium">C'est quoi un budget?</p>
+                    <p className="text-sm text-muted-foreground">
+                      Un budget c'est décider à l'avance combien tu veux dépenser dans chaque catégorie. 
+                      Ça t'aide à éviter de dépasser et à économiser pour tes projets!
+                    </p>
+                  </div>
+                  {hasNoBudget && (
+                    <Button onClick={() => setShowQuestionnaire(true)} className="shrink-0">
+                      <HelpCircle className="w-4 h-4 mr-2" />
+                      Aide-moi à créer mon budget
+                    </Button>
                   )}
                 </div>
-              </CardContent>
-            </Card>
 
-            {/* Insights Section - Compact scrollable */}
-            <div className="mb-6">
-              <div className="flex items-center gap-2 mb-3">
-                <Lightbulb className="h-4 w-4 text-primary" />
-                <span className="text-sm font-semibold text-foreground">Recommandations</span>
-              </div>
-              <SmartInsights />
-            </div>
+                {/* Questionnaire Modal */}
+                {showQuestionnaire && (
+                  <BudgetQuestionnaire onComplete={() => setShowQuestionnaire(false)} />
+                )}
 
-            {/* Analytics Grid - Premium cards */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6">
-              <Card className="border-0 shadow-md">
-                <CardHeader className="pb-0 pt-5 px-5">
-                  <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                    <PiggyBank className="h-4 w-4 text-primary" />
-                    Dépenses par catégorie
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="pt-4 px-5 pb-5">
-                  <ExpensesByCategory 
-                    transactions={transactions}
-                    categories={categories}
-                    onAnalyze={() => {}}
-                  />
-                </CardContent>
-              </Card>
-              <Card className="border-0 shadow-md">
-                <CardHeader className="pb-0 pt-5 px-5">
-                  <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                    <BarChart3 className="h-4 w-4 text-primary" />
-                    Score financier
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="pt-4 px-5 pb-5">
-                  <FinancialHealthScore 
-                    transactions={transactions}
-                    debts={debts}
-                    assets={assets}
-                  />
-                </CardContent>
-              </Card>
-            </div>
+                {/* Budget Planner */}
+                {!showQuestionnaire && (
+                  <BudgetPlanner isAuthenticated={isAuthenticated} />
+                )}
 
-            {/* Financial Goals Section */}
-            <Card className="mb-6 border-border">
-              <CardHeader className="pb-2 border-b border-border">
-                <div className="flex items-center gap-2">
-                  <Target className="h-4 w-4 text-primary" />
-                  <CardTitle className="text-sm font-medium">Objectifs financiers</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className="pt-4">
-                <FinancialGoals isAuthenticated={isAuthenticated} />
-              </CardContent>
-            </Card>
+                {/* Budget vs Actual Comparison */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <TrendingUp className="w-4 h-4" />
+                      Budget vs Réel
+                    </CardTitle>
+                    <CardDescription>
+                      Compare ce que tu avais prévu avec ce que tu as vraiment dépensé
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <BudgetVsActual isAuthenticated={isAuthenticated} />
+                  </CardContent>
+                </Card>
+              </TabsContent>
 
-            {/* Budget Planner */}
-            <Card className="border-border mb-6">
-              <CardHeader className="pb-2 border-b border-border">
-                <CardTitle className="text-sm font-medium">Planification budgétaire</CardTitle>
-              </CardHeader>
-              <CardContent className="pt-4">
-                <BudgetPlanner isAuthenticated={isAuthenticated} />
-              </CardContent>
-            </Card>
+              {/* EXPENSES TAB */}
+              <TabsContent value="expenses" className="space-y-6">
+                <ExpenseTracker isAuthenticated={isAuthenticated} />
+              </TabsContent>
 
+              {/* DEBTS TAB */}
+              <TabsContent value="debts" className="space-y-6">
+                <DebtManager isAuthenticated={isAuthenticated} />
+              </TabsContent>
+            </Tabs>
           </div>
         </div>
       </>
