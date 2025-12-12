@@ -86,12 +86,7 @@
     <link rel="dns-prefetch" href="https://api.mapbox.com" />
     <link rel="dns-prefetch" href="https://js.stripe.com" />
     
-    <!-- Preload critical resources for faster initial load -->
-    <link rel="modulepreload" href="/src/main.tsx" />
-    <link rel="modulepreload" href="/src/App.tsx" />
-    <link rel="modulepreload" href="/src/pages/Home.tsx" />
-    <link rel="modulepreload" href="/src/components/Layout.tsx" />
-    <link rel="modulepreload" href="/src/components/Header.tsx" />
+    <!-- Note: modulepreload removed - Vite handles this automatically in production -->
     
     <!-- Google Tag Manager -->
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
