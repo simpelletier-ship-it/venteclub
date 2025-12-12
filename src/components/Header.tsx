@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { useTranslation } from "react-i18next";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,18 +11,27 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getAvatarUrl } from "@/lib/avatarUtils";
-import { LayoutDashboard, Settings, LogOut, Menu, Sparkles, Mail } from "lucide-react";
+import { 
+  LayoutDashboard, 
+  Settings, 
+  LogOut, 
+  Menu, 
+  Sparkles, 
+  PiggyBank,
+  Calculator,
+  Receipt,
+  Building2,
+  ChevronDown
+} from "lucide-react";
 import { NotificationBell } from "./NotificationBell";
 import { ThemeToggle } from "./ThemeToggle";
 
 const Header = () => {
   const navigate = useNavigate();
-  const { t } = useTranslation();
   const [user, setUser] = useState<any>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [profile, setProfile] = useState<any>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -68,25 +76,9 @@ const Header = () => {
     setProfile(data);
   };
 
-  const fetchUnreadMessages = async () => {
-    if (!user) return;
-    
-    const { count } = await supabase
-      .from('messages')
-      .select('*', { count: 'exact', head: true })
-      .eq('receiver_id', user.id)
-      .eq('read', false);
-
-    setUnreadMessagesCount(count || 0);
-  };
-
   useEffect(() => {
     if (!user) return;
 
-    // Fetch initial unread messages count
-    fetchUnreadMessages();
-
-    // Écouter les changements de profil en temps réel
     const profileChannel = supabase
       .channel('profile-changes')
       .on(
@@ -103,24 +95,8 @@ const Header = () => {
       )
       .subscribe();
 
-    // Écouter les changements de messages en temps réel
-    const messagesChannel = supabase
-      .channel('header-unread-messages')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'messages',
-          filter: `receiver_id=eq.${user.id}`
-        },
-        () => fetchUnreadMessages()
-      )
-      .subscribe();
-
     return () => {
       supabase.removeChannel(profileChannel);
-      supabase.removeChannel(messagesChannel);
     };
   }, [user?.id]);
 
@@ -130,7 +106,7 @@ const Header = () => {
   };
 
   return (
-    <nav className="border-b border-border bg-background/95 backdrop-blur-xl sticky top-0 z-50 shadow-sm py-2 sm:py-3 md:py-4">
+    <nav className="border-b border-border bg-background/95 backdrop-blur-xl sticky top-0 z-50 shadow-sm py-3 sm:py-4">
       <div className="container mx-auto px-4 sm:px-6 md:px-8">
         <div className="flex items-center justify-between">
           {/* Logo */}
@@ -138,54 +114,70 @@ const Header = () => {
             className="flex items-center cursor-pointer group" 
             onClick={() => navigate("/")}
           >
-            <span className="font-display font-bold text-foreground text-xl sm:text-2xl md:text-3xl transition-all duration-300 group-hover:scale-105">
-              Vente<span className="text-secondary">.Club</span>
+            <span className="font-display font-bold text-foreground text-xl sm:text-2xl transition-all duration-300 group-hover:scale-105">
+              Budget<span className="text-emerald-600 dark:text-emerald-500">.club</span>
             </span>
           </div>
 
-          {/* Desktop Navigation - Plus d'espace et mieux organisé */}
-          <div className="hidden lg:flex items-center flex-1 justify-center gap-8 xl:gap-10">
-            <button 
-              onClick={() => navigate("/entreprises")} 
-              className="text-muted-foreground hover:text-foreground transition-all duration-300 font-semibold relative group whitespace-nowrap text-base"
+          {/* Desktop Navigation */}
+          <div className="hidden lg:flex items-center flex-1 justify-center gap-1">
+            {/* Main Budget Link */}
+            <Button 
+              variant="ghost"
+              onClick={() => navigate("/outils/budget")} 
+              className="text-muted-foreground hover:text-foreground font-semibold gap-2"
             >
-              {t('nav.buyBusiness')}
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full" />
-            </button>
+              <PiggyBank className="w-4 h-4" />
+              Mon Budget
+            </Button>
 
-            <button 
-              onClick={() => navigate("/sell")} 
-              className="text-muted-foreground hover:text-foreground transition-all duration-300 font-semibold relative group whitespace-nowrap text-base"
-            >
-              {t('nav.sellBusiness')}
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full" />
-            </button>
+            {/* Tools Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="text-muted-foreground hover:text-foreground font-semibold gap-1">
+                  Outils
+                  <ChevronDown className="w-4 h-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="center" className="w-56">
+                <DropdownMenuItem onClick={() => navigate("/outils/salaire")} className="cursor-pointer gap-3 py-3">
+                  <Calculator className="w-5 h-5 text-blue-600" />
+                  <div>
+                    <p className="font-medium">Calculateur de salaire</p>
+                    <p className="text-xs text-muted-foreground">Salaire net au Québec</p>
+                  </div>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate("/outils/retour-impot")} className="cursor-pointer gap-3 py-3">
+                  <Receipt className="w-5 h-5 text-purple-600" />
+                  <div>
+                    <p className="font-medium">Retour d'impôt</p>
+                    <p className="text-xs text-muted-foreground">Estimation remboursement</p>
+                  </div>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
-            <button 
-              onClick={() => navigate("/immeubles-commerciaux")} 
-              className="text-muted-foreground hover:text-foreground transition-all duration-300 font-semibold relative group whitespace-nowrap text-base"
-            >
-              {t('nav.commercialRealEstate')}
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full" />
-            </button>
-
-            <button 
-              onClick={() => navigate("/outils")} 
-              className="text-muted-foreground hover:text-foreground transition-all duration-300 font-semibold relative group whitespace-nowrap text-base"
-            >
-              Outils
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full" />
-            </button>
-
-            {!user && (
-              <button 
-                onClick={() => navigate("/faq")} 
-                className="text-muted-foreground hover:text-foreground transition-all duration-300 font-semibold relative group text-base"
-              >
-                {t('nav.faq')}
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full" />
-              </button>
-            )}
+            {/* Business Dropdown - Secondary */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="text-muted-foreground hover:text-foreground font-semibold gap-1">
+                  <Building2 className="w-4 h-4" />
+                  Entreprises
+                  <ChevronDown className="w-4 h-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="center" className="w-56">
+                <DropdownMenuItem onClick={() => navigate("/entreprises")} className="cursor-pointer py-3">
+                  Acheter une entreprise
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate("/sell")} className="cursor-pointer py-3">
+                  Vendre mon entreprise
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate("/immeubles-commerciaux")} className="cursor-pointer py-3">
+                  Immeubles commerciaux
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
           {/* Right Side Actions */}
@@ -200,31 +192,19 @@ const Header = () => {
                 size="sm"
                 className="hidden md:flex items-center gap-2"
               >
-              <Sparkles className="w-4 h-4" />
-              {t('nav.admin')}
-            </Button>
-          )}
+                <Sparkles className="w-4 h-4" />
+                Admin
+              </Button>
+            )}
 
-          {user ? (
+            {user ? (
               <>
-                <button 
-                  onClick={() => navigate("/messages")} 
-                  className="hidden lg:flex items-center gap-2 px-4 py-2 rounded-lg border border-border/50 bg-accent/30 hover:bg-accent/50 transition-all duration-300 font-semibold relative text-base h-10"
-                >
-                  <Mail className="w-4 h-4" />
-                  <span>{t('nav.messaging')}</span>
-                  {unreadMessagesCount > 0 && (
-                    <span className="absolute -top-1.5 -right-1.5 h-5 w-5 rounded-full bg-destructive text-white text-[10px] flex items-center justify-center font-bold shadow-lg">
-                      {unreadMessagesCount > 9 ? '9+' : unreadMessagesCount}
-                    </span>
-                  )}
-                </button>
                 <Button
-                  onClick={() => navigate("/dashboard")}
-                  className="hidden lg:flex bg-[#6366f1] hover:bg-[#4f46e5] text-white font-semibold shadow-lg px-5 py-2.5 text-base h-10"
+                  onClick={() => navigate("/outils/budget")}
+                  className="hidden lg:flex bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow-lg px-5 py-2.5 text-base h-10"
                 >
-                  <LayoutDashboard className="mr-2 w-4 h-4" />
-                  <span>{t('nav.dashboard')}</span>
+                  <PiggyBank className="mr-2 w-4 h-4" />
+                  <span>Mon Budget</span>
                 </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -233,18 +213,18 @@ const Header = () => {
                       className="relative h-9 w-9 sm:h-10 sm:w-10 rounded-full"
                       aria-label="Menu du profil utilisateur"
                     >
-                      <Avatar className="h-9 w-9 sm:h-10 sm:w-10 border-2 border-secondary/40 hover:border-secondary transition-colors">
+                      <Avatar className="h-9 w-9 sm:h-10 sm:w-10 border-2 border-emerald-500/40 hover:border-emerald-500 transition-colors">
                         <AvatarImage 
                           src={getAvatarUrl(profile?.avatar_url, profile?.full_name, user.email)} 
                           alt={profile?.full_name || "Photo de profil"} 
                         />
-                        <AvatarFallback className="bg-secondary text-white font-semibold text-sm">
+                        <AvatarFallback className="bg-emerald-600 text-white font-semibold text-sm">
                           {profile?.full_name?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || "U"}
                         </AvatarFallback>
                       </Avatar>
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56 bg-card/95 backdrop-blur-xl border-border/50 shadow-premium">
+                  <DropdownMenuContent align="end" className="w-56">
                     <div className="flex items-center justify-start gap-2 p-2">
                       <div className="flex flex-col space-y-1">
                         <p className="text-sm font-semibold text-foreground">
@@ -253,14 +233,18 @@ const Header = () => {
                         <p className="text-xs text-muted-foreground">{user.email}</p>
                       </div>
                     </div>
-                    <DropdownMenuSeparator className="bg-border/50" />
-                    <DropdownMenuItem onClick={() => navigate("/settings")} className="cursor-pointer hover:bg-muted/50">
-                      <Settings className="mr-2 h-4 w-4" />
-                      {t('nav.settings')}
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => navigate("/dashboard")} className="cursor-pointer">
+                      <LayoutDashboard className="mr-2 h-4 w-4" />
+                      Tableau de bord
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={handleLogout} className="cursor-pointer hover:bg-muted/50 text-destructive focus:text-destructive">
+                    <DropdownMenuItem onClick={() => navigate("/settings")} className="cursor-pointer">
+                      <Settings className="mr-2 h-4 w-4" />
+                      Paramètres
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-destructive focus:text-destructive">
                       <LogOut className="mr-2 h-4 w-4" />
-                      {t('nav.logout')}
+                      Déconnexion
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -268,23 +252,17 @@ const Header = () => {
             ) : (
               <>
                 <Button
+                  variant="ghost"
                   onClick={() => navigate("/auth")}
-                  className="lg:hidden bg-[#6366f1] hover:bg-[#4f46e5] text-white font-semibold px-2 py-1.5 h-8 text-[10px] shadow-lg whitespace-nowrap"
+                  className="hidden lg:inline-flex font-semibold px-5 py-2.5 text-base h-10"
                 >
                   Connexion
                 </Button>
                 <Button
-                  variant="ghost"
                   onClick={() => navigate("/auth")}
-                  className="hidden lg:inline-flex font-semibold border border-border/50 hover:border-border hover:bg-accent px-5 py-2.5 text-base h-10 whitespace-nowrap"
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow-lg px-5 py-2.5 text-sm lg:text-base h-9 lg:h-10"
                 >
-                  {t('nav.login')}
-                </Button>
-                <Button
-                  onClick={() => navigate("/auth")}
-                  className="hidden lg:inline-flex bg-[#6366f1] hover:bg-[#4f46e5] text-white font-semibold shadow-lg px-5 py-2.5 text-base h-10 whitespace-nowrap"
-                >
-                  {t('nav.createAccount')}
+                  Commencer
                 </Button>
               </>
             )}
@@ -305,22 +283,46 @@ const Header = () => {
         {/* Mobile Menu */}
         {mobileMenuOpen && (
           <div className="lg:hidden mt-4 pb-4 space-y-2 border-t border-border pt-4 animate-slide-up">
-            {!user && (
-              <div className="px-2 pb-3 mb-2 border-b border-border">
-                <Button
-                  onClick={() => {
-                    navigate("/auth");
-                    setMobileMenuOpen(false);
-                  }}
-                  className="w-full bg-[#6366f1] hover:bg-[#4f46e5] text-white font-semibold h-11 text-base shadow-lg"
-                >
-                  {t('nav.createAccount')}
-                </Button>
-              </div>
-            )}
-            
             <div className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-              {t('nav.navigation')}
+              Budget
+            </div>
+            <button
+              onClick={() => {
+                navigate("/outils/budget");
+                setMobileMenuOpen(false);
+              }}
+              className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors flex items-center gap-2"
+            >
+              <PiggyBank className="w-4 h-4 text-emerald-600" />
+              Mon Budget
+            </button>
+            
+            <div className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide mt-4">
+              Outils
+            </div>
+            <button
+              onClick={() => {
+                navigate("/outils/salaire");
+                setMobileMenuOpen(false);
+              }}
+              className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors flex items-center gap-2"
+            >
+              <Calculator className="w-4 h-4 text-blue-600" />
+              Calculateur de salaire
+            </button>
+            <button
+              onClick={() => {
+                navigate("/outils/retour-impot");
+                setMobileMenuOpen(false);
+              }}
+              className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors flex items-center gap-2"
+            >
+              <Receipt className="w-4 h-4 text-purple-600" />
+              Retour d'impôt
+            </button>
+            
+            <div className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide mt-4">
+              Entreprises
             </div>
             <button
               onClick={() => {
@@ -329,7 +331,7 @@ const Header = () => {
               }}
               className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors"
             >
-              {t('nav.buyBusiness')}
+              Acheter une entreprise
             </button>
             <button
               onClick={() => {
@@ -338,39 +340,14 @@ const Header = () => {
               }}
               className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors"
             >
-              {t('nav.sellBusiness')}
+              Vendre mon entreprise
             </button>
-            <button
-              onClick={() => {
-                navigate("/immeubles-commerciaux");
-                setMobileMenuOpen(false);
-              }}
-              className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors"
-            >
-              {t('nav.commercialRealEstate')}
-            </button>
-            <button
-              onClick={() => {
-                navigate("/outils");
-                setMobileMenuOpen(false);
-              }}
-              className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors"
-            >
-              Outils
-            </button>
-            {!user && (
-              <button
-                onClick={() => {
-                  navigate("/faq");
-                  setMobileMenuOpen(false);
-                }}
-                className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors"
-              >
-                {t('nav.faq')}
-              </button>
-            )}
+            
             {user && (
               <>
+                <div className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide mt-4">
+                  Mon compte
+                </div>
                 <button
                   onClick={() => {
                     navigate("/dashboard");
@@ -379,35 +356,21 @@ const Header = () => {
                   className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors flex items-center gap-2"
                 >
                   <LayoutDashboard className="w-4 h-4" />
-                  {t('nav.dashboard')}
-                </button>
-                <button
-                  onClick={() => {
-                    navigate("/messages");
-                    setMobileMenuOpen(false);
-                  }}
-                  className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors flex items-center gap-2 relative"
-                >
-                  <Mail className="w-4 h-4" />
-                  <span>{t('nav.messaging')}</span>
-                  {unreadMessagesCount > 0 && (
-                    <span className="ml-auto h-5 w-5 rounded-full bg-destructive text-white text-[10px] inline-flex items-center justify-center font-bold">
-                      {unreadMessagesCount > 9 ? '9+' : unreadMessagesCount}
-                    </span>
-                  )}
+                  Tableau de bord
                 </button>
               </>
             )}
+            
             {isAdmin && (
               <button
                 onClick={() => {
                   navigate("/admin");
                   setMobileMenuOpen(false);
                 }}
-                className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors flex items-center gap-2 text-secondary"
+                className="w-full text-left px-4 py-2 rounded-lg hover:bg-accent transition-colors flex items-center gap-2 text-emerald-600"
               >
                 <Sparkles className="w-4 h-4" />
-                {t('nav.admin')}
+                Admin
               </button>
             )}
           </div>

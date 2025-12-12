@@ -1,493 +1,399 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams, Link } from "react-router-dom";
-import { useToast } from "@/hooks/use-toast";
+import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import BusinessCard from "@/components/BusinessCard";
-import { ArrowRight, TrendingUp, Shield, Clock, Sparkles, Building2, Users, Eye, DollarSign } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { Card } from "@/components/ui/card";
+import { 
+  ArrowRight, 
+  PiggyBank, 
+  TrendingUp, 
+  Target, 
+  Wallet, 
+  Calculator, 
+  Receipt, 
+  Shield, 
+  Smartphone,
+  BarChart3,
+  Sparkles,
+  CheckCircle2,
+  ChevronRight,
+  Star
+} from "lucide-react";
 import { SEO } from "@/components/SEO";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { TypewriterAnimation } from "@/components/AnimatedSearchBar";
-import { useCountUp } from "@/hooks/useCountUp";
-import { FloatingOpportunities } from "@/components/FloatingOpportunities";
-import { CircuitBackground } from "@/components/CircuitBackground";
-import { trackPageView } from "@/lib/googleAds";
+import { useAuth } from "@/contexts/AuthContext";
+import { motion } from "framer-motion";
 
 const Home = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [featuredBusinesses, setFeaturedBusinesses] = useState<any[]>([]);
-  const [stats, setStats] = useState({
-    totalBusinesses: 0,
-    totalViews: 0,
-    totalUsers: 0,
-    totalValue: 0
-  });
-  
-  // Compteurs animés pour les statistiques - animation rapide
-  const businessesCount = useCountUp({ end: stats.totalBusinesses, duration: 1200, delay: 100 });
-  const viewsCount = useCountUp({ end: Math.floor(stats.totalViews / 1000), duration: 1200, delay: 200 });
-  const usersCount = useCountUp({ end: 28, duration: 1200, delay: 300 });
-  const valueCount = useCountUp({ end: Math.floor(stats.totalValue / 1000000), duration: 1200, delay: 400 });
-  
-  useEffect(() => {
-    fetchFeaturedBusinesses();
-    fetchStats();
-    
-    // Envoyer événement de page vue à Google Ads
-    trackPageView();
-  }, []);
-
-  useEffect(() => {
-    if (searchParams.get('premium_success') === 'true') {
-      toast({
-        title: "Paiement réussi",
-        description: "Votre abonnement Club Select est activé. Rechargez la page pour voir les changements.",
-      });
-      setSearchParams({});
-    } else if (searchParams.get('premium_cancel') === 'true') {
-      toast({
-        variant: "destructive",
-        title: "Abonnement annulé",
-        description: "L'abonnement Club Select a été annulé.",
-      });
-      setSearchParams({});
-    }
-  }, [searchParams, setSearchParams, toast]);
-
-  const fetchFeaturedBusinesses = async () => {
-    try {
-      // Fetch only the columns we need for display
-      const { data: businesses } = await supabase
-        .from('businesses')
-        .select('id, slug, title, industry, city, region, annual_revenue, asking_price, baiia, description, featured, status, approval_status, is_franchise, sale_type, property_type, year_built, square_footage, is_rental_property, rental_units, is_demo, created_at')
-        .eq('status', 'active')
-        .eq('approval_status', 'approved')
-        .eq('featured', true)
-        .order('created_at', { ascending: false })
-        .limit(6);
-
-      if (businesses) {
-        setFeaturedBusinesses(businesses);
-      }
-    } catch (error) {
-      console.error('[FETCH-FEATURED] Error:', error);
-    }
-  };
-
-  const fetchStats = async () => {
-    try {
-      // Utiliser la fonction publique sécurisée pour obtenir toutes les stats
-      const { data, error } = await supabase.rpc('get_public_stats');
-      
-      if (error) {
-        console.error('[FETCH-STATS] Error:', error);
-        return;
-      }
-
-      if (data && data.length > 0) {
-        const stats = data[0];
-        setStats({
-          totalBusinesses: Number(stats.total_businesses) || 0,
-          totalViews: Number(stats.total_views) || 0,
-          totalUsers: Number(stats.total_users) || 0,
-          totalValue: Number(stats.total_value) || 0
-        });
-      }
-    } catch (error) {
-      console.error('[FETCH-STATS] Error:', error);
-    }
-  };
+  const { user } = useAuth();
 
   const structuredData = {
     "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "Vente.Club",
+    "@type": "WebApplication",
+    "name": "Vente.Club Budget",
     "url": "https://vente.club",
-    "description": "Plateforme intelligente optimisée par IA qui facilite la mise en relation entre acquéreurs et propriétaires d'entreprises au Québec. Tous secteurs d'activité : restauration, hôtellerie, commerce, industrie.",
-    "potentialAction": {
-      "@type": "SearchAction",
-      "target": {
-        "@type": "EntryPoint",
-        "urlTemplate": "https://vente.club/entreprises?q={search_term_string}"
-      },
-      "query-input": "required name=search_term_string"
-    },
-    "provider": {
-      "@type": "Organization",
-      "name": "Vente.Club",
-      "description": "Plateforme spécialisée dans les transactions d'entreprises au Québec",
-      "foundingDate": "2024",
-      "areaServed": {
-        "@type": "State",
-        "name": "Québec"
-      }
+    "description": "Plateforme intelligente de gestion budgétaire personnelle. Suivez vos dépenses, atteignez vos objectifs financiers et prenez le contrôle de votre argent.",
+    "applicationCategory": "FinanceApplication",
+    "operatingSystem": "Web",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "CAD"
     }
   };
+
+  const features = [
+    {
+      icon: Wallet,
+      title: "Suivi des dépenses",
+      description: "Catégorisez automatiquement vos transactions et visualisez où va votre argent"
+    },
+    {
+      icon: Target,
+      title: "Objectifs financiers",
+      description: "Définissez des objectifs d'épargne et suivez votre progression en temps réel"
+    },
+    {
+      icon: TrendingUp,
+      title: "Valeur nette",
+      description: "Suivez l'évolution de votre patrimoine avec actifs et passifs"
+    },
+    {
+      icon: BarChart3,
+      title: "Analyses avancées",
+      description: "Graphiques et statistiques pour comprendre vos habitudes financières"
+    },
+    {
+      icon: Receipt,
+      title: "Dépenses récurrentes",
+      description: "Détectez et gérez vos abonnements et paiements réguliers"
+    },
+    {
+      icon: Sparkles,
+      title: "Coach IA",
+      description: "Recommandations personnalisées pour optimiser votre budget"
+    }
+  ];
+
+  const tools = [
+    {
+      title: "Planificateur de budget",
+      description: "Gérez vos revenus, dépenses et objectifs financiers en un seul endroit",
+      icon: PiggyBank,
+      href: "/outils/budget",
+      color: "from-emerald-500 to-teal-600",
+      featured: true
+    },
+    {
+      title: "Calculateur de salaire",
+      description: "Calculez votre salaire net après impôts et déductions au Québec",
+      icon: Calculator,
+      href: "/outils/salaire",
+      color: "from-blue-500 to-indigo-600"
+    },
+    {
+      title: "Retour d'impôt",
+      description: "Estimez votre remboursement d'impôt provincial et fédéral",
+      icon: Receipt,
+      href: "/outils/retour-impot",
+      color: "from-purple-500 to-violet-600"
+    }
+  ];
+
+  const testimonials = [
+    {
+      name: "Marie-Claude",
+      role: "Enseignante",
+      quote: "Grâce au planificateur, j'ai économisé 5 000$ en 6 mois pour mon voyage.",
+      rating: 5
+    },
+    {
+      name: "Jean-Philippe",
+      role: "Développeur",
+      quote: "Interface simple et intuitive. Je comprends enfin où va mon argent!",
+      rating: 5
+    },
+    {
+      name: "Sophie",
+      role: "Infirmière",
+      quote: "Le meilleur outil de budget que j'ai utilisé. Et c'est gratuit!",
+      rating: 5
+    }
+  ];
 
   return (
     <>
       <SEO 
-        title="Achat et Vente d'Entreprises au Québec - Plateforme #1 pour Trouver Votre Opportunité" 
-        description="Plateforme québécoise pour l'achat et la vente d'entreprises : restaurants, commerces, franchises. Connexion directe avec les propriétaires. Recherche optimisée par IA. Transactions sécurisées et accompagnement professionnel."
-        keywords="achat entreprise Québec, vente entreprise, PME à vendre, commerce à vendre, opportunité affaires, reprise commerce Montréal, cession entreprise, prix entreprise 2025"
+        title="Gérez votre budget intelligemment - Planificateur financier gratuit" 
+        description="Plateforme québécoise de gestion budgétaire. Suivez vos dépenses, atteignez vos objectifs d'épargne et prenez le contrôle de vos finances personnelles. 100% gratuit."
+        keywords="budget personnel, planificateur budget, gestion finances, économiser argent, suivi dépenses, Québec"
         canonical="/" 
         structuredData={structuredData} 
       />
       
-      {/* Hero Section */}
-      <section className="relative min-h-[65vh] sm:min-h-[75vh] lg:min-h-[85vh] flex items-center bg-gradient-to-br from-[#1e1b4b] via-[#312e81] to-[#1e3a8a] overflow-hidden" aria-label="Section principale">
-        {/* Circuit Background */}
-        <CircuitBackground />
-        
-        {/* Simplified Background Elements - removed parallax for performance */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-20 -right-20 w-96 h-96 bg-[#6366f1]/20 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '8s' }} />
-          <div className="absolute bottom-20 -left-20 w-96 h-96 bg-[#818cf8]/20 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '10s', animationDelay: '2s' }} />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#4f46e5]/10 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '12s', animationDelay: '4s' }} />
+      {/* Hero Section - Style Mint/YNAB */}
+      <section className="relative min-h-[85vh] flex items-center overflow-hidden bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 dark:from-slate-950 dark:via-slate-900 dark:to-emerald-950">
+        {/* Subtle pattern overlay */}
+        <div className="absolute inset-0 opacity-30">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `radial-gradient(circle at 25% 25%, hsl(var(--primary) / 0.1) 0%, transparent 50%),
+                             radial-gradient(circle at 75% 75%, hsl(var(--secondary) / 0.1) 0%, transparent 50%)`
+          }} />
         </div>
         
-        <div className="container mx-auto px-4 py-8 sm:py-12 lg:py-20 relative z-10">
-          <div className="max-w-6xl mx-auto">
-            <div className="space-y-4 sm:space-y-6 lg:space-y-8 animate-slide-up">
-              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-display font-bold leading-[1.2] sm:leading-[1.15] tracking-tight text-white">
-                Achetez ou vendez une <TypewriterAnimation />
-                <br />
-                partout au Québec
+        {/* Floating elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <motion.div 
+            animate={{ y: [0, -20, 0] }}
+            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute top-20 right-[15%] w-16 h-16 rounded-2xl bg-emerald-500/20 backdrop-blur-sm border border-emerald-500/30"
+          />
+          <motion.div 
+            animate={{ y: [0, 20, 0] }}
+            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+            className="absolute top-40 left-[10%] w-12 h-12 rounded-full bg-teal-500/20 backdrop-blur-sm border border-teal-500/30"
+          />
+          <motion.div 
+            animate={{ y: [0, -15, 0] }}
+            transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+            className="absolute bottom-32 right-[25%] w-20 h-20 rounded-3xl bg-cyan-500/20 backdrop-blur-sm border border-cyan-500/30"
+          />
+        </div>
+        
+        <div className="container mx-auto px-4 py-16 lg:py-24 relative z-10">
+          <div className="max-w-4xl mx-auto text-center">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+            >
+              {/* Badge */}
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 text-sm font-medium mb-6">
+                <Sparkles className="w-4 h-4" />
+                100% gratuit · Aucune carte de crédit requise
+              </div>
+              
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-bold leading-[1.1] tracking-tight text-slate-900 dark:text-white mb-6">
+                Prenez le contrôle de{" "}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600 dark:from-emerald-400 dark:to-teal-400">
+                  vos finances
+                </span>
               </h1>
               
-              <p className="text-sm sm:text-base lg:text-lg text-white/90 max-w-3xl leading-relaxed sm:leading-loose">
-                Vente.Club est la plateforme québécoise qui facilite l'achat et la vente d'entreprises établies. Découvrez des centaines d'opportunités d'affaires et connectez-vous directement avec les propriétaires dans un environnement simple, transparent et professionnel.
+              <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto mb-10 leading-relaxed">
+                Le planificateur budgétaire le plus complet et intuitif au Québec. 
+                Suivez vos dépenses, atteignez vos objectifs et bâtissez votre liberté financière.
               </p>
               
-              {/* Credibility Line */}
-              <div className="flex items-center gap-4 sm:gap-6 text-white/90 text-xs sm:text-sm pt-2">
-                <div className="flex items-center gap-1.5">
-                  <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-green-500/20 flex items-center justify-center">
-                    <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
-                  <span className="font-medium">Annonces approuvées</span>
-                </div>
-                <span className="text-white/50">·</span>
-                <div className="flex items-center gap-1.5">
-                  <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-green-500/20 flex items-center justify-center">
-                    <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
-                  <span className="font-medium">Affichage gratuit</span>
-                </div>
-                <span className="text-white/50">·</span>
-                <div className="flex items-center gap-1.5">
-                  <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-green-500/20 flex items-center justify-center">
-                    <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
-                  <span className="font-medium">100% québécois</span>
-                </div>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button 
+                  size="lg" 
+                  className="h-14 px-8 text-lg font-semibold rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/30 transition-all"
+                  onClick={() => navigate("/outils/budget")}
+                >
+                  Commencer gratuitement
+                  <ArrowRight className="ml-2 w-5 h-5" />
+                </Button>
+                <Button 
+                  size="lg" 
+                  variant="outline"
+                  className="h-14 px-8 text-lg font-semibold rounded-xl border-2 border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800"
+                  onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
+                >
+                  Découvrir les fonctionnalités
+                </Button>
               </div>
               
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-28 sm:pt-32 lg:pt-36">
-                <Button 
-                  size="lg" 
-                  className="bg-[#6366f1] hover:bg-[#4f46e5] text-white h-14 sm:h-16 lg:h-[72px] px-8 sm:px-10 lg:px-14 text-base sm:text-lg lg:text-xl font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all group w-full sm:w-auto"
-                  onClick={() => document.getElementById('featured')?.scrollIntoView({ behavior: 'smooth' })}
-                >
-                  Explorer les opportunités
-                  <ArrowRight className="ml-2 w-5 sm:w-6 h-5 sm:h-6 group-hover:translate-x-1 transition-transform" />
-                </Button>
-                <Button 
-                  size="lg" 
-                  className="h-14 sm:h-16 lg:h-[72px] px-8 sm:px-10 lg:px-14 text-base sm:text-lg lg:text-xl font-semibold rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/20 shadow-lg hover:shadow-xl transition-all backdrop-blur-sm w-full sm:w-auto"
-                  onClick={() => navigate("/sell")}
-                >
-                  Vendre mon entreprise
-                </Button>
+              {/* Trust indicators */}
+              <div className="flex items-center justify-center gap-6 mt-10 text-sm text-slate-500 dark:text-slate-400">
+                <div className="flex items-center gap-2">
+                  <Shield className="w-4 h-4 text-emerald-600" />
+                  <span>Données sécurisées</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Smartphone className="w-4 h-4 text-emerald-600" />
+                  <span>Mode hors-ligne</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                  <span>100% québécois</span>
+                </div>
               </div>
-            </div>
-          </div>
-          
-          {/* Floating Animation - Positioned Absolutely */}
-          <div className="hidden xl:block absolute left-[66%] top-[55%] -translate-y-1/2 w-[400px] pointer-events-none">
-            <FloatingOpportunities />
-          </div>
-        </div>
-        
-      </section>
-
-      {/* Statistics Section */}
-      <section className="py-10 sm:py-14 lg:py-16 bg-[#1e1b4b]" aria-label="Statistiques de la plateforme">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 md:gap-8 max-w-5xl mx-auto">
-            <div className="text-center">
-              <div className="inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#818cf8]/20 mb-2 sm:mb-3">
-                <Building2 className="w-5 h-5 sm:w-6 sm:h-6 text-[#818cf8]" />
-              </div>
-              <div ref={businessesCount.ref} className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-1 sm:mb-2 tabular-nums">
-                {businessesCount.count}+
-              </div>
-              <div className="text-xs sm:text-sm lg:text-base text-white/70 leading-tight">entreprises actives</div>
-            </div>
-            <div className="text-center">
-              <div className="inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#818cf8]/20 mb-2 sm:mb-3">
-                <Eye className="w-5 h-5 sm:w-6 sm:h-6 text-[#818cf8]" />
-              </div>
-              <div ref={viewsCount.ref} className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-1 sm:mb-2 tabular-nums">
-                {viewsCount.count}k+
-              </div>
-              <div className="text-xs sm:text-sm lg:text-base text-white/70 leading-tight">vues totales</div>
-            </div>
-            <div className="text-center">
-              <div className="inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#818cf8]/20 mb-2 sm:mb-3">
-                <Users className="w-5 h-5 sm:w-6 sm:h-6 text-[#818cf8]" />
-              </div>
-              <div ref={usersCount.ref} className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-1 sm:mb-2 tabular-nums">
-                {usersCount.count}+
-              </div>
-              <div className="text-xs sm:text-sm lg:text-base text-white/70 leading-tight">entrepreneurs inscrits</div>
-            </div>
-            <div className="text-center">
-              <div className="inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#818cf8]/20 mb-2 sm:mb-3">
-                <DollarSign className="w-5 h-5 sm:w-6 sm:h-6 text-[#818cf8]" />
-              </div>
-              <div ref={valueCount.ref} className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-1 sm:mb-2 tabular-nums">
-                {valueCount.count}M+$
-              </div>
-              <div className="text-xs sm:text-sm lg:text-base text-white/70 leading-tight">valeur totale des annonces</div>
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Featured Businesses Section */}
-      <section id="featured" className="py-12 sm:py-16 lg:py-20 bg-background relative">
-        {/* Decorative Top Border */}
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
+      {/* Tools Section */}
+      <section className="py-20 bg-background">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-8 sm:mb-10 lg:mb-12 animate-slide-up">
-            <h2 id="featured-heading" className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-display font-bold text-foreground mb-3 sm:mb-4">
-              Opportunités d'affaires en vedette
+          <div className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl font-display font-bold text-foreground mb-4">
+              Vos outils financiers
             </h2>
-            <p className="text-sm sm:text-base lg:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed px-4 sm:px-0">
-              Découvrez notre sélection des meilleures entreprises à vendre, approuvées par notre équipe et prêtes à être acquises
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+              Des calculateurs puissants et un planificateur complet pour gérer vos finances
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
-            {featuredBusinesses.map((business, index) => (
-              <div key={business.id} className="animate-slide-up h-full" style={{ animationDelay: `${index * 100}ms` }}>
-                <BusinessCard {...business} />
-              </div>
+          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            {tools.map((tool, index) => (
+              <motion.div
+                key={tool.title}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                viewport={{ once: true }}
+              >
+                <Card 
+                  className={`group relative overflow-hidden cursor-pointer h-full transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${tool.featured ? 'ring-2 ring-emerald-500/50' : ''}`}
+                  onClick={() => navigate(tool.href)}
+                >
+                  {tool.featured && (
+                    <div className="absolute top-4 right-4 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 text-xs font-semibold">
+                      Populaire
+                    </div>
+                  )}
+                  <div className="p-8">
+                    <div className={`w-14 h-14 rounded-2xl bg-gradient-to-r ${tool.color} flex items-center justify-center mb-6`}>
+                      <tool.icon className="w-7 h-7 text-white" />
+                    </div>
+                    <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors">
+                      {tool.title}
+                    </h3>
+                    <p className="text-muted-foreground mb-4">
+                      {tool.description}
+                    </p>
+                    <div className="flex items-center text-primary font-medium">
+                      Accéder
+                      <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </div>
+                </Card>
+              </motion.div>
             ))}
-          </div>
-
-          <div className="text-center animate-slide-up">
-            <Button 
-              size="lg" 
-              onClick={() => navigate("/entreprises")}
-              className="bg-gradient-to-r from-secondary to-primary hover:from-secondary/90 hover:to-primary/90 text-white h-12 sm:h-14 px-8 sm:px-10 text-sm sm:text-base font-semibold shadow-lg hover:shadow-xl transition-all hover:scale-105 group"
-            >
-              Voir toutes les entreprises à vendre
-              <ArrowRight className="ml-2 w-4 sm:w-5 h-4 sm:h-5 group-hover:translate-x-1 transition-transform" />
-            </Button>
           </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="py-12 sm:py-16 lg:py-20 bg-gradient-to-br from-[#1e1b4b] via-[#312e81] to-[#1e3a8a] border-y border-primary/20" aria-labelledby="features-heading">
+      <section id="features" className="py-20 bg-slate-50 dark:bg-slate-900/50">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-8 sm:mb-10 max-w-4xl mx-auto">
-            <h2 id="features-heading" className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-display font-bold mb-4 sm:mb-6 text-white">
-              Des solutions adaptées à chaque entrepreneur
+          <div className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl font-display font-bold text-foreground mb-4">
+              Tout ce dont vous avez besoin
             </h2>
-            <p className="text-sm sm:text-base md:text-lg text-white/90 leading-relaxed text-justify px-2 sm:px-4">
-              Quel que soit votre secteur d'activité, découvrez un large éventail d'opportunités adaptées à vos compétences et à votre budget. Notre <a href="/ressources" className="text-white hover:text-secondary underline font-semibold transition-colors">plateforme intelligente</a> vous permet d'acquérir une entreprise selon différentes modalités : immobilisation complète incluant bâtiment et équipements, acquisition d'actions pour devenir actionnaire, ou <a href="/blog" className="text-white hover:text-secondary underline font-semibold transition-colors">rachat de fonds de commerce</a> pour reprendre l'activité existante.
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+              Des fonctionnalités pensées pour simplifier la gestion de votre budget
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5 lg:gap-6 max-w-5xl mx-auto mb-10 sm:mb-12">
-            <div className="text-center p-5 sm:p-6 lg:p-8 rounded-xl bg-white/10 border border-white/20 hover:bg-white/15 hover:shadow-2xl hover:scale-105 transition-all duration-300 backdrop-blur-sm">
-              <TrendingUp className="w-9 sm:w-10 lg:w-12 h-9 sm:h-10 lg:h-12 mx-auto mb-2 sm:mb-3 lg:mb-4 text-white" />
-              <h3 className="text-base sm:text-lg lg:text-xl font-bold mb-2 sm:mb-2.5 lg:mb-3 text-white">Recherche optimisée par IA</h3>
-              <p className="text-xs sm:text-sm lg:text-base text-white/80 leading-relaxed">Trouvez rapidement les opportunités qui correspondent à votre profil grâce à notre intelligence artificielle</p>
-            </div>
-            <div className="text-center p-5 sm:p-6 lg:p-8 rounded-xl bg-white/10 border border-white/20 hover:bg-white/15 hover:shadow-2xl hover:scale-105 transition-all duration-300 backdrop-blur-sm">
-              <Shield className="w-9 sm:w-10 lg:w-12 h-9 sm:h-10 lg:h-12 mx-auto mb-2 sm:mb-3 lg:mb-4 text-white" />
-              <h3 className="text-base sm:text-lg lg:text-xl font-bold mb-2 sm:mb-2.5 lg:mb-3 text-white">Paiements sécurisés</h3>
-              <p className="text-xs sm:text-sm lg:text-base text-white/80 leading-relaxed">Abonnements et achats protégés par une infrastructure de paiement certifiée et conforme aux normes bancaires</p>
-            </div>
-            <div className="text-center p-5 sm:p-6 lg:p-8 rounded-xl bg-white/10 border border-white/20 hover:bg-white/15 hover:shadow-2xl hover:scale-105 transition-all duration-300 backdrop-blur-sm">
-              <Clock className="w-9 sm:w-10 lg:w-12 h-9 sm:h-10 lg:h-12 mx-auto mb-2 sm:mb-3 lg:mb-4 text-white" />
-              <h3 className="text-base sm:text-lg lg:text-xl font-bold mb-2 sm:mb-2.5 lg:mb-3 text-white">Interface simplifiée</h3>
-              <p className="text-xs sm:text-sm lg:text-base text-white/80 leading-relaxed">Navigation intuitive et gestion facile de vos annonces grâce à notre technologie avancée</p>
-            </div>
-          </div>
-          
-          {/* Popular Categories - Internal Links */}
-          <div className="max-w-5xl mx-auto mt-12">
-            <h3 className="text-2xl font-bold text-center mb-6 text-white">Catégories populaires au Québec</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <a href="/entreprises-a-vendre-montreal" className="text-center p-4 rounded-lg bg-white/5 hover:bg-white/10 transition-colors border border-white/10 hover:border-[#818cf8]">
-                <p className="font-semibold text-white">Montréal</p>
-                <p className="text-xs text-white/70 mt-1">Entreprises à vendre</p>
-              </a>
-              <a href="/entreprises-a-vendre-quebec" className="text-center p-4 rounded-lg bg-white/5 hover:bg-white/10 transition-colors border border-white/10 hover:border-[#818cf8]">
-                <p className="font-semibold text-white">Québec</p>
-                <p className="text-xs text-white/70 mt-1">Opportunités</p>
-              </a>
-              <a href="/entreprises-a-vendre-laval" className="text-center p-4 rounded-lg bg-white/5 hover:bg-white/10 transition-colors border border-white/10 hover:border-[#818cf8]">
-                <p className="font-semibold text-white">Laval</p>
-                <p className="text-xs text-white/70 mt-1">Commerces</p>
-              </a>
-              <a href="/immeubles-commerciaux" className="text-center p-4 rounded-lg bg-white/5 hover:bg-white/10 transition-colors border border-white/10 hover:border-[#818cf8]">
-                <p className="font-semibold text-white">Immeubles</p>
-                <p className="text-xs text-white/70 mt-1">Commerciaux</p>
-              </a>
-            </div>
-          </div>
-
-          {/* Resources Links */}
-          <div className="max-w-5xl mx-auto mt-12 text-center">
-            <p className="text-white/80">
-              Besoin d'aide pour <a href="/sell" className="text-[#818cf8] hover:underline font-semibold">vendre votre entreprise</a> ? 
-              Consultez nos <a href="/ressources" className="text-[#818cf8] hover:underline font-semibold">ressources</a> et notre 
-              <a href="/faq" className="text-[#818cf8] hover:underline font-semibold ml-1">FAQ</a> ou 
-              <a href="/contact" className="text-[#818cf8] hover:underline font-semibold ml-1">contactez-nous</a> pour un accompagnement personnalisé.
-            </p>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            {features.map((feature, index) => (
+              <motion.div
+                key={feature.title}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                className="flex gap-4"
+              >
+                <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center">
+                  <feature.icon className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-foreground mb-2">{feature.title}</h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed">{feature.description}</p>
+                </div>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* SEO Content Section */}
-      <section className="py-16 sm:py-20 bg-background" aria-labelledby="seo-heading">
-        <div className="container mx-auto px-4 max-w-5xl">
-          <div className="prose prose-lg max-w-none">
-            <h2 id="seo-heading" className="text-3xl sm:text-4xl font-display font-bold text-foreground mb-6">
-              Votre partenaire pour l'achat et la vente d'entreprises au Québec
+      {/* Testimonials */}
+      <section className="py-20 bg-background">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl font-display font-bold text-foreground mb-4">
+              Ce que nos utilisateurs disent
             </h2>
-            
-            <div className="space-y-6 text-muted-foreground leading-relaxed">
-              <p>
-                <strong className="text-foreground">Vente.club</strong> est la plateforme québécoise de référence qui facilite la mise en relation entre acheteurs et vendeurs d'entreprises. Que vous cherchiez à acquérir un restaurant établi, un commerce de détail prospère, une franchise reconnue ou un immeuble commercial, notre plateforme vous offre l'accès à des centaines d'opportunités d'affaires vérifiées partout au Québec.
-              </p>
-              
-              <h3 className="text-2xl font-bold text-foreground mt-8 mb-4">
-                Une plateforme sécurisée pour vos transactions
-              </h3>
-              <p>
-                La sécurité de vos transactions est notre priorité absolue. Notre plateforme utilise des protocoles de paiement certifiés conformes aux normes bancaires internationales, garantissant la protection de vos informations personnelles et financières. Chaque annonce est soigneusement vérifiée par notre équipe avant publication pour assurer la qualité et la fiabilité des opportunités présentées.
-              </p>
-              
-              <h3 className="text-2xl font-bold text-foreground mt-8 mb-4">
-                Des opportunités dans tous les secteurs d'activité
-              </h3>
-              <p>
-                Notre catalogue diversifié couvre l'ensemble des secteurs d'activité au Québec. De la restauration à l'hôtellerie, du commerce de détail aux services professionnels, en passant par l'industrie manufacturière et les franchises établies, vous trouverez des entreprises rentables adaptées à votre budget et à vos compétences. Nos annonces détaillées incluent les états financiers, les données d'exploitation et les informations clés pour faciliter votre prise de décision.
-              </p>
-              
-              <h3 className="text-2xl font-bold text-foreground mt-8 mb-4">
-                Un accompagnement professionnel à chaque étape
-              </h3>
-              <p>
-                Que vous soyez acheteur ou vendeur, nous mettons à votre disposition des ressources complètes pour vous guider tout au long du processus. De l'évaluation initiale à la négociation finale, en passant par la due diligence et les aspects juridiques, notre centre de ressources et notre équipe d'experts sont là pour répondre à vos questions et faciliter vos démarches. Consultez notre blog régulièrement mis à jour avec des conseils pratiques, des analyses de marché et des guides détaillés.
-              </p>
-              
-              <div className="bg-gradient-to-r from-[#6366f1]/10 to-[#818cf8]/10 p-6 rounded-lg border border-[#6366f1]/20 mt-8">
-                <h3 className="text-xl font-bold text-foreground mb-3">
-                  Pourquoi choisir Vente.club ?
-                </h3>
-                <ul className="space-y-2 list-disc list-inside text-muted-foreground">
-                  <li><strong className="text-foreground">Connexion directe</strong> avec les propriétaires d'entreprises sans intermédiaires</li>
-                  <li><strong className="text-foreground">Recherche optimisée par IA</strong> pour trouver rapidement les meilleures opportunités</li>
-                  <li><strong className="text-foreground">Transactions sécurisées</strong> avec infrastructure de paiement certifiée</li>
-                  <li><strong className="text-foreground">Support expert</strong> disponible pour vous accompagner dans vos démarches</li>
-                  <li><strong className="text-foreground">Réseau établi</strong> de plus de 28 entrepreneurs et investisseurs actifs</li>
-                </ul>
-              </div>
-              
-              <p className="mt-8">
-                Rejoignez dès aujourd'hui des milliers d'entrepreneurs québécois qui ont fait confiance à Vente.club pour réaliser leur projet d'acquisition ou de cession d'entreprise. Créez votre compte gratuitement et explorez notre catalogue complet d'opportunités d'affaires disponibles dans toutes les régions du Québec.
-              </p>
-            </div>
           </div>
-        </div>
-      </section>
-
-      {/* FAQ Section */}
-      <section className="py-16 sm:py-20 bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50" aria-labelledby="faq-heading">
-        <div className="container mx-auto px-4 max-w-4xl">
-          <div className="text-center mb-8">
-            <h2 id="faq-heading" className="text-4xl font-display font-bold">Questions fréquentes</h2>
-            <p className="text-muted-foreground mt-2">Tout ce que vous devez savoir sur l'achat et la vente d'entreprises</p>
-          </div>
-          <Accordion type="single" collapsible className="w-full mb-8">
-            <AccordionItem value="item-1">
-              <AccordionTrigger>Comment acheter une entreprise au Québec?</AccordionTrigger>
-              <AccordionContent>
-                L'achat d'une entreprise commence par l'identification d'opportunités sur notre plateforme. <a href="/entreprises" className="text-secondary hover:underline font-semibold">Explorez les annonces</a>, contactez les vendeurs directement, effectuez une due diligence complète, négociez le prix et finalisez la transaction avec des professionnels. Consultez notre <a href="/blog" className="text-secondary hover:underline font-semibold">guide complet</a> pour plus de détails.
-              </AccordionContent>
-            </AccordionItem>
-            <AccordionItem value="item-2">
-              <AccordionTrigger>Comment vendre mon entreprise?</AccordionTrigger>
-              <AccordionContent>
-                <a href="/auth" className="text-secondary hover:underline font-semibold">Créez un compte gratuit</a>, puis <a href="/sell" className="text-secondary hover:underline font-semibold">soumettez votre annonce</a> avec tous les détails de votre entreprise. Notre équipe approuvera votre annonce pour s'assurer qu'elle respecte nos standards de publication. Profitez de notre réseau de plus de 10 000 acheteurs potentiels au Québec.
-              </AccordionContent>
-            </AccordionItem>
-            <AccordionItem value="item-3">
-              <AccordionTrigger>À quoi sert le Club Select?</AccordionTrigger>
-              <AccordionContent>
-                Le Club Select à 19,99$/mois vous offre un accès illimité à tous les vendeurs, des conversations sans limite, et la possibilité de contacter autant d'entreprises que vous le souhaitez chaque jour. Découvrez tous les <Link to="/club-select" className="text-secondary hover:underline font-semibold">avantages du Club Select</Link> pour les acheteurs sérieux.
-              </AccordionContent>
-            </AccordionItem>
-            <AccordionItem value="item-4">
-              <AccordionTrigger>Quels types d'entreprises puis-je trouver?</AccordionTrigger>
-              <AccordionContent>
-                Restaurants, cafés, boutiques, garages, salons de beauté, franchises, immeubles commerciaux et bien plus. Découvrez toutes les <a href="/marche" className="text-secondary hover:underline font-semibold">catégories disponibles</a> et trouvez l'opportunité qui correspond à vos compétences.
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
-          <div className="text-center">
-            <Button 
-              variant="outline"
-              size="lg"
-              onClick={() => navigate("/faq")}
-              className="h-12 px-8 text-base font-semibold"
-            >
-              Voir toutes les questions
-              <ArrowRight className="ml-2 w-4 h-4" />
-            </Button>
+          
+          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            {testimonials.map((testimonial, index) => (
+              <motion.div
+                key={testimonial.name}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                viewport={{ once: true }}
+              >
+                <Card className="p-6 h-full">
+                  <div className="flex gap-1 mb-4">
+                    {[...Array(testimonial.rating)].map((_, i) => (
+                      <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+                    ))}
+                  </div>
+                  <p className="text-foreground mb-6 italic">"{testimonial.quote}"</p>
+                  <div>
+                    <p className="font-semibold text-foreground">{testimonial.name}</p>
+                    <p className="text-sm text-muted-foreground">{testimonial.role}</p>
+                  </div>
+                </Card>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="relative py-20 sm:py-24 overflow-hidden bg-gradient-to-br from-[#1e1b4b] via-[#312e81] to-[#1e3a8a]" aria-labelledby="cta-heading">
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-20 -right-20 w-96 h-96 bg-[#6366f1]/20 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '8s' }} />
-          <div className="absolute bottom-20 -left-20 w-96 h-96 bg-[#818cf8]/20 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '10s', animationDelay: '2s' }} />
+      <section className="py-20 bg-gradient-to-r from-emerald-600 to-teal-600">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-3xl sm:text-4xl font-display font-bold text-white mb-6">
+            Prêt à transformer vos finances?
+          </h2>
+          <p className="text-emerald-100 text-lg max-w-2xl mx-auto mb-8">
+            Rejoignez des milliers de Québécois qui ont pris le contrôle de leur budget. 
+            C'est gratuit, simple et ça fonctionne.
+          </p>
+          <Button 
+            size="lg" 
+            className="h-14 px-10 text-lg font-semibold rounded-xl bg-white text-emerald-700 hover:bg-emerald-50 shadow-lg hover:shadow-xl transition-all"
+            onClick={() => navigate(user ? "/outils/budget" : "/auth")}
+          >
+            {user ? "Ouvrir mon budget" : "Créer un compte gratuit"}
+            <ArrowRight className="ml-2 w-5 h-5" />
+          </Button>
         </div>
-        
-        <div className="relative container mx-auto px-4">
-          <div className="max-w-4xl mx-auto space-y-8 text-center animate-slide-up">
-            <h2 id="cta-heading" className="text-4xl sm:text-5xl md:text-6xl font-display font-bold text-white leading-tight">
-              Prêt à trouver <span className="text-white">votre<br />prochaine opportunité ?</span>
+      </section>
+
+      {/* Business Section - Kept but secondary */}
+      <section className="py-16 bg-slate-100 dark:bg-slate-900">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto text-center">
+            <p className="text-sm text-muted-foreground uppercase tracking-wide mb-4">Pour les entrepreneurs</p>
+            <h2 className="text-2xl sm:text-3xl font-display font-bold text-foreground mb-4">
+              Vous cherchez à acheter ou vendre une entreprise?
             </h2>
-            <p className="text-lg sm:text-xl md:text-2xl text-white/90">
-              Commencez dès maintenant votre recherche ou déposez votre annonce gratuitement
+            <p className="text-muted-foreground mb-8">
+              Découvrez notre marketplace d'opportunités d'affaires au Québec
             </p>
-            <div className="flex justify-center pt-4">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 
-                size="lg" 
-                className="bg-white hover:bg-white/90 text-[#1e1b4b] h-14 sm:h-16 px-10 sm:px-12 text-base sm:text-lg font-bold shadow-2xl hover:shadow-xl transition-all hover:scale-105 group"
+                variant="outline"
+                size="lg"
                 onClick={() => navigate("/entreprises")}
+                className="h-12"
               >
-                Commencer gratuitement
-                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                Voir les entreprises à vendre
+              </Button>
+              <Button 
+                variant="ghost"
+                size="lg"
+                onClick={() => navigate("/sell")}
+                className="h-12"
+              >
+                Vendre mon entreprise
               </Button>
             </div>
           </div>
