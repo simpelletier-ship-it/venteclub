@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Pencil, Trash2, Plus, GripVertical, Pin, Eye, EyeOff } from "lucide-react";
+import { CategoryIcon } from "./CategoryIcon";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -422,10 +423,10 @@ export const CategoryManager = ({ isAuthenticated }: { isAuthenticated: boolean 
           <>
             <div className="flex items-center gap-3 flex-1">
               <div 
-                className="w-10 h-10 rounded-full flex items-center justify-center text-xl"
+                className="w-10 h-10 rounded-full flex items-center justify-center"
                 style={{ backgroundColor: category.color + '20' }}
               >
-                {category.icon}
+                <CategoryIcon icon={category.icon} color={category.color} size="lg" />
               </div>
               <div>
                 <div className="font-medium">{category.name}</div>
