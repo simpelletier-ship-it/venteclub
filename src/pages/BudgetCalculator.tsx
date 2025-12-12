@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { SEO } from "@/components/SEO";
 import { BreadcrumbSchema } from "@/components/BreadcrumbSchema";
-import { Loader2, TrendingUp, TrendingDown, Wallet, Target, ChevronRight, ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { Loader2, TrendingUp, TrendingDown, Wallet, ArrowUpRight, ArrowDownRight, Plus, ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
@@ -123,8 +123,8 @@ const BudgetCalculator = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-950">
-        <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="h-6 w-6 animate-spin text-primary" />
       </div>
     );
   }
@@ -135,132 +135,144 @@ const BudgetCalculator = () => {
     return null;
   }
 
+  const currentMonthName = new Date().toLocaleDateString('fr-CA', { month: 'long', year: 'numeric' });
+
   return (
     <ErrorBoundary>
       <>
         <CreateDefaultCategories />
         <BudgetOnboarding />
         <SEO
-          title="Mon Budget | Gestion Finances Personnelles"
-          description="Gérez votre budget personnel simplement. Suivi des dépenses, objectifs d'épargne et analyses financières."
+          title="Tableau de bord | Budget"
+          description="Gérez votre budget personnel. Suivi des dépenses, objectifs d'épargne et analyses financières."
           keywords="budget personnel, gestion finances, suivi dépenses, épargne"
           canonical="/budget"
           type="website"
         />
         <BreadcrumbSchema
-          items={[
-            { name: "Budget", url: "/budget" }
-          ]}
+          items={[{ name: "Budget", url: "/budget" }]}
         />
 
-        <div className="min-h-screen bg-slate-950 text-white pb-8">
-          {/* Top Summary Bar */}
-          <div className="bg-slate-900 border-b border-slate-800">
-            <div className="container mx-auto px-4 py-4">
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700/50">
-                  <div className="flex items-center gap-2 mb-1">
-                    <TrendingUp className="h-4 w-4 text-emerald-400" />
-                    <span className="text-xs text-slate-400 uppercase tracking-wide">Revenus</span>
-                  </div>
-                  <p className="text-xl font-bold text-emerald-400">{formatPrice(monthlyIncome)}</p>
+        <div className="min-h-screen bg-background">
+          {/* Page Header */}
+          <div className="border-b border-border bg-card">
+            <div className="container mx-auto px-6 py-5">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h1 className="text-lg font-semibold text-foreground">Tableau de bord</h1>
+                  <p className="text-sm text-muted-foreground capitalize">{currentMonthName}</p>
                 </div>
-                <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700/50">
-                  <div className="flex items-center gap-2 mb-1">
-                    <TrendingDown className="h-4 w-4 text-red-400" />
-                    <span className="text-xs text-slate-400 uppercase tracking-wide">Dépenses</span>
-                  </div>
-                  <p className="text-xl font-bold text-red-400">{formatPrice(monthlyExpenses)}</p>
-                </div>
-                <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700/50">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Wallet className="h-4 w-4 text-blue-400" />
-                    <span className="text-xs text-slate-400 uppercase tracking-wide">Solde</span>
-                  </div>
-                  <p className={cn(
-                    "text-xl font-bold",
-                    monthlyBalance >= 0 ? "text-emerald-400" : "text-red-400"
-                  )}>
-                    {monthlyBalance >= 0 ? '+' : ''}{formatPrice(monthlyBalance)}
-                  </p>
-                </div>
-                <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700/50">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Target className="h-4 w-4 text-violet-400" />
-                    <span className="text-xs text-slate-400 uppercase tracking-wide">Valeur nette</span>
-                  </div>
-                  <p className={cn(
-                    "text-xl font-bold",
-                    netWorth >= 0 ? "text-violet-400" : "text-red-400"
-                  )}>
-                    {formatPrice(netWorth)}
-                  </p>
-                </div>
+                <OfflineIndicator 
+                  isOnline={isOnline}
+                  pendingCount={pendingCount}
+                  isSyncing={isSyncing}
+                  onSync={triggerSync}
+                />
               </div>
             </div>
           </div>
 
-          <div className="container mx-auto px-4 py-6">
-            <OfflineIndicator 
-              isOnline={isOnline}
-              pendingCount={pendingCount}
-              isSyncing={isSyncing}
-              onSync={triggerSync}
-            />
+          <div className="container mx-auto px-6 py-6">
+            {/* KPI Cards - Banking Style */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+              <Card className="border-border">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Revenus</span>
+                    <TrendingUp className="h-4 w-4 text-success" />
+                  </div>
+                  <p className="text-xl font-semibold text-foreground">{formatPrice(monthlyIncome)}</p>
+                </CardContent>
+              </Card>
 
-            {/* QUICK ADD - PRIMARY ACTION */}
-            <div className="mb-8">
+              <Card className="border-border">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Dépenses</span>
+                    <TrendingDown className="h-4 w-4 text-destructive" />
+                  </div>
+                  <p className="text-xl font-semibold text-foreground">{formatPrice(monthlyExpenses)}</p>
+                  {expenseChange !== 0 && (
+                    <div className={cn(
+                      "flex items-center gap-1 mt-1 text-xs",
+                      expenseChange > 0 ? "text-destructive" : "text-success"
+                    )}>
+                      {expenseChange > 0 ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
+                      <span>{Math.abs(expenseChange).toFixed(0)}% vs mois dernier</span>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              <Card className="border-border">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Solde</span>
+                    <Wallet className="h-4 w-4 text-primary" />
+                  </div>
+                  <p className={cn(
+                    "text-xl font-semibold",
+                    monthlyBalance >= 0 ? "text-success" : "text-destructive"
+                  )}>
+                    {monthlyBalance >= 0 ? '+' : ''}{formatPrice(monthlyBalance)}
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="border-border cursor-pointer hover:border-primary/20 transition-colors" onClick={() => navigate('/budget/valeur-nette')}>
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Patrimoine</span>
+                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  <p className={cn(
+                    "text-xl font-semibold",
+                    netWorth >= 0 ? "text-foreground" : "text-destructive"
+                  )}>
+                    {formatPrice(netWorth)}
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Quick Add Section */}
+            <div className="mb-6">
               <QuickExpenseTracker isAuthenticated={isAuthenticated} />
             </div>
 
-            {/* Monthly Trend */}
-            {expenseChange !== 0 && (
-              <div className={cn(
-                "flex items-center gap-2 px-4 py-3 rounded-lg text-sm mb-6",
-                expenseChange > 0 
-                  ? "bg-red-500/10 border border-red-500/20 text-red-400" 
-                  : "bg-emerald-500/10 border border-emerald-500/20 text-emerald-400"
-              )}>
-                {expenseChange > 0 ? <ArrowUpRight className="h-4 w-4" /> : <ArrowDownRight className="h-4 w-4" />}
-                <span>
-                  Dépenses {expenseChange > 0 ? 'en hausse' : 'en baisse'} de {Math.abs(expenseChange).toFixed(0)}% vs mois dernier
-                </span>
-              </div>
-            )}
-
             {/* Recent Transactions */}
-            <Card className="bg-slate-900 border-slate-800 mb-6">
-              <CardHeader className="pb-3 flex flex-row items-center justify-between">
-                <CardTitle className="text-base font-semibold text-white">Dernières transactions</CardTitle>
+            <Card className="mb-6 border-border">
+              <CardHeader className="pb-3 flex flex-row items-center justify-between border-b border-border">
+                <CardTitle className="text-sm font-medium">Transactions récentes</CardTitle>
                 <Button 
                   variant="ghost" 
                   size="sm" 
                   onClick={() => navigate('/budget/historique')}
-                  className="text-slate-400 hover:text-white"
+                  className="text-xs text-muted-foreground hover:text-foreground"
                 >
-                  Voir tout <ChevronRight className="h-4 w-4 ml-1" />
+                  Voir tout <ChevronRight className="h-3.5 w-3.5 ml-1" />
                 </Button>
               </CardHeader>
-              <CardContent className="pt-0">
-                <div className="space-y-1">
+              <CardContent className="p-0">
+                <div className="divide-y divide-border">
                   {transactions.slice(0, 5).map((t) => {
                     const category = categories.find(c => c.id === t.category_id);
                     return (
-                      <div key={t.id} className="flex items-center justify-between py-3 border-b border-slate-800 last:border-0">
+                      <div key={t.id} className="flex items-center justify-between px-5 py-3.5 hover:bg-muted/30 transition-colors">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-lg">
+                          <div className="w-8 h-8 rounded-md bg-muted flex items-center justify-center text-sm">
                             {category?.icon || '📝'}
                           </div>
                           <div>
-                            <p className="font-medium text-white">{t.description || category?.name || 'Transaction'}</p>
-                            <p className="text-xs text-slate-500">
+                            <p className="text-sm font-medium text-foreground">{t.description || category?.name || 'Transaction'}</p>
+                            <p className="text-xs text-muted-foreground">
                               {new Date(t.transaction_date).toLocaleDateString('fr-CA', { day: 'numeric', month: 'short' })}
                             </p>
                           </div>
                         </div>
                         <span className={cn(
-                          "font-semibold",
-                          t.type === 'income' ? "text-emerald-400" : "text-white"
+                          "text-sm font-medium",
+                          t.type === 'income' ? "text-success" : "text-foreground"
                         )}>
                           {t.type === 'income' ? '+' : '-'}{formatPrice(Number(t.amount))}
                         </span>
@@ -268,34 +280,51 @@ const BudgetCalculator = () => {
                     );
                   })}
                   {transactions.length === 0 && (
-                    <p className="text-sm text-slate-500 text-center py-8">Aucune transaction</p>
+                    <div className="px-5 py-8 text-center">
+                      <p className="text-sm text-muted-foreground">Aucune transaction</p>
+                    </div>
                   )}
                 </div>
               </CardContent>
             </Card>
 
-            {/* Charts Row */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-              <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
-                <ExpensesByCategory 
-                  transactions={transactions}
-                  categories={categories}
-                  onAnalyze={() => {}}
-                />
-              </div>
-              <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
-                <FinancialHealthScore 
-                  transactions={transactions}
-                  debts={debts}
-                  assets={assets}
-                />
-              </div>
+            {/* Analytics Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+              <Card className="border-border">
+                <CardHeader className="pb-2 border-b border-border">
+                  <CardTitle className="text-sm font-medium">Dépenses par catégorie</CardTitle>
+                </CardHeader>
+                <CardContent className="pt-4">
+                  <ExpensesByCategory 
+                    transactions={transactions}
+                    categories={categories}
+                    onAnalyze={() => {}}
+                  />
+                </CardContent>
+              </Card>
+              <Card className="border-border">
+                <CardHeader className="pb-2 border-b border-border">
+                  <CardTitle className="text-sm font-medium">Score financier</CardTitle>
+                </CardHeader>
+                <CardContent className="pt-4">
+                  <FinancialHealthScore 
+                    transactions={transactions}
+                    debts={debts}
+                    assets={assets}
+                  />
+                </CardContent>
+              </Card>
             </div>
 
             {/* Budget Planner */}
-            <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
-              <BudgetPlanner isAuthenticated={isAuthenticated} />
-            </div>
+            <Card className="border-border">
+              <CardHeader className="pb-2 border-b border-border">
+                <CardTitle className="text-sm font-medium">Planification budgétaire</CardTitle>
+              </CardHeader>
+              <CardContent className="pt-4">
+                <BudgetPlanner isAuthenticated={isAuthenticated} />
+              </CardContent>
+            </Card>
           </div>
         </div>
       </>
