@@ -279,7 +279,7 @@ export const QuickExpenseTracker = ({ isAuthenticated }: QuickExpenseTrackerProp
             className={cn(
               "flex-1 flex items-center justify-center gap-2.5 py-3.5 rounded-lg font-semibold text-sm transition-all duration-300",
               transactionType === 'income' 
-                ? "bg-sky-600 text-white shadow-md" 
+                ? "bg-emerald-600 text-white shadow-md" 
                 : "text-muted-foreground hover:text-foreground"
             )}
           >
