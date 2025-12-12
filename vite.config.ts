@@ -49,6 +49,11 @@ export default defineConfig(({ mode }) => ({
         ]
       },
       workbox: {
+        // Force new cache version to invalidate old caches
+        cacheId: 'vente-club-v20251212',
+        cleanupOutdatedCaches: true,
+        clientsClaim: true,
+        skipWaiting: true,
         globPatterns: ['**/*.{js,css,html,ico,png,jpg,jpeg,svg,webp}'],
         maximumFileSizeToCacheInBytes: 5000000,
         runtimeCaching: [
@@ -56,7 +61,7 @@ export default defineConfig(({ mode }) => ({
             urlPattern: /^https:\/\/xmwsrvaricrfxovimffm\.supabase\.co\/.*/i,
             handler: 'NetworkFirst',
             options: {
-              cacheName: 'api-cache',
+              cacheName: 'api-cache-v2',
               networkTimeoutSeconds: 10,
               expiration: {
                 maxEntries: 100,
@@ -71,7 +76,7 @@ export default defineConfig(({ mode }) => ({
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
             handler: 'CacheFirst',
             options: {
-              cacheName: 'google-fonts-cache',
+              cacheName: 'google-fonts-cache-v2',
               expiration: {
                 maxEntries: 10,
                 maxAgeSeconds: 60 * 60 * 24 * 365 // 1 an
@@ -85,7 +90,7 @@ export default defineConfig(({ mode }) => ({
             urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
             handler: 'CacheFirst',
             options: {
-              cacheName: 'gstatic-fonts-cache',
+              cacheName: 'gstatic-fonts-cache-v2',
               expiration: {
                 maxEntries: 10,
                 maxAgeSeconds: 60 * 60 * 24 * 365 // 1 an
@@ -99,7 +104,7 @@ export default defineConfig(({ mode }) => ({
             urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp)$/i,
             handler: 'CacheFirst',
             options: {
-              cacheName: 'images-cache',
+              cacheName: 'images-cache-v2',
               expiration: {
                 maxEntries: 200,
                 maxAgeSeconds: 60 * 60 * 24 * 30 // 30 jours
