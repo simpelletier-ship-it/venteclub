@@ -13,6 +13,7 @@ import { MobileNotificationsContainer } from "@/components/MobileNotificationsCo
 import { ThemeProvider } from "next-themes";
 
 // Lazy load all pages
+const Home = lazy(() => import("./pages/Home"));
 const Auth = lazy(() => import("./pages/Auth"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const Sell = lazy(() => import("./pages/Sell"));
@@ -46,6 +47,7 @@ const BudgetCalculator = lazy(() => import("./pages/BudgetCalculator"));
 const BudgetHistory = lazy(() => import("./pages/BudgetHistory"));
 const BudgetGoals = lazy(() => import("./pages/BudgetGoals"));
 const BudgetNetWorth = lazy(() => import("./pages/BudgetNetWorth"));
+const BudgetAnalytics = lazy(() => import("./pages/BudgetAnalytics"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -85,9 +87,9 @@ const App = () => (
             <AnalyticsTracker />
             <Layout>
               <Suspense fallback={<div className="flex items-center justify-center min-h-screen bg-slate-950"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div></div>}>
-                <Routes>
-                  {/* Redirect root to budget */}
-                  <Route path="/" element={<Navigate to="/budget" replace />} />
+              <Routes>
+                  {/* Homepage */}
+                  <Route path="/" element={<Home />} />
                   
                   {/* Auth pages */}
                   <Route path="/auth" element={<Auth />} />
@@ -101,6 +103,7 @@ const App = () => (
                   <Route path="/budget/historique" element={<BudgetHistory />} />
                   <Route path="/budget/objectifs" element={<BudgetGoals />} />
                   <Route path="/budget/valeur-nette" element={<BudgetNetWorth />} />
+                  <Route path="/budget/analyses" element={<BudgetAnalytics />} />
                   
                   {/* Legacy redirect */}
                   <Route path="/outils/budget" element={<Navigate to="/budget" replace />} />

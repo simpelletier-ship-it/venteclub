@@ -134,7 +134,7 @@ const Header = () => {
               onClick={() => navigate("/budget")} 
               className={cn(
                 "h-9 px-4 font-medium text-sm rounded-md text-muted-foreground hover:text-foreground hover:bg-muted",
-                isActive('/budget') && !isActive('/budget/historique') && !isActive('/budget/objectifs') && !isActive('/budget/valeur-nette') && "bg-muted text-foreground"
+                isActive('/budget') && !isActive('/budget/historique') && !isActive('/budget/objectifs') && !isActive('/budget/valeur-nette') && !isActive('/budget/analyses') && "bg-muted text-foreground"
               )}
             >
               Tableau de bord
@@ -151,7 +151,6 @@ const Header = () => {
               Transactions
             </Button>
 
-
             <Button 
               variant="ghost"
               onClick={() => navigate("/budget/valeur-nette")} 
@@ -161,6 +160,17 @@ const Header = () => {
               )}
             >
               Patrimoine
+            </Button>
+
+            <Button 
+              variant="ghost"
+              onClick={() => navigate("/budget/analyses")} 
+              className={cn(
+                "h-9 px-4 font-medium text-sm rounded-md text-muted-foreground hover:text-foreground hover:bg-muted",
+                isActive('/budget/analyses') && "bg-muted text-foreground"
+              )}
+            >
+              Analyses
             </Button>
 
             <DropdownMenu>
@@ -288,7 +298,7 @@ const Header = () => {
               }}
               className={cn(
                 "w-full text-left px-4 py-2.5 rounded-md transition-colors text-sm font-medium",
-                isActive('/budget') && !isActive('/budget/historique') && !isActive('/budget/objectifs') && !isActive('/budget/valeur-nette') 
+                isActive('/budget') && !isActive('/budget/historique') && !isActive('/budget/objectifs') && !isActive('/budget/valeur-nette') && !isActive('/budget/analyses')
                   ? "bg-muted text-foreground" 
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
               )}
@@ -309,7 +319,6 @@ const Header = () => {
               Transactions
             </button>
 
-
             <button
               onClick={() => {
                 navigate("/budget/valeur-nette");
@@ -321,6 +330,19 @@ const Header = () => {
               )}
             >
               Patrimoine
+            </button>
+
+            <button
+              onClick={() => {
+                navigate("/budget/analyses");
+                setMobileMenuOpen(false);
+              }}
+              className={cn(
+                "w-full text-left px-4 py-2.5 rounded-md transition-colors text-sm font-medium",
+                isActive('/budget/analyses') ? "bg-muted text-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"
+              )}
+            >
+              Analyses
             </button>
 
             <div className="border-t border-border my-2" />
