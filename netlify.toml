@@ -41,10 +41,7 @@
   to = "/robots.txt"
   status = 200
 
-[[redirects]]
-  from = "/sitemap.xml"
-  to = "/sitemap.xml"
-  status = 200
+# Sitemap is handled by edge function redirect above
 
 [[redirects]]
   from = "/manifest.webmanifest"
