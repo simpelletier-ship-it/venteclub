@@ -234,103 +234,82 @@ const BudgetCalculator = () => {
               <QuickExpenseTracker isAuthenticated={isAuthenticated} />
             </div>
 
-            {/* Main Tabs */}
-            <Tabs defaultValue="overview" className="space-y-6">
-              {/* Desktop Tabs */}
-              <TabsList className="hidden lg:flex w-full h-12 p-1 bg-muted/50 rounded-xl">
-                <TabsTrigger value="overview" className="flex-1 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm">
-                  <BarChart3 className="h-4 w-4 mr-2" />
-                  Tableau de bord
+            {/* Main Tabs - SIMPLIFIED: 3 tabs only */}
+            <Tabs defaultValue="home" className="space-y-6">
+              {/* Desktop Tabs - Clean and Simple */}
+              <TabsList className="hidden lg:grid w-full max-w-md mx-auto grid-cols-3 h-12 p-1 bg-muted/50 rounded-xl">
+                <TabsTrigger value="home" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                  🏠 Accueil
                 </TabsTrigger>
-                <TabsTrigger value="transactions" className="flex-1 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm">
-                  Historique
+                <TabsTrigger value="history" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                  📋 Historique
                 </TabsTrigger>
-                <TabsTrigger value="budget" className="flex-1 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm">
-                  Mon budget
-                </TabsTrigger>
-              <TabsTrigger value="assets" className="flex-1 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm">
-                  Valeur nette
-                </TabsTrigger>
-                <TabsTrigger value="tools" className="flex-1 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm">
-                  Outils
-                </TabsTrigger>
-                <TabsTrigger value="analyses" className="flex-1 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm">
-                  Analyses
-                </TabsTrigger>
-                <TabsTrigger value="settings" className="flex-1 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm">
-                  Paramètres
+                <TabsTrigger value="more" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                  ⚙️ Plus
                 </TabsTrigger>
               </TabsList>
 
-              {/* Mobile Bottom Nav */}
+              {/* Mobile Bottom Nav - 3 tabs only */}
               <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-lg border-t border-border z-50">
-                <TabsList className="grid w-full grid-cols-6 h-16 bg-transparent rounded-none">
-                  <TabsTrigger value="overview" className="flex flex-col gap-0.5 h-full rounded-none data-[state=active]:bg-primary/5">
-                    <BarChart3 className="h-5 w-5" />
-                    <span className="text-[10px]">Accueil</span>
+                <TabsList className="grid w-full grid-cols-3 h-16 bg-transparent rounded-none">
+                  <TabsTrigger value="home" className="flex flex-col gap-0.5 h-full rounded-none data-[state=active]:bg-primary/5 data-[state=active]:text-primary">
+                    <span className="text-xl">🏠</span>
+                    <span className="text-xs font-medium">Accueil</span>
                   </TabsTrigger>
-                  <TabsTrigger value="transactions" className="flex flex-col gap-0.5 h-full rounded-none data-[state=active]:bg-primary/5">
-                    <span className="text-lg">📋</span>
-                    <span className="text-[10px]">Historique</span>
+                  <TabsTrigger value="history" className="flex flex-col gap-0.5 h-full rounded-none data-[state=active]:bg-primary/5 data-[state=active]:text-primary">
+                    <span className="text-xl">📋</span>
+                    <span className="text-xs font-medium">Historique</span>
                   </TabsTrigger>
-                  <TabsTrigger value="budget" className="flex flex-col gap-0.5 h-full rounded-none data-[state=active]:bg-primary/5">
-                    <span className="text-lg">💰</span>
-                    <span className="text-[10px]">Budget</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="assets" className="flex flex-col gap-0.5 h-full rounded-none data-[state=active]:bg-primary/5">
-                    <span className="text-lg">📊</span>
-                    <span className="text-[10px]">Valeur</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="tools" className="flex flex-col gap-0.5 h-full rounded-none data-[state=active]:bg-primary/5">
-                    <span className="text-lg">🛠️</span>
-                    <span className="text-[10px]">Outils</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="analyses" className="flex flex-col gap-0.5 h-full rounded-none data-[state=active]:bg-primary/5">
-                    <span className="text-lg">📈</span>
-                    <span className="text-[10px]">Plus</span>
+                  <TabsTrigger value="more" className="flex flex-col gap-0.5 h-full rounded-none data-[state=active]:bg-primary/5 data-[state=active]:text-primary">
+                    <span className="text-xl">⚙️</span>
+                    <span className="text-xs font-medium">Plus</span>
                   </TabsTrigger>
                 </TabsList>
               </div>
 
-              {/* Overview Tab */}
-              <TabsContent value="overview" className="space-y-6">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                  {/* Main Charts */}
-                  <div className="lg:col-span-2 space-y-6">
-                    <ExpensesByCategory 
-                      transactions={transactions}
-                      categories={categories}
-                      onAnalyze={() => {}}
-                    />
-                    <ExpenseTrendsChart transactions={transactions} />
-                  </div>
-                  
-                  {/* Sidebar */}
+              {/* HOME TAB - Everything important at a glance */}
+              <TabsContent value="home" className="space-y-6">
+                {/* Charts Row */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <ExpensesByCategory 
+                    transactions={transactions}
+                    categories={categories}
+                    onAnalyze={() => {}}
+                  />
                   <div className="space-y-6">
                     <FinancialHealthScore 
                       transactions={transactions}
                       debts={debts}
                       assets={assets}
                     />
-                    <Card>
-                      <CardHeader className="pb-3">
-                        <CardTitle className="text-base font-medium flex items-center gap-2">
-                          🎯 Objectifs
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <FinancialGoals isAuthenticated={isAuthenticated} />
-                      </CardContent>
-                    </Card>
+                    <AgeOfMoney 
+                      monthlyIncome={monthlyIncome}
+                      monthlyExpenses={monthlyExpenses}
+                      currentBalance={monthlyBalance > 0 ? monthlyBalance : 0}
+                    />
                   </div>
                 </div>
-                
-                {/* AI Coach */}
+
+                {/* Goals & Budget */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base font-medium">🎯 Objectifs d'épargne</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <FinancialGoals isAuthenticated={isAuthenticated} />
+                    </CardContent>
+                  </Card>
+                  <BudgetPlanner isAuthenticated={isAuthenticated} />
+                </div>
+
+                {/* Trends */}
+                <ExpenseTrendsChart transactions={transactions} />
+
+                {/* AI Insights */}
                 <Card>
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-base font-medium flex items-center gap-2">
-                      🤖 Conseils personnalisés
-                    </CardTitle>
+                    <CardTitle className="text-base font-medium">💡 Conseils personnalisés</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <BudgetInsights 
@@ -343,14 +322,11 @@ const BudgetCalculator = () => {
                 </Card>
               </TabsContent>
 
-              {/* Budget Tab */}
-              <TabsContent value="budget" className="space-y-6">
-                <BudgetPlanner isAuthenticated={isAuthenticated} />
-              </TabsContent>
-
-              {/* Transactions Tab */}
-              <TabsContent value="transactions" className="space-y-6">
+              {/* HISTORY TAB - All transactions */}
+              <TabsContent value="history" className="space-y-6">
                 <BudgetTransactions isAuthenticated={isAuthenticated} />
+                
+                {/* Recurring Expenses Collapsible */}
                 <details className="group">
                   <summary className="flex items-center gap-2 cursor-pointer p-4 rounded-xl border bg-card hover:bg-accent/50 transition-colors">
                     <span>🔁</span>
@@ -362,62 +338,62 @@ const BudgetCalculator = () => {
                 </details>
               </TabsContent>
 
-              {/* Assets Tab */}
-              <TabsContent value="assets" className="space-y-6">
-                <SimpleNetWorthTracker currentNetWorth={netWorth} isAuthenticated={isAuthenticated} />
-                <NetWorthGamification netWorth={netWorth} isAuthenticated={isAuthenticated} />
-                <BudgetAssetsDebts isAuthenticated={isAuthenticated} />
-                <InvestmentTracker />
-              </TabsContent>
-
-              {/* Tools Tab - All New Features */}
-              <TabsContent value="tools" className="space-y-6">
-                {/* Quick Access Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <AgeOfMoney 
-                    monthlyIncome={monthlyIncome}
-                    monthlyExpenses={monthlyExpenses}
-                    currentBalance={monthlyBalance > 0 ? monthlyBalance : 0}
-                  />
-                  <RoundUpSavings transactions={transactions} />
-                  <SpendingLimitsAlerts />
+              {/* MORE TAB - All other features organized in sections */}
+              <TabsContent value="more" className="space-y-8">
+                {/* Section: Net Worth */}
+                <div>
+                  <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                    💰 Valeur nette
+                  </h2>
+                  <div className="space-y-4">
+                    <SimpleNetWorthTracker currentNetWorth={netWorth} isAuthenticated={isAuthenticated} />
+                    <NetWorthGamification netWorth={netWorth} isAuthenticated={isAuthenticated} />
+                    <BudgetAssetsDebts isAuthenticated={isAuthenticated} />
+                  </div>
                 </div>
 
-                {/* Debt & Savings Tools */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <DebtPayoffPlanner />
-                  <SavingsChallenges />
+                {/* Section: Tools */}
+                <div>
+                  <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                    🛠️ Outils financiers
+                  </h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <RoundUpSavings transactions={transactions} />
+                    <SpendingLimitsAlerts />
+                    <InvestmentTracker />
+                  </div>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
+                    <DebtPayoffPlanner />
+                    <SavingsChallenges />
+                  </div>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
+                    <BillCalendar />
+                    <CashFlowForecast />
+                  </div>
                 </div>
 
-                {/* Calendar & Forecast */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <BillCalendar />
-                  <CashFlowForecast />
+                {/* Section: Analysis */}
+                <div>
+                  <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                    📊 Analyses avancées
+                  </h2>
+                  <div className="space-y-4">
+                    <MonthComparisonChart transactions={transactions} categories={categories} />
+                    <BenchmarkComparison isAuthenticated={isAuthenticated} />
+                    <SmartInsights />
+                    <FinancialProductComparison />
+                  </div>
                 </div>
 
-                {/* Product Comparison & Smart Insights */}
-                <SmartInsights />
-                <FinancialProductComparison />
-              </TabsContent>
-
-              {/* Analyses Tab */}
-              <TabsContent value="analyses" className="space-y-6">
-                <MonthComparisonChart transactions={transactions} categories={categories} />
-                <BenchmarkComparison isAuthenticated={isAuthenticated} />
-                <PremiumAnalysisTab 
-                  transactions={transactions}
-                  categories={categories}
-                  debts={debts}
-                  assets={assets}
-                />
-                <AIFinancialCoach />
-              </TabsContent>
-
-              {/* Settings Tab */}
-              <TabsContent value="settings" className="space-y-6">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <CategoryManager isAuthenticated={isAuthenticated} />
-                  <ThemeCustomizer />
+                {/* Section: Settings */}
+                <div>
+                  <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                    ⚙️ Paramètres
+                  </h2>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <CategoryManager isAuthenticated={isAuthenticated} />
+                    <ThemeCustomizer />
+                  </div>
                 </div>
               </TabsContent>
             </Tabs>
