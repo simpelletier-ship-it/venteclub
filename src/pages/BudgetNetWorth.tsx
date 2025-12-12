@@ -2,21 +2,19 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { SEO } from "@/components/SEO";
 import { BreadcrumbSchema } from "@/components/BreadcrumbSchema";
-import { Loader2, Plus, TrendingUp, TrendingDown, Wallet, Calendar } from "lucide-react";
+import { Loader2, Plus, Calendar } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { SimpleNetWorthTracker } from "@/components/budget/SimpleNetWorthTracker";
-import { NetWorthGamification } from "@/components/budget/NetWorthGamification";
+import { NetWorthChart } from "@/components/budget/NetWorthChart";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { formatPrice } from "@/lib/priceFormat";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
 
 const ASSET_TYPES = [
   { value: 'checking', label: 'Compte chèques' },
@@ -163,6 +161,10 @@ const BudgetNetWorth = () => {
   const totalAssets = assets.reduce((sum, asset) => sum + Number(asset.value), 0);
   const totalDebts = debts.reduce((sum, debt) => sum + Number(debt.balance), 0);
   const netWorth = totalAssets - totalDebts;
+  
+  // Get asset/debt names for display
+  const assetNames = assets.map(a => a.name);
+  const debtNames = debts.map(d => d.name);
 
   if (loading) {
     return (
@@ -192,39 +194,16 @@ const BudgetNetWorth = () => {
         <div className="container mx-auto px-6 py-6">
           <h1 className="text-xl font-semibold text-foreground mb-6">Ma valeur nette</h1>
           
-          {/* Résumé KPI */}
-          <div className="grid grid-cols-3 gap-4 mb-6">
-            <Card className="border-border">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Ce que je possède</span>
-                  <TrendingUp className="h-4 w-4 text-success" />
-                </div>
-                <p className="text-xl font-semibold text-success">{formatPrice(totalAssets)}</p>
-              </CardContent>
-            </Card>
-
-            <Card className="border-border">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Ce que je dois</span>
-                  <TrendingDown className="h-4 w-4 text-destructive" />
-                </div>
-                <p className="text-xl font-semibold text-destructive">{formatPrice(totalDebts)}</p>
-              </CardContent>
-            </Card>
-
-            <Card className="border-border">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Valeur nette</span>
-                  <Wallet className="h-4 w-4 text-primary" />
-                </div>
-                <p className={cn("text-xl font-semibold", netWorth >= 0 ? "text-foreground" : "text-destructive")}>
-                  {formatPrice(netWorth)}
-                </p>
-              </CardContent>
-            </Card>
+          {/* Graphique principal style Wealthsimple */}
+          <div className="mb-6">
+            <NetWorthChart 
+              netWorth={netWorth}
+              totalAssets={totalAssets}
+              totalDebts={totalDebts}
+              assetNames={assetNames}
+              debtNames={debtNames}
+              isAuthenticated={isAuthenticated}
+            />
           </div>
 
           {/* Formulaires d'ajout rapide */}
@@ -378,11 +357,6 @@ const BudgetNetWorth = () => {
 
           {/* Gestion des actifs et passifs */}
           <SimpleNetWorthTracker currentNetWorth={netWorth} isAuthenticated={isAuthenticated} />
-
-          {/* Graphique d'évolution de la valeur nette - en bas */}
-          <div className="mt-6">
-            <NetWorthGamification netWorth={netWorth} isAuthenticated={isAuthenticated} />
-          </div>
         </div>
       </div>
     </ErrorBoundary>
