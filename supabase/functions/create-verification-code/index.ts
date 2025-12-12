@@ -40,7 +40,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     if (emailRateLimit) {
       if (emailRateLimit.attempts >= 3) {
-        console.warn(`Rate limit exceeded for email: ${email}`);
+        console.warn("Rate limit exceeded for verification code request");
         return new Response(
           JSON.stringify({ 
             error: "Trop de tentatives. Veuillez réessayer dans une heure." 
@@ -107,7 +107,7 @@ const handler = async (req: Request): Promise<Response> => {
       throw emailError;
     }
 
-    console.log("Verification code created and sent for:", email);
+    console.log("Verification code created and sent successfully");
 
     return new Response(
       JSON.stringify({ success: true }),

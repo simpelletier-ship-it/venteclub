@@ -27,7 +27,7 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const { email, success, failure_reason, ip_address, user_agent }: LoginAttemptRequest = await req.json();
 
-    console.log("Checking login attempt for:", email);
+    console.log("Processing login attempt check");
 
     // Enregistrer la tentative de connexion
     const { error: insertError } = await supabase
