@@ -1,10 +1,11 @@
 import { useMemo, useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { TrendingUp, TrendingDown, Wallet, PiggyBank } from "lucide-react";
+import { TrendingUp, TrendingDown, Wallet, PiggyBank, HelpCircle } from "lucide-react";
 import { formatPrice } from "@/lib/priceFormat";
 import { startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, subMonths, format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { cn } from "@/lib/utils";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface FinancialSummaryBoxesProps {
   transactions: any[];
@@ -159,13 +160,32 @@ export const FinancialSummaryBoxes = ({ transactions }: FinancialSummaryBoxesPro
         <div className="p-4 rounded-xl bg-muted/30 border border-border/50">
           <div className="flex items-center gap-2 mb-3">
             <Wallet className="h-4 w-4 text-muted-foreground" />
-            <span className="text-xs font-medium text-muted-foreground">Taux</span>
+            <span className="text-xs font-medium text-muted-foreground">Taux d'épargne</span>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="h-3.5 w-3.5 text-muted-foreground/60 cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent side="top" className="max-w-[280px] p-3">
+                  <p className="text-sm font-medium mb-1">Comment c'est calculé?</p>
+                  <p className="text-xs text-muted-foreground">
+                    (Revenus − Dépenses) ÷ Revenus × 100
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Un taux ≥ 20% est considéré excellent. Entre 10-20% c'est bon. Moins de 10% nécessite attention.
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
           <p className={cn(
             "text-lg sm:text-xl font-semibold tabular-nums",
             savingsRate >= 20 ? "text-emerald-600" : savingsRate >= 10 ? "text-blue-600" : "text-muted-foreground"
           )}>
             {savingsRate.toFixed(0)}%
+          </p>
+          <p className="text-[11px] text-muted-foreground mt-1">
+            {savingsRate >= 20 ? "Excellent!" : savingsRate >= 10 ? "Bon" : "À améliorer"}
           </p>
         </div>
       </div>
