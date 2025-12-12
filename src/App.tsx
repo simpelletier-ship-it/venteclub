@@ -51,6 +51,7 @@ const BudgetGoals = lazy(() => import("./pages/BudgetGoals"));
 const BudgetNetWorth = lazy(() => import("./pages/BudgetNetWorth"));
 const BudgetAnalytics = lazy(() => import("./pages/BudgetAnalytics"));
 const TaxSimulator = lazy(() => import("./pages/TaxSimulator"));
+const Support = lazy(() => import("./pages/Support"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -129,6 +130,7 @@ const App = () => (
                   <Route path="/terms" element={<EmailVerificationGuard><Terms /></EmailVerificationGuard>} />
                   <Route path="/ressources" element={<EmailVerificationGuard><Resources /></EmailVerificationGuard>} />
                   <Route path="/faq" element={<EmailVerificationGuard><FAQ /></EmailVerificationGuard>} />
+                  <Route path="/soutien" element={<Support />} />
                   
                   {/* User pages */}
                   <Route path="/settings" element={<EmailVerificationGuard><Settings /></EmailVerificationGuard>} />
