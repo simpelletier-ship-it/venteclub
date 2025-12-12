@@ -1033,7 +1033,12 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
 
           <Button 
             id="add-button"
-            className="w-full h-11 text-base font-bold mt-1"
+            className={cn(
+              "w-full h-11 text-base font-bold mt-1",
+              transactionType === 'income' 
+                ? "bg-emerald-600 hover:bg-emerald-700 text-white" 
+                : "bg-rose-500 hover:bg-rose-600 text-white"
+            )}
             onClick={handleQuickAdd}
             disabled={quickAdd.isPending || !amount || parseFloat(amount) <= 0}
             size="default"
