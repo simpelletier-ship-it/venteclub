@@ -2,19 +2,14 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { SEO } from "@/components/SEO";
 import { BreadcrumbSchema } from "@/components/BreadcrumbSchema";
-import { Loader2, TrendingUp, TrendingDown, History, PieChart, Target, Wallet, ChevronRight, Calendar, Bell, ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { Loader2, TrendingUp, TrendingDown, Wallet, Target, ChevronRight, ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
-import { BudgetTransactions } from "@/components/budget/BudgetTransactions";
-import { SimpleNetWorthTracker } from "@/components/budget/SimpleNetWorthTracker";
 import { BudgetPlanner } from "@/components/budget/BudgetPlanner";
-import { FinancialGoals } from "@/components/budget/FinancialGoals";
 import { QuickExpenseTracker } from "@/components/budget/QuickExpenseTrackerPro";
-import RecurringExpenses from "@/components/budget/RecurringExpenses";
 import { ExpensesByCategory } from "@/components/budget/ExpensesByCategory";
-import { ExpenseTrendsChart } from "@/components/budget/ExpenseTrendsChart";
 import { FinancialHealthScore } from "@/components/budget/FinancialHealthScore";
 import { BudgetOnboarding } from "@/components/budget/BudgetOnboarding";
 import { CreateDefaultCategories } from "@/components/budget/CreateDefaultCategories";
@@ -30,11 +25,10 @@ const BudgetCalculator = () => {
   const { user, loading } = useAuth();
   const isAuthenticated = !!user;
   const { isOnline, pendingCount, isSyncing, triggerSync } = useOfflineSync(isAuthenticated);
-  const [activeTab, setActiveTab] = useState<'overview' | 'history' | 'goals' | 'networth'>('overview');
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
-      navigate('/auth?redirect=/outils/budget');
+      navigate('/auth?redirect=/budget');
     }
   }, [loading, isAuthenticated, navigate]);
 
@@ -136,7 +130,7 @@ const BudgetCalculator = () => {
   }
 
   if (!isAuthenticated) {
-    sessionStorage.setItem('authReturnUrl', '/outils/budget');
+    sessionStorage.setItem('authReturnUrl', '/budget');
     navigate("/auth");
     return null;
   }
@@ -150,17 +144,16 @@ const BudgetCalculator = () => {
           title="Mon Budget | Gestion Finances Personnelles"
           description="Gérez votre budget personnel simplement. Suivi des dépenses, objectifs d'épargne et analyses financières."
           keywords="budget personnel, gestion finances, suivi dépenses, épargne"
-          canonical="/outils/budget"
+          canonical="/budget"
           type="website"
         />
         <BreadcrumbSchema
           items={[
-            { name: "Accueil", url: "/" },
-            { name: "Budget", url: "/outils/budget" }
+            { name: "Budget", url: "/budget" }
           ]}
         />
 
-        <div className="min-h-screen bg-slate-950 text-white pb-24 lg:pb-8">
+        <div className="min-h-screen bg-slate-950 text-white pb-8">
           {/* Top Summary Bar */}
           <div className="bg-slate-900 border-b border-slate-800">
             <div className="container mx-auto px-4 py-4">
@@ -215,173 +208,93 @@ const BudgetCalculator = () => {
               onSync={triggerSync}
             />
 
-            {/* QUICK ADD - PRIMARY ACTION - ALWAYS VISIBLE */}
+            {/* QUICK ADD - PRIMARY ACTION */}
             <div className="mb-8">
               <QuickExpenseTracker isAuthenticated={isAuthenticated} />
             </div>
 
-            {/* Navigation Tabs */}
-            <div className="flex gap-2 mb-6 overflow-x-auto pb-2 scrollbar-hide">
-              {[
-                { id: 'overview', label: 'Aperçu', icon: PieChart },
-                { id: 'history', label: 'Historique', icon: History },
-                { id: 'goals', label: 'Objectifs', icon: Target },
-                { id: 'networth', label: 'Valeur nette', icon: Wallet },
-              ].map(tab => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id as any)}
-                  className={cn(
-                    "flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium text-sm whitespace-nowrap transition-all",
-                    activeTab === tab.id
-                      ? "bg-emerald-600 text-white shadow-lg shadow-emerald-600/25"
-                      : "bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700"
-                  )}
+            {/* Monthly Trend */}
+            {expenseChange !== 0 && (
+              <div className={cn(
+                "flex items-center gap-2 px-4 py-3 rounded-lg text-sm mb-6",
+                expenseChange > 0 
+                  ? "bg-red-500/10 border border-red-500/20 text-red-400" 
+                  : "bg-emerald-500/10 border border-emerald-500/20 text-emerald-400"
+              )}>
+                {expenseChange > 0 ? <ArrowUpRight className="h-4 w-4" /> : <ArrowDownRight className="h-4 w-4" />}
+                <span>
+                  Dépenses {expenseChange > 0 ? 'en hausse' : 'en baisse'} de {Math.abs(expenseChange).toFixed(0)}% vs mois dernier
+                </span>
+              </div>
+            )}
+
+            {/* Recent Transactions */}
+            <Card className="bg-slate-900 border-slate-800 mb-6">
+              <CardHeader className="pb-3 flex flex-row items-center justify-between">
+                <CardTitle className="text-base font-semibold text-white">Dernières transactions</CardTitle>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => navigate('/budget/historique')}
+                  className="text-slate-400 hover:text-white"
                 >
-                  <tab.icon className="h-4 w-4" />
-                  {tab.label}
-                </button>
-              ))}
+                  Voir tout <ChevronRight className="h-4 w-4 ml-1" />
+                </Button>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="space-y-1">
+                  {transactions.slice(0, 5).map((t) => {
+                    const category = categories.find(c => c.id === t.category_id);
+                    return (
+                      <div key={t.id} className="flex items-center justify-between py-3 border-b border-slate-800 last:border-0">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-lg">
+                            {category?.icon || '📝'}
+                          </div>
+                          <div>
+                            <p className="font-medium text-white">{t.description || category?.name || 'Transaction'}</p>
+                            <p className="text-xs text-slate-500">
+                              {new Date(t.transaction_date).toLocaleDateString('fr-CA', { day: 'numeric', month: 'short' })}
+                            </p>
+                          </div>
+                        </div>
+                        <span className={cn(
+                          "font-semibold",
+                          t.type === 'income' ? "text-emerald-400" : "text-white"
+                        )}>
+                          {t.type === 'income' ? '+' : '-'}{formatPrice(Number(t.amount))}
+                        </span>
+                      </div>
+                    );
+                  })}
+                  {transactions.length === 0 && (
+                    <p className="text-sm text-slate-500 text-center py-8">Aucune transaction</p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Charts Row */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+              <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
+                <ExpensesByCategory 
+                  transactions={transactions}
+                  categories={categories}
+                  onAnalyze={() => {}}
+                />
+              </div>
+              <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
+                <FinancialHealthScore 
+                  transactions={transactions}
+                  debts={debts}
+                  assets={assets}
+                />
+              </div>
             </div>
 
-            {/* Content */}
-            {activeTab === 'overview' && (
-              <div className="space-y-6">
-                {/* Monthly Trend */}
-                {expenseChange !== 0 && (
-                  <div className={cn(
-                    "flex items-center gap-2 px-4 py-3 rounded-lg text-sm",
-                    expenseChange > 0 
-                      ? "bg-red-500/10 border border-red-500/20 text-red-400" 
-                      : "bg-emerald-500/10 border border-emerald-500/20 text-emerald-400"
-                  )}>
-                    {expenseChange > 0 ? <ArrowUpRight className="h-4 w-4" /> : <ArrowDownRight className="h-4 w-4" />}
-                    <span>
-                      Dépenses {expenseChange > 0 ? 'en hausse' : 'en baisse'} de {Math.abs(expenseChange).toFixed(0)}% vs mois dernier
-                    </span>
-                  </div>
-                )}
-
-                {/* Recent Transactions */}
-                <Card className="bg-slate-900 border-slate-800">
-                  <CardHeader className="pb-3 flex flex-row items-center justify-between">
-                    <CardTitle className="text-base font-semibold text-white">Dernières transactions</CardTitle>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      onClick={() => setActiveTab('history')}
-                      className="text-slate-400 hover:text-white"
-                    >
-                      Voir tout <ChevronRight className="h-4 w-4 ml-1" />
-                    </Button>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <div className="space-y-1">
-                      {transactions.slice(0, 5).map((t) => {
-                        const category = categories.find(c => c.id === t.category_id);
-                        return (
-                          <div key={t.id} className="flex items-center justify-between py-3 border-b border-slate-800 last:border-0">
-                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-lg">
-                                {category?.icon || '📝'}
-                              </div>
-                              <div>
-                                <p className="font-medium text-white">{t.description || category?.name || 'Transaction'}</p>
-                                <p className="text-xs text-slate-500">
-                                  {new Date(t.transaction_date).toLocaleDateString('fr-CA', { day: 'numeric', month: 'short' })}
-                                </p>
-                              </div>
-                            </div>
-                            <span className={cn(
-                              "font-semibold",
-                              t.type === 'income' ? "text-emerald-400" : "text-white"
-                            )}>
-                              {t.type === 'income' ? '+' : '-'}{formatPrice(Number(t.amount))}
-                            </span>
-                          </div>
-                        );
-                      })}
-                      {transactions.length === 0 && (
-                        <p className="text-sm text-slate-500 text-center py-8">Aucune transaction</p>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Charts Row */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
-                    <ExpensesByCategory 
-                      transactions={transactions}
-                      categories={categories}
-                      onAnalyze={() => {}}
-                    />
-                  </div>
-                  <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
-                    <FinancialHealthScore 
-                      transactions={transactions}
-                      debts={debts}
-                      assets={assets}
-                    />
-                  </div>
-                </div>
-
-                {/* Budget Planner */}
-                <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
-                  <BudgetPlanner isAuthenticated={isAuthenticated} />
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'history' && (
-              <div className="space-y-6">
-                <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
-                  <BudgetTransactions isAuthenticated={isAuthenticated} />
-                </div>
-                <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
-                  <h3 className="text-lg font-semibold text-white mb-4">Dépenses récurrentes</h3>
-                  <RecurringExpenses isAuthenticated={isAuthenticated} />
-                </div>
-                <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
-                  <ExpenseTrendsChart transactions={transactions} />
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'goals' && (
-              <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
-                <FinancialGoals isAuthenticated={isAuthenticated} />
-              </div>
-            )}
-
-            {activeTab === 'networth' && (
-              <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
-                <SimpleNetWorthTracker currentNetWorth={netWorth} isAuthenticated={isAuthenticated} />
-              </div>
-            )}
-          </div>
-
-          {/* Mobile Bottom Nav */}
-          <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-slate-900 border-t border-slate-800 z-40">
-            <div className="grid grid-cols-4 h-16">
-              {[
-                { id: 'overview', label: 'Aperçu', icon: PieChart },
-                { id: 'history', label: 'Historique', icon: History },
-                { id: 'goals', label: 'Objectifs', icon: Target },
-                { id: 'networth', label: 'Valeur', icon: Wallet },
-              ].map(tab => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id as any)}
-                  className={cn(
-                    "flex flex-col items-center justify-center gap-1",
-                    activeTab === tab.id ? "text-emerald-400" : "text-slate-500"
-                  )}
-                >
-                  <tab.icon className="h-5 w-5" />
-                  <span className="text-xs">{tab.label}</span>
-                </button>
-              ))}
+            {/* Budget Planner */}
+            <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
+              <BudgetPlanner isAuthenticated={isAuthenticated} />
             </div>
           </div>
         </div>
