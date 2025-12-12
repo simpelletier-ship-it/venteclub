@@ -206,18 +206,31 @@ const Tools = () => {
       </div>
 
       <Helmet>
-        <title>Outils Financiers Gratuits Québec 2025 | Calculateurs Budget Salaire Impôt</title>
-        <meta name="description" content="Suite complète d'outils financiers gratuits pour le Québec : calculateur de salaire net, retour d'impôt avec REER/CELIAPP, planificateur de budget intelligent. Taux 2025 à jour, calculs précis, interface intuitive. Gérez vos finances personnelles efficacement." />
-        <meta name="keywords" content="outils financiers québec, calculateur salaire net, calculateur retour impôt, planificateur budget, gestion finances personnelles, REER, CELIAPP, budget mensuel, impôt québec 2025, calculateur gratuit" />
+        <title>Outils Financiers Gratuits Québec 2025 | Calculateur Salaire Net, Impôt, Budget</title>
+        <meta name="description" content="Suite complète d'outils financiers gratuits pour le Québec 2025: calculateur de salaire net après impôts (RRQ, AE, RQAP), estimation retour d'impôt avec REER/CELIAPP, planificateur de budget intelligent avec suivi des dépenses et objectifs d'épargne. Taux à jour, calculs précis." />
+        <meta name="keywords" content="outils financiers québec gratuit, calculateur salaire net québec, calculateur retour impôt 2025, planificateur budget personnel, gestion finances québec, REER CELIAPP, impôt provincial fédéral, RRQ AE RQAP, calcul paie, objectifs épargne" />
         
         {/* Canonical */}
         <link rel="canonical" href="https://vente.club/outils" />
         
         {/* Open Graph */}
-        <meta property="og:title" content="Outils Financiers Gratuits Québec 2025 | Calculateurs Budget Salaire Impôt" />
-        <meta property="og:description" content="Suite complète d'outils financiers gratuits : calculateur salaire net, retour d'impôt, planificateur budget. Taux 2025 à jour." />
+        <meta property="og:title" content="Outils Financiers Gratuits Québec 2025 | Salaire, Impôt, Budget" />
+        <meta property="og:description" content="Calculateurs gratuits: salaire net, retour d'impôt, planificateur budget. Taux 2025 à jour pour le Québec." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://vente.club/outils" />
+        <meta property="og:site_name" content="Vente.Club" />
+        <meta property="og:locale" content="fr_CA" />
+        
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Outils Financiers Gratuits Québec 2025" />
+        <meta name="twitter:description" content="Calculateurs salaire net, retour d'impôt et planificateur budget. 100% gratuit avec taux 2025." />
+        
+        {/* Additional SEO */}
+        <meta name="robots" content="index, follow, max-image-preview:large" />
+        <meta name="author" content="Vente.Club" />
+        <meta name="geo.region" content="CA-QC" />
+        <meta name="geo.placename" content="Québec" />
         
         {/* Structured Data - BreadcrumbList */}
         <script type="application/ld+json">
@@ -225,18 +238,8 @@ const Tools = () => {
             "@context": "https://schema.org",
             "@type": "BreadcrumbList",
             "itemListElement": [
-              {
-                "@type": "ListItem",
-                "position": 1,
-                "name": "Accueil",
-                "item": "https://vente.club"
-              },
-              {
-                "@type": "ListItem",
-                "position": 2,
-                "name": "Outils Financiers",
-                "item": "https://vente.club/outils"
-              }
+              { "@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://vente.club" },
+              { "@type": "ListItem", "position": 2, "name": "Outils Financiers", "item": "https://vente.club/outils" }
             ]
           })}
         </script>
@@ -246,33 +249,76 @@ const Tools = () => {
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "CollectionPage",
-            "name": "Outils Financiers Gratuits Québec",
-            "description": "Suite complète d'outils financiers gratuits pour gérer vos finances personnelles au Québec",
+            "name": "Outils Financiers Gratuits Québec 2025",
+            "description": "Suite complète d'outils financiers gratuits pour gérer vos finances personnelles au Québec avec les taux 2025",
             "url": "https://vente.club/outils",
+            "inLanguage": "fr-CA",
             "hasPart": [
               {
                 "@type": "WebApplication",
-                "name": "Calculateur de Salaire Net Québec",
+                "name": "Calculateur de Salaire Net Québec 2025",
                 "url": "https://vente.club/outils/salaire",
-                "applicationCategory": "FinanceApplication"
+                "applicationCategory": "FinanceApplication",
+                "description": "Calculez votre salaire net après impôts fédéral et provincial, RRQ, AE et RQAP"
               },
               {
                 "@type": "WebApplication",
-                "name": "Calculateur de Retour d'Impôt",
+                "name": "Calculateur de Retour d'Impôt 2025",
                 "url": "https://vente.club/outils/retour-impot",
-                "applicationCategory": "FinanceApplication"
+                "applicationCategory": "FinanceApplication",
+                "description": "Estimez votre retour d'impôt Québec et fédéral avec REER, CELIAPP et tous les crédits"
               },
               {
                 "@type": "WebApplication",
-                "name": "Planificateur de Budget",
+                "name": "Planificateur de Budget Personnel",
                 "url": "https://vente.club/outils/budget",
-                "applicationCategory": "FinanceApplication"
+                "applicationCategory": "FinanceApplication",
+                "description": "Gérez votre budget, suivez vos dépenses et atteignez vos objectifs d'épargne"
               }
             ],
-            "publisher": {
-              "@type": "Organization",
-              "name": "Vente.Club"
-            }
+            "publisher": { "@type": "Organization", "name": "Vente.Club", "url": "https://vente.club" }
+          })}
+        </script>
+        
+        {/* Structured Data - FAQ */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "Les calculateurs financiers sont-ils vraiment gratuits?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Oui, absolument! Tous nos outils financiers sont 100% gratuits et sans frais cachés. Le calculateur de salaire et le calculateur de retour d'impôt ne nécessitent même pas d'inscription. Seul le planificateur de budget nécessite un compte gratuit pour sauvegarder vos données."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Les taux d'imposition sont-ils à jour pour 2025?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Oui, tous nos calculateurs utilisent les taux d'imposition fédéraux et provinciaux de 2025, ainsi que les taux de cotisation au RRQ (5.95%), RQAP (0.494%) et assurance-emploi (1.27% au Québec). Nous mettons à jour nos outils chaque année dès l'annonce des nouveaux taux."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Comment calculer mon salaire net au Québec?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Utilisez notre calculateur de salaire net gratuit. Entrez votre salaire brut, choisissez la période (annuel, mensuel, horaire) et obtenez instantanément votre paie nette après déduction de l'impôt fédéral, impôt provincial du Québec, RRQ, assurance-emploi et RQAP."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Comment estimer mon retour d'impôt?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Notre calculateur de retour d'impôt vous permet d'estimer votre remboursement Québec et fédéral séparément. Entrez vos cotisations REER, CELIAPP, dons de charité, frais médicaux et autres déductions pour voir votre économie d'impôt totale avec les taux 2025."
+                }
+              }
+            ]
           })}
         </script>
       </Helmet>

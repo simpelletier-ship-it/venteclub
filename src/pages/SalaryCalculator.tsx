@@ -264,45 +264,70 @@ const SalaryCalculator = () => {
     ...(province === "QC" ? [{ name: "RQAP", value: results.qpipContribution, color: "#ec4899" }] : []),
   ].filter(item => item.value > 0);
 
+  // FAQ data pour SEO
+  const salaryFAQs = [
+    {
+      question: "Comment calculer mon salaire net au Québec en 2025?",
+      answer: "Pour calculer votre salaire net au Québec, soustrayez de votre salaire brut: l'impôt fédéral (15% à 33%), l'impôt provincial du Québec (14% à 25.75%), les cotisations RRQ (5.95%), l'assurance-emploi (1.27%), et le RQAP (0.494%). Notre calculateur applique automatiquement tous ces taux 2025."
+    },
+    {
+      question: "Quelle est la différence entre le salaire brut et le salaire net?",
+      answer: "Le salaire brut est votre rémunération totale avant toute déduction. Le salaire net est ce que vous recevez réellement après déduction des impôts fédéral et provincial, des cotisations RRQ, de l'assurance-emploi et du RQAP au Québec."
+    },
+    {
+      question: "Comment convertir un salaire horaire en salaire annuel?",
+      answer: "Pour convertir un salaire horaire en annuel: multipliez votre taux horaire par vos heures hebdomadaires, puis par 52 semaines. Exemple: 25$/h × 40h × 52 = 52 000$/an. Notre calculateur fait cette conversion automatiquement."
+    },
+    {
+      question: "Pourquoi le taux d'assurance-emploi est-il différent au Québec?",
+      answer: "Le Québec a son propre régime d'assurance parentale (RQAP) offrant de meilleures prestations de maternité et paternité. En échange, les travailleurs québécois paient une cotisation RQAP (0.494%), mais bénéficient d'un taux réduit d'assurance-emploi (1.27% vs 1.58% ailleurs au Canada)."
+    },
+    {
+      question: "Qu'est-ce que le taux marginal d'imposition?",
+      answer: "Le taux marginal est le pourcentage d'impôt payé sur votre dernier dollar gagné. Au Québec, il peut atteindre 53.31% (25.75% provincial + 33% fédéral) pour les revenus dépassant 246 752$. Votre taux effectif (impôt total / revenu) est généralement beaucoup plus bas."
+    },
+    {
+      question: "Les cotisations RRQ sont-elles les mêmes que le RPC?",
+      answer: "Le Régime de rentes du Québec (RRQ) est l'équivalent québécois du Régime de pensions du Canada (RPC). Les deux ont le même taux de cotisation en 2025 (5.95%), mais le RRQ est administré par Retraite Québec plutôt que par le gouvernement fédéral."
+    }
+  ];
+
   return (
     <>
       <Helmet>
-        <title>Calculateur de Salaire Net Québec 2025 - Gratuit et Précis | Impôt, RRQ, AE</title>
-        <meta name="description" content="Calculateur de salaire net gratuit pour le Québec 2025. Calcul instantané de votre paie après impôts fédéral et provincial, RRQ, assurance-emploi et RQAP. Conversion automatique annuel, mensuel, bihebdomadaire, hebdomadaire et horaire." />
-        <meta name="keywords" content="calculateur salaire net québec, calcul paie après impôt, salaire brut net québec, impôt québec 2025, calculateur impôt revenu, paie nette québec, calculateur paie, salaire horaire annuel, RRQ AE RQAP" />
+        <title>Calculateur de Salaire Net Québec 2025 - Gratuit et Précis | Impôt, RRQ, AE, RQAP</title>
+        <meta name="description" content="Calculateur de salaire net gratuit pour le Québec 2025. Calcul instantané de votre paie après impôts fédéral et provincial, RRQ, assurance-emploi et RQAP. Conversion automatique annuel, mensuel, bihebdomadaire, hebdomadaire et horaire. Taux d'imposition 2025 à jour." />
+        <meta name="keywords" content="calculateur salaire net québec, calcul paie après impôt, salaire brut net québec, impôt québec 2025, calculateur impôt revenu, paie nette québec, calculateur paie gratuit, salaire horaire annuel, RRQ RPC AE RQAP, conversion salaire, taux imposition québec" />
         <link rel="canonical" href="https://vente.club/outils/salaire" />
         
         {/* Open Graph / Facebook */}
         <meta property="og:type" content="website" />
-        <meta property="og:title" content="Calculateur de Salaire Net Québec 2025 - Gratuit" />
-        <meta property="og:description" content="Calculez instantanément votre salaire net après impôts au Québec avec les taux 2025. Conversion automatique entre toutes les périodes de paie." />
+        <meta property="og:title" content="Calculateur de Salaire Net Québec 2025 - Gratuit et Précis" />
+        <meta property="og:description" content="Calculez instantanément votre salaire net après impôts au Québec avec les taux 2025. Conversion automatique entre toutes les périodes de paie. Inclut RRQ, AE, RQAP." />
         <meta property="og:url" content="https://vente.club/outils/salaire" />
+        <meta property="og:site_name" content="Vente.Club" />
+        <meta property="og:locale" content="fr_CA" />
         
-        {/* Schema.org markup for Google */}
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Calculateur de Salaire Net Québec 2025" />
+        <meta name="twitter:description" content="Calcul gratuit de votre paie nette après impôts, RRQ, AE et RQAP. Taux 2025 à jour." />
+        
+        {/* Additional SEO */}
+        <meta name="robots" content="index, follow, max-image-preview:large" />
+        <meta name="author" content="Vente.Club" />
+        <meta name="geo.region" content="CA-QC" />
+        <meta name="geo.placename" content="Québec" />
+        
         {/* Breadcrumb Schema */}
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "BreadcrumbList",
             "itemListElement": [
-              {
-                "@type": "ListItem",
-                "position": 1,
-                "name": "Accueil",
-                "item": "https://vente.club"
-              },
-              {
-                "@type": "ListItem",
-                "position": 2,
-                "name": "Outils Financiers",
-                "item": "https://vente.club/outils"
-              },
-              {
-                "@type": "ListItem",
-                "position": 3,
-                "name": "Calculateur de Salaire Net",
-                "item": "https://vente.club/outils/salaire"
-              }
+              { "@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://vente.club" },
+              { "@type": "ListItem", "position": 2, "name": "Outils Financiers", "item": "https://vente.club/outils" },
+              { "@type": "ListItem", "position": 3, "name": "Calculateur de Salaire Net", "item": "https://vente.club/outils/salaire" }
             ]
           })}
         </script>
@@ -312,23 +337,30 @@ const SalaryCalculator = () => {
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "WebApplication",
-            "name": "Calculateur de Salaire Net Québec",
-            "description": "Calculateur gratuit de salaire net après impôts pour le Québec avec les taux d'imposition 2025",
+            "name": "Calculateur de Salaire Net Québec 2025",
+            "description": "Calculateur gratuit de salaire net après impôts pour le Québec avec les taux d'imposition 2025. Inclut impôt fédéral, provincial, RRQ, AE et RQAP.",
             "url": "https://vente.club/outils/salaire",
             "applicationCategory": "FinanceApplication",
             "operatingSystem": "Any",
-            "offers": {
-              "@type": "Offer",
-              "price": "0",
-              "priceCurrency": "CAD"
-            },
-            "featureList": [
-              "Calcul impôt fédéral et provincial",
-              "RRQ (Régime de rentes du Québec)",
-              "Assurance-emploi",
-              "RQAP (Régime québécois d'assurance parentale)",
-              "Conversion entre périodes de paie"
-            ]
+            "browserRequirements": "Requires JavaScript",
+            "inLanguage": "fr-CA",
+            "isAccessibleForFree": true,
+            "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CAD" },
+            "featureList": ["Calcul impôt fédéral et provincial", "RRQ (Régime de rentes du Québec)", "Assurance-emploi (AE)", "RQAP (Régime québécois d'assurance parentale)", "Conversion entre périodes de paie", "Taux 2025 à jour"],
+            "provider": { "@type": "Organization", "name": "Vente.Club", "url": "https://vente.club" }
+          })}
+        </script>
+        
+        {/* FAQ Schema */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": salaryFAQs.map(faq => ({
+              "@type": "Question",
+              "name": faq.question,
+              "acceptedAnswer": { "@type": "Answer", "text": faq.answer }
+            }))
           })}
         </script>
       </Helmet>

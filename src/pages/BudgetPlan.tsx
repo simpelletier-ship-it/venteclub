@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet";
 import { SEO } from "@/components/SEO";
 import { BreadcrumbSchema } from "@/components/BreadcrumbSchema";
 import { Loader2, Target, Settings2, Info, X, BookOpen, CheckCircle2 } from "lucide-react";
@@ -63,18 +64,35 @@ const BudgetPlan = () => {
         <CreateDefaultCategories />
         <BudgetOnboarding />
         <SEO
-          title="Mon Budget | Planifier mes dépenses"
-          description="Créez votre budget personnel. Définissez combien vous voulez dépenser par catégorie chaque mois."
-          keywords="budget personnel, planification budget, gestion finances"
+          title="Mon Budget Personnel | Planificateur de Dépenses Gratuit Québec 2025"
+          description="Créez votre budget personnel avec notre planificateur gratuit. Définissez combien dépenser par catégorie, suivez vos revenus et dépenses, recevez des conseils personnalisés. Interface intuitive avec règle 50/30/20."
+          keywords="budget personnel gratuit, planificateur budget, gestion dépenses, catégories budget, épargne mensuelle, règle 50-30-20, suivi finances"
           canonical="/budget/planifier"
           type="website"
         />
         <BreadcrumbSchema
           items={[
+            { name: "Outils Financiers", url: "/outils" },
             { name: "Budget", url: "/budget" },
             { name: "Mon budget", url: "/budget/planifier" }
           ]}
         />
+        
+        <Helmet>
+          <script type="application/ld+json">
+            {JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebApplication",
+              "name": "Planificateur de Budget par Catégorie",
+              "description": "Définissez votre budget mensuel par catégorie de dépenses et revenus. Glissez-déposez pour réorganiser vos priorités.",
+              "url": "https://vente.club/budget/planifier",
+              "applicationCategory": "FinanceApplication",
+              "inLanguage": "fr-CA",
+              "isAccessibleForFree": true,
+              "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CAD" }
+            })}
+          </script>
+        </Helmet>
 
         <div className="min-h-screen bg-background">
           <div className="container mx-auto px-4 md:px-6 py-4 md:py-6">

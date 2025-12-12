@@ -147,18 +147,60 @@ const TaxReturnCalculator = () => {
 
   const results = calculateTaxReturn();
 
+  // FAQ data pour SEO
+  const taxFAQs = [
+    {
+      question: "Comment calculer mon retour d'impôt au Québec 2025?",
+      answer: "Votre retour d'impôt dépend de vos cotisations REER, CELIAPP, dons de charité, frais médicaux et autres déductions. Utilisez notre calculateur gratuit pour estimer votre remboursement provincial (Québec) et fédéral séparément avec les taux 2025."
+    },
+    {
+      question: "Quelle est la différence entre le retour d'impôt du Québec et du fédéral?",
+      answer: "Au Canada, vous produisez deux déclarations: une au Québec (Revenu Québec) et une au fédéral (ARC). Chaque palier a ses propres taux et crédits. Le Québec offre des crédits uniques comme le RQAP et certains crédits non disponibles au fédéral."
+    },
+    {
+      question: "Combien puis-je économiser avec un REER?",
+      answer: "L'économie d'impôt REER dépend de votre taux marginal. Au Québec, avec un taux combiné de 37.12% (revenu de 51 780$ à 55 867$), une cotisation de 5 000$ génère environ 1 856$ d'économie. Plus votre revenu est élevé, plus l'économie est importante."
+    },
+    {
+      question: "C'est quoi le CELIAPP et combien puis-je économiser?",
+      answer: "Le CELIAPP (Compte d'épargne libre d'impôt pour l'achat d'une première propriété) permet de cotiser jusqu'à 8 000$/an (max 40 000$ à vie). Vous obtenez une déduction fiscale immédiate ET les retraits pour l'achat d'une maison sont non imposables."
+    },
+    {
+      question: "Quand vais-je recevoir mon remboursement d'impôt?",
+      answer: "Si vous produisez électroniquement avec dépôt direct, Revenu Québec traite généralement en 2 semaines et l'ARC en 8 à 10 jours ouvrables. Les déclarations papier prennent 4 à 8 semaines."
+    },
+    {
+      question: "Le crédit REER FTQ vaut-il la peine?",
+      answer: "Oui! Le REER FTQ/Fondaction offre un crédit d'impôt additionnel de 30% (15% Québec + 15% fédéral) en plus de la déduction REER régulière. Sur 5 000$ (maximum annuel), vous recevez 1 500$ en crédits supplémentaires."
+    }
+  ];
+
   return (
     <>
       <Helmet>
-        <title>Calculateur de Retour d'Impôt Québec et Fédéral 2025 | Gratuit</title>
-        <meta name="description" content="Calculez votre retour d'impôt provincial (Québec) et fédéral 2025 avec REER, CELIAPP, dons de charité, frais médicaux et garde d'enfants. Outil gratuit avec taux à jour." />
-        <meta name="keywords" content="calculateur retour impôt québec, remboursement impôt 2025, REER économie impôt, CELIAPP déduction fiscale, calculer retour impôt fédéral, dons charité crédit impôt" />
+        <title>Calculateur de Retour d'Impôt Québec et Fédéral 2025 | REER CELIAPP | Gratuit</title>
+        <meta name="description" content="Calculateur gratuit de retour d'impôt Québec et fédéral 2025. Estimez votre remboursement avec REER, CELIAPP, dons de charité, frais médicaux, garde d'enfants, REER FTQ et frais de scolarité. Résultats instantanés et précis." />
+        <meta name="keywords" content="calculateur retour impôt québec, remboursement impôt 2025, REER économie impôt, CELIAPP déduction fiscale, calculer retour impôt fédéral, dons charité crédit impôt, REER FTQ Fondaction, frais scolarité crédit, estimation impôt québec" />
+        <link rel="canonical" href="https://vente.club/outils/retour-impot" />
         
         {/* Open Graph */}
         <meta property="og:title" content="Calculateur de Retour d'Impôt Québec et Fédéral 2025" />
-        <meta property="og:description" content="Estimez votre retour d'impôt provincial et fédéral 2025 avec toutes vos déductions fiscales. Outil gratuit et précis." />
+        <meta property="og:description" content="Estimez votre retour d'impôt provincial et fédéral 2025 avec REER, CELIAPP, dons, frais médicaux. Outil gratuit avec taux à jour." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://vente.club/outils/retour-impot" />
+        <meta property="og:site_name" content="Vente.Club" />
+        <meta property="og:locale" content="fr_CA" />
+        
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Calculateur de Retour d'Impôt Québec 2025" />
+        <meta name="twitter:description" content="Calculez votre remboursement d'impôt avec REER, CELIAPP et tous les crédits populaires. Gratuit!" />
+        
+        {/* Additional SEO */}
+        <meta name="robots" content="index, follow, max-image-preview:large" />
+        <meta name="author" content="Vente.Club" />
+        <meta name="geo.region" content="CA-QC" />
+        <meta name="geo.placename" content="Québec" />
         
         {/* Breadcrumb Schema */}
         <script type="application/ld+json">
@@ -166,24 +208,9 @@ const TaxReturnCalculator = () => {
             "@context": "https://schema.org",
             "@type": "BreadcrumbList",
             "itemListElement": [
-              {
-                "@type": "ListItem",
-                "position": 1,
-                "name": "Accueil",
-                "item": "https://vente.club"
-              },
-              {
-                "@type": "ListItem",
-                "position": 2,
-                "name": "Outils Financiers",
-                "item": "https://vente.club/outils"
-              },
-              {
-                "@type": "ListItem",
-                "position": 3,
-                "name": "Calculateur de Retour d'Impôt",
-                "item": "https://vente.club/outils/retour-impot"
-              }
+              { "@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://vente.club" },
+              { "@type": "ListItem", "position": 2, "name": "Outils Financiers", "item": "https://vente.club/outils" },
+              { "@type": "ListItem", "position": 3, "name": "Calculateur de Retour d'Impôt", "item": "https://vente.club/outils/retour-impot" }
             ]
           })}
         </script>
@@ -194,20 +221,29 @@ const TaxReturnCalculator = () => {
             "@context": "https://schema.org",
             "@type": "WebApplication",
             "name": "Calculateur de Retour d'Impôt Québec 2025",
-            "description": "Calculateur gratuit pour estimer votre retour d'impôt provincial (Québec) et fédéral avec REER, CELIAPP, dons de charité et autres déductions fiscales.",
+            "description": "Calculateur gratuit pour estimer votre retour d'impôt provincial (Québec) et fédéral avec REER, CELIAPP, dons de charité, frais médicaux et autres déductions fiscales.",
             "url": "https://vente.club/outils/retour-impot",
             "applicationCategory": "FinanceApplication",
             "operatingSystem": "Any",
-            "offers": {
-              "@type": "Offer",
-              "price": "0",
-              "priceCurrency": "CAD"
-            },
-            "provider": {
-              "@type": "Organization",
-              "name": "Vente.Club",
-              "url": "https://vente.club"
-            }
+            "browserRequirements": "Requires JavaScript",
+            "inLanguage": "fr-CA",
+            "isAccessibleForFree": true,
+            "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CAD" },
+            "featureList": ["Calcul retour Québec et Fédéral séparés", "REER et CELIAPP", "Dons de charité", "Frais médicaux", "Garde d'enfants", "REER FTQ/Fondaction", "Frais de scolarité", "Crédit achat première maison"],
+            "provider": { "@type": "Organization", "name": "Vente.Club", "url": "https://vente.club" }
+          })}
+        </script>
+        
+        {/* FAQ Schema */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": taxFAQs.map(faq => ({
+              "@type": "Question",
+              "name": faq.question,
+              "acceptedAnswer": { "@type": "Answer", "text": faq.answer }
+            }))
           })}
         </script>
       </Helmet>
