@@ -2251,10 +2251,7 @@ export type Database = {
           province: string
           region: string
           sale_type: string
-          seller_email: string
           seller_id: string
-          seller_name: string
-          seller_phone: string
           slug: string
           sold_at: string
           status: string
