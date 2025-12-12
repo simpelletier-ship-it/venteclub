@@ -66,6 +66,15 @@ const CREDIT_RECOMMENDATIONS: Record<string, CreditRecommendation[]> = {
       icon: Heart,
       category: "Famille",
       eligibility: ["Résider au Québec", "Enfant à charge"]
+    },
+    {
+      id: "fournitures",
+      name: "Crédit fournitures scolaires",
+      description: "Déduction pour le matériel scolaire des enfants",
+      estimatedValue: "Jusqu'à 100$/enfant",
+      icon: BookOpen,
+      category: "Famille",
+      eligibility: ["Enfant en âge scolaire", "Factures d'achat"]
     }
   ],
   immobilier: [
@@ -95,6 +104,24 @@ const CREDIT_RECOMMENDATIONS: Record<string, CreditRecommendation[]> = {
       icon: Leaf,
       category: "Immobilier",
       eligibility: ["Travaux admissibles", "Entrepreneur qualifié"]
+    },
+    {
+      id: "accessibilite",
+      name: "Crédit rénovation accessibilité domiciliaire",
+      description: "Modifications pour personnes âgées ou à mobilité réduite",
+      estimatedValue: "Jusqu'à 10 000$",
+      icon: Accessibility,
+      category: "Immobilier",
+      eligibility: ["Personne de 65+ ans ou handicapée", "Travaux admissibles"]
+    },
+    {
+      id: "taxes-foncieres",
+      name: "Remboursement de taxes foncières",
+      description: "Crédit pour propriétaires à faible revenu",
+      estimatedValue: "Variable selon revenu",
+      icon: Home,
+      category: "Immobilier",
+      eligibility: ["Revenu modeste", "Propriétaire occupant"]
     }
   ],
   emploi: [
@@ -124,6 +151,33 @@ const CREDIT_RECOMMENDATIONS: Record<string, CreditRecommendation[]> = {
       icon: DollarSign,
       category: "Emploi",
       eligibility: ["Maximum 5 000$ cotisation", "Fonds de travailleurs"]
+    },
+    {
+      id: "outils",
+      name: "Déduction pour outils de gens de métier",
+      description: "Achat d'outils requis pour votre emploi",
+      estimatedValue: "Jusqu'à 500$",
+      icon: Briefcase,
+      category: "Emploi",
+      eligibility: ["Travailleur qualifié", "Outils non remboursés"]
+    },
+    {
+      id: "deplacement",
+      name: "Frais de déplacement pour travail",
+      description: "Véhicule utilisé pour le travail (pas trajet domicile-bureau)",
+      estimatedValue: "Variable selon km",
+      icon: Car,
+      category: "Emploi",
+      eligibility: ["Véhicule requis pour travail", "Journal de bord"]
+    },
+    {
+      id: "syndicales",
+      name: "Cotisations syndicales et professionnelles",
+      description: "Cotisations obligatoires à un syndicat ou ordre professionnel",
+      estimatedValue: "100% déductible",
+      icon: Users,
+      category: "Emploi",
+      eligibility: ["Cotisations obligatoires", "Reçu officiel"]
     }
   ],
   etudes: [
@@ -144,6 +198,24 @@ const CREDIT_RECOMMENDATIONS: Record<string, CreditRecommendation[]> = {
       icon: BookOpen,
       category: "Études",
       eligibility: ["Prêts AFE/gouvernementaux", "Intérêts de l'année"]
+    },
+    {
+      id: "manuels",
+      name: "Crédit pour manuels et fournitures",
+      description: "Matériel scolaire pour études postsecondaires",
+      estimatedValue: "Variable",
+      icon: BookOpen,
+      category: "Études",
+      eligibility: ["Étudiant inscrit", "Reçus d'achat"]
+    },
+    {
+      id: "examen",
+      name: "Frais d'examen professionnel",
+      description: "Examens pour obtenir un titre professionnel",
+      estimatedValue: "15% fédéral",
+      icon: GraduationCap,
+      category: "Études",
+      eligibility: ["Examen reconnu", "Reçu officiel"]
     }
   ],
   sante: [
@@ -173,6 +245,24 @@ const CREDIT_RECOMMENDATIONS: Record<string, CreditRecommendation[]> = {
       icon: Accessibility,
       category: "Santé",
       eligibility: ["Formulaire T2201", "Certification médicale"]
+    },
+    {
+      id: "reei",
+      name: "Régime enregistré d'épargne-invalidité (REEI)",
+      description: "Épargne bonifiée par le gouvernement pour personnes handicapées",
+      estimatedValue: "Subventions + Bons",
+      icon: Accessibility,
+      category: "Santé",
+      eligibility: ["Crédit handicap approuvé", "Moins de 60 ans"]
+    },
+    {
+      id: "maintien-domicile",
+      name: "Crédit maintien à domicile (65+)",
+      description: "Services de maintien à domicile pour aînés",
+      estimatedValue: "Jusqu'à 35% des frais",
+      icon: Home,
+      category: "Santé",
+      eligibility: ["70 ans et plus", "Services admissibles"]
     }
   ],
   autre: [
@@ -193,6 +283,51 @@ const CREDIT_RECOMMENDATIONS: Record<string, CreditRecommendation[]> = {
       icon: DollarSign,
       category: "Épargne",
       eligibility: ["Maximum 18% du revenu", "Droits inutilisés reportables"]
+    },
+    {
+      id: "celi",
+      name: "CELI - Compte d'épargne libre d'impôt",
+      description: "Revenus de placement à l'abri de l'impôt",
+      estimatedValue: "Croissance non imposée",
+      icon: DollarSign,
+      category: "Épargne",
+      eligibility: ["Droits de cotisation", "7 000$/an en 2025"]
+    },
+    {
+      id: "solidarite",
+      name: "Crédit d'impôt pour solidarité (QC)",
+      description: "Aide pour les frais de logement, TVQ et villages nordiques",
+      estimatedValue: "Jusqu'à 1 400$/an",
+      icon: Heart,
+      category: "Autre",
+      eligibility: ["Revenu modeste", "Inscription Revenu Québec"]
+    },
+    {
+      id: "travailleurs",
+      name: "Crédit d'impôt pour travailleurs",
+      description: "Crédit pour les travailleurs à faible ou moyen revenu",
+      estimatedValue: "Jusqu'à 1 200$",
+      icon: Briefcase,
+      category: "Autre",
+      eligibility: ["Revenu de travail", "Automatique"]
+    },
+    {
+      id: "pompiers",
+      name: "Crédit pour pompiers volontaires/secouristes",
+      description: "Volontaires ayant fait au moins 200h de service",
+      estimatedValue: "3 000$",
+      icon: Users,
+      category: "Autre",
+      eligibility: ["200+ heures de service", "Attestation"]
+    },
+    {
+      id: "politique",
+      name: "Contribution politique",
+      description: "Dons à des partis politiques provinciaux ou fédéraux",
+      estimatedValue: "Jusqu'à 75%",
+      icon: Gift,
+      category: "Autre",
+      eligibility: ["Reçu officiel", "Parti enregistré"]
     }
   ]
 };
@@ -205,7 +340,8 @@ const QUESTIONS = [
     subQuestions: [
       "Payez-vous des frais de garderie ou camp de jour?",
       "Vos enfants participent-ils à des activités sportives ou culturelles?",
-      "Recevez-vous l'allocation famille Québec?"
+      "Recevez-vous l'allocation famille Québec?",
+      "Avez-vous acheté des fournitures scolaires?"
     ]
   },
   {
@@ -215,7 +351,9 @@ const QUESTIONS = [
     subQuestions: [
       "Avez-vous acheté votre première maison cette année?",
       "Cotisez-vous au CELIAPP?",
-      "Avez-vous fait des rénovations écoénergétiques?"
+      "Avez-vous fait des rénovations écoénergétiques?",
+      "Avez-vous fait des rénovations pour l'accessibilité?",
+      "Êtes-vous propriétaire à faible revenu?"
     ]
   },
   {
@@ -225,7 +363,10 @@ const QUESTIONS = [
     subQuestions: [
       "Travaillez-vous de la maison (télétravail)?",
       "Utilisez-vous le transport en commun pour le travail?",
-      "Cotisez-vous au Fonds FTQ ou Fondaction?"
+      "Cotisez-vous au Fonds FTQ ou Fondaction?",
+      "Avez-vous acheté des outils pour votre métier?",
+      "Utilisez-vous votre véhicule pour le travail?",
+      "Payez-vous des cotisations syndicales ou professionnelles?"
     ]
   },
   {
@@ -234,7 +375,9 @@ const QUESTIONS = [
     icon: GraduationCap,
     subQuestions: [
       "Payez-vous des frais de scolarité?",
-      "Avez-vous des prêts étudiants avec intérêts?"
+      "Avez-vous des prêts étudiants avec intérêts?",
+      "Avez-vous acheté des manuels ou fournitures?",
+      "Avez-vous passé un examen professionnel?"
     ]
   },
   {
@@ -244,7 +387,9 @@ const QUESTIONS = [
     subQuestions: [
       "Avez-vous des frais médicaux importants non remboursés?",
       "Êtes-vous proche aidant d'une personne?",
-      "Vous ou un proche avez-vous une déficience reconnue?"
+      "Vous ou un proche avez-vous une déficience reconnue?",
+      "Cotisez-vous à un REEI?",
+      "Avez-vous 70+ ans et utilisez des services de maintien à domicile?"
     ]
   },
   {
@@ -253,7 +398,12 @@ const QUESTIONS = [
     icon: Gift,
     subQuestions: [
       "Faites-vous des dons à des organismes de charité?",
-      "Cotisez-vous à un REER?"
+      "Cotisez-vous à un REER?",
+      "Cotisez-vous à un CELI?",
+      "Êtes-vous éligible au crédit pour solidarité?",
+      "Avez-vous un revenu de travail modeste?",
+      "Êtes-vous pompier volontaire ou secouriste?",
+      "Avez-vous fait des dons à un parti politique?"
     ]
   }
 ];

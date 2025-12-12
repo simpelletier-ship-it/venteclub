@@ -14,7 +14,7 @@ import { SavingsChallenges } from "@/components/budget/SavingsChallenges";
 import { CashFlowForecast } from "@/components/budget/CashFlowForecast";
 import { SpendingLimitsAlerts } from "@/components/budget/SpendingLimitsAlerts";
 import { InvestmentTracker } from "@/components/budget/InvestmentTracker";
-import { FinancialProductComparison } from "@/components/budget/FinancialProductComparison";
+
 import { SmartInsights } from "@/components/budget/SmartInsights";
 import { SubscriptionDetector } from "@/components/budget/SubscriptionDetector";
 import { InterestAnalyzer } from "@/components/budget/InterestAnalyzer";
@@ -171,7 +171,6 @@ const BudgetAnalytics = () => {
 
                 <TabsContent value="debts" className="mt-0 space-y-6">
                   <DebtPayoffPlanner />
-                  <FinancialProductComparison />
                 </TabsContent>
 
                 <TabsContent value="interests" className="mt-0">
