@@ -133,7 +133,9 @@ export const SimpleNetWorthTracker = ({ currentNetWorth, isAuthenticated }: Simp
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user-assets'] });
+      queryClient.invalidateQueries({ queryKey: ['user-debts'] });
       queryClient.invalidateQueries({ queryKey: ['net-worth-history'] });
+      queryClient.invalidateQueries({ queryKey: ['asset-history'] });
       toast.success("Solde mis à jour");
       setEditingId(null);
       setEditValue("");
@@ -166,7 +168,9 @@ export const SimpleNetWorthTracker = ({ currentNetWorth, isAuthenticated }: Simp
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user-debts'] });
+      queryClient.invalidateQueries({ queryKey: ['user-assets'] });
       queryClient.invalidateQueries({ queryKey: ['net-worth-history'] });
+      queryClient.invalidateQueries({ queryKey: ['debt-history'] });
       toast.success("Solde mis à jour");
       setEditingId(null);
       setEditValue("");
@@ -191,6 +195,8 @@ export const SimpleNetWorthTracker = ({ currentNetWorth, isAuthenticated }: Simp
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user-assets'] });
+      queryClient.invalidateQueries({ queryKey: ['user-debts'] });
+      queryClient.invalidateQueries({ queryKey: ['net-worth-history'] });
       confetti({ particleCount: 30, spread: 50, origin: { y: 0.7 } });
       toast.success("Compte ajouté");
       setShowAddAsset(false);
@@ -217,6 +223,8 @@ export const SimpleNetWorthTracker = ({ currentNetWorth, isAuthenticated }: Simp
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user-debts'] });
+      queryClient.invalidateQueries({ queryKey: ['user-assets'] });
+      queryClient.invalidateQueries({ queryKey: ['net-worth-history'] });
       toast.success("Dette ajoutée");
       setShowAddDebt(false);
       setNewName("");
@@ -232,6 +240,8 @@ export const SimpleNetWorthTracker = ({ currentNetWorth, isAuthenticated }: Simp
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user-assets'] });
+      queryClient.invalidateQueries({ queryKey: ['user-debts'] });
+      queryClient.invalidateQueries({ queryKey: ['net-worth-history'] });
       toast.success("Supprimé");
     },
   });
@@ -243,6 +253,8 @@ export const SimpleNetWorthTracker = ({ currentNetWorth, isAuthenticated }: Simp
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user-debts'] });
+      queryClient.invalidateQueries({ queryKey: ['user-assets'] });
+      queryClient.invalidateQueries({ queryKey: ['net-worth-history'] });
       toast.success("Supprimé");
     },
   });
@@ -323,9 +335,9 @@ export const SimpleNetWorthTracker = ({ currentNetWorth, isAuthenticated }: Simp
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div className="flex items-center justify-center gap-1 mt-1">
-                    <Percent className="w-3 h-3 text-orange-500" />
+                    <CreditCard className="w-3 h-3 text-orange-500" />
                     <span className="text-xs text-orange-500 font-medium">
-                      {formatPrice(totalMonthlyInterest)}/mois
+                      {formatPrice(totalMonthlyInterest)}/mois intérêts
                     </span>
                   </div>
                 </TooltipTrigger>
