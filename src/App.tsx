@@ -44,6 +44,8 @@ const Tools = lazy(() => import("./pages/Tools"));
 const SalaryCalculator = lazy(() => import("./pages/SalaryCalculator"));
 const TaxReturnCalculator = lazy(() => import("./pages/TaxReturnCalculator"));
 const BudgetCalculator = lazy(() => import("./pages/BudgetCalculator"));
+const BudgetPlan = lazy(() => import("./pages/BudgetPlan"));
+const BudgetExpenses = lazy(() => import("./pages/BudgetExpenses"));
 const BudgetHistory = lazy(() => import("./pages/BudgetHistory"));
 const BudgetGoals = lazy(() => import("./pages/BudgetGoals"));
 const BudgetNetWorth = lazy(() => import("./pages/BudgetNetWorth"));
@@ -101,6 +103,8 @@ const App = () => (
                   
                   {/* Main Budget App - Unified Navigation */}
                   <Route path="/budget" element={<BudgetCalculator />} />
+                  <Route path="/budget/planifier" element={<BudgetPlan />} />
+                  <Route path="/budget/depenses" element={<BudgetExpenses />} />
                   <Route path="/budget/historique" element={<BudgetHistory />} />
                   <Route path="/budget/objectifs" element={<BudgetGoals />} />
                   <Route path="/budget/valeur-nette" element={<BudgetNetWorth />} />
