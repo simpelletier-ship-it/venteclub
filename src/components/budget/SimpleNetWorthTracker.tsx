@@ -2,14 +2,17 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { CurrencyInput } from "@/components/CurrencyInput";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Plus, Trash2, TrendingUp, TrendingDown, Wallet, CreditCard, Building, PiggyBank, Car, GraduationCap, RefreshCw } from "lucide-react";
+import { Plus, Trash2, TrendingUp, TrendingDown, Wallet, CreditCard, Building, PiggyBank, Car, GraduationCap, RefreshCw, Calendar } from "lucide-react";
 import { formatPrice } from "@/lib/priceFormat";
 import confetti from "canvas-confetti";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { format } from "date-fns";
+import { fr } from "date-fns/locale";
 
 interface SimpleNetWorthTrackerProps {
   currentNetWorth: number;
@@ -50,11 +53,13 @@ export const SimpleNetWorthTracker = ({ currentNetWorth, isAuthenticated }: Simp
   const queryClient = useQueryClient();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editValue, setEditValue] = useState("");
+  const [editDate, setEditDate] = useState<Date>(new Date());
   const [showAddAsset, setShowAddAsset] = useState(false);
   const [showAddDebt, setShowAddDebt] = useState(false);
   const [newName, setNewName] = useState("");
   const [newValue, setNewValue] = useState("");
   const [newType, setNewType] = useState("savings");
+  const [newDate, setNewDate] = useState<Date>(new Date());
 
   // Fetch assets
   const { data: assets = [], refetch: refetchAssets } = useQuery({
@@ -84,11 +89,13 @@ export const SimpleNetWorthTracker = ({ currentNetWorth, isAuthenticated }: Simp
     },
   });
 
-  // Quick update asset value
+  // Quick update asset value with date selection
   const updateAsset = useMutation({
-    mutationFn: async ({ id, value }: { id: string; value: number }) => {
+    mutationFn: async ({ id, value, date }: { id: string; value: number; date: Date }) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Non authentifié");
+
+      const recordedAt = date.toISOString().split('T')[0];
 
       const { error } = await supabase
         .from('user_assets')
@@ -97,12 +104,12 @@ export const SimpleNetWorthTracker = ({ currentNetWorth, isAuthenticated }: Simp
 
       if (error) throw error;
 
-      // Record history
+      // Record history with selected date
       await supabase.from('asset_history').insert({
         user_id: user.id,
         asset_id: id,
         value,
-        recorded_at: new Date().toISOString().split('T')[0],
+        recorded_at: recordedAt,
       });
     },
     onSuccess: () => {
@@ -111,14 +118,17 @@ export const SimpleNetWorthTracker = ({ currentNetWorth, isAuthenticated }: Simp
       toast.success("Solde mis à jour");
       setEditingId(null);
       setEditValue("");
+      setEditDate(new Date());
     },
   });
 
-  // Quick update debt balance
+  // Quick update debt balance with date selection
   const updateDebt = useMutation({
-    mutationFn: async ({ id, balance }: { id: string; balance: number }) => {
+    mutationFn: async ({ id, balance, date }: { id: string; balance: number; date: Date }) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Non authentifié");
+
+      const recordedAt = date.toISOString().split('T')[0];
 
       const { error } = await supabase
         .from('user_debts')
@@ -127,12 +137,12 @@ export const SimpleNetWorthTracker = ({ currentNetWorth, isAuthenticated }: Simp
 
       if (error) throw error;
 
-      // Record history
+      // Record history with selected date
       await supabase.from('debt_history').insert({
         user_id: user.id,
         debt_id: id,
         balance,
-        recorded_at: new Date().toISOString().split('T')[0],
+        recorded_at: recordedAt,
       });
     },
     onSuccess: () => {
@@ -141,6 +151,7 @@ export const SimpleNetWorthTracker = ({ currentNetWorth, isAuthenticated }: Simp
       toast.success("Solde mis à jour");
       setEditingId(null);
       setEditValue("");
+      setEditDate(new Date());
     },
   });
 
@@ -307,7 +318,7 @@ export const SimpleNetWorthTracker = ({ currentNetWorth, isAuthenticated }: Simp
                   <span className="text-sm flex-1 truncate">{asset.name}</span>
                   
                   {isEditing ? (
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1 flex-wrap">
                       <CurrencyInput
                         value={editValue}
                         onChange={setEditValue}
@@ -315,10 +326,26 @@ export const SimpleNetWorthTracker = ({ currentNetWorth, isAuthenticated }: Simp
                         allowDecimals
                         autoFocus
                       />
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button variant="outline" size="sm" className="h-7 px-2 text-xs">
+                            <Calendar className="w-3 h-3 mr-1" />
+                            {format(editDate, 'dd/MM', { locale: fr })}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="end">
+                          <CalendarComponent
+                            mode="single"
+                            selected={editDate}
+                            onSelect={(date) => date && setEditDate(date)}
+                            locale={fr}
+                          />
+                        </PopoverContent>
+                      </Popover>
                       <Button 
                         size="sm" 
                         className="h-7 px-2"
-                        onClick={() => updateAsset.mutate({ id: asset.id, value: parseFloat(editValue) || 0 })}
+                        onClick={() => updateAsset.mutate({ id: asset.id, value: parseFloat(editValue) || 0, date: editDate })}
                       >
                         ✓
                       </Button>
@@ -326,7 +353,7 @@ export const SimpleNetWorthTracker = ({ currentNetWorth, isAuthenticated }: Simp
                         variant="ghost" 
                         size="sm" 
                         className="h-7 px-2"
-                        onClick={() => { setEditingId(null); setEditValue(""); }}
+                        onClick={() => { setEditingId(null); setEditValue(""); setEditDate(new Date()); }}
                       >
                         ✕
                       </Button>
@@ -406,7 +433,7 @@ export const SimpleNetWorthTracker = ({ currentNetWorth, isAuthenticated }: Simp
                   <span className="text-sm flex-1 truncate">{debt.name}</span>
                   
                   {isEditing ? (
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1 flex-wrap">
                       <CurrencyInput
                         value={editValue}
                         onChange={setEditValue}
@@ -414,10 +441,26 @@ export const SimpleNetWorthTracker = ({ currentNetWorth, isAuthenticated }: Simp
                         allowDecimals
                         autoFocus
                       />
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button variant="outline" size="sm" className="h-7 px-2 text-xs">
+                            <Calendar className="w-3 h-3 mr-1" />
+                            {format(editDate, 'dd/MM', { locale: fr })}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="end">
+                          <CalendarComponent
+                            mode="single"
+                            selected={editDate}
+                            onSelect={(date) => date && setEditDate(date)}
+                            locale={fr}
+                          />
+                        </PopoverContent>
+                      </Popover>
                       <Button 
                         size="sm" 
                         className="h-7 px-2"
-                        onClick={() => updateDebt.mutate({ id: debt.id, balance: parseFloat(editValue) || 0 })}
+                        onClick={() => updateDebt.mutate({ id: debt.id, balance: parseFloat(editValue) || 0, date: editDate })}
                       >
                         ✓
                       </Button>
@@ -425,7 +468,7 @@ export const SimpleNetWorthTracker = ({ currentNetWorth, isAuthenticated }: Simp
                         variant="ghost" 
                         size="sm" 
                         className="h-7 px-2"
-                        onClick={() => { setEditingId(null); setEditValue(""); }}
+                        onClick={() => { setEditingId(null); setEditValue(""); setEditDate(new Date()); }}
                       >
                         ✕
                       </Button>

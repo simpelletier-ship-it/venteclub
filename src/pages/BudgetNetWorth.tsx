@@ -8,7 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { SimpleNetWorthTracker } from "@/components/budget/SimpleNetWorthTracker";
-import { Card, CardContent } from "@/components/ui/card";
+import { NetWorthGamification } from "@/components/budget/NetWorthGamification";
 
 const BudgetNetWorth = () => {
   const navigate = useNavigate();
@@ -73,13 +73,15 @@ const BudgetNetWorth = () => {
 
       <div className="min-h-screen bg-background pb-8">
         <div className="container mx-auto px-6 py-6">
-          <h1 className="text-xl font-semibold text-foreground mb-6">Ma valeur nette</h1>
+          <h1 className="text-xl font-semibold text-foreground mb-6">Mon patrimoine</h1>
           
-          <Card className="border-border">
-            <CardContent className="p-6">
-              <SimpleNetWorthTracker currentNetWorth={netWorth} isAuthenticated={isAuthenticated} />
-            </CardContent>
-          </Card>
+          {/* Graphique d'évolution de la valeur nette */}
+          <div className="mb-6">
+            <NetWorthGamification netWorth={netWorth} isAuthenticated={isAuthenticated} />
+          </div>
+
+          {/* Gestion des actifs et passifs */}
+          <SimpleNetWorthTracker currentNetWorth={netWorth} isAuthenticated={isAuthenticated} />
         </div>
       </div>
     </ErrorBoundary>

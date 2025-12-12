@@ -120,7 +120,7 @@ const Header = () => {
           {/* Logo - Institutional Style */}
           <div 
             className="flex items-center cursor-pointer" 
-            onClick={() => navigate("/budget")}
+            onClick={() => navigate("/")}
           >
             <span className="font-semibold text-foreground text-base tracking-tight">
               Budget<span className="text-primary font-semibold">.club</span>
@@ -196,16 +196,6 @@ const Header = () => {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <Button 
-              variant="ghost"
-              onClick={() => navigate("/blog")} 
-              className={cn(
-                "h-9 px-4 font-medium text-sm rounded-md text-muted-foreground hover:text-foreground hover:bg-muted",
-                isActive('/blog') && "bg-muted text-foreground"
-              )}
-            >
-              Ressources
-            </Button>
           </div>
 
           {/* Right Side Actions */}
@@ -383,18 +373,6 @@ const Header = () => {
               Retour d'impôt
             </button>
             
-            <button
-              onClick={() => {
-                navigate("/blog");
-                setMobileMenuOpen(false);
-              }}
-              className={cn(
-                "w-full text-left px-4 py-2.5 rounded-md transition-colors text-sm font-medium",
-                isActive('/blog') ? "bg-muted text-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"
-              )}
-            >
-              Ressources
-            </button>
             
             {isAdmin && (
               <button
