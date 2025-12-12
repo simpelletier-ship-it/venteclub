@@ -230,14 +230,7 @@ export const FinancialGoals = ({ isAuthenticated }: { isAuthenticated: boolean }
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h3 className="text-2xl font-bold flex items-center gap-2">
-            <Target className="h-6 w-6 text-primary" />
-            Mes Objectifs Financiers
-          </h3>
-          <p className="text-muted-foreground">Définissez et suivez vos objectifs d'épargne</p>
-        </div>
+      <div className="flex items-center justify-end">
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
             <Button>
