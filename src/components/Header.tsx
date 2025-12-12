@@ -308,9 +308,9 @@ const Header = () => {
           </div>
         </div>
 
-        {/* Mobile Menu - Clean Banking Style */}
+        {/* Mobile Menu - Optimized for touch */}
         {mobileMenuOpen && (
-          <div className="lg:hidden pb-4 space-y-0.5 border-t border-border pt-3">
+          <div className="lg:hidden pb-4 space-y-0.5 border-t border-border pt-3 max-h-[calc(100vh-4rem)] overflow-y-auto overscroll-contain">
             {/* Budget Section */}
             <div className="px-4 py-1.5">
               <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Budget</span>

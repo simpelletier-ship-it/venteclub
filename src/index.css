@@ -301,16 +301,113 @@
 }
 
 /* ============================================
-   MOBILE OPTIMIZATIONS
+   MOBILE OPTIMIZATIONS - ENHANCED
    ============================================ */
 
-@media (max-width: 1024px) {
+/* Safe area insets for notched devices */
+@supports (padding: env(safe-area-inset-bottom)) {
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top);
+  }
+}
+
+/* Smoother scrolling on iOS */
+html {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* Prevent horizontal overflow on mobile */
+body {
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Touch-friendly sizing */
+@media (max-width: 768px) {
+  button, a, input, select, textarea {
+    min-height: 44px;
+  }
+
+  .card-kpi {
+    padding: 0.875rem;
+  }
+
+  /* Improved touch targets */
+  button:not(.icon-btn), 
+  [role="button"]:not(.icon-btn) {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  /* Prevent text selection during scrolling */
+  .scrollable-area {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  /* Smoother card transitions */
+  .card, [class*="Card"] {
+    will-change: transform;
+    transform: translateZ(0);
+  }
+
+  /* Stack elements more efficiently */
+  .grid {
+    gap: 0.75rem !important;
+  }
+
+  /* Reduce padding on mobile containers */
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  /* Full-width inputs on mobile */
+  input, select, textarea {
+    width: 100%;
+    font-size: 16px; /* Prevents iOS zoom on focus */
+  }
+
+  /* Better modal sizing */
+  [role="dialog"] {
+    max-height: 90vh;
+    max-height: 90dvh;
+  }
+
+  /* Optimized bottom navigation spacing */
+  main, .main-content {
+    padding-bottom: calc(4rem + env(safe-area-inset-bottom, 1rem));
+  }
+}
+
+/* Tablet optimizations */
+@media (max-width: 1024px) and (min-width: 769px) {
   button, a, input, select, textarea {
     min-height: 44px;
   }
 
   .card-kpi {
     padding: 1rem;
+  }
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .border, [class*="border"] {
+    border-width: 2px;
   }
 }
 

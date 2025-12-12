@@ -81,10 +81,16 @@ export const MobileBottomNav = () => {
     <motion.nav
       initial={{ y: 100 }}
       animate={{ y: isVisible ? 0 : 100 }}
-      transition={{ type: "spring", stiffness: 300, damping: 30 }}
-      className="fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-xl border-t border-border px-4 py-3 md:hidden safe-area-bottom shadow-lg"
+      transition={{ type: "spring", stiffness: 400, damping: 35 }}
+      className="fixed bottom-0 left-0 right-0 z-50 bg-card/98 backdrop-blur-xl border-t border-border md:hidden shadow-lg"
+      style={{ 
+        paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))',
+        paddingTop: '0.5rem',
+        paddingLeft: 'max(0.5rem, env(safe-area-inset-left))',
+        paddingRight: 'max(0.5rem, env(safe-area-inset-right))'
+      }}
     >
-      <div className="flex items-center justify-around">
+      <div className="flex items-center justify-around max-w-md mx-auto">
         {navItems.map((item) => {
           const Icon = item.icon;
           const active = isActive(item.path);
@@ -93,23 +99,26 @@ export const MobileBottomNav = () => {
             <button
               key={item.path}
               onClick={() => navigate(item.path)}
-              className="relative flex flex-col items-center gap-1 min-w-[60px] py-1"
+              className="relative flex flex-col items-center justify-center gap-0.5 min-w-[56px] min-h-[48px] py-1 px-2 rounded-lg active:bg-muted/50 transition-colors touch-manipulation"
+              aria-label={item.label}
+              aria-current={active ? 'page' : undefined}
             >
-              <div className={`relative transition-all duration-300 ${active ? 'scale-110' : 'scale-100'}`}>
+              <div className={`relative transition-transform duration-200 ${active ? 'scale-105' : 'scale-100'}`}>
                 <Icon 
-                  className={`w-6 h-6 transition-colors ${
+                  className={`w-5 h-5 transition-colors ${
                     active ? 'text-primary' : 'text-muted-foreground'
                   }`} 
+                  strokeWidth={active ? 2.5 : 2}
                 />
                 {item.badge !== undefined && item.badge > 0 && (
                   <Badge 
-                    className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center bg-destructive text-white text-[10px] font-bold"
+                    className="absolute -top-1.5 -right-1.5 h-4 w-4 rounded-full p-0 flex items-center justify-center bg-destructive text-white text-[9px] font-bold border-2 border-card"
                   >
                     {item.badge > 9 ? '9+' : item.badge}
                   </Badge>
                 )}
               </div>
-              <span className={`text-[10px] font-medium transition-colors ${
+              <span className={`text-[10px] font-medium transition-colors leading-tight ${
                 active ? 'text-primary' : 'text-muted-foreground'
               }`}>
                 {item.label}
@@ -117,7 +126,7 @@ export const MobileBottomNav = () => {
               {active && (
                 <motion.div
                   layoutId="bottomNavIndicator"
-                  className="absolute -top-3 left-1/2 -translate-x-1/2 w-12 h-1 bg-primary rounded-full"
+                  className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-primary rounded-full"
                   transition={{ type: "spring", stiffness: 500, damping: 30 }}
                 />
               )}
