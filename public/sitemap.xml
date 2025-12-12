@@ -82,21 +82,42 @@
     <loc>https://vente.club/outils/salaire</loc>
     <changefreq>weekly</changefreq>
     <priority>0.98</priority>
-    <lastmod>2025-11-19</lastmod>
+    <lastmod>2025-12-12</lastmod>
   </url>
   
   <url>
     <loc>https://vente.club/outils/retour-impot</loc>
     <changefreq>weekly</changefreq>
     <priority>0.98</priority>
-    <lastmod>2025-11-19</lastmod>
+    <lastmod>2025-12-12</lastmod>
   </url>
   
   <url>
     <loc>https://vente.club/outils/budget</loc>
     <changefreq>daily</changefreq>
     <priority>0.98</priority>
-    <lastmod>2025-11-19</lastmod>
+    <lastmod>2025-12-12</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://vente.club/budget</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.95</priority>
+    <lastmod>2025-12-12</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://vente.club/budget/planifier</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.90</priority>
+    <lastmod>2025-12-12</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://vente.club/soutien</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.60</priority>
+    <lastmod>2025-12-12</lastmod>
   </url>
   
   <!-- Major Quebec Cities -->

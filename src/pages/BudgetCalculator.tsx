@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Helmet } from "react-helmet";
 import { useNavigate } from "react-router-dom";
 import { SEO } from "@/components/SEO";
 import { BreadcrumbSchema } from "@/components/BreadcrumbSchema";
@@ -179,15 +180,98 @@ const BudgetCalculator = () => {
         <CreateDefaultCategories />
         <BudgetOnboarding />
         <SEO
-          title="Tableau de bord | Budget"
-          description="Gérez votre budget personnel. Suivi des dépenses, objectifs d'épargne et analyses financières."
-          keywords="budget personnel, gestion finances, suivi dépenses, épargne"
+          title="Planificateur de Budget Gratuit Québec 2025 | Suivi Dépenses et Épargne"
+          description="Planificateur de budget personnel gratuit pour le Québec. Suivez vos dépenses en temps réel, gérez vos actifs et dettes, définissez des objectifs d'épargne, analysez vos habitudes financières avec score de santé financière et coaching IA personnalisé."
+          keywords="planificateur budget gratuit, gestion finances personnelles québec, suivi dépenses, application budget, objectifs épargne, valeur nette, gestion dettes, coach financier, budget mensuel, calcul budget"
           canonical="/budget"
           type="website"
         />
         <BreadcrumbSchema
-          items={[{ name: "Budget", url: "/budget" }]}
+          items={[
+            { name: "Outils Financiers", url: "/outils" },
+            { name: "Planificateur de Budget", url: "/budget" }
+          ]}
         />
+        
+        {/* WebApplication Schema for Budget */}
+        <Helmet>
+          <script type="application/ld+json">
+            {JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebApplication",
+              "name": "Planificateur de Budget Personnel Gratuit",
+              "description": "Application gratuite de gestion de budget personnel avec suivi des dépenses en temps réel, objectifs d'épargne, analyse de la valeur nette et coaching financier IA.",
+              "url": "https://vente.club/budget",
+              "applicationCategory": "FinanceApplication",
+              "operatingSystem": "Any",
+              "browserRequirements": "Requires JavaScript",
+              "inLanguage": "fr-CA",
+              "isAccessibleForFree": true,
+              "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CAD" },
+              "featureList": [
+                "Suivi des dépenses en temps réel",
+                "Gestion des revenus et dépenses par catégorie",
+                "Objectifs d'épargne avec progression visuelle",
+                "Calcul de la valeur nette (actifs - dettes)",
+                "Score de santé financière personnalisé",
+                "Conseils IA personnalisés",
+                "Graphiques d'évolution des finances",
+                "Mode hors-ligne avec synchronisation"
+              ],
+              "provider": { "@type": "Organization", "name": "Vente.Club", "url": "https://vente.club" }
+            })}
+          </script>
+          
+          {/* FAQ Schema for Budget */}
+          <script type="application/ld+json">
+            {JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              "mainEntity": [
+                {
+                  "@type": "Question",
+                  "name": "Comment créer un budget personnel efficace?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Pour créer un budget efficace: 1) Listez tous vos revenus mensuels, 2) Catégorisez vos dépenses (logement, alimentation, transport, etc.), 3) Appliquez la règle 50/30/20 (50% besoins, 30% envies, 20% épargne), 4) Suivez vos dépenses quotidiennement, 5) Révisez et ajustez chaque mois."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "C'est quoi la règle 50/30/20 pour le budget?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "La règle 50/30/20 recommande d'allouer 50% de vos revenus aux besoins essentiels (logement, épicerie, factures), 30% aux envies (loisirs, restaurants, shopping), et 20% à l'épargne et au remboursement des dettes. C'est une base solide pour un budget équilibré."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "Combien devrais-je épargner chaque mois?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "L'objectif recommandé est d'épargner au minimum 20% de vos revenus nets. Commencez par constituer un fonds d'urgence de 3-6 mois de dépenses, puis orientez votre épargne vers vos objectifs (retraite, maison, voyage)."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "Comment suivre mes dépenses efficacement?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Utilisez notre planificateur de budget pour enregistrer chaque dépense immédiatement. Catégorisez automatiquement vos achats, visualisez vos tendances avec des graphiques, et recevez des alertes quand vous approchez vos limites de budget par catégorie."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "Comment calculer ma valeur nette?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Valeur nette = Total des actifs - Total des dettes. Additionnez tous vos actifs (épargne, REER, CELI, propriété, placements) et soustrayez toutes vos dettes (hypothèque, prêt auto, cartes de crédit). Notre outil calcule et suit automatiquement votre valeur nette."
+                  }
+                }
+              ]
+            })}
+          </script>
+        </Helmet>
 
         <div className="min-h-screen bg-background">
           <div className="container mx-auto px-6 py-6">
