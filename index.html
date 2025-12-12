@@ -116,6 +116,49 @@
         'cookie_flags': 'SameSite=None;Secure'
       });
     </script>
+    <!-- Service Worker Cleanup - Force cache reset for all users -->
+    <script>
+      (function() {
+        var SW_VERSION = '20251212-v2';
+        var lastVersion = localStorage.getItem('sw-version');
+        
+        if (lastVersion !== SW_VERSION) {
+          console.log('[SW Cleanup] New version detected, clearing cache...');
+          
+          // Unregister all service workers
+          if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function(registrations) {
+              registrations.forEach(function(registration) {
+                registration.unregister().then(function() {
+                  console.log('[SW Cleanup] Service Worker unregistered');
+                });
+              });
+            });
+          }
+          
+          // Clear all caches
+          if ('caches' in window) {
+            caches.keys().then(function(names) {
+              names.forEach(function(name) {
+                caches.delete(name).then(function() {
+                  console.log('[SW Cleanup] Cache deleted:', name);
+                });
+              });
+            });
+          }
+          
+          // Mark as cleaned
+          localStorage.setItem('sw-version', SW_VERSION);
+          
+          // Force reload after cleanup (only once)
+          if (lastVersion !== null) {
+            setTimeout(function() {
+              window.location.reload(true);
+            }, 500);
+          }
+        }
+      })();
+    </script>
   </head>
 
   <body>
