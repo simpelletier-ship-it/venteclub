@@ -62,13 +62,22 @@ interface InlineBudgetInputProps {
   category: Category;
   budget: number;
   spent: number;
-  onSave: (categoryId: string, amount: number) => void;
+  onSave: (categoryId: string, amount: number, frequency: string) => void;
   onDelete: (categoryId: string) => void;
   hasBudget: boolean;
+  savedFrequency?: string;
 }
 
-const InlineBudgetInput = ({ category, budget, spent, onSave, onDelete, hasBudget }: InlineBudgetInputProps) => {
+const frequencyOptions = [
+  { value: 'monthly', label: '/mois', multiplier: 1 },
+  { value: 'biweekly', label: '/2 sem', multiplier: 2.17 },
+  { value: 'weekly', label: '/sem', multiplier: 4.33 },
+  { value: 'yearly', label: '/an', multiplier: 1/12 },
+];
+
+const InlineBudgetInput = ({ category, budget, spent, onSave, onDelete, hasBudget, savedFrequency = 'monthly' }: InlineBudgetInputProps) => {
   const [localValue, setLocalValue] = useState(budget > 0 ? budget.toString() : "");
+  const [frequency, setFrequency] = useState(savedFrequency);
   const [isFocused, setIsFocused] = useState(false);
   
   const percentage = budget > 0 ? (spent / budget) * 100 : 0;
@@ -77,7 +86,7 @@ const InlineBudgetInput = ({ category, budget, spent, onSave, onDelete, hasBudge
   const handleSave = () => {
     const amount = parseFloat(localValue.replace(/[^\d.]/g, ''));
     if (amount > 0) {
-      onSave(category.id, amount);
+      onSave(category.id, amount, frequency);
     }
     setIsFocused(false);
   };
@@ -88,19 +97,27 @@ const InlineBudgetInput = ({ category, budget, spent, onSave, onDelete, hasBudge
     }
   };
 
+  const handleFrequencyChange = (newFreq: string) => {
+    setFrequency(newFreq);
+    const amount = parseFloat(localValue.replace(/[^\d.]/g, ''));
+    if (amount > 0) {
+      onSave(category.id, amount, newFreq);
+    }
+  };
+
   return (
     <div className={cn(
-      "flex items-center gap-3 py-3 px-4 rounded-xl transition-all",
+      "flex items-center gap-2 sm:gap-3 py-3 px-3 sm:px-4 rounded-xl transition-all",
       "hover:bg-muted/40",
       isFocused && "bg-muted/50 ring-1 ring-primary/20"
     )}>
       <CategoryIcon icon={category.icon} color={category.color} size="md" />
       
       <div className="flex-1 min-w-0">
-        <p className="font-medium text-sm">{category.name}</p>
+        <p className="font-medium text-sm truncate">{category.name}</p>
         {hasBudget && (
           <div className="flex items-center gap-2 mt-1.5">
-            <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden max-w-[120px]">
+            <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden max-w-[100px]">
               <div 
                 className={cn(
                   "h-full transition-all rounded-full",
@@ -123,7 +140,7 @@ const InlineBudgetInput = ({ category, budget, spent, onSave, onDelete, hasBudge
         )}
       </div>
 
-      <div className="text-right mr-2">
+      <div className="text-right shrink-0 hidden sm:block">
         <p className={cn(
           "font-semibold text-sm tabular-nums",
           hasBudget && isOver && category.type === 'expense' && "text-red-500"
@@ -133,7 +150,7 @@ const InlineBudgetInput = ({ category, budget, spent, onSave, onDelete, hasBudge
         <p className="text-[11px] text-muted-foreground">dépensé</p>
       </div>
       
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1.5">
         <div className="relative">
           <input
             type="text"
@@ -148,20 +165,36 @@ const InlineBudgetInput = ({ category, budget, spent, onSave, onDelete, hasBudge
             onKeyDown={handleKeyDown}
             placeholder="0"
             className={cn(
-              "w-24 h-10 px-3 pr-6 text-right text-sm font-medium rounded-lg",
+              "w-20 sm:w-24 h-10 px-2 sm:px-3 pr-5 text-right text-sm font-medium rounded-lg",
               "bg-muted/50 border border-border/50",
               "focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50",
               "placeholder:text-muted-foreground/50 tabular-nums",
               "transition-all"
             )}
           />
-          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground pointer-events-none">$</span>
+          <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground pointer-events-none">$</span>
         </div>
+        
+        {/* Frequency selector */}
+        <select
+          value={frequency}
+          onChange={(e) => handleFrequencyChange(e.target.value)}
+          className={cn(
+            "h-10 px-1.5 sm:px-2 text-xs font-medium rounded-lg appearance-none cursor-pointer",
+            "bg-muted/50 border border-border/50",
+            "focus:outline-none focus:ring-2 focus:ring-primary/30",
+            "text-muted-foreground hover:text-foreground transition-colors"
+          )}
+        >
+          {frequencyOptions.map(opt => (
+            <option key={opt.value} value={opt.value}>{opt.label}</option>
+          ))}
+        </select>
         
         {hasBudget && (
           <button 
             onClick={() => onDelete(category.id)}
-            className="p-2 rounded-lg hover:bg-red-500/10 transition-colors"
+            className="p-2 rounded-lg hover:bg-red-500/10 transition-colors shrink-0"
           >
             <Trash2 className="h-4 w-4 text-muted-foreground hover:text-red-500" />
           </button>
@@ -338,8 +371,13 @@ export const BudgetPlanner = ({ isAuthenticated }: { isAuthenticated: boolean })
     setFrequency(goals.find(g => g.category_id === category.id)?.frequency || "monthly");
   };
 
-  const handleInlineSave = (categoryId: string, amount: number) => {
-    saveGoal.mutate({ categoryId, limit: amount, freq: "monthly" });
+  const handleInlineSave = (categoryId: string, amount: number, freq: string = "monthly") => {
+    saveGoal.mutate({ categoryId, limit: amount, freq });
+  };
+
+  const getGoalFrequency = (categoryId: string) => {
+    const goal = goals.find(g => g.category_id === categoryId);
+    return goal?.frequency || 'monthly';
   };
 
   const incomeCategories = useMemo(() => 
@@ -419,6 +457,7 @@ export const BudgetPlanner = ({ isAuthenticated }: { isAuthenticated: boolean })
                 hasBudget={getCategoryBudget(category.id) > 0}
                 onSave={handleInlineSave}
                 onDelete={(id) => setDeleteConfirm(id)}
+                savedFrequency={getGoalFrequency(category.id)}
               />
             ))}
           </div>
@@ -443,6 +482,7 @@ export const BudgetPlanner = ({ isAuthenticated }: { isAuthenticated: boolean })
                 hasBudget={getCategoryBudget(category.id) > 0}
                 onSave={handleInlineSave}
                 onDelete={(id) => setDeleteConfirm(id)}
+                savedFrequency={getGoalFrequency(category.id)}
               />
             ))}
           </div>
