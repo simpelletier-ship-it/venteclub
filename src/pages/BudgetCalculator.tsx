@@ -364,26 +364,25 @@ const BudgetCalculator = () => {
               </CardContent>
             </Card>
 
-            {/* Insights Section - Under Dashboard */}
-            <Card className="mb-6 border-border">
-              <CardHeader className="pb-2 border-b border-border">
-                <div className="flex items-center gap-2">
-                  <Lightbulb className="h-4 w-4 text-primary" />
-                  <CardTitle className="text-sm font-medium">Recommandations</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className="pt-4">
-                <SmartInsights />
-              </CardContent>
-            </Card>
+            {/* Insights Section - Compact scrollable */}
+            <div className="mb-6">
+              <div className="flex items-center gap-2 mb-3">
+                <Lightbulb className="h-4 w-4 text-primary" />
+                <span className="text-sm font-semibold text-foreground">Recommandations</span>
+              </div>
+              <SmartInsights />
+            </div>
 
-            {/* Analytics Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-              <Card className="border-border">
-                <CardHeader className="pb-2 border-b border-border">
-                  <CardTitle className="text-sm font-medium">Dépenses par catégorie</CardTitle>
+            {/* Analytics Grid - Premium cards */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6">
+              <Card className="border-0 shadow-md">
+                <CardHeader className="pb-0 pt-5 px-5">
+                  <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                    <PiggyBank className="h-4 w-4 text-primary" />
+                    Dépenses par catégorie
+                  </CardTitle>
                 </CardHeader>
-                <CardContent className="pt-4">
+                <CardContent className="pt-4 px-5 pb-5">
                   <ExpensesByCategory 
                     transactions={transactions}
                     categories={categories}
@@ -391,11 +390,14 @@ const BudgetCalculator = () => {
                   />
                 </CardContent>
               </Card>
-              <Card className="border-border">
-                <CardHeader className="pb-2 border-b border-border">
-                  <CardTitle className="text-sm font-medium">Score financier</CardTitle>
+              <Card className="border-0 shadow-md">
+                <CardHeader className="pb-0 pt-5 px-5">
+                  <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                    <BarChart3 className="h-4 w-4 text-primary" />
+                    Score financier
+                  </CardTitle>
                 </CardHeader>
-                <CardContent className="pt-4">
+                <CardContent className="pt-4 px-5 pb-5">
                   <FinancialHealthScore 
                     transactions={transactions}
                     debts={debts}
