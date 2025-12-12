@@ -367,38 +367,6 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Business Section - Kept but secondary */}
-      <section className="py-16 bg-slate-100 dark:bg-slate-900">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <p className="text-sm text-muted-foreground uppercase tracking-wide mb-4">Pour les entrepreneurs</p>
-            <h2 className="text-2xl sm:text-3xl font-display font-bold text-foreground mb-4">
-              Vous cherchez à acheter ou vendre une entreprise?
-            </h2>
-            <p className="text-muted-foreground mb-8">
-              Découvrez notre marketplace d'opportunités d'affaires au Québec
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button 
-                variant="outline"
-                size="lg"
-                onClick={() => navigate("/entreprises")}
-                className="h-12"
-              >
-                Voir les entreprises à vendre
-              </Button>
-              <Button 
-                variant="ghost"
-                size="lg"
-                onClick={() => navigate("/sell")}
-                className="h-12"
-              >
-                Vendre mon entreprise
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
     </>
   );
 };

@@ -43,24 +43,23 @@ export const Footer = () => {
             </ul>
           </div>
 
-          {/* Entreprises */}
+          {/* Ressources */}
           <div>
-            <h3 className="font-semibold text-foreground mb-4">Entreprises</h3>
+            <h3 className="font-semibold text-foreground mb-4">Ressources</h3>
             <ul className="space-y-3">
               <li>
-                <Link to="/entreprises" className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-2">
-                  <Building2 className="w-4 h-4" />
-                  Entreprises à vendre
+                <Link to="/blog" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Blog
                 </Link>
               </li>
               <li>
-                <Link to="/sell" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Vendre une entreprise
+                <Link to="/faq" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  FAQ
                 </Link>
               </li>
               <li>
-                <Link to="/immeubles-commerciaux" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Immeubles commerciaux
+                <Link to="/contact" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Contact
                 </Link>
               </li>
             </ul>
