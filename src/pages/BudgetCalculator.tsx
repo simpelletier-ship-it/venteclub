@@ -33,7 +33,19 @@ import { OfflineIndicator } from "@/components/budget/OfflineIndicator";
 import { useOfflineSync } from "@/hooks/useOfflineSync";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatPrice } from "@/lib/priceFormat";
-import { TrendingUp, TrendingDown, Wallet, PiggyBank, Target, BarChart3 } from "lucide-react";
+import { TrendingUp, TrendingDown, Wallet, PiggyBank, Target, BarChart3, Coins, Calendar, Clock, CreditCard, Trophy, LineChart, Bell, Briefcase, GitCompare, Lightbulb } from "lucide-react";
+
+// New feature imports
+import { RoundUpSavings } from "@/components/budget/RoundUpSavings";
+import { BillCalendar } from "@/components/budget/BillCalendar";
+import { AgeOfMoney } from "@/components/budget/AgeOfMoney";
+import { DebtPayoffPlanner } from "@/components/budget/DebtPayoffPlanner";
+import { SavingsChallenges } from "@/components/budget/SavingsChallenges";
+import { CashFlowForecast } from "@/components/budget/CashFlowForecast";
+import { SpendingLimitsAlerts } from "@/components/budget/SpendingLimitsAlerts";
+import { InvestmentTracker } from "@/components/budget/InvestmentTracker";
+import { FinancialProductComparison } from "@/components/budget/FinancialProductComparison";
+import { SmartInsights } from "@/components/budget/SmartInsights";
 
 const BudgetCalculator = () => {
   const navigate = useNavigate();
@@ -236,8 +248,11 @@ const BudgetCalculator = () => {
                 <TabsTrigger value="budget" className="flex-1 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm">
                   Mon budget
                 </TabsTrigger>
-                <TabsTrigger value="assets" className="flex-1 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm">
+              <TabsTrigger value="assets" className="flex-1 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm">
                   Valeur nette
+                </TabsTrigger>
+                <TabsTrigger value="tools" className="flex-1 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                  Outils
                 </TabsTrigger>
                 <TabsTrigger value="analyses" className="flex-1 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm">
                   Analyses
@@ -249,7 +264,7 @@ const BudgetCalculator = () => {
 
               {/* Mobile Bottom Nav */}
               <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-lg border-t border-border z-50">
-                <TabsList className="grid w-full grid-cols-5 h-16 bg-transparent rounded-none">
+                <TabsList className="grid w-full grid-cols-6 h-16 bg-transparent rounded-none">
                   <TabsTrigger value="overview" className="flex flex-col gap-0.5 h-full rounded-none data-[state=active]:bg-primary/5">
                     <BarChart3 className="h-5 w-5" />
                     <span className="text-[10px]">Accueil</span>
@@ -265,6 +280,10 @@ const BudgetCalculator = () => {
                   <TabsTrigger value="assets" className="flex flex-col gap-0.5 h-full rounded-none data-[state=active]:bg-primary/5">
                     <span className="text-lg">📊</span>
                     <span className="text-[10px]">Valeur</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="tools" className="flex flex-col gap-0.5 h-full rounded-none data-[state=active]:bg-primary/5">
+                    <span className="text-lg">🛠️</span>
+                    <span className="text-[10px]">Outils</span>
                   </TabsTrigger>
                   <TabsTrigger value="analyses" className="flex flex-col gap-0.5 h-full rounded-none data-[state=active]:bg-primary/5">
                     <span className="text-lg">📈</span>
@@ -348,6 +367,37 @@ const BudgetCalculator = () => {
                 <SimpleNetWorthTracker currentNetWorth={netWorth} isAuthenticated={isAuthenticated} />
                 <NetWorthGamification netWorth={netWorth} isAuthenticated={isAuthenticated} />
                 <BudgetAssetsDebts isAuthenticated={isAuthenticated} />
+                <InvestmentTracker />
+              </TabsContent>
+
+              {/* Tools Tab - All New Features */}
+              <TabsContent value="tools" className="space-y-6">
+                {/* Quick Access Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <AgeOfMoney 
+                    monthlyIncome={monthlyIncome}
+                    monthlyExpenses={monthlyExpenses}
+                    currentBalance={monthlyBalance > 0 ? monthlyBalance : 0}
+                  />
+                  <RoundUpSavings transactions={transactions} />
+                  <SpendingLimitsAlerts />
+                </div>
+
+                {/* Debt & Savings Tools */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <DebtPayoffPlanner />
+                  <SavingsChallenges />
+                </div>
+
+                {/* Calendar & Forecast */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <BillCalendar />
+                  <CashFlowForecast />
+                </div>
+
+                {/* Product Comparison & Smart Insights */}
+                <SmartInsights />
+                <FinancialProductComparison />
               </TabsContent>
 
               {/* Analyses Tab */}

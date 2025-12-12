@@ -8,7 +8,7 @@ import { Coins, PiggyBank, TrendingUp, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface RoundUpSavingsProps {
-  transactions?: Array<{ amount: number; description: string; date: string }>;
+  transactions?: Array<{ amount: number; description?: string | null; transaction_date?: string; date?: string }>;
 }
 
 export const RoundUpSavings = ({ transactions = [] }: RoundUpSavingsProps) => {
@@ -21,7 +21,11 @@ export const RoundUpSavings = ({ transactions = [] }: RoundUpSavingsProps) => {
     return remainder > 0 ? roundUpAmount - remainder : 0;
   };
 
-  const sampleTransactions = transactions.length > 0 ? transactions : [
+  const sampleTransactions = transactions.length > 0 ? transactions.map(t => ({
+    amount: t.amount,
+    description: t.description || "Transaction",
+    date: t.transaction_date || t.date || new Date().toISOString().slice(0, 10)
+  })) : [
     { amount: 4.75, description: "Café", date: "2024-01-15" },
     { amount: 23.42, description: "Épicerie", date: "2024-01-14" },
     { amount: 8.99, description: "Netflix", date: "2024-01-13" },
