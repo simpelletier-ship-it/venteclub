@@ -35,13 +35,42 @@
   status = 301
   force = true
 
-# Force all routes to index.html for client-side routing (SPA)
+# Static file redirects (must come before SPA fallback)
+[[redirects]]
+  from = "/robots.txt"
+  to = "/robots.txt"
+  status = 200
+
+[[redirects]]
+  from = "/sitemap.xml"
+  to = "/sitemap.xml"
+  status = 200
+
+[[redirects]]
+  from = "/manifest.webmanifest"
+  to = "/manifest.webmanifest"
+  status = 200
+
+[[redirects]]
+  from = "/favicon-vente.png"
+  to = "/favicon-vente.png"
+  status = 200
+
+[[redirects]]
+  from = "/logo.png"
+  to = "/logo.png"
+  status = 200
+
+[[redirects]]
+  from = "/assets/*"
+  to = "/assets/:splat"
+  status = 200
+
+# SPA fallback - ALL other routes go to index.html
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
-  force = false
-  conditions = {path = "!^/(robots\\.txt|favicon-vente\\.png|logo\\.png|og-image\\.jpg|blog-.*\\.jpg|demo-photos/.*)$"}
 
 # Security headers
 [[headers]]
@@ -52,7 +81,6 @@
     X-XSS-Protection = "1; mode=block"
     Referrer-Policy = "strict-origin-when-cross-origin"
     Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
-    Content-Security-Policy = "default-src 'self'; img-src 'self' data: https: blob: https://*.supabase.co; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://www.google.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.google-analytics.com https://www.googletagmanager.com;"
 
 # Cache headers for static assets
 [[headers]]
@@ -66,22 +94,7 @@
     Cache-Control = "public, max-age=31536000, immutable"
 
 [[headers]]
-  for = "/*.jpeg"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-
-[[headers]]
   for = "/*.png"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-
-[[headers]]
-  for = "/*.webp"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-
-[[headers]]
-  for = "/*.svg"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
@@ -89,3 +102,9 @@
   for = "/sw.js"
   [headers.values]
     Cache-Control = "no-cache"
+
+# No cache for index.html to force fresh content
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
