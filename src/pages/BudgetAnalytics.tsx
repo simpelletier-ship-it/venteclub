@@ -120,7 +120,7 @@ const BudgetAnalytics = () => {
   return (
     <ErrorBoundary>
       <SEO
-        title="Analyses avancées | Budget.club"
+        title="Analyses avancées | Vente.club"
         description="Analyses financières avancées : insights, abonnements, trésorerie, dettes et épargne."
         canonical="/budget/analyses"
       />

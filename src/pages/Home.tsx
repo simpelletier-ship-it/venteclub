@@ -34,8 +34,8 @@ const Home = () => {
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    "name": "Budget.club - Planificateur Budgétaire Québec",
-    "url": "https://budget.club",
+    "name": "Vente.club - Achat et Vente d'Entreprises au Québec",
+    "url": "https://vente.club",
     "description": "Le planificateur budgétaire gratuit pour le Québec. Suivez vos dépenses, calculez votre salaire net, estimez votre retour d'impôt et atteignez vos objectifs financiers.",
     "applicationCategory": "FinanceApplication",
     "operatingSystem": "Web",
@@ -69,7 +69,7 @@ const Home = () => {
         "name": "Le planificateur budgétaire est-il gratuit?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Oui, Budget.club est entièrement gratuit. Aucune carte de crédit n'est requise pour créer un compte."
+          "text": "Oui, Vente.club est entièrement gratuit. Aucune carte de crédit n'est requise pour créer un compte."
         }
       },
       {

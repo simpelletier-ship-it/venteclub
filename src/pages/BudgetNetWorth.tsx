@@ -179,7 +179,7 @@ const BudgetNetWorth = () => {
   return (
     <ErrorBoundary>
       <SEO
-        title="Valeur nette | Budget.club"
+        title="Valeur nette | Vente.club"
         description="Suivez l'évolution de votre valeur nette et patrimoine."
         canonical="/budget/valeur-nette"
       />
