@@ -128,36 +128,22 @@
       </div>
       <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
     </div>
-    <script type="module">
-      import('/src/main.tsx')
-        .catch((error) => {
-          console.error('[Boot Error] Failed to load main.tsx', error);
-          const root = document.getElementById('root');
-          const loader = document.getElementById('initial-loader');
-          if (root && loader) {
-            loader.innerHTML = '<div style="text-align:center;padding:40px;max-width:600px;margin:0 auto;">'
-              + '<h2 style="color:#ef4444;margin-bottom:16px;">Erreur de chargement de l\'application</h2>'
-              + '<p style="margin-bottom:12px;">Une erreur technique empêche le site de se charger correctement.</p>'
-              + '<p style="margin-bottom:20px;font-size:13px;opacity:0.8;word-break:break-word;">Détail technique : '
-              + (error && error.message ? error.message : 'Erreur inconnue') + '</p>'
-              + '<button onclick="location.reload(true)" style="background:#3b82f6;color:#fff;border:none;padding:12px 24px;border-radius:8px;cursor:pointer;font-size:16px;">Rafraîchir la page</button>'
-              + '</div>';
-          }
-        });
-    </script>
+    
+    <!-- Main React bundle - standard Vite entry so it works in dev & production -->
+    <script type="module" src="/src/main.tsx"></script>
+    
+    <!-- Simple safety fallback: if React is toujours pas monté après 10s, afficher un message générique -->
     <script>
-      // Fallback: if React doesn't load after 10 secondes, show generic error
       setTimeout(function() {
         var root = document.getElementById('root');
         var loader = document.getElementById('initial-loader');
+        // Si React n'a pas remplacé le contenu initial (root ne contient que le loader + style)
         if (root && loader && root.children.length <= 2) {
-          if (!loader.innerHTML || loader.innerHTML.indexOf('Erreur de chargement de l') === -1) {
-            loader.innerHTML = '<div style="text-align:center;padding:40px;">'
-              + '<h2 style="color:#ef4444;margin-bottom:16px;">Erreur de chargement</h2>'
-              + '<p style="margin-bottom:20px;">Le site n\'a pas pu se charger correctement.</p>'
-              + '<button onclick="location.reload(true)" style="background:#3b82f6;color:#fff;border:none;padding:12px 24px;border-radius:8px;cursor:pointer;font-size:16px;">Rafraîchir la page</button>'
-              + '</div>';
-          }
+          loader.innerHTML = '<div style="text-align:center;padding:40px;max-width:600px;margin:0 auto;">'
+            + '<h2 style="color:#ef4444;margin-bottom:16px;">Erreur de chargement</h2>'
+            + '<p style="margin-bottom:20px;">Le site n\'a pas pu se charger correctement. Veuillez rafraîchir la page.</p>'
+            + '<button onclick="location.reload(true)" style="background:#3b82f6;color:#fff;border:none;padding:12px 24px;border-radius:8px;cursor:pointer;font-size:16px;">Rafraîchir la page</button>'
+            + '</div>';
         }
       }, 10000);
     </script>
