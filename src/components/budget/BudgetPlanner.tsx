@@ -1,11 +1,11 @@
-import { useState } from "react";
-import { Plus, Trash2, PencilLine, ChevronDown, ChevronUp } from "lucide-react";
+import { useState, useMemo } from "react";
+import { Plus, Trash2, PencilLine, GripVertical, TrendingUp, TrendingDown, Settings2 } from "lucide-react";
 import { CategoryIcon } from "@/components/budget/CategoryIcon";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { CurrencyInput } from "@/components/CurrencyInput";
 import { formatPrice } from "@/lib/priceFormat";
@@ -15,6 +15,23 @@ import { toast } from "sonner";
 import { useBudgetRealtime } from "@/hooks/useBudgetRealtime";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 interface Category {
   id: string;
@@ -22,6 +39,7 @@ interface Category {
   icon: string;
   color: string;
   type: 'income' | 'expense';
+  display_order?: number;
 }
 
 interface BudgetGoal {
@@ -31,17 +49,133 @@ interface BudgetGoal {
   frequency?: string;
 }
 
+interface SortableBudgetRowProps {
+  category: Category;
+  budget: number;
+  spent: number;
+  onEdit: () => void;
+  onDelete: () => void;
+  hasBudget: boolean;
+}
+
+const SortableBudgetRow = ({ category, budget, spent, onEdit, onDelete, hasBudget }: SortableBudgetRowProps) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: category.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 50 : 'auto',
+  };
+
+  const percentage = budget > 0 ? (spent / budget) * 100 : 0;
+  const isOver = category.type === 'expense' ? spent > budget : spent < budget;
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={cn(
+        "flex items-center gap-3 py-3 px-3 rounded-lg bg-card border border-border/50",
+        "hover:border-border hover:shadow-sm transition-all group",
+        isDragging && "shadow-lg border-primary/50"
+      )}
+    >
+      <div
+        {...attributes}
+        {...listeners}
+        className="cursor-grab active:cursor-grabbing touch-none opacity-40 group-hover:opacity-100 transition-opacity"
+      >
+        <GripVertical className="h-4 w-4 text-muted-foreground" />
+      </div>
+      
+      <CategoryIcon icon={category.icon} color={category.color} size="md" />
+      
+      <div className="flex-1 min-w-0">
+        <p className="font-medium text-sm truncate">{category.name}</p>
+        {hasBudget && (
+          <div className="flex items-center gap-2 mt-1.5">
+            <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden max-w-[120px]">
+              <div 
+                className={cn(
+                  "h-full transition-all rounded-full",
+                  category.type === 'expense'
+                    ? percentage > 100 ? 'bg-red-500' : percentage > 80 ? 'bg-amber-500' : 'bg-emerald-500'
+                    : percentage >= 100 ? 'bg-emerald-500' : 'bg-amber-500'
+                )}
+                style={{ width: `${Math.min(percentage, 100)}%` }}
+              />
+            </div>
+            <span className="text-xs text-muted-foreground tabular-nums">
+              {Math.round(percentage)}%
+            </span>
+          </div>
+        )}
+      </div>
+      
+      <div className="text-right min-w-[90px]">
+        <p className={cn(
+          "font-semibold text-sm tabular-nums",
+          hasBudget && isOver && category.type === 'expense' && "text-red-500"
+        )}>
+          {formatPrice(spent)}
+        </p>
+        {hasBudget && (
+          <p className="text-xs text-muted-foreground tabular-nums">/ {formatPrice(budget)}</p>
+        )}
+      </div>
+      
+      <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-7 w-7"
+          onClick={onEdit}
+        >
+          {hasBudget ? <PencilLine className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5" />}
+        </Button>
+        {hasBudget && (
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="h-7 w-7 text-muted-foreground hover:text-destructive"
+            onClick={onDelete}
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+};
+
 export const BudgetPlanner = ({ isAuthenticated }: { isAuthenticated: boolean }) => {
   const { user } = useAuth();
-  const [open, setOpen] = useState(false);
-  const [editingGoal, setEditingGoal] = useState<{ categoryId: string; currentLimit: number; currentFrequency?: string } | null>(null);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [monthlyLimit, setMonthlyLimit] = useState("");
   const [frequency, setFrequency] = useState("monthly");
-  const [showAllExpenses, setShowAllExpenses] = useState(false);
-  const [showAllIncome, setShowAllIncome] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   
   const queryClient = useQueryClient();
   useBudgetRealtime(user?.id);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   const { data: categories = [] } = useQuery({
     queryKey: ['budget-categories'],
@@ -49,7 +183,7 @@ export const BudgetPlanner = ({ isAuthenticated }: { isAuthenticated: boolean })
       const { data, error } = await supabase
         .from('budget_categories')
         .select('*')
-        .order('type', { ascending: true })
+        .order('display_order', { ascending: true })
         .order('name', { ascending: true });
       if (error) throw error;
       return data as Category[];
@@ -84,6 +218,21 @@ export const BudgetPlanner = ({ isAuthenticated }: { isAuthenticated: boolean })
     enabled: isAuthenticated,
   });
 
+  const reorderCategories = useMutation({
+    mutationFn: async (updates: { id: string; display_order: number }[]) => {
+      const promises = updates.map(({ id, display_order }) =>
+        supabase
+          .from('budget_categories')
+          .update({ display_order })
+          .eq('id', id)
+      );
+      await Promise.all(promises);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['budget-categories'] });
+    },
+  });
+
   const saveGoal = useMutation({
     mutationFn: async ({ categoryId, limit, freq }: { categoryId: string; limit: number; freq: string }) => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -111,8 +260,7 @@ export const BudgetPlanner = ({ isAuthenticated }: { isAuthenticated: boolean })
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['budget-goals'] });
       toast.success("Budget enregistré");
-      setOpen(false);
-      setEditingGoal(null);
+      setEditingCategory(null);
       setMonthlyLimit("");
       setFrequency("monthly");
     },
@@ -128,12 +276,14 @@ export const BudgetPlanner = ({ isAuthenticated }: { isAuthenticated: boolean })
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['budget-goals'] });
       toast.success("Budget supprimé");
+      setDeleteConfirm(null);
     },
   });
 
-  const handleSubmit = (e: React.FormEvent, categoryId: string) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    saveGoal.mutate({ categoryId, limit: parseFloat(monthlyLimit), freq: frequency });
+    if (!editingCategory) return;
+    saveGoal.mutate({ categoryId: editingCategory.id, limit: parseFloat(monthlyLimit), freq: frequency });
   };
 
   const getCategorySpent = (categoryId: string) => {
@@ -149,236 +299,240 @@ export const BudgetPlanner = ({ isAuthenticated }: { isAuthenticated: boolean })
     return goal ? Number(goal.monthly_limit) : 0;
   };
 
-  const incomeCategories = categories.filter(c => c.type === 'income');
-  const expenseCategories = categories.filter(c => c.type === 'expense');
+  const handleDragEnd = (event: DragEndEvent, type: 'expense' | 'income') => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const cats = type === 'expense' ? expenseCategories : incomeCategories;
+    const oldIndex = cats.findIndex(c => c.id === active.id);
+    const newIndex = cats.findIndex(c => c.id === over.id);
+
+    const reordered = arrayMove(cats, oldIndex, newIndex);
+    const updates = reordered.map((cat, index) => ({
+      id: cat.id,
+      display_order: index,
+    }));
+
+    reorderCategories.mutate(updates);
+  };
+
+  const openEditDialog = (category: Category) => {
+    const budget = getCategoryBudget(category.id);
+    setEditingCategory(category);
+    setMonthlyLimit(budget > 0 ? budget.toString() : "");
+    setFrequency(goals.find(g => g.category_id === category.id)?.frequency || "monthly");
+  };
+
+  const incomeCategories = useMemo(() => 
+    categories.filter(c => c.type === 'income'), [categories]);
+  const expenseCategories = useMemo(() => 
+    categories.filter(c => c.type === 'expense'), [categories]);
 
   const totalIncomeBudget = incomeCategories.reduce((sum, cat) => sum + getCategoryBudget(cat.id), 0);
   const totalExpenseBudget = expenseCategories.reduce((sum, cat) => sum + getCategoryBudget(cat.id), 0);
   const totalIncomeActual = incomeCategories.reduce((sum, cat) => sum + getCategorySpent(cat.id), 0);
   const totalExpenseActual = expenseCategories.reduce((sum, cat) => sum + getCategorySpent(cat.id), 0);
-
-  const renderBudgetRow = (category: Category) => {
-    const budget = getCategoryBudget(category.id);
-    const spent = getCategorySpent(category.id);
-    const percentage = budget > 0 ? (spent / budget) * 100 : 0;
-    const isOver = category.type === 'expense' ? spent > budget : spent < budget;
-    const hasBudget = budget > 0;
-
-    return (
-      <div 
-        key={category.id} 
-        className="flex items-center gap-4 py-3 px-4 rounded-xl hover:bg-muted/50 transition-colors group"
-      >
-        <CategoryIcon icon={category.icon} color={category.color} size="lg" />
-        <div className="flex-1 min-w-0">
-          <p className="font-medium text-sm truncate">{category.name}</p>
-          {hasBudget && (
-            <div className="flex items-center gap-2 mt-1">
-              <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
-                <div 
-                  className={cn(
-                    "h-full transition-all",
-                    category.type === 'expense'
-                      ? percentage > 100 ? 'bg-red-500' : percentage > 80 ? 'bg-amber-500' : 'bg-emerald-500'
-                      : percentage >= 100 ? 'bg-emerald-500' : 'bg-amber-500'
-                  )}
-                  style={{ width: `${Math.min(percentage, 100)}%` }}
-                />
-              </div>
-              <span className="text-xs text-muted-foreground w-10 text-right">
-                {Math.round(percentage)}%
-              </span>
-            </div>
-          )}
-        </div>
-        <div className="text-right">
-          <p className={cn(
-            "font-semibold text-sm",
-            hasBudget && isOver && category.type === 'expense' && "text-red-500"
-          )}>
-            {formatPrice(spent)}
-          </p>
-          {hasBudget && (
-            <p className="text-xs text-muted-foreground">/ {formatPrice(budget)}</p>
-          )}
-        </div>
-        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-          <Dialog open={open && editingGoal?.categoryId === category.id} onOpenChange={(isOpen) => {
-            setOpen(isOpen);
-            if (!isOpen) {
-              setEditingGoal(null);
-              setMonthlyLimit("");
-              setFrequency("monthly");
-            }
-          }}>
-            <DialogTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8"
-                onClick={() => {
-                  setEditingGoal({ categoryId: category.id, currentLimit: budget });
-                  setMonthlyLimit(budget.toString());
-                  setOpen(true);
-                }}
-              >
-                {hasBudget ? <PencilLine className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-sm">
-              <DialogHeader>
-                <DialogTitle className="flex items-center gap-2">
-                  <CategoryIcon icon={category.icon} color={category.color} size="md" />
-                  {category.name}
-                </DialogTitle>
-                <DialogDescription>Définir un budget mensuel</DialogDescription>
-              </DialogHeader>
-              <form onSubmit={(e) => handleSubmit(e, category.id)} className="space-y-4">
-                <div>
-                  <Label className="text-sm">Montant</Label>
-                  <CurrencyInput
-                    value={monthlyLimit}
-                    onChange={setMonthlyLimit}
-                    placeholder="0 $"
-                    className="mt-1"
-                  />
-                </div>
-                <div>
-                  <Label className="text-sm">Fréquence</Label>
-                  <Select value={frequency} onValueChange={setFrequency}>
-                    <SelectTrigger className="mt-1">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="weekly">Hebdomadaire</SelectItem>
-                      <SelectItem value="biweekly">Aux 2 semaines</SelectItem>
-                      <SelectItem value="monthly">Mensuel</SelectItem>
-                      <SelectItem value="yearly">Annuel</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <Button type="submit" className="w-full" disabled={saveGoal.isPending}>
-                  Enregistrer
-                </Button>
-              </form>
-            </DialogContent>
-          </Dialog>
-          {hasBudget && (
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive">
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Supprimer ce budget?</AlertDialogTitle>
-                  <AlertDialogDescription>Cette action est irréversible.</AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Annuler</AlertDialogCancel>
-                  <AlertDialogAction onClick={() => deleteGoal.mutate(category.id)} className="bg-destructive text-destructive-foreground">
-                    Supprimer
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          )}
-        </div>
-      </div>
-    );
-  };
-
-  const displayedExpenses = showAllExpenses ? expenseCategories : expenseCategories.slice(0, 6);
-  const displayedIncome = showAllIncome ? incomeCategories : incomeCategories.slice(0, 4);
+  const balance = totalIncomeActual - totalExpenseActual;
 
   return (
     <div className="space-y-6">
-      {/* Summary */}
-      <div className="grid grid-cols-2 gap-4">
-        <Card className="border-emerald-200 dark:border-emerald-800/50">
+      {/* Summary Cards */}
+      <div className="grid grid-cols-3 gap-3">
+        <Card className="bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 border-emerald-500/20">
           <CardContent className="p-4">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-muted-foreground">Revenus</span>
-              <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400">
-                {totalIncomeBudget > 0 ? `${Math.round((totalIncomeActual / totalIncomeBudget) * 100)}%` : '—'}
-              </span>
+            <div className="flex items-center gap-2 mb-2">
+              <TrendingUp className="h-4 w-4 text-emerald-600" />
+              <span className="text-xs font-medium text-emerald-700 dark:text-emerald-400">Revenus</span>
             </div>
-            <p className="text-2xl font-bold text-emerald-600">{formatPrice(totalIncomeActual)}</p>
+            <p className="text-xl font-bold text-emerald-600 tabular-nums">{formatPrice(totalIncomeActual)}</p>
             {totalIncomeBudget > 0 && (
-              <p className="text-xs text-muted-foreground mt-1">sur {formatPrice(totalIncomeBudget)} budgété</p>
+              <p className="text-xs text-muted-foreground mt-1">sur {formatPrice(totalIncomeBudget)}</p>
             )}
           </CardContent>
         </Card>
 
-        <Card className="border-red-200 dark:border-red-800/50">
+        <Card className="bg-gradient-to-br from-red-500/10 to-red-500/5 border-red-500/20">
           <CardContent className="p-4">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-muted-foreground">Dépenses</span>
-              <span className={cn(
-                "text-xs px-2 py-0.5 rounded-full",
-                totalExpenseActual > totalExpenseBudget 
-                  ? "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400"
-                  : "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400"
-              )}>
-                {totalExpenseBudget > 0 ? `${Math.round((totalExpenseActual / totalExpenseBudget) * 100)}%` : '—'}
-              </span>
+            <div className="flex items-center gap-2 mb-2">
+              <TrendingDown className="h-4 w-4 text-red-600" />
+              <span className="text-xs font-medium text-red-700 dark:text-red-400">Dépenses</span>
             </div>
-            <p className="text-2xl font-bold text-red-600">{formatPrice(totalExpenseActual)}</p>
+            <p className="text-xl font-bold text-red-600 tabular-nums">{formatPrice(totalExpenseActual)}</p>
             {totalExpenseBudget > 0 && (
-              <p className="text-xs text-muted-foreground mt-1">sur {formatPrice(totalExpenseBudget)} budgété</p>
+              <p className="text-xs text-muted-foreground mt-1">sur {formatPrice(totalExpenseBudget)}</p>
             )}
+          </CardContent>
+        </Card>
+
+        <Card className={cn(
+          "bg-gradient-to-br border",
+          balance >= 0 
+            ? "from-blue-500/10 to-blue-500/5 border-blue-500/20" 
+            : "from-orange-500/10 to-orange-500/5 border-orange-500/20"
+        )}>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-xs font-medium text-muted-foreground">Balance</span>
+            </div>
+            <p className={cn(
+              "text-xl font-bold tabular-nums",
+              balance >= 0 ? "text-blue-600" : "text-orange-600"
+            )}>
+              {balance >= 0 ? '+' : ''}{formatPrice(balance)}
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">ce mois</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Expense Categories */}
-      <Card>
-        <CardContent className="p-0">
-          <div className="px-4 py-3 border-b border-border">
-            <h3 className="font-semibold">Dépenses par catégorie</h3>
-          </div>
-          <div className="divide-y divide-border">
-            {displayedExpenses.map(renderBudgetRow)}
-          </div>
-          {expenseCategories.length > 6 && (
-            <button
-              onClick={() => setShowAllExpenses(!showAllExpenses)}
-              className="w-full py-3 text-sm text-muted-foreground hover:text-foreground flex items-center justify-center gap-1 transition-colors"
+      {/* Two Column Layout */}
+      <div className="grid md:grid-cols-2 gap-4">
+        {/* Expenses */}
+        <Card>
+          <CardHeader className="pb-3 pt-4 px-4">
+            <CardTitle className="text-base font-semibold flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-red-500" />
+              Dépenses
+              <span className="text-xs font-normal text-muted-foreground ml-auto">
+                Glissez pour réorganiser
+              </span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-3 pt-0">
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={(e) => handleDragEnd(e, 'expense')}
             >
-              {showAllExpenses ? (
-                <>Voir moins <ChevronUp className="h-4 w-4" /></>
-              ) : (
-                <>Voir tout ({expenseCategories.length}) <ChevronDown className="h-4 w-4" /></>
-              )}
-            </button>
-          )}
-        </CardContent>
-      </Card>
+              <SortableContext
+                items={expenseCategories.map(c => c.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                <div className="space-y-2 max-h-[400px] overflow-y-auto pr-1">
+                  {expenseCategories.map(category => (
+                    <SortableBudgetRow
+                      key={category.id}
+                      category={category}
+                      budget={getCategoryBudget(category.id)}
+                      spent={getCategorySpent(category.id)}
+                      hasBudget={getCategoryBudget(category.id) > 0}
+                      onEdit={() => openEditDialog(category)}
+                      onDelete={() => setDeleteConfirm(category.id)}
+                    />
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
+          </CardContent>
+        </Card>
 
-      {/* Income Categories */}
-      <Card>
-        <CardContent className="p-0">
-          <div className="px-4 py-3 border-b border-border">
-            <h3 className="font-semibold">Revenus par catégorie</h3>
-          </div>
-          <div className="divide-y divide-border">
-            {displayedIncome.map(renderBudgetRow)}
-          </div>
-          {incomeCategories.length > 4 && (
-            <button
-              onClick={() => setShowAllIncome(!showAllIncome)}
-              className="w-full py-3 text-sm text-muted-foreground hover:text-foreground flex items-center justify-center gap-1 transition-colors"
+        {/* Income */}
+        <Card>
+          <CardHeader className="pb-3 pt-4 px-4">
+            <CardTitle className="text-base font-semibold flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-emerald-500" />
+              Revenus
+              <span className="text-xs font-normal text-muted-foreground ml-auto">
+                Glissez pour réorganiser
+              </span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-3 pt-0">
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={(e) => handleDragEnd(e, 'income')}
             >
-              {showAllIncome ? (
-                <>Voir moins <ChevronUp className="h-4 w-4" /></>
-              ) : (
-                <>Voir tout ({incomeCategories.length}) <ChevronDown className="h-4 w-4" /></>
+              <SortableContext
+                items={incomeCategories.map(c => c.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                <div className="space-y-2 max-h-[400px] overflow-y-auto pr-1">
+                  {incomeCategories.map(category => (
+                    <SortableBudgetRow
+                      key={category.id}
+                      category={category}
+                      budget={getCategoryBudget(category.id)}
+                      spent={getCategorySpent(category.id)}
+                      hasBudget={getCategoryBudget(category.id) > 0}
+                      onEdit={() => openEditDialog(category)}
+                      onDelete={() => setDeleteConfirm(category.id)}
+                    />
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Edit Budget Dialog */}
+      <Dialog open={!!editingCategory} onOpenChange={(open) => !open && setEditingCategory(null)}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              {editingCategory && (
+                <>
+                  <CategoryIcon icon={editingCategory.icon} color={editingCategory.color} size="md" />
+                  {editingCategory.name}
+                </>
               )}
-            </button>
-          )}
-        </CardContent>
-      </Card>
+            </DialogTitle>
+            <DialogDescription>Définir un budget mensuel</DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <Label className="text-sm">Montant</Label>
+              <CurrencyInput
+                value={monthlyLimit}
+                onChange={setMonthlyLimit}
+                placeholder="0 $"
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label className="text-sm">Fréquence</Label>
+              <Select value={frequency} onValueChange={setFrequency}>
+                <SelectTrigger className="mt-1">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="weekly">Hebdomadaire</SelectItem>
+                  <SelectItem value="biweekly">Aux 2 semaines</SelectItem>
+                  <SelectItem value="monthly">Mensuel</SelectItem>
+                  <SelectItem value="yearly">Annuel</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <DialogFooter>
+              <Button type="submit" className="w-full" disabled={saveGoal.isPending || !monthlyLimit}>
+                Enregistrer
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={!!deleteConfirm} onOpenChange={(open) => !open && setDeleteConfirm(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Supprimer ce budget?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Cette action supprimera le budget défini pour cette catégorie.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={() => deleteConfirm && deleteGoal.mutate(deleteConfirm)} 
+              className="bg-destructive text-destructive-foreground"
+            >
+              Supprimer
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
