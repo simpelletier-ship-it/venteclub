@@ -1,0 +1,4 @@
+# Netlify _redirects - Simple SPA fallback
+# This ensures the React app handles all routing
+
+/*    /index.html   200
