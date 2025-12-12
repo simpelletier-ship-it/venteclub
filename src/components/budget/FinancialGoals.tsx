@@ -180,7 +180,7 @@ export const FinancialGoals = ({ isAuthenticated }: { isAuthenticated: boolean }
       const isCompleted = updatedAmount >= Number(goal?.target_amount || 0);
       
       toast.success(
-        isCompleted ? "🎉 Objectif atteint! Félicitations!" : "Progression mise à jour! 📈", 
+        isCompleted ? "Objectif atteint! Félicitations!" : "Progression mise à jour!", 
         {
           duration: isCompleted ? 6000 : 4000,
           className: "animate-scale-in",
@@ -372,14 +372,14 @@ export const FinancialGoals = ({ isAuthenticated }: { isAuthenticated: boolean }
                       {daysRemaining !== null && daysRemaining > 0 && (
                         <>
                           <div className="flex items-center justify-between text-xs">
-                            <span className="text-muted-foreground">📅 Temps restant:</span>
+                            <span className="text-muted-foreground">Temps restant:</span>
                             <span className={daysRemaining < 30 ? 'text-orange-600 font-semibold' : 'font-semibold'}>
                               {Math.floor(daysRemaining / 30)} mois {daysRemaining % 30} jours
                             </span>
                           </div>
                           {monthlyNeeded > 0 && (
                             <div className="flex items-center justify-between text-xs">
-                              <span className="text-muted-foreground">💰 Épargne mensuelle requise:</span>
+                              <span className="text-muted-foreground">Épargne mensuelle requise:</span>
                               <span className="font-semibold text-primary">{formatPrice(monthlyNeeded)}/mois</span>
                             </div>
                           )}
@@ -388,7 +388,7 @@ export const FinancialGoals = ({ isAuthenticated }: { isAuthenticated: boolean }
 
                       {!goal.deadline && estimatedMonths && estimatedMonths > 0 && (
                         <div className="flex items-center justify-between text-xs">
-                          <span className="text-muted-foreground">⏱️ Temps estimé restant:</span>
+                          <span className="text-muted-foreground">Temps estimé restant:</span>
                           <span className="font-semibold">~{estimatedMonths} mois</span>
                         </div>
                       )}
@@ -512,7 +512,7 @@ export const FinancialGoals = ({ isAuthenticated }: { isAuthenticated: boolean }
       <Dialog open={updateDialogOpen} onOpenChange={setUpdateDialogOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>💰 Ajouter de l'argent vers l'objectif</DialogTitle>
+            <DialogTitle>Ajouter de l'argent vers l'objectif</DialogTitle>
             <DialogDescription>
               {selectedGoal && (
                 <div className="space-y-1 mt-2">

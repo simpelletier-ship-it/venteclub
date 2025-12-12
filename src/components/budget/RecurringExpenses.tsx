@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Pencil, Trash2, RepeatIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import { CategoryIcon } from "./CategoryIcon";
 
 interface RecurringExpensesProps {
   isAuthenticated: boolean;
@@ -137,8 +138,8 @@ const RecurringExpenses = ({ isAuthenticated }: RecurringExpensesProps) => {
             <Card key={expense.id} className="p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3 flex-1">
-                  <div className="text-2xl">
-                    {expense.budget_categories?.icon || "💸"}
+                  <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
+                    <CategoryIcon icon={expense.budget_categories?.icon} size="lg" />
                   </div>
                   <div className="flex-1">
                     <p className="font-medium">{expense.description || "Sans description"}</p>

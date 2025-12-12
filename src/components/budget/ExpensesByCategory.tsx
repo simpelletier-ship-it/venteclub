@@ -4,7 +4,7 @@ import { formatPrice } from "@/lib/priceFormat";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Trash2, TrendingUp, List, Grid3x3, ArrowUpDown, PieChartIcon, BarChart3, ChevronLeft, ChevronRight } from "lucide-react";
+import { Trash2, TrendingUp, List, Grid3x3, ArrowUpDown, PieChartIcon, BarChart3, ChevronLeft, ChevronRight, LayoutGrid, DollarSign, TrendingDown } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import { CategoryIcon } from "./CategoryIcon";
 
 interface ExpensesByCategoryProps {
   transactions: any[];
@@ -146,14 +147,14 @@ export const ExpensesByCategory = ({ transactions, categories, onAnalyze }: Expe
       return (
         <div className="bg-background border border-border rounded-lg shadow-lg p-3 cursor-pointer">
           <p className="font-semibold flex items-center gap-2">
-            <span className="text-xl">{data.payload.icon}</span>
+            <CategoryIcon icon={data.payload.icon} className="h-5 w-5" />
             {data.name}
           </p>
           <p className="text-lg font-bold text-primary">{formatPrice(data.value)}</p>
           <p className="text-sm text-muted-foreground">
             {((data.value / totalExpenses) * 100).toFixed(1)}% du total
           </p>
-          <p className="text-xs text-primary mt-1">👆 Cliquer pour voir les détails</p>
+          <p className="text-xs text-primary mt-1">Cliquer pour voir les détails</p>
         </div>
       );
     }
@@ -189,7 +190,10 @@ export const ExpensesByCategory = ({ transactions, categories, onAnalyze }: Expe
         <CardHeader>
           <div className="flex items-start justify-between">
             <div className="flex-1">
-              <CardTitle className="text-xl">📊 Dépenses par catégorie</CardTitle>
+              <CardTitle className="text-xl flex items-center gap-2">
+                <PieChartIcon className="h-5 w-5 text-primary" />
+                Dépenses par catégorie
+              </CardTitle>
               <CardDescription>
                 {hasData ? `${formatPrice(totalExpenses)} total` : '0 $ dépensé'}
               </CardDescription>
@@ -249,14 +253,14 @@ export const ExpensesByCategory = ({ transactions, categories, onAnalyze }: Expe
           {!hasData ? (
             <div className="flex items-center justify-center h-[300px] text-center">
               <div className="space-y-2">
-                <p className="text-4xl">📊</p>
+                <LayoutGrid className="h-12 w-12 mx-auto text-muted-foreground" />
                 <p className="text-lg font-semibold">Aucune dépense</p>
                 <p className="text-sm text-muted-foreground">
                   Aucune transaction enregistrée pour {format(selectedMonth, 'MMMM yyyy', { locale: fr })}
                 </p>
-                <div className="text-sm text-muted-foreground space-y-1 pt-4">
-                  <p>💰 Dépenses: 0 $</p>
-                  <p>📈 Revenus: 0 $</p>
+                <div className="text-sm text-muted-foreground space-y-1 pt-4 flex flex-col items-center gap-2">
+                  <p className="flex items-center gap-2"><DollarSign className="h-4 w-4" /> Dépenses: 0 $</p>
+                  <p className="flex items-center gap-2"><TrendingUp className="h-4 w-4" /> Revenus: 0 $</p>
                 </div>
               </div>
             </div>
@@ -336,7 +340,7 @@ export const ExpensesByCategory = ({ transactions, categories, onAnalyze }: Expe
                   style={{ backgroundColor: category.color }}
                 />
                 <div className="flex items-center gap-1 min-w-0 flex-1">
-                  <span className="text-base">{category.icon}</span>
+                  <CategoryIcon icon={category.icon} className="h-4 w-4" />
                   <span className="text-sm font-medium truncate">{category.name}</span>
                 </div>
                 <span className="text-sm font-bold shrink-0">
@@ -358,7 +362,7 @@ export const ExpensesByCategory = ({ transactions, categories, onAnalyze }: Expe
             <div className="flex items-start justify-between">
               <div>
                 <DialogTitle className="flex items-center gap-2 text-xl">
-                  <span className="text-2xl">{selectedCategoryData?.icon}</span>
+                  <CategoryIcon icon={selectedCategoryData?.icon || 'circle'} className="h-6 w-6" />
                   {selectedCategoryData?.name}
                 </DialogTitle>
                 <p className="text-sm text-muted-foreground">

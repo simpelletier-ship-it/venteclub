@@ -25,11 +25,13 @@ import { SpendingLimitsAlerts } from "@/components/budget/SpendingLimitsAlerts";
 import { InvestmentTracker } from "@/components/budget/InvestmentTracker";
 import { FinancialProductComparison } from "@/components/budget/FinancialProductComparison";
 import { SmartInsights } from "@/components/budget/SmartInsights";
+import { CategoryIcon } from "@/components/budget/CategoryIcon";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatPrice } from "@/lib/priceFormat";
 import { cn } from "@/lib/utils";
+
 const BudgetCalculator = () => {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
@@ -263,8 +265,8 @@ const BudgetCalculator = () => {
                     return (
                       <div key={t.id} className="flex items-center justify-between px-5 py-3.5 hover:bg-muted/30 transition-colors">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-md bg-muted flex items-center justify-center text-sm">
-                            {category?.icon || '📝'}
+                          <div className="w-8 h-8 rounded-md bg-muted flex items-center justify-center">
+                            <CategoryIcon icon={category?.icon} size="md" />
                           </div>
                           <div>
                             <p className="text-sm font-medium text-foreground">{t.description || category?.name || 'Transaction'}</p>
