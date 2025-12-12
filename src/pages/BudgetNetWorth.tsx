@@ -100,7 +100,7 @@ const BudgetNetWorth = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user-assets'] });
       queryClient.invalidateQueries({ queryKey: ['asset-history'] });
-      toast.success('Actif ajouté');
+      toast.success('Avoir ajouté');
       setAssetForm({ name: '', type: 'savings', value: '', date: new Date().toISOString().split('T')[0] });
       setShowAddAsset(false);
     },
@@ -135,7 +135,7 @@ const BudgetNetWorth = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user-debts'] });
       queryClient.invalidateQueries({ queryKey: ['debt-history'] });
-      toast.success('Passif ajouté');
+      toast.success('Dette ajoutée');
       setDebtForm({ name: '', type: 'credit_card', balance: '', date: new Date().toISOString().split('T')[0] });
       setShowAddDebt(false);
     },
@@ -190,14 +190,14 @@ const BudgetNetWorth = () => {
 
       <div className="min-h-screen bg-background pb-8">
         <div className="container mx-auto px-6 py-6">
-          <h1 className="text-xl font-semibold text-foreground mb-6">Mon patrimoine</h1>
+          <h1 className="text-xl font-semibold text-foreground mb-6">Ma valeur nette</h1>
           
           {/* Résumé KPI */}
           <div className="grid grid-cols-3 gap-4 mb-6">
             <Card className="border-border">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Actifs</span>
+                  <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Ce que je possède</span>
                   <TrendingUp className="h-4 w-4 text-success" />
                 </div>
                 <p className="text-xl font-semibold text-success">{formatPrice(totalAssets)}</p>
@@ -207,7 +207,7 @@ const BudgetNetWorth = () => {
             <Card className="border-border">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Passifs</span>
+                  <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Ce que je dois</span>
                   <TrendingDown className="h-4 w-4 text-destructive" />
                 </div>
                 <p className="text-xl font-semibold text-destructive">{formatPrice(totalDebts)}</p>
@@ -232,7 +232,7 @@ const BudgetNetWorth = () => {
             <Card className="border-border">
               <CardHeader className="pb-3 border-b border-border">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-sm font-medium">Ajouter un actif</CardTitle>
+                  <CardTitle className="text-sm font-medium">Ajouter un avoir</CardTitle>
                   <Button 
                     variant="ghost" 
                     size="sm" 
@@ -296,7 +296,7 @@ const BudgetNetWorth = () => {
                     className="w-full h-9"
                     disabled={addAssetMutation.isPending}
                   >
-                    {addAssetMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Ajouter l\'actif'}
+                    {addAssetMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Ajouter'}
                   </Button>
                 </CardContent>
               )}
@@ -305,7 +305,7 @@ const BudgetNetWorth = () => {
             <Card className="border-border">
               <CardHeader className="pb-3 border-b border-border">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-sm font-medium">Ajouter un passif</CardTitle>
+                  <CardTitle className="text-sm font-medium">Ajouter une dette</CardTitle>
                   <Button 
                     variant="ghost" 
                     size="sm" 
@@ -369,7 +369,7 @@ const BudgetNetWorth = () => {
                     className="w-full h-9"
                     disabled={addDebtMutation.isPending}
                   >
-                    {addDebtMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Ajouter le passif'}
+                    {addDebtMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Ajouter'}
                   </Button>
                 </CardContent>
               )}

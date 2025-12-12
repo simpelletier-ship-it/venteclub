@@ -132,7 +132,7 @@ export const FinancialCalculator = ({ isAuthenticated }: FinancialCalculatorProp
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user-assets'] });
-      toast.success("Actif mis à jour avec succès");
+      toast.success("Mis à jour avec succès");
       setEditingAssetId(null);
     },
   });
@@ -367,7 +367,7 @@ export const FinancialCalculator = ({ isAuthenticated }: FinancialCalculatorProp
           <Tabs defaultValue="existing" className="space-y-6">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="existing">
-                Mes actifs/dettes ({existingAssets.length + existingDebts.length})
+                Mes avoirs/dettes ({existingAssets.length + existingDebts.length})
               </TabsTrigger>
               <TabsTrigger value="new">
                 Ajouter nouveaux
@@ -427,10 +427,10 @@ export const FinancialCalculator = ({ isAuthenticated }: FinancialCalculatorProp
             <TabsContent value="existing" className="space-y-4">
               {/* Existing Assets */}
               <div className="space-y-3">
-                <Label className="text-base font-semibold">💰 Actifs existants</Label>
+                <Label className="text-base font-semibold">💰 Ce que je possède</Label>
                 {existingAssets.length === 0 ? (
                   <p className="text-sm text-muted-foreground text-center py-4">
-                    Aucun actif enregistré
+                    Aucun avoir enregistré
                   </p>
                 ) : (
                   existingAssets.map((asset: any) => (
@@ -521,7 +521,7 @@ export const FinancialCalculator = ({ isAuthenticated }: FinancialCalculatorProp
 
               {/* Existing Debts */}
               <div className="space-y-3">
-                <Label className="text-base font-semibold">💳 Dettes existantes</Label>
+                <Label className="text-base font-semibold">💳 Ce que je dois</Label>
                 {existingDebts.length === 0 ? (
                   <p className="text-sm text-muted-foreground text-center py-4">
                     Aucune dette enregistrée
@@ -620,7 +620,7 @@ export const FinancialCalculator = ({ isAuthenticated }: FinancialCalculatorProp
             {/* Assets Section */}
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <Label className="text-base font-semibold">💰 Mes actifs</Label>
+                <Label className="text-base font-semibold">💰 Ce que je possède</Label>
                 <Button type="button" variant="outline" size="sm" onClick={addAssetField}>
                   <Plus className="h-3 w-3 mr-1" />
                   Ajouter
@@ -673,7 +673,7 @@ export const FinancialCalculator = ({ isAuthenticated }: FinancialCalculatorProp
 
               {assets.length === 0 && (
                 <p className="text-sm text-muted-foreground text-center py-2">
-                  Aucun actif ajouté
+                  Aucun avoir ajouté
                 </p>
               )}
             </div>
@@ -681,7 +681,7 @@ export const FinancialCalculator = ({ isAuthenticated }: FinancialCalculatorProp
             {/* Debts Section */}
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <Label className="text-base font-semibold">💳 Mes dettes</Label>
+                <Label className="text-base font-semibold">💳 Ce que je dois</Label>
                 <Button type="button" variant="outline" size="sm" onClick={addDebtField}>
                   <Plus className="h-3 w-3 mr-1" />
                   Ajouter
@@ -746,7 +746,7 @@ export const FinancialCalculator = ({ isAuthenticated }: FinancialCalculatorProp
               <div className="flex items-center justify-between text-sm">
                 <span className="flex items-center gap-2">
                   <TrendingUp className="h-4 w-4 text-green-600" />
-                  Total actifs
+                  Ce que je possède
                 </span>
                 <span className="font-semibold text-green-600">{formatPrice(totalAssets)}</span>
               </div>
@@ -756,7 +756,7 @@ export const FinancialCalculator = ({ isAuthenticated }: FinancialCalculatorProp
               <div className="flex items-center justify-between text-sm">
                 <span className="flex items-center gap-2">
                   <TrendingDown className="h-4 w-4 text-red-600" />
-                  Total dettes
+                  Ce que je dois
                 </span>
                 <span className="font-semibold text-red-600">{formatPrice(totalDebts)}</span>
               </div>
