@@ -1,180 +1,172 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system - Fintech/Budget App Style */
-
-@layer utilities {
-  @keyframes shimmer {
-    0% {
-      background-position: -200% 0;
-    }
-    100% {
-      background-position: 200% 0;
-    }
-  }
-  
-  .animate-shimmer {
-    animation: shimmer 3s infinite;
-  }
-}
+/* ============================================
+   INSTITUTIONAL BANKING DESIGN SYSTEM
+   Inspired by: J.P. Morgan, HSBC, UBS, Goldman Sachs, RBC
+   ============================================ */
 
 @layer base {
   :root {
-    /* Clean Fintech Design System - Mint/YNAB Inspired */
-    --background: 0 0% 100%;
-    --foreground: 222 47% 11%;
+    /* Core Banking Colors - Ultra Professional */
+    --background: 220 14% 98%;
+    --foreground: 220 20% 10%;
     
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 220 20% 10%;
     
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover-foreground: 220 20% 10%;
     
-    /* Primary: Fresh Emerald */
-    --primary: 158 64% 42%;
+    /* Primary: Deep Navy Blue - Institutional */
+    --primary: 216 50% 12%;
     --primary-foreground: 0 0% 100%;
-    --primary-light: 158 64% 52%;
-    --primary-dark: 158 64% 32%;
+    --primary-light: 216 45% 22%;
+    --primary-dark: 216 55% 8%;
     
-    /* Secondary: Teal */
-    --secondary: 172 66% 40%;
+    /* Secondary: Slate Gray */
+    --secondary: 215 16% 47%;
     --secondary-foreground: 0 0% 100%;
     
-    /* Publish: Emerald */
-    --publish: 158 64% 35%;
+    /* Publish/Action */
+    --publish: 216 50% 12%;
     --publish-foreground: 0 0% 100%;
     
-    /* Success: Bright Green */
-    --success: 142 76% 45%;
+    /* Success: Muted Green */
+    --success: 152 35% 38%;
     --success-foreground: 0 0% 100%;
-    --success-light: 142 76% 55%;
+    --success-light: 152 30% 48%;
     
-    /* Accent colors for different tools */
-    --accent-gold: 45 93% 47%;
-    --accent-gold-foreground: 222 47% 11%;
-    --accent-blue: 217 91% 60%;
-    --accent-purple: 262 83% 58%;
+    /* Accent colors - Subdued */
+    --accent-gold: 38 25% 55%;
+    --accent-gold-foreground: 220 20% 10%;
+    --accent-blue: 216 50% 12%;
+    --accent-purple: 240 15% 45%;
     
     /* Primary Pale */
-    --primary-pale: 158 64% 95%;
-    --primary-pale-foreground: 158 64% 35%;
+    --primary-pale: 216 30% 95%;
+    --primary-pale-foreground: 216 50% 12%;
     
-    /* Muted */
-    --muted: 210 40% 96%;
+    /* Muted - Light Gray */
+    --muted: 220 14% 96%;
     --muted-foreground: 215 16% 47%;
     
     /* Accent */
-    --accent: 210 40% 96%;
-    --accent-foreground: 222 47% 11%;
+    --accent: 220 14% 96%;
+    --accent-foreground: 220 20% 10%;
     
-    /* Franchise: Orange */
-    --franchise: 25 95% 53%;
+    /* Warning/Franchise */
+    --franchise: 25 40% 50%;
     --franchise-foreground: 0 0% 100%;
     
-    --destructive: 0 84% 60%;
+    --destructive: 0 55% 50%;
     --destructive-foreground: 0 0% 100%;
     
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 158 64% 42%;
+    /* Borders - Subtle Gray */
+    --border: 220 13% 90%;
+    --input: 220 13% 90%;
+    --ring: 216 50% 12%;
     
-    /* Fresh Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(158 64% 42%) 0%, hsl(172 66% 40%) 100%);
-    --gradient-hero: linear-gradient(135deg, hsl(158 64% 97%) 0%, hsl(172 66% 95%) 50%, hsl(195 70% 96%) 100%);
-    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(210 40% 98%) 100%);
-    --gradient-success: linear-gradient(135deg, hsl(142 76% 45%) 0%, hsl(142 76% 55%) 100%);
-    --gradient-cta: linear-gradient(135deg, hsl(158 64% 42%) 0%, hsl(172 66% 40%) 100%);
+    /* No gradients in banking style - solid colors only */
+    --gradient-primary: none;
+    --gradient-hero: none;
+    --gradient-card: none;
+    --gradient-success: none;
+    --gradient-cta: none;
     
-    /* Clean Shadows */
-    --shadow-sm: 0 1px 2px hsla(222, 47%, 11%, 0.04), 0 1px 4px hsla(222, 47%, 11%, 0.02);
-    --shadow-md: 0 2px 8px hsla(222, 47%, 11%, 0.06), 0 4px 16px hsla(222, 47%, 11%, 0.03);
-    --shadow-lg: 0 8px 24px hsla(222, 47%, 11%, 0.08), 0 12px 40px hsla(222, 47%, 11%, 0.04);
-    --shadow-xl: 0 16px 48px hsla(222, 47%, 11%, 0.10), 0 24px 64px hsla(222, 47%, 11%, 0.05);
-    --shadow-premium: 0 20px 60px hsla(158, 64%, 42%, 0.15), 0 0 0 1px hsla(158, 64%, 42%, 0.1);
+    /* Minimal Shadows - Very Subtle */
+    --shadow-sm: 0 1px 2px hsla(220, 20%, 10%, 0.03);
+    --shadow-md: 0 2px 4px hsla(220, 20%, 10%, 0.04);
+    --shadow-lg: 0 4px 8px hsla(220, 20%, 10%, 0.05);
+    --shadow-xl: 0 8px 16px hsla(220, 20%, 10%, 0.06);
+    --shadow-premium: 0 1px 3px hsla(220, 20%, 10%, 0.04);
     
-    --radius: 0.75rem;
+    /* Strict Border Radius - Maximum 6px */
+    --radius: 0.375rem;
     
-    --chart-1: 158 64% 42%;
-    --chart-2: 172 66% 40%;
-    --chart-3: 217 91% 60%;
-    --chart-4: 262 83% 58%;
-    --chart-5: 45 93% 47%;
+    /* Chart Colors - Neutral Banking */
+    --chart-1: 216 50% 12%;
+    --chart-2: 215 16% 47%;
+    --chart-3: 220 13% 65%;
+    --chart-4: 152 35% 38%;
+    --chart-5: 38 25% 55%;
 
-    --sidebar-background: 222 47% 11%;
+    /* Sidebar - Professional Navy */
+    --sidebar-background: 216 50% 12%;
     --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 158 64% 42%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 222 35% 18%;
+    --sidebar-primary: 0 0% 100%;
+    --sidebar-primary-foreground: 216 50% 12%;
+    --sidebar-accent: 216 45% 18%;
     --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 222 35% 20%;
-    --sidebar-ring: 158 64% 42%;
+    --sidebar-border: 216 40% 20%;
+    --sidebar-ring: 0 0% 100%;
   }
 
   .dark {
-    /* Dark Mode - Clean Fintech */
-    --background: 222 47% 8%;
-    --foreground: 0 0% 98%;
+    /* Dark Mode - Institutional */
+    --background: 220 20% 8%;
+    --foreground: 0 0% 95%;
     
-    --card: 222 40% 12%;
-    --card-foreground: 0 0% 98%;
+    --card: 220 18% 12%;
+    --card-foreground: 0 0% 95%;
     
-    --popover: 222 40% 12%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 220 18% 12%;
+    --popover-foreground: 0 0% 95%;
     
-    --primary: 158 64% 50%;
-    --primary-foreground: 0 0% 100%;
-    --primary-light: 158 64% 60%;
-    --primary-dark: 158 64% 40%;
+    --primary: 210 40% 65%;
+    --primary-foreground: 220 20% 8%;
+    --primary-light: 210 40% 75%;
+    --primary-dark: 210 40% 55%;
     
-    --secondary: 172 50% 45%;
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 215 20% 55%;
+    --secondary-foreground: 220 20% 8%;
     
-    --publish: 158 64% 45%;
-    --publish-foreground: 0 0% 100%;
+    --publish: 210 40% 65%;
+    --publish-foreground: 220 20% 8%;
     
-    --success: 142 76% 50%;
-    --success-foreground: 0 0% 100%;
-    --success-light: 142 76% 60%;
+    --success: 152 30% 50%;
+    --success-foreground: 220 20% 8%;
+    --success-light: 152 25% 60%;
     
-    --accent-gold: 45 93% 55%;
-    --accent-gold-foreground: 222 47% 8%;
+    --accent-gold: 38 30% 60%;
+    --accent-gold-foreground: 220 20% 8%;
     
-    --primary-pale: 158 50% 20%;
-    --primary-pale-foreground: 158 64% 60%;
+    --primary-pale: 216 30% 18%;
+    --primary-pale-foreground: 210 40% 70%;
     
-    --muted: 222 30% 18%;
-    --muted-foreground: 215 20% 65%;
+    --muted: 220 15% 16%;
+    --muted-foreground: 215 15% 55%;
     
-    --accent: 222 30% 18%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 220 15% 16%;
+    --accent-foreground: 0 0% 95%;
     
-    --franchise: 25 95% 60%;
-    --franchise-foreground: 0 0% 100%;
+    --franchise: 25 45% 55%;
+    --franchise-foreground: 220 20% 8%;
     
-    --destructive: 0 75% 55%;
+    --destructive: 0 50% 55%;
     --destructive-foreground: 0 0% 100%;
     
-    --border: 215 20% 25%;
-    --input: 215 20% 25%;
-    --ring: 210 85% 55%;
+    --border: 220 15% 22%;
+    --input: 220 15% 22%;
+    --ring: 210 40% 65%;
     
-    --shadow-sm: 0 1px 2px hsla(0, 0%, 0%, 0.4), 0 1px 4px hsla(0, 0%, 0%, 0.3);
-    --shadow-md: 0 2px 8px hsla(0, 0%, 0%, 0.5), 0 4px 16px hsla(0, 0%, 0%, 0.4);
-    --shadow-lg: 0 8px 24px hsla(0, 0%, 0%, 0.6), 0 12px 40px hsla(0, 0%, 0%, 0.5);
-    --shadow-xl: 0 16px 48px hsla(0, 0%, 0%, 0.7), 0 24px 64px hsla(0, 0%, 0%, 0.6);
-    --shadow-premium: 0 20px 60px hsla(210, 85%, 55%, 0.25), 0 0 0 1px hsla(40, 85%, 60%, 0.15);
+    --shadow-sm: 0 1px 2px hsla(0, 0%, 0%, 0.2);
+    --shadow-md: 0 2px 4px hsla(0, 0%, 0%, 0.25);
+    --shadow-lg: 0 4px 8px hsla(0, 0%, 0%, 0.3);
+    --shadow-xl: 0 8px 16px hsla(0, 0%, 0%, 0.35);
+    --shadow-premium: 0 1px 3px hsla(0, 0%, 0%, 0.25);
     
-    --sidebar-background: 215 28% 8%;
-    --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 210 85% 55%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 215 25% 16%;
-    --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 215 20% 20%;
-    --sidebar-ring: 210 85% 55%;
+    --sidebar-background: 220 20% 8%;
+    --sidebar-foreground: 0 0% 95%;
+    --sidebar-primary: 210 40% 65%;
+    --sidebar-primary-foreground: 220 20% 8%;
+    --sidebar-accent: 220 18% 14%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 220 15% 18%;
+    --sidebar-ring: 210 40% 65%;
   }
 }
 
@@ -188,178 +180,139 @@
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    font-size: 16px;
-    line-height: 1.65;
-    letter-spacing: -0.01em;
-  }
-  
-  /* Prévenir CLS avec réservation d'espace pour les fonts */
-  body {
-    font-display: swap;
-  }
-  
-  /* Optimisation tactile mobile */
-  @media (hover: none) and (pointer: coarse) {
-    button, a {
-      min-height: 44px;
-      min-width: 44px;
-    }
+    font-size: 14px;
+    line-height: 1.5;
+    letter-spacing: 0;
   }
   
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Sora', 'Inter', sans-serif;
+    font-family: 'Inter', sans-serif;
     font-weight: 600;
-    letter-spacing: -0.03em;
-    line-height: 1.2;
+    letter-spacing: -0.01em;
+    line-height: 1.3;
   }
   
   h1 {
-    font-weight: 700;
-    letter-spacing: -0.04em;
+    font-weight: 600;
+    font-size: 1.75rem;
   }
   
   h2 {
-    font-weight: 650;
-    letter-spacing: -0.035em;
+    font-weight: 600;
+    font-size: 1.25rem;
+  }
+
+  h3 {
+    font-weight: 500;
+    font-size: 1rem;
   }
 }
 
+/* ============================================
+   INSTITUTIONAL UTILITY CLASSES
+   ============================================ */
+
 @layer utilities {
-  /* Hide scrollbar for Chrome, Safari and Opera */
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
 
-  /* Hide scrollbar for IE, Edge and Firefox */
   .scrollbar-hide {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
-  }
-  .text-gradient {
-    @apply bg-clip-text text-transparent;
-    background-image: var(--gradient-primary);
-  }
-  
-  .text-gradient-gold {
-    @apply bg-clip-text text-transparent;
-    background-image: var(--gradient-gold);
-  }
-  
-  /* Premium Card - Minimaliste et élégant */
-  .card-premium {
-    background: hsl(var(--card));
-    box-shadow: var(--shadow-sm);
-    border: 1px solid hsl(var(--border));
-    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  
-  .card-premium:hover {
-    box-shadow: var(--shadow-lg);
-    transform: translateY(-2px);
-    border-color: hsl(var(--primary) / 0.2);
-  }
-  
-  /* Premium Button - Sophistiqué */
-  .btn-premium {
-    position: relative;
-    overflow: hidden;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: var(--shadow-sm);
-  }
-  
-  .btn-premium:hover {
-    box-shadow: var(--shadow-md);
-    transform: translateY(-1px);
-  }
-  
-  .btn-premium::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.08), transparent);
-    transform: translateX(-100%);
-    transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  
-  .btn-premium:hover::before {
-    transform: translateX(100%);
-  }
-  
-  /* Glass Effect - Ultra subtil */
-  .glass-effect {
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.4);
-  }
-  
-  .dark .glass-effect {
-    background: rgba(33, 39, 55, 0.75);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-  }
-  
-  /* Premium Separator */
-  .separator-premium {
-    height: 1px;
-    background: linear-gradient(90deg, transparent, hsl(var(--border)), transparent);
-  }
-  
-  /* Subtle Hover Scale */
-  .hover-lift {
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  
-  .hover-lift:hover {
-    transform: translateY(-2px);
-  }
-  
-  /* Premium Focus Ring */
-  .focus-premium:focus-visible {
-    outline: none;
-    box-shadow: 0 0 0 3px hsl(var(--primary) / 0.12);
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 
-  /* Blog Content Formatting - Espacement professionnel et justification */
+  /* Banking Card - Ultra Clean */
+  .card-banking {
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    border-radius: 4px;
+  }
+
+  .card-banking:hover {
+    border-color: hsl(var(--primary) / 0.15);
+  }
+  
+  /* KPI Card - Institutional Style */
+  .card-kpi {
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    border-radius: 4px;
+    padding: 1.25rem;
+  }
+
+  /* Professional Button */
+  .btn-institutional {
+    font-weight: 500;
+    font-size: 0.875rem;
+    letter-spacing: 0;
+    border-radius: 4px;
+    transition: background-color 0.15s ease;
+  }
+
+  /* Table Row - Banking Style */
+  .table-row-banking {
+    border-bottom: 1px solid hsl(var(--border));
+  }
+
+  .table-row-banking:hover {
+    background: hsl(var(--muted) / 0.5);
+  }
+
+  /* Separator Line */
+  .separator-banking {
+    height: 1px;
+    background: hsl(var(--border));
+  }
+
+  /* Focus Ring - Subtle */
+  .focus-institutional:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px hsl(var(--primary) / 0.1);
+  }
+
+  /* Status Indicators */
+  .status-positive {
+    color: hsl(var(--success));
+  }
+
+  .status-negative {
+    color: hsl(var(--destructive));
+  }
+
+  .status-neutral {
+    color: hsl(var(--muted-foreground));
+  }
+}
+
+/* ============================================
+   BLOG CONTENT - Professional
+   ============================================ */
+
+@layer utilities {
   .blog-content {
-    @apply text-foreground/90;
+    @apply text-foreground;
   }
 
   .blog-content > * {
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
   }
 
   .blog-content h2 {
-    @apply text-3xl font-bold text-foreground mt-16 mb-8 pb-4 border-b-2 border-primary/20;
-    line-height: 1.3;
+    @apply text-xl font-semibold text-foreground mt-8 mb-4 pb-2 border-b border-border;
   }
 
   .blog-content h3 {
-    @apply text-2xl font-bold text-foreground mt-12 mb-6;
-    line-height: 1.4;
-  }
-
-  .blog-content h4 {
-    @apply text-xl font-semibold text-foreground mt-10 mb-5;
-    line-height: 1.5;
+    @apply text-lg font-medium text-foreground mt-6 mb-3;
   }
 
   .blog-content p {
-    @apply text-lg text-foreground/90 leading-[2] mb-8;
-    text-align: justify;
-    text-justify: inter-word;
-    hyphens: auto;
-  }
-
-  .blog-content strong,
-  .blog-content b {
-    @apply font-semibold text-foreground;
-    display: inline-block;
-    margin: 0.5rem 0;
+    @apply text-sm text-foreground leading-relaxed mb-4;
   }
 
   .blog-content ul,
   .blog-content ol {
-    @apply my-10 space-y-5 pl-8;
+    @apply my-4 space-y-2 pl-6;
   }
 
   .blog-content ul {
@@ -371,196 +324,105 @@
   }
 
   .blog-content li {
-    @apply text-lg text-foreground/90 leading-[1.9] pl-3;
-    text-align: justify;
-    text-justify: inter-word;
-  }
-
-  .blog-content li::marker {
-    @apply text-primary font-bold;
+    @apply text-sm text-foreground leading-relaxed;
   }
 
   .blog-content blockquote {
-    @apply border-l-4 border-primary pl-6 py-6 my-12 bg-primary/5 rounded-r-lg italic text-lg;
+    @apply border-l-2 border-primary pl-4 py-2 my-4 italic text-sm;
   }
 
   .blog-content a {
-    @apply text-primary font-medium no-underline hover:underline transition-colors;
+    @apply text-primary font-medium hover:underline;
   }
 
   .blog-content code {
-    @apply bg-muted px-2 py-1 rounded text-sm font-mono;
-  }
-
-  .blog-content img {
-    @apply rounded-lg shadow-lg my-12 w-full;
+    @apply bg-muted px-1.5 py-0.5 rounded text-xs font-mono;
   }
 
   .blog-content table {
-    @apply w-full border-collapse my-12;
+    @apply w-full border-collapse my-4;
   }
 
   .blog-content th {
-    @apply bg-muted font-semibold text-left p-4 border border-border;
+    @apply bg-muted font-medium text-left p-3 border border-border text-sm;
   }
 
   .blog-content td {
-    @apply p-4 border border-border;
+    @apply p-3 border border-border text-sm;
   }
-  
-  /* Blue slider variant for property pages */
-  .slider-blue [role="slider"] {
-    @apply border-blue-600;
-  }
-  
-  .slider-blue .bg-accent {
-    @apply bg-blue-600;
+}
+
+/* ============================================
+   MOBILE OPTIMIZATIONS
+   ============================================ */
+
+@media (max-width: 1024px) {
+  button, a, input, select, textarea {
+    min-height: 44px;
   }
 
-  /* TipTap Editor Styles */
-  .ProseMirror {
-    outline: none;
-  }
-
-  .ProseMirror p.is-editor-empty:first-child::before {
-    color: hsl(var(--muted-foreground));
-    content: attr(data-placeholder);
-    float: left;
-    height: 0;
-    pointer-events: none;
-  }
-
-  .ProseMirror img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 0.5rem;
-    margin: 1rem 0;
-  }
-
-  .ProseMirror a {
-    color: hsl(var(--primary));
-    text-decoration: underline;
-    cursor: pointer;
-  }
-
-  .ProseMirror blockquote {
-    border-left: 4px solid hsl(var(--primary));
-    padding-left: 1rem;
-    margin: 1rem 0;
-    font-style: italic;
-  }
-
-  .ProseMirror code {
-    background-color: hsl(var(--muted));
-    padding: 0.125rem 0.25rem;
-    border-radius: 0.25rem;
-    font-family: 'Courier New', monospace;
-  }
-
-  .ProseMirror pre {
-    background-color: hsl(var(--muted));
+  .card-kpi {
     padding: 1rem;
-    border-radius: 0.5rem;
-    overflow-x: auto;
   }
+}
 
-  .ProseMirror ul,
-  .ProseMirror ol {
-    padding-left: 1.5rem;
-  }
+/* ============================================
+   PROSEMIRROR / EDITOR STYLES
+   ============================================ */
 
-  .ProseMirror h1 {
-    font-size: 2rem;
-    font-weight: bold;
-    margin: 1.5rem 0 1rem;
-  }
+.ProseMirror {
+  outline: none;
+}
 
-  .ProseMirror h2 {
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin: 1.25rem 0 0.75rem;
-  }
+.ProseMirror p.is-editor-empty:first-child::before {
+  color: hsl(var(--muted-foreground));
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
 
-  .ProseMirror h3 {
-    font-size: 1.25rem;
-    font-weight: bold;
-    margin: 1rem 0 0.5rem;
-  }
+.ProseMirror a {
+  color: hsl(var(--primary));
+  text-decoration: underline;
+}
 
-  /* Mobile Optimization for Budget Planner */
-  @media (max-width: 1024px) {
-    /* Larger touch targets for mobile */
-    button, a, input, select, textarea {
-      min-height: 44px; /* iOS recommended touch target */
-    }
+.ProseMirror blockquote {
+  border-left: 2px solid hsl(var(--primary));
+  padding-left: 1rem;
+  margin: 1rem 0;
+  font-style: italic;
+}
 
-    /* Better tap feedback */
-    button:active, a:active {
-      opacity: 0.7;
-      transform: scale(0.98);
-      transition: all 0.1s ease;
-    }
+.ProseMirror code {
+  background-color: hsl(var(--muted));
+  padding: 0.125rem 0.25rem;
+  border-radius: 2px;
+  font-family: 'SF Mono', 'Consolas', monospace;
+  font-size: 0.875em;
+}
 
-    /* Optimize card spacing */
-    .card {
-      margin-bottom: 1rem;
-    }
+.ProseMirror pre {
+  background-color: hsl(var(--muted));
+  padding: 1rem;
+  border-radius: 4px;
+  overflow-x: auto;
+}
 
-    /* Larger text for better readability */
-    body {
-      font-size: 16px; /* Prevents iOS auto-zoom on inputs */
-    }
+.ProseMirror h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 1rem 0 0.5rem;
+}
 
-    /* Better form inputs on mobile */
-    input, select, textarea {
-      font-size: 16px !important; /* Prevents zoom on iOS */
-      padding: 12px;
-    }
+.ProseMirror h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0.75rem 0 0.5rem;
+}
 
-    /* Optimize dialog for mobile */
-    [role="dialog"] {
-      max-height: 90vh;
-      overflow-y: auto;
-    }
-
-    /* Better tab navigation on mobile */
-    [role="tablist"] button {
-      font-size: 0.75rem;
-      padding: 0.5rem;
-    }
-
-    /* Optimize scrollable containers */
-    .overflow-x-auto {
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width: thin;
-    }
-
-    /* Hide scrollbar on mobile but keep functionality */
-    .overflow-x-auto::-webkit-scrollbar {
-      height: 4px;
-    }
-
-    .overflow-x-auto::-webkit-scrollbar-thumb {
-      background: hsl(var(--muted-foreground) / 0.3);
-      border-radius: 2px;
-    }
-
-    /* Bottom safe area for mobile navigation */
-    .pb-safe {
-      padding-bottom: env(safe-area-inset-bottom, 0);
-    }
-
-    /* Optimize table display for mobile */
-    table {
-      display: block;
-      overflow-x: auto;
-      white-space: nowrap;
-    }
-
-    /* Better chart responsiveness */
-    .recharts-wrapper {
-      width: 100% !important;
-      height: auto !important;
-    }
-  }
+.ProseMirror h3 {
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 0.5rem 0 0.25rem;
 }
