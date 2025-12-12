@@ -6,11 +6,11 @@ export const OrganizationSchema = () => {
   const organizationSchema = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    "name": "Vente.club",
-    "alternateName": "Vente Club",
+    "name": "Budget.club",
+    "alternateName": "Budget Club",
     "url": siteUrl,
     "logo": `${siteUrl}/logo.png`,
-    "description": "Plateforme spécialisée dans l'achat et la vente d'entreprises au Québec. Connectez acheteurs et vendeurs d'entreprises, commerces et franchises.",
+    "description": "Plateforme de gestion budgétaire et outils financiers québécois. Calculateurs de salaire, retour d'impôt et planificateur de budget personnel.",
     "address": {
       "@type": "PostalAddress",
       "addressCountry": "CA",
@@ -22,10 +22,6 @@ export const OrganizationSchema = () => {
       "areaServed": "CA-QC",
       "availableLanguage": ["French"]
     },
-    "sameAs": [
-      "https://www.facebook.com/vente.club",
-      "https://www.linkedin.com/company/vente-club"
-    ],
     "foundingDate": "2024",
     "areaServed": {
       "@type": "State",
