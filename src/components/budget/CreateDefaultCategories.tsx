@@ -16,7 +16,7 @@ const EMOJI_TO_LUCIDE: Record<string, string> = {
   '☕': 'coffee', '🍺': 'beer', '🍻': 'beer',
   '💡': 'lightbulb', '🔌': 'zap', '⚡': 'zap',
   '🛡️': 'shield', '🔒': 'shield', '🔐': 'shield',
-  '📱': 'smartphone', '💻': 'smartphone', '📲': 'smartphone',
+  '📱': 'smartphone', '💻': 'laptop', '📲': 'smartphone',
   '📶': 'wifi', '🌐': 'wifi',
   '📺': 'tv', '🎧': 'music',
   '🏋️': 'dumbbell', '💪': 'dumbbell', '🏃': 'dumbbell',
@@ -45,7 +45,9 @@ const EMOJI_TO_LUCIDE: Record<string, string> = {
   '🐶': 'paw-print', '🐱': 'paw-print',
   '🚴': 'bike', '🏊': 'dumbbell',
   '📻': 'music', '🎤': 'music',
-  '🧾': 'receipt'
+  '🧾': 'receipt',
+  '👛': 'wallet', '💷': 'wallet',
+  '🤝': 'hand-coins', '🙏': 'hand-coins'
 };
 
 const DEFAULT_EXPENSE_CATEGORIES = [
@@ -68,7 +70,13 @@ const DEFAULT_EXPENSE_CATEGORIES = [
   { name: "Animaux", icon: "paw-print", color: "#ea580c", display_order: 16 },
   { name: "Soins personnels", icon: "sparkles", color: "#a855f7", display_order: 17 },
   { name: "Voyages", icon: "plane", color: "#0284c7", display_order: 18 },
-  { name: "Autre", icon: "box", color: "#64748b", display_order: 19 },
+  { name: "Café & Collations", icon: "coffee", color: "#78350f", display_order: 19 },
+  { name: "Électronique", icon: "laptop", color: "#1e40af", display_order: 20 },
+  { name: "Entretien maison", icon: "wrench", color: "#475569", display_order: 21 },
+  { name: "Essence", icon: "fuel", color: "#ea580c", display_order: 22 },
+  { name: "Garde d'enfants", icon: "baby", color: "#f472b6", display_order: 23 },
+  { name: "Frais bancaires", icon: "landmark", color: "#4b5563", display_order: 24 },
+  { name: "Autre", icon: "box", color: "#64748b", display_order: 25 },
 ];
 
 const DEFAULT_INCOME_CATEGORIES = [
@@ -80,7 +88,10 @@ const DEFAULT_INCOME_CATEGORIES = [
   { name: "Business", icon: "building-2", color: "#2563eb", display_order: 5 },
   { name: "Remboursements", icon: "undo", color: "#16a34a", display_order: 6 },
   { name: "Bonus", icon: "party-popper", color: "#db2777", display_order: 7 },
-  { name: "Autre", icon: "box", color: "#64748b", display_order: 8 },
+  { name: "Allocations", icon: "users", color: "#0d9488", display_order: 8 },
+  { name: "Pension", icon: "wallet", color: "#7c3aed", display_order: 9 },
+  { name: "Pourboires", icon: "hand-coins", color: "#eab308", display_order: 10 },
+  { name: "Autre", icon: "box", color: "#64748b", display_order: 11 },
 ];
 
 /**

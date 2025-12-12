@@ -1,22 +1,41 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { SEO } from "@/components/SEO";
 import { BreadcrumbSchema } from "@/components/BreadcrumbSchema";
-import { Loader2, Target, Settings2, Plus } from "lucide-react";
+import { Loader2, Target, Settings2, Info, X, BookOpen, CheckCircle2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { BudgetPlanner } from "@/components/budget/BudgetPlanner";
 import { CategoryManager } from "@/components/budget/CategoryManager";
 import { CreateDefaultCategories } from "@/components/budget/CreateDefaultCategories";
 import { BudgetOnboarding } from "@/components/budget/BudgetOnboarding";
-import { Card, CardContent } from "@/components/ui/card";
+import { BudgetTips } from "@/components/budget/BudgetTips";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+
+const BUDGET_FEATURES = [
+  "Définissez un budget pour chaque catégorie de dépense",
+  "Suivez vos revenus et dépenses en temps réel",
+  "Visualisez votre progression avec des graphiques",
+  "Recevez des alertes quand vous dépassez vos limites",
+  "Réorganisez vos catégories par glisser-déposer",
+  "Créez des catégories personnalisées selon vos besoins"
+];
 
 const BudgetPlan = () => {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
   const isAuthenticated = !!user;
+  const [showInfo, setShowInfo] = useState(() => {
+    return localStorage.getItem('budget-info-dismissed') !== 'true';
+  });
+
+  const dismissInfo = () => {
+    localStorage.setItem('budget-info-dismissed', 'true');
+    setShowInfo(false);
+  };
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -93,8 +112,50 @@ const BudgetPlan = () => {
               </div>
             </div>
 
+            {/* Info card about budgeting - dismissible */}
+            {showInfo && (
+              <Card className="mb-6 border-blue-500/20 bg-gradient-to-br from-blue-500/5 to-transparent">
+                <CardHeader className="pb-2">
+                  <div className="flex items-start justify-between">
+                    <CardTitle className="text-base font-semibold flex items-center gap-2">
+                      <BookOpen className="h-5 w-5 text-blue-600" />
+                      C'est quoi un budget?
+                    </CardTitle>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-7 w-7 -mt-1 -mr-2"
+                      onClick={dismissInfo}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <p className="text-sm text-muted-foreground">
+                    Un budget est un plan qui vous aide à <strong>contrôler où va votre argent</strong>. 
+                    Au lieu de vous demander "où est passé mon argent?", vous décidez à l'avance 
+                    combien vous voulez dépenser dans chaque catégorie.
+                  </p>
+                  <div className="grid sm:grid-cols-2 gap-2">
+                    {BUDGET_FEATURES.map((feature, index) => (
+                      <div key={index} className="flex items-start gap-2 text-sm">
+                        <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
+                        <span className="text-muted-foreground">{feature}</span>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Budget Planner - Everything on one page */}
             <BudgetPlanner isAuthenticated={isAuthenticated} />
+
+            {/* Budget Tips Section */}
+            <div className="mt-8">
+              <BudgetTips />
+            </div>
           </div>
         </div>
       </>
