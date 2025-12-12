@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { SEO } from "@/components/SEO";
 import { BreadcrumbSchema } from "@/components/BreadcrumbSchema";
-import { Loader2, TrendingUp, TrendingDown, Wallet, ArrowUpRight, ArrowDownRight, Plus, ChevronRight } from "lucide-react";
+import { Loader2, TrendingUp, TrendingDown, Wallet, ArrowUpRight, ArrowDownRight, Plus, ChevronRight, Target } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
@@ -11,6 +11,7 @@ import { BudgetPlanner } from "@/components/budget/BudgetPlanner";
 import { QuickExpenseTracker } from "@/components/budget/QuickExpenseTrackerPro";
 import { ExpensesByCategory } from "@/components/budget/ExpensesByCategory";
 import { FinancialHealthScore } from "@/components/budget/FinancialHealthScore";
+import { FinancialGoals } from "@/components/budget/FinancialGoals";
 import { BudgetOnboarding } from "@/components/budget/BudgetOnboarding";
 import { CreateDefaultCategories } from "@/components/budget/CreateDefaultCategories";
 import { OfflineIndicator } from "@/components/budget/OfflineIndicator";
@@ -308,6 +309,19 @@ const BudgetCalculator = () => {
                 </CardContent>
               </Card>
             </div>
+
+            {/* Financial Goals Section */}
+            <Card className="mb-6 border-border">
+              <CardHeader className="pb-2 border-b border-border">
+                <div className="flex items-center gap-2">
+                  <Target className="h-4 w-4 text-primary" />
+                  <CardTitle className="text-sm font-medium">Objectifs financiers</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-4">
+                <FinancialGoals isAuthenticated={isAuthenticated} />
+              </CardContent>
+            </Card>
 
             {/* Budget Planner */}
             <Card className="border-border">

@@ -151,16 +151,6 @@ const Header = () => {
               Transactions
             </Button>
 
-            <Button 
-              variant="ghost"
-              onClick={() => navigate("/budget/objectifs")} 
-              className={cn(
-                "h-9 px-4 font-medium text-sm rounded-md text-muted-foreground hover:text-foreground hover:bg-muted",
-                isActive('/budget/objectifs') && "bg-muted text-foreground"
-              )}
-            >
-              Objectifs
-            </Button>
 
             <Button 
               variant="ghost"
@@ -319,18 +309,6 @@ const Header = () => {
               Transactions
             </button>
 
-            <button
-              onClick={() => {
-                navigate("/budget/objectifs");
-                setMobileMenuOpen(false);
-              }}
-              className={cn(
-                "w-full text-left px-4 py-2.5 rounded-md transition-colors text-sm font-medium",
-                isActive('/budget/objectifs') ? "bg-muted text-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"
-              )}
-            >
-              Objectifs
-            </button>
 
             <button
               onClick={() => {

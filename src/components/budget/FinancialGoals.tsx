@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Target, Trash2, Trophy, TrendingUp } from "lucide-react";
+import { Plus, Target, Trash2, Trophy, TrendingUp, Plane, Home, Car, AlertTriangle, Wallet, CreditCard, BarChart3, ShoppingBag, Circle } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,16 +15,28 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import confetti from "canvas-confetti";
 
+const GOAL_ICONS: Record<string, any> = {
+  vacation: Plane,
+  house_downpayment: Home,
+  car: Car,
+  emergency_fund: AlertTriangle,
+  savings: Wallet,
+  debt_payoff: CreditCard,
+  investment: BarChart3,
+  purchase: ShoppingBag,
+  other: Target,
+};
+
 const GOAL_TYPES = [
-  { value: 'vacation', label: '✈️ Voyage', icon: '✈️' },
-  { value: 'house_downpayment', label: '🏠 Mise de fond maison', icon: '🏠' },
-  { value: 'car', label: '🚗 Voiture', icon: '🚗' },
-  { value: 'emergency_fund', label: '🚨 Fonds d\'urgence', icon: '🚨' },
-  { value: 'savings', label: '💰 Épargne générale', icon: '💰' },
-  { value: 'debt_payoff', label: '💳 Remboursement de dettes', icon: '💳' },
-  { value: 'investment', label: '📈 Investissement', icon: '📈' },
-  { value: 'purchase', label: '🛍️ Achat important', icon: '🛍️' },
-  { value: 'other', label: '🎯 Autre', icon: '🎯' },
+  { value: 'vacation', label: 'Voyage', icon: Plane },
+  { value: 'house_downpayment', label: 'Mise de fond maison', icon: Home },
+  { value: 'car', label: 'Voiture', icon: Car },
+  { value: 'emergency_fund', label: 'Fonds d\'urgence', icon: AlertTriangle },
+  { value: 'savings', label: 'Épargne générale', icon: Wallet },
+  { value: 'debt_payoff', label: 'Remboursement de dettes', icon: CreditCard },
+  { value: 'investment', label: 'Investissement', icon: BarChart3 },
+  { value: 'purchase', label: 'Achat important', icon: ShoppingBag },
+  { value: 'other', label: 'Autre', icon: Target },
 ];
 
 export const FinancialGoals = ({ isAuthenticated }: { isAuthenticated: boolean }) => {
@@ -74,6 +86,7 @@ export const FinancialGoals = ({ isAuthenticated }: { isAuthenticated: boolean }
       }
 
       const goalType = GOAL_TYPES.find(t => t.value === type);
+      const IconComponent = goalType?.icon || Target;
       const { error } = await supabase
         .from('financial_goals')
         .insert({
@@ -82,7 +95,7 @@ export const FinancialGoals = ({ isAuthenticated }: { isAuthenticated: boolean }
           type,
           target_amount: amount,
           deadline: deadline || null,
-          icon: goalType?.icon || '🎯',
+          icon: goalType?.value || 'other',
           notes: notes?.trim() || null,
         });
 
@@ -249,9 +262,17 @@ export const FinancialGoals = ({ isAuthenticated }: { isAuthenticated: boolean }
                     <SelectValue placeholder="Sélectionner" />
                   </SelectTrigger>
                   <SelectContent>
-                    {GOAL_TYPES.map(t => (
-                      <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
-                    ))}
+                    {GOAL_TYPES.map(t => {
+                      const Icon = t.icon;
+                      return (
+                        <SelectItem key={t.value} value={t.value}>
+                          <div className="flex items-center gap-2">
+                            <Icon className="h-4 w-4 text-primary" />
+                            <span>{t.label}</span>
+                          </div>
+                        </SelectItem>
+                      );
+                    })}
                   </SelectContent>
                 </Select>
               </div>
@@ -294,15 +315,20 @@ export const FinancialGoals = ({ isAuthenticated }: { isAuthenticated: boolean }
               const estimatedMonths = avgMonthlySavings > 0 ? Math.ceil(remaining / avgMonthlySavings) : null;
 
               return (
-                <Card key={goal.id} className="hover:shadow-lg transition-all duration-300 hover:scale-[1.02] animate-fade-in">
+                <Card key={goal.id} className="hover:shadow-lg transition-all duration-300 hover:scale-[1.02] animate-fade-in border-border">
                   <CardHeader>
                     <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="text-3xl">{goal.icon}</span>
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                          {(() => {
+                            const Icon = GOAL_ICONS[goal.type] || Target;
+                            return <Icon className="h-5 w-5 text-primary" />;
+                          })()}
+                        </div>
                         <div>
                           <CardTitle className="text-lg">{goal.name}</CardTitle>
                           <CardDescription>
-                            {GOAL_TYPES.find(t => t.value === goal.type)?.label.replace(/^[^\s]+ /, '')}
+                            {GOAL_TYPES.find(t => t.value === goal.type)?.label}
                           </CardDescription>
                         </div>
                       </div>
@@ -406,10 +432,15 @@ export const FinancialGoals = ({ isAuthenticated }: { isAuthenticated: boolean }
           </h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {completedGoals.map((goal: any) => (
-              <Card key={goal.id} className="border-green-200 dark:border-green-800 bg-green-50/50 dark:bg-green-950/20">
+              <Card key={goal.id} className="border-success/20 bg-success/5">
                 <CardContent className="pt-6">
                   <div className="flex items-center gap-3 mb-2">
-                    <span className="text-3xl">{goal.icon}</span>
+                    <div className="w-10 h-10 rounded-lg bg-success/10 flex items-center justify-center">
+                      {(() => {
+                        const Icon = GOAL_ICONS[goal.type] || Target;
+                        return <Icon className="h-5 w-5 text-success" />;
+                      })()}
+                    </div>
                     <div>
                       <div className="font-semibold">{goal.name}</div>
                       <div className="text-sm text-muted-foreground">
