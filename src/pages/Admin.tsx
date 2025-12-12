@@ -428,9 +428,6 @@ const Admin = () => {
     city: z.string().trim().min(2, "Ville requise"),
     province: z.string().trim().min(2, "Province requise"),
     industry: z.string().min(1, "Secteur requis"),
-    seller_name: z.string().trim().max(200).optional(),
-    seller_phone: z.string().trim().max(20).optional(),
-    seller_email: z.string().email("Email invalide").optional().or(z.literal('')),
     chat_disabled: z.boolean(),
     source_url: z.string().url("URL invalide").optional().or(z.literal('')),
   });
@@ -456,9 +453,6 @@ const Admin = () => {
         city: validated.city,
         province: validated.province,
         industry: validated.industry as any,
-        seller_name: validated.seller_name || null,
-        seller_phone: validated.seller_phone || null,
-        seller_email: validated.seller_email || null,
         chat_disabled: validated.chat_disabled,
         source_url: validated.source_url || null,
         updated_by_admin: true,
@@ -1333,7 +1327,7 @@ const Admin = () => {
                         <div className="flex-1">
                           <CardTitle className="text-lg">{business.title}</CardTitle>
                           <CardDescription className="mt-1">
-                            {business.seller_email || "Email non disponible"}
+                            {business.city || "Ville non spécifiée"}
                           </CardDescription>
                         </div>
                         <Badge variant="default" className="bg-orange-500">
