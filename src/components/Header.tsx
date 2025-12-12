@@ -128,73 +128,71 @@ const Header = () => {
           </div>
 
           {/* Desktop Navigation - Clean Banking Style */}
-          <div className="hidden lg:flex items-center gap-0.5">
-            <Button 
-              variant="ghost"
-              onClick={() => navigate("/budget")} 
-              className={cn(
-                "h-9 px-4 font-medium text-sm rounded-md text-muted-foreground hover:text-foreground hover:bg-muted",
-                isActive('/budget') && !isActive('/budget/historique') && !isActive('/budget/objectifs') && !isActive('/budget/valeur-nette') && !isActive('/budget/analyses') && "bg-muted text-foreground"
-              )}
-            >
-              Tableau de bord
-            </Button>
+          <div className="hidden lg:flex items-center gap-1">
+            {/* Budget Dropdown - Section principale */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="ghost"
+                  className={cn(
+                    "h-9 px-4 font-medium text-sm rounded-md text-muted-foreground hover:text-foreground hover:bg-muted gap-1",
+                    isActive('/budget') && "bg-muted text-foreground"
+                  )}
+                >
+                  <PiggyBank className="h-4 w-4" />
+                  Budget
+                  <ChevronDown className="h-3 w-3" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-56 rounded-md border border-border bg-card">
+                <DropdownMenuItem onClick={() => navigate("/budget")} className="cursor-pointer py-2.5 text-sm">
+                  <Wallet className="mr-2 h-4 w-4 text-muted-foreground" />
+                  Mon budget
+                  <span className="ml-auto text-xs text-muted-foreground">Planifier</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate("/budget/historique")} className="cursor-pointer py-2.5 text-sm">
+                  <Receipt className="mr-2 h-4 w-4 text-muted-foreground" />
+                  Mes dépenses
+                  <span className="ml-auto text-xs text-muted-foreground">Suivre</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => navigate("/budget/valeur-nette")} className="cursor-pointer py-2.5 text-sm">
+                  <Target className="mr-2 h-4 w-4 text-muted-foreground" />
+                  Ma valeur nette
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate("/budget/analyses")} className="cursor-pointer py-2.5 text-sm">
+                  <Lightbulb className="mr-2 h-4 w-4 text-muted-foreground" />
+                  Analyses & conseils
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
-            <Button 
-              variant="ghost"
-              onClick={() => navigate("/budget/historique")} 
-              className={cn(
-                "h-9 px-4 font-medium text-sm rounded-md text-muted-foreground hover:text-foreground hover:bg-muted",
-                isActive('/budget/historique') && "bg-muted text-foreground"
-              )}
-            >
-              Transactions
-            </Button>
-
-            <Button 
-              variant="ghost"
-              onClick={() => navigate("/budget/valeur-nette")} 
-              className={cn(
-                "h-9 px-4 font-medium text-sm rounded-md text-muted-foreground hover:text-foreground hover:bg-muted",
-                isActive('/budget/valeur-nette') && "bg-muted text-foreground"
-              )}
-            >
-              Patrimoine
-            </Button>
-
-            <Button 
-              variant="ghost"
-              onClick={() => navigate("/budget/analyses")} 
-              className={cn(
-                "h-9 px-4 font-medium text-sm rounded-md text-muted-foreground hover:text-foreground hover:bg-muted",
-                isActive('/budget/analyses') && "bg-muted text-foreground"
-              )}
-            >
-              Analyses
-            </Button>
-
-            <Button 
-              variant="ghost"
-              onClick={() => navigate("/outils/salaire")} 
-              className={cn(
-                "h-9 px-4 font-medium text-sm rounded-md text-muted-foreground hover:text-foreground hover:bg-muted",
-                isActive('/outils/salaire') && "bg-muted text-foreground"
-              )}
-            >
-              Salaire
-            </Button>
-
-            <Button 
-              variant="ghost"
-              onClick={() => navigate("/impots")} 
-              className={cn(
-                "h-9 px-4 font-medium text-sm rounded-md text-muted-foreground hover:text-foreground hover:bg-muted",
-                isActive('/impots') && "bg-muted text-foreground"
-              )}
-            >
-              Impôt – Estimation
-            </Button>
-
+            {/* Outils Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="ghost"
+                  className={cn(
+                    "h-9 px-4 font-medium text-sm rounded-md text-muted-foreground hover:text-foreground hover:bg-muted gap-1",
+                    (isActive('/outils') || isActive('/impots')) && "bg-muted text-foreground"
+                  )}
+                >
+                  <Calculator className="h-4 w-4" />
+                  Outils
+                  <ChevronDown className="h-3 w-3" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-56 rounded-md border border-border bg-card">
+                <DropdownMenuItem onClick={() => navigate("/outils/salaire")} className="cursor-pointer py-2.5 text-sm">
+                  <Calculator className="mr-2 h-4 w-4 text-muted-foreground" />
+                  Calculateur salaire
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate("/impots")} className="cursor-pointer py-2.5 text-sm">
+                  <Receipt className="mr-2 h-4 w-4 text-muted-foreground" />
+                  Impôt – Estimation
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
           {/* Right Side Actions */}
@@ -290,19 +288,24 @@ const Header = () => {
         {/* Mobile Menu - Clean Banking Style */}
         {mobileMenuOpen && (
           <div className="lg:hidden pb-4 space-y-0.5 border-t border-border pt-3">
+            {/* Budget Section */}
+            <div className="px-4 py-1.5">
+              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Budget</span>
+            </div>
             <button
               onClick={() => {
                 navigate("/budget");
                 setMobileMenuOpen(false);
               }}
               className={cn(
-                "w-full text-left px-4 py-2.5 rounded-md transition-colors text-sm font-medium",
-                isActive('/budget') && !isActive('/budget/historique') && !isActive('/budget/objectifs') && !isActive('/budget/valeur-nette') && !isActive('/budget/analyses')
+                "w-full text-left px-4 py-2.5 rounded-md transition-colors text-sm font-medium flex items-center gap-2",
+                isActive('/budget') && !isActive('/budget/historique') && !isActive('/budget/valeur-nette') && !isActive('/budget/analyses')
                   ? "bg-muted text-foreground" 
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
               )}
             >
-              Tableau de bord
+              <Wallet className="h-4 w-4" />
+              Mon budget
             </button>
 
             <button
@@ -311,11 +314,12 @@ const Header = () => {
                 setMobileMenuOpen(false);
               }}
               className={cn(
-                "w-full text-left px-4 py-2.5 rounded-md transition-colors text-sm font-medium",
+                "w-full text-left px-4 py-2.5 rounded-md transition-colors text-sm font-medium flex items-center gap-2",
                 isActive('/budget/historique') ? "bg-muted text-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"
               )}
             >
-              Transactions
+              <Receipt className="h-4 w-4" />
+              Mes dépenses
             </button>
 
             <button
@@ -324,11 +328,12 @@ const Header = () => {
                 setMobileMenuOpen(false);
               }}
               className={cn(
-                "w-full text-left px-4 py-2.5 rounded-md transition-colors text-sm font-medium",
+                "w-full text-left px-4 py-2.5 rounded-md transition-colors text-sm font-medium flex items-center gap-2",
                 isActive('/budget/valeur-nette') ? "bg-muted text-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"
               )}
             >
-              Patrimoine
+              <Target className="h-4 w-4" />
+              Ma valeur nette
             </button>
 
             <button
@@ -337,14 +342,19 @@ const Header = () => {
                 setMobileMenuOpen(false);
               }}
               className={cn(
-                "w-full text-left px-4 py-2.5 rounded-md transition-colors text-sm font-medium",
+                "w-full text-left px-4 py-2.5 rounded-md transition-colors text-sm font-medium flex items-center gap-2",
                 isActive('/budget/analyses') ? "bg-muted text-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"
               )}
             >
-              Analyses
+              <Lightbulb className="h-4 w-4" />
+              Analyses & conseils
             </button>
 
+            {/* Outils Section */}
             <div className="border-t border-border my-2" />
+            <div className="px-4 py-1.5">
+              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Outils</span>
+            </div>
             
             <button
               onClick={() => {
@@ -352,10 +362,11 @@ const Header = () => {
                 setMobileMenuOpen(false);
               }}
               className={cn(
-                "w-full text-left px-4 py-2.5 rounded-md transition-colors text-sm font-medium",
+                "w-full text-left px-4 py-2.5 rounded-md transition-colors text-sm font-medium flex items-center gap-2",
                 isActive('/outils/salaire') ? "bg-muted text-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"
               )}
             >
+              <Calculator className="h-4 w-4" />
               Calculateur salaire
             </button>
             
@@ -365,24 +376,27 @@ const Header = () => {
                 setMobileMenuOpen(false);
               }}
               className={cn(
-                "w-full text-left px-4 py-2.5 rounded-md transition-colors text-sm font-medium",
+                "w-full text-left px-4 py-2.5 rounded-md transition-colors text-sm font-medium flex items-center gap-2",
                 isActive('/impots') ? "bg-muted text-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"
               )}
             >
-              Simulateur d'impôts
+              <Receipt className="h-4 w-4" />
+              Impôt – Estimation
             </button>
             
-            
             {isAdmin && (
-              <button
-                onClick={() => {
-                  navigate("/admin");
-                  setMobileMenuOpen(false);
-                }}
-                className="w-full text-left px-4 py-2.5 rounded-md text-muted-foreground hover:bg-muted hover:text-foreground transition-colors text-sm font-medium"
-              >
-                Admin
-              </button>
+              <>
+                <div className="border-t border-border my-2" />
+                <button
+                  onClick={() => {
+                    navigate("/admin");
+                    setMobileMenuOpen(false);
+                  }}
+                  className="w-full text-left px-4 py-2.5 rounded-md text-muted-foreground hover:bg-muted hover:text-foreground transition-colors text-sm font-medium"
+                >
+                  Admin
+                </button>
+              </>
             )}
 
             {user && (
@@ -393,8 +407,9 @@ const Header = () => {
                     navigate("/settings");
                     setMobileMenuOpen(false);
                   }}
-                  className="w-full text-left px-4 py-2.5 rounded-md text-muted-foreground hover:bg-muted hover:text-foreground transition-colors text-sm font-medium"
+                  className="w-full text-left px-4 py-2.5 rounded-md text-muted-foreground hover:bg-muted hover:text-foreground transition-colors text-sm font-medium flex items-center gap-2"
                 >
+                  <Settings className="h-4 w-4" />
                   Paramètres
                 </button>
               </>
