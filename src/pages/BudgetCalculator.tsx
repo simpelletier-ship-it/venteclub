@@ -252,16 +252,16 @@ const BudgetCalculator = () => {
                       <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-widest">Solde</span>
                       <p className={cn(
                         "text-2xl lg:text-3xl font-bold mt-2 tracking-tight",
-                        monthlyBalance >= 0 ? "text-primary" : "text-amber-600 dark:text-amber-400"
+                        monthlyBalance >= 0 ? "text-primary" : "text-[#C7463D]"
                       )}>
                         {monthlyBalance >= 0 ? '+' : ''}{formatPrice(monthlyBalance)}
                       </p>
                     </div>
                     <div className={cn(
                       "w-11 h-11 rounded-xl flex items-center justify-center",
-                      monthlyBalance >= 0 ? "bg-primary/10" : "bg-amber-500/10"
+                      monthlyBalance >= 0 ? "bg-primary/10" : "bg-[#C7463D]/10"
                     )}>
-                      <Wallet className={cn("h-5 w-5", monthlyBalance >= 0 ? "text-primary" : "text-amber-500")} />
+                      <Wallet className={cn("h-5 w-5", monthlyBalance >= 0 ? "text-primary" : "text-[#C7463D]")} />
                     </div>
                   </div>
                 </CardContent>
