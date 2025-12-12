@@ -336,6 +336,10 @@ export const DebtPayoffPlanner = () => {
               {sortedDebts.map((debt, index) => {
                 const months = calculatePayoffMonths(debt, index === 0 ? extraPayment : 0);
                 const payoffDate = getPayoffDate(months);
+                const balance = Number(debt.balance);
+                const interestRate = Number(debt.interest_rate);
+                const annualInterest = balance * (interestRate / 100);
+                const monthlyInterest = annualInterest / 12;
 
                 return (
                   <motion.div
@@ -352,7 +356,7 @@ export const DebtPayoffPlanner = () => {
                         <Badge variant="outline" className="text-xs">{getDebtTypeLabel(debt.type)}</Badge>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="font-bold">{formatPrice(debt.balance)}</span>
+                        <span className="font-bold">{formatPrice(balance)}</span>
                         <Button 
                           variant="ghost" 
                           size="icon" 
@@ -372,7 +376,15 @@ export const DebtPayoffPlanner = () => {
                       </div>
                     </div>
                     <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
-                      <span>{debt.interest_rate}% d'intérêt • Min: {formatPrice(debt.minimum_payment || Number(debt.balance) * 0.02)}/mois</span>
+                      <div className="flex items-center gap-3">
+                        <span>{interestRate}% d'intérêt</span>
+                        <span className="text-red-500 font-medium">
+                          ~{formatPrice(monthlyInterest)}/mois en intérêts
+                        </span>
+                        <span className="text-red-600/70">
+                          ({formatPrice(annualInterest)}/an)
+                        </span>
+                      </div>
                       <span className="flex items-center gap-1">
                         <Calendar className="w-3 h-3" />
                         Libéré: {payoffDate}
