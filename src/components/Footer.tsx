@@ -14,7 +14,7 @@ export const Footer = () => {
               </span>
             </Link>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              La plateforme québécoise pour gérer votre budget personnel et atteindre vos objectifs financiers.
+              Vente.club – la plateforme qui clarifie vos finances.
             </p>
           </div>
 
