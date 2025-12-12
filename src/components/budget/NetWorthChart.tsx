@@ -214,11 +214,11 @@ export const NetWorthChart = ({
           </ResponsiveContainer>
         </div>
 
-        {/* Assets & Debts Summary */}
-        <div className="grid grid-cols-2 gap-8 mt-6 pt-6 border-t border-border">
+        {/* Assets, Debts & Net Worth Summary */}
+        <div className="grid grid-cols-3 gap-6 mt-6 pt-6 border-t border-border">
           <div>
             <p className="text-sm text-muted-foreground mb-1">Actifs</p>
-            <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
+            <p className="text-xl font-bold text-emerald-600 dark:text-emerald-400">
               {formatPrice(totalAssets)}
             </p>
             {assetNames.length > 0 && (
@@ -231,7 +231,7 @@ export const NetWorthChart = ({
           
           <div>
             <p className="text-sm text-muted-foreground mb-1">Passifs</p>
-            <p className="text-2xl font-bold text-red-600 dark:text-red-400">
+            <p className="text-xl font-bold text-red-600 dark:text-red-400">
               {formatPrice(totalDebts)}
             </p>
             {debtNames.length > 0 && (
@@ -240,6 +240,13 @@ export const NetWorthChart = ({
                 <span>{debtNames.slice(0, 3).join(', ')}{debtNames.length > 3 ? '...' : ''}</span>
               </div>
             )}
+          </div>
+
+          <div>
+            <p className="text-sm text-muted-foreground mb-1">Valeur nette</p>
+            <p className={`text-xl font-bold ${netWorth >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-orange-600 dark:text-orange-400'}`}>
+              {formatPrice(netWorth)}
+            </p>
           </div>
         </div>
       </CardContent>
