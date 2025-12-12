@@ -323,12 +323,12 @@ export const SimpleNetWorthTracker = ({ currentNetWorth, isAuthenticated }: Simp
       <div className="grid grid-cols-3 gap-3">
         <div className="bg-emerald-500/10 rounded-xl p-4 text-center">
           <TrendingUp className="w-5 h-5 text-emerald-600 mx-auto mb-1" />
-          <div className="text-xs text-muted-foreground">Actifs</div>
+          <div className="text-xs text-muted-foreground">Ce que je possède</div>
           <div className="text-lg font-bold text-emerald-600">{formatPrice(totalAssets)}</div>
         </div>
         <div className="bg-red-500/10 rounded-xl p-4 text-center">
           <TrendingDown className="w-5 h-5 text-red-600 mx-auto mb-1" />
-          <div className="text-xs text-muted-foreground">Passifs</div>
+          <div className="text-xs text-muted-foreground">Ce que je dois</div>
           <div className="text-lg font-bold text-red-600">{formatPrice(totalDebts)}</div>
           {totalMonthlyInterest > 0 && (
             <TooltipProvider>
@@ -385,7 +385,7 @@ export const SimpleNetWorthTracker = ({ currentNetWorth, isAuthenticated }: Simp
           {/* Assets List */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-emerald-600">Actifs</span>
+              <span className="text-sm font-medium text-emerald-600">Ce que je possède</span>
               <Button 
                 variant="ghost" 
                 size="sm" 
@@ -500,7 +500,7 @@ export const SimpleNetWorthTracker = ({ currentNetWorth, isAuthenticated }: Simp
           {/* Debts List */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-red-600">Passifs</span>
+              <span className="text-sm font-medium text-red-600">Ce que je dois</span>
               <Button 
                 variant="ghost" 
                 size="sm" 
