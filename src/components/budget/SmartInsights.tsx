@@ -11,7 +11,10 @@ import {
   ThumbsUp,
   ThumbsDown,
   DollarSign,
-  PiggyBank
+  PiggyBank,
+  Trophy,
+  CreditCard,
+  Calendar
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -56,7 +59,7 @@ export const SmartInsights = () => {
     {
       id: "4",
       type: "achievement",
-      title: "Objectif épargne atteint! 🎉",
+      title: "Objectif épargne atteint!",
       description: "Félicitations! Vous avez atteint 75% de votre objectif 'Fonds d'urgence'.",
       priority: "low",
     },
@@ -73,26 +76,26 @@ export const SmartInsights = () => {
   const getIcon = (type: Insight["type"]) => {
     switch (type) {
       case "saving":
-        return <DollarSign className="w-5 h-5 text-emerald-600" />;
+        return <DollarSign className="w-5 h-5 text-success" />;
       case "warning":
-        return <AlertTriangle className="w-5 h-5 text-amber-600" />;
+        return <AlertTriangle className="w-5 h-5 text-warning" />;
       case "opportunity":
-        return <Sparkles className="w-5 h-5 text-blue-600" />;
+        return <Sparkles className="w-5 h-5 text-primary" />;
       case "achievement":
-        return <ThumbsUp className="w-5 h-5 text-violet-600" />;
+        return <Trophy className="w-5 h-5 text-chart-4" />;
     }
   };
 
   const getBackground = (type: Insight["type"]) => {
     switch (type) {
       case "saving":
-        return "bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800";
+        return "bg-success/10 border-success/20";
       case "warning":
-        return "bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800";
+        return "bg-warning/10 border-warning/20";
       case "opportunity":
-        return "bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800";
+        return "bg-primary/10 border-primary/20";
       case "achievement":
-        return "bg-violet-50 dark:bg-violet-950/20 border-violet-200 dark:border-violet-800";
+        return "bg-chart-4/10 border-chart-4/20";
     }
   };
 
@@ -101,16 +104,16 @@ export const SmartInsights = () => {
     .reduce((acc, i) => acc + (i.potentialSavings || 0), 0);
 
   return (
-    <Card className="border-0 shadow-lg">
+    <Card className="border-border">
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-lg">
-            <div className="p-2 rounded-xl bg-gradient-to-r from-violet-500/10 to-purple-500/10">
-              <Lightbulb className="w-5 h-5 text-violet-600" />
+            <div className="p-2 rounded-xl bg-primary/10">
+              <Lightbulb className="w-5 h-5 text-primary" />
             </div>
             Insights intelligents
           </CardTitle>
-          <Badge className="bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border-0">
+          <Badge className="bg-success/10 text-success border-success/20">
             <PiggyBank className="w-3 h-3 mr-1" />
             {totalPotentialSavings}$/mois potentiel
           </Badge>
@@ -126,14 +129,14 @@ export const SmartInsights = () => {
             className={`p-4 rounded-xl border ${getBackground(insight.type)}`}
           >
             <div className="flex items-start gap-3">
-              <div className="p-2 rounded-lg bg-white dark:bg-slate-800 shadow-sm">
+              <div className="p-2 rounded-lg bg-background shadow-sm">
                 {getIcon(insight.type)}
               </div>
               <div className="flex-1">
                 <div className="flex items-start justify-between gap-2 mb-1">
                   <h4 className="font-semibold text-sm">{insight.title}</h4>
                   {insight.potentialSavings && (
-                    <Badge variant="secondary" className="shrink-0 bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border-0">
+                    <Badge variant="secondary" className="shrink-0 bg-success/10 text-success border-success/20">
                       +{insight.potentialSavings}$/mois
                     </Badge>
                   )}
