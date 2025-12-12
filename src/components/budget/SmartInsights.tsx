@@ -1,23 +1,22 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { 
   Lightbulb, 
-  TrendingUp, 
-  TrendingDown, 
-  AlertTriangle, 
-  Sparkles, 
   ArrowRight,
-  ThumbsUp,
-  ThumbsDown,
   DollarSign,
   PiggyBank,
   Trophy,
-  CreditCard,
-  Calendar
+  AlertTriangle,
+  Sparkles,
+  X,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { cn } from "@/lib/utils";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 interface Insight {
   id: string;
@@ -32,14 +31,15 @@ interface Insight {
 
 export const SmartInsights = () => {
   const navigate = useNavigate();
+  const [dismissedIds, setDismissedIds] = useState<string[]>([]);
 
-  const insights: Insight[] = [
+  const allInsights: Insight[] = [
     {
       id: "1",
       type: "saving",
-      title: "Abonnements inutilisés détectés",
-      description: "Vous avez 2 abonnements que vous n'avez pas utilisés depuis 60+ jours: Netflix, Spotify.",
-      action: "Réviser mes abonnements",
+      title: "Abonnements inutilisés",
+      description: "2 abonnements non utilisés depuis 60+ jours",
+      action: "Réviser",
       actionRoute: "/budget/analyses?section=abonnements",
       potentialSavings: 32,
       priority: "high",
@@ -47,9 +47,9 @@ export const SmartInsights = () => {
     {
       id: "2",
       type: "opportunity",
-      title: "Opportunité d'épargne automatique",
-      description: "Basé sur vos habitudes, vous pourriez épargner 150$/mois sans affecter votre style de vie.",
-      action: "Configurer l'épargne",
+      title: "Épargne automatique",
+      description: "Potentiel de 150$/mois sans impact",
+      action: "Configurer",
       actionRoute: "/budget/objectifs",
       potentialSavings: 150,
       priority: "high",
@@ -57,141 +57,149 @@ export const SmartInsights = () => {
     {
       id: "3",
       type: "warning",
-      title: "Dépenses restaurants en hausse",
-      description: "Vos dépenses restaurants ont augmenté de 45% par rapport au mois dernier.",
-      action: "Voir les détails",
+      title: "Restaurants en hausse",
+      description: "+45% vs mois dernier",
+      action: "Détails",
       actionRoute: "/budget/historique?category=restaurant",
       priority: "medium",
     },
     {
       id: "4",
       type: "achievement",
-      title: "Objectif épargne atteint!",
-      description: "Félicitations! Vous avez atteint 75% de votre objectif 'Fonds d'urgence'.",
-      action: "Voir mes objectifs",
+      title: "Objectif atteint!",
+      description: "75% du fonds d'urgence",
+      action: "Voir",
       actionRoute: "/budget/objectifs",
       priority: "low",
     },
     {
       id: "5",
       type: "saving",
-      title: "Meilleur moment pour payer",
-      description: "Payez votre carte de crédit le 25 du mois pour économiser 12$ en intérêts.",
-      action: "Gérer mes dettes",
+      title: "Optimiser paiement",
+      description: "Payez le 25 pour économiser 12$",
+      action: "Gérer",
       actionRoute: "/budget/valeur-nette",
       potentialSavings: 12,
       priority: "medium",
     },
   ];
 
+  const insights = allInsights.filter(i => !dismissedIds.includes(i.id));
+
   const getIcon = (type: Insight["type"]) => {
     switch (type) {
       case "saving":
-        return <DollarSign className="w-5 h-5 text-success" />;
+        return <DollarSign className="w-4 h-4" />;
       case "warning":
-        return <AlertTriangle className="w-5 h-5 text-warning" />;
+        return <AlertTriangle className="w-4 h-4" />;
       case "opportunity":
-        return <Sparkles className="w-5 h-5 text-primary" />;
+        return <Sparkles className="w-4 h-4" />;
       case "achievement":
-        return <Trophy className="w-5 h-5 text-chart-4" />;
+        return <Trophy className="w-4 h-4" />;
     }
   };
 
-  const getBackground = (type: Insight["type"]) => {
+  const getColors = (type: Insight["type"]) => {
     switch (type) {
       case "saving":
-        return "bg-success/10 border-success/20";
+        return "bg-primary/10 text-primary border-primary/20";
       case "warning":
-        return "bg-warning/10 border-warning/20";
+        return "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20";
       case "opportunity":
-        return "bg-primary/10 border-primary/20";
+        return "bg-violet-500/10 text-violet-600 dark:text-violet-400 border-violet-500/20";
       case "achievement":
-        return "bg-chart-4/10 border-chart-4/20";
+        return "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20";
     }
   };
 
-  const handleActionClick = (insight: Insight) => {
-    if (insight.actionRoute) {
-      navigate(insight.actionRoute);
-    }
+  const handleDismiss = (id: string) => {
+    setDismissedIds(prev => [...prev, id]);
   };
 
   const totalPotentialSavings = insights
     .filter((i) => i.potentialSavings)
     .reduce((acc, i) => acc + (i.potentialSavings || 0), 0);
 
+  if (insights.length === 0) {
+    return (
+      <div className="text-center py-6 text-muted-foreground text-sm">
+        <Lightbulb className="w-8 h-8 mx-auto mb-2 opacity-30" />
+        Aucune recommandation pour le moment
+      </div>
+    );
+  }
+
   return (
-    <Card className="border-border">
-      <CardHeader className="pb-2">
-        <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <div className="p-2 rounded-xl bg-primary/10">
-              <Lightbulb className="w-5 h-5 text-primary" />
-            </div>
-            Insights intelligents
-          </CardTitle>
-          <Badge className="bg-success/10 text-success border-success/20">
+    <div className="space-y-3">
+      {/* Header compact */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Badge variant="secondary" className="bg-primary/10 text-primary border-0 text-xs">
             <PiggyBank className="w-3 h-3 mr-1" />
-            {totalPotentialSavings}$/mois potentiel
+            {totalPotentialSavings}$/mois
           </Badge>
         </div>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {insights.map((insight, index) => (
-          <motion.div
-            key={insight.id}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: index * 0.1 }}
-            className={`p-4 rounded-xl border ${getBackground(insight.type)}`}
-          >
-            <div className="flex items-start gap-3">
-              <div className="p-2 rounded-lg bg-background shadow-sm">
-                {getIcon(insight.type)}
-              </div>
-              <div className="flex-1">
-                <div className="flex items-start justify-between gap-2 mb-1">
-                  <h4 className="font-semibold text-sm">{insight.title}</h4>
-                  {insight.potentialSavings && (
-                    <Badge variant="secondary" className="shrink-0 bg-success/10 text-success border-success/20">
-                      +{insight.potentialSavings}$/mois
-                    </Badge>
-                  )}
-                </div>
-                <p className="text-sm text-muted-foreground mb-3">
-                  {insight.description}
-                </p>
-                {insight.action && (
-                  <Button 
-                    size="sm" 
-                    variant="ghost" 
-                    className="h-8 px-3 gap-1"
-                    onClick={() => handleActionClick(insight)}
-                  >
-                    {insight.action}
-                    <ArrowRight className="w-3 h-3" />
-                  </Button>
-                )}
-              </div>
-            </div>
-          </motion.div>
-        ))}
+        <span className="text-xs text-muted-foreground">{insights.length} conseil(s)</span>
+      </div>
 
-        {/* Feedback section */}
-        <div className="flex items-center justify-center gap-4 pt-4 border-t">
-          <span className="text-sm text-muted-foreground">Ces conseils sont-ils utiles?</span>
-          <div className="flex gap-2">
-            <Button variant="ghost" size="sm" className="gap-1">
-              <ThumbsUp className="w-4 h-4" />
-              Oui
-            </Button>
-            <Button variant="ghost" size="sm" className="gap-1">
-              <ThumbsDown className="w-4 h-4" />
-              Non
-            </Button>
-          </div>
+      {/* Scrollable insights */}
+      <ScrollArea className="w-full">
+        <div className="flex gap-3 pb-2">
+          <AnimatePresence mode="popLayout">
+            {insights.map((insight) => (
+              <motion.div
+                key={insight.id}
+                layout
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9, x: -20 }}
+                className={cn(
+                  "relative flex-shrink-0 w-[260px] p-4 rounded-xl border transition-all hover:shadow-md",
+                  getColors(insight.type)
+                )}
+              >
+                {/* Dismiss button */}
+                <button
+                  onClick={() => handleDismiss(insight.id)}
+                  className="absolute top-2 right-2 p-1 rounded-full hover:bg-background/50 transition-colors opacity-60 hover:opacity-100"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+
+                <div className="flex items-start gap-3">
+                  <div className="p-2 rounded-lg bg-background/80 shadow-sm">
+                    {getIcon(insight.type)}
+                  </div>
+                  <div className="flex-1 min-w-0 pr-4">
+                    <h4 className="font-semibold text-sm truncate">{insight.title}</h4>
+                    <p className="text-xs opacity-80 line-clamp-2 mt-0.5">
+                      {insight.description}
+                    </p>
+                    {insight.action && (
+                      <Button 
+                        size="sm" 
+                        variant="ghost" 
+                        className="h-7 px-2 gap-1 mt-2 text-xs -ml-2"
+                        onClick={() => insight.actionRoute && navigate(insight.actionRoute)}
+                      >
+                        {insight.action}
+                        <ArrowRight className="w-3 h-3" />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+
+                {insight.potentialSavings && (
+                  <Badge className="absolute bottom-3 right-3 bg-background/80 text-foreground border-0 text-[10px]">
+                    +{insight.potentialSavings}$
+                  </Badge>
+                )}
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </div>
-      </CardContent>
-    </Card>
+        <ScrollBar orientation="horizontal" />
+      </ScrollArea>
+    </div>
   );
 };

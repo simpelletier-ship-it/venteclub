@@ -186,174 +186,133 @@ export const ExpensesByCategory = ({ transactions, categories, onAnalyze }: Expe
 
   return (
     <>
-      <Card className="shadow-lg">
-        <CardHeader>
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
-              <CardTitle className="text-xl flex items-center gap-2">
-                <PieChartIcon className="h-5 w-5 text-primary" />
-                Dépenses par catégorie
-              </CardTitle>
-              <CardDescription>
-                {hasData ? `${formatPrice(totalExpenses)} total` : '0 $ dépensé'}
-              </CardDescription>
-            </div>
-            <div className="flex items-center gap-2">
-              <ToggleGroup type="single" value={chartType} onValueChange={(v) => v && setChartType(v)}>
-                <ToggleGroupItem value="pie" aria-label="Graphique circulaire">
-                  <PieChartIcon className="h-4 w-4" />
-                </ToggleGroupItem>
-                <ToggleGroupItem value="bar" aria-label="Graphique à bandes">
-                  <BarChart3 className="h-4 w-4" />
-                </ToggleGroupItem>
-              </ToggleGroup>
-              
-              {/* Month navigation */}
-              <div className="flex items-center gap-1 bg-muted/50 rounded-md p-1">
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="h-8 w-8"
-                  onClick={goToPreviousMonth}
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-                <div className="flex items-center gap-2 px-3 min-w-[140px] justify-center">
-                  <span className="text-sm font-medium">
-                    {format(selectedMonth, 'MMMM yyyy', { locale: fr })}
-                  </span>
-                  {selectedMonth.getMonth() === new Date().getMonth() && 
-                   selectedMonth.getFullYear() === new Date().getFullYear() && (
-                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-primary/20 text-primary border border-primary/30">
-                      Actuel
-                    </span>
-                  )}
-                </div>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="h-8 w-8"
-                  onClick={goToNextMonth}
-                  disabled={selectedMonth.getMonth() === new Date().getMonth() && selectedMonth.getFullYear() === new Date().getFullYear()}
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-              </div>
-              
-              {onAnalyze && (
-                <Button variant="outline" size="sm" onClick={onAnalyze}>
-                  <TrendingUp className="mr-2 h-4 w-4" />
-                  Analyser
-                </Button>
-              )}
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          {!hasData ? (
-            <div className="flex items-center justify-center h-[300px] text-center">
-              <div className="space-y-2">
-                <LayoutGrid className="h-12 w-12 mx-auto text-muted-foreground" />
-                <p className="text-lg font-semibold">Aucune dépense</p>
-                <p className="text-sm text-muted-foreground">
-                  Aucune transaction enregistrée pour {format(selectedMonth, 'MMMM yyyy', { locale: fr })}
-                </p>
-                <div className="text-sm text-muted-foreground space-y-1 pt-4 flex flex-col items-center gap-2">
-                  <p className="flex items-center gap-2"><DollarSign className="h-4 w-4" /> Dépenses: 0 $</p>
-                  <p className="flex items-center gap-2"><TrendingUp className="h-4 w-4" /> Revenus: 0 $</p>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <>
-          <ResponsiveContainer width="100%" height={300}>
-            {chartType === "pie" ? (
-              <PieChart>
-                <Pie
-                  data={expensesByCategory}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  outerRadius={110}
-                  fill="#8884d8"
-                  dataKey="value"
-                  onClick={handleCategoryClick}
-                  onMouseEnter={(_, index) => setActiveIndex(index)}
-                  onMouseLeave={() => setActiveIndex(null)}
-                  activeIndex={activeIndex ?? undefined}
-                  activeShape={renderActiveShape}
-                  cursor="pointer"
-                >
-                  {expensesByCategory.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip content={<CustomTooltip />} />
-              </PieChart>
-            ) : (
-              <BarChart data={expensesByCategory}>
-                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                <XAxis 
-                  dataKey="name" 
-                  className="text-xs"
-                  tick={{ fill: 'currentColor' }}
-                  angle={-45}
-                  textAnchor="end"
-                  height={80}
-                />
-                <YAxis 
-                  className="text-xs"
-                  tick={{ fill: 'currentColor' }}
-                  tickFormatter={(value) => `${(value / 1000).toFixed(0)}k`}
-                />
-                <Tooltip content={<CustomTooltip />} />
-                <Legend />
-                <Bar 
-                  dataKey="value" 
-                  fill="#6366f1"
-                  onClick={handleCategoryClick}
-                  cursor="pointer"
-                  name="Dépenses"
-                >
-                  {expensesByCategory.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Bar>
-              </BarChart>
-            )}
-          </ResponsiveContainer>
-
-          {/* Legend - Clickable */}
-          {hasData && (
-          <div className="grid grid-cols-2 gap-2 mt-4">
-            {expensesByCategory.slice(0, 6).map((category) => (
-              <button
-                key={category.name}
-                onClick={() => {
-                  setSelectedCategory(category.id);
-                  setDialogOpen(true);
-                }}
-                className="flex items-center gap-2 p-2 rounded-lg hover:bg-accent/50 transition-colors text-left"
+      <div className="space-y-4">
+        {/* Header compact */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5 bg-muted/50 rounded-lg p-1">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="h-7 w-7"
+                onClick={goToPreviousMonth}
               >
-                <div
-                  className="w-4 h-4 rounded-full shrink-0"
-                  style={{ backgroundColor: category.color }}
-                />
-                <div className="flex items-center gap-1 min-w-0 flex-1">
-                  <CategoryIcon icon={category.icon} className="h-4 w-4" />
-                  <span className="text-sm font-medium truncate">{category.name}</span>
-                </div>
-                <span className="text-sm font-bold shrink-0">
-                  {formatPrice(category.value)}
-                </span>
-              </button>
-            ))}
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <span className="text-xs font-medium px-2 min-w-[100px] text-center">
+                {format(selectedMonth, 'MMM yyyy', { locale: fr })}
+              </span>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="h-7 w-7"
+                onClick={goToNextMonth}
+                disabled={selectedMonth.getMonth() === new Date().getMonth() && selectedMonth.getFullYear() === new Date().getFullYear()}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+            <ToggleGroup type="single" value={chartType} onValueChange={(v) => v && setChartType(v)} className="bg-muted/50 p-0.5 rounded-lg">
+              <ToggleGroupItem value="pie" className="h-7 w-7 p-0">
+                <PieChartIcon className="h-3.5 w-3.5" />
+              </ToggleGroupItem>
+              <ToggleGroupItem value="bar" className="h-7 w-7 p-0">
+                <BarChart3 className="h-3.5 w-3.5" />
+              </ToggleGroupItem>
+            </ToggleGroup>
           </div>
-          )}
+          <span className="text-lg font-bold text-foreground">{formatPrice(totalExpenses)}</span>
+        </div>
+
+        {!hasData ? (
+          <div className="flex items-center justify-center h-[200px] text-center">
+            <div className="space-y-2">
+              <LayoutGrid className="h-10 w-10 mx-auto text-muted-foreground/30" />
+              <p className="text-sm text-muted-foreground">Aucune dépense</p>
+            </div>
+          </div>
+        ) : (
+          <>
+            <ResponsiveContainer width="100%" height={220}>
+              {chartType === "pie" ? (
+                <PieChart>
+                  <Pie
+                    data={expensesByCategory}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    outerRadius={85}
+                    innerRadius={50}
+                    fill="#8884d8"
+                    dataKey="value"
+                    onClick={handleCategoryClick}
+                    onMouseEnter={(_, index) => setActiveIndex(index)}
+                    onMouseLeave={() => setActiveIndex(null)}
+                    activeIndex={activeIndex ?? undefined}
+                    activeShape={renderActiveShape}
+                    cursor="pointer"
+                    strokeWidth={2}
+                    stroke="hsl(var(--background))"
+                  >
+                    {expensesByCategory.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip content={<CustomTooltip />} />
+                </PieChart>
+              ) : (
+                <BarChart data={expensesByCategory} layout="vertical">
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted/30" horizontal={false} />
+                  <XAxis type="number" hide />
+                  <YAxis 
+                    type="category"
+                    dataKey="name" 
+                    className="text-[10px]"
+                    tick={{ fill: 'currentColor' }}
+                    width={70}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Bar 
+                    dataKey="value" 
+                    onClick={handleCategoryClick}
+                    cursor="pointer"
+                    radius={[0, 4, 4, 0]}
+                  >
+                    {expensesByCategory.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              )}
+            </ResponsiveContainer>
+
+            {/* Legend compact */}
+            <div className="grid grid-cols-2 gap-1.5">
+              {expensesByCategory.slice(0, 6).map((category) => (
+                <button
+                  key={category.name}
+                  onClick={() => {
+                    setSelectedCategory(category.id);
+                    setDialogOpen(true);
+                  }}
+                  className="flex items-center gap-2 p-2 rounded-lg hover:bg-muted/50 transition-colors text-left"
+                >
+                  <div
+                    className="w-2.5 h-2.5 rounded-full shrink-0"
+                    style={{ backgroundColor: category.color }}
+                  />
+                  <span className="text-xs font-medium truncate flex-1">{category.name}</span>
+                  <span className="text-xs font-semibold shrink-0 text-muted-foreground">
+                    {((category.value / totalExpenses) * 100).toFixed(0)}%
+                  </span>
+                </button>
+              ))}
+            </div>
           </>
-          )}
-        </CardContent>
-      </Card>
+        )}
+      </div>
 
       {/* Dialog showing transactions for selected category */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>

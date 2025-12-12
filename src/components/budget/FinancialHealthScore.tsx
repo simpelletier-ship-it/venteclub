@@ -1,8 +1,8 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { TrendingUp, AlertCircle, CheckCircle, Trophy, Target, Zap } from "lucide-react";
+import { Trophy, Target, Zap, CheckCircle, TrendingUp } from "lucide-react";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
+import { cn } from "@/lib/utils";
 
 interface FinancialHealthScoreProps {
   transactions: any[];
@@ -56,42 +56,15 @@ export const FinancialHealthScore = ({
   );
 
   const badges = [];
-  if (savingsRate >= 20) badges.push({ name: "Épargnant", icon: Trophy, color: "text-yellow-500" });
-  if (savingsRate >= 30) badges.push({ name: "Super Épargnant", icon: Target, color: "text-yellow-600" });
-  if (debtToAssetRatio < 30) badges.push({ name: "Faible Endettement", icon: CheckCircle, color: "text-green-500" });
-  if (emergencyFundScore >= 100) badges.push({ name: "Fonds d'Urgence", icon: Zap, color: "text-blue-500" });
-  if (diversityScore >= 66) badges.push({ name: "Revenus Diversifiés", icon: TrendingUp, color: "text-indigo-500" });
-
-  const recommendations = [];
-  if (savingsRate < 20) {
-    recommendations.push({
-      type: "warning",
-      message: "Votre taux d'épargne est inférieur à 20%. Essayez de réduire vos dépenses non-essentielles."
-    });
-  }
-  if (debtToAssetRatio > 50) {
-    recommendations.push({
-      type: "alert",
-      message: "Votre ratio dette/actifs est élevé. Priorisez le remboursement des dettes à taux d'intérêt élevé."
-    });
-  }
-  if (emergencyFundScore < 100) {
-    recommendations.push({
-      type: "info",
-      message: `Il vous manque ${(emergencyFundTarget - liquidAssets).toLocaleString('fr-CA')} $ pour atteindre votre fonds d'urgence de 3 mois.`
-    });
-  }
-  if (diversityScore < 50) {
-    recommendations.push({
-      type: "info",
-      message: "Diversifiez vos sources de revenus pour plus de stabilité financière."
-    });
-  }
+  if (savingsRate >= 20) badges.push({ name: "Épargnant", icon: Trophy, color: "text-amber-500" });
+  if (debtToAssetRatio < 30) badges.push({ name: "Faible dette", icon: CheckCircle, color: "text-primary" });
+  if (emergencyFundScore >= 100) badges.push({ name: "Fonds OK", icon: Zap, color: "text-blue-500" });
+  if (diversityScore >= 66) badges.push({ name: "Diversifié", icon: TrendingUp, color: "text-violet-500" });
 
   const getScoreColor = (score: number) => {
-    if (score >= 80) return "text-green-500";
-    if (score >= 60) return "text-yellow-500";
-    return "text-red-500";
+    if (score >= 80) return "text-primary";
+    if (score >= 60) return "text-amber-500";
+    return "text-slate-500";
   };
 
   const getScoreLabel = (score: number) => {
@@ -101,115 +74,85 @@ export const FinancialHealthScore = ({
     return "À améliorer";
   };
 
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Trophy className="h-5 w-5 text-primary" />
-          Score de Santé Financière
-        </CardTitle>
-        <CardDescription>
-          Évaluation globale de votre situation financière
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="text-center space-y-2">
-          <div className={`text-6xl font-bold ${getScoreColor(overallScore)}`}>
-            {overallScore}/100
-          </div>
-          <p className="text-lg text-muted-foreground">
-            Santé financière : {getScoreLabel(overallScore)}
-          </p>
-          <Progress value={overallScore} className="h-3" />
-        </div>
+  const getProgressColor = (score: number) => {
+    if (score >= 80) return "bg-primary";
+    if (score >= 60) return "bg-amber-500";
+    return "bg-slate-400";
+  };
 
-        {badges.length > 0 && (
-          <div>
-            <h4 className="font-semibold mb-3">🏆 Badges débloqués</h4>
-            <div className="flex flex-wrap gap-2">
-              {badges.map((badge, index) => (
-                <Badge key={index} variant="secondary" className="gap-1.5 py-1.5">
-                  <badge.icon className={`h-4 w-4 ${badge.color}`} />
+  const metrics = [
+    { label: "Épargne", value: savingsRate, tooltip: "% de revenus économisés" },
+    { label: "Dette/Actifs", value: Math.max(100 - debtToAssetRatio, 0), tooltip: "Ratio dette/actifs inversé" },
+    { label: "Fonds urgence", value: emergencyFundScore, tooltip: "Couverture 3 mois" },
+    { label: "Diversification", value: diversityScore, tooltip: "Sources de revenus" },
+  ];
+
+  return (
+    <div className="space-y-5">
+      {/* Score principal - Design premium compact */}
+      <div className="flex items-center gap-6">
+        <div className="relative">
+          <div className={cn(
+            "w-24 h-24 rounded-full flex items-center justify-center border-4",
+            overallScore >= 80 ? "border-primary/30 bg-primary/5" :
+            overallScore >= 60 ? "border-amber-500/30 bg-amber-500/5" :
+            "border-slate-400/30 bg-slate-400/5"
+          )}>
+            <div className="text-center">
+              <span className={cn("text-3xl font-bold", getScoreColor(overallScore))}>
+                {overallScore}
+              </span>
+              <span className="text-xs text-muted-foreground block">/100</span>
+            </div>
+          </div>
+        </div>
+        
+        <div className="flex-1">
+          <div className="flex items-center gap-2 mb-1">
+            <Trophy className="h-4 w-4 text-primary" />
+            <span className="font-semibold text-sm">{getScoreLabel(overallScore)}</span>
+          </div>
+          <Progress value={overallScore} className="h-2 mb-3" />
+          
+          {/* Badges compacts */}
+          {badges.length > 0 && (
+            <div className="flex flex-wrap gap-1.5">
+              {badges.slice(0, 3).map((badge, index) => (
+                <Badge key={index} variant="secondary" className="gap-1 py-0.5 px-2 text-[10px] bg-muted/50">
+                  <badge.icon className={cn("h-3 w-3", badge.color)} />
                   {badge.name}
                 </Badge>
               ))}
             </div>
-          </div>
-        )}
+          )}
+        </div>
+      </div>
 
-          <div className="space-y-3">
-            <h4 className="font-semibold">Détails du score</h4>
-            
-            <div className="space-y-2">
-              <div className="flex justify-between items-center text-sm">
-                <span className="flex items-center gap-1">
-                  Taux d'épargne
-                  <InfoTooltip content="Pourcentage de vos revenus que vous économisez chaque mois. Un taux de 20% ou plus est excellent!" />
-                </span>
-                <span className="font-medium">{savingsRate.toFixed(1)}%</span>
-              </div>
-              <Progress value={Math.min(savingsRate, 100)} className="h-2" />
+      {/* Métriques détaillées - Grid compact */}
+      <div className="grid grid-cols-2 gap-3">
+        {metrics.map((metric) => (
+          <div key={metric.label} className="p-3 rounded-xl bg-muted/30 border border-border/50">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-medium text-muted-foreground flex items-center gap-1">
+                {metric.label}
+                <InfoTooltip content={metric.tooltip} />
+              </span>
+              <span className={cn(
+                "text-sm font-bold",
+                metric.value >= 60 ? "text-primary" : metric.value >= 40 ? "text-amber-500" : "text-muted-foreground"
+              )}>
+                {metric.value.toFixed(0)}%
+              </span>
             </div>
-
-            <div className="space-y-2">
-              <div className="flex justify-between items-center text-sm">
-                <span className="flex items-center gap-1">
-                  Ratio dette/actifs
-                  <InfoTooltip content="Mesure combien vous devez par rapport à ce que vous possédez. Plus ce ratio est bas, mieux c'est! Idéalement moins de 30%." />
-                </span>
-                <span className="font-medium">{debtToAssetRatio.toFixed(1)}%</span>
-              </div>
-              <Progress value={Math.max(100 - debtToAssetRatio, 0)} className="h-2" />
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex justify-between items-center text-sm">
-                <span className="flex items-center gap-1">
-                  Fonds d'urgence
-                  <InfoTooltip content="Montant d'argent liquide disponible pour couvrir 3 mois de dépenses en cas d'imprévu (perte d'emploi, urgence médicale, etc.)" />
-                </span>
-                <span className="font-medium">{emergencyFundScore.toFixed(0)}%</span>
-              </div>
-              <Progress value={emergencyFundScore} className="h-2" />
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex justify-between items-center text-sm">
-                <span className="flex items-center gap-1">
-                  Diversification
-                  <InfoTooltip content="Nombre de sources de revenus différentes. Avoir plusieurs sources de revenus réduit le risque financier si vous perdez une source." />
-                </span>
-                <span className="font-medium">{diversityScore.toFixed(0)}%</span>
-              </div>
-              <Progress value={diversityScore} className="h-2" />
-            </div>
-          </div>
-
-        {recommendations.length > 0 && (
-          <div className="space-y-2">
-            <h4 className="font-semibold">💡 Recommandations</h4>
-            {recommendations.map((rec, index) => (
+            <div className="h-1.5 bg-muted rounded-full overflow-hidden">
               <div 
-                key={index}
-                className={`flex items-start gap-2 p-3 rounded-lg ${
-                  rec.type === 'alert' ? 'bg-red-50 dark:bg-red-950/20' :
-                  rec.type === 'warning' ? 'bg-yellow-50 dark:bg-yellow-950/20' :
-                  'bg-blue-50 dark:bg-blue-950/20'
-                }`}
-              >
-                {rec.type === 'alert' ? (
-                  <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
-                ) : rec.type === 'warning' ? (
-                  <AlertCircle className="h-5 w-5 text-yellow-500 flex-shrink-0 mt-0.5" />
-                ) : (
-                  <CheckCircle className="h-5 w-5 text-blue-500 flex-shrink-0 mt-0.5" />
-                )}
-                <p className="text-sm">{rec.message}</p>
-              </div>
-            ))}
+                className={cn("h-full rounded-full transition-all", getProgressColor(metric.value))}
+                style={{ width: `${Math.min(metric.value, 100)}%` }}
+              />
+            </div>
           </div>
-        )}
-      </CardContent>
-    </Card>
+        ))}
+      </div>
+    </div>
   );
 };
