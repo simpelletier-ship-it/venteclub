@@ -25,7 +25,8 @@ import {
   Target,
   Wallet,
   X,
-  User
+  User,
+  Heart
 } from "lucide-react";
 import { NotificationBell } from "./NotificationBell";
 import { ThemeToggle } from "./ThemeToggle";
@@ -203,6 +204,18 @@ const Header = () => {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+
+            <Button 
+              variant="ghost"
+              onClick={() => navigate("/soutien")}
+              className={cn(
+                "h-9 px-3 font-medium text-sm rounded-md text-muted-foreground hover:text-foreground hover:bg-muted gap-1.5",
+                isActive('/soutien') && "bg-muted text-foreground"
+              )}
+            >
+              <Heart className="h-4 w-4 text-pink-500" />
+              Soutenir
+            </Button>
           </div>
 
           {/* Right Side Actions */}
@@ -406,6 +419,20 @@ const Header = () => {
             >
               <Receipt className="h-4 w-4" />
               Impôt – Estimation
+            </button>
+
+            <button
+              onClick={() => {
+                navigate("/soutien");
+                setMobileMenuOpen(false);
+              }}
+              className={cn(
+                "w-full text-left px-4 py-2.5 rounded-md transition-colors text-sm font-medium flex items-center gap-2",
+                isActive('/soutien') ? "bg-muted text-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"
+              )}
+            >
+              <Heart className="h-4 w-4 text-pink-500" />
+              Soutenir
             </button>
             
             {isAdmin && (
