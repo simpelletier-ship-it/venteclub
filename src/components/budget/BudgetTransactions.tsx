@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Plus, Trash2, Search, Calendar as CalendarIcon, List, Tag as TagIcon, Pencil } from "lucide-react";
+import { Plus, Trash2, Search, Calendar as CalendarIcon, List, Tag as TagIcon, Pencil, FileText } from "lucide-react";
+import { CategoryIcon, ICON_MAP } from "./CategoryIcon";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -64,7 +65,7 @@ export const BudgetTransactions = ({ isAuthenticated }: { isAuthenticated: boole
   // States for adding custom categories
   const [categoryDialogOpen, setCategoryDialogOpen] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
-  const [newCategoryIcon, setNewCategoryIcon] = useState("📝");
+  const [newCategoryIcon, setNewCategoryIcon] = useState("file-text");
   const [newCategoryType, setNewCategoryType] = useState<'income' | 'expense'>('expense');
   const [newCategoryColor, setNewCategoryColor] = useState("#3b82f6");
   
@@ -97,22 +98,22 @@ export const BudgetTransactions = ({ isAuthenticated }: { isAuthenticated: boole
       if (!hasDefaultCategories) {
         const defaultCategories = [
           // Revenus
-          { name: "Salaire", icon: "💼", color: "#10b981", type: "income", user_id: user.id, is_custom: false },
-          { name: "Freelance", icon: "💻", color: "#06b6d4", type: "income", user_id: user.id, is_custom: false },
-          { name: "Investissements", icon: "📈", color: "#8b5cf6", type: "income", user_id: user.id, is_custom: false },
-          { name: "Autre revenu", icon: "💰", color: "#14b8a6", type: "income", user_id: user.id, is_custom: false },
+          { name: "Salaire", icon: "banknote", color: "#10b981", type: "income", user_id: user.id, is_custom: false },
+          { name: "Freelance", icon: "briefcase", color: "#06b6d4", type: "income", user_id: user.id, is_custom: false },
+          { name: "Investissements", icon: "trending-up", color: "#8b5cf6", type: "income", user_id: user.id, is_custom: false },
+          { name: "Autre revenu", icon: "coins", color: "#14b8a6", type: "income", user_id: user.id, is_custom: false },
           
           // Dépenses
-          { name: "Logement", icon: "🏠", color: "#ef4444", type: "expense", user_id: user.id, is_custom: false },
-          { name: "Alimentation", icon: "🍽️", color: "#f59e0b", type: "expense", user_id: user.id, is_custom: false },
-          { name: "Transport", icon: "🚗", color: "#3b82f6", type: "expense", user_id: user.id, is_custom: false },
-          { name: "Divertissement", icon: "🎬", color: "#ec4899", type: "expense", user_id: user.id, is_custom: false },
-          { name: "Santé", icon: "🏥", color: "#06b6d4", type: "expense", user_id: user.id, is_custom: false },
-          { name: "Éducation", icon: "📚", color: "#8b5cf6", type: "expense", user_id: user.id, is_custom: false },
-          { name: "Services publics", icon: "💡", color: "#f59e0b", type: "expense", user_id: user.id, is_custom: false },
-          { name: "Assurances", icon: "🛡️", color: "#6366f1", type: "expense", user_id: user.id, is_custom: false },
-          { name: "Vêtements", icon: "👕", color: "#ec4899", type: "expense", user_id: user.id, is_custom: false },
-          { name: "Autre dépense", icon: "💳", color: "#64748b", type: "expense", user_id: user.id, is_custom: false },
+          { name: "Logement", icon: "home", color: "#ef4444", type: "expense", user_id: user.id, is_custom: false },
+          { name: "Alimentation", icon: "utensils", color: "#f59e0b", type: "expense", user_id: user.id, is_custom: false },
+          { name: "Transport", icon: "car", color: "#3b82f6", type: "expense", user_id: user.id, is_custom: false },
+          { name: "Divertissement", icon: "film", color: "#ec4899", type: "expense", user_id: user.id, is_custom: false },
+          { name: "Santé", icon: "heart-pulse", color: "#06b6d4", type: "expense", user_id: user.id, is_custom: false },
+          { name: "Éducation", icon: "graduation-cap", color: "#8b5cf6", type: "expense", user_id: user.id, is_custom: false },
+          { name: "Services publics", icon: "lightbulb", color: "#f59e0b", type: "expense", user_id: user.id, is_custom: false },
+          { name: "Assurances", icon: "shield", color: "#6366f1", type: "expense", user_id: user.id, is_custom: false },
+          { name: "Vêtements", icon: "shirt", color: "#ec4899", type: "expense", user_id: user.id, is_custom: false },
+          { name: "Autre dépense", icon: "credit-card", color: "#64748b", type: "expense", user_id: user.id, is_custom: false },
         ];
 
         const { error: insertError } = await supabase
@@ -462,7 +463,10 @@ export const BudgetTransactions = ({ isAuthenticated }: { isAuthenticated: boole
                         <div className="px-2 py-1.5 text-sm font-semibold text-muted-foreground">Revenus</div>
                         {incomeCategories.map(cat => (
                           <SelectItem key={cat.id} value={cat.id}>
-                            {cat.icon} {cat.name}
+                            <span className="flex items-center gap-2">
+                              <CategoryIcon icon={cat.icon} color={cat.color} size="sm" />
+                              {cat.name}
+                            </span>
                           </SelectItem>
                         ))}
                       </>
@@ -472,7 +476,10 @@ export const BudgetTransactions = ({ isAuthenticated }: { isAuthenticated: boole
                         <div className="px-2 py-1.5 text-sm font-semibold text-muted-foreground">Dépenses</div>
                         {expenseCategories.map(cat => (
                           <SelectItem key={cat.id} value={cat.id}>
-                            {cat.icon} {cat.name}
+                            <span className="flex items-center gap-2">
+                              <CategoryIcon icon={cat.icon} color={cat.color} size="sm" />
+                              {cat.name}
+                            </span>
                           </SelectItem>
                         ))}
                       </>
@@ -561,7 +568,10 @@ export const BudgetTransactions = ({ isAuthenticated }: { isAuthenticated: boole
                         <div className="px-2 py-1.5 text-sm font-semibold text-muted-foreground">Revenus</div>
                         {incomeCategories.map(cat => (
                           <SelectItem key={cat.id} value={cat.id}>
-                            {cat.icon} {cat.name}
+                            <span className="flex items-center gap-2">
+                              <CategoryIcon icon={cat.icon} color={cat.color} size="sm" />
+                              {cat.name}
+                            </span>
                           </SelectItem>
                         ))}
                       </>
@@ -571,7 +581,10 @@ export const BudgetTransactions = ({ isAuthenticated }: { isAuthenticated: boole
                         <div className="px-2 py-1.5 text-sm font-semibold text-muted-foreground">Dépenses</div>
                         {expenseCategories.map(cat => (
                           <SelectItem key={cat.id} value={cat.id}>
-                            {cat.icon} {cat.name}
+                            <span className="flex items-center gap-2">
+                              <CategoryIcon icon={cat.icon} color={cat.color} size="sm" />
+                              {cat.name}
+                            </span>
                           </SelectItem>
                         ))}
                       </>
@@ -670,8 +683,8 @@ export const BudgetTransactions = ({ isAuthenticated }: { isAuthenticated: boole
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Tout</SelectItem>
-                <SelectItem value="income">💰 Revenus</SelectItem>
-                <SelectItem value="expense">💳 Dépenses</SelectItem>
+                <SelectItem value="income">Revenus</SelectItem>
+                <SelectItem value="expense">Dépenses</SelectItem>
               </SelectContent>
             </Select>
             {tags.length > 0 && (
@@ -709,10 +722,10 @@ export const BudgetTransactions = ({ isAuthenticated }: { isAuthenticated: boole
                 >
                   <div className="flex items-center gap-3 flex-1">
                     <div
-                      className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shrink-0"
+                      className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
                       style={{ backgroundColor: transaction.category?.color + '20' }}
                     >
-                      {transaction.category?.icon || '💳'}
+                      <CategoryIcon icon={transaction.category?.icon} color={transaction.category?.color} size="lg" />
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="font-semibold text-base">{transaction.category?.name || 'Sans catégorie'}</p>

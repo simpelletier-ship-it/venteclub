@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Plus, TrendingDown, Zap, Sparkles, Check, ChevronsUpDown, Settings, Pin, PinOff, GripVertical, Calendar as CalendarIcon, Pencil, Rocket } from "lucide-react";
+import { Plus, TrendingDown, Zap, Sparkles, Check, ChevronsUpDown, Settings, Pin, PinOff, GripVertical, Calendar as CalendarIcon, Pencil, Rocket, X, DollarSign, FolderOpen, Search, Wallet, Banknote } from "lucide-react";
+import { CategoryIcon, ICON_MAP } from "./CategoryIcon";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,7 +36,13 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-const EMOJI_OPTIONS = ['🍔', '🚗', '🏠', '💡', '🎮', '👕', '📱', '💊', '🎓', '✈️', '🎬', '☕', '🛒', '🏋️', '📚'];
+// Professional Lucide icon options for categories
+const ICON_OPTIONS = [
+  'utensils', 'car', 'home', 'lightbulb', 'gamepad-2', 'shirt', 'smartphone', 'pill',
+  'graduation-cap', 'plane', 'film', 'coffee', 'shopping-cart', 'dumbbell', 'book',
+  'heart-pulse', 'gift', 'paw-print', 'sparkles', 'box', 'briefcase', 'banknote',
+  'trending-up', 'coins', 'building', 'wifi', 'tv', 'music', 'beer', 'baby'
+];
 const COLOR_OPTIONS = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6', '#8b5cf6', '#ec4899', '#64748b'];
 
 // AI-powered category suggestions based on description
@@ -101,11 +108,11 @@ const SortableCategoryItem = ({
       </div>
       
       <div className="flex items-center gap-3 flex-1">
-        <div 
-          className="w-10 h-10 rounded-full flex items-center justify-center text-xl"
+      <div 
+          className="w-10 h-10 rounded-lg flex items-center justify-center"
           style={{ backgroundColor: category.color + '20' }}
         >
-          {category.icon}
+          <CategoryIcon icon={category.icon} color={category.color} size="lg" />
         </div>
         <div>
           <div className="font-medium">{category.name}</div>
@@ -159,7 +166,7 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
   const [newCategoryOpen, setNewCategoryOpen] = useState(false);
   const [editPinnedOpen, setEditPinnedOpen] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
-  const [newCategoryIcon, setNewCategoryIcon] = useState("🍔");
+  const [newCategoryIcon, setNewCategoryIcon] = useState("utensils");
   const [newCategoryColor, setNewCategoryColor] = useState("#3b82f6");
   const [transactionDate, setTransactionDate] = useState<Date>(new Date());
   const [editCategoryOpen, setEditCategoryOpen] = useState(false);
@@ -393,7 +400,7 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
       setSelectedCategory(newCategory.id);
       setNewCategoryOpen(false);
       setNewCategoryName("");
-      setNewCategoryIcon("🍔");
+      setNewCategoryIcon("utensils");
       setNewCategoryColor("#3b82f6");
     },
     onError: (error: any) => {
@@ -491,8 +498,12 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
     <Card className="shadow-lg" id="quick-expense-tracker">
        <CardHeader className="pb-2 pt-4">
         <div className="flex items-center justify-between" id="transaction-type">
-          <CardTitle className="text-xl">
-            {transactionType === 'expense' ? '💸 Nouvelle dépense' : '💰 Nouveau revenu'}
+          <CardTitle className="text-xl flex items-center gap-2">
+            {transactionType === 'expense' ? (
+              <><TrendingDown className="h-5 w-5 text-destructive" /> Nouvelle dépense</>
+            ) : (
+              <><Banknote className="h-5 w-5 text-success" /> Nouveau revenu</>
+            )}
           </CardTitle>
           <div className="flex gap-1.5">
             <Button
@@ -504,8 +515,10 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
                 setSelectedCategory("");
                 setSuggestedCategory(null);
               }}
+              className="gap-1.5"
             >
-              💸 Dépense
+              <TrendingDown className="h-4 w-4" />
+              Dépense
             </Button>
             <Button
               type="button"
@@ -516,8 +529,10 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
                 setSelectedCategory("");
                 setSuggestedCategory(null);
               }}
+              className="gap-1.5"
             >
-              💰 Revenu
+              <Banknote className="h-4 w-4" />
+              Revenu
             </Button>
           </div>
         </div>
@@ -525,8 +540,9 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
       <CardContent className="pt-2">
         <div className="space-y-2.5">
           <div id="amount-input">
-            <Label className="text-sm font-medium mb-1.5 block">
-              💰 Combien?
+            <Label className="text-sm font-medium mb-1.5 flex items-center gap-1.5">
+              <DollarSign className="h-4 w-4 text-muted-foreground" />
+              Combien?
             </Label>
             <div className="relative">
               <CurrencyInput 
@@ -552,8 +568,9 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
           
           <div id="category-buttons">
             <div className="flex items-center justify-between mb-1.5">
-              <Label className="text-sm font-medium">
-                📂 Pour quoi?
+              <Label className="text-sm font-medium flex items-center gap-1.5">
+                <FolderOpen className="h-4 w-4 text-muted-foreground" />
+                Pour quoi?
               </Label>
               <Button
                 variant="ghost"
@@ -573,10 +590,12 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
                   key={cat.id}
                   type="button"
                   variant={selectedCategory === cat.id ? "default" : "outline"}
-                  className="h-14 flex flex-col gap-0.5 text-sm p-1"
+                  className="h-14 flex flex-col gap-1 text-sm p-1"
                   onClick={() => setSelectedCategory(cat.id)}
                 >
-                  <span className="text-xl">{cat.icon}</span>
+                  <div className="w-6 h-6 flex items-center justify-center">
+                    <CategoryIcon icon={cat.icon} color={selectedCategory === cat.id ? undefined : cat.color} size="lg" />
+                  </div>
                   <span className="text-[10px] leading-tight">{cat.name}</span>
                 </Button>
               ))}
@@ -587,9 +606,9 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
-                className="w-full h-9 text-sm"
+                className="w-full h-9 text-sm gap-1.5"
               >
-                <span className="text-base mr-1.5">🔍</span>
+                <Search className="h-4 w-4" />
                 Autre catégorie...
               </Button>
             </PopoverTrigger>
@@ -616,10 +635,14 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
                               (selectedCategory || suggestedCategory) === cat.id ? "opacity-100" : "opacity-0"
                             )}
                           />
-                          <span className="mr-2 text-lg">{cat.icon}</span>
+                          <div className="mr-2 w-5 h-5 flex items-center justify-center">
+                            <CategoryIcon icon={cat.icon} color={cat.color} size="md" />
+                          </div>
                           <span className="font-medium">{cat.name}</span>
                           {suggestedCategory === cat.id && !selectedCategory && (
-                            <span className="ml-2 text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">Suggéré ✨</span>
+                            <span className="ml-2 text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full flex items-center gap-1">
+                              <Sparkles className="h-3 w-3" /> Suggéré
+                            </span>
                           )}
                         </div>
                         <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -678,8 +701,9 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
           </div>
 
           <div id="date-picker">
-            <Label className="text-sm font-medium mb-1.5 block">
-              📅 Quand?
+            <Label className="text-sm font-medium mb-1.5 flex items-center gap-1.5">
+              <CalendarIcon className="h-4 w-4 text-muted-foreground" />
+              Quand?
             </Label>
             <Popover>
               <PopoverTrigger asChild>
@@ -707,8 +731,9 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
           </div>
           
           <div id="description-input">
-            <Label className="text-sm font-medium mb-1.5 block">
-              📝 Détails (facultatif)
+            <Label className="text-sm font-medium mb-1.5 flex items-center gap-1.5">
+              <Pencil className="h-4 w-4 text-muted-foreground" />
+              Détails (facultatif)
             </Label>
             <div className="relative">
               <Input
@@ -726,7 +751,7 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
                     <Command>
                       <CommandList>
                         <CommandEmpty>Aucune suggestion.</CommandEmpty>
-                        <CommandGroup heading="💡 Descriptions récentes">
+                        <CommandGroup heading="Descriptions récentes">
                           {previousDescriptions
                             .filter(desc => desc.toLowerCase().includes(description.toLowerCase()))
                             .slice(0, 10)
@@ -753,7 +778,7 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
             </div>
             {suggestedCategory && (
               <div className="text-xs bg-primary/10 text-primary px-2 py-1.5 rounded-md mt-1.5 flex items-center gap-1.5">
-                <span>✨</span>
+                <Sparkles className="h-3 w-3" />
                 <span className="font-medium">
                   {categories.find(c => c.id === suggestedCategory)?.name}
                 </span>
@@ -786,16 +811,16 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
 
                 <div className="space-y-2">
                   <Label>Icône</Label>
-                  <div className="grid grid-cols-8 gap-2">
-                    {EMOJI_OPTIONS.map((emoji) => (
+                  <div className="grid grid-cols-6 gap-2">
+                    {ICON_OPTIONS.map((iconKey) => (
                       <Button
-                        key={emoji}
+                        key={iconKey}
                         type="button"
-                        variant={newCategoryIcon === emoji ? "default" : "outline"}
-                        className="h-10 w-10 p-0 text-xl"
-                        onClick={() => setNewCategoryIcon(emoji)}
+                        variant={newCategoryIcon === iconKey ? "default" : "outline"}
+                        className="h-10 w-10 p-0 flex items-center justify-center"
+                        onClick={() => setNewCategoryIcon(iconKey)}
                       >
-                        {emoji}
+                        <CategoryIcon icon={iconKey} size="md" />
                       </Button>
                     ))}
                   </div>
@@ -906,16 +931,16 @@ export const QuickExpenseTracker = ({ isAuthenticated }: { isAuthenticated: bool
 
                   <div className="space-y-2">
                     <Label>Icône</Label>
-                    <div className="grid grid-cols-8 gap-2">
-                      {EMOJI_OPTIONS.map((emoji) => (
+                    <div className="grid grid-cols-6 gap-2">
+                      {ICON_OPTIONS.map((iconKey) => (
                         <Button
-                          key={emoji}
+                          key={iconKey}
                           type="button"
-                          variant={editingCategory.icon === emoji ? "default" : "outline"}
-                          className="h-10 w-10 p-0 text-xl"
-                          onClick={() => setEditingCategory({ ...editingCategory, icon: emoji })}
+                          variant={editingCategory.icon === iconKey ? "default" : "outline"}
+                          className="h-10 w-10 p-0 flex items-center justify-center"
+                          onClick={() => setEditingCategory({ ...editingCategory, icon: iconKey })}
                         >
-                          {emoji}
+                          <CategoryIcon icon={iconKey} size="md" />
                         </Button>
                       ))}
                     </div>
