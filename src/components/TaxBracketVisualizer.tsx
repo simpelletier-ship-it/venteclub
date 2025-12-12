@@ -167,7 +167,7 @@ export const TaxBracketVisualizer = ({
         {/* Slider de revenu */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-foreground">Revenu imposable</span>
+            <span className="text-sm font-medium text-foreground">Revenu brut</span>
             <span className="text-lg font-bold text-primary">{formatPrice(income)}</span>
           </div>
           <Slider
@@ -283,11 +283,12 @@ export const TaxBracketVisualizer = ({
             </div>
             
             {/* Barre de progression Québec - Entièrement bleue */}
-            <div className="relative h-8 rounded-lg overflow-hidden flex">
+            <div className="relative h-8 rounded-lg overflow-hidden flex w-full">
               {QUEBEC_BRACKETS.map((bracket, i) => {
-                const width = bracket.max === Infinity 
-                  ? 25 
-                  : ((bracket.max - bracket.min) / 300000) * 100;
+                const totalRange = 300000;
+                const bracketEnd = bracket.max === Infinity ? totalRange : Math.min(bracket.max, totalRange);
+                const bracketStart = bracket.min;
+                const width = ((bracketEnd - bracketStart) / totalRange) * 100;
                 const isActive = currentIncome >= bracket.min && (bracket.max === Infinity || currentIncome < bracket.max);
                 
                 return (
@@ -296,10 +297,10 @@ export const TaxBracketVisualizer = ({
                       <div 
                         className={cn(
                           bracket.color,
-                          "h-full flex items-center justify-center text-xs font-medium text-white cursor-pointer transition-all",
+                          "h-full flex items-center justify-center text-xs font-medium text-white cursor-pointer transition-all flex-shrink-0",
                           isActive && "ring-2 ring-white ring-inset"
                         )}
-                        style={{ width: `${width}%`, minWidth: '50px' }}
+                        style={{ width: `${width}%` }}
                       >
                         {bracket.rate}%
                       </div>
@@ -341,11 +342,12 @@ export const TaxBracketVisualizer = ({
             </div>
             
             {/* Barre de progression Fédéral - Entièrement rouge */}
-            <div className="relative h-8 rounded-lg overflow-hidden flex">
+            <div className="relative h-8 rounded-lg overflow-hidden flex w-full">
               {FEDERAL_BRACKETS.map((bracket, i) => {
-                const width = bracket.max === Infinity 
-                  ? 20 
-                  : ((bracket.max - bracket.min) / 300000) * 100;
+                const totalRange = 300000;
+                const bracketEnd = bracket.max === Infinity ? totalRange : Math.min(bracket.max, totalRange);
+                const bracketStart = bracket.min;
+                const width = ((bracketEnd - bracketStart) / totalRange) * 100;
                 const isActive = currentIncome >= bracket.min && (bracket.max === Infinity || currentIncome < bracket.max);
                 
                 return (
@@ -354,10 +356,10 @@ export const TaxBracketVisualizer = ({
                       <div 
                         className={cn(
                           bracket.color,
-                          "h-full flex items-center justify-center text-xs font-medium text-white cursor-pointer transition-all",
+                          "h-full flex items-center justify-center text-xs font-medium text-white cursor-pointer transition-all flex-shrink-0",
                           isActive && "ring-2 ring-white ring-inset"
                         )}
-                        style={{ width: `${width}%`, minWidth: '40px' }}
+                        style={{ width: `${width}%` }}
                       >
                         {bracket.rate}%
                       </div>
@@ -400,21 +402,22 @@ export const TaxBracketVisualizer = ({
             </div>
             
             {/* Barre de progression Combiné - Gris */}
-            <div className="relative h-8 rounded-lg overflow-hidden flex">
+            <div className="relative h-8 rounded-lg overflow-hidden flex w-full">
               {COMBINED_BRACKETS.map((bracket, i) => {
-                const width = bracket.max === Infinity 
-                  ? 20 
-                  : ((bracket.max - bracket.min) / 300000) * 100;
+                const totalRange = 300000;
+                const bracketEnd = bracket.max === Infinity ? totalRange : Math.min(bracket.max, totalRange);
+                const bracketStart = bracket.min;
+                const width = ((bracketEnd - bracketStart) / totalRange) * 100;
                 const isActive = currentIncome >= bracket.min && (bracket.max === Infinity || currentIncome < bracket.max);
                 
                 // Couleurs grises progressives
                 const grayColors = [
                   "bg-slate-400",
-                  "bg-slate-450",
                   "bg-slate-500",
-                  "bg-slate-550",
+                  "bg-slate-500",
                   "bg-slate-600",
-                  "bg-slate-650",
+                  "bg-slate-600",
+                  "bg-slate-700",
                   "bg-slate-700",
                   "bg-slate-800"
                 ];
@@ -425,10 +428,10 @@ export const TaxBracketVisualizer = ({
                       <div 
                         className={cn(
                           grayColors[i] || "bg-slate-600",
-                          "h-full flex items-center justify-center text-xs font-medium text-white cursor-pointer transition-all",
+                          "h-full flex items-center justify-center text-xs font-medium text-white cursor-pointer transition-all flex-shrink-0",
                           isActive && "ring-2 ring-white ring-inset"
                         )}
-                        style={{ width: `${Math.max(width, 8)}%`, minWidth: '35px' }}
+                        style={{ width: `${width}%` }}
                       >
                         {bracket.combinedRate.toFixed(1)}%
                       </div>
