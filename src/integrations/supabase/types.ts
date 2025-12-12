@@ -685,10 +685,7 @@ export type Database = {
           rental_units: Json | null
           royalty_percentage: number | null
           sale_type: Database["public"]["Enums"]["sale_type"] | null
-          seller_email: string | null
           seller_id: string
-          seller_name: string | null
-          seller_phone: string | null
           slug: string
           sold_at: string | null
           source_url: string | null
@@ -747,10 +744,7 @@ export type Database = {
           rental_units?: Json | null
           royalty_percentage?: number | null
           sale_type?: Database["public"]["Enums"]["sale_type"] | null
-          seller_email?: string | null
           seller_id: string
-          seller_name?: string | null
-          seller_phone?: string | null
           slug: string
           sold_at?: string | null
           source_url?: string | null
@@ -809,10 +803,7 @@ export type Database = {
           rental_units?: Json | null
           royalty_percentage?: number | null
           sale_type?: Database["public"]["Enums"]["sale_type"] | null
-          seller_email?: string | null
           seller_id?: string
-          seller_name?: string | null
-          seller_phone?: string | null
           slug?: string
           sold_at?: string | null
           source_url?: string | null
