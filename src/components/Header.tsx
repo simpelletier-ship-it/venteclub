@@ -147,21 +147,26 @@ const Header = () => {
               <DropdownMenuContent align="start" className="w-56 rounded-md border border-border bg-card">
                 <DropdownMenuItem onClick={() => navigate("/budget")} className="cursor-pointer py-2.5 text-sm">
                   <Wallet className="mr-2 h-4 w-4 text-muted-foreground" />
+                  Tableau de bord
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => navigate("/budget/planifier")} className="cursor-pointer py-2.5 text-sm">
+                  <Target className="mr-2 h-4 w-4 text-muted-foreground" />
                   Mon budget
                   <span className="ml-auto text-xs text-muted-foreground">Planifier</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate("/budget/historique")} className="cursor-pointer py-2.5 text-sm">
+                <DropdownMenuItem onClick={() => navigate("/budget/depenses")} className="cursor-pointer py-2.5 text-sm">
                   <Receipt className="mr-2 h-4 w-4 text-muted-foreground" />
                   Mes dépenses
                   <span className="ml-auto text-xs text-muted-foreground">Suivre</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => navigate("/budget/valeur-nette")} className="cursor-pointer py-2.5 text-sm">
-                  <Target className="mr-2 h-4 w-4 text-muted-foreground" />
+                  <Lightbulb className="mr-2 h-4 w-4 text-muted-foreground" />
                   Ma valeur nette
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => navigate("/budget/analyses")} className="cursor-pointer py-2.5 text-sm">
-                  <Lightbulb className="mr-2 h-4 w-4 text-muted-foreground" />
+                  <History className="mr-2 h-4 w-4 text-muted-foreground" />
                   Analyses & conseils
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -299,23 +304,37 @@ const Header = () => {
               }}
               className={cn(
                 "w-full text-left px-4 py-2.5 rounded-md transition-colors text-sm font-medium flex items-center gap-2",
-                isActive('/budget') && !isActive('/budget/historique') && !isActive('/budget/valeur-nette') && !isActive('/budget/analyses')
+                isActive('/budget') && !isActive('/budget/planifier') && !isActive('/budget/depenses') && !isActive('/budget/valeur-nette') && !isActive('/budget/analyses')
                   ? "bg-muted text-foreground" 
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
               )}
             >
               <Wallet className="h-4 w-4" />
+              Tableau de bord
+            </button>
+
+            <button
+              onClick={() => {
+                navigate("/budget/planifier");
+                setMobileMenuOpen(false);
+              }}
+              className={cn(
+                "w-full text-left px-4 py-2.5 rounded-md transition-colors text-sm font-medium flex items-center gap-2",
+                isActive('/budget/planifier') ? "bg-muted text-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"
+              )}
+            >
+              <Target className="h-4 w-4" />
               Mon budget
             </button>
 
             <button
               onClick={() => {
-                navigate("/budget/historique");
+                navigate("/budget/depenses");
                 setMobileMenuOpen(false);
               }}
               className={cn(
                 "w-full text-left px-4 py-2.5 rounded-md transition-colors text-sm font-medium flex items-center gap-2",
-                isActive('/budget/historique') ? "bg-muted text-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                isActive('/budget/depenses') ? "bg-muted text-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"
               )}
             >
               <Receipt className="h-4 w-4" />
@@ -332,7 +351,7 @@ const Header = () => {
                 isActive('/budget/valeur-nette') ? "bg-muted text-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"
               )}
             >
-              <Target className="h-4 w-4" />
+              <Lightbulb className="h-4 w-4" />
               Ma valeur nette
             </button>
 
@@ -346,7 +365,7 @@ const Header = () => {
                 isActive('/budget/analyses') ? "bg-muted text-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"
               )}
             >
-              <Lightbulb className="h-4 w-4" />
+              <History className="h-4 w-4" />
               Analyses & conseils
             </button>
 
