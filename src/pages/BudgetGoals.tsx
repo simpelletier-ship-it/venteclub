@@ -32,7 +32,7 @@ const BudgetGoals = () => {
   return (
     <ErrorBoundary>
       <SEO
-        title="Objectifs financiers | Budget.club"
+        title="Objectifs financiers | Vente.club"
         description="Définissez et suivez vos objectifs d'épargne et financiers."
         canonical="/budget/objectifs"
       />

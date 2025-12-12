@@ -10,7 +10,7 @@ export const Footer = () => {
           <div className="md:col-span-1">
             <Link to="/" className="inline-block mb-4">
               <span className="font-semibold text-base text-foreground">
-                Budget<span className="text-primary">.club</span>
+                Vente<span className="text-primary">.club</span>
               </span>
             </Link>
             <p className="text-sm text-muted-foreground leading-relaxed">
@@ -94,7 +94,7 @@ export const Footer = () => {
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="flex flex-col md:flex-row items-center gap-4">
               <p className="text-sm text-muted-foreground">
-                © {new Date().getFullYear()} Budget.club. Tous droits réservés.
+                © {new Date().getFullYear()} Vente.club. Tous droits réservés.
               </p>
               <div className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-success/10">
                 <Shield className="h-4 w-4 text-success" />

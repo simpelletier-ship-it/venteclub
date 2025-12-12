@@ -163,16 +163,16 @@ const TaxSimulator = () => {
         <meta property="og:title" content="Simulateur d'Impôt Québec et Fédéral 2025" />
         <meta property="og:description" content="Visualisez exactement où vous vous situez dans les tranches d'imposition et maximisez votre retour d'impôt. Outil gratuit et précis." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://budget.club/impots" />
+        <meta property="og:url" content="https://vente.club/impots" />
         
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "BreadcrumbList",
             "itemListElement": [
-              { "@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://budget.club" },
-              { "@type": "ListItem", "position": 2, "name": "Outils", "item": "https://budget.club/outils" },
-              { "@type": "ListItem", "position": 3, "name": "Simulateur d'Impôt", "item": "https://budget.club/impots" }
+              { "@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://vente.club" },
+              { "@type": "ListItem", "position": 2, "name": "Outils", "item": "https://vente.club/outils" },
+              { "@type": "ListItem", "position": 3, "name": "Simulateur d'Impôt", "item": "https://vente.club/impots" }
             ]
           })}
         </script>
@@ -183,7 +183,7 @@ const TaxSimulator = () => {
             "@type": "WebApplication",
             "name": "Simulateur d'Impôt Québec 2025",
             "description": "Simulateur complet pour visualiser vos tranches d'imposition Québec et fédéral, calculer votre retour d'impôt, et découvrir les crédits d'impôt disponibles.",
-            "url": "https://budget.club/impots",
+            "url": "https://vente.club/impots",
             "applicationCategory": "FinanceApplication",
             "operatingSystem": "Any",
             "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CAD" }

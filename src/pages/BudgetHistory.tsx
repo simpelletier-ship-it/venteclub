@@ -50,7 +50,7 @@ const BudgetHistory = () => {
   return (
     <ErrorBoundary>
       <SEO
-        title="Historique | Budget.club"
+        title="Historique | Vente.club"
         description="Consultez l'historique de toutes vos transactions financières."
         canonical="/budget/historique"
       />
