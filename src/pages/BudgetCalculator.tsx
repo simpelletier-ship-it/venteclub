@@ -1,9 +1,8 @@
-import { Helmet } from "react-helmet";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { SEO } from "@/components/SEO";
 import { BreadcrumbSchema } from "@/components/BreadcrumbSchema";
-import { Loader2, Plus, ArrowUpRight, ArrowDownRight, ChevronRight, Settings, History, PieChart, Target, Wallet, MoreHorizontal } from "lucide-react";
+import { Loader2, Plus, ArrowUpRight, ArrowDownRight, ChevronRight, History, PieChart, Target, Wallet } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
@@ -12,7 +11,6 @@ import { BudgetTransactions } from "@/components/budget/BudgetTransactions";
 import { SimpleNetWorthTracker } from "@/components/budget/SimpleNetWorthTracker";
 import { BudgetPlanner } from "@/components/budget/BudgetPlanner";
 import { FinancialGoals } from "@/components/budget/FinancialGoals";
-import { CategoryManager } from "@/components/budget/CategoryManager";
 import { QuickExpenseTracker } from "@/components/budget/QuickExpenseTrackerPro";
 import RecurringExpenses from "@/components/budget/RecurringExpenses";
 import { ExpensesByCategory } from "@/components/budget/ExpensesByCategory";
@@ -27,7 +25,6 @@ import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/priceFormat";
 import { cn } from "@/lib/utils";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 const BudgetCalculator = () => {
   const navigate = useNavigate();
@@ -170,33 +167,6 @@ const BudgetCalculator = () => {
         />
 
         <div className="min-h-screen bg-background pb-24 lg:pb-8">
-          {/* Clean Header */}
-          <header className="border-b border-border bg-card">
-            <div className="container mx-auto px-4 py-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h1 className="text-2xl font-bold">Mon Budget</h1>
-                  <p className="text-sm text-muted-foreground capitalize">{currentMonthName} 2024</p>
-                </div>
-                <Sheet>
-                  <SheetTrigger asChild>
-                    <Button variant="ghost" size="icon">
-                      <Settings className="h-5 w-5" />
-                    </Button>
-                  </SheetTrigger>
-                  <SheetContent>
-                    <SheetHeader>
-                      <SheetTitle>Paramètres</SheetTitle>
-                    </SheetHeader>
-                    <div className="mt-6 space-y-6">
-                      <CategoryManager isAuthenticated={isAuthenticated} />
-                    </div>
-                  </SheetContent>
-                </Sheet>
-              </div>
-            </div>
-          </header>
-
           <div className="container mx-auto px-4 py-6">
             <OfflineIndicator 
               isOnline={isOnline}
