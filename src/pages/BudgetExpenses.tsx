@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { SEO } from "@/components/SEO";
 import { BreadcrumbSchema } from "@/components/BreadcrumbSchema";
-import { Loader2, Plus, Receipt, TrendingUp, TrendingDown, Target, ChevronRight, CheckCircle2, AlertCircle } from "lucide-react";
+import { Loader2, Receipt } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
@@ -11,11 +11,10 @@ import { QuickExpenseTracker } from "@/components/budget/QuickExpenseTrackerPro"
 import { BudgetTransactions } from "@/components/budget/BudgetTransactions";
 import { CreateDefaultCategories } from "@/components/budget/CreateDefaultCategories";
 import { useBudgetRealtime } from "@/hooks/useBudgetRealtime";
+import { FinancialHealthScore } from "@/components/budget/FinancialHealthScore";
+import { ExpensesByCategory } from "@/components/budget/ExpensesByCategory";
+import { SmartBudgetInsights } from "@/components/budget/SmartBudgetInsights";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { formatPrice } from "@/lib/priceFormat";
-import { cn } from "@/lib/utils";
-import { Progress } from "@/components/ui/progress";
 
 const BudgetExpenses = () => {
   const navigate = useNavigate();
@@ -30,6 +29,20 @@ const BudgetExpenses = () => {
     }
   }, [loading, isAuthenticated, navigate]);
 
+  // Fetch all transactions
+  const { data: transactions = [] } = useQuery({
+    queryKey: ['budget-transactions-all'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('budget_transactions')
+        .select('*')
+        .order('transaction_date', { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: isAuthenticated,
+  });
+
   // Fetch categories
   const { data: categories = [] } = useQuery({
     queryKey: ['budget-categories'],
@@ -41,7 +54,7 @@ const BudgetExpenses = () => {
     enabled: isAuthenticated,
   });
 
-  // Fetch budget goals
+  // Fetch goals
   const { data: goals = [] } = useQuery({
     queryKey: ['budget-goals'],
     queryFn: async () => {
@@ -52,52 +65,74 @@ const BudgetExpenses = () => {
     enabled: isAuthenticated,
   });
 
-  // Fetch current month transactions
-  const { data: transactions = [] } = useQuery({
-    queryKey: ['budget-transactions-current-month'],
+  // Fetch assets
+  const { data: assets = [] } = useQuery({
+    queryKey: ['user-assets'],
     queryFn: async () => {
-      const startOfMonth = new Date();
-      startOfMonth.setDate(1);
-      startOfMonth.setHours(0, 0, 0, 0);
-      
-      const { data, error } = await supabase
-        .from('budget_transactions')
-        .select('*')
-        .gte('transaction_date', startOfMonth.toISOString().split('T')[0])
-        .order('transaction_date', { ascending: false });
+      const { data, error } = await supabase.from('user_assets').select('*');
       if (error) throw error;
       return data || [];
     },
     enabled: isAuthenticated,
   });
 
-  // Calculate budget vs actual per category
-  const expenseCategories = categories.filter(c => c.type === 'expense');
-  
-  const categoryStats = expenseCategories.map(cat => {
-    const goal = goals.find(g => g.category_id === cat.id);
-    const budget = goal ? Number(goal.monthly_limit) : 0;
-    const spent = transactions
-      .filter(t => t.category_id === cat.id && t.type === 'expense')
-      .reduce((sum, t) => sum + Number(t.amount), 0);
-    const percentage = budget > 0 ? (spent / budget) * 100 : 0;
-    const remaining = budget - spent;
-    
-    return {
-      category: cat,
-      budget,
-      spent,
-      remaining,
-      percentage,
-      isOver: spent > budget && budget > 0,
-      hasBudget: budget > 0
-    };
-  }).filter(s => s.hasBudget);
+  // Fetch debts
+  const { data: debts = [] } = useQuery({
+    queryKey: ['user-debts'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('user_debts').select('*');
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: isAuthenticated,
+  });
 
-  const totalBudget = categoryStats.reduce((sum, s) => sum + s.budget, 0);
-  const totalSpent = categoryStats.reduce((sum, s) => sum + s.spent, 0);
-  const totalRemaining = totalBudget - totalSpent;
-  const overBudgetCount = categoryStats.filter(s => s.isOver).length;
+  // Calculate monthly income/expenses
+  const { monthlyIncome, monthlyExpenses } = useMemo(() => {
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+    
+    const currentMonthTransactions = transactions.filter(t => {
+      const date = new Date(t.transaction_date);
+      return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
+    });
+
+    const income = currentMonthTransactions
+      .filter(t => t.type === 'income')
+      .reduce((sum, t) => sum + Number(t.amount), 0);
+
+    const expenses = currentMonthTransactions
+      .filter(t => t.type === 'expense')
+      .reduce((sum, t) => sum + Number(t.amount), 0);
+
+    return { monthlyIncome: income, monthlyExpenses: expenses };
+  }, [transactions]);
+
+  // Format transactions for FinancialHealthScore
+  const formattedTransactions = useMemo(() => {
+    return transactions.map(t => ({
+      ...t,
+      date: t.transaction_date,
+      amount: Number(t.amount)
+    }));
+  }, [transactions]);
+
+  // Format assets for FinancialHealthScore
+  const formattedAssets = useMemo(() => {
+    return assets.map(a => ({
+      ...a,
+      value: Number(a.value)
+    }));
+  }, [assets]);
+
+  // Format debts for FinancialHealthScore
+  const formattedDebts = useMemo(() => {
+    return debts.map(d => ({
+      ...d,
+      balance: Number(d.balance)
+    }));
+  }, [debts]);
 
   if (loading) {
     return (
@@ -146,14 +181,68 @@ const BudgetExpenses = () => {
               </div>
             </div>
 
-
             {/* Quick Add Transaction */}
             <div className="mb-6">
               <QuickExpenseTracker isAuthenticated={isAuthenticated} />
             </div>
 
+            {/* Score & Charts Row */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+              {/* Financial Health Score */}
+              <Card className="border-border">
+                <CardHeader className="pb-3 border-b border-border">
+                  <CardTitle className="text-sm font-medium">Score de santé financière</CardTitle>
+                </CardHeader>
+                <CardContent className="pt-4">
+                  <FinancialHealthScore 
+                    transactions={formattedTransactions}
+                    debts={formattedDebts}
+                    assets={formattedAssets}
+                  />
+                </CardContent>
+              </Card>
+
+              {/* Expenses by Category */}
+              <Card className="border-border">
+                <CardHeader className="pb-3 border-b border-border">
+                  <CardTitle className="text-sm font-medium">Dépenses par catégorie</CardTitle>
+                </CardHeader>
+                <CardContent className="pt-4">
+                  <ExpensesByCategory 
+                    transactions={transactions} 
+                    categories={categories}
+                  />
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Smart Insights */}
+            <div className="mb-6">
+              <Card className="border-border">
+                <CardHeader className="pb-3 border-b border-border">
+                  <CardTitle className="text-sm font-medium">Conseils personnalisés</CardTitle>
+                </CardHeader>
+                <CardContent className="pt-4">
+                  <SmartBudgetInsights 
+                    transactions={transactions}
+                    categories={categories}
+                    goals={goals}
+                    monthlyIncome={monthlyIncome}
+                    monthlyExpenses={monthlyExpenses}
+                  />
+                </CardContent>
+              </Card>
+            </div>
+
             {/* Transactions List */}
-            <BudgetTransactions isAuthenticated={isAuthenticated} />
+            <Card className="border-border">
+              <CardHeader className="pb-3 border-b border-border">
+                <CardTitle className="text-sm font-medium">Historique des transactions</CardTitle>
+              </CardHeader>
+              <CardContent className="pt-4">
+                <BudgetTransactions isAuthenticated={isAuthenticated} />
+              </CardContent>
+            </Card>
           </div>
         </div>
       </>
