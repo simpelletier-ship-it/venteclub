@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { SEO } from "@/components/SEO";
 import { BreadcrumbSchema } from "@/components/BreadcrumbSchema";
-import { Loader2, Calendar, Clock, CreditCard, PiggyBank, LineChart, Lightbulb, ReceiptText } from "lucide-react";
+import { Loader2, Calendar, Clock, CreditCard, PiggyBank, LineChart, Lightbulb, ReceiptText, TrendingDown, DollarSign } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
@@ -17,6 +17,7 @@ import { InvestmentTracker } from "@/components/budget/InvestmentTracker";
 import { FinancialProductComparison } from "@/components/budget/FinancialProductComparison";
 import { SmartInsights } from "@/components/budget/SmartInsights";
 import { SubscriptionDetector } from "@/components/budget/SubscriptionDetector";
+import { InterestAnalyzer } from "@/components/budget/InterestAnalyzer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -136,11 +137,15 @@ const BudgetAnalytics = () => {
           
           <Card className="border-border">
             <CardContent className="pt-6">
-              <Tabs defaultValue="insights" className="w-full">
-                <TabsList className="grid grid-cols-3 lg:grid-cols-6 gap-1 h-auto p-1 mb-6">
-                  <TabsTrigger value="insights" className="text-xs py-2.5 px-3 gap-1.5">
-                    <Lightbulb className="h-3.5 w-3.5" />
-                    <span className="hidden sm:inline">Insights</span>
+              <Tabs defaultValue="debts" className="w-full">
+                <TabsList className="grid grid-cols-3 lg:grid-cols-7 gap-1 h-auto p-1 mb-6">
+                  <TabsTrigger value="debts" className="text-xs py-2.5 px-3 gap-1.5">
+                    <CreditCard className="h-3.5 w-3.5" />
+                    <span className="hidden sm:inline">Dettes</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="interests" className="text-xs py-2.5 px-3 gap-1.5">
+                    <TrendingDown className="h-3.5 w-3.5" />
+                    <span className="hidden sm:inline">Intérêts</span>
                   </TabsTrigger>
                   <TabsTrigger value="subscriptions" className="text-xs py-2.5 px-3 gap-1.5">
                     <ReceiptText className="h-3.5 w-3.5" />
@@ -154,23 +159,23 @@ const BudgetAnalytics = () => {
                     <LineChart className="h-3.5 w-3.5" />
                     <span className="hidden sm:inline">Trésorerie</span>
                   </TabsTrigger>
-                  <TabsTrigger value="debts" className="text-xs py-2.5 px-3 gap-1.5">
-                    <CreditCard className="h-3.5 w-3.5" />
-                    <span className="hidden sm:inline">Dettes</span>
-                  </TabsTrigger>
                   <TabsTrigger value="savings" className="text-xs py-2.5 px-3 gap-1.5">
                     <PiggyBank className="h-3.5 w-3.5" />
                     <span className="hidden sm:inline">Épargne</span>
                   </TabsTrigger>
+                  <TabsTrigger value="age" className="text-xs py-2.5 px-3 gap-1.5">
+                    <Clock className="h-3.5 w-3.5" />
+                    <span className="hidden sm:inline">Âge argent</span>
+                  </TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="insights" className="mt-0 space-y-6">
-                  <SmartInsights />
-                  <AgeOfMoney 
-                    monthlyIncome={monthlyIncome}
-                    monthlyExpenses={monthlyExpenses}
-                    currentBalance={monthlyBalance > 0 ? monthlyBalance : 0}
-                  />
+                <TabsContent value="debts" className="mt-0 space-y-6">
+                  <DebtPayoffPlanner />
+                  <FinancialProductComparison />
+                </TabsContent>
+
+                <TabsContent value="interests" className="mt-0">
+                  <InterestAnalyzer debts={debts} />
                 </TabsContent>
 
                 <TabsContent value="subscriptions" className="mt-0">
@@ -194,14 +199,17 @@ const BudgetAnalytics = () => {
                   />
                 </TabsContent>
 
-                <TabsContent value="debts" className="mt-0 space-y-6">
-                  <DebtPayoffPlanner />
-                  <FinancialProductComparison />
-                </TabsContent>
-
                 <TabsContent value="savings" className="mt-0 space-y-6">
                   <SavingsChallenges />
                   <InvestmentTracker />
+                </TabsContent>
+
+                <TabsContent value="age" className="mt-0">
+                  <AgeOfMoney 
+                    monthlyIncome={monthlyIncome}
+                    monthlyExpenses={monthlyExpenses}
+                    currentBalance={monthlyBalance > 0 ? monthlyBalance : 0}
+                  />
                 </TabsContent>
               </Tabs>
             </CardContent>

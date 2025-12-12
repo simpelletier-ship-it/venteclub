@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { SEO } from "@/components/SEO";
 import { BreadcrumbSchema } from "@/components/BreadcrumbSchema";
-import { Loader2, TrendingUp, TrendingDown, Wallet, ArrowUpRight, ArrowDownRight, Plus, ChevronRight, Target, Calendar, Clock, CreditCard, PiggyBank, LineChart, Bell, BarChart3, Lightbulb, ReceiptText } from "lucide-react";
+import { Loader2, TrendingUp, TrendingDown, Wallet, ArrowUpRight, ArrowDownRight, Plus, ChevronRight, Target, Calendar, Clock, CreditCard, PiggyBank, LineChart, Bell, BarChart3, Lightbulb, ReceiptText, Trash2, Pencil, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
@@ -26,8 +26,11 @@ import { InvestmentTracker } from "@/components/budget/InvestmentTracker";
 import { FinancialProductComparison } from "@/components/budget/FinancialProductComparison";
 import { SmartInsights } from "@/components/budget/SmartInsights";
 import { SubscriptionDetector } from "@/components/budget/SubscriptionDetector";
+import { InterestAnalyzer } from "@/components/budget/InterestAnalyzer";
 import { CategoryIcon } from "@/components/budget/CategoryIcon";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatPrice } from "@/lib/priceFormat";
@@ -35,9 +38,29 @@ import { cn } from "@/lib/utils";
 
 const BudgetCalculator = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { user, loading } = useAuth();
   const isAuthenticated = !!user;
   const { isOnline, pendingCount, isSyncing, triggerSync } = useOfflineSync(isAuthenticated);
+
+  // Delete transaction mutation
+  const deleteTransaction = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('budget_transactions')
+        .delete()
+        .eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['budget-transactions-all'] });
+      queryClient.invalidateQueries({ queryKey: ['budget-transactions'] });
+      toast.success("Transaction supprimée");
+    },
+    onError: () => {
+      toast.error("Erreur lors de la suppression");
+    },
+  });
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -265,7 +288,7 @@ const BudgetCalculator = () => {
                   {transactions.slice(0, 5).map((t) => {
                     const category = categories.find(c => c.id === t.category_id);
                     return (
-                      <div key={t.id} className="flex items-center justify-between px-5 py-3.5 hover:bg-muted/30 transition-colors">
+                      <div key={t.id} className="flex items-center justify-between px-5 py-3.5 hover:bg-muted/30 transition-colors group">
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 rounded-md bg-muted flex items-center justify-center">
                             <CategoryIcon icon={category?.icon} size="md" />
@@ -277,12 +300,32 @@ const BudgetCalculator = () => {
                             </p>
                           </div>
                         </div>
-                        <span className={cn(
-                          "text-sm font-medium",
-                          t.type === 'income' ? "text-success" : "text-foreground"
-                        )}>
-                          {t.type === 'income' ? '+' : '-'}{formatPrice(Number(t.amount))}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className={cn(
+                            "text-sm font-medium",
+                            t.type === 'income' ? "text-success" : "text-foreground"
+                          )}>
+                            {t.type === 'income' ? '+' : '-'}{formatPrice(Number(t.amount))}
+                          </span>
+                          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="h-7 w-7 p-0"
+                              onClick={() => navigate(`/budget/historique?edit=${t.id}`)}
+                            >
+                              <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+                            </Button>
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="h-7 w-7 p-0 hover:bg-destructive/10"
+                              onClick={() => deleteTransaction.mutate(t.id)}
+                            >
+                              <X className="h-3.5 w-3.5 text-destructive" />
+                            </Button>
+                          </div>
+                        </div>
                       </div>
                     );
                   })}
@@ -292,6 +335,19 @@ const BudgetCalculator = () => {
                     </div>
                   )}
                 </div>
+              </CardContent>
+            </Card>
+
+            {/* Insights Section - Under Dashboard */}
+            <Card className="mb-6 border-border">
+              <CardHeader className="pb-2 border-b border-border">
+                <div className="flex items-center gap-2">
+                  <Lightbulb className="h-4 w-4 text-primary" />
+                  <CardTitle className="text-sm font-medium">Recommandations</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-4">
+                <SmartInsights />
               </CardContent>
             </Card>
 
