@@ -56,7 +56,6 @@ const suggestCategory = (description: string, categories: any[]) => {
   return null;
 };
 
-// Sortable Category Item Component
 const SortableCategoryItem = ({ 
   category, 
   isSelected, 
@@ -86,11 +85,7 @@ const SortableCategoryItem = ({
   };
 
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className="relative"
-    >
+    <div ref={setNodeRef} style={style} className="relative">
       {isEditMode && (
         <>
           <button
@@ -102,7 +97,7 @@ const SortableCategoryItem = ({
           <div
             {...attributes}
             {...listeners}
-            className="absolute -top-1 -left-1 z-10 w-5 h-5 rounded-full bg-muted text-muted-foreground flex items-center justify-center cursor-grab active:cursor-grabbing"
+            className="absolute -top-1 -left-1 z-10 w-5 h-5 rounded-full bg-slate-600 text-slate-300 flex items-center justify-center cursor-grab active:cursor-grabbing"
           >
             <GripVertical className="h-3 w-3" />
           </div>
@@ -113,15 +108,15 @@ const SortableCategoryItem = ({
         onClick={onSelect}
         disabled={isEditMode}
         className={cn(
-          "w-full flex flex-col items-center gap-1.5 p-3 rounded-xl transition-all",
+          "w-full flex flex-col items-center gap-1.5 p-3 rounded-xl transition-all border",
           isSelected
-            ? "bg-primary/10 ring-2 ring-primary"
-            : "bg-muted/30 hover:bg-muted/50",
+            ? "bg-emerald-500/20 border-emerald-500 ring-1 ring-emerald-500"
+            : "bg-slate-800/50 border-slate-700 hover:border-slate-600 hover:bg-slate-800",
           isEditMode && "pointer-events-none"
         )}
       >
         <span className="text-2xl">{category.icon}</span>
-        <span className="text-[10px] font-medium text-center line-clamp-1 text-muted-foreground">
+        <span className="text-[10px] font-medium text-center line-clamp-1 text-slate-400">
           {category.name}
         </span>
       </button>
@@ -143,14 +138,8 @@ export const QuickExpenseTracker = ({ isAuthenticated }: QuickExpenseTrackerProp
   const { addOfflineTransaction } = useOfflineSync(isAuthenticated);
 
   const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8,
-      },
-    }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
   const { data: categories = [] } = useQuery({
@@ -170,71 +159,49 @@ export const QuickExpenseTracker = ({ isAuthenticated }: QuickExpenseTrackerProp
 
   const updateCategoryMutation = useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: any }) => {
-      const { error } = await supabase
-        .from('budget_categories')
-        .update(updates)
-        .eq('id', id);
+      const { error } = await supabase.from('budget_categories').update(updates).eq('id', id);
       if (error) throw error;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['budget-categories'] });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['budget-categories'] }),
   });
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
-    
     if (over && active.id !== over.id) {
       const oldIndex = filteredCategories.findIndex(c => c.id === active.id);
       const newIndex = filteredCategories.findIndex(c => c.id === over.id);
-      
       const newOrder = arrayMove(filteredCategories, oldIndex, newIndex);
-      
-      // Update display_order for all reordered categories
       newOrder.forEach((cat, index) => {
-        updateCategoryMutation.mutate({
-          id: cat.id,
-          updates: { display_order: index }
-        });
+        updateCategoryMutation.mutate({ id: cat.id, updates: { display_order: index } });
       });
     }
   };
 
   const handleHideCategory = (categoryId: string) => {
-    updateCategoryMutation.mutate({
-      id: categoryId,
-      updates: { is_hidden: true }
-    });
-    toast.success("Catégorie masquée", {
-      description: "Réactivez-la dans les paramètres"
-    });
+    updateCategoryMutation.mutate({ id: categoryId, updates: { is_hidden: true } });
+    toast.success("Catégorie masquée");
   };
 
   const addMutation = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase
-        .from('budget_transactions')
-        .insert({
-          amount: parseFloat(amount),
-          category_id: selectedCategoryId,
-          description: description || null,
-          transaction_date: format(selectedDate, 'yyyy-MM-dd'),
-          type: transactionType,
-          user_id: user?.id,
-        } as any);
-
+      const { error } = await supabase.from('budget_transactions').insert({
+        amount: parseFloat(amount),
+        category_id: selectedCategoryId,
+        description: description || null,
+        transaction_date: format(selectedDate, 'yyyy-MM-dd'),
+        type: transactionType,
+        user_id: user?.id,
+      } as any);
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['budget-transactions'] });
       queryClient.invalidateQueries({ queryKey: ['budget-transactions-all'] });
       queryClient.invalidateQueries({ queryKey: ['monthly-summary-transactions'] });
-      
       const categoryName = filteredCategories.find(c => c.id === selectedCategoryId)?.name;
       toast.success(transactionType === 'expense' ? 'Dépense ajoutée' : 'Revenu ajouté', {
         description: `${amount} $ • ${categoryName}`,
       });
-      
       setAmount("");
       setDescription("");
       setSelectedCategoryId("");
@@ -248,7 +215,6 @@ export const QuickExpenseTracker = ({ isAuthenticated }: QuickExpenseTrackerProp
           transaction_date: format(selectedDate, 'yyyy-MM-dd'),
           type: transactionType,
         });
-        
         toast.success('Enregistré hors ligne');
         setAmount("");
         setDescription("");
@@ -278,166 +244,166 @@ export const QuickExpenseTracker = ({ isAuthenticated }: QuickExpenseTrackerProp
   };
 
   return (
-    <div className="bg-card border border-border rounded-2xl p-6 shadow-sm">
-      {/* Type Toggle */}
-      <div className="flex items-center justify-center gap-1 p-1 bg-muted/50 rounded-xl mb-6 max-w-xs mx-auto">
-        <button
-          onClick={() => { setTransactionType('expense'); setSelectedCategoryId(''); }}
-          className={cn(
-            "flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg font-medium text-sm transition-all",
-            transactionType === 'expense' 
-              ? "bg-red-500 text-white shadow-sm" 
-              : "text-muted-foreground hover:text-foreground"
-          )}
-        >
-          <Minus className="h-4 w-4" />
-          Dépense
-        </button>
-        <button
-          onClick={() => { setTransactionType('income'); setSelectedCategoryId(''); }}
-          className={cn(
-            "flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg font-medium text-sm transition-all",
-            transactionType === 'income' 
-              ? "bg-emerald-500 text-white shadow-sm" 
-              : "text-muted-foreground hover:text-foreground"
-          )}
-        >
-          <Plus className="h-4 w-4" />
-          Revenu
-        </button>
+    <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
+      {/* Header */}
+      <div className="bg-slate-800/50 px-6 py-4 border-b border-slate-800">
+        <h2 className="text-lg font-semibold text-white">Nouvelle transaction</h2>
       </div>
 
-      {/* Amount Input - Prominent with decimals support */}
-      <div className="text-center mb-6">
-        <CurrencyInput
-          value={amount}
-          onChange={setAmount}
-          allowDecimals={true}
-          placeholder="0,00"
-          className="text-4xl lg:text-5xl font-light h-16 text-center border-0 bg-transparent focus:ring-0 focus-visible:ring-0 placeholder:text-muted-foreground/30"
-        />
-      </div>
-
-      {/* Date Selector */}
-      <div className="flex justify-center mb-6">
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              size="sm"
-              className="rounded-full px-4 h-9 text-sm font-normal"
-            >
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {format(selectedDate, "d MMMM", { locale: fr })}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="center">
-            <Calendar 
-              mode="single" 
-              selected={selectedDate} 
-              onSelect={(date) => date && setSelectedDate(date)} 
-              initialFocus 
-            />
-          </PopoverContent>
-        </Popover>
-      </div>
-
-      {/* Categories Grid with Drag & Drop */}
-      <div className="mb-6">
-        <div className="flex items-center justify-between mb-3">
-          <Label className="text-sm font-medium text-muted-foreground">Catégorie</Label>
-          <div className="flex gap-2">
-            <Button
-              variant={isEditMode ? "default" : "ghost"}
-              size="sm"
-              className="h-7 text-xs"
-              onClick={() => setIsEditMode(!isEditMode)}
-            >
-              {isEditMode ? "Terminé" : "Réorganiser"}
-            </Button>
-            <Dialog open={showCategoryManager} onOpenChange={setShowCategoryManager}>
-              <DialogTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-7 text-xs text-muted-foreground">
-                  <Settings className="h-3 w-3 mr-1" />
-                  Gérer
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle>Gérer les catégories</DialogTitle>
-                  <DialogDescription>Organisez vos catégories de transactions</DialogDescription>
-                </DialogHeader>
-                <CategoryManager isAuthenticated={isAuthenticated} />
-              </DialogContent>
-            </Dialog>
-          </div>
+      <div className="p-6">
+        {/* Type Toggle */}
+        <div className="flex gap-2 p-1 bg-slate-800 rounded-xl mb-6">
+          <button
+            onClick={() => { setTransactionType('expense'); setSelectedCategoryId(''); }}
+            className={cn(
+              "flex-1 flex items-center justify-center gap-2 py-3 rounded-lg font-semibold text-sm transition-all",
+              transactionType === 'expense' 
+                ? "bg-red-500 text-white shadow-lg shadow-red-500/25" 
+                : "text-slate-400 hover:text-white"
+            )}
+          >
+            <Minus className="h-4 w-4" />
+            Dépense
+          </button>
+          <button
+            onClick={() => { setTransactionType('income'); setSelectedCategoryId(''); }}
+            className={cn(
+              "flex-1 flex items-center justify-center gap-2 py-3 rounded-lg font-semibold text-sm transition-all",
+              transactionType === 'income' 
+                ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/25" 
+                : "text-slate-400 hover:text-white"
+            )}
+          >
+            <Plus className="h-4 w-4" />
+            Revenu
+          </button>
         </div>
 
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragEnd={handleDragEnd}
-        >
-          <SortableContext
-            items={filteredCategories.map(c => c.id)}
-            strategy={rectSortingStrategy}
-          >
-            <div className="grid grid-cols-4 sm:grid-cols-5 lg:grid-cols-6 gap-2">
-              {filteredCategories.slice(0, 12).map((category) => (
-                <SortableCategoryItem
-                  key={category.id}
-                  category={category}
-                  isSelected={selectedCategoryId === category.id}
-                  onSelect={() => setSelectedCategoryId(category.id)}
-                  onHide={() => handleHideCategory(category.id)}
-                  isEditMode={isEditMode}
-                />
-              ))}
+        {/* Amount Input */}
+        <div className="text-center mb-6">
+          <CurrencyInput
+            value={amount}
+            onChange={setAmount}
+            allowDecimals={true}
+            placeholder="0,00"
+            className="text-5xl lg:text-6xl font-bold h-20 text-center border-0 bg-transparent focus:ring-0 focus-visible:ring-0 placeholder:text-slate-700 text-white"
+          />
+        </div>
+
+        {/* Date Selector */}
+        <div className="flex justify-center mb-6">
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" className="rounded-full px-5 h-10 bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700 hover:text-white">
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {format(selectedDate, "d MMMM yyyy", { locale: fr })}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0 bg-slate-900 border-slate-700" align="center">
+              <Calendar 
+                mode="single" 
+                selected={selectedDate} 
+                onSelect={(date) => date && setSelectedDate(date)} 
+                initialFocus 
+                className="bg-slate-900"
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
+
+        {/* Categories */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-3">
+            <Label className="text-sm font-medium text-slate-400">Catégorie</Label>
+            <div className="flex gap-2">
+              <Button
+                variant={isEditMode ? "default" : "ghost"}
+                size="sm"
+                className={cn(
+                  "h-7 text-xs",
+                  isEditMode ? "bg-emerald-600 hover:bg-emerald-700" : "text-slate-400 hover:text-white"
+                )}
+                onClick={() => setIsEditMode(!isEditMode)}
+              >
+                {isEditMode ? "Terminé" : "Modifier"}
+              </Button>
+              <Dialog open={showCategoryManager} onOpenChange={setShowCategoryManager}>
+                <DialogTrigger asChild>
+                  <Button variant="ghost" size="sm" className="h-7 text-xs text-slate-500 hover:text-white">
+                    <Settings className="h-3 w-3 mr-1" />
+                    Gérer
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto bg-slate-900 border-slate-700">
+                  <DialogHeader>
+                    <DialogTitle className="text-white">Gérer les catégories</DialogTitle>
+                    <DialogDescription className="text-slate-400">Organisez vos catégories de transactions</DialogDescription>
+                  </DialogHeader>
+                  <CategoryManager isAuthenticated={isAuthenticated} />
+                </DialogContent>
+              </Dialog>
             </div>
-          </SortableContext>
-        </DndContext>
-        
-        {isEditMode && (
-          <p className="text-xs text-muted-foreground text-center mt-3">
-            Glissez pour réorganiser • Cliquez sur X pour masquer
-          </p>
-        )}
-      </div>
+          </div>
 
-      {/* Description Input */}
-      <div className="mb-6">
-        <Input
-          value={description}
-          onChange={(e) => {
-            setDescription(e.target.value);
-            const suggestedId = suggestCategory(e.target.value, filteredCategories);
-            if (suggestedId && !selectedCategoryId) setSelectedCategoryId(suggestedId);
-          }}
-          placeholder="Description (optionnel)"
-          className="h-11 rounded-xl bg-muted/30 border-0 focus-visible:ring-1"
-        />
-      </div>
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            <SortableContext items={filteredCategories.map(c => c.id)} strategy={rectSortingStrategy}>
+              <div className="grid grid-cols-4 sm:grid-cols-5 lg:grid-cols-6 gap-2">
+                {filteredCategories.slice(0, 12).map((category) => (
+                  <SortableCategoryItem
+                    key={category.id}
+                    category={category}
+                    isSelected={selectedCategoryId === category.id}
+                    onSelect={() => setSelectedCategoryId(category.id)}
+                    onHide={() => handleHideCategory(category.id)}
+                    isEditMode={isEditMode}
+                  />
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
+          
+          {isEditMode && (
+            <p className="text-xs text-slate-500 text-center mt-3">
+              Glissez pour réorganiser • Cliquez sur X pour masquer
+            </p>
+          )}
+        </div>
 
-      {/* Submit Button */}
-      <Button
-        onClick={handleSubmit}
-        disabled={addMutation.isPending || !amount || amount === '0' || !selectedCategoryId}
-        className={cn(
-          "w-full h-12 text-base font-medium rounded-xl transition-all",
-          transactionType === 'expense' 
-            ? "bg-red-500 hover:bg-red-600" 
-            : "bg-emerald-500 hover:bg-emerald-600"
-        )}
-      >
-        {addMutation.isPending ? (
-          <div className="h-5 w-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-        ) : (
-          <>
-            <Check className="h-5 w-5 mr-2" />
-            {transactionType === 'expense' ? 'Ajouter la dépense' : 'Ajouter le revenu'}
-          </>
-        )}
-      </Button>
+        {/* Description */}
+        <div className="mb-6">
+          <Input
+            value={description}
+            onChange={(e) => {
+              setDescription(e.target.value);
+              const suggestedId = suggestCategory(e.target.value, filteredCategories);
+              if (suggestedId && !selectedCategoryId) setSelectedCategoryId(suggestedId);
+            }}
+            placeholder="Description (optionnel)"
+            className="h-12 rounded-xl bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus-visible:ring-emerald-500 focus-visible:border-emerald-500"
+          />
+        </div>
+
+        {/* Submit */}
+        <Button
+          onClick={handleSubmit}
+          disabled={addMutation.isPending || !amount || amount === '0' || !selectedCategoryId}
+          className={cn(
+            "w-full h-14 text-base font-semibold rounded-xl transition-all",
+            transactionType === 'expense' 
+              ? "bg-red-500 hover:bg-red-600 shadow-lg shadow-red-500/25" 
+              : "bg-emerald-500 hover:bg-emerald-600 shadow-lg shadow-emerald-500/25"
+          )}
+        >
+          {addMutation.isPending ? (
+            <div className="h-5 w-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+          ) : (
+            <>
+              <Check className="h-5 w-5 mr-2" />
+              {transactionType === 'expense' ? 'Ajouter la dépense' : 'Ajouter le revenu'}
+            </>
+          )}
+        </Button>
+      </div>
     </div>
   );
 };
